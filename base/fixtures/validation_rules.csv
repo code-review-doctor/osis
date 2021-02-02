@@ -1518,7 +1518,7 @@ Examples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>","Code d’un Parternariat de mo
 <li><b>V</b></li>
 </ul>
 Exemples: <i>LAGRO114V, LDRT100V, LFIAL100V</i>",Ex: LAGRO100V
-base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1529,7 +1529,7 @@ base.validationrule,MiniTrainingForm.DEEPENING.abbreviated_title,REQUIRED,,^[a-z
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: APPBIOL
-base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1540,7 +1540,7 @@ base.validationrule,MiniTrainingForm.SOCIETY_MINOR.abbreviated_title,REQUIRED,,^
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINDD
-base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1551,7 +1551,7 @@ base.validationrule,MiniTrainingForm.ACCESS_MINOR.abbreviated_title,REQUIRED,,^[
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINECON
-base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1562,7 +1562,7 @@ base.validationrule,MiniTrainingForm.OPEN_MINOR.abbreviated_title,REQUIRED,,^[a-
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINCULTS
-base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1573,7 +1573,7 @@ base.validationrule,MiniTrainingForm.DISCIPLINARY_COMPLEMENT_MINOR.abbreviated_t
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MINANGL
-base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1584,7 +1584,7 @@ base.validationrule,MiniTrainingForm.FSA_SPECIALITY.abbreviated_title,REQUIRED,,
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: MAJPSY
-base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
@@ -1595,7 +1595,7 @@ base.validationrule,MiniTrainingForm.OPTION.abbreviated_title,REQUIRED,,^[a-zA-Z
 	<li>chiffres: 0-9</li>
 	<li>caract&egrave;res sp&eacute;ciaux: <b>-</b>, <b>_</b> ou <b>/</b></li>
 </ul>",Ex: OPTLAFR2M1/LA
-base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.abbreviated_title,REQUIRED,,^[a-zA-Z0-9_\-\/]+$,,"Authorized characters for the acronym/short title of mini-training:
+base.validationrule,MiniTrainingForm.MOBILITY_PARTNERSHIP.abbreviated_title,REQUIRED,,"^[a-zA-Z0-9_\-\/]+$",,"Authorized characters for the acronym/short title of mini-training:
 <ul>
 	<li>letters: A-Z</li>
 	<li>numbers: 0-9</li>
