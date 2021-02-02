@@ -28,25 +28,14 @@ from datetime import datetime
 from typing import Iterable, Dict, Optional, List
 
 import attr
-from django.utils.functional import cached_property
 
 from base.models import entity_version, offer_year_entity
 from base.models.entity_version import EntityVersion, find_latest_version
-from base.models.enums.organization_type import MAIN
-
-SERVICE_COURSE = 'SERVICE_COURSE'
 
 
 def find_from_offer_year(offer_year):
     return [entity_version.get_last_version(off_year_entity.entity)
             for off_year_entity in offer_year_entity.search(offer_year=offer_year).distinct('entity')]
-
-
-def find_entity_version_according_academic_year(entity_versions, academic_year):
-    """This function can be use after a prefetech_related"""
-    return next((entity_vers for entity_vers in entity_versions
-                 if entity_vers.start_date <= academic_year.end_date and
-                 (entity_vers.end_date is None or entity_vers.end_date > academic_year.end_date)), None)
 
 
 @attr.s(frozen=True, slots=True)
@@ -73,6 +62,11 @@ class MainEntityStructure:
 
     def get_node(self, entity_id: int) -> Optional['MainEntityStructure.Node']:
         return self.nodes.get(entity_id)
+
+    def has_same_faculty(self, entity_id: int, other_entity_id: int):
+        node = self.nodes.get(entity_id)
+        another_node = self.nodes.get(other_entity_id)
+        return (node and node.faculty()) == (another_node and another_node.faculty())
 
 
 def load_main_entity_structure(date: datetime.date) -> MainEntityStructure:

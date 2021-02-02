@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
 from collections import defaultdict
 from typing import Dict, List
 
@@ -34,7 +33,7 @@ from django_filters import filters
 from base.business.entity_version import load_main_entity_structure, MainEntityStructure
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models.academic_year import AcademicYear
-from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
+from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.views.learning_units.search.common import SearchTypes
 from program_management.ddd.repositories.find_roots import find_roots_for_element_ids
@@ -102,7 +101,7 @@ def filter_borrowed_learning_units(
     )
 
     return [luy.id for luy in learning_unit_year_qs
-            if _is_borrowed_learning_unit(luy, map_element_entities, entity_structure)]
+            if _is_borrowed_course(luy, map_element_entities.get(luy.element.id, []), entity_structure)]
 
 
 def _get_faculty_entities(entity_structure: 'MainEntityStructure', faculty_borrowing_id: int) -> List[int]:
@@ -131,14 +130,11 @@ def _get_management_entity_of_roots_by_elements(
     return dict_group_year_entities_for_learning_unit_year
 
 
-def _is_borrowed_learning_unit(
-        luy: 'LearningUnitYear',
-        map_elements_entities: Dict,
+def _is_borrowed_course(
+        luy: 'LearningUnitYearQuerySet',
+        entities_using_luy: List[int],
         entity_structure: 'MainEntityStructure') -> bool:
-    luy_faculty = entity_structure.get_node(luy.learning_container_year.requirement_entity_id).faculty()
-
-    entities_using_luy = map_elements_entities.get(luy.element.id, [])
-    entities_faculties = (entity_structure.get_node(entity).faculty() for entity in entities_using_luy)
-    entities_faculties_different_from_luy_faculty = (entity_faculty for entity_faculty in entities_faculties
-                                                     if entity_faculty != luy_faculty)
-    return any(entities_faculties_different_from_luy_faculty)
+    for entity in entities_using_luy:
+        if not entity_structure.has_same_faculty(luy.learning_container_year.requirement_entity_id, entity):
+            return True
+    return False
