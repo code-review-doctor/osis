@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-02 11:03+0100\n"
+"POT-Creation-Date: 2021-02-02 11:07+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -178,9 +178,6 @@ msgstr "Procédures d'admission et d'inscription"
 
 msgid "Admission exam"
 msgstr "Concours"
-
-msgid "Adults taking up their university training"
-msgstr ""
 
 msgid "Alert Message"
 msgstr "Message d'alerte"
