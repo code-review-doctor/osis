@@ -192,7 +192,7 @@ def _find_root_trainings_using_ue(learning_unit_year: LearningUnitYear) -> List[
         for indirect_parent in direct_link.get('indirect_parents'):
             formations_using_ue.add("{} - {}".format(indirect_parent.get('node').full_acronym(),
                                                      indirect_parent.get('node').full_title()))
-    return sorted(formations_using_ue)
+    return list(sorted(formations_using_ue))
 
 
 def update_context_with_messages_update_warnings(all_messages):
