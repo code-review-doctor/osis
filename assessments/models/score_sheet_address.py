@@ -88,7 +88,7 @@ class ScoreSheetAddress(models.Model):
                 "Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
 
     def __str__(self):
-        return "{0} - {1}".format(self.offer_year, self.entity_address_choice)
+        return "{0} - {1}".format(self.education_group, self.entity_address_choice)
 
 
 def search_from_education_group_ids(education_group_ids: List[int]) -> List[ScoreSheetAddress]:

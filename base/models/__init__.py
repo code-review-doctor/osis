@@ -42,8 +42,6 @@ from base.models import proposal_learning_unit
 from base.models import session_exam
 from base.models import session_exam_calendar
 from base.models import session_exam_deadline
-from base.models import structure
-from base.models import structure_address
 from base.models import student
 from base.models import student_specific_profile
 from base.models import synchronization

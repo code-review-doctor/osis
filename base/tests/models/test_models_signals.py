@@ -28,10 +28,10 @@ from django.test import TestCase
 
 from base.models import models_signals as mdl_signals, person as mdl_person
 from base.models.person import Person
-from base.models.structure import Structure
 from base.models.tutor import Tutor
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import TutorGroupFactory, ProgramManagerGroupFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 
@@ -152,7 +152,7 @@ class AddToGroupsSignalsTest(TestCase):
         return ProgramManagerFactory(education_group=egy.education_group, person=self.person_foo)
 
     def create_test_entity_manager(self):
-        return EntityManagerFactory(person=self.person_foo, structure=Structure.objects.create(acronym="TEST"))
+        return EntityManagerFactory(person=self.person_foo, entity=EntityVersionFactory(acronym="TEST").entity)
 
     def setUp(self):
         self.user_foo = User.objects.create_user('user_foo')
