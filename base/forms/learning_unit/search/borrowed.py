@@ -135,6 +135,6 @@ def _is_borrowed_course(
         entities_using_luy: List[int],
         entity_structure: 'MainEntityStructure') -> bool:
     for entity in entities_using_luy:
-        if not entity_structure.has_same_faculty(luy.learning_container_year.requirement_entity_id, entity):
+        if not entity_structure.in_same_faculty(luy.learning_container_year.requirement_entity_id, entity):
             return True
     return False

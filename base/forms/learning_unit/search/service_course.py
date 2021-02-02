@@ -63,7 +63,7 @@ def _is_service_course(luy: 'LearningUnitYear', entity_structure: 'MainEntityStr
         return False
     if not luy.learning_container_year.allocation_entity_id:
         return False
-    return not entity_structure.has_same_faculty(
+    return not entity_structure.in_same_faculty(
         luy.learning_container_year.requirement_entity_id,
         luy.learning_container_year.allocation_entity_id
     )

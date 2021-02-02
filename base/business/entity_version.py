@@ -46,12 +46,15 @@ class MainEntityStructure:
         parent = attr.ib(type=Optional['MainEntityStructure.Node'], default=None)
         direct_children = attr.ib(type=List['MainEntityStructure.Node'], factory=list)
 
-        def faculty(self) -> 'MainEntityStructure.Node':
+        def faculty(self) -> Optional['MainEntityStructure.Node']:
             if self.entity_version.is_faculty():
                 return self
             if self.parent:
                 return self.parent.faculty()
-            return self
+            return None
+
+        def containing_faculty(self):
+            return self.faculty() or self
 
         def get_all_children(self) -> List['MainEntityStructure.Node']:
             return list(itertools.chain.from_iterable((child.get_all_children() for child in self.direct_children))) + \
@@ -63,10 +66,10 @@ class MainEntityStructure:
     def get_node(self, entity_id: int) -> Optional['MainEntityStructure.Node']:
         return self.nodes.get(entity_id)
 
-    def has_same_faculty(self, entity_id: int, other_entity_id: int):
+    def in_same_faculty(self, entity_id: int, other_entity_id: int):
         node = self.nodes.get(entity_id)
         another_node = self.nodes.get(other_entity_id)
-        return (node and node.faculty()) == (another_node and another_node.faculty())
+        return (node and node.containing_faculty()) == (another_node and another_node.containing_faculty())
 
 
 def load_main_entity_structure(date: datetime.date) -> MainEntityStructure:
