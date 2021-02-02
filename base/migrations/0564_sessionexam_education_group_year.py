@@ -51,5 +51,5 @@ class Migration(migrations.Migration):
             name='education_group_year',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear'),
         ),
-        migrations.RunPython(set_session_exam_education_group_year_field),  # TODO :: add operation to remove OfferYaer from SessionExam
+        migrations.RunPython(set_session_exam_education_group_year_field),
     ]
