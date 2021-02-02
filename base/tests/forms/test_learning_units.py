@@ -28,8 +28,6 @@ from django.test import TestCase
 import base.forms.learning_unit.search.service_course
 import base.forms.learning_unit.search.simple
 from attribution.tests.factories.attribution import AttributionNewFactory
-from base.business.learning_unit_year_with_context import is_service_course
-from base.models.entity_version import PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 from base.models.enums import entity_type
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -165,29 +163,6 @@ class TestLearningUnitForm(TestCase):
         list_lu_container_year[3].requirement_entity = list_entity_version[3].entity
         list_lu_container_year[3].allocation_entity = list_entity_version[5].entity
         list_lu_container_year[3].save()
-
-    def test_is_service_course(self):
-        self.assertTrue(
-            is_service_course(self.current_ac_year, self.list_entity_version[0], self.list_entity_version[1])
-        )
-
-    def test_is_service_course_pedagogical_exception(self):
-        exception_entity = [
-            EntityVersionFactory(
-                start_date=self.current_ac_year.start_date, end_date=self.current_ac_year.end_date,
-                acronym=acronym, entity_type=entity_type.SCHOOL
-            )
-            for acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
-        ]
-        for entity in exception_entity:
-            self.assertTrue(
-                is_service_course(self.current_ac_year, entity, self.list_entity_version[0])
-            )
-
-    def test_is_not_service_course(self):
-        self.assertFalse(
-            is_service_course(self.current_ac_year, self.list_entity_version[2], self.list_entity_version[3])
-        )
 
     def get_valid_data(self):
         return {

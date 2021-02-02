@@ -26,11 +26,9 @@
 from django import forms
 from django_filters import filters
 
-from base.business.entity import build_entity_container_prefetch
-from base.business.entity_version import SERVICE_COURSE
-from base.business.learning_unit_year_with_context import append_latest_entities
+from base.business.entity_version import MainEntityStructure, load_main_entity_structure
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models.enums import entity_container_year_link_type
+from base.models.learning_unit_year import LearningUnitYear
 from base.views.learning_units.search.common import SearchTypes
 
 
@@ -45,12 +43,13 @@ class ServiceCourseFilter(LearningUnitFilter):
 
     def filter_queryset(self, queryset):
         qs = super().filter_queryset(queryset)
-        qs = qs.prefetch_related(
-            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
-            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
-        )
 
-        for luy in qs:
-            append_latest_entities(luy, service_course_search=True)
+        academic_year = self.form.cleaned_data["academic_year"]
+        entity_structure = load_main_entity_structure(academic_year.start_date)
+        service_courses_ids = [luy.id for luy in qs if self._is_service_course(luy, entity_structure)]
+        return qs.filter(pk__in=service_courses_ids)
 
-        return qs.filter(pk__in=[lu.pk for lu in qs if lu.entities.get(SERVICE_COURSE)])
+    def _is_service_course(self, luy: 'LearningUnitYear', entity_structure: 'MainEntityStructure'):
+        requirement_faculty = entity_structure.get_node(luy.learning_container_year.requirement_entity_id).faculty()
+        allocation_faculty = entity_structure.get_node(luy.learning_container_year.allocation_entity_id).faculty()
+        return requirement_faculty != allocation_faculty
