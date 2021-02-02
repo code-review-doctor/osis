@@ -93,12 +93,12 @@ def __default_admission_condition():
             'text_en': ''
         },
         'adults_taking_up_university_training': {
-            'label_translated': _('Adults taking up their university training'),
+            'label_translated': _('Access based on validation of professional experience'),
             'text_fr': '',
             'text_en': ''
         },
         'personalized_access': {
-            'label_translated': _('Personalized access'),
+            'label_translated': _('Access based on application'),
             'text_fr': '',
             'text_en': ''
         },
@@ -259,12 +259,12 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'adults_taking_up_university_training': {
-            'label_translated': _('Adults taking up their university training'),
+            'label_translated': _('Access based on validation of professional experience'),
             'text_fr': '',
             'text_en': ''
         },
         'personalized_access': {
-            'label_translated': _('Personalized access'),
+            'label_translated': _('Access based on application'),
             'text_fr': '',
             'text_en': ''
         },
