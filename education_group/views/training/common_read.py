@@ -92,6 +92,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def has_transition_version(self) -> 'EducationGroupVersion':
         return EducationGroupVersion.objects.filter(
             root_group__acronym=self.education_group_version.root_group.acronym,
+            version_name=self.education_group_version.version_name,
             is_transition=True
         ).exists()
 
