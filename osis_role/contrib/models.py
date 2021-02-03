@@ -59,7 +59,7 @@ class RoleModelMeta(models.base.ModelBase):
 
 class RoleModel(models.Model, metaclass=RoleModelMeta):
     objects = RoleQuerySet.as_manager()
-    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='%(app_label)s_%(class)s_set')
+    person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='+')
 
     class Meta:
         abstract = True
