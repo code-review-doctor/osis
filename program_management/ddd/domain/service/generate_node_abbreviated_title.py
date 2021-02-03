@@ -29,6 +29,11 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
+DEFAULT_SPECIFIC_TITLES = {
+    GroupType.MINOR_LIST_CHOICE: 'Liste au choix mineures',
+    GroupType.OPTION_LIST_CHOICE: 'Liste au choix options'
+}
+
 
 class GenerateNodeAbbreviatedTitle(interface.DomainService):
 
@@ -44,10 +49,6 @@ class GenerateNodeAbbreviatedTitle(interface.DomainService):
 
     @classmethod
     def _get_default_title(cls, child_node_type):
-        default_specific_titles = {
-            GroupType.MINOR_LIST_CHOICE: 'Liste au choix mineures',
-            GroupType.OPTION_LIST_CHOICE: 'Liste au choix options'
-        }
-        if child_node_type in default_specific_titles.keys():
-            return default_specific_titles[child_node_type]
+        if child_node_type in DEFAULT_SPECIFIC_TITLES.keys():
+            return DEFAULT_SPECIFIC_TITLES[child_node_type]
         return FieldValidationRule.get(child_node_type, 'title_fr').initial_value
