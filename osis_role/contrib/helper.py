@@ -73,6 +73,11 @@ class EntityRoleHelper:
                 qs.append(type(s))
         return qs
 
-    @staticmethod
-    def has_role(role: EntityRoleModel, user_roles: List[EntityRoleModel]) -> bool:
-        return role in user_roles
+    @classmethod
+    def has_roles(cls, person: Person, role_cls_list: List['RoleModel']) -> bool:
+        user_roles = cls.get_all_roles(person)
+        return all(role_cls in user_roles for role_cls in role_cls_list)
+
+    @classmethod
+    def has_role(cls, person: Person, role_cls: 'RoleModel') -> bool:
+        return cls.has_roles(person, [role_cls])

@@ -159,8 +159,7 @@ class ProposalLearningUnitFilter(FilterSet):
     def __init_academic_year_field(self):
         target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
 
-        user_roles = EntityRoleHelper.get_all_roles(self.person)
-        if EntityRoleHelper.has_role(FacultyManager, user_roles):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
             target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
 
         self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
