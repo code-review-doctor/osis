@@ -48,7 +48,7 @@ def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'Pr
         override_start_year_to=cmd.override_start_year_to
     )
 
-    ## TODO: Move validation_rule to intiial credit Node
+    # TODO: Move validation_rule to initial credit Node
     validation_rule = FieldValidationRule.get(
         program_tree.root_node.node_type, 'credits', is_version=True
     )

@@ -30,8 +30,8 @@ from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_specific_version_service, postpone_program_tree_service, \
-    update_program_tree_version_service
+from program_management.ddd.service.write import postpone_tree_specific_version_service, \
+    postpone_program_tree_service, update_program_tree_version_service
 
 
 def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
