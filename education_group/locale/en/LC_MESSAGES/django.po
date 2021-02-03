@@ -675,12 +675,6 @@ msgstr ""
 msgid "Postpone will be apply on all block contact !"
 msgstr ""
 
-msgid "Postpone will be apply on all achievement block !"
-msgstr ""
-
-msgid "Postpone will be apply on all block contact !"
-msgstr ""
-
 msgid "Primary language"
 msgstr ""
 
