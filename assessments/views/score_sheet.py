@@ -50,8 +50,8 @@ def offer_score_encoding_tab(request, education_group_id):
     score_sheet_address = score_encoding_sheet.get_score_sheet_address(context.get('education_group_year'))
     entity_id_selected = score_sheet_address['entity_id_selected']
     address = score_sheet_address['address']
-    if not address.get('offer_year'):
-        address['offer_year'] = education_group_id
+    if not address.get('offer_acronym'):
+        address['offer_acronym'] = education_group_id
     form = ScoreSheetAddressForm(initial=address)
     context.update({'entity_id_selected': entity_id_selected, 'form': form})
     return render(request, "offer/score_sheet_address_tab.html", context)
