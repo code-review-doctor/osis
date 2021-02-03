@@ -341,10 +341,9 @@ class FullForm(LearningUnitBaseForm):
 
     def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
-            user_roles = EntityRoleHelper.get_all_roles(self.person)
-            if EntityRoleHelper.has_role(FacultyManager, user_roles):
+            if EntityRoleHelper.has_role(self.person, FacultyManager):
                 target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
-            elif EntityRoleHelper.has_role(CentralManager, user_roles):
+            elif EntityRoleHelper.has_role(self.person, CentralManager):
                 target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
             else:
                 target_years_opened = []
