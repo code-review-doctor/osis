@@ -125,8 +125,7 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
 
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
 
-        user_roles = EntityRoleHelper.get_all_roles(self.person)
-        if EntityRoleHelper.has_role(FacultyManager, user_roles):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
             target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
 
         self.luy_current_year = self.learning_unit_year.academic_year.year

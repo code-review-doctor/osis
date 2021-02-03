@@ -50,6 +50,8 @@ class TestRoleModel(TestCase):
         )
         cls.central_manager_for_eg = CentralManagerEGFactory(entity=cls.entity)
         cls.central_manager_for_lu = CentralManagerLUFactory(entity=cls.entity)
+        cls.central_manager_full = CentralManagerEGFactory(entity=cls.entity)
+        CentralManagerLUFactory(entity=cls.entity, person=cls.central_manager_full.person)
 
     def test_get_all_entities(self):
         cases = [
@@ -81,30 +83,70 @@ class TestRoleModel(TestCase):
                 'name': 'Central manager LU',
                 'value_to_test': EntityRoleHelper.get_all_roles(self.central_manager_for_lu.person),
                 'expected_value': [CentralManagerLU]
+            },
+            {
+                'name': 'Central manager FULL',
+                'value_to_test': EntityRoleHelper.get_all_roles(self.central_manager_full.person),
+                'expected_value': [CentralManagerLU, CentralManagerEG]
             }
         ]
 
         for case in cases:
             with self.subTest(case['name']):
-                self.assertEqual(case['value_to_test'], case['expected_value'])
+                self.assertCountEqual(case['value_to_test'], case['expected_value'])
+                for value in case['value_to_test']:
+                    self.assertIn(value, case['expected_value'])
+
+    def test_has_roles(self):
+        cases = [
+            {
+                'name': 'Central manager EG',
+                'person': self.central_manager_for_eg.person,
+                'role': [CentralManagerEG],
+                'expected_value': True
+            },
+            {
+                'name': 'Central manager LU without EG',
+                'person': self.central_manager_for_lu.person,
+                'role': [CentralManagerLU, CentralManagerEG],
+                'expected_value': False
+            },
+            {
+                'name': 'Central manager FULL',
+                'person': self.central_manager_full.person,
+                'role': [CentralManagerLU, CentralManagerEG],
+                'expected_value': True
+            }
+        ]
+        for case in cases:
+            with self.subTest(case['name']):
+                self.assertEqual(
+                    EntityRoleHelper.has_roles(case['person'], case['role']), case['expected_value']
+                )
 
     def test_has_role(self):
         cases = [
             {
                 'name': 'Central manager EG',
-                'user_roles': EntityRoleHelper.get_all_roles(self.central_manager_for_eg.person),
+                'person': self.central_manager_for_eg.person,
                 'role': CentralManagerEG,
                 'expected_value': True
             },
             {
                 'name': 'Central manager LU',
-                'user_roles': EntityRoleHelper.get_all_roles(self.central_manager_for_lu.person),
+                'person': self.central_manager_for_lu.person,
+                'role': CentralManagerLU,
+                'expected_value': True
+            },
+            {
+                'name': 'Central manager FULL with 1 role',
+                'person': self.central_manager_full.person,
                 'role': CentralManagerLU,
                 'expected_value': True
             },
             {
                 'name': 'Central manager LU with wrong value',
-                'user_roles': EntityRoleHelper.get_all_roles(self.central_manager_for_lu.person),
+                'person': self.central_manager_for_lu.person,
                 'role': CentralManagerEG,
                 'expected_value': False
             }
@@ -113,5 +155,5 @@ class TestRoleModel(TestCase):
         for case in cases:
             with self.subTest(case['name']):
                 self.assertEqual(
-                    EntityRoleHelper.has_role(case['role'], case['user_roles']), case['expected_value']
+                    EntityRoleHelper.has_role(case['person'], case['role']), case['expected_value']
                 )
