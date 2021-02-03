@@ -72,23 +72,13 @@ def get_with_context(**learning_unit_year_data):
     return learning_unit_years
 
 
-def append_latest_entities(learning_unit_yr, service_course_search=False):
+def append_latest_entities(learning_unit_yr):
     learning_unit_yr.entities = {}
 
     for link_type in entity_types.ENTITY_TYPE_LIST:
         container = learning_unit_yr.learning_container_year
         entity = container.get_entity_from_type(link_type)
         learning_unit_yr.entities[link_type] = entity.get_latest_entity_version() if entity else None
-
-    requirement_entity_version = learning_unit_yr.entities.get(entity_types.REQUIREMENT_ENTITY)
-    allocation_entity_version = learning_unit_yr.entities.get(entity_types.ALLOCATION_ENTITY)
-
-    if service_course_search:
-        learning_unit_yr.entities[business_entity_version.SERVICE_COURSE] = is_service_course(
-            learning_unit_yr.academic_year,
-            requirement_entity_version,
-            allocation_entity_version
-        )
 
     return learning_unit_yr
 
@@ -136,26 +126,6 @@ def volume_learning_component_year(learning_component_year):
         VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
         VOLUME_GLOBAL: learning_component_year.vol_global
     }
-
-
-def is_service_course(academic_year: AcademicYear,
-                      requirement_entity_version: EntityVersion,
-                      allocation_entity_version: EntityVersion) \
-        -> bool:
-    if not requirement_entity_version or not allocation_entity_version \
-            or requirement_entity_version == allocation_entity_version:
-        return False
-
-    requirement_parent_faculty = requirement_entity_version.find_faculty_version(academic_year)
-
-    if not requirement_parent_faculty:
-        return requirement_entity_version != allocation_entity_version
-
-    allocation_parent_faculty = allocation_entity_version.find_faculty_version(academic_year)
-    if not allocation_parent_faculty:
-        return True
-    else:
-        return requirement_parent_faculty != allocation_parent_faculty
 
 
 def get_learning_component_prefetch():

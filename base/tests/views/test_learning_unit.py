@@ -561,51 +561,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
-    def test_learning_units_search_with_service_course_no_result(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'ESPO',
-            'with_entity_subordinated': True
-        }
-        number_of_results = 0
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_learning_units_search_with_service_course_without_entity_subordinated(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'ELOG',
-            'with_entity_subordinated': False
-        }
-        number_of_results = 1
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_learning_units_search_with_service_course_with_entity_subordinated(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'PSP',
-            'with_entity_subordinated': True
-        }
-
-        number_of_results = 1
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'PSP',
-            'allocation_entity': 'ELOG',
-            'with_entity_subordinated': True
-        }
-        number_of_results = 0
-        self.service_course_search(filter_data, number_of_results)
-
-    def service_course_search(self, filter_data, number_of_results):
-        self._prepare_context_learning_units_search()
-        response = self.client.get(reverse("learning_units_service_course"), data=filter_data)
-
-        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
-        self.assertEqual(response.context['learning_units_count'], number_of_results)
-
     def test_learning_units_search_quadrimester(self):
         self._prepare_context_learning_units_search()
         self.luy_LBIR1100C.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.name
