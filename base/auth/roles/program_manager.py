@@ -48,7 +48,7 @@ from osis_role.contrib import predicates as osis_role_predicates
 class ProgramManagerAdmin(VersionAdmin, EducationGroupRoleModelAdmin):
     list_display = ('person', 'education_group_most_recent_acronym', 'changed',)
     raw_id_fields = ('person', 'education_group')
-    list_filter = ('education_group__educationgroupyear__academic_year',)
+    search_fields = ('education_group__educationgroupyear__acronym', 'person__first_name', 'person__last_name')
 
 
 class ProgramManager(EducationGroupRoleModel):
