@@ -137,10 +137,28 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
+    def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
+        validators_by_business_action.CopyProgramTreeValidatorList(copy_from).validate()
+        identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
+        try:
+            # Case update program tree to next year
+            program_tree_next_year = repository.get(identity_next_year)
+            program_tree_next_year.root_node = self._copy_node_and_children_to_next_year(copy_from.root_node)
+        except exception.ProgramTreeNotFoundException:
+            # Case create program tree to next year
+            root_next_year = self._copy_node_and_children_to_next_year(copy_from.root_node)
+            program_tree_next_year = ProgramTree(
+                entity_id=identity_next_year,
+                root_node=root_next_year,
+                authorized_relationships=load_authorized_relationship.load()
+            )
+        return program_tree_next_year
+
     # Do not delete : will be usefull to copy content of a program tree to next year
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
         parent_next_year = node_factory.copy_to_next_year(copy_from_node)
-        for copy_from_link in copy_from_node.children:
+        links_to_copy = (link for link in copy_from_node.children if link.child.end_date > link.child.year)
+        for copy_from_link in links_to_copy:
             child_node = copy_from_link.child
             child_next_year = self._copy_node_and_children_to_next_year(child_node)
             link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
