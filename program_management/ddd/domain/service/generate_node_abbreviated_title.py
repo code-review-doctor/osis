@@ -49,6 +49,5 @@ class GenerateNodeAbbreviatedTitle(interface.DomainService):
 
     @classmethod
     def _get_default_title(cls, child_node_type):
-        if child_node_type in DEFAULT_SPECIFIC_TITLES.keys():
-            return DEFAULT_SPECIFIC_TITLES[child_node_type]
-        return FieldValidationRule.get(child_node_type, 'title_fr').initial_value
+        return DEFAULT_SPECIFIC_TITLES.get(child_node_type) or \
+               FieldValidationRule.get(child_node_type, 'title_fr').initial_value
