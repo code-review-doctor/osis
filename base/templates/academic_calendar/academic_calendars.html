@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
-{% load static %}
-{% load i18n %}
-{% load dictionnary %}
-{% load format %}
+
+{% load static i18n dictionnary format%}
+
 {% get_current_language as LANGUAGE_CODE %}
 
 {% comment "License" %}
@@ -45,61 +44,13 @@
 <div class="panel panel-default">
   <div class="panel-body">
     <div class="row">
-      <form  method="get" action="{% url 'academic_calendars' %}" >
-        <div class="col-md-2">
-          <label for="slt_academic_year" >{% trans 'Academic year'%}</label>
-          <select class="form-control" id="slt_academic_year"  name="academic_year" value="{{ academic_year }}" onchange='this.form.submit();'>
-            {% for v in academic_years %}
-              <option value="{{ v.id }}" {% if v.id == academic_year %}selected {% endif %} >
-                  {{ v }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-md-2">
-            {% if request.user.is_superuser %}
-                <table>
-                    <tr>
-                        <td><label>{% trans "academic events" as academic_events %}{{ academic_events|title }}</label></td>
-                        <td style="padding-left: 0.5em; padding-top: 4px;">
-                            <label class="switch">
-                              <input type="checkbox" name="show_academic_events" title="{{ academic_events|title }}" onclick='this.form.submit();' {% if show_academic_events %}checked{% endif %} />
-                              <span class="slider round"></span>
-                            </label>
-                        </td>
-                    </tr>
-                </table>
-            {% else %}
-                <input type="hidden" name="show_academic_events" title="{{ academic_events|title }}" value="on" />
-            {% endif %}
-        </div>
-        <div class="col-md-8">
-            {% if request.user.is_superuser %}
-                <a href="{% url 'academic_calendar_form' %}" id="lnk_academic_calendar_create" class="btn btn-default" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
-            {% endif %}
-        </div>
-      </form>
+
     </div>
     <br>
     <div id="gantt">
-      {% if show_gantt_diagram %}
-        <div id="gantt_div"></div>
-      {% else %}
-          <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
-      {% endif %}
-    </div>
-    {% if undated_calendars_list|length > 0 %}
-      <div id="undated_calendars">
-        <br>{% trans 'Unscheduled events' %} :
-        <ul>
-          {% for calendar in undated_calendars_list %}
-            <li>
-              <a href="{% url 'academic_calendar_read' academic_calendar_id=calendar.id %}" id="lnk_academic_calendar_edit_{{calendar.id}}">{{ calendar.title }}</a>
-            </li>
-          {% endfor %}
-        </ul>
+      <div id="gantt_div">
       </div>
-    {% endif %}
+    </div>
   </div>
 </div>
 {% endblock %}
@@ -126,44 +77,31 @@
 
         gantt.config.readonly = true;
         gantt.config.columns = [
-            {name:"text", label:" ", width:"*", align: "left"},
+            {name:"text", label:" ", width:"*", align: "left", tree:true},
         ];
 
-        gantt.templates.task_text=function(start,end,task){
-            return Math.round(task.progress * 100) + '%';
-        };
-
         gantt.config.tooltip_offset_y = -20;
-        gantt.config.tooltip_hide_timeout = 2500;
-        gantt.templates.tooltip_text = function(start,end,task){
-            days = task.duration + 1; // include end_date in duration
-            if(days <= 1){
-                duration = days + " {% trans 'day'%}"
-            }
-            else{
-                duration = days + " {% trans 'days'%}"
-            }
-
-            return "<b>" + task.text + "</b><br>"
-            + formatDate(task.start_date) + " - " + formatDate(task.end_date)
-            + " (" + duration +  ") <br>"
-            + "<a href=\"{% url 'academic_calendars' %}" + task.id + "\">"
-            + "{% trans 'Details'%}</a>";
+        gantt.config.tooltip_hide_timeout = 2000;
+        gantt.templates.tooltip_text = function(start,end,row){
+           let domElem = '';
+           if (!row.divider){
+               domElem = "<b>" + row.tooltip_text + "</b><br>"
+                + formatDate(row.start_date) + " - " + formatDate(row.end_date)
+                //+ "<a href=\"{% url 'academic_calendars' %}" + task.id + "\">"
+                + "<br>{% trans 'Details'%}</a>";
+           }
+           return domElem;
         };
 
-        gantt.addMarker({
-            start_date: new Date() // this is today
+        const todayMarker = gantt.addMarker({
+            start_date: new Date(),
+            text: "{% trans "Today" %}"
         });
-
         gantt.config.autosize = "y";
+        gantt.config.scroll_on_click= false;
         gantt.init("gantt_div");
-        gantt.parse({{ academic_calendar_json|safe }},"json");
-
-        function get_release_title(d,m,y, id){
-            return "<b>" + gettext('Release') + " : " + d + "/" + m + "/" +  y + "</b>"
-                    + "<br>"
-                    + "<a href=\"{% url 'academic_calendars' %}" + id + "\">"
-                    + "{% trans 'Details'%}</a>";
-        }
+        gantt.parse({
+            'data': {{ gantt_rows|safe }}
+        }, "json");
     </script>
 {% endblock %}

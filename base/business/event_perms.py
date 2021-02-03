@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List
+from typing import List, Optional
 
 import attr
 from django.core.exceptions import PermissionDenied
@@ -46,6 +46,7 @@ class AcademicEvent:
     authorized_target_year = attr.ib(type=int)
     start_date = attr.ib(type=datetime.date)
     end_date = attr.ib(type=datetime.date)
+    type = attr.ib(type=str)
 
     def is_open_now(self) -> bool:
         """
@@ -154,12 +155,14 @@ class AcademicEventCalendarHelper(ABC):
 
 
 class AcademicEventFactory:
-    def get_academic_events(self, event_reference: str) -> List[AcademicEvent]:
-        qs = AcademicCalendar.objects.filter(
-            reference=event_reference
-        ).annotate(
-            authorized_target_year=F('data_year__year')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year')
+    def get_academic_events(self, event_reference: Optional[str] = None) -> List[AcademicEvent]:
+        qs = AcademicCalendar.objects.all()
+        if event_reference:
+            qs = qs.filter(reference=event_reference)
+        qs = qs.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('title', 'start_date', 'end_date', 'authorized_target_year', 'type')
         return [AcademicEvent(**obj) for obj in qs]
 
 
@@ -197,8 +200,9 @@ class AcademicEventSessionFactory:
             sessionexamcalendar__isnull=True
         ).annotate(
             authorized_target_year=F('data_year__year'),
+            type=F('reference'),
             session=F('sessionexamcalendar__number_session')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year', 'session')
+        ).values('title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
         return [AcademicSessionEvent(**obj) for obj in qs]
 
 
