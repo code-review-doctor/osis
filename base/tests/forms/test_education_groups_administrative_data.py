@@ -203,7 +203,6 @@ class TestAdministrativeDataForm(TestCase):
         oyc = formset_session.forms[0]._get_offer_year_calendar('scores_exam_diffusion')
         self.assertIsNone(oyc.id)
         self.assertEqual(oyc.education_group_year, education_group_yr)
-        self.assertIsNone(oyc.offer_year)
 
     def _search_offer_year_calendar(self, education_group_yr, a_reference):
         academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=1,
@@ -278,7 +277,7 @@ class TestCourseEnrollmentForm(TestCase):
 
 class TestAdditionalInfoForm(TestCase):
     def test_get_new_course_enrollment_calendar(self):
-        academic_year = AcademicYearFactory(year=2017)
+        academic_year = AcademicYearFactory(current=True)
         education_group_yr = EducationGroupYearFactory(
             academic_year=academic_year,
             weighting=True,
