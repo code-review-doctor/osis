@@ -43,8 +43,8 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
-    transition_name = attr.ib(type=str, converter=to_upper_case_converter)
     is_transition = attr.ib(type=bool)  # TODO : to remove in OSIS-5580
+    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default='')
 
     def is_standard(self):
         return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
