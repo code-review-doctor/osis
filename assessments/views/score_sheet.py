@@ -119,8 +119,8 @@ def incorrect_email_management(context_param, email_encode, education_group_id):
     entity_id_selected = dict['entity_id_selected']
     address = dict['address']
     address['email'] = email_encode
-    if not address.get('offer_year'):
-        address['offer_year'] = education_group_id
+    if not address.get('offer_acronym'):
+        address['offer_acronym'] = education_group_id
     form = ScoreSheetAddressForm(initial=address)
     form.errors['email'] = _('Enter a valid email address.')
     context.update({'form': form})
