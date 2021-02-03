@@ -40,10 +40,8 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
     LearningContainerYearModelForm
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
-from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
-    generate_learning_unit_edition_calendars
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
@@ -425,13 +423,6 @@ class TestLearningUnitVolumesManagement(TestCase):
     @classmethod
     def setUpTestData(cls):
         start_year, end_year = AcademicYearFactory.produce_in_future(quantity=2)
-        AcademicCalendarFactory(
-            data_year=start_year,
-            start_date=datetime.datetime(start_year.year - 2, 9, 15),
-            end_date=datetime.datetime(start_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
-
         cls.academic_years = [start_year, end_year]
         generate_learning_unit_edition_calendars(cls.academic_years)
 

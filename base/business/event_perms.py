@@ -36,8 +36,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
-from base.models.learning_unit_year import LearningUnitYear
 
 
 @attr.s(frozen=True, slots=True)
@@ -274,25 +272,3 @@ class EventPermClosed(EventPerm):
     @classmethod
     def get_open_academic_calendars_queryset(cls) -> QuerySet:
         return AcademicCalendar.objects.none()
-
-
-class EventPermLearningUnitFacultyManagerEdition(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-    error_msg = _("This learning unit is not editable by faculty managers during this period.")
-
-
-class EventPermLearningUnitCentralManagerEdition(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
-    error_msg = _("This learning unit is not editable by central managers during this period.")
-
-
-# TODO : gather EventPerm disregarding role
-def generate_event_perm_learning_unit_edition(person, obj=None, raise_exception=True):
-    if person.is_central_manager_for_ue:
-        return EventPermLearningUnitCentralManagerEdition(obj, raise_exception)
-    elif person.is_faculty_manager_for_ue:
-        return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
-    else:
-        return EventPermClosed(obj, raise_exception)

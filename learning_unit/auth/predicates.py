@@ -4,7 +4,6 @@ from rules import predicate
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.tutor_application import TutorApplication
-from base.business import event_perms
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.proposal_state import ProposalState
@@ -146,18 +145,6 @@ def is_learning_unit_date_container_type_editable(self, user, learning_unit_year
     if learning_unit_year:
         container = learning_unit_year.learning_container_year
         return container and container.container_type in [type.name for type in FACULTY_DATE_EDITABLE_CONTAINER_TYPES]
-    return None
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit is not editable this period."))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_learning_unit_edition_period_open(self, user, learning_unit_year):
-    if learning_unit_year:
-        for role in self.context['role_qs']:
-            return event_perms.generate_event_perm_learning_unit_edition(
-                role.person, learning_unit_year, raise_exception=False
-            ).is_open()
     return None
 
 
