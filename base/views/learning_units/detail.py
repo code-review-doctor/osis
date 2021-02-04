@@ -43,8 +43,6 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_warning_messages, add_to_session
 from osis_common.utils.models import get_object_or_none
-from django.contrib.messages import get_messages
-from base.views.learning_units.common import update_context_with_messages_update_warnings
 
 SEARCH_URL_PART = 'learning_units/by_'
 
