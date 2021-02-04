@@ -124,7 +124,8 @@ class NodeFactory:
             copied_node.remark_en = None
             copied_node.remark_fr = None
             if copied_node.node_type in GroupType:
-                copied_node.credits = None
+                default_credit = FieldValidationRule.get_initial_value_or_none(duplicate_from.node_type, 'credits')
+                copied_node.credits = default_credit
         copied_node._has_changed = True
         return copied_node
 
