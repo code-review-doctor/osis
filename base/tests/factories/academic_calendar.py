@@ -79,8 +79,8 @@ def generate_proposal_calendars(academic_years):
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.date(academic_year.year - 6,  9, 15),
-            end_date=datetime.date(academic_year.year + 1, 9, 14),
+            # start_date=datetime.date(academic_year.year - 6,  9, 15),
+            # end_date=datetime.date(academic_year.year + 1, 9, 14),
         )
         for academic_year in academic_years
     ]
@@ -88,8 +88,8 @@ def generate_proposal_calendars(academic_years):
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.date(academic_year.year - 2,  9, 15),
-            end_date=datetime.date(academic_year.year, 9, 14),
+            # start_date=datetime.date(academic_year.year - 2,  9, 15),
+            # end_date=datetime.date(academic_year.year, 9, 14),
         )
         for academic_year in academic_years
     ]
