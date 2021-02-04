@@ -30,7 +30,6 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from typing import List
 from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_year_with_context
@@ -50,7 +49,6 @@ from base.views.learning_units.common import get_learning_unit_identification_co
     get_common_context_learning_unit_year, check_formations_impacted_by_update
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
-from django.contrib.messages import get_messages
 
 
 @login_required
@@ -60,7 +58,7 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)
 
-    context = get_learning_unit_identification_context(learning_unit_year_id, person, get_messages(request))
+    context = get_learning_unit_identification_context(learning_unit_year_id, person)
 
     learning_unit_to_edit = learning_unit_year.learning_unit
     form = LearningUnitDailyManagementEndDateForm(
