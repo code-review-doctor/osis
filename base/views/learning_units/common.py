@@ -189,6 +189,6 @@ def _find_root_trainings_using_ue(learning_unit_year: LearningUnitYear) -> List[
     formations_using_ue = set()
     for direct_link in direct_parents:
         for indirect_parent in direct_link.get('indirect_parents'):
-            formations_using_ue.add("{} {}".format(indirect_parent.get('node').full_acronym(),
-                                                   build_title(indirect_parent.get('node'), get_language())))
+            formations_using_ue.add("{}{}".format(indirect_parent.get('node').full_acronym(),
+                                                  build_title(indirect_parent.get('node'), get_language())))
     return list(sorted(formations_using_ue))
