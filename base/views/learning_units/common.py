@@ -30,6 +30,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
+from django.utils.translation import get_language
 
 from base import models as mdl
 from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
@@ -47,7 +48,7 @@ from django.contrib import messages
 
 from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
-from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.node import NodeIdentity, build_title
 from program_management.serializers.program_trees_utilizations import utilizations_serializer
 
 
@@ -188,6 +189,6 @@ def _find_root_trainings_using_ue(learning_unit_year: LearningUnitYear) -> List[
     formations_using_ue = set()
     for direct_link in direct_parents:
         for indirect_parent in direct_link.get('indirect_parents'):
-            formations_using_ue.add("{} - {}".format(indirect_parent.get('node').full_acronym(),
-                                                     indirect_parent.get('node').full_title()))
+            formations_using_ue.add("{} {}".format(indirect_parent.get('node').full_acronym(),
+                                                   build_title(indirect_parent.get('node'), get_language())))
     return list(sorted(formations_using_ue))

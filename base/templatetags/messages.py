@@ -82,7 +82,7 @@ def as_messages_special_warning(context):
 
     messages_update_warning = [m.message for m in all_messages if m.tags == '']
     if messages_update_warning:
-        html = "{}<ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
+        html = "<b>{}</b><ul>".format(_('Pay attention! This learning unit is used in more than one formation'))
         for message in messages_update_warning:
             html += "<li>{}</li>".format(message)
         html += "</ul>"
