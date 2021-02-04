@@ -63,7 +63,7 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 class ProgramTreeBuilder:
 
-    def duplicate(
+    def create_and_fill_from_program_tree(
             self,
             duplicate_from: 'ProgramTree',
             duplicate_to_transition: bool,

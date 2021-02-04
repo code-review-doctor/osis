@@ -33,10 +33,11 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.validation_rule import ValidationRuleFactory
 from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
     CreateAndPostponeTrainingAndProgramTreeCommandFactory
-from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeVersionCommand, GetProgramTreeVersionFromNodeCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import get_program_tree_version_service
 from program_management.ddd.service.write import create_program_tree_transition_version_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
@@ -156,21 +157,3 @@ class TestCreateProgramTreeVersion(TestCase):
     def test_when_tree_version_standard_does_not_exist(self):
         with self.assertRaises(ProgramTreeVersionNotFoundException):
             create_program_tree_transition_version_service.create_program_tree_transition_version(self.command)
-
-    def test_assert_tree_version_correctly_created(self):
-        self._create_standard_version()
-
-        identity = create_program_tree_transition_version_service.create_program_tree_transition_version(self.command)
-
-        tree_version_created = ProgramTreeVersionRepository().get(identity)
-        tree = tree_version_created.get_tree()
-
-        self.assertEqual(tree_version_created.entity_id.offer_acronym, self.command.offer_acronym)
-        self.assertEqual(tree_version_created.entity_id.year, self.command.start_year)
-        self.assertEqual(tree_version_created.entity_id.version_name, self.command.version_name)
-        self.assertEqual(tree_version_created.entity_id.is_transition, self.command.is_transition)
-        self.assertEqual(tree_version_created.title_fr, self.command.title_fr)
-        self.assertEqual(tree_version_created.title_en, self.command.title_en)
-        self.assertEqual(tree.root_node.end_year, self.command.end_year)
-        self.assertEqual(tree_version_created.start_year, self.command.start_year)
-        self.assertEqual(tree.root_node.credits, self.credit_rule.initial_value)

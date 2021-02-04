@@ -41,7 +41,7 @@ def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'Pr
     existing_tree = ProgramTreeRepository().get(entity_id=program_tree_identity)
 
     # WHEN
-    program_tree = ProgramTreeBuilder().duplicate(
+    program_tree = ProgramTreeBuilder().create_and_fill_from_program_tree(
         duplicate_from=existing_tree,
         duplicate_to_transition=cmd.duplicate_to_transition,
         override_end_year_to=cmd.override_end_year_to,

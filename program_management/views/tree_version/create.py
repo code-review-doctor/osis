@@ -185,7 +185,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
     def person(self):
         return self.request.user.person
 
-    @functools.lru_cache()
+    @cached_property
     def get_permission_object(self) -> GroupYear:
         return get_object_or_404(
             GroupYear,

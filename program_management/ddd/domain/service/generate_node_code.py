@@ -32,6 +32,8 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
+TRANSITION_FIRST_LETTER = "T"
+
 NodeCode = str
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
@@ -50,7 +52,7 @@ class GenerateNodeCode(interface.DomainService):
             child_node_type: EducationGroupTypesEnum,
             duplicate_to_transition: bool
     ) -> NodeCode:
-        code = "T" + parent_node.code[1:] if duplicate_to_transition else parent_node.code
+        code = TRANSITION_FIRST_LETTER + parent_node.code[1:] if duplicate_to_transition else parent_node.code
         return cls.generate_node_code(code=code, child_node_type=child_node_type)
 
     @classmethod
