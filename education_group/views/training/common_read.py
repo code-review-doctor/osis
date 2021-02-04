@@ -52,10 +52,11 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.command import GetLastExistingVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import node_identity_service
+from program_management.ddd.service.read import node_identity_service, get_last_existing_version_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -89,12 +90,13 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return node_identity == self.node_identity
 
     @cached_property
-    def has_transition_version(self) -> 'EducationGroupVersion':
-        return EducationGroupVersion.objects.filter(
-            root_group__acronym=self.education_group_version.root_group.acronym,
-            version_name=self.education_group_version.version_name,
-            is_transition=True
-        ).exists()
+    def has_transition_version(self) -> 'bool':
+        cmd = GetLastExistingVersionNameCommand(
+            version_name=self.program_tree_version_identity.version_name,
+            offer_acronym=self.program_tree_version_identity.offer_acronym,
+            is_transition=self.program_tree_version_identity.is_transition
+        )
+        return bool(get_last_existing_version_service.get_last_existing_version_identity(cmd))
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':

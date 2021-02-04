@@ -122,30 +122,76 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.year = AcademicYearFactory(current=True).year
-        cls.entity_id = ProgramTreeVersionIdentityFactory(year=cls.year)
         cls.repository = ProgramTreeVersionRepository()
 
-        cls.root_group = ElementFactory(
+    def test_field_mapping_with_specific_version(self):
+        entity_id = ProgramTreeVersionIdentityFactory(year=self.year)
+        root_group = ElementFactory(
             group_year=GroupYearFactory(
-                academic_year__year=cls.entity_id.year,
+                academic_year__year=entity_id.year,
                 group__end_year=AcademicYearFactory(current=True),
             )
         ).group_year
 
-    def test_field_mapping(self):
         education_group_version_model_obj = EducationGroupVersionFactory(
-            offer__acronym=self.entity_id.offer_acronym,
-            offer__academic_year__year=self.entity_id.year,
-            version_name=self.entity_id.version_name,
-            is_transition=self.entity_id.is_transition,
-            root_group=self.root_group,
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            version_name=entity_id.version_name,
+            is_transition=entity_id.is_transition,
+            root_group=root_group,
         )
 
-        version_tree_domain_obj = self.repository.get(self.entity_id)
+        version_tree_domain_obj = self.repository.get(entity_id)
 
-        self.assertEqual(version_tree_domain_obj.entity_id, self.entity_id)
-        self.assertEqual(version_tree_domain_obj.entity_id.offer_acronym, education_group_version_model_obj.offer.acronym)
-        self.assertEqual(version_tree_domain_obj.entity_id.year, education_group_version_model_obj.offer.academic_year.year)
-        self.assertEqual(version_tree_domain_obj.entity_id.version_name, education_group_version_model_obj.version_name)
-        self.assertEqual(version_tree_domain_obj.entity_id.is_transition, education_group_version_model_obj.is_transition)
-        self.assertEqual(version_tree_domain_obj.end_year_of_existence, self.root_group.group.end_year.year)
+        self.assertEqual(version_tree_domain_obj.entity_id, entity_id)
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.offer_acronym, education_group_version_model_obj.offer.acronym
+        )
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.year, education_group_version_model_obj.offer.academic_year.year
+        )
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.version_name, education_group_version_model_obj.version_name
+        )
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.is_transition, education_group_version_model_obj.is_transition
+        )
+        self.assertEqual(
+            version_tree_domain_obj.end_year_of_existence, root_group.group.end_year.year
+        )
+
+    def test_field_mapping_with_transition_version(self):
+        entity_id = ProgramTreeVersionIdentityFactory(year=self.year, is_transition=True)
+        root_group = ElementFactory(
+            group_year=GroupYearFactory(
+                academic_year__year=entity_id.year,
+                group__end_year=AcademicYearFactory(current=True),
+            )
+        ).group_year
+
+        education_group_version_model_obj = EducationGroupVersionFactory(
+            offer__acronym=entity_id.offer_acronym,
+            offer__academic_year__year=entity_id.year,
+            version_name=entity_id.version_name,
+            is_transition=entity_id.is_transition,
+            root_group=root_group,
+        )
+
+        version_tree_domain_obj = self.repository.get(entity_id)
+
+        self.assertEqual(version_tree_domain_obj.entity_id, entity_id)
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.offer_acronym, education_group_version_model_obj.offer.acronym
+        )
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.year, education_group_version_model_obj.offer.academic_year.year
+        )
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.version_name, education_group_version_model_obj.version_name
+        )
+        self.assertEqual(
+            version_tree_domain_obj.entity_id.is_transition, education_group_version_model_obj.is_transition
+        )
+        self.assertEqual(
+            version_tree_domain_obj.end_year_of_existence, root_group.group.end_year.year
+        )

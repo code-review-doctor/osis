@@ -155,12 +155,12 @@ class TestCreateProgramTreeVersion(TestCase):
 
     def test_when_tree_version_standard_does_not_exist(self):
         with self.assertRaises(ProgramTreeVersionNotFoundException):
-            create_program_tree_transition_version_service.create_program_tree_version(self.command)
+            create_program_tree_transition_version_service.create_program_tree_transition_version(self.command)
 
     def test_assert_tree_version_correctly_created(self):
         self._create_standard_version()
 
-        identity = create_program_tree_transition_version_service.create_program_tree_version(self.command)
+        identity = create_program_tree_transition_version_service.create_program_tree_transition_version(self.command)
 
         tree_version_created = ProgramTreeVersionRepository().get(identity)
         tree = tree_version_created.get_tree()

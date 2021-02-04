@@ -29,7 +29,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 from program_management.ddd.service.write import duplicate_program_tree_service
 
 
-def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+def create_program_tree_transition_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
 
     # GIVEN
     tree_version_identity_from = ProgramTreeVersionIdentity(

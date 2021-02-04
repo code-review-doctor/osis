@@ -26,16 +26,16 @@
 from typing import List
 
 from program_management.ddd.command import CreateProgramTreeVersionCommand, PostponeProgramTreeCommand, \
-    PostponeProgramTreeTransitionVersionCommand
+    PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.write import postpone_tree_transition_version_service, \
+from program_management.ddd.service.write import postpone_tree_specific_version_service, \
     postpone_program_tree_service, create_program_tree_transition_version_service
 
 
 def create_and_postpone(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
 
-    identity = create_program_tree_transition_version_service.create_program_tree_version(command)
+    identity = create_program_tree_transition_version_service.create_program_tree_transition_version(command)
     tree_version = ProgramTreeVersionRepository().get(identity)
 
     postpone_program_tree_service.postpone_program_tree(
@@ -46,13 +46,12 @@ def create_and_postpone(command: 'CreateProgramTreeVersionCommand') -> List[Prog
         )
     )
 
-    created_identities = postpone_tree_transition_version_service.postpone_program_tree_version(
-        PostponeProgramTreeTransitionVersionCommand(
+    created_identities = postpone_tree_specific_version_service.postpone_program_tree_version(
+        PostponeProgramTreeVersionCommand(
             from_offer_acronym=identity.offer_acronym,
             from_year=identity.year,
             from_is_transition=identity.is_transition,
             from_version_name=identity.version_name,
-            from_end_year=command.end_year
         )
     )
 

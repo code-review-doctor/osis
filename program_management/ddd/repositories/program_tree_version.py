@@ -319,6 +319,8 @@ def _get_common_queryset() -> QuerySet:
                     }
                 ) & Q(
                     version_name=STANDARD
+                ) & Q(
+                    is_transition=False
                 ),
                 then=F('offer__education_group__end_year__year')
             ),
