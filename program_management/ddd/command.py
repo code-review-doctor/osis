@@ -441,7 +441,7 @@ class DeleteStandardProgramTreeCommand(interface.CommandRequest):
 class DeleteProgramTreeVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -450,7 +450,7 @@ class DeleteTrainingWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -471,7 +471,7 @@ class DeleteMiniWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
@@ -480,7 +480,7 @@ class DeleteMiniTrainingWithProgramTreeCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
     from_year = attr.ib(type=int)
 
 
