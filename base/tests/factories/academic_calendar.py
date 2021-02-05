@@ -95,6 +95,23 @@ def generate_proposal_calendars(academic_years):
     ]
 
 
+def generate_proposal_calendars_without_start_and_end_date(academic_years):
+    [
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
+            data_year=academic_year
+        )
+        for academic_year in academic_years
+    ]
+    [
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
+            data_year=academic_year
+        )
+        for academic_year in academic_years
+    ]
+
+
 def generate_learning_unit_edition_calendars(academic_years):
     [
         OpenAcademicCalendarFactory(
