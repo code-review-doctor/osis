@@ -71,7 +71,7 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
             offer_acronym=version.offer.acronym,
             year=version.offer.academic_year.year,
             version_name=version.version_name,
-            is_transition=version.is_transition
+            transition_name=version.transition_name
         )
         tree_version = ProgramTreeVersionRepository.get(version_identity)
         self.tree = tree_version.get_tree()
