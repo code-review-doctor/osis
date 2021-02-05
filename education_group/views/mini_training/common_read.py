@@ -90,7 +90,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         cmd = GetLastExistingVersionNameCommand(
             version_name=self.program_tree_version_identity.version_name,
             offer_acronym=self.program_tree_version_identity.offer_acronym,
-            is_transition=self.program_tree_version_identity.is_transition
+            is_transition=True
         )
         return bool(get_last_existing_version_service.get_last_existing_version_identity(cmd))
 

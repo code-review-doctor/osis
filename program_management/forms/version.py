@@ -90,7 +90,7 @@ class SpecificVersionForm(forms.Form):
             self.fields["version_name"],
             reverse(
                 "check_version_name",
-                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym, False]
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
             )
         )
 
@@ -163,7 +163,7 @@ class TransitionVersionForm(forms.Form):
             self.fields["version_name"],
             reverse(
                 "check_version_name",
-                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym, True]
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
             )
         )
 
