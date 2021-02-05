@@ -201,7 +201,7 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_transition(self) -> bool:
-        return self.entity_id.is_transition
+        return bool(self.transition_name)
 
     @transition_name.default
     def _transition_name(self) -> str:
