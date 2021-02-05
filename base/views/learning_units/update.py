@@ -54,7 +54,6 @@ from osis_role.contrib.views import permission_required
 @waffle_flag("learning_unit_update")
 @permission_required('base.can_edit_learningunit_date', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_edition_end_date(request, learning_unit_year_id):
-    print('learning_unit_edition_end_date')
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)
 

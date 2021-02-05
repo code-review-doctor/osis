@@ -48,7 +48,6 @@ class LearningUnitEndDateForm(forms.Form):
                                            )
 
     def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
-        print('max_year {}'.format(max_year))
         self.learning_unit = learning_unit_year.learning_unit
         self.learning_unit_year = learning_unit_year
         self.person = person
