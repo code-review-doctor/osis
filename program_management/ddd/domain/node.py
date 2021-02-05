@@ -124,7 +124,8 @@ class NodeFactory:
             copied_node.remark_en = None
             copied_node.remark_fr = None
             if copied_node.node_type in GroupType:
-                copied_node.credits = None
+                default_credit = FieldValidationRule.get_initial_value_or_none(duplicate_from.node_type, 'credits')
+                copied_node.credits = default_credit
         copied_node._has_changed = True
         return copied_node
 
@@ -133,6 +134,8 @@ class NodeFactory:
             child_type,
             'title_fr'
         ).initial_value
+        default_credits = FieldValidationRule.get_initial_value_or_none(child_type, 'credits')
+        default_title_en = FieldValidationRule.get_initial_value_or_none(child_type, 'title_en')
         child = self.get_node(
             type=NodeType.GROUP,
             node_type=child_type,
@@ -145,7 +148,9 @@ class NodeFactory:
             teaching_campus=parent_node.teaching_campus,
             management_entity_acronym=parent_node.management_entity_acronym,
             group_title_fr=generated_child_title,
+            group_title_en=default_title_en,
             start_year=parent_node.year,
+            credits=default_credits
         )
         child._has_changed = True
         return child
