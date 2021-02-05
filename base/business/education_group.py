@@ -50,6 +50,7 @@ from program_management.ddd.service.read import node_identity_service
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.views import serializers
 from base.models.enums.publication_contact_type import PublicationContactType
+from django.template.defaultfilters import yesno
 # List of key that a user can modify
 DATE_FORMAT = '%d-%m-%Y'
 DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
@@ -120,6 +121,7 @@ WITH_EDUCATION_FIELDS = "with_education_fields"
 WITH_ORGANIZATION = "with_organization"
 WITH_ACTIVITIES_ORGANIZATION = "with_activities_organization"
 WITH_RESPONSIBLES_AND_CONTACTS = "with_responsibles_and_contacts"
+WITH_DIPLOMAS_CERTIFICATS = "with_diplomas_and_certificats"
 
 TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_VALIDITY,
@@ -128,7 +130,8 @@ TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_EDUCATION_FIELDS,
     WITH_ORGANIZATION,
     WITH_ACTIVITIES_ORGANIZATION,
-    WITH_RESPONSIBLES_AND_CONTACTS
+    WITH_RESPONSIBLES_AND_CONTACTS,
+    WITH_DIPLOMAS_CERTIFICATS
 ]
 DEFAULT_EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
                                   str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits'))]
@@ -146,11 +149,13 @@ PARAMETER_HEADERS = {
                                    str(_('Primary language')), str(_('activities in English')).title(),
                                    str(_('Other languages activities')),
                                    ],
-    WITH_RESPONSIBLES_AND_CONTACTS: ["{} - {}".format(str(_('General informations')), str(_('contacts')))]
-
+    WITH_RESPONSIBLES_AND_CONTACTS: ["{} - {}".format(str(_('General informations')), str(_('contacts')))],
+    WITH_DIPLOMAS_CERTIFICATS: [str(_('Leads to diploma/certificate')), str(_('Diploma title')),
+                                str(_('Professionnal title')), str(_('certificate aims')).title()]
 
 }
 CARRIAGE_RETURN = "\n"
+
 
 def create_xls(user, found_education_groups_param, filters, order_data):
     found_education_groups = ordering_data(found_education_groups_param, order_data)
@@ -541,6 +546,19 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.append(_get_responsibles_and_contacts(training, group, current_version))
         else:
             data.extend(add_empty_str(WITH_RESPONSIBLES_AND_CONTACTS))
+
+    if WITH_DIPLOMAS_CERTIFICATS:
+        if group.is_training():
+            data.append(yesno(training.diploma.leads_to_diploma).title())
+            data.append(yesno(training.diploma.printing_title))
+            data.append(yesno(training.diploma.professional_title))
+            aims = ''
+            for aim in training.diploma.aims:
+                aims += "{} - {} - {}{}".format(aim.section, aim.code, aim.description, CARRIAGE_RETURN)
+            data.append(aims)
+        else:
+            data.extend(add_empty_str(WITH_DIPLOMAS_CERTIFICATS))
+
     return data
 
 

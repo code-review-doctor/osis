@@ -44,6 +44,8 @@
             <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"> {% trans 'Organization' %}<br>
             <input type="checkbox" id="chb_with_activities_organization" value="chb_with_activities_organization" class="chb_parameters"> {% trans 'Activities organization' %}<br>
             <input type="checkbox" id="chb_with_responsibles_and_contacts" value="chb_with_responsibles_and_contacts" class="chb_parameters"> {% trans 'Responsibles and contacts' %}<br>
+            <input type="checkbox" id="chb_with_diplomas_and_certificats" value="chb_with_diplomas_and_certificats" class="chb_parameters"> {% trans 'Diplomas/Certificates' %}<br>
+
 
             <input type="hidden" id="xls_status" name="xls_status"  value="xls_customized">
         </div>
@@ -90,6 +92,10 @@
             if($('#chb_with_responsibles_and_contacts').prop('checked')){
                 $('#hdn_with_responsibles_and_contacts').val(true);
             }
+            if($('#chb_with_diplomas_and_certificats').prop('checked')){
+                $('#hdn_with_diplomas_and_certificats').val(true);
+            }
+
 
 
         }
