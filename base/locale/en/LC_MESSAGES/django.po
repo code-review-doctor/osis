@@ -1768,6 +1768,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Pay attention! This learning unit is used in more than one formation"
+msgstr ""
+
 msgid "Pending"
 msgstr ""
 
