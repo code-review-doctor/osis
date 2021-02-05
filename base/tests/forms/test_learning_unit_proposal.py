@@ -49,7 +49,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, FacultyManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
@@ -303,7 +303,7 @@ class TestSave(TestCase):
 
     def test_academic_year_range_creation_proposal_central_manager(self):
         FrenchLanguageFactory()
-        central_manager = CentralManagerForUEFactory()
+        central_manager = CentralManagerFactory(entity=self.an_entity).person
         form = learning_unit_create_2.FullForm(
             central_manager,
             self.learning_unit_year.academic_year,
@@ -318,7 +318,7 @@ class TestSave(TestCase):
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
         FrenchLanguageFactory()
-        faculty_manager = FacultyManagerForUEFactory()
+        faculty_manager = FacultyManagerFactory(entity=self.an_entity).person
         form = learning_unit_create_2.FullForm(
             faculty_manager,
             self.learning_unit_year.academic_year,
