@@ -43,7 +43,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
-from base.tests.factories.academic_calendar import generate_proposal_calendars
+from base.tests.factories.academic_calendar import generate_proposal_calendars_without_start_and_end_date
 from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
@@ -76,7 +76,7 @@ class LearningUnitViewTestCase(TestCase):
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.current_academic_year = cls.academic_years[0]
         cls.next_academic_year = cls.academic_years[1]
-        generate_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars_without_start_and_end_date(cls.academic_years)
         cls.language = FrenchLanguageFactory()
 
     def setUp(self):
