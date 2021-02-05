@@ -56,7 +56,7 @@ def add_default_titles_to_minor_option_list_choice_and_complementary_module(apps
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('education_group', '0017_merge_20210129_1507'),
+        ('education_group', '0019_auto_20210203_1310'),
     ]
 
     operations = [
