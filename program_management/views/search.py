@@ -75,9 +75,10 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
 
 def _create_xls_customized(view_obj, context, **response_kwargs):
     print('_create_xls_customized')
-    other_params = {}
+    other_params = []
     for parameter in TRAINING_LIST_CUSTOMIZABLE_PARAMETERS:
-        other_params[parameter] = view_obj.request.GET.get(parameter) == 'true'
+        if view_obj.request.GET.get(parameter) == 'true':
+            other_params.append(parameter)
 
     print(other_params)
     user = view_obj.request.user

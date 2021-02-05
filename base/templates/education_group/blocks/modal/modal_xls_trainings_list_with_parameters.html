@@ -42,8 +42,7 @@
             <input type="checkbox" id="chb_with_partial_english_titles" value="chb_with_partial_english_titles" class="chb_parameters"> {% trans 'Titles(partial/English)' %}<br>
             <input type="checkbox" id="chb_with_education_fields" value="chb_with_education_fields" class="chb_parameters"> {% trans 'partnership_year_education_fields' %}<br>
             <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"> {% trans 'Organization' %}<br>
-
-
+            <input type="checkbox" id="chb_with_activities_organization" value="chb_with_activities_organization" class="chb_parameters"> {% trans 'Activities organization' %}<br>
             <input type="hidden" id="xls_status" name="xls_status"  value="xls_customized">
         </div>
         <div class="modal-footer">
@@ -65,6 +64,8 @@
             $('#hdn_with_partial_english_titles').val(false);
             $('#hdn_with_education_fields').val(false);
             $('#hdn_with_organization').val(false);
+            $('#hdn_with_activities_organization').val(false);
+
 
             if($('#chb_with_validity').prop('checked')){
                 $('#hdn_with_validity').val(true);
@@ -81,6 +82,10 @@
             if($('#chb_with_organization').prop('checked')){
                 $('#hdn_with_organization').val(true);
             }
+            if($('#chb_with_activities_organization').prop('checked')){
+                $('#hdn_with_activities_organization').val(true);
+            }
+
         }
 
         $("#chb_all_param").click(function(){

@@ -117,13 +117,15 @@ WITH_OSIS_CODE = "with_osis_code"
 WITH_PARTIAL_ENGLISH_TITLES = "with_partial_english_titles"
 WITH_EDUCATION_FIELDS = "with_education_fields"
 WITH_ORGANIZATION = "with_organization"
+WITH_ACTIVITIES_ORGANIZATION = "with_activities_organization"
 
 TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_VALIDITY,
     WITH_OSIS_CODE,
     WITH_PARTIAL_ENGLISH_TITLES,
     WITH_EDUCATION_FIELDS,
-    WITH_ORGANIZATION
+    WITH_ORGANIZATION,
+    WITH_ACTIVITIES_ORGANIZATION,
 ]
 DEFAULT_EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
                                   str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits'))]
@@ -136,7 +138,10 @@ PARAMETER_HEADERS = {
                                   str(_('Partial title in English'))],
     WITH_EDUCATION_FIELDS: [str(_('main domain')).title(), str(_('secondary domains')).title(), str(_('ISCED domain'))],
     WITH_ORGANIZATION: [str(_('Schedule type')), str(_('Manag. ent.')), str(_('Admin. ent.')),
-                        str(_('Learning location')), str(_('Duration'))]
+                        str(_('Learning location')), str(_('Duration'))],
+    WITH_ACTIVITIES_ORGANIZATION: [str(_('Activities on other campus')), str(_('Internship')), str(_('Dissertation')),
+                                   str(_('Primary language')), str(_('activities in English')).title(),
+                                   str(_('Other languages activities')), ]
 
 }
 
@@ -442,7 +447,7 @@ def _get_title(a_version, language):
     return " [{}]".format(title) if title else ''
 
 
-def create_customized_xls(user, found_education_groups_param, filters, order_data, other_params):
+def create_customized_xls(user, found_education_groups_param, filters, order_data, other_params: List):
     found_education_groups = ordering_data(found_education_groups_param, order_data)
     working_sheets_data = prepare_xls_content_with_parameters(found_education_groups, other_params)
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
@@ -484,17 +489,13 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.append(_get_start_year(current_version, training, group_year, group))
             data.append(_get_end_year(current_version, training, group_year, group))
         else:
-            data.extend(add_empty_str(TRAINING_LIST_CUSTOMIZABLE_PARAMETERS[WITH_VALIDITY]))
+            data.extend(add_empty_str(WITH_VALIDITY))
 
     if WITH_OSIS_CODE in other_params:
         data.append(group.code)
-    else:
-        data.extend(add_empty_str(TRAINING_LIST_CUSTOMIZABLE_PARAMETERS[WITH_OSIS_CODE]))
 
     if WITH_PARTIAL_ENGLISH_TITLES in other_params:
         data.extend(_get_titles(current_version, training, group))
-    else:
-        data.extend(add_empty_str(TRAINING_LIST_CUSTOMIZABLE_PARAMETERS[WITH_PARTIAL_ENGLISH_TITLES]))
 
     if WITH_EDUCATION_FIELDS in other_params:
         if group.is_training():
@@ -503,7 +504,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.append("{} {}".format(training.isced_domain.code,
                                        training.isced_domain.title_fr) if training.isced_domain else '')
         else:
-            data.extend(add_empty_str(TRAINING_LIST_CUSTOMIZABLE_PARAMETERS[WITH_EDUCATION_FIELDS]))
+            data.extend(add_empty_str(WITH_EDUCATION_FIELDS))
 
     if WITH_ORGANIZATION in other_params:
         if group.is_training():
@@ -516,20 +517,27 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             else:
                 data.append("")
         else:
-            data.extend(add_empty_str(TRAINING_LIST_CUSTOMIZABLE_PARAMETERS[WITH_ORGANIZATION]))
+            data.extend(add_empty_str(WITH_ORGANIZATION))
+
+    if WITH_ACTIVITIES_ORGANIZATION in other_params:
+        if group.is_training():
+            data.append(training.other_campus_activities.value if training.other_campus_activities else '')
+            data.append(training.internship_presence.value.title() if training.internship_presence else '')
+            data.append(str(_('Yes')) if training.has_dissertation else str(_('No')))
+            data.append(training.main_language.name if training.main_language else '')
+            data.append(training.english_activities.value.title() if training.english_activities else '')
+            data.append(training.other_language_activities.value.title() if training.other_language_activities else '')
+        else:
+            data.extend(add_empty_str(WITH_ACTIVITIES_ORGANIZATION))
 
     return data
 
 
 def _build_customized_header(other_params):
-    print('_build_customized_header')
     customized_header = DEFAULT_EDUCATION_GROUP_TITLES
     print(customized_header)
-    for parameter, value in other_params.items():
-        print(parameter, value)
-        if value:
-            customized_header.extend(PARAMETER_HEADERS[parameter])
-        print('fin for {}'.format(customized_header))
+    for parameter in other_params:
+        customized_header.extend(PARAMETER_HEADERS[parameter])
     return customized_header
 
 
@@ -543,7 +551,7 @@ def _get_training(year: int, acronym: str) -> 'Training':
 
 def add_empty_str(parameter):
     ch = []
-    for occurence in TRAINING_LIST_CUSTOMIZABLE_PARAMETERS[parameter]:
+    for occurence in PARAMETER_HEADERS[parameter]:
         ch.append('')
     return ch
 
