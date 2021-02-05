@@ -124,6 +124,11 @@
                 <input type="hidden" id="xls_status" name="xls_status">
                 <input type="hidden" id="xls_order_col" name="xls_order_col">
                 <input type="hidden" id="xls_order" name="xls_order">
+                <input type="hidden" id="hdn_with_validity" name="with_validity">
+                <input type="hidden" id="hdn_with_osis_code" name="with_osis_code">
+                <input type="hidden" id="hdn_with_partial_english_titles" name="with_partial_english_titles">
+                <input type="hidden" id="hdn_with_education_fields" name="with_education_fields">
+                <input type="hidden" id="hdn_with_organization" name="with_organization">
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
@@ -152,6 +157,16 @@
                                        title="{% trans 'Produce xls with a list of trainings' %}">
                                         &nbsp;{% trans 'List of trainings' %}
                                     </a>
+                                </li>
+                                <li>
+                                    <a id="btn_produce_personnalized_xls"
+                                       class="download"
+                                       style="margin-right:10px;"
+                                       data-toggle="modal" data-target="#modalXlsTrainingsListWithParameters"
+                                       title="{% trans 'Produce xls with a list of trainings' %}">
+                                        &nbsp;{% trans 'List of trainings' %}2
+                                    </a>
+
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_administrative_data"
@@ -190,6 +205,7 @@
             </div>
         </div>
     </div>
+    {% include 'education_group/blocks/modal/modal_xls_trainings_list_with_parameters.html' %}
 {% endblock %}
 
 
@@ -248,6 +264,12 @@
         $('#id_education_group_type').on('select2:opening select2:closing', function( event ) {
             let $searchfield = $(this).parent().find('.select2-search__field');
             $searchfield.prop('disabled', true);
+        });
+
+        $("#btn_xls_with_parameters").click(function(e) {
+            prepare_xls(e, 'xls_customized');
+            $("#hdn_with_grp").val('');
+            $("#hdn_with_attributions").val('');
         });
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
