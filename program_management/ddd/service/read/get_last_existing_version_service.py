@@ -34,5 +34,5 @@ def get_last_existing_version_identity(
     return GetLastExistingVersion().get_last_existing_version_identity(
         version_name=cmd.version_name,
         offer_acronym=cmd.offer_acronym,
-        is_transition=cmd.is_transition,
+        transition_name=cmd.transition_name,
     )
