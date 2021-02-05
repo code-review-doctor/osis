@@ -37,6 +37,7 @@ from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
 NOT_A_TRANSITION = ""
+TRANSITION_PREFIX = "TRANSITION"
 
 
 @attr.s(frozen=True, slots=True)

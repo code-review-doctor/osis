@@ -158,7 +158,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                     offer_acronym=update_command.offer_acronym,
                     year=year,
                     version_name=update_command.version_name,
-                    is_transition=update_command.is_transition
+                    transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
         return []
