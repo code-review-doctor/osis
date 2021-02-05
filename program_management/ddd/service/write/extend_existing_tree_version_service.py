@@ -40,7 +40,7 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
         offer_acronym=command.offer_acronym,
         year=command.year,
         version_name=command.version_name,
-        is_transition=command.is_transition,
+        transition_name=command.transition_name,
     )
     last_existing_tree_version = ProgramTreeVersionRepository().get_last_in_past(identity_to_create)
 

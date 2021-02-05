@@ -57,7 +57,7 @@ def __convert_to_extend_command(command: ProlongExistingProgramTreeVersionComman
         offer_acronym=command.offer_acronym,
         version_name=command.version_name,
         year=command.updated_year,
-        is_transition=bool(command.transition_name)
+        transition_name=command.transition_name
     )
 
 

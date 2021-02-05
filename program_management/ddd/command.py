@@ -67,7 +67,7 @@ class ExtendProgramTreeVersionCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     year = attr.ib(type=int)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

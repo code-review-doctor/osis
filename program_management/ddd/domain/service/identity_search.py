@@ -40,7 +40,7 @@ from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -116,13 +116,13 @@ class NodeIdentitySearch(interface.DomainService):
             self,
             training_identity: 'TrainingIdentity',
             version_name: str = STANDARD,
-            is_transition: str = False,
+            transition_name: str = NOT_A_TRANSITION,
     ) -> 'NodeIdentity':
         values = GroupYear.objects.filter(
             educationgroupversion__offer__acronym=training_identity.acronym,
             educationgroupversion__offer__academic_year__year=training_identity.year,
             educationgroupversion__version_name=version_name,
-            educationgroupversion__is_transition=is_transition,
+            educationgroupversion__transition_name=transition_name,
         ).values(
             'partial_acronym'
         )
@@ -134,7 +134,7 @@ class NodeIdentitySearch(interface.DomainService):
             educationgroupversion__offer__acronym=tree_version_id.offer_acronym,
             educationgroupversion__offer__academic_year__year=tree_version_id.year,
             educationgroupversion__version_name=tree_version_id.version_name,
-            educationgroupversion__is_transition=tree_version_id.is_transition,
+            educationgroupversion__transition_name=tree_version_id.transition_name,
         ).values(
             'partial_acronym',
         )
@@ -199,7 +199,7 @@ class GroupIdentitySearch(interface.DomainService):
         values = EducationGroupVersion.objects.filter(
             offer__acronym=identity.offer_acronym,
             offer__academic_year__year=identity.year,
-            is_transition=identity.is_transition,
+            transition_name=identity.transition_name,
             version_name=identity.version_name,
         ).annotate(
             code=F('root_group__partial_acronym'),
