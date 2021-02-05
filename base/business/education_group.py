@@ -48,7 +48,8 @@ from program_management.ddd.domain.service.identity_search import ProgramTreeVer
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import node_identity_service
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
-
+from education_group.views import serializers
+from base.models.enums.publication_contact_type import PublicationContactType
 # List of key that a user can modify
 DATE_FORMAT = '%d-%m-%Y'
 DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
@@ -118,6 +119,7 @@ WITH_PARTIAL_ENGLISH_TITLES = "with_partial_english_titles"
 WITH_EDUCATION_FIELDS = "with_education_fields"
 WITH_ORGANIZATION = "with_organization"
 WITH_ACTIVITIES_ORGANIZATION = "with_activities_organization"
+WITH_RESPONSIBLES_AND_CONTACTS = "with_responsibles_and_contacts"
 
 TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_VALIDITY,
@@ -126,6 +128,7 @@ TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_EDUCATION_FIELDS,
     WITH_ORGANIZATION,
     WITH_ACTIVITIES_ORGANIZATION,
+    WITH_RESPONSIBLES_AND_CONTACTS
 ]
 DEFAULT_EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
                                   str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits'))]
@@ -141,10 +144,13 @@ PARAMETER_HEADERS = {
                         str(_('Learning location')), str(_('Duration'))],
     WITH_ACTIVITIES_ORGANIZATION: [str(_('Activities on other campus')), str(_('Internship')), str(_('Dissertation')),
                                    str(_('Primary language')), str(_('activities in English')).title(),
-                                   str(_('Other languages activities')), ]
+                                   str(_('Other languages activities')),
+                                   ],
+    WITH_RESPONSIBLES_AND_CONTACTS: ["{} - {}".format(str(_('General informations')), str(_('contacts')))]
+
 
 }
-
+CARRIAGE_RETURN = "\n"
 
 def create_xls(user, found_education_groups_param, filters, order_data):
     found_education_groups = ordering_data(found_education_groups_param, order_data)
@@ -530,6 +536,11 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         else:
             data.extend(add_empty_str(WITH_ACTIVITIES_ORGANIZATION))
 
+    if WITH_RESPONSIBLES_AND_CONTACTS:
+        if group.is_training():
+            data.append(_get_responsibles_and_contacts(training, group, current_version))
+        else:
+            data.extend(add_empty_str(WITH_RESPONSIBLES_AND_CONTACTS))
     return data
 
 
@@ -610,3 +621,39 @@ def management_entity(training, group, current_version):
         return training.management_entity.acronym
     else:
         return group.management_entity.acronym
+
+
+def _get_responsibles_and_contacts(training, group, current_version):
+    responsibles_and_contacts = ''
+
+    contacts = serializers.general_information.get_contacts(group)
+    academic_responsibles = contacts.get(PublicationContactType.ACADEMIC_RESPONSIBLE.name) or []
+    other_academic_responsibles = contacts.get(PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name) or []
+    jury_members = contacts.get(PublicationContactType.JURY_MEMBER.name) or []
+    other_contacts = contacts.get(PublicationContactType.OTHER_CONTACT.name) or []
+
+    responsibles_and_contacts += get_contacts(academic_responsibles, _('Academic responsible'))
+    responsibles_and_contacts += get_contacts(other_academic_responsibles, _('Other academic responsibles'))
+    responsibles_and_contacts += get_contacts(jury_members, _('Jury members'))
+    responsibles_and_contacts += get_contacts(other_contacts, _('Other contacts'))
+
+    return responsibles_and_contacts
+
+
+def get_contacts(contact_persons, title):
+    if contact_persons:
+        responsibles_and_contacts = '{}{}'.format(title, CARRIAGE_RETURN)
+        for contact in contact_persons:
+            if contact.get('email'):
+                responsibles_and_contacts += contact.get('email')
+            else:
+                responsibles_and_contacts += contact.get('description', '')
+            responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+            if contact.get('role_fr'):
+                responsibles_and_contacts += "(fr) {}{}".format(contact.get('role_fr'), CARRIAGE_RETURN)
+            if contact.get('role_en'):
+                responsibles_and_contacts += "(en) {}{}".format(contact.get('role_en'), CARRIAGE_RETURN)
+            responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+        responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+        return responsibles_and_contacts
+    return ''
