@@ -96,7 +96,7 @@ class ProgramTreeVersionBuilder:
             offer_acronym=cmd.offer_acronym,
             year=cmd.start_year,
             version_name=STANDARD,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
         tree_identity = program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.start_year)
         return ProgramTreeVersion(
@@ -154,7 +154,7 @@ class ProgramTreeVersionBuilder:
             offer_acronym=from_tree_version.entity_id.offer_acronym,
             version_name=command.version_name,
             year=from_tree_version.entity_id.year,
-            is_transition=command.is_transition
+            transition_name=command.transition_name
         )
         return ProgramTreeVersion(
             program_tree_identity=new_tree_identity,

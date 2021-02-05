@@ -47,6 +47,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand, \
     GetLastExistingVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_last_existing_version_service
@@ -169,7 +170,7 @@ def _convert_form_to_create_command(form: SpecificVersionForm) -> CreateProgramT
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         start_year=form.tree_version_identity.year,
-        is_transition=False,
+        transition_name=NOT_A_TRANSITION,
         title_en=form.cleaned_data.get("version_title_en"),
         title_fr=form.cleaned_data.get("version_title_fr"),
         end_year=form.cleaned_data.get("end_year"),
@@ -188,7 +189,7 @@ def _convert_form_to_prolong_command(
         updated_year=form.tree_version_identity.year,
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data['version_name'],
-        is_transition=False,
+        transition_name=NOT_A_TRANSITION,
         title_en=form.cleaned_data.get("version_title_en") or last_program_tree_version.title_en,
         title_fr=form.cleaned_data.get("version_title_fr") or last_program_tree_version.title_fr,
     )

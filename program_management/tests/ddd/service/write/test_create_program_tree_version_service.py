@@ -58,7 +58,7 @@ class TestCreateProgramTreeVersion(TestCase):
             offer_acronym=self.offer_acronym,
             version_name='CEMS',
             start_year=self.standard_version.entity_identity.year,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
             title_en='Title in English',
             title_fr='Intitulé en français',
         )
@@ -168,7 +168,7 @@ class TestCreateProgramTreeVersion(TestCase):
         self.assertEqual(tree_version_created.entity_id.offer_acronym, self.command.offer_acronym)
         self.assertEqual(tree_version_created.entity_id.year, self.command.start_year)
         self.assertEqual(tree_version_created.entity_id.version_name, self.command.version_name)
-        self.assertEqual(tree_version_created.entity_id.is_transition, self.command.is_transition)
+        self.assertEqual(tree_version_created.entity_id.transition_name, self.command.transition_name)
         self.assertEqual(tree_version_created.title_fr, self.command.title_fr)
         self.assertEqual(tree_version_created.title_en, self.command.title_en)
         self.assertEqual(tree_version_created.end_year_of_existence, self.command.end_year)

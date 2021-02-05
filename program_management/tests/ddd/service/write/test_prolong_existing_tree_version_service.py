@@ -26,12 +26,9 @@ from django.test import TestCase
 
 from education_group.tests.ddd.factories.group import GroupIdentityFactory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.service.write import update_and_postpone_mini_training_version_service, \
-    prolong_existing_tree_version_service
+from program_management.ddd.service.write import prolong_existing_tree_version_service
 from program_management.tests.ddd.factories.commands.prolong_existing_program_tree_version import \
     ProlongExistingProgramTreeVersionCommandFactory
-from program_management.tests.ddd.factories.commands.update_mini_training_version_command import \
-    UpdateMiniTrainingVersionCommandFactory
 
 
 class TestProlongExistingTreeVersion(TestCase):
@@ -54,7 +51,7 @@ class TestProlongExistingTreeVersion(TestCase):
             version_name=cmd.version_name,
             offer_acronym=cmd.offer_acronym,
             year=cmd.updated_year,
-            is_transition=cmd.is_transition,
+            transition_name=cmd.transition_name,
         )
 
         mock_extend_existing_past_version.return_value = [identity_expected]

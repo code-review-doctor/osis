@@ -66,8 +66,8 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
             offer_acronym=F('educationgroupversion__offer__acronym'),
             year=F('academic_year__year'),
             version_name=F('educationgroupversion__version_name'),
-            is_transition=F('educationgroupversion__is_transition'),
-        ).values('offer_acronym', 'year', 'version_name', 'is_transition')
+            transition_name=F('educationgroupversion__transition_name'),
+        ).values('offer_acronym', 'year', 'version_name', 'transition_name')
         if values:
             return [ProgramTreeVersionIdentity(**value) for value in values]
         raise interface.BusinessException("Program tree version identity not found")

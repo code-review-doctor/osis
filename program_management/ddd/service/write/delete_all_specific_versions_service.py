@@ -55,6 +55,6 @@ def _call_delete_specific_version_service(tree_version: 'ProgramTreeVersion') ->
             acronym=tree_version.entity_identity.offer_acronym,
             year=tree_version.entity_identity.year,
             version_name=tree_version.entity_identity.version_name,
-            is_transition=tree_version.entity_identity.is_transition,
+            transition_name=tree_version.entity_identity.transition_name,
         )
     )
