@@ -47,6 +47,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand, \
     GetLastExistingVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import get_last_existing_version_service
@@ -103,7 +104,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
             last_existing_version = get_last_existing_version(
                 version_name=form.cleaned_data['version_name'],
                 offer_acronym=self.tree_version_identity.offer_acronym,
-                is_transition=False
+                transition_name=NOT_A_TRANSITION
             )
 
             identities = []
@@ -208,7 +209,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             last_existing_version = get_last_existing_version(
                 version_name=form.cleaned_data['version_name'],
                 offer_acronym=self.tree_version_identity.offer_acronym,
-                is_transition=True
+                transition_name=form.cleaned_data['transition_name'],
             )
 
             identities = []
@@ -239,7 +240,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
         return render(request, self.template_name, self.get_context_data(form))
 
     def get_context_data(self, form: TransitionVersionForm):
-        suffix_version_name = " - Transition" if self.tree_version_identity.version_name else "Transition"
+        suffix_version_name = " - TRANSITION" if self.tree_version_identity.version_name else "TRANSITION"
         return {
             'training_identity': self.training_identity,
             'version_name': self.tree_version_identity.version_name+suffix_version_name,
@@ -280,7 +281,7 @@ def _convert_form_to_create_specific_version_command(form: SpecificVersionForm) 
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         start_year=form.tree_version_identity.year,
-        is_transition=False,
+        transition_name=NOT_A_TRANSITION,
         title_en=form.cleaned_data.get("version_title_en"),
         title_fr=form.cleaned_data.get("version_title_fr"),
         end_year=form.cleaned_data.get("end_year"),
@@ -292,7 +293,7 @@ def _convert_form_to_create_transition_version_command(form: TransitionVersionFo
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         start_year=form.tree_version_identity.year,
-        is_transition=True,
+        transition_name=form.cleaned_data.get("transition_name"),
         title_en=form.cleaned_data.get("version_title_en"),
         title_fr=form.cleaned_data.get("version_title_fr"),
         end_year=form.cleaned_data.get("end_year"),
@@ -311,7 +312,7 @@ def _convert_form_to_prolong_command(
         updated_year=form.tree_version_identity.year,
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data['version_name'],
-        is_transition=False,
+        transition_name=NOT_A_TRANSITION,
         title_en=form.cleaned_data.get("version_title_en") or last_program_tree_version.title_en,
         title_fr=form.cleaned_data.get("version_title_fr") or last_program_tree_version.title_fr,
     )
@@ -320,12 +321,12 @@ def _convert_form_to_prolong_command(
 def get_last_existing_version(
         version_name: str,
         offer_acronym: str,
-        is_transition: bool
+        transition_name: str
 ) -> 'ProgramTreeVersionIdentity':
     return get_last_existing_version_service.get_last_existing_version_identity(
         GetLastExistingVersionNameCommand(
             version_name=version_name.upper(),
             offer_acronym=offer_acronym.upper(),
-            is_transition=is_transition,
+            transition_name=transition_name,
         )
     )

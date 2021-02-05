@@ -54,7 +54,7 @@ class TestUpdateTrainingVersion(TestCase):
             offer_acronym=cmd.offer_acronym,
             year=cmd.year,
             version_name=cmd.version_name,
-            is_transition=cmd.is_transition,
+            transition_name=cmd.transition_name,
         )
         mock_update_tree_version_service.return_value = identity_expected
         mock_identity_converter.return_value = GroupIdentityFactory()

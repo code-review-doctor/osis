@@ -96,6 +96,5 @@ class EducationGroupVersion(models.Model):
         return offer_name
 
     class Meta:
-        # TODO: change is_transition to transition_name in OSIS-5580
-        unique_together = ('version_name', 'offer', 'is_transition')
+        unique_together = ('version_name', 'offer', 'transition_name')
         default_manager_name = 'objects'

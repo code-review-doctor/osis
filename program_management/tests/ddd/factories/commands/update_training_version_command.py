@@ -26,8 +26,6 @@
 
 import factory.fuzzy
 
-from base.models.enums import education_group_types
-from base.models.enums.active_status import ActiveStatusEnum
 from program_management.ddd import command
 
 
@@ -38,7 +36,7 @@ class UpdateTrainingVersionCommandFactory(factory.Factory):
 
     offer_acronym = "DROI2M"
     version_name = "VERSIONNAME"
-    is_transition = False
+    transition_name = ''
     year = 2019
     credits = 23
     end_year = None

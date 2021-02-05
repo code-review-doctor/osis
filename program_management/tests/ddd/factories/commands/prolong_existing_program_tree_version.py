@@ -36,7 +36,7 @@ class ProlongExistingProgramTreeVersionCommandFactory(factory.Factory):
 
     offer_acronym = "CHIM1BA"
     version_name = "VERSIONNAME"
-    is_transition = False
+    transition_name = ''
     updated_year = 2019
     end_year = None
     title_fr = "fr  title"

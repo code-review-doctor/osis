@@ -50,7 +50,7 @@ def create_and_postpone(command: 'CreateProgramTreeVersionCommand') -> List[Prog
         PostponeProgramTreeVersionCommand(
             from_offer_acronym=identity.offer_acronym,
             from_year=identity.year,
-            from_is_transition=identity.is_transition,
+            from_transition_name=identity.transition_name,
             from_version_name=identity.version_name,
         )
     )

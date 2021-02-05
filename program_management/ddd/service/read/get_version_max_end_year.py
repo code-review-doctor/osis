@@ -33,7 +33,7 @@ def calculate_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
         offer_acronym=cmd.offer_acronym,
         year=cmd.year,
         version_name=cmd.version_name,
-        is_transition=False
+        transition_name=program_tree_version.NOT_A_TRANSITION
     )
 
     tree_version = tree_version_repository.ProgramTreeVersionRepository.get(standard_tree_version_identity)
