@@ -41,7 +41,8 @@ from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OT
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars, generate_proposal_calendars
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars, \
+    generate_proposal_calendars, generate_proposal_calendars_without_start_and_end_date
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, \
     create_past_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -449,7 +450,7 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             year=cls.current_academic_year.year - 1
         )
         academic_years = [cls.past_academic_year, cls.current_academic_year]
-        generate_proposal_calendars(academic_years)
+        generate_proposal_calendars_without_start_and_end_date(academic_years)
 
     def setUp(self):
         requirement_entity = EntityFactory()
