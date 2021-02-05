@@ -36,6 +36,7 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
+NOT_A_TRANSITION = ""
 
 
 @attr.s(frozen=True, slots=True)
@@ -43,11 +44,14 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
-    is_transition = attr.ib(type=bool)  # TODO : to remove in OSIS-5580
-    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default='')
+    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default=NOT_A_TRANSITION)
 
     def is_standard(self):
         return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
+
+    @property
+    def is_transition(self) -> bool:
+        return bool(self.transition_name)
 
 
 class ProgramTreeVersionBuilder:
@@ -191,7 +195,7 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_transition(self) -> bool:
-        return bool(self.transition_name)
+        return self.entity_id.is_transition
 
     @transition_name.default
     def _transition_name(self) -> str:

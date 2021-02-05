@@ -40,7 +40,7 @@ class ProgramTreeVersionIdentityFactory(factory.Factory):
     offer_acronym = factory.Sequence(lambda n: 'OFFERACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     version_name = factory.Sequence(lambda n: 'VERSION%02d' % n)
-    is_transition = False
+    transition_name = ''
 
 
 class ProgramTreeVersionFactory(factory.Factory):
@@ -60,6 +60,7 @@ class ProgramTreeVersionFactory(factory.Factory):
     )
     entity_identity = factory.SelfAttribute("entity_id")
     version_name = factory.SelfAttribute("entity_id.version_name")
+    transition_name = factory.SelfAttribute('entity_id.transition_name')
     end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
 
     @staticmethod
