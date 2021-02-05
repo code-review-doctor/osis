@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@ from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
+from base.models import academic_year
 from base.models.academic_year import AcademicYear
 from base.models.proposal_learning_unit import find_by_learning_unit
 from base.models.enums import learning_unit_year_subtypes
 
-
+DEFAULT_MAX_YEAR = 6
 # TODO Convert it in ModelForm
+
 
 class LearningUnitEndDateForm(forms.Form):
     EMPTY_LABEL = BLANK_CHOICE_DISPLAY
@@ -46,6 +48,7 @@ class LearningUnitEndDateForm(forms.Form):
                                            )
 
     def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
+        print('max_year {}'.format(max_year))
         self.learning_unit = learning_unit_year.learning_unit
         self.learning_unit_year = learning_unit_year
         self.person = person
@@ -55,7 +58,8 @@ class LearningUnitEndDateForm(forms.Form):
         end_year = self.learning_unit.end_year
 
         self._set_initial_value(end_year)
-
+        if not max_year:
+            max_year = academic_year.current_academic_year().year + DEFAULT_MAX_YEAR
         try:
             self.fields['academic_year'].queryset = self._get_academic_years(max_year)
         except ValueError:
