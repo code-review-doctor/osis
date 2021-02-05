@@ -239,8 +239,10 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
         return render(request, self.template_name, self.get_context_data(form))
 
     def get_context_data(self, form: TransitionVersionForm):
+        suffix_version_name = " - Transition" if self.tree_version_identity.version_name else "Transition"
         return {
             'training_identity': self.training_identity,
+            'version_name': self.tree_version_identity.version_name+suffix_version_name,
             'node_identity': self.node_identity,
             'form': form,
         }
