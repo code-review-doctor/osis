@@ -200,6 +200,6 @@ def get_last_existing_version(version_name: str, offer_acronym: str) -> 'Program
         GetLastExistingVersionNameCommand(
             version_name=version_name.upper(),
             offer_acronym=offer_acronym.upper(),
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
     )

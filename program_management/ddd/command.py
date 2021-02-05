@@ -319,7 +319,7 @@ class CreateMiniTrainingAndPasteCommand(interface.CommandRequest):
 class GetLastExistingVersionNameCommand(interface.CommandRequest):
     version_name = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
-    is_transition = attr.ib(type=str)
+    transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
