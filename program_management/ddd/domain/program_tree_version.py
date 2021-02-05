@@ -36,6 +36,7 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
+NOT_A_TRANSITION = ""
 
 
 @attr.s(frozen=True, slots=True)
@@ -43,7 +44,7 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
-    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default='')
+    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default=NOT_A_TRANSITION)
 
     def is_standard(self):
         return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition

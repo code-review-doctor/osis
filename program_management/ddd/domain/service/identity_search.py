@@ -24,25 +24,23 @@
 #
 ##############################################################################
 import functools
-import itertools
 import operator
 from typing import Union, List
 
 from django.db.models import F, Subquery, Q
 
-from program_management.ddd.business_types import *
-
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
+    as EducationGroupTrainingIdentitySearch
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch \
-    as EducationGroupTrainingIdentitySearch
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -99,14 +97,14 @@ class ProgramTreeVersionIdentitySearch(interface.DomainService):
                 GroupYear.objects.filter(
                     educationgroupversion__offer__acronym=program_tree_version_identity.offer_acronym,
                     educationgroupversion__version_name=program_tree_version_identity.version_name,
-                    educationgroupversion__is_transition=program_tree_version_identity.is_transition,
+                    educationgroupversion__transition_name=program_tree_version_identity.transition_name,
                     academic_year__year=program_tree_version_identity.year,
                 ).values('group_id')[:1]
             )
         ).annotate(
             offer_acronym=F('offer__acronym'),
             year=F('root_group__academic_year__year'),
-        ).order_by('year').values('offer_acronym', 'year', 'version_name', 'is_transition')
+        ).order_by('year').values('offer_acronym', 'year', 'version_name', 'transition_name')
         return [ProgramTreeVersionIdentity(**value) for value in values]
 
 

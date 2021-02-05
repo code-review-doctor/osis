@@ -30,7 +30,7 @@ import attr
 
 from base.models.enums.link_type import LinkTypes
 from education_group.ddd import command as education_group_command
-from education_group.ddd.command import AimCode, AimSection, DecreeName, DomainCode
+from education_group.ddd.command import DecreeName, DomainCode
 from osis_common.ddd import interface
 
 
@@ -505,7 +505,7 @@ class DeleteStandardVersionCommand(interface.CommandRequest):
 class DeletePermanentlyTreeVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

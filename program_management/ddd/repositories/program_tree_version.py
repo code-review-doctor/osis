@@ -24,8 +24,6 @@
 #
 ##############################################################################
 import contextlib
-import functools
-import operator
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -81,8 +79,9 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
                 title_fr=program_tree_version.title_fr,
                 title_en=program_tree_version.title_en,
                 offer_id=education_group_year_id,
-                is_transition=program_tree_version.is_transition,
-                root_group_id=group_year_id
+                transition_name=program_tree_version.entity_id.transition_name,
+                root_group_id=group_year_id,
+                is_transition=False  # TODO: To remove in XXX
             )
             _update_start_year_and_end_year(
                 educ_group_version,
@@ -99,7 +98,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             offer__acronym=program_tree_version.entity_identity.offer_acronym,
             offer__academic_year__year=program_tree_version.entity_identity.year,
             version_name=program_tree_version.entity_identity.version_name,
-            is_transition=program_tree_version.entity_identity.is_transition,
+            transition_name=program_tree_version.entity_identity.transition_name,
         )
         obj.version_name = program_tree_version.version_name
         obj.title_fr = program_tree_version.title_fr
@@ -120,7 +119,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year=entity_id.year,
-            is_transition=entity_id.is_transition,
+            transition_name=entity_id.transition_name,
         )
         try:
             return _instanciate_tree_version(qs.get())
@@ -145,7 +144,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
                 offer_acronym=entity_id.offer_acronym,
                 year=last_past_year,
                 version_name=entity_id.version_name,
-                is_transition=entity_id.is_transition,
+                transition_name=entity_id.transition_name,
             )
             return cls.get(entity_id=last_identity)
 
@@ -155,7 +154,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
             version_name: str = None,
             offer_acronym: str = None,
-            is_transition: bool = False,
+            transition_name: str = None,
             code: str = None,
             year: int = None,
             **kwargs
@@ -168,8 +167,8 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             qs = qs.filter(version_name=version_name)
         if offer_acronym is not None:
             qs = qs.filter(offer__acronym=offer_acronym)
-        if is_transition is not None:
-            qs = qs.filter(is_transition=is_transition)
+        if transition_name is not None:
+            qs = qs.filter(transition_name=transition_name)
         if year is not None:
             qs = qs.filter(offer__academic_year__year=year)
         if code is not None:
@@ -191,7 +190,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             version_name=entity_id.version_name,
             offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year=entity_id.year,
-            is_transition=entity_id.is_transition,
+            transition_name=entity_id.transition_name,
         ).delete()
 
         root_node = program_tree_version.get_tree().root_node
@@ -250,7 +249,7 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
         offer_acronym=record_dict['offer_acronym'],
         year=record_dict['offer_year'],
         version_name=record_dict['version_name'],
-        is_transition=record_dict['is_transition'],
+        transition_name=record_dict['transition_name'],
     )
     return program_tree_version.ProgramTreeVersion(
         entity_identity=identity,
@@ -346,7 +345,7 @@ def _get_common_queryset() -> QuerySet:
         'version_name',
         'version_title_fr',
         'version_title_en',
-        'is_transition',
+        'transition_name',
         'end_year_of_existence',
         'start_year',
     )
