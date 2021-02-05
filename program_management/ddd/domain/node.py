@@ -433,9 +433,18 @@ class Node(interface.Entity):
         return child
 
     def detach_child(self, node_to_detach: 'Node') -> 'Link':
-        link_to_detach = next(link for link in self.children if link.child == node_to_detach)
+        link_to_detach = self._get_link_to_detach_and_move_it_down(node_to_detach)
         self._deleted_children.append(link_to_detach)
         self.children.remove(link_to_detach)
+        return link_to_detach
+
+    def _get_link_to_detach_and_move_it_down(self, node_to_detach: 'Node') -> 'Link':
+        link_to_detach = None
+        for link in self.children:
+            if link.child == node_to_detach:
+                link_to_detach = link
+            elif link_to_detach:
+                link.parent.down_child(link_to_detach.child)
         return link_to_detach
 
     def get_link(self, link_id: int) -> 'Link':
