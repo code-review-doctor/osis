@@ -224,14 +224,14 @@ class TestGetCreateProgramTreeTransitionVersion(TestCase):
 
         response = self.client.get(self.create_training_version_url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "tree_version/create_specific_version_inner.html")
+        self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
 
     def test_case_user_as_central_manager_for_create_mini_training_version(self):
         self.client.force_login(self.central_manager.person.user)
 
         response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "tree_version/create_specific_version_inner.html")
+        self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
 
     def test_case_user_as_faculty_manager_for_create_training_version(self):
         self.client.force_login(self.factulty_manager.person.user)
@@ -247,4 +247,4 @@ class TestGetCreateProgramTreeTransitionVersion(TestCase):
         response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "tree_version/create_specific_version_inner.html")
+        self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
