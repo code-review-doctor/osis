@@ -44,9 +44,13 @@
             <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"> {% trans 'Organization' %}<br>
             <input type="checkbox" id="chb_with_activities_organization" value="chb_with_activities_organization" class="chb_parameters"> {% trans 'Activities organization' %}<br>
             <input type="checkbox" id="chb_with_responsibles_and_contacts" value="chb_with_responsibles_and_contacts" class="chb_parameters"> {% trans 'Responsibles and contacts' %}<br>
-            <input type="checkbox" id="chb_with_diplomas_and_certificats" value="chb_with_diplomas_and_certificats" class="chb_parameters"> {% trans 'Diplomas/Certificates' %}<br>
-
-
+            <input type="checkbox" id="chb_with_co_graduation_and_partnership" value="chb_with_co_graduation_and_partnership" class="chb_parameters"> {% trans 'Co-graduation/partnership' %}<br>
+            <input type="checkbox" id="chb_with_ares_code" value="chb_with_ares_code" class="chb_parameters"> {% trans 'Ares code' %}<br>
+            <input type="checkbox" id="chb_with_enrollment" value="chb_with_enrollment" class="chb_parameters"> {% trans 'Enrollment' %}<br>
+            <input type="checkbox" id="chb_with_funding" value="chb_with_funding" class="chb_parameters"> {% trans 'Funding' %}<br>
+            <input type="checkbox" id="chb_with_other_legal_information" value="chb_with_other_legal_information" class="chb_parameters"> {% trans 'Other legal information' %}<br>
+            <input type="checkbox" id="chb_with_additional_info" value="chb_with_additional_info" class="chb_parameters"> {% trans 'Additional info' %}<br>
+            <input type="checkbox" id="chb_with_keywords" value="chb_with_keywords" class="chb_parameters"> {% trans 'Keywords' %}<br>
             <input type="hidden" id="xls_status" name="xls_status"  value="xls_customized">
         </div>
         <div class="modal-footer">
@@ -70,6 +74,14 @@
             $('#hdn_with_organization').val(false);
             $('#hdn_with_activities_organization').val(false);
             $('#hdn_with_responsibles_and_contacts').val(false);
+            $('#hdn_with_co_graduation_and_partnership').val(false);
+            $('#hdn_with_ares_code').val(false);
+            $('#hdn_with_enrollment').val(false);
+            $('#hdn_with_funding').val(false);
+            $('#hdn_with_other_legal_information').val(false);
+            $('#hdn_with_additional_info').val(false);
+            $('#hdn_with_keywords').val(false);
+
 
             if($('#chb_with_validity').prop('checked')){
                 $('#hdn_with_validity').val(true);
@@ -95,8 +107,27 @@
             if($('#chb_with_diplomas_and_certificats').prop('checked')){
                 $('#hdn_with_diplomas_and_certificats').val(true);
             }
-
-
+            if($('#chb_with_co_graduation_and_partnership').prop('checked')){
+                $('#hdn_with_co_graduation_and_partnership').val(true);
+            }
+            if($('#chb_with_ares_code').prop('checked')){
+                $('#hdn_with_ares_code').val(true);
+            }
+            if($('#chb_with_enrollment').prop('checked')){
+                $('#hdn_with_enrollment').val(true);
+            }
+            if($('#chb_with_funding').prop('checked')){
+                $('#hdn_with_funding').val(true);
+            }
+            if($('#chb_with_other_legal_information').prop('checked')){
+                $('#hdn_with_other_legal_information').val(true);
+            }
+            if($('#chb_with_additional_info').prop('checked')){
+                $('#hdn_with_additional_info').val(true);
+            }
+            if($('#chb_with_keywords').prop('checked')){
+                $('#hdn_with_keywords').val(true);
+            }
 
         }
 

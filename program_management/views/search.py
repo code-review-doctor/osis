@@ -35,8 +35,8 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _, get_language
 from django_filters.views import FilterView
 
-from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data, \
-    create_customized_xls, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS
+from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
+from base.business.xls_customized import create_customized_xls, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_type import EducationGroupType
@@ -74,7 +74,6 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
 
 
 def _create_xls_customized(view_obj, context, **response_kwargs):
-    print('_create_xls_customized')
     other_params = []
     for parameter in TRAINING_LIST_CUSTOMIZABLE_PARAMETERS:
         if view_obj.request.GET.get(parameter) == 'true':
