@@ -225,7 +225,7 @@ def can_edit_proposal(proposal, author, raise_exception):
 
 
 def can_refused_proposal(proposal, author, raise_exception):
-    perm = 'base.can_refused_learning_unit_proposal'
+    perm = 'base.can_refuse_learning_unit_proposal'
     return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 

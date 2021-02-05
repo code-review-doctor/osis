@@ -101,11 +101,11 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_learning_unit_no_application_this_year &
-                (
-                    (predicates.is_proposal_of_type_suppression &
-                     predicates.has_learning_unit_no_application_all_years &
+                (predicates.is_not_proposal_of_type_suppression |
+                    (predicates.has_learning_unit_no_application_all_years &
                      predicates.has_learning_unit_no_attribution_all_years
-                     ) | predicates.is_not_proposal_of_type_suppression),
+                     )
+                 ),
             'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
                 predicates.is_user_attached_to_current_requirement_entity,
@@ -122,14 +122,13 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_update_learning_achievement':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year,
-            'base.can_refused_learning_unit_proposal':
+            'base.can_refuse_learning_unit_proposal':
                 predicates.is_in_proposal_state &
                 predicates.is_year_in_proposal_state &
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
-                (
-                    (predicates.is_proposal_of_type_creation &
-                     predicates.has_learning_unit_no_attribution_this_year &
-                     predicates.has_learning_unit_no_application_this_year) |
-                    predicates.is_not_proposal_of_type_creation),
+                (predicates.is_not_proposal_of_type_creation |
+                    (predicates.has_learning_unit_no_attribution_this_year &
+                     predicates.has_learning_unit_no_application_this_year)
+                 ),
         })
