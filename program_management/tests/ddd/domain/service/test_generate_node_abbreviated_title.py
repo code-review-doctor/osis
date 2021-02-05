@@ -21,11 +21,14 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
+
 import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import MiniTrainingType
-from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle
+from program_management.ddd.domain.service.generate_node_abbreviated_title import GenerateNodeAbbreviatedTitle, \
+    DEFAULT_SPECIFIC_TITLES
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
@@ -42,3 +45,12 @@ class TestGenerateFromParentNode(SimpleTestCase):
 
         self.assertEqual("INITIALVALUETitle", result)
 
+    @mock.patch("program_management.ddd.domain.service.validation_rule.FieldValidationRule.get")
+    def test_should_use_default_specific_titles_for_minor_or_option_list(self, mock_get_field):
+        mock_get_field.return_value.initial_value = None
+
+        parent_node = NodeGroupYearFactory(title="Title")
+        child_type = random.choice(list(DEFAULT_SPECIFIC_TITLES.keys()))
+        result = GenerateNodeAbbreviatedTitle.generate(parent_node, child_type)
+        expected_result = DEFAULT_SPECIFIC_TITLES[child_type].replace(" ", "").upper() + parent_node.title
+        self.assertEqual(expected_result, result)
