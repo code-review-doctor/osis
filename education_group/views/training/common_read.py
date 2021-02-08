@@ -34,7 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
-from base.auth.roles import program_manager
+from base.business.education_group import has_coorganization
 from base.business.education_groups import general_information_sections
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
@@ -50,18 +50,16 @@ from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.business_types import *
 from program_management.ddd.command import GetLastExistingVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import node_identity_service, get_last_existing_version_service, \
-    get_last_existing_transition_version_service
+from program_management.ddd.service.read import node_identity_service, get_last_existing_transition_version_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -157,7 +155,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ).format(
                 root=root_node,
                 version="[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard() else ""
+                if version_identity and not version_identity.is_standard else ""
             )
             display_warning_messages(self.request, message)
             return root_node
@@ -256,14 +254,14 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return "program_management.change_training_version"
 
     def get_delete_permanently_training_url(self):
-        if self.program_tree_version_identity.is_standard():
+        if self.program_tree_version_identity.is_standard:
             return reverse(
                 'training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             )
 
     def get_delete_permanently_tree_version_url(self):
-        if not self.program_tree_version_identity.is_standard():
+        if not self.program_tree_version_identity.is_standard:
             return reverse(
                 'delete_permanently_tree_version',
                 kwargs={
@@ -276,7 +274,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return "program_management.delete_permanently_training_version"
 
     def get_create_specific_version_url(self):
-        if self.is_root_node and self.program_tree_version_identity.is_standard():
+        if self.is_root_node and self.program_tree_version_identity.is_standard:
             return reverse(
                 'create_education_group_specific_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
