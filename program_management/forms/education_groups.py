@@ -204,12 +204,12 @@ class GroupFilter(FilterSet):
         ).annotate(
             complete_title_fr=Case(
                 When(~Q(educationgroupversion__transition_name=NOT_A_TRANSITION) &
-                     Q(educationgroupversion__version_name=STANDARD),
+                     Q(educationgroupversion__version_name=''),
                      then=Concat('acronym', Value('[Transition]'))),
-                When(~Q(educationgroupversion__version_name=STANDARD) &
+                When(~Q(educationgroupversion__version_name='') &
                      ~Q(educationgroupversion__transition_name=NOT_A_TRANSITION),
                      then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
-                When(~Q(educationgroupversion__version_name=STANDARD) &
+                When(~Q(educationgroupversion__version_name='') &
                      Q(educationgroupversion__transition_name=NOT_A_TRANSITION),
                      then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
                 default='acronym',
