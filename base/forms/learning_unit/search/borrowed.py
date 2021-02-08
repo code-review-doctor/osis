@@ -65,7 +65,7 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         self.form.fields["academic_year"].required = True
 
     def filter_queryset(self, queryset: 'LearningUnitYearQuerySet'):
-        qs = super().filter_queryset(queryset).select_related("element")
+        qs = super().filter_queryset(queryset).select_related("element").exclude(element__isnull=True)
 
         faculty_borrowing_id = None
         faculty_borrowing_acronym = self.form.cleaned_data.get('faculty_borrowing_acronym')
