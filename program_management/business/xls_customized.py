@@ -48,7 +48,7 @@ ARES_ONLY = [str(_('ARES study code')), str(_('ARES-GRACA')), str(_('ARES abilit
 
 ACTIVITIES_TITLES = [
     str(_('Activities on other campus')), str(_('Internship')), str(_('Dissertation')), str(_('Primary language')),
-    str(_('activities in English')).title(), str(_('Other languages activities')),
+    str(_('activities in English')).capitalize(), str(_('Other languages activities')),
 ]
 
 WORKSHEET_TITLE = _('Education_groups')
@@ -95,16 +95,16 @@ COMMON_ARES_TITlES = [str(_('Code co-graduation inter CfB')), str(_('Co-graduati
 
 PARAMETER_HEADERS = {
     WITH_VALIDITY: [str(_('Status')), str(_('Beginning')), str(_('Last year of org.'))],
-    WITH_OSIS_CODE: [str(_('Code OSIS'))],
+    WITH_OSIS_CODE: [str(_('Code'))],
     WITH_PARTIAL_ENGLISH_TITLES: [str(_('Title in English')), str(_('Partial title in French')),
                                   str(_('Partial title in English'))],
-    WITH_EDUCATION_FIELDS: [str(_('main domain')).title(), str(_('secondary domains')).title(), str(_('ISCED domain'))],
+    WITH_EDUCATION_FIELDS: [str(_('main domain')).capitalize(), str(_('secondary domains')).capitalize(), str(_('ISCED domain'))],
     WITH_ORGANIZATION: [str(_('Schedule type')), str(_('Manag. ent.')), str(_('Admin. ent.')),
                         str(_('Learning location')), str(_('Duration'))] + ACTIVITIES_TITLES,
     WITH_ACTIVITIES: ACTIVITIES_TITLES,
     WITH_RESPONSIBLES_AND_CONTACTS: ["{} - {}".format(str(_('General informations')), str(_('contacts')))],
     WITH_DIPLOMA_CERTIFICAT: [str(_('Leads to diploma/certificate')), str(_('Diploma title')),
-                              str(_('Professionnal title')), str(_('certificate aims')).title()],
+                              str(_('Professionnal title')), str(_('certificate aims')).capitalize()],
     WITH_CO_GRADUATION_AND_PARTNERSHIP: COMMON_ARES_TITlES + [str(_('Program organized with other institutes'))],
     WITH_ARES_CODE: COMMON_ARES_TITlES + ARES_ONLY,
     WITH_ENROLLMENT: [str(_('Enrollment campus')), str(_('Enrollment enabled')), str(_('Web re-registration')),
@@ -113,14 +113,15 @@ PARAMETER_HEADERS = {
                    str(_('Funding international cooperation CCD/CUD direction'))],
     WITH_OTHER_LEGAL_INFORMATION: [str(_('Academic type')), str(_('University certificate')),
                                    str(_('Decree category'))],
-    WITH_ADDITIONAL_INFO: [str(_('Type of constraint')), str(_('minimum constraint').title()),
-                           str(_('maximum constraint').title()), str(_('comment (internal)').title()),
-                           str(_('Remark')), str(_('remark in english').title())],
+    WITH_ADDITIONAL_INFO: [str(_('Type of constraint')), str(_('minimum constraint').capitalize()),
+                           str(_('maximum constraint').capitalize()), str(_('comment (internal)').capitalize()),
+                           str(_('Remark')), str(_('Remark in English'))],
     WITH_KEYWORDS: [str(_('Keywords'))]
 }
 
 CARRIAGE_RETURN = "\n"
 BOLD_FONT = Font(bold=True)
+
 
 def create_customized_xls(user, found_education_groups_param, filters, order_data, other_params: List):
     if WITH_ORGANIZATION in other_params and WITH_ACTIVITIES in other_params:
