@@ -23,18 +23,60 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models.enums.education_group_types import TrainingType
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+
+def copy_to_next_year(modeladmin, request, queryset):
+    from program_management.ddd.command import CopyTreeVersionToNextYearCommand
+    from program_management.ddd.service.write import bulk_copy_program_tree_version_content_service
+    cmds = []
+    qs = queryset.select_related("offer", "root_group")
+    for obj in qs:
+        cmd = CopyTreeVersionToNextYearCommand(
+            from_year=obj.offer.academic_year.year,
+            from_offer_acronym=obj.offer.acronym,
+            from_offer_code=obj.root_group.partial_acronym,
+            from_version_name=obj.version_name,
+            from_is_transition=obj.is_transition
+        )
+        cmds.append(cmd)
+    result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version(cmds)
+    modeladmin.message_user(request, "{} programs have been copied".format(len(result)))
+
+
+copy_to_next_year.short_description = _("Copy program tree content to next year")
+
+
+class StandardListFilter(admin.SimpleListFilter):
+    title = _('Version')
+
+    parameter_name = 'standard'
+
+    def lookups(self, request, model_admin):
+        return (
+            ("yes", _("Standard")),
+            ("no", _("Particular"))
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(version_name='')
+        if self.value() == "no":
+            return queryset.exclude(version_name='')
+        return queryset
 
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'is_transition')
-    list_filter = ('is_transition', 'offer__academic_year')
+    list_filter = (StandardListFilter, 'is_transition', 'offer__academic_year')
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
+    actions = [copy_to_next_year]
 
 
 class StandardEducationGroupVersionManager(models.Manager):

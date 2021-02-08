@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 13:29+0100\n"
+"POT-Creation-Date: 2021-02-08 08:21+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -220,6 +220,9 @@ msgstr "Contenu"
 
 msgid "Continue"
 msgstr "Continuer"
+
+msgid "Copy program tree content to next year"
+msgstr "Copie le contenu du programme vers l'année suivante"
 
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
@@ -576,6 +579,9 @@ msgstr "Intitulé partiel en anglais"
 msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
 
+msgid "Particular"
+msgstr "Particulière"
+
 msgid "Particulière"
 msgstr "Particulière"
 
@@ -770,7 +776,9 @@ msgstr ""
 msgid ""
 "The learning unit %(acronym)s is used inside %(mini_trainings)s but not "
 "inside %(training)s"
-msgstr "L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais pas dans %(training)s"
+msgstr ""
+"L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais "
+"pas dans %(training)s"
 
 msgid "The learning unit has prerequisites"
 msgstr "L'UE a des prérequis"
@@ -785,11 +793,13 @@ msgstr "L'UE est un prérequis"
 msgid "The link \"%(node)s\" has been updated."
 msgstr "Le lien \"%(node)s\" a été mis à jour."
 
+#, python-format
 msgid ""
 "The parent \"%(parent)s\" has reached the maximum number of children allowed "
 "for the type(s) : \"%(child_types)s\"."
 msgstr ""
-"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de type(s) : \"%(child_types)s\"."
+"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de "
+"type(s) : \"%(child_types)s\"."
 
 #, python-format
 msgid ""

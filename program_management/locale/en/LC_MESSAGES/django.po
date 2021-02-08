@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 13:29+0100\n"
+"POT-Creation-Date: 2021-02-08 08:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -200,6 +200,9 @@ msgid "Content"
 msgstr ""
 
 msgid "Continue"
+msgstr ""
+
+msgid "Copy program tree content to next year"
 msgstr ""
 
 msgid "Courses not taught"
@@ -538,6 +541,9 @@ msgid "Partial title in English"
 msgstr ""
 
 msgid "Partial title in French"
+msgstr ""
+
+msgid "Particular"
 msgstr ""
 
 msgid "Particulière"
