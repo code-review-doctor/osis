@@ -25,7 +25,6 @@
 ##############################################################################
 
 from django.test import SimpleTestCase
-from django.utils.translation import gettext as _
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import TrainingType, GroupType
@@ -89,7 +88,9 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
             #          does not exist.
         """
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
-        LinkFactory(parent=self.authorized_parent, child=unauthorized_child)
+        LinkFactory(parent=self.authorized_parent, child=unauthorized_child, order=0)
+        LinkFactory(parent=self.authorized_parent, child=self.authorized_child, order=1)
+
         validator = DetachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
         self.assertValidatorNotRaises(validator)
 
@@ -119,7 +120,8 @@ class TestDetachAuthorizedRelationshipValidator(TestValidatorValidateMixin, Simp
               |--LEARNING_UNIT
         """
         LinkFactory(parent=self.authorized_parent, child=self.authorized_child)
-        link = LinkFactory(parent=self.authorized_child, child__node_type=NodeType.LEARNING_UNIT)
+        link = LinkFactory(parent=self.authorized_child, child__node_type=NodeType.LEARNING_UNIT, order=0)
+        LinkFactory(parent=self.authorized_child, child__node_type=GroupType.SUB_GROUP, order=1)
 
         node_to_detach = link.child
         detach_from = link.parent
