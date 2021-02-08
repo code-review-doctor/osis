@@ -53,7 +53,7 @@ from program_management.ddd.command import GetLastExistingVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import node_identity_service, get_last_existing_version_service
+from program_management.ddd.service.read import node_identity_service, get_last_existing_transition_version_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -90,9 +90,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         cmd = GetLastExistingVersionNameCommand(
             version_name=self.program_tree_version_identity.version_name,
             offer_acronym=self.program_tree_version_identity.offer_acronym,
-            is_transition=True
+            transition_name=self.program_tree_version_identity.transition_name
         )
-        return bool(get_last_existing_version_service.get_last_existing_version_identity(cmd))
+        return bool(get_last_existing_transition_version_service.get_last_existing_transition_version_identity(cmd))
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':

@@ -36,6 +36,8 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
+NOT_A_TRANSITION = ""
+TRANSITION_PREFIX = "TRANSITION"
 
 
 @attr.s(frozen=True, slots=True)
@@ -43,11 +45,14 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
-    is_transition = attr.ib(type=bool)  # TODO : to remove in OSIS-5580
-    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default='')
+    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default=NOT_A_TRANSITION)
 
     def is_standard(self):
         return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
+
+    @property
+    def is_transition(self) -> bool:
+        return bool(self.transition_name)
 
 
 class ProgramTreeVersionBuilder:
@@ -92,7 +97,7 @@ class ProgramTreeVersionBuilder:
             offer_acronym=cmd.offer_acronym,
             year=cmd.start_year,
             version_name=STANDARD,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
         tree_identity = program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.start_year)
         return ProgramTreeVersion(
@@ -115,7 +120,7 @@ class ProgramTreeVersionBuilder:
             command.start_year,
             command.offer_acronym,
             command.version_name,
-            command.is_transition
+            command.transition_name
         )
         if validator.is_valid():
             assert isinstance(from_existing_version, ProgramTreeVersion)
@@ -140,7 +145,7 @@ class ProgramTreeVersionBuilder:
             offer_acronym=from_tree_version.entity_id.offer_acronym,
             version_name=command.version_name,
             year=from_tree_version.entity_id.year,
-            is_transition=command.is_transition
+            transition_name=command.transition_name
         )
         return ProgramTreeVersion(
             program_tree_identity=new_tree_identity,
@@ -191,7 +196,7 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_transition(self) -> bool:
-        return bool(self.transition_name)
+        return self.entity_id.is_transition
 
     @transition_name.default
     def _transition_name(self) -> str:
@@ -208,10 +213,14 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def version_label(self):  # TODO :: to remove
         if self.is_standard:
-            return '[Transition]' if self.is_transition else ''
+            if self.is_transition:
+                return '[{}]'.format(self.transition_name)
+            else:
+                return ''
         else:
-            return '[{}-Transition]'.format(
-                self.version_name
+            return '[{}-{}]'.format(
+                self.version_name,
+                self.transition_name
             ) if self.is_transition else '[{}]'.format(self.version_name)
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':

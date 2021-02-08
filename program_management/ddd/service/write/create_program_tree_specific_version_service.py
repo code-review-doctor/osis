@@ -25,7 +25,7 @@
 ##############################################################################
 from program_management.ddd.command import CreateProgramTreeVersionCommand, DuplicateProgramTree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
-    STANDARD
+    STANDARD, NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import duplicate_program_tree_service
 
@@ -37,7 +37,7 @@ def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> P
         offer_acronym=command.offer_acronym,
         year=command.start_year,
         version_name=STANDARD,
-        is_transition=False
+        transition_name=NOT_A_TRANSITION
     )
     program_tree_version_from = ProgramTreeVersionRepository().get(entity_id=tree_version_identity_from)
 
@@ -46,7 +46,7 @@ def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> P
         DuplicateProgramTree(
             from_root_code=program_tree_version_from.program_tree_identity.code,
             from_root_year=program_tree_version_from.program_tree_identity.year,
-            duplicate_to_transition=command.is_transition,
+            duplicate_to_transition=command.transition_name,
             override_end_year_to=command.end_year,
             override_start_year_to=command.start_year,
         )

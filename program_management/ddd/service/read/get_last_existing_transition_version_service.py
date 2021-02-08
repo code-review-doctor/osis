@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,31 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
+from typing import Union
 
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
-from program_management.ddd.service.write import delete_program_tree_service
-from program_management.ddd.validators.validators_by_business_action import DeleteSpecificVersionValidatorList
+from program_management.ddd.domain.service.get_last_existing_transition_version_name import \
+    GetLastExistingTransitionVersion
 
 
-@transaction.atomic()
-def delete_specific_version(cmd: command.DeleteSpecificVersionCommand) -> ProgramTreeVersionIdentity:
-    program_tree_version_id = ProgramTreeVersionIdentity(
-        offer_acronym=cmd.acronym,
-        year=cmd.year,
+def get_last_existing_transition_version_identity(
+        cmd: command.GetLastExistingTransitionVersionNameCommand
+) -> Union[ProgramTreeVersionIdentity, None]:
+    return GetLastExistingTransitionVersion().get_last_existing_transition_version_identity(
         version_name=cmd.version_name,
-        transition_name=cmd.transition_name,
+        offer_acronym=cmd.offer_acronym
     )
-    program_tree_version = program_tree_version_repository.ProgramTreeVersionRepository.get(program_tree_version_id)
-
-    DeleteSpecificVersionValidatorList(program_tree_version).validate()
-
-    program_tree_version_repository.ProgramTreeVersionRepository.delete(
-        program_tree_version_id,
-
-        # Service Dependancy injection
-        delete_program_tree_service=delete_program_tree_service.delete_program_tree
-    )
-    return program_tree_version_id

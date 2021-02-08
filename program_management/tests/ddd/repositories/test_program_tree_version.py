@@ -35,6 +35,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -42,7 +43,6 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
     ProgramTreeVersionIdentityFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
-from program_management.ddd.domain.node import Node
 
 
 class TestVersionRepositoryCreateMethod(TestCase):
@@ -91,7 +91,7 @@ class TestVersionRepositoryCreateMethod(TestCase):
             offer__acronym=self.new_program_tree_version.entity_id.offer_acronym,
             offer__academic_year__year=self.new_program_tree_version.entity_id.year,
             version_name=self.new_program_tree_version.entity_id.version_name,
-            is_transition=self.new_program_tree_version.entity_id.is_transition,
+            transition_name=self.new_program_tree_version.entity_id.transition_name,
         )
 
         group_year_db_object = GroupYear.objects.get(
@@ -137,7 +137,7 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
             offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year=entity_id.year,
             version_name=entity_id.version_name,
-            is_transition=entity_id.is_transition,
+            transition_name=entity_id.transition_name,
             root_group=root_group,
         )
 
@@ -173,7 +173,7 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
             offer__acronym=entity_id.offer_acronym,
             offer__academic_year__year=entity_id.year,
             version_name=entity_id.version_name,
-            is_transition=entity_id.is_transition,
+            transition_name=entity_id.transition_name,
             root_group=root_group,
         )
 

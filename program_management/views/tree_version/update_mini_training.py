@@ -160,7 +160,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                     offer_acronym=update_command.offer_acronym,
                     year=year,
                     version_name=update_command.version_name,
-                    is_transition=update_command.is_transition
+                    transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
         return []
@@ -271,7 +271,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             offer_acronym=self.get_program_tree_version_obj().entity_id.offer_acronym,
             version_name=self.get_program_tree_version_obj().entity_id.version_name,
             year=self.get_program_tree_version_obj().entity_id.year,
-            is_transition=self.get_program_tree_version_obj().entity_id.is_transition,
+            transition_name=self.get_program_tree_version_obj().entity_id.transition_name,
 
             title_en=form.cleaned_data["version_title_en"],
             title_fr=form.cleaned_data["version_title_fr"],

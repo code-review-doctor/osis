@@ -31,6 +31,7 @@ from dateutil.relativedelta import relativedelta
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 
 
 class EducationGroupVersionFactory(factory.DjangoModelFactory):
@@ -41,6 +42,7 @@ class EducationGroupVersionFactory(factory.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.today() - relativedelta(years=1), datetime.today())
 
+    transition_name = NOT_A_TRANSITION
     is_transition = False
     version_name = factory.Sequence(lambda n: 'VERSION%d' % n)
     root_group = factory.SubFactory(GroupYearFactory)
@@ -62,11 +64,12 @@ class StandardEducationGroupVersionFactory(EducationGroupVersionFactory):
 class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = ''
     is_transition = True
+    transition_name = 'TRANSITION'
 
 
 class ParticularTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = 'CEMS'
-    is_transition = True
+    transition_name = 'TRANSITION'
 
 
 def create_with_version(version_offer=None, **kwargs):
