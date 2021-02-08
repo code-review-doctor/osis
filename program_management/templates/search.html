@@ -121,8 +121,8 @@
                 </div>
                 {% bootstrap_field form.ordering %}
                 {{ form.media }}
-                <input type="text" id="xls_status" name="xls_status">
-                <input type="text" id="xls_order_col" name="xls_order_col">
+                <input type="hidden" id="xls_status" name="xls_status">
+                <input type="hidden" id="xls_order_col" name="xls_order_col">
                 <input type="hidden" id="xls_order" name="xls_order">
                 <input type="hidden" id="hdn_with_validity" name="with_validity">
                 <input type="hidden" id="hdn_with_osis_code" name="with_osis_code">
@@ -161,22 +161,13 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                                 <li>
-                                    <a id="btn_produce_xls"
-                                       class="no_spinner"
-                                       style="margin-right:10px;"
-                                       title="{% trans 'Produce xls with a list of trainings' %}">
-                                        &nbsp;{% trans 'List of trainings' %}
-                                    </a>
-                                </li>
-                                <li>
                                     <a id="btn_produce_personnalized_xls"
                                        class="download"
                                        style="margin-right:10px;"
                                        data-toggle="modal" data-target="#modalXlsTrainingsListWithParameters"
                                        title="{% trans 'Produce xls with a list of trainings' %}">
-                                        &nbsp;{% trans 'List of trainings' %}2
+                                        &nbsp;{% trans 'List of trainings' %}
                                     </a>
-
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_administrative_data"
