@@ -22,6 +22,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
+
 from base.business.education_groups.general_information_sections import can_postpone_general_information, \
     CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from base.models.education_group_year import EducationGroupYear
@@ -29,7 +31,7 @@ from cms.contrib.views import UpdateCmsView
 from cms.enums import entity_name
 from education_group.views.mini_training.common_read import MiniTrainingRead
 from education_group.views.training.common_read import Tab
-from django.utils.translation import gettext_lazy as _
+
 
 class MiniTrainingUpdateGeneralInformation(MiniTrainingRead, UpdateCmsView):
     active_tab = Tab.GENERAL_INFO
