@@ -57,7 +57,7 @@ class TestCreateProgramTreeVersion(TestCase):
             offer_acronym=self.offer_acronym,
             version_name='',
             start_year=self.standard_version.entity_identity.year,
-            is_transition=True,
+            transition_name='Transition',
             title_en='Title in English',
             title_fr='Intitulé en français',
         )
