@@ -98,7 +98,8 @@ PARAMETER_HEADERS = {
     WITH_OSIS_CODE: [str(_('Code'))],
     WITH_PARTIAL_ENGLISH_TITLES: [str(_('Title in English')), str(_('Partial title in French')),
                                   str(_('Partial title in English'))],
-    WITH_EDUCATION_FIELDS: [str(_('main domain')).capitalize(), str(_('secondary domains')).capitalize(), str(_('ISCED domain'))],
+    WITH_EDUCATION_FIELDS: [str(_('main domain')).capitalize(), str(_('secondary domains')).capitalize(),
+                            str(_('ISCED domain'))],
     WITH_ORGANIZATION: [str(_('Schedule type')), str(_('Manag. ent.')), str(_('Admin. ent.')),
                         str(_('Learning location')), str(_('Duration'))] + ACTIVITIES_TITLES,
     WITH_ACTIVITIES: ACTIVITIES_TITLES,
@@ -132,7 +133,7 @@ def create_customized_xls(user, found_education_groups_param, filters, order_dat
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
                   xls_build.USER: get_name_or_username(user),
                   xls_build.FILENAME: XLS_FILENAME,
-                  xls_build.HEADER_TITLES: _build_customized_header(other_params),
+                  xls_build.HEADER_TITLES: _build_headers(other_params),
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
                   xls_build.FONT_ROWS: {BOLD_FONT: [0]}
                   }
@@ -184,7 +185,9 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         elif mini_training:
             data.append(mini_training.status.value)
             data.append(current_version.start_year)
-            data.append(current_version.end_year_of_existence if current_version.end_year_of_existence else _('unspecified'))
+            data.append(
+                current_version.end_year_of_existence if current_version.end_year_of_existence else _('unspecified')
+            )
         else:
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_VALIDITY])))
 
@@ -319,14 +322,14 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
     return data
 
 
-def _build_customized_header(other_params):
-    customized_header = DEFAULT_EDUCATION_GROUP_TITLES
-    for parameter in other_params:
-        if parameter == WITH_ARES_CODE and WITH_CO_GRADUATION_AND_PARTNERSHIP in other_params:
-            customized_header.extend(ARES_ONLY)
+def _build_headers(xls_parameters: List) -> List['str']:
+    customized_headers = DEFAULT_EDUCATION_GROUP_TITLES
+    for parameter in xls_parameters:
+        if parameter == WITH_ARES_CODE and WITH_CO_GRADUATION_AND_PARTNERSHIP in xls_parameters:
+            customized_headers.extend(ARES_ONLY)
         else:
-            customized_header.extend(PARAMETER_HEADERS[parameter])
-    return customized_header
+            customized_headers.extend(PARAMETER_HEADERS[parameter])
+    return customized_headers
 
 
 def _get_training(year: int, acronym: str) -> 'Training':
