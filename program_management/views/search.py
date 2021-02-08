@@ -83,6 +83,8 @@ def _create_xls_customized(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     egys = context["filter"].qs
     filters = _get_filter(context["form"])
+    print('-------1')
+    print(view_obj.request.GET.get('xls_order_col'))
     # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
     order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
              ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}

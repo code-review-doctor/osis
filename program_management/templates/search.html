@@ -121,17 +121,17 @@
                 </div>
                 {% bootstrap_field form.ordering %}
                 {{ form.media }}
-                <input type="hidden" id="xls_status" name="xls_status">
-                <input type="hidden" id="xls_order_col" name="xls_order_col">
+                <input type="text" id="xls_status" name="xls_status">
+                <input type="text" id="xls_order_col" name="xls_order_col">
                 <input type="hidden" id="xls_order" name="xls_order">
                 <input type="hidden" id="hdn_with_validity" name="with_validity">
                 <input type="hidden" id="hdn_with_osis_code" name="with_osis_code">
                 <input type="hidden" id="hdn_with_partial_english_titles" name="with_partial_english_titles">
                 <input type="hidden" id="hdn_with_education_fields" name="with_education_fields">
                 <input type="hidden" id="hdn_with_organization" name="with_organization">
-                <input type="hidden" id="hdn_with_activities_organization" name="with_activities_organization">
+                <input type="hidden" id="hdn_with_activities" name="with_activities">
                 <input type="hidden" id="hdn_with_responsibles_and_contacts" name="with_responsibles_and_contacts">
-                <input type="hidden" id="hdn_with_diplomas_and_certificats" name="with_diplomas_and_certificats">
+                <input type="hidden" id="hdn_with_diploma_and_certificat" name="with_diploma_and_certificat">
                 <input type="hidden" id="hdn_with_co_graduation_and_partnership" name="with_co_graduation_and_partnership">
                 <input type="hidden" id="hdn_with_ares_code" name="with_ares_code">
                 <input type="hidden" id="hdn_with_enrollment" name="with_enrollment">
@@ -244,11 +244,7 @@
         });
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
-
-            let table = $('#table_education_groups').DataTable();
-            let order = table.order();
-            $("#xls_order_col").val(get_ordering_column(order));
-            $("#xls_order").val(order[0][1]);
+            set_order_hidden_fields();
 
             let action_value;
             if ($(this).attr('id') === 'btn_produce_xls') {
@@ -257,8 +253,7 @@
                 action_value = 'xls_administrative';
             }
             prepare_xls(e, action_value);
-            $("#xls_order").val('');
-            $("#xls_order_col").val('');
+            reset_order_hidden_fields();
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
@@ -277,10 +272,38 @@
         });
 
         $("#btn_xls_with_parameters").click(function(e) {
+            set_order_hidden_fields();
             prepare_xls(e, 'xls_customized');
-            $("#hdn_with_grp").val('');
-            $("#hdn_with_attributions").val('');
+            $("#hdn_with_validity").val('');
+            $("#hdn_with_osis_code").val('');
+            $("#hdn_with_partial_english_titles").val('');
+            $("#hdn_with_education_fields").val('');
+            $("#hdn_with_organization").val('');
+            $("#hdn_with_activities").val('');
+            $("#hdn_with_responsibles_and_contacts").val('');
+            $("#hdn_with_diploma_and_certificat").val('');
+            $("#hdn_with_co_graduation_and_partnership").val('');
+            $("#hdn_with_ares_code").val('');
+            $("#hdn_with_enrollment").val('');
+            $("#hdn_with_funding").val('');
+            $("#hdn_with_other_legal_information").val('');
+            $("#hdn_with_additional_info").val('');
+            $("#hdn_with_keywords").val('');
+            reset_order_hidden_fields();
         });
+
+        function set_order_hidden_fields(){
+            let table = $('#table_education_groups').DataTable();
+            let order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+        }
+
+        function reset_order_hidden_fields() {
+            $("#xls_order").val('');
+            $("#xls_order_col").val('');
+        }
+
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
 {% endblock %}

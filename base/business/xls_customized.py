@@ -39,6 +39,14 @@ from osis_common.document import xls_build
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from base.utils.excel import get_html_to_text
+
+ARES_ONLY = [str(_('ARES study code')), str(_('ARES-GRACA')), str(_('ARES ability'))]
+
+ACTIVITIES_TITLES = [
+    str(_('Activities on other campus')), str(_('Internship')), str(_('Dissertation')), str(_('Primary language')),
+    str(_('activities in English')).title(), str(_('Other languages activities')),
+]
 
 WORKSHEET_TITLE = _('Education_groups')
 XLS_FILENAME = _('Education_groups')
@@ -49,16 +57,16 @@ WITH_OSIS_CODE = "with_osis_code"
 WITH_PARTIAL_ENGLISH_TITLES = "with_partial_english_titles"
 WITH_EDUCATION_FIELDS = "with_education_fields"
 WITH_ORGANIZATION = "with_organization"
-WITH_ACTIVITIES_ORGANIZATION = "with_activities_organization"
+WITH_ACTIVITIES = "with_activities"
 WITH_RESPONSIBLES_AND_CONTACTS = "with_responsibles_and_contacts"
-WITH_DIPLOMAS_CERTIFICATS = "with_diplomas_and_certificats"
+WITH_DIPLOMA_CERTIFICAT = "with_diploma_and_certificat"
 WITH_CO_GRADUATION_AND_PARTNERSHIP = "with_co_graduation_and_partnership"
 WITH_ARES_CODE = "with_ares_code"
 WITH_ENROLLMENT = "with_enrollment"
 WITH_FUNDING = "with_funding"
 WITH_OTHER_LEGAL_INFORMATION = "with_other_legal_information"
 WITH_ADDITIONAL_INFO = "with_additional_info"
-WITH_KEY_WORDS = "with_keywords"
+WITH_KEYWORDS = "with_keywords"
 
 TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_VALIDITY,
@@ -66,20 +74,21 @@ TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_PARTIAL_ENGLISH_TITLES,
     WITH_EDUCATION_FIELDS,
     WITH_ORGANIZATION,
-    WITH_ACTIVITIES_ORGANIZATION,
     WITH_RESPONSIBLES_AND_CONTACTS,
-    WITH_DIPLOMAS_CERTIFICATS,
+    WITH_ACTIVITIES,
+    WITH_DIPLOMA_CERTIFICAT,
     WITH_CO_GRADUATION_AND_PARTNERSHIP,
-    WITH_ARES_CODE,
     WITH_ENROLLMENT,
     WITH_FUNDING,
+    WITH_ARES_CODE,
     WITH_OTHER_LEGAL_INFORMATION,
     WITH_ADDITIONAL_INFO,
-    WITH_KEY_WORDS
+    WITH_KEYWORDS
 ]
 DEFAULT_EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
                                   str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits'))]
 
+COMMON_ARES_TITlES = [str(_('Code co-graduation inter CfB')), str(_('Co-graduation total coefficient'))]
 
 PARAMETER_HEADERS = {
     WITH_VALIDITY: [str(_('Status')), str(_('Beginning')), str(_('Last year of org.'))],
@@ -88,19 +97,13 @@ PARAMETER_HEADERS = {
                                   str(_('Partial title in English'))],
     WITH_EDUCATION_FIELDS: [str(_('main domain')).title(), str(_('secondary domains')).title(), str(_('ISCED domain'))],
     WITH_ORGANIZATION: [str(_('Schedule type')), str(_('Manag. ent.')), str(_('Admin. ent.')),
-                        str(_('Learning location')), str(_('Duration'))],
-    WITH_ACTIVITIES_ORGANIZATION: [str(_('Activities on other campus')), str(_('Internship')), str(_('Dissertation')),
-                                   str(_('Primary language')), str(_('activities in English')).title(),
-                                   str(_('Other languages activities')),
-                                   ],
+                        str(_('Learning location')), str(_('Duration'))] + ACTIVITIES_TITLES,
+    WITH_ACTIVITIES: ACTIVITIES_TITLES,
     WITH_RESPONSIBLES_AND_CONTACTS: ["{} - {}".format(str(_('General informations')), str(_('contacts')))],
-    WITH_DIPLOMAS_CERTIFICATS: [str(_('Leads to diploma/certificate')), str(_('Diploma title')),
-                                str(_('Professionnal title')), str(_('certificate aims')).title()],
-    WITH_CO_GRADUATION_AND_PARTNERSHIP: [str(_('Code co-graduation inter CfB')),
-                                         str(_('Co-graduation total coefficient')),
-                                         str(_('Program organized with other institutes'))],
-    WITH_ARES_CODE: [str(_('Code co-graduation inter CfB')), str(_('Co-graduation total coefficient')),
-                     str(_('ARES study code')), str(_('ARES-GRACA')), str(_('ARES ability'))],
+    WITH_DIPLOMA_CERTIFICAT: [str(_('Leads to diploma/certificate')), str(_('Diploma title')),
+                              str(_('Professionnal title')), str(_('certificate aims')).title()],
+    WITH_CO_GRADUATION_AND_PARTNERSHIP: COMMON_ARES_TITlES + [str(_('Program organized with other institutes'))],
+    WITH_ARES_CODE: COMMON_ARES_TITlES + ARES_ONLY,
     WITH_ENROLLMENT: [str(_('Enrollment campus')), str(_('Enrollment enabled')), str(_('Web re-registration')),
                       str(_('Partial deliberation')), str(_('Admission exam')), str(_('Rate code'))],
     WITH_FUNDING: [str(_('Funding')), str(_('Funding direction')), str(_('Funding international cooperation CCD/CUD')),
@@ -110,13 +113,16 @@ PARAMETER_HEADERS = {
     WITH_ADDITIONAL_INFO: [str(_('Type of constraint')), str(_('minimum constraint').title()),
                            str(_('maximum constraint').title()), str(_('comment (internal)').title()),
                            str(_('Remark')), str(_('remark in english').title())],
-    WITH_KEY_WORDS: [str(_('Keywords'))]
+    WITH_KEYWORDS: [str(_('Keywords'))]
 }
 
 CARRIAGE_RETURN = "\n"
 
 
 def create_customized_xls(user, found_education_groups_param, filters, order_data, other_params: List):
+    if WITH_ORGANIZATION in other_params and WITH_ACTIVITIES in other_params:
+        other_params.remove(WITH_ACTIVITIES)
+
     found_education_groups = ordering_data(found_education_groups_param, order_data)
     working_sheets_data = prepare_xls_content_with_parameters(found_education_groups, other_params)
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
@@ -133,8 +139,6 @@ def prepare_xls_content_with_parameters(found_education_groups: List[GroupYear],
 
 
 def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear, other_params) -> List:
-    """ At this stage, the group_year has been annotated with property complete_title_fr / full_title_fr"""
-
     training = _get_training(group_year.academic_year.year, group_year.acronym)
 
     node_identity = NodeIdentity(code=group_year.partial_acronym, year=group_year.academic_year.year)
@@ -184,19 +188,9 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
                 data.append("{} {}".format(training.duration, training.duration_unit.value))
             else:
                 data.append("")
+            data.extend(activities_data(training))
         else:
             data.extend(add_empty_str(WITH_ORGANIZATION))
-
-    if WITH_ACTIVITIES_ORGANIZATION in other_params:
-        if group.is_training():
-            data.append(training.other_campus_activities.value if training.other_campus_activities else '')
-            data.append(training.internship_presence.value.title() if training.internship_presence else '')
-            data.append(str(_('Yes')) if training.has_dissertation else str(_('No')))
-            data.append(training.main_language.name if training.main_language else '')
-            data.append(training.english_activities.value.title() if training.english_activities else '')
-            data.append(training.other_language_activities.value.title() if training.other_language_activities else '')
-        else:
-            data.extend(add_empty_str(WITH_ACTIVITIES_ORGANIZATION))
 
     if WITH_RESPONSIBLES_AND_CONTACTS in other_params:
         if group.is_training():
@@ -204,7 +198,13 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         else:
             data.extend(add_empty_str(WITH_RESPONSIBLES_AND_CONTACTS))
 
-    if WITH_DIPLOMAS_CERTIFICATS:
+    if WITH_ACTIVITIES in other_params:
+        if group.is_training():
+            data.extend(activities_data(training))
+        else:
+            data.extend(add_empty_str(WITH_ACTIVITIES))
+
+    if WITH_DIPLOMA_CERTIFICAT in other_params:
         if group.is_training():
             data.append(yesno(training.diploma.leads_to_diploma).title())
             data.append(yesno(training.diploma.printing_title))
@@ -214,7 +214,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
                 aims += "{} - {} - {}{}".format(aim.section, aim.code, aim.description, CARRIAGE_RETURN)
             data.append(aims)
         else:
-            data.extend(add_empty_str(WITH_DIPLOMAS_CERTIFICATS))
+            data.extend(add_empty_str(WITH_DIPLOMA_CERTIFICAT))
 
     if WITH_CO_GRADUATION_AND_PARTNERSHIP in other_params:
         if group.is_training():
@@ -223,14 +223,6 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         else:
             data.extend(add_empty_str(WITH_CO_GRADUATION_AND_PARTNERSHIP))
 
-    if WITH_ARES_CODE in other_params:
-        if group.is_training():
-            data.extend(_build_common_ares_code_data(training, group, current_version))
-            data.append(training.hops.ares_code)
-            data.append(training.hops.ares_graca)
-            data.append(training.hops.ares_authorization)
-        else:
-            data.extend(add_empty_str(WITH_ARES_CODE))
     if WITH_ENROLLMENT in other_params:
         if group.is_training():
             data.append("{} - {}".format(training.enrollment_campus.name, training.enrollment_campus.university_name))
@@ -256,6 +248,16 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         else:
             data.extend(add_empty_str(WITH_FUNDING))
 
+    if WITH_ARES_CODE in other_params:
+        if group.is_training():
+            if WITH_CO_GRADUATION_AND_PARTNERSHIP not in other_params:
+                data.extend(_build_common_ares_code_data(training))
+            data.append(training.hops.ares_code)
+            data.append(training.hops.ares_graca)
+            data.append(training.hops.ares_authorization)
+        else:
+            data.extend(add_empty_str(WITH_ARES_CODE))
+
     if WITH_OTHER_LEGAL_INFORMATION in other_params:
         if group.is_training():
             data.append(training.academic_type.value if training.academic_type else '')
@@ -271,17 +273,17 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.append(group.content_constraint.minimum)
             data.append(group.content_constraint.maximum)
             data.append(training.internal_comment)
-            data.append(group.remark.text_fr)  # attention voir ce que ça donne avec html
-            data.append(group.remark.text_en)  # attention voir ce que ça donne avec html
+            data.append(get_html_to_text(group.remark.text_fr))
+            data.append(get_html_to_text(group.remark.text_en))
 
         else:
             data.extend(add_empty_str(WITH_ADDITIONAL_INFO))
 
-    if WITH_KEY_WORDS in other_params:
+    if WITH_KEYWORDS in other_params:
         if group.is_training():
             data.append(training.keywords)
         else:
-            data.extend(add_empty_str(WITH_KEY_WORDS))
+            data.extend(add_empty_str(WITH_KEYWORDS))
     return data
 
 
@@ -289,7 +291,10 @@ def _build_customized_header(other_params):
     customized_header = DEFAULT_EDUCATION_GROUP_TITLES
     print(customized_header)
     for parameter in other_params:
-        customized_header.extend(PARAMETER_HEADERS[parameter])
+        if parameter == WITH_ARES_CODE and WITH_CO_GRADUATION_AND_PARTNERSHIP in other_params:
+            customized_header.extend(ARES_ONLY)
+        else:
+            customized_header.extend(PARAMETER_HEADERS[parameter])
     return customized_header
 
 
@@ -302,10 +307,11 @@ def _get_training(year: int, acronym: str) -> 'Training':
 
 
 def add_empty_str(parameter):
-    ch = []
-    for occurence in PARAMETER_HEADERS[parameter]:
-        ch.append('')
-    return ch
+    # ch = []
+    # for occurence in PARAMETER_HEADERS[parameter]:
+    #     ch.append('')
+    # return ch
+    return ['' for occurence in PARAMETER_HEADERS[parameter]]
 
 
 def _get_start_year(current_version, training, group):
@@ -433,4 +439,15 @@ def get_co_organizations(training):
 
 def _build_common_ares_code_data(training):
     return [training.co_graduation.code_inter_cfb,
-            training.co_graduation.coefficientnormalize if training.co_graduation.coefficient else '']
+            training.co_graduation.coefficient if training.co_graduation.coefficient else '']
+
+
+def activities_data(training):
+    data = list()
+    data.append(training.other_campus_activities.value if training.other_campus_activities else '')
+    data.append(training.internship_presence.value.title() if training.internship_presence else '')
+    data.append(str(_('Yes')) if training.has_dissertation else str(_('No')))
+    data.append(training.main_language.name if training.main_language else '')
+    data.append(training.english_activities.value.title() if training.english_activities else '')
+    data.append(training.other_language_activities.value.title() if training.other_language_activities else '')
+    return data
