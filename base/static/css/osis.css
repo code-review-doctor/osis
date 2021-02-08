@@ -697,3 +697,11 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .btn-publish {
     margin-right: 20px;
 }
+
+/*
+Override default z-index of datepicker component in order to fix issue with datepicker in modal
+https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-behind-popover/51344669
+*/
+.bootstrap-datetimepicker-widget {
+    z-index: 1600;
+}

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,21 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
-from rest_framework.response import Response
+from django import forms
+from django.core.exceptions import ValidationError
 
-from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
-from attribution.calendar.application_courses_calendar import ApplicationCoursesCalendar
-from base.business.event_perms import AcademicEventRepository
+from base.forms.utils.datefield import DatePickerInput
+from django.utils.translation import gettext_lazy as _
 
 
-class ApplicationCoursesCalendarListView(generics.ListAPIView):
-    """
-       Return all calendars related to application courses
-    """
-    name = 'application-courses-calendars'
+class AcademicCalendarUpdateForm(forms.Form):
+    start_date = forms.DateField(label=_("Start date"), widget=DatePickerInput())
+    end_date = forms.DateField(widget=DatePickerInput(), label=_("End date"), required=False)
 
-    def list(self, request, *args, **kwargs):
-        events = AcademicEventRepository().get_academic_events(ApplicationCoursesCalendar.event_reference)
-        serializer = ApplicationCourseCalendarSerializer(events, many=True)
-        return Response(serializer.data)
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        if cleaned_data['end_date'] is not None and cleaned_data['end_date'] < cleaned_data['start_date']:
+            raise ValidationError({
+                'end_date': _("%(max)s must be greater or equals than %(min)s") % {
+                    "max": _("End date"),
+                    "min": _("Start date"),
+                }
+            })
+        return cleaned_data

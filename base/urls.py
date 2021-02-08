@@ -93,12 +93,11 @@ urlpatterns = [
 
     url(r'^academic_calendars/', include([
         url(r'^$', academic_calendar.AcademicCalendarsView.as_view(), name='academic_calendars'),
-        # url(r'^(?P<academic_calendar_id>[0-9]+)/$', academic_calendar.academic_calendar_read,
-        #     name='academic_calendar_read'),
-        # url(r'^form(?:/(?P<academic_calendar_id>[0-9]+))?/$', academic_calendar.academic_calendar_form,
-        #     name='academic_calendar_form'),
-        # url(r'^delete(?:/(?P<pk>[0-9]+))?/$', academic_calendar.AcademicCalendarDelete.as_view(),
-        #     name='academic_calendar_delete'),
+        url(
+            r'^(?P<academic_calendar_id>[0-9]+)/$',
+            academic_calendar.AcademicCalendarUpdate.as_view(),
+            name='academic_calendar_update'
+        ),
     ])),
 
     url(r'^admin/', include([

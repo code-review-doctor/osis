@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,21 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
-from rest_framework.response import Response
+import datetime
 
-from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
-from attribution.calendar.application_courses_calendar import ApplicationCoursesCalendar
-from base.business.event_perms import AcademicEventRepository
+from django.test import SimpleTestCase
+
+from base.forms.academic_calendar.update import AcademicCalendarUpdateForm
 
 
-class ApplicationCoursesCalendarListView(generics.ListAPIView):
-    """
-       Return all calendars related to application courses
-    """
-    name = 'application-courses-calendars'
+class TesAcademicCalendarUpdateForm(SimpleTestCase):
+    def test_end_date_lower_than_start_date_assert_raise_exception(self):
+        form = AcademicCalendarUpdateForm(data={
+            'start_date': datetime.date.today(),
+            'end_date': datetime.date.today() - datetime.timedelta(days=5)
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('end_date', form.errors)
 
-    def list(self, request, *args, **kwargs):
-        events = AcademicEventRepository().get_academic_events(ApplicationCoursesCalendar.event_reference)
-        serializer = ApplicationCourseCalendarSerializer(events, many=True)
-        return Response(serializer.data)
+    def test_start_date_empty_assert_raise_error_because_start_date_mandatory(self):
+        form = AcademicCalendarUpdateForm(data={
+            'start_date': '',
+            'end_date': ''
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('start_date', form.errors)
+
+    def test_assert_end_date_can_be_empty(self):
+        form = AcademicCalendarUpdateForm(data={
+            'start_date': datetime.date.today(),
+            'end_date': ''
+        })
+        self.assertTrue(form.is_valid())
