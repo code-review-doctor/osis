@@ -32,6 +32,9 @@ from dateutil.relativedelta import relativedelta
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
+from program_management.forms.version import TRANSITION
+
+CEMS = 'CEMS'
 
 
 class EducationGroupVersionFactory(factory.DjangoModelFactory):
@@ -62,12 +65,12 @@ class StandardEducationGroupVersionFactory(EducationGroupVersionFactory):
 
 class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = ''
-    transition_name = 'TRANSITION'
+    transition_name = TRANSITION
 
 
 class ParticularTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
-    version_name = 'CEMS'
-    transition_name = 'TRANSITION'
+    version_name = CEMS
+    transition_name = TRANSITION
 
 
 def create_with_version(version_offer=None, **kwargs):
@@ -75,3 +78,4 @@ def create_with_version(version_offer=None, **kwargs):
     if version_offer:
         EducationGroupVersionFactory(offer=version_offer, root_group=group_yr)
     return group_yr
+

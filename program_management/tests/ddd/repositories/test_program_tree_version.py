@@ -36,6 +36,7 @@ from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -126,8 +127,8 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         cls.year = AcademicYearFactory(current=True).year
         cls.repository = ProgramTreeVersionRepository()
 
-    def test_field_mapping_with_specific_version(self):
-        entity_id = ProgramTreeVersionIdentityFactory(year=self.year)
+    def test_field_mapping_with_specific_version_not_transition(self):
+        entity_id = ProgramTreeVersionIdentityFactory(year=self.year, transition_name=NOT_A_TRANSITION)
         root_group = ElementFactory(
             group_year=GroupYearFactory(
                 academic_year__year=entity_id.year,
