@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/education_group/
    description: 'Production server'
 info:
-  version: '1.02'
+  version: '1.03'
   title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
@@ -911,6 +911,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         prerequisites_string:
           type: string
           example: (codeA OR codeB) AND (codeC)
@@ -927,6 +929,8 @@ components:
           type: string
           format: uri
         title:
+          type: string
+        title_en:
           type: string
     Hops:
       type: object
