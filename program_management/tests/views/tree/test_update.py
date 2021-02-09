@@ -30,7 +30,7 @@ from django.urls import reverse
 from base.tests.factories.person import PersonFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
-from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.forms.content import LinkForm, ContentFormSet
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
@@ -135,7 +135,7 @@ class TestUpdateLinkView(TestCase):
         mock_get_tree.return_value = self.tree
         mock_get_tree_version.return_value = ProgramTreeVersionIdentityFactory(
             transition_name=NOT_A_TRANSITION,
-            version_name=''
+            version_name=STANDARD
         )
         mock_form_save.side_effect = form_save_effect
         self.client.post(self.url, data={})
