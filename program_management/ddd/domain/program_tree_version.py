@@ -226,18 +226,16 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_official_standard(self) -> bool:
         return self.entity_id.is_official_standard
 
+    # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
     @property
-    def version_label(self):  # TODO :: to remove
-        if self.is_standard:
-            if self.is_transition:
-                return '[{}]'.format(self.transition_name)
-            else:
-                return ''
-        else:
-            return '[{}-{}]'.format(
-                self.version_name,
-                self.transition_name
-            ) if self.is_transition else '[{}]'.format(self.version_name)
+    def version_label(self):
+        if self.entity_id.is_official_standard:
+            return ''
+        elif self.entity_id.is_standard_transition:
+            return '[{}]'.format(self.transition_name)
+        elif self.entity_id.is_specific_official:
+            return '[{}]'.format(self.version_name)
+        return '[{}-{}]'.format(self.version_name, self.transition_name)
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)
