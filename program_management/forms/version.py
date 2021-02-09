@@ -48,7 +48,8 @@ from program_management.ddd.command import GetVersionMaxEndYear
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_specific_version_max_end_year_service, get_transition_version_max_end_year_service
+from program_management.ddd.service.read import get_specific_version_max_end_year_service, \
+    get_transition_version_max_end_year_service
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
     TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
