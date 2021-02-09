@@ -102,7 +102,9 @@ class TestVersionRepositoryCreateMethod(TestCase):
         self.assertEqual(len(education_group_year_db_objects), 1)
         self.assertEqual(education_group_version_db_object.offer_id, self.database_offer.id)
         self.assertEqual(education_group_version_db_object.root_group, group_year_db_object)
-        self.assertEqual(education_group_version_db_object.is_transition, self.new_program_tree_version.is_transition)
+        self.assertEqual(
+            education_group_version_db_object.transition_name, self.new_program_tree_version.transition_name
+        )
         self.assertEqual(education_group_version_db_object.version_name, self.new_program_tree_version.version_name)
         self.assertEqual(education_group_version_db_object.title_fr, self.new_program_tree_version.title_fr)
         self.assertEqual(education_group_version_db_object.title_en, self.new_program_tree_version.title_en)
@@ -154,7 +156,7 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
             version_tree_domain_obj.entity_id.version_name, education_group_version_model_obj.version_name
         )
         self.assertEqual(
-            version_tree_domain_obj.entity_id.is_transition, education_group_version_model_obj.is_transition
+            version_tree_domain_obj.entity_id.transition_name, education_group_version_model_obj.transition_name
         )
         self.assertEqual(
             version_tree_domain_obj.end_year_of_existence, root_group.group.end_year.year

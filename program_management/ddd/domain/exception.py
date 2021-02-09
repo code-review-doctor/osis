@@ -150,7 +150,7 @@ class ProgramTreeVersionMismatch(BusinessException):
         super().__init__(messages, **kwargs)
 
     def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
-        return str(_('Standard')) if version_identity.is_standard else version_identity.version_name
+        return str(_('Standard')) if version_identity.is_official_standard else version_identity.version_name
 
 
 class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):

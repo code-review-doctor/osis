@@ -155,7 +155,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ).format(
                 root=root_node,
                 version="[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard else ""
+                if version_identity and not version_identity.is_official_standard else ""
             )
             display_warning_messages(self.request, message)
             return root_node
@@ -235,7 +235,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                "?path_to={}".format(self.path)
 
     def get_update_training_url(self):
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return reverse_with_get(
                 'training_update',
                 kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'],
@@ -249,19 +249,19 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         )
 
     def get_update_permission_name(self) -> str:
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return "base.change_training"
         return "program_management.change_training_version"
 
     def get_delete_permanently_training_url(self):
-        if self.program_tree_version_identity.is_standard:
+        if self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             )
 
     def get_delete_permanently_tree_version_url(self):
-        if not self.program_tree_version_identity.is_standard:
+        if not self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'delete_permanently_tree_version',
                 kwargs={
@@ -274,7 +274,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return "program_management.delete_permanently_training_version"
 
     def get_create_specific_version_url(self):
-        if self.is_root_node and self.program_tree_version_identity.is_standard:
+        if self.is_root_node and self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'create_education_group_specific_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
@@ -310,7 +310,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
-                'display': self.current_version.is_standard_version,
+                'display': self.current_version.is_official_standard,
                 'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, self.node_identity, self.path),
             },
             Tab.ADMINISTRATIVE_DATA: {
@@ -359,18 +359,18 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def have_administrative_data_tab(self):
         return self.group.type not in TrainingType.root_master_2m_types_enum() and \
-               self.current_version.is_standard_version
+               self.current_version.is_official_standard
 
     def have_general_information_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
 
     def have_skills_and_achievements_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in TrainingType.with_skills_achievements()
 
     def have_admission_condition_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in TrainingType.with_admission_condition()
 
     def get_publish_url(self):
