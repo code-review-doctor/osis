@@ -27,31 +27,17 @@ from django.test import TestCase, SimpleTestCase
 
 
 from program_management.business.xls_customized import _build_headers, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS, \
-    WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, _build_additional_info
+    WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
+    _build_additional_info_data, _build_validity_data, _get_start_year, _get_end_year, _get_titles_en, \
+    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data
 from django.test.utils import override_settings
-
-from django.conf import settings
-from django.db.models import F
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
-
-from base.models.enums import organization_type, education_group_types
-from base.tests.factories.academic_year import AcademicYearFactory
-
-
-from base.tests.factories.entity_version import EntityVersionFactory
-from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
-from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory
-from reference.tests.factories.domain import DomainFactory
-from unittest import mock
-
-from django.http import HttpResponseForbidden, HttpResponseNotFound
-from django.test import TestCase
-from django.urls import reverse
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
+    SpecificProgramTreeVersionFactory, ProgramTreeVersionFactory
 from django.utils.translation import gettext_lazy as _
-
+from base.models.enums import organization_type, education_group_types
+from education_group.tests.ddd.factories.titles import TitlesFactory
+from base.models.education_group_publication_contact import EducationGroupPublicationContact
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
@@ -80,7 +66,16 @@ from education_group.tests.ddd.factories.remark import RemarkFactory
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
+from education_group.ddd.domain.training import TrainingIdentity
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
+from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
+from base.models.enums.publication_contact_type import PublicationContactType
+from base.tests.factories.education_group_year import TrainingFactory as DbTrainingFactory
+from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory, DiplomaAimIdentityFactory
+
+UNSPECIFIED_FR = "Indéterminé"
+
+REMARK = RemarkFactory(text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>", text_en="Remarque fr")
 
 DEFAULT_FR_HEADERS = ['Anac.', 'Sigle/Int. abr.', 'Intitulé', 'Catégorie', 'Type', 'Crédits']
 VALIDITY_HEADERS = ["Statut", "Début", "Dernière année d'org."]
@@ -181,7 +176,7 @@ class XlsCustomizedHeadersTestCase(SimpleTestCase):
         self.assertListEqual(headers[6:], CO_GRADUATION_AND_PARTNERSHIP_HEADERS)
 
 
-class XlsCustomizedContentForTrainingTestCase(TestCase):
+class XlsCustomizedContentTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_year = get_current_year()
@@ -197,78 +192,280 @@ class XlsCustomizedContentForTrainingTestCase(TestCase):
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
         cls.root_group_element = ElementGroupYearFactory(group_year=cls.training_version.root_group)
-        # cls.group = cls.training_version.root_group
-        cls.constraint = ContentConstraintFactory(type=ConstraintTypeEnum.CREDITS,
-                                              minimum=1,
-                                              maximum=15)
-
-        cls.group_training = GroupFactory(entity_identity__code=cls.training_version.root_group.partial_acronym,
-                                 entity_identity__year=cls.current_year,
-                                 content_constraint=cls.constraint,
-                                 remark=RemarkFactory(
-                                     text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>",
-                                     text_en="Remarque fr")
-                                 )
-        cls.training = TrainingFactory(entity_identity__acronym=cls.training_version.root_group.partial_acronym,
-                                       entity_identity__year=cls.current_year,
-                                       internal_comment='Internal comment')
-
-    def test_build_additional_info_for_training(self):
-        expected = [self.group_training.content_constraint.type.value.title(), self.group_training.content_constraint.minimum,
-                    self.group_training.content_constraint.maximum, self.training.internal_comment,
-                    "Remarque voir Google", self.group_training.remark.text_en]
-        data = _build_additional_info(self.training, None, self.group_training)
-        self.assertListEqual(data, expected)
-
-
-class XlsCustomizedContentForMiniTrainingTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.current_year = get_current_year()
-
-        cls.mini_training_version = StandardEducationGroupVersionFactory(
-            offer__acronym="DROI2M",
-            offer__partial_acronym="LDROI200M",
-            offer__academic_year__year=cls.current_year,
-            offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
-            root_group__acronym="DROI2M",
-            root_group__partial_acronym="LDROI200M",
-            root_group__academic_year__year=cls.current_year,
-            root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
-        )
-        cls.root_group_element = ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
         cls.constraint = ContentConstraintFactory(type=ConstraintTypeEnum.CREDITS,
                                                   minimum=1,
                                                   maximum=15)
 
-        cls.group_training = GroupFactory(entity_identity__code=cls.mini_training_version.root_group.partial_acronym,
+        cls.group_training = GroupFactory(entity_identity__code=cls.training_version.root_group.partial_acronym,
                                           entity_identity__year=cls.current_year,
                                           content_constraint=cls.constraint,
-                                          remark=RemarkFactory(
-                                              text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>",
-                                              text_en="Remarque fr")
+                                          remark=REMARK
                                           )
+        cls.training = TrainingFactory(entity_identity__acronym=cls.training_version.root_group.partial_acronym,
+                                       entity_identity__year=cls.current_year,
+                                       internal_comment='Internal comment',
+                                       start_year=cls.current_year,
+                                       end_year=cls.current_year+6)
+
+        root_node_training = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120,
+                                                  offer_partial_title_fr='LDROI200M',
+                                                  start_year=cls.current_year,
+                                                  end_year=cls.current_year+3,)
+        cls.current_training_tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=root_node_training))
+
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
+            offer__acronym="APPDRT",
+            offer__partial_acronym="LDRT100P",
+            offer__academic_year__year=cls.current_year,
+            offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
+            root_group__acronym="APPDRT",
+            root_group__partial_acronym="LDRT100P",
+            root_group__academic_year__year=cls.current_year,
+            root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
+        )
+
         cls.education_group_type = MiniTrainingEducationGroupTypeFactory()
         cls.mini_training = MiniTrainingFactory(
-            entity_identity=MiniTrainingIdentity(acronym="LOIS58", year=cls.current_year),
+            entity_identity=MiniTrainingIdentity(acronym="APPDRT", year=cls.current_year),
             start_year=cls.current_year,
             type=education_group_types.MiniTrainingType[cls.education_group_type.name],
         )
-        cls.group_mini_training = GroupFactory(entity_identity__code=cls.mini_training_version.root_group.partial_acronym,
-                                               entity_identity__year=cls.current_year,
-                                               content_constraint=cls.constraint,
-                                               remark=RemarkFactory(
-                                                   text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>",
-                                                   text_en="Remarque fr")
-                                               )
+        root_node_mini_training = NodeGroupYearFactory(node_type=cls.mini_training.type,
+                                            offer_partial_title_fr='LDRT100P')
+        cls.current_mini_training_tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=root_node_mini_training))
+
+        cls.group_mini_training = GroupFactory(
+            entity_identity__code=cls.mini_training_version.root_group.partial_acronym,
+            entity_identity__year=cls.current_year,
+            content_constraint=cls.constraint,
+            remark=REMARK
+        )
+
+        cls.group = GroupFactory(
+            entity_identity=GroupIdentity(code="LOIS58", year=cls.current_year),
+            start_year=cls.current_year,
+            type=GroupType.COMMON_CORE.name,
+            content_constraint=cls.constraint,
+            remark=REMARK
+        )
+
+    def test_build_validity_for_training(self):
+        version = StandardProgramTreeVersionFactory()
+        # mock_get_program_tree_version.return_value = version
+        expected = ['Actif', str(self.training.start_year), str(self.training.end_year)]
+        data = _build_validity_data(self.training, None, self.group_training, self.current_training_tree_version)
+        self.assertListEqual(data, expected)
+
+    def test_get_start_year(self):
+        standard_current_version = StandardProgramTreeVersionFactory()
+        particular_current_version = SpecificProgramTreeVersionFactory()
+        training = TrainingFactory(start_year=2020,
+                                   end_year=2021)
+        mini_training = MiniTrainingFactory(start_year=2022,
+                                            end_year=2023)
+        group = GroupFactory(start_year=2018,
+                             end_year=2019)
+        self.assertEqual(_get_start_year(standard_current_version, training, None, group), str(training.start_year))
+        self.assertEqual(_get_start_year(particular_current_version, training, None, group),
+                         str(group.start_year))
+        self.assertEqual(_get_start_year(standard_current_version, None, mini_training, group),
+                         str(standard_current_version.start_year))
+        self.assertEqual(_get_start_year(particular_current_version, None, mini_training, group),
+                         str(particular_current_version.start_year))
 
     def test_build_additional_info_for_training(self):
+        expected = [self.group_training.content_constraint.type.value.title(), self.group_training.content_constraint.minimum,
+                    self.group_training.content_constraint.maximum, self.training.internal_comment,
+                    "Remarque voir Google", self.group_training.remark.text_en]
+        data = _build_additional_info_data(self.training, None, self.group_training)
+        self.assertListEqual(data, expected)
+
+    def test_build_additional_info_for_mini_training(self):
         expected = [self.group_mini_training.content_constraint.type.value.title(),
                     self.group_mini_training.content_constraint.minimum,
                     self.group_mini_training.content_constraint.maximum, '',
                     "Remarque voir Google", self.group_mini_training.remark.text_en]
-        data = _build_additional_info(None, self.mini_training, self.group_mini_training)
+        data = _build_additional_info_data(None, self.mini_training, self.group_mini_training)
         self.assertListEqual(data, expected)
 
+    def test_build_additional_info_for_group(self):
+        expected = [self.group.content_constraint.type.value.title(),
+                    self.group.content_constraint.minimum,
+                    self.group.content_constraint.maximum, '',
+                    "Remarque voir Google", self.group.remark.text_en]
+        data = _build_additional_info_data(None, None, self.group)
+        self.assertListEqual(data, expected)
 
+    def test_end_year(self):
+        standard_current_version = StandardProgramTreeVersionFactory()
+        particular_current_version = SpecificProgramTreeVersionFactory()
+        training = TrainingFactory(start_year=2020,
+                                   end_year=2021)
+        training_without_end_year = TrainingFactory(start_year=2020, end_year=None)
+        mini_training = MiniTrainingFactory(start_year=2022,
+                                            end_year=2023)
+        group = GroupFactory(start_year=2018,
+                             end_year=2019)
+        self.assertEqual(_get_end_year(standard_current_version, training, None, group), str(training.end_year))
+        self.assertEqual(_get_end_year(particular_current_version, training, None, group), str(group.end_year))
+        self.assertEqual(_get_end_year(standard_current_version, training_without_end_year, None, group),
+                         UNSPECIFIED_FR)
+
+        standard_current_version = ProgramTreeVersionFactory(end_year_of_existence=2021)
+        standard_current_version_without_end_year = ProgramTreeVersionFactory(end_year_of_existence=None)
+        self.assertEqual(_get_end_year(standard_current_version, None, mini_training, group),
+                         str(standard_current_version.end_year_of_existence))
+        self.assertEqual(_get_end_year(standard_current_version_without_end_year, None, mini_training, group),
+                         UNSPECIFIED_FR)
+
+
+class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.standard_current_version = StandardProgramTreeVersionFactory()
+        cls.particular_current_version = SpecificProgramTreeVersionFactory(title_en='Title en')
+
+        titles = TitlesFactory()
+        cls.aims1 = DiplomaAimFactory(entity_id__section=1, entity_id__code=191, description="description 1")
+        cls.aims2 = DiplomaAimFactory(entity_id__section=2, entity_id__code=192, description="description 2")
+        diplomas_factory = DiplomaFactory(aims=[
+            cls.aims1,
+            cls.aims2,
+        ])
+        cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory)
+        cls.training_finality = TrainingFactory(titles=titles,
+                                                type=TrainingType.MASTER_MA_120)
+
+        cls.mini_training = MiniTrainingFactory(titles=titles)
+        cls.group = GroupFactory(titles=titles)
+
+    def test_get_titles_en_for_training_standard_version_not_finality(self):
+        self.assertListEqual(_get_titles_en(self.standard_current_version, self.training, None, self.group),
+                             [self.training.titles.title_en, '', ''])
+
+    def test_get_titles_en_for_training_standard_version_finality(self):
+        self.assertListEqual(_get_titles_en(self.standard_current_version, self.training_finality, None, self.group),
+                             [
+                                 self.training.titles.title_en,
+                                 self.training.titles.partial_title_fr,
+                                 self.training.titles.partial_title_en
+                             ]
+                             )
+
+    def test_get_titles_en_for_training_particular_version_not_finality(self):
+        self.assertListEqual(_get_titles_en(self.particular_current_version, self.training, None, self.group),
+                             ["{}[{}]".format(self.training.titles.title_en,
+                                            self.particular_current_version.title_en),
+                              '', '']
+                             )
+
+    def test_get_titles_en_for_training_particular_version_finality(self):
+        self.assertListEqual(_get_titles_en(self.particular_current_version, self.training_finality, None, self.group),
+                             [
+                                 "{}[{}]".format(self.training.titles.title_en,
+                                               self.particular_current_version.title_en),
+                                 self.training.titles.partial_title_fr,
+                                 self.training.titles.partial_title_en
+                             ]
+                             )
+
+    def test_get_titles_en_for_group(self):
+        self.assertListEqual(_get_titles_en(None, None, None, self.group),
+                             [self.group.titles.title_en, '', ''])
+
+    def test_build_organization_data_for_training(self):
+        self.assertListEqual(
+            _build_organization_data(self.standard_current_version, self.training, self.group),
+            [
+                self.training.schedule_type.value, self.training.management_entity.acronym,
+                self.training.administration_entity.acronym,
+                "{} - {}".format(self.group.teaching_campus.name,
+                                 self.group.teaching_campus.university_name),
+                "{} {}".format(self.training.duration, self.training.duration_unit.value),
+                self.training.other_campus_activities.value if self.training.other_campus_activities else '',
+                self.training.internship_presence.value.title() if self.training.internship_presence else '',
+                str(_('Yes')) if self.training.has_dissertation else str(_('No')),
+                self.training.main_language.name if self.training.main_language else '',
+                self.training.english_activities.value.title() if self.training.english_activities else '',
+                self.training.other_language_activities.value.title() if self.training.other_language_activities else ''
+            ])
+
+    def test_build_organization_data_when_not_training(self):
+        self.assertListEqual(_build_organization_data(None, None, None),
+                             ['', '', '', '', '', '', '', '', '', '', ''])
+
+    def test_get_responsibles_and_contacts(self):
+        education_group_version = StandardEducationGroupVersionFactory()
+
+        g = GroupFactory(entity_identity=GroupIdentity(code=education_group_version.offer.partial_acronym,
+                                                       year=education_group_version.offer.academic_year.year))
+        academic_responsible_contact = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+            role_fr='dummy role in french',
+            role_en='dummy role in english',
+            education_group_year=education_group_version.offer
+        )
+
+        # education_group_yr = academic_responsible_contact.education_group_year
+        other_academic_responsible_contact = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
+            role_fr='dummy role in french',
+            role_en='dummy role in english',
+            education_group_year=education_group_version.offer
+        )
+        jury_member = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.JURY_MEMBER.name,
+            role_fr='dummy role in french',
+            role_en='dummy role in english',
+            education_group_year=education_group_version.offer
+        )
+        other_contact = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.OTHER_CONTACT.name,
+            role_fr='dummy role in french',
+            role_en='dummy role in english',
+            education_group_year=education_group_version.offer
+        )
+        contacts = _get_responsibles_and_contacts(g)
+
+        expected = "{}{}{}{}".format(
+            "Responsable académique{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(
+                CARRIAGE_RETURN, academic_responsible_contact.email, CARRIAGE_RETURN, CARRIAGE_RETURN, CARRIAGE_RETURN,
+                CARRIAGE_RETURN),
+            "Autres responsables académiques{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(
+                CARRIAGE_RETURN, other_academic_responsible_contact.email, CARRIAGE_RETURN,
+                CARRIAGE_RETURN, CARRIAGE_RETURN, CARRIAGE_RETURN),
+            "Membres du jury{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(CARRIAGE_RETURN,
+                                                                                                    jury_member.email,
+                                                                                                    CARRIAGE_RETURN,
+                                                                                                    CARRIAGE_RETURN,
+                                                                                                    CARRIAGE_RETURN,
+                                                                                                    CARRIAGE_RETURN),
+            "Autres contacts{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(CARRIAGE_RETURN,
+                                                                                                    other_contact.email,
+                                                                                                    CARRIAGE_RETURN,
+                                                                                                    CARRIAGE_RETURN,
+                                                                                                    CARRIAGE_RETURN,
+                                                                                                    CARRIAGE_RETURN))
+
+        self.assertEqual(contacts, expected)
+
+    def test_build_aims_data(self):
+        data_aims_1 = "{} - {} - {}{}".format(
+            self.aims1.section, self.aims1.code, self.aims1.description, CARRIAGE_RETURN
+        )
+        data_aims_2 = "{} - {} - {}{}".format(self.aims2.section, self.aims2.code, self.aims2.description,
+                                              CARRIAGE_RETURN)
+        expected = "{}{}".format(data_aims_1, data_aims_2)
+        aims_data = _build_aims_data(self.training)
+        self.assertEqual(aims_data, expected)
+
+    def test_build_without_aims_data(self):
+        training_without_aims = TrainingFactory(diploma=DiplomaFactory(aims=[]))
+        self.assertEqual(_build_aims_data(training_without_aims), '')
+
+    def test_build_keywords_data(self):
+        self.assertEqual(_build_keywords_data(self.training, None), self.training.keywords)
+        self.assertEqual(_build_keywords_data(None, self.mini_training), self.mini_training.keywords)
+        self.assertEqual(_build_keywords_data(None, None), '')

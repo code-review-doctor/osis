@@ -959,6 +959,9 @@ msgstr "Impossible de publier les sections pour {code} - {year}"
 msgid "University certificate"
 msgstr "Certificat universitaire"
 
+msgid "Unspecified"
+msgstr "Indéterminé"
+
 msgid "Update Content"
 msgstr "Modification Contenu"
 

@@ -150,12 +150,9 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
     mini_training = None
 
     if root_node:
-        print('rott')
         if root_node.is_training():
-            print('is_trainging')
             training = _get_training(group_year.academic_year.year, group_year.acronym)
         elif root_node.is_mini_training():
-            print('is_mini_t')
             mini_training = _get_mini_training(group_year.academic_year.year, group_year.acronym)
 
     group = _get_group(group_year.academic_year.year, group_year.partial_acronym)
@@ -178,18 +175,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         group.credits if group.credits else ""
     ]
     if WITH_VALIDITY in other_params:
-        if training:
-            data.append(training.status.value)
-            data.append(_get_start_year(current_version, training, group))
-            data.append(_get_end_year(current_version, training, group))
-        elif mini_training:
-            data.append(mini_training.status.value)
-            data.append(current_version.start_year)
-            data.append(
-                current_version.end_year_of_existence if current_version.end_year_of_existence else _('unspecified')
-            )
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_VALIDITY])))
+        data.extend(_build_validity_data(training, mini_training, group, current_version))
 
     if WITH_OSIS_CODE in other_params:
         data.append(group.code)
@@ -207,18 +193,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_EDUCATION_FIELDS])))
 
     if WITH_ORGANIZATION in other_params:
-        if training:
-            data.append(training.schedule_type.value)
-            data.append(management_entity(training, group, current_version))
-            data.append(training.administration_entity.acronym)
-            data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
-            if training.duration and training.duration_unit.value:
-                data.append("{} {}".format(training.duration, training.duration_unit.value))
-            else:
-                data.append("")
-            data.extend(activities_data(training))
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ORGANIZATION])))
+        data.extend(_build_organization_data(current_version, training, group))
 
     if WITH_RESPONSIBLES_AND_CONTACTS in other_params:
         if training:
@@ -237,10 +212,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.append(yesno(training.diploma.leads_to_diploma).title())
             data.append(yesno(training.diploma.printing_title))
             data.append(yesno(training.diploma.professional_title))
-            aims = ''
-            for aim in training.diploma.aims:
-                aims += "{} - {} - {}{}".format(aim.section, aim.code, aim.description, CARRIAGE_RETURN)
-            data.append(aims)
+            data.append(_build_aims_data(training))
         else:
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_DIPLOMA_CERTIFICAT])))
 
@@ -299,16 +271,27 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_OTHER_LEGAL_INFORMATION])))
 
     if WITH_ADDITIONAL_INFO in other_params:
-        data.extend(_build_additional_info(training, mini_training, group))
+        data.extend(_build_additional_info_data(training, mini_training, group))
 
     if WITH_KEYWORDS in other_params:
-        if training:
-            data.append(training.keywords)
-        elif mini_training:
-            data.append(mini_training.keywords)
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_KEYWORDS])))
+        data.append(_build_keywords_data(training, mini_training))
+
     return data
+
+
+def _build_keywords_data(training, mini_training):
+    if training:
+        return training.keywords
+    elif mini_training:
+        return mini_training.keywords
+    return ''
+
+
+def _build_aims_data(training):
+    aims = ''
+    for aim in training.diploma.aims:
+        aims += "{} - {} - {}{}".format(aim.section, aim.code, aim.description, CARRIAGE_RETURN)
+    return aims
 
 
 def _build_headers(xls_parameters: List) -> List['str']:
@@ -336,18 +319,16 @@ def _add_empty_characters(number_of_occurences):
     return ['' for occurence in range(number_of_occurences)]
 
 
-def _get_start_year(current_version, training, group):
-    if current_version.is_standard:
-        return training.start_year
-    else:
-        return group.start_year
-
-
-def _get_end_year(current_version, training, group):
-    if current_version.is_standard:
-        return training.end_year if training.end_year else str(_("unspecified"))
-    else:
-        return group.end_year if group.end_year else str(_("unspecified"))
+def _get_end_year(current_version: 'ProgramTreeVersion', training: 'Training', mini_training: 'MiniTraining',
+                  group: 'Group') -> str:
+    if training:
+        if current_version.is_standard:
+            return str(training.end_year) if training.end_year else str(_("Unspecified"))
+        else:
+            return str(group.end_year) if group.end_year else str(_("Unspecified"))
+    elif mini_training:
+        return str(current_version.end_year_of_existence) if current_version.end_year_of_existence else _('Unspecified')
+    return ''
 
 
 def get_category(training, mini_training, group):
@@ -361,7 +342,9 @@ def get_category(training, mini_training, group):
         return ''
 
 
-def _get_titles_en(current_version, training, mini_training, group):
+def _get_titles_en(current_version: 'ProgramTreeVersion', training: 'Training', mini_training: 'MiniTraining',
+                   group: 'Group') -> List['str']:
+
     titles = []
     if training:
         title_en = training.titles.title_en if training.titles.title_en else ''
@@ -374,7 +357,7 @@ def _get_titles_en(current_version, training, mini_training, group):
 
     if training or mini_training:
         if (not current_version.is_standard or current_version.is_transition) and current_version.title_en:
-            title_en += current_version.title_en
+            title_en = "{}[{}]".format(title_en, current_version.title_en)
         titles.append(title_en)
 
         if training and training.is_finality():
@@ -438,7 +421,6 @@ def get_contacts(contact_persons, title):
             if contact.get('role_en'):
                 responsibles_and_contacts += "(en) {}{}".format(contact.get('role_en'), CARRIAGE_RETURN)
             responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
-        responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
         return responsibles_and_contacts
     return ''
 
@@ -506,7 +488,19 @@ def _get_group(year: int, acronym: str) -> 'Group':
     return get_group_service.get_group(get_group_training_cmd)
 
 
-def _build_additional_info(training, mini_training, group):
+def _build_validity_data(training: 'Training', mini_training: 'MiniTraining', group: 'Group',
+                         current_version: 'ProgramTreeVersion') -> List['str']:
+    data = []
+    if training or mini_training:
+        data.append(training.status.value if training else mini_training.status.value)
+        data.append(_get_start_year(current_version, training, mini_training, group))
+        data.append(_get_end_year(current_version, training, mini_training, group))
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_VALIDITY])))
+    return data
+
+
+def _build_additional_info_data(training, mini_training, group):
     data = []
     if training or mini_training or group:
         data.append(group.content_constraint.type.value.title() if group.content_constraint.type else '')
@@ -517,4 +511,31 @@ def _build_additional_info(training, mini_training, group):
         data.append(get_html_to_text(group.remark.text_en))
     else:
         data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ADDITIONAL_INFO])))
+    return data
+
+
+def _get_start_year(current_version: 'ProgramTreeVersion', training: 'Training', mini_training: 'MiniTraining',
+                    group: 'Group') -> str:
+    if training:
+        return str(training.start_year) if current_version.is_standard else str(group.start_year)
+    elif mini_training:
+        return str(current_version.start_year)
+
+    return ''
+
+
+def _build_organization_data(current_version, training, group):
+    data = []
+    if training:
+        data.append(training.schedule_type.value)
+        data.append(training.management_entity.acronym if current_version.is_standard else group.management_entity.acronym)
+        data.append(training.administration_entity.acronym)
+        data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
+        if training.duration and training.duration_unit.value:
+            data.append("{} {}".format(training.duration, training.duration_unit.value))
+        else:
+            data.append("")
+        data.extend(activities_data(training))
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ORGANIZATION])))
     return data

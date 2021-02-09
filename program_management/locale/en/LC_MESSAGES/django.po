@@ -898,6 +898,9 @@ msgstr ""
 msgid "University certificate"
 msgstr ""
 
+msgid "Unspecified"
+msgstr ""
+
 msgid "Update Content"
 msgstr ""
 
