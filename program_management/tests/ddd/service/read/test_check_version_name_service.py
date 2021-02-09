@@ -26,6 +26,7 @@ from django.test import SimpleTestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd import command
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.read import check_version_name_service
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionIdentityFactory
 from testing.mocks import MockPatcherMixin
@@ -44,7 +45,7 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
             year=2018,
             offer_acronym="Offer",
             version_name="VER_SION",
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
@@ -61,7 +62,7 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
             year=2018,
             offer_acronym="Offer",
             version_name="VERSION",
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
@@ -78,7 +79,7 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
             year=2018,
             offer_acronym="Offer",
             version_name="VERSION",
-            is_transition=False
+            transition_name=NOT_A_TRANSITION
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
