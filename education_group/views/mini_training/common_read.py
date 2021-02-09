@@ -49,7 +49,7 @@ from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
-from program_management.ddd.command import GetLastExistingVersionNameCommand
+from program_management.ddd.command import GetLastExistingVersionCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -87,7 +87,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     @cached_property
     def has_transition_version(self) -> 'bool':
-        cmd = GetLastExistingVersionNameCommand(
+        cmd = GetLastExistingVersionCommand(
             version_name=self.program_tree_version_identity.version_name,
             offer_acronym=self.program_tree_version_identity.offer_acronym,
             transition_name=self.program_tree_version_identity.transition_name
