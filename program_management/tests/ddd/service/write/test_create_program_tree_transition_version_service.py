@@ -33,9 +33,9 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.validation_rule import ValidationRuleFactory
 from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
     CreateAndPostponeTrainingAndProgramTreeCommandFactory
-from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand
+from program_management.ddd.command import CreateProgramTreeTransitionVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.service.write import create_program_tree_transition_version_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
@@ -53,7 +53,7 @@ class TestCreateProgramTreeVersion(TestCase):
             current_year=self.current_year,
             end_year=self.end_year_standard_version
         )
-        self.command = CreateProgramTreeSpecificVersionCommand(
+        self.command = CreateProgramTreeTransitionVersionCommand(
             end_year=self.end_year_standard_version,
             offer_acronym=self.offer_acronym,
             version_name='',
@@ -148,7 +148,7 @@ class TestCreateProgramTreeVersion(TestCase):
             offer_acronym=cmd.abbreviated_title,
             year=cmd.year,
             version_name=STANDARD,
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
         )
 
         return training_identities, standard_version_identity
