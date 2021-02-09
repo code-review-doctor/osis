@@ -485,6 +485,7 @@ def volume_information(learning_unit_yr):
             learning_unit_yr.pp_classes or 0]
 
 
+# FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
 def __acronym_with_version_label(acronym: str, transition_name: str, version_name: str) -> str:
     if version_name or transition_name:
         if version_name == '':
