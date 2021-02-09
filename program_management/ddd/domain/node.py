@@ -30,6 +30,7 @@ from typing import List, Set, Optional, Iterator, Tuple, Generator
 
 import attr
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
@@ -437,9 +438,18 @@ class Node(interface.Entity):
         return child
 
     def detach_child(self, node_to_detach: 'Node') -> 'Link':
-        link_to_detach = next(link for link in self.children if link.child == node_to_detach)
+        link_to_detach = self._move_down_link_to_detach(node_to_detach)
         self._deleted_children.append(link_to_detach)
         self.children.remove(link_to_detach)
+        return link_to_detach
+
+    def _move_down_link_to_detach(self, node_to_detach: 'Node') -> 'Link':
+        link_to_detach = None
+        for link in self.children:
+            if link.child == node_to_detach:
+                link_to_detach = link
+            elif link_to_detach:
+                link.parent.down_child(link_to_detach.child)
         return link_to_detach
 
     def get_link(self, link_id: int) -> 'Link':
@@ -583,3 +593,19 @@ class NodeLearningClassYear(Node):
 class NodeNotFoundException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__("The node cannot be found on the current tree")
+
+
+def build_title(node: 'NodeGroupYear', language: str):
+    if language == LANGUAGE_CODE_EN and node.offer_title_en:
+        offer_title = " - {}".format(
+            node.offer_title_en
+        ) if node.offer_title_en else ''
+    else:
+        offer_title = " - {}".format(
+            node.offer_title_fr
+        ) if node.offer_title_fr else ''
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        version_title = " [{}]".format(node.version_title_en)
+    else:
+        version_title = " [{}]".format(node.version_title_fr) if node.version_title_fr else ''
+    return "{}{}".format(offer_title, version_title)

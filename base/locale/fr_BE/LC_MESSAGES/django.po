@@ -1820,6 +1820,9 @@ msgstr "Partenariats"
 msgid "Password"
 msgstr "Mot de passe"
 
+msgid "Pay attention! This learning unit is used in more than one formation"
+msgstr "Attention cette unité d'enseignement fait partie de plusieurs formations:"
+
 msgid "Pending"
 msgstr "En attente"
 
