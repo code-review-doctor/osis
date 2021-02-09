@@ -81,7 +81,6 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
                 offer_id=education_group_year_id,
                 transition_name=program_tree_version.entity_id.transition_name,
                 root_group_id=group_year_id,
-                is_transition=program_tree_version.entity_id.is_transition  # TODO: To remove in XXX
             )
             _update_start_year_and_end_year(
                 educ_group_version,
