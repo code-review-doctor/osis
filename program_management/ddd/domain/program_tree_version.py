@@ -57,7 +57,6 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 
 
 class ProgramTreeVersionBuilder:
-
     _tree_version = None
 
     def copy_to_next_year(
@@ -125,6 +124,7 @@ class ProgramTreeVersionBuilder:
         )
         if validator.is_valid():
             assert isinstance(from_existing_version, ProgramTreeVersion)
+            assert not from_existing_version.is_transition, "Forbidden to create a version from a transition"
             self._tree_version = self._build_from_existing(
                 from_existing_version,
                 new_tree_identity,
@@ -170,7 +170,6 @@ class UpdateProgramTreeVersiongData:
 # FIXME :: should be in a separate DDD domain
 @attr.s(slots=True)
 class ProgramTreeVersion(interface.RootEntity):
-
     entity_identity = entity_id = attr.ib(type=ProgramTreeVersionIdentity)
     program_tree_identity = attr.ib(type='ProgramTreeIdentity')
     program_tree_repository = attr.ib(type=interface.AbstractRepository)
