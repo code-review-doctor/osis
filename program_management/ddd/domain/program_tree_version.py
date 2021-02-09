@@ -141,6 +141,8 @@ class ProgramTreeVersionBuilder:
         if validator.is_valid():
             assert isinstance(from_existing_version, ProgramTreeVersion)
             assert not from_existing_version.is_transition, "Forbidden to create a version from a transition"
+            assert not from_existing_version.version_name and not command.version_name, \
+                "Forbidden to create a specific version from an other specific version"
             self._tree_version = self._build_from_existing(
                 from_existing_version,
                 new_tree_identity,
