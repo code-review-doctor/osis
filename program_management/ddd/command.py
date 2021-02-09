@@ -51,7 +51,18 @@ class OrderLinkCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class CreateProgramTreeVersionCommand(interface.CommandRequest):
+class CreateProgramTreeSpecificVersionCommand(interface.CommandRequest):
+    end_year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    transition_name = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateProgramTreeTransitionVersionCommand(interface.CommandRequest):
     end_year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)

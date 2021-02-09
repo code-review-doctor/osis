@@ -23,14 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.command import CreateProgramTreeVersionCommand, DuplicateProgramTree
+from program_management.ddd.command import CreateProgramTreeTransitionVersionCommand, DuplicateProgramTree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder, ProgramTreeVersionIdentity, \
     NOT_A_TRANSITION
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import duplicate_program_tree_service
 
 
-def create_program_tree_transition_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersionIdentity:
+def create_program_tree_transition_version(
+        command: 'CreateProgramTreeTransitionVersionCommand'
+) -> ProgramTreeVersionIdentity:
 
     # GIVEN
     tree_version_identity_from = ProgramTreeVersionIdentity(

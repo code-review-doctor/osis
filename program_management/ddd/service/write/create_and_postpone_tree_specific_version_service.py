@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeVersionCommand, \
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeSpecificVersionCommand, \
     PostponeProgramTreeCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -33,9 +33,11 @@ from program_management.ddd.service.write import postpone_tree_specific_version_
     postpone_program_tree_service, create_program_tree_specific_version_service
 
 
-def create_and_postpone(command: 'CreateProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
+def create_and_postpone_program_tree_specific_version(
+        command: 'CreateProgramTreeSpecificVersionCommand'
+) -> List[ProgramTreeVersionIdentity]:
 
-    identity = create_program_tree_specific_version_service.create_program_tree_version(command)
+    identity = create_program_tree_specific_version_service.create_program_tree_specific_version(command)
     tree_version = ProgramTreeVersionRepository().get(identity)
 
     postpone_program_tree_service.postpone_program_tree(

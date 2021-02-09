@@ -44,8 +44,9 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand, \
-    GetLastExistingVersionCommand
+from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand, \
+    ProlongExistingProgramTreeVersionCommand, \
+    GetLastExistingVersionCommand, CreateProgramTreeTransitionVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
@@ -111,7 +112,8 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
             if not last_existing_version:
                 command = _convert_form_to_create_specific_version_command(form)
                 try:
-                    identities = create_and_postpone_tree_specific_version_service.create_and_postpone(command=command)
+                    identities = create_and_postpone_tree_specific_version_service.create_and_postpone_program_tree_specific_version(
+                        command=command)
                 except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
@@ -216,7 +218,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             if not last_existing_version:
                 command = _convert_form_to_create_transition_version_command(form)
                 try:
-                    identities = create_and_postpone_tree_transition_version_service.create_and_postpone(
+                    identities = create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
                         command=command
                     )
                 except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
@@ -243,7 +245,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
         suffix_version_name = " - TRANSITION" if self.tree_version_identity.version_name else "TRANSITION"
         return {
             'training_identity': self.training_identity,
-            'version_name': self.tree_version_identity.version_name+suffix_version_name,
+            'version_name': self.tree_version_identity.version_name + suffix_version_name,
             'node_identity': self.node_identity,
             'form': form,
         }
@@ -269,15 +271,17 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
                 ) % {
                     "link": self.get_url_program_version(created_identity),
                     "offer_acronym": created_identity.offer_acronym,
-                    "acronym": created_identity.version_name+suffix_version_name,
+                    "acronym": created_identity.version_name + suffix_version_name,
                     "academic_year": display_as_academic_year(created_identity.year)
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
 
 
-def _convert_form_to_create_specific_version_command(form: SpecificVersionForm) -> CreateProgramTreeVersionCommand:
-    return CreateProgramTreeVersionCommand(
+def _convert_form_to_create_specific_version_command(
+        form: SpecificVersionForm
+) -> CreateProgramTreeSpecificVersionCommand:
+    return CreateProgramTreeSpecificVersionCommand(
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         start_year=form.tree_version_identity.year,
@@ -288,8 +292,10 @@ def _convert_form_to_create_specific_version_command(form: SpecificVersionForm) 
     )
 
 
-def _convert_form_to_create_transition_version_command(form: TransitionVersionForm) -> CreateProgramTreeVersionCommand:
-    return CreateProgramTreeVersionCommand(
+def _convert_form_to_create_transition_version_command(
+        form: TransitionVersionForm
+) -> CreateProgramTreeTransitionVersionCommand:
+    return CreateProgramTreeTransitionVersionCommand(
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data.get("version_name"),
         start_year=form.tree_version_identity.year,

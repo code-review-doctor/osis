@@ -29,7 +29,7 @@ import attr
 from base.ddd.utils.converters import to_upper_case_converter
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CreateProgramTreeVersionCommand
+from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand
 from program_management.ddd.command import CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
@@ -130,7 +130,7 @@ class ProgramTreeVersionBuilder:
             self,
             from_existing_version: 'ProgramTreeVersion',
             new_tree_identity: 'ProgramTreeIdentity',
-            command: 'CreateProgramTreeVersionCommand',
+            command: 'CreateProgramTreeSpecificVersionCommand',
     ) -> 'ProgramTreeVersion':
         validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
             command.start_year,
@@ -156,7 +156,7 @@ class ProgramTreeVersionBuilder:
             self,
             from_tree_version: 'ProgramTreeVersion',
             new_tree_identity: 'ProgramTreeIdentity',
-            command: 'CreateProgramTreeVersionCommand',
+            command: 'CreateProgramTreeSpecificVersionCommand',
     ) -> 'ProgramTreeVersion':
         tree_version_identity = ProgramTreeVersionIdentity(
             offer_acronym=from_tree_version.entity_id.offer_acronym,
