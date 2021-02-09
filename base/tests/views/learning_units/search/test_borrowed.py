@@ -27,6 +27,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_types import TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -131,8 +132,25 @@ class TestFilter(TestCase):
             transform=lambda obj: obj
         )
 
-    def generate_get_data(self):
-        return {"academic_year": self.academic_year.id}
+    def test_should_not_return_any_learning_unit_when_no_learning_unit_is_borrowed_by_specific_entity(self):
+        gey = self.generate_group_element_year(
+            self.entities_hierarchy.school_1_1_1.entity,
+            self.entities_hierarchy.school_2_1_1.entity
+        )
+        response = self.client.get(
+            self.url,
+            self.generate_get_data(borrowing_faculty=self.entities_hierarchy.faculty_1_2)
+        )
+        self.assertQuerysetEqual(
+            response.context["page_obj"].object_list,
+            [],
+        )
+
+    def generate_get_data(self, borrowing_faculty: EntityVersion = None):
+        data = {"academic_year": self.academic_year.id}
+        if borrowing_faculty:
+            data["faculty_borrowing_acronym"] = borrowing_faculty.acronym
+        return data
 
     def generate_group_element_year(self, root_entity, luy_entity):
         return GroupElementYearChildLeafFactory(
