@@ -32,6 +32,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.decorators.ajax import ajax_required
 from program_management.ddd import command
 from program_management.ddd.domain.exception import VersionNameExistedException
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.read import check_version_name_service
 from django.utils.translation import gettext_lazy as _
 
@@ -45,7 +46,7 @@ def check_version_name(request, year, acronym):
         year=year,
         offer_acronym=acronym,
         version_name=version_name,
-        is_transition=False
+        transition_name=NOT_A_TRANSITION
     )
 
     try:

@@ -702,4 +702,4 @@ class CheckVersionNameCommand(interface.CommandRequest):
     year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
-    is_transition = attr.ib(type=bool)
+    transition_name = attr.ib(type=str)
