@@ -145,19 +145,20 @@ def prepare_xls_content_with_parameters(found_education_groups: List[GroupYear],
 
 
 def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear, other_params: List['str']) -> List:
-    root_node = NodeRepository().get(NodeIdentity(code=group_year.acronym, year=group_year.academic_year.year))
+    root_node = NodeRepository().get(NodeIdentity(code=group_year.partial_acronym, year=group_year.academic_year.year))
     training = None
     mini_training = None
-    group = None    
+
     if root_node:
-        if training:
-            training = _get_training(group_year.academic_year.year, group_year.acronym)            
-        elif mini_training:
+        print('rott')
+        if root_node.is_training():
+            print('is_trainging')
+            training = _get_training(group_year.academic_year.year, group_year.acronym)
+        elif root_node.is_mini_training():
+            print('is_mini_t')
             mini_training = _get_mini_training(group_year.academic_year.year, group_year.acronym)
-        else:
-            group = _get_group(group_year.academic_year.year, group_year.partial_acronym)
-    else:
-        group = _get_group(group_year.academic_year.year, group_year.partial_acronym)
+
+    group = _get_group(group_year.academic_year.year, group_year.partial_acronym)
 
     node_identity = NodeIdentity(code=group_year.partial_acronym, year=group_year.academic_year.year)
     program_tree_version_identity = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
@@ -298,18 +299,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_OTHER_LEGAL_INFORMATION])))
 
     if WITH_ADDITIONAL_INFO in other_params:
-        if training or mini_training or group:
-            data.append(group.content_constraint.type.value.title() if group.content_constraint.type else '')
-            data.append(group.content_constraint.minimum)
-            data.append(group.content_constraint.maximum)
-            if training:
-                data.append(training.internal_comment)
-            else:
-                data.append('')
-            data.append(get_html_to_text(group.remark.text_fr))
-            data.append(get_html_to_text(group.remark.text_en))
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ADDITIONAL_INFO])))
+        data.extend(_build_additional_info(training, mini_training, group))
 
     if WITH_KEYWORDS in other_params:
         if training:
@@ -514,3 +504,17 @@ def _get_group(year: int, acronym: str) -> 'Group':
         code=acronym
     )
     return get_group_service.get_group(get_group_training_cmd)
+
+
+def _build_additional_info(training, mini_training, group):
+    data = []
+    if training or mini_training or group:
+        data.append(group.content_constraint.type.value.title() if group.content_constraint.type else '')
+        data.append(group.content_constraint.minimum)
+        data.append(group.content_constraint.maximum)
+        data.append(training.internal_comment if training else '')
+        data.append(get_html_to_text(group.remark.text_fr))
+        data.append(get_html_to_text(group.remark.text_en))
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ADDITIONAL_INFO])))
+    return data
