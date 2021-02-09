@@ -14,4 +14,8 @@ class Migration(migrations.Migration):
             name='educationgroupversion',
             unique_together={('version_name', 'offer', 'transition_name')},
         ),
+        migrations.RemoveField(
+            model_name='educationgroupversion',
+            name='is_transition',
+        ),
     ]
