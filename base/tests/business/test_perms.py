@@ -35,16 +35,14 @@ from attribution.tests.factories.tutor_application import TutorApplicationFactor
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
     MAX_ACADEMIC_YEAR_CENTRAL
-from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes, \
-    academic_calendar_type
+from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
-    generate_learning_unit_edition_calendars, generate_creation_or_end_date_proposal_calendars, \
-    OpenAcademicCalendarFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars, \
+    generate_proposal_calendars, generate_proposal_calendars_without_start_and_end_date
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, \
     create_past_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -102,15 +100,7 @@ class PermsTestCase(TestCase):
         cls.faculty_manager = FacultyManagerFactory(entity=cls.entity)
         academic_years = [cls.academic_yr, cls.academic_yr_1, cls.academic_yr_2]
         generate_learning_unit_edition_calendars(academic_years)
-        for ac in academic_years:
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
-                data_year=ac
-            )
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
-                data_year=ac
-            )
+        generate_proposal_calendars(academic_years)
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
@@ -263,7 +253,7 @@ class PermsTestCase(TestCase):
             learning_unit_year=luy
         )
 
-        generate_modification_transformation_proposal_calendars(
+        generate_proposal_calendars(
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
@@ -283,7 +273,7 @@ class PermsTestCase(TestCase):
             learning_unit_year=luy
         )
 
-        generate_modification_transformation_proposal_calendars(
+        generate_proposal_calendars(
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
@@ -303,7 +293,7 @@ class PermsTestCase(TestCase):
             learning_unit_year=luy
         )
 
-        generate_creation_or_end_date_proposal_calendars(
+        generate_proposal_calendars(
             [self.academic_yr, self.academic_yr_1, self.academic_yr_2, self.academic_yr_6]
         )
 
@@ -460,11 +450,7 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
             year=cls.current_academic_year.year - 1
         )
         academic_years = [cls.past_academic_year, cls.current_academic_year]
-        for ac in academic_years:
-            OpenAcademicCalendarFactory(
-                reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
-                data_year=ac
-            )
+        generate_proposal_calendars_without_start_and_end_date(academic_years)
 
     def setUp(self):
         requirement_entity = EntityFactory()
