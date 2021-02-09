@@ -259,9 +259,14 @@ div:target {
     content: "\f077";
 }
 
+/* Override select2 css */
 .select2-container {
     width: 100% !important;
     padding: 0;
+}
+.select2-selection--multiple{
+    overflow: hidden !important;
+    height: auto !important;
 }
 
 #loader {

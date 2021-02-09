@@ -32,6 +32,7 @@ from django.urls import reverse
 
 from base.business.event_perms import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views.academic_calendar.read import AcademicCalendarFilter
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -86,6 +87,28 @@ class TestAcademicCalendarsView(TestCase):
         self.assertIn('gantt_rows', response.context)
 
         self.assertIsInstance(response.context['filter'], AcademicCalendarFilter)
+
+    def test_assert_default_value_case_no_research(self):
+        current_academic_year = AcademicYearFactory(current=True)
+        response = self.client.get(self.url)
+
+        form = response.context['filter'].form
+        self.assertDictEqual(form.data, {
+            'event_type': [
+                AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name,
+                AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
+                AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+                AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name,
+                AcademicCalendarTypes.COURSE_ENROLLMENT.name,
+                AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+                AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
+                AcademicCalendarTypes.EDUCATION_GROUP_EDITION.name,
+                AcademicCalendarTypes.DELIBERATION.name,
+                AcademicCalendarTypes.DISSERTATION_SUBMISSION.name,
+            ],
+            'from_date': current_academic_year.start_date,
+            'to_date': current_academic_year.end_date
+        })
 
     def test_assert_gantt_rows_formated(self):
         response = self.client.get(self.url)

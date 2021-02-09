@@ -58,12 +58,17 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
-    EntityRequirementAutocomplete, EmployeeAutocomplete
+    EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
 from education_group import urls as education_group_urls
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
     path('autocomplete/', include([
+        path(
+            'academic-calendar-types/',
+            AcademicCalendarTypeAutocomplete.as_view(),
+            name='academic_calendar_type_autocomplete'
+        ),
         path('entities/', EntityAutocomplete.as_view(), name='entity_autocomplete'),
         # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
         path('allocation-entities/', AllocationEntityAutocomplete.as_view(), name='allocation_entity_autocomplete'),

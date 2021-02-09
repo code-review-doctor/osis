@@ -30,11 +30,7 @@
 
 {% block style %}
     {% include "education_group/blocks/datetimepicker_imports_css.html" %}
-    <style>
-     .gantt_task_line {
-        border: 0!important;
-      }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/academic_calendar.css' %}">
 {% endblock %}
 
 {% block breadcrumb %}
@@ -52,16 +48,20 @@
             <div class="row">
                 {% bootstrap_field filter.form.from_date form_group_class="col-md-3" %}
                 {% bootstrap_field filter.form.to_date form_group_class="col-md-3" %}
-                {% bootstrap_field filter.form.event_type form_group_class="col-md-4" %}
-
-                <div class="col-md-1">
+                <div class="col-md-4">
                     <br>
                     <div class="pull-right">
                         {% bootstrap_button "" button_type="submit" button_class="btn-primary" icon="search" %}
+                        {% include 'blocks/button/button_filter_refresh.html' %}
                     </div>
                 </div>
             </div>
+            <div class="row" style="margin-top: 10px;">
+                {% bootstrap_field filter.form.event_type form_group_class="col-md-10" %}
+            </div>
+            {{ filter.form.media }}
         </form>
+        {% include 'learning_unit/blocks/form/search_form_reset.html' %}
         <br>
         <div id="gantt">
           <div id="gantt_container"></div>
@@ -138,13 +138,19 @@
                if (row.type !== "project"){
                    domElem = "<b>" + row.tooltip_text + "</b><br>"
                     + formatDate(row.start_date) + " - " + formatDate(row.end_date)
-                    + "<a onclick='openUpdateModal(\"" + row.update_url + "\")'>"
+                    + "<a style='cursor:pointer;' onclick='openUpdateModal(\"" + row.update_url + "\")'>"
                     + "<br>{% trans 'Details'%}</a>";
                }
                return domElem;
             };
             gantt.templates.task_text = function(start,end,row) {
                 return '';
+            };
+            gantt.templates.task_class  = function(start, end, task){
+                if(task.parent) {
+                    return task.parent;
+                }
+                return task.id;
             };
             gantt.config.scroll_on_click= true;
         }
