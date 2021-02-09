@@ -45,7 +45,7 @@ from education_group.templatetags.academic_year_display import display_as_academ
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeVersionCommand, ProlongExistingProgramTreeVersionCommand, \
-    GetLastExistingVersionNameCommand
+    GetLastExistingVersionCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
@@ -324,7 +324,7 @@ def get_last_existing_version(
         transition_name: str
 ) -> 'ProgramTreeVersionIdentity':
     return get_last_existing_version_service.get_last_existing_version_identity(
-        GetLastExistingVersionNameCommand(
+        GetLastExistingVersionCommand(
             version_name=version_name.upper(),
             offer_acronym=offer_acronym.upper(),
             transition_name=transition_name,
