@@ -48,7 +48,7 @@ ARES_ONLY = [str(_('ARES study code')), str(_('ARES-GRACA')), str(_('ARES abilit
 
 ACTIVITIES_TITLES = [
     str(_('Activities on other campus')), str(_('Internship')), str(_('Dissertation')), str(_('Primary language')),
-    str(_('activities in English')).capitalize(), str(_('Other languages activities')),
+    str(_('activities in English')).capitalize(), str(_('Other languages activities'))
 ]
 
 WORKSHEET_TITLE = _('Education_groups')
@@ -125,9 +125,6 @@ BOLD_FONT = Font(bold=True)
 
 
 def create_customized_xls(user, found_education_groups_param, filters, order_data, other_params: List):
-    if WITH_ORGANIZATION in other_params and WITH_ACTIVITIES in other_params:
-        other_params.remove(WITH_ACTIVITIES)
-
     found_education_groups = ordering_data(found_education_groups_param, order_data)
     working_sheets_data = prepare_xls_content_with_parameters(found_education_groups, other_params)
     parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
@@ -142,6 +139,8 @@ def create_customized_xls(user, found_education_groups_param, filters, order_dat
 
 
 def prepare_xls_content_with_parameters(found_education_groups: List[GroupYear], other_params: List['str']) -> List:
+    if WITH_ORGANIZATION in other_params and WITH_ACTIVITIES in other_params:
+        other_params.remove(WITH_ACTIVITIES)
     return [extract_xls_data_from_education_group_with_parameters(eg, other_params) for eg in found_education_groups]
 
 
@@ -323,7 +322,10 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
 
 
 def _build_headers(xls_parameters: List) -> List['str']:
-    customized_headers = DEFAULT_EDUCATION_GROUP_TITLES
+
+    customized_headers = DEFAULT_EDUCATION_GROUP_TITLES.copy()
+    if WITH_ORGANIZATION in xls_parameters and WITH_ACTIVITIES in xls_parameters:
+        xls_parameters.remove(WITH_ACTIVITIES)
     for parameter in xls_parameters:
         if parameter == WITH_ARES_CODE and WITH_CO_GRADUATION_AND_PARTNERSHIP in xls_parameters:
             customized_headers.extend(ARES_ONLY)
