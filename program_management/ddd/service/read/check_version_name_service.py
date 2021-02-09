@@ -30,5 +30,5 @@ def check_version_name(cmd: command.CheckVersionNameCommand) -> None:
         cmd.year,
         cmd.offer_acronym,
         cmd.version_name,
-        cmd.is_transition
+        cmd.transition_name
     ).validate()

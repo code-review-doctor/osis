@@ -266,18 +266,18 @@ class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidat
 
 class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
-    def __init__(self, year: int, offer_acronym: str, version_name: str, is_transition: bool):
+    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
-            VersionNameExistsValidator(year, offer_acronym, version_name, is_transition),
+            VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
         ]
         super().__init__()
 
 
 class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(self, year: int, offer_acronym: str, version_name: str, is_transition: bool):
+    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNamePatternValidator(version_name),
-            VersionNameExistsValidator(year, offer_acronym, version_name, is_transition),
-            VersionNameExistedValidator(year, offer_acronym, version_name, is_transition),
+            VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
+            VersionNameExistedValidator(year, offer_acronym, version_name, transition_name),
         ]
         super().__init__()

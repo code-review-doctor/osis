@@ -39,6 +39,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.service.write import create_program_tree_transition_version_service
 from program_management.ddd.service.write.create_training_with_program_tree import \
     create_and_report_training_with_program_tree
+from program_management.forms.version import TRANSITION
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from reference.tests.factories.language import LanguageFactory
 
@@ -57,7 +58,7 @@ class TestCreateProgramTreeVersion(TestCase):
             offer_acronym=self.offer_acronym,
             version_name='',
             start_year=self.standard_version.entity_identity.year,
-            transition_name='Transition',
+            transition_name=TRANSITION,
             title_en='Title in English',
             title_fr='Intitulé en français',
         )
