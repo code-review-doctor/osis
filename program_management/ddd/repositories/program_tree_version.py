@@ -42,7 +42,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain import program_tree_version
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD, NOT_A_TRANSITION
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.models.education_group_version import EducationGroupVersion
 
@@ -319,7 +319,7 @@ def _get_common_queryset() -> QuerySet:
                 ) & Q(
                     version_name=STANDARD
                 ) & Q(
-                    is_transition=False
+                    transition_name=NOT_A_TRANSITION
                 ),
                 then=F('offer__education_group__end_year__year')
             ),
