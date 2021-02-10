@@ -60,8 +60,7 @@ class LinkForm(forms.Form):
         self.__initialize_fields()
 
     def __initialize_fields(self):
-        if self.is_a_parent_minor_major_option_list_choice() and \
-           not self.is_a_child_minor_major_option_list_choice():
+        if self.is_a_parent_minor_major_option_list_choice():
             fields_to_exclude = (
                 'relative_credits',
                 'is_mandatory',
