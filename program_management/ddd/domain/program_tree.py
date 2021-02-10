@@ -138,6 +138,7 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
+    # TODO copy content to next year should take next year tree to delete links
     def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         validators_by_business_action.CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
