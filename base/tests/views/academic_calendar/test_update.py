@@ -54,6 +54,7 @@ class TestAcademicCalendarUpdate(TestCase):
         self.patcher_get_academic_event = mock.patch('base.views.academic_calendar.update.AcademicEventRepository.get')
         self.mock_get_academic_event = self.patcher_get_academic_event.start()
         self.mock_get_academic_event.return_value = self.open_event
+        self.addCleanup(self.patcher_get_academic_event.stop)
 
         self.person = PersonWithPermissionsFactory("can_access_academic_calendar")
         self.client.force_login(self.person.user)
