@@ -344,10 +344,8 @@ msgstr "Stage"
 msgid "Invalid name version"
 msgstr "Nom de version invalide"
 
-#, fuzzy
-#| msgid "Transition name"
 msgid "Invalid transition name"
-msgstr "Sigle de la transition"
+msgstr "Nom de transition invalide"
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
