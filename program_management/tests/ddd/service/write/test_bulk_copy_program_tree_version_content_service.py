@@ -93,6 +93,17 @@ class TestBulkCopyProgramTreeVersion(MockPatcherMixin, TestCase):
         result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version([self.cmd])
         self.assertListEqual(result, [])
 
+    def test_should_copy_prerequisites_to_next_year(self):
+        bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version([self.cmd])
+
+        next_year_tree = self.fake_program_tree_repository.get(
+            self._get_next_year_tree_identity()
+        )
+        self.assertEqual(
+            len(self.tree_version.tree.prerequisites.prerequisites),
+            len(next_year_tree.prerequisites.prerequisites)
+        )
+
     def _get_next_year_tree_version_identity(self):
         return ProgramTreeVersionIdentityFactory(
             offer_acronym=self.tree_version.entity_id.offer_acronym,

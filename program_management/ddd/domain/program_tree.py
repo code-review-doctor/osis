@@ -43,6 +43,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.prerequisite import factory as prerequisite_factory, Prerequisites
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.repositories import load_authorized_relationship
@@ -152,6 +153,13 @@ class ProgramTreeBuilder:
                 root_node=root_next_year,
                 authorized_relationships=load_authorized_relationship.load()
             )
+
+        program_tree_next_year.prerequisites = Prerequisites(
+            program_tree_next_year.entity_id,
+            [prerequisite_factory.copy_to_next_year(prerequisite)
+             for prerequisite in copy_from.prerequisites.prerequisites]
+        )
+
         return program_tree_next_year
 
     # Do not delete : will be usefull to copy content of a program tree to next year

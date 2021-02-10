@@ -228,6 +228,22 @@ class PrerequisiteFactory:
             return OR
         return AND
 
+    @classmethod
+    def copy_to_next_year(cls, to_copy: 'Prerequisite') -> 'Prerequisite':
+        next_year_identity = attr.evolve(
+            to_copy.node_having_prerequisites,
+            year=to_copy.node_having_prerequisites.year+1
+        )
+        tree_next_year_identity = attr.evolve(
+            to_copy.context_tree,
+            year=to_copy.context_tree.year+1
+        )
+        return cls().from_expression(
+            to_copy.get_prerequisite_expression(translate=False),
+            next_year_identity,
+            tree_next_year_identity
+        )
+
 
 factory = PrerequisiteFactory()
 
