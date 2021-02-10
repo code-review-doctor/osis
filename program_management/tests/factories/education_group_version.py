@@ -77,4 +77,3 @@ def create_with_version(version_offer=None, **kwargs):
     if version_offer:
         EducationGroupVersionFactory(offer=version_offer, root_group=group_yr)
     return group_yr
-
