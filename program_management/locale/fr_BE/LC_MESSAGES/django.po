@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-05 09:12+0100\n"
+"POT-Creation-Date: 2021-02-08 09:33+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -514,6 +514,9 @@ msgstr "Nouvelle version particulière"
 msgid "New training"
 msgstr "Nouvelle Formation"
 
+msgid "New transition version"
+msgstr "Nouvelle version de transition"
+
 msgid "No"
 msgstr "Non"
 
@@ -886,6 +889,14 @@ msgstr "Transition"
 
 msgid "Transition name"
 msgstr "Sigle de la transition"
+
+msgid ""
+"Transition version for education group year <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
+msgstr ""
+"La version de transition de la formation <a href='%(link)s'> "
+"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> a été créée avec "
+"succés"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"

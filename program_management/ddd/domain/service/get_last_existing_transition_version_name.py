@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,23 +28,23 @@ from typing import Union
 from django.db.models import F
 
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.models.education_group_version import EducationGroupVersion
 
 
-class GetLastExistingVersion(interface.DomainService):
+class GetLastExistingTransitionVersion(interface.DomainService):
 
     @classmethod
-    def get_last_existing_version_identity(
+    def get_last_existing_transition_version_identity(
             cls,
             version_name: str,
             offer_acronym: str,
-            transition_name: str,
     ) -> Union[ProgramTreeVersionIdentity, None]:
         group_version = EducationGroupVersion.objects.filter(
             version_name=version_name,
-            root_group__acronym=offer_acronym,
-            transition_name=transition_name,
+            root_group__acronym=offer_acronym
+        ).exclude(
+            transition_name=NOT_A_TRANSITION
         ).annotate(
             year=F('offer__academic_year__year'),
             offer_acronym=F('offer__acronym'),

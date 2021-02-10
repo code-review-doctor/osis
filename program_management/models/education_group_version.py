@@ -32,8 +32,8 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('offer', 'version_name', 'root_group', 'is_transition')
-    list_filter = ('is_transition', 'offer__academic_year')
+    list_display = ('offer', 'version_name', 'root_group', 'transition_name')
+    list_filter = ('offer__academic_year',)
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
 
 
@@ -46,7 +46,6 @@ class EducationGroupVersion(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    is_transition = models.BooleanField(verbose_name=_('Transition'))
     transition_name = models.CharField(
         blank=True,
         max_length=25,
@@ -96,6 +95,5 @@ class EducationGroupVersion(models.Model):
         return offer_name
 
     class Meta:
-        # TODO: change is_transition to transition_name in OSIS-5580
-        unique_together = ('version_name', 'offer', 'is_transition')
+        unique_together = ('version_name', 'offer', 'transition_name')
         default_manager_name = 'objects'
