@@ -43,7 +43,8 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
     offer_acronym = attr.ib(type=str, converter=to_upper_case_converter)
     year = attr.ib(type=int)
     version_name = attr.ib(type=str, converter=to_upper_case_converter)
-    is_transition = attr.ib(type=bool)
+    is_transition = attr.ib(type=bool)  # TODO : to remove in OSIS-5580
+    transition_name = attr.ib(type=str, converter=to_upper_case_converter, default='')
 
     def is_standard(self):
         return (self.version_name == STANDARD or self.version_name is None) and not self.is_transition
@@ -178,6 +179,7 @@ class ProgramTreeVersion(interface.RootEntity):
     program_tree_identity = attr.ib(type='ProgramTreeIdentity')
     program_tree_repository = attr.ib(type=interface.AbstractRepository)
     start_year = attr.ib(type=int)
+    transition_name = attr.ib(type=str)
     version_name = attr.ib(type=str)
     title_fr = attr.ib(type=str, default=None)
     title_en = attr.ib(type=str, default=None)
@@ -199,7 +201,11 @@ class ProgramTreeVersion(interface.RootEntity):
 
     @property
     def is_transition(self) -> bool:
-        return self.entity_id.is_transition
+        return bool(self.transition_name)
+
+    @transition_name.default
+    def _transition_name(self) -> str:
+        return self.entity_id.transition_name
 
     @version_name.default
     def _version_name(self) -> str:

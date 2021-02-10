@@ -47,6 +47,12 @@ class EducationGroupVersion(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
     is_transition = models.BooleanField(verbose_name=_('Transition'))
+    transition_name = models.CharField(
+        blank=True,
+        max_length=25,
+        verbose_name=_('Transition name'),
+        default=''
+    )
     version_name = models.CharField(
         blank=True,
         max_length=25,
@@ -80,8 +86,16 @@ class EducationGroupVersion(models.Model):
     standard = StandardEducationGroupVersionManager()
 
     def __str__(self):
-        return "{} ({})".format(self.offer, self.version_name) if self.version_name else str(self.offer)
+        offer_name = str(self.offer)
+        if self.version_name and self.transition_name:
+            offer_name += ' ({} - TRANSITION {})'.format(self.version_name, self.transition_name)
+        elif self.version_name:
+            offer_name += ' ({})'.format(self.version_name)
+        elif self.transition_name:
+            offer_name += ' (TRANSITION {})'.format(self.transition_name)
+        return offer_name
 
     class Meta:
+        # TODO: change is_transition to transition_name in OSIS-5580
         unique_together = ('version_name', 'offer', 'is_transition')
         default_manager_name = 'objects'
