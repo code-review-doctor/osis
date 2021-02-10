@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-01 10:50+0100\n"
+"POT-Creation-Date: 2021-02-10 08:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,6 +77,10 @@ msgstr ""
 msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
+msgstr ""
+
+#, python-format
+msgid "%(title)s has been updated"
 msgstr ""
 
 msgid "1st quadri"
@@ -311,9 +315,6 @@ msgstr ""
 msgid "Are you sure you want to delete the achievement?"
 msgstr ""
 
-msgid "Are you sure you want to delete the event"
-msgstr ""
-
 msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
@@ -333,9 +334,6 @@ msgid "Arrangement specific locale"
 msgstr ""
 
 msgid "Artist"
-msgstr ""
-
-msgid "As displayed on the home page"
 msgstr ""
 
 msgid "Assistants"
@@ -869,9 +867,6 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-msgid "Event"
-msgstr ""
-
 msgid "Exam board secretary"
 msgstr ""
 
@@ -1040,9 +1035,6 @@ msgstr ""
 msgid "Global ID"
 msgstr ""
 
-msgid "Go"
-msgstr ""
-
 msgctxt "carousel"
 msgid "Go"
 msgstr ""
@@ -1063,15 +1055,6 @@ msgid "Help"
 msgstr ""
 
 msgid "High Level Promising athlete"
-msgstr ""
-
-msgid "Highlight description"
-msgstr ""
-
-msgid "Highlight shortcut"
-msgstr ""
-
-msgid "Highlight title"
 msgstr ""
 
 msgid "Home"
@@ -2212,13 +2195,7 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-msgid "Start date and end date are mandatory"
-msgstr ""
-
 msgid "Start date is mandatory"
-msgstr ""
-
-msgid "Start date must be lower than end date"
 msgstr ""
 
 msgid "State"
@@ -2315,12 +2292,6 @@ msgstr ""
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr ""
 
-#, python-format
-msgid ""
-"The closure's date of '%s' of the academic calendar can't be lower than %s "
-"(end date of '%s' of the program '%s')"
-msgstr ""
-
 msgid "The configuration of you user profile"
 msgstr ""
 
@@ -2341,10 +2312,6 @@ msgstr ""
 
 #, python-format
 msgid "The entity '%(acronym)s' doesn't exist anymore in %(year)s"
-msgstr ""
-
-#, python-format
-msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
 msgid "The field can contain only one value."
@@ -2589,6 +2556,9 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
+msgid "Today"
+msgstr ""
+
 msgid "Total"
 msgstr ""
 
@@ -2626,9 +2596,6 @@ msgid "Tutors"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Type of event"
 msgstr ""
 
 msgid "Type of training"
@@ -2670,10 +2637,10 @@ msgstr ""
 msgid "University second cycle certificate"
 msgstr ""
 
-msgid "Unscheduled events"
+msgid "Up"
 msgstr ""
 
-msgid "Up"
+msgid "Update"
 msgstr ""
 
 msgid "Update for teacher locked"
@@ -2767,9 +2734,6 @@ msgctxt "section title"
 msgid "Welcome"
 msgstr ""
 
-msgid "Year of concerned data"
-msgstr ""
-
 msgid "Yes"
 msgstr ""
 
@@ -2838,9 +2802,6 @@ msgstr ""
 msgid "a partim volume value is greater than corresponding volume of parent"
 msgstr ""
 
-msgid "academic events"
-msgstr ""
-
 # TODO
 msgid "acronym rules"
 msgstr ""
@@ -2898,17 +2859,8 @@ msgstr ""
 msgid "credits"
 msgstr ""
 
-msgid "date_format"
-msgstr "%m/%d/%Y"
-
 msgid "date_format_string"
 msgstr "m/d/Y"
-
-msgid "day"
-msgstr ""
-
-msgid "days"
-msgstr ""
 
 msgid "delete"
 msgstr ""
@@ -2944,9 +2896,6 @@ msgstr ""
 
 msgid "field reference"
 msgstr ""
-
-msgid "format_date"
-msgstr "mm/dd/yyyy"
 
 msgid "french help text"
 msgstr ""
