@@ -92,7 +92,7 @@ msgstr ""
 
 #, python-format
 msgid "%(title)s has been updated"
-msgstr "%(title)s a été modifié"
+msgstr "%(title)s a été modifié(e)"
 
 msgid "1st quadri"
 msgstr "1er quadri"
