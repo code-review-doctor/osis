@@ -60,8 +60,7 @@ class LinkForm(forms.Form):
         self.__initialize_fields()
 
     def __initialize_fields(self):
-        if self.is_a_parent_minor_major_option_list_choice() and \
-           not self.is_a_child_minor_major_option_list_choice():
+        if self.is_a_parent_minor_major_option_list_choice():
             fields_to_exclude = (
                 'relative_credits',
                 'is_mandatory',
@@ -128,7 +127,8 @@ class LinkForm(forms.Form):
         for e in business_exceptions.exceptions:
             if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
                     isinstance(e, exception.ChildTypeNotAuthorizedException) or\
-                    isinstance(e, exception.MaximumChildTypesReachedException):
+                    isinstance(e, exception.MaximumChildTypesReachedException) or \
+                    isinstance(e, exception.MinimumChildTypesNotRespectedException):
                 self.add_error("link_type", e.message)
             elif isinstance(e, exception.InvalidBlockException):
                 self.add_error("block", e.message)
