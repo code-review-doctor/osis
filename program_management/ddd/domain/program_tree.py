@@ -162,7 +162,6 @@ class ProgramTreeBuilder:
 
         return program_tree_next_year
 
-    # Do not delete : will be usefull to copy content of a program tree to next year
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
         parent_next_year = node_factory.copy_to_next_year(copy_from_node)
         links_to_copy = (link for link in copy_from_node.children
