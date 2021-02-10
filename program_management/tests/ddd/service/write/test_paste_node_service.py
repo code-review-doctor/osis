@@ -392,6 +392,44 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
             invalid_command
         )
 
+    def test_should_let_paste_list_minor_major_inside_list_minor_major(self):
+        tree_to_paste_data = {
+            "node_type": GroupType.MINOR_LIST_CHOICE,
+            "year": 2020,
+            "children": [
+                {
+                    "node_type": MiniTrainingType.OPEN_MINOR,
+                    "year": 2020,
+                    "end_year": 2025,
+                    "link_data": {"link_type": LinkTypes.REFERENCE},
+                    "children": [
+                        {
+                            "node_type": GroupType.COMMON_CORE,
+                            "year": 2020
+                        }
+                    ]
+                },
+            ]
+        }
+        tree_to_paste = tree_builder(tree_to_paste_data)
+        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
+
+        valid_command = PasteElementCommandFactory(
+            node_to_paste_code=tree_to_paste.root_node.code,
+            node_to_paste_year=tree_to_paste.root_node.year,
+            path_where_to_paste="1|22",
+            link_type=None
+        )
+
+        result = paste_element_service.paste_element(valid_command)
+        self.assertTrue(result)
+
     def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_surpassed(self):
         tree_to_paste_data = {
             "node_type": GroupType.FINALITY_120_LIST_CHOICE,
