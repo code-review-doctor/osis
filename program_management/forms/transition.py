@@ -1,41 +1,13 @@
-##############################################################################
-#
-#    OSIS stands for Open Student Information System. It's an application
-#    designed to manage the core business of higher education institutions,
-#    such as universities, faculties, institutes and professional schools.
-#    The core business involves the administration of students, teachers,
-#    courses, programs and so on.
-#
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
-#
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    A copy of this license - GNU General Public License - is available
-#    at the root of the source code of this program.  If not,
-#    see http://www.gnu.org/licenses/.
-#
-##############################################################################
 from typing import Dict
 
-import attr
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
-from django.urls import reverse
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
-from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
@@ -45,22 +17,22 @@ from education_group.forms.training import _get_section_choices
 from education_group.forms.widgets import CertificateAimsWidget
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetVersionMaxEndYear
-from program_management.ddd.domain import program_tree_version
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_specific_version_max_end_year_service
-from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
-    TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
+from program_management.ddd.service.read import get_transition_version_max_end_year_service
+from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
+    MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
-TRANSITION = " - Transition"
 
-
-class SpecificVersionForm(forms.Form):
+class TransitionVersionForm(forms.Form):
     version_name = forms.CharField(
-        max_length=15,
-        required=True,
+        max_length=28,
+        required=False,
         label=_('Acronym/Short title'),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+    )
+    transition_name = forms.CharField(
+        max_length=25,
+        required=False,
         widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
     )
     version_title_fr = forms.CharField(
@@ -82,19 +54,9 @@ class SpecificVersionForm(forms.Form):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
         self._init_academic_year_choices()
-        self._set_remote_validation_on_version_name()
-
-    def _set_remote_validation_on_version_name(self):
-        set_remote_validation(
-            self.fields["version_name"],
-            reverse(
-                "check_version_name",
-                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
-            )
-        )
 
     def _init_academic_year_choices(self):
-        max_year = get_specific_version_max_end_year_service.calculate_specific_version_max_end_year(
+        max_year = get_transition_version_max_end_year_service.calculate_transition_version_max_end_year(
             GetVersionMaxEndYear(
                 offer_acronym=self.tree_version_identity.offer_acronym,
                 version_name=self.tree_version_identity.version_name,
@@ -106,23 +68,24 @@ class SpecificVersionForm(forms.Form):
             for year in range(self.tree_version_identity.year, max_year + 1)
         ]
 
-        standard_version_identity = attr.evolve(self.tree_version_identity, version_name=program_tree_version.STANDARD)
-        if not ProgramTreeVersionRepository.get(standard_version_identity).end_year_of_existence:
-            choices_years += BLANK_CHOICE
-
         self.fields["end_year"].choices = choices_years
         if not self.fields["end_year"].initial:
-            self.fields["end_year"].initial = choices_years[-1]
+            self.fields["end_year"].initial = choices_years[0]
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
         return int(end_year) if end_year else None
 
     def clean_version_name(self):
-        return self.cleaned_data['version_name'].upper()
+        return self.tree_version_identity.version_name.upper()
+
+    def clean_transition_name(self):
+        prefix_transition_name = "Transition " if self.cleaned_data['transition_name'] else "Transition"
+        transition_name = prefix_transition_name + self.cleaned_data['transition_name']
+        return transition_name.upper()
 
 
-class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, SpecificVersionForm):
+class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMixin, TransitionVersionForm):
     # panel_informations_form.html
     code = forms.CharField(label=_("Code"), disabled=True, required=False)
     category = forms.CharField(label=_("Category"), disabled=True, required=False)
@@ -307,7 +270,7 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
         return {'context': self.get_context()}
 
 
-class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, SpecificVersionForm):
+class UpdateMiniTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMixin, TransitionVersionForm):
     code = forms.CharField(label=_("Code"), disabled=True, required=False)
     category = forms.CharField(label=_("Category"), disabled=True, required=False)
     type = forms.CharField(label=_("Type of training"), disabled=True, required=False)
