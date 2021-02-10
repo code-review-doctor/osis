@@ -21,18 +21,27 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Union
-
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
+from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.repositories import program_tree_version as tree_version_repository
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 
-def get_last_existing_version_identity(
-        cmd: command.GetLastExistingVersionCommand
-) -> Union[ProgramTreeVersionIdentity, None]:
-    return GetLastExistingVersion().get_last_existing_version_identity(
-        version_name=cmd.version_name,
+def calculate_specific_version_max_end_year(cmd: command.GetVersionMaxEndYear) -> int:
+    standard_tree_version_identity = program_tree_version.ProgramTreeVersionIdentity(
         offer_acronym=cmd.offer_acronym,
-        transition_name=cmd.transition_name,
+        year=cmd.year,
+        version_name=program_tree_version.STANDARD,
+        transition_name=program_tree_version.NOT_A_TRANSITION
+    )
+
+    tree_version = tree_version_repository.ProgramTreeVersionRepository.get(standard_tree_version_identity)
+    return tree_version.end_year_of_existence or _compute_max_postponement_year(standard_tree_version_identity)
+
+
+def _compute_max_postponement_year(version_identity: 'program_tree_version.ProgramTreeVersionIdentity'):
+    return CalculateEndPostponement().calculate_end_postponement_year_program_tree_version(
+        identity=version_identity,
+        repository=ProgramTreeVersionRepository()
     )

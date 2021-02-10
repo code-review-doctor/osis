@@ -26,8 +26,8 @@
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.functional import cached_property
 from django.utils import translation
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 
@@ -70,7 +70,7 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
         cmd_delete = command_program_management.DeletePermanentlyTreeVersionCommand(
             acronym=self.tree_version_identity.offer_acronym,
             version_name=self.tree_version_identity.version_name,
-            is_transition=self.tree_version_identity.is_transition,
+            transition_name=self.tree_version_identity.transition_name,
         )
         try:
             delete_all_specific_versions_service.delete_permanently_tree_version(cmd_delete)

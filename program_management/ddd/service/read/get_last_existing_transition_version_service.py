@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@ from typing import Union
 
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
+from program_management.ddd.domain.service.get_last_existing_transition_version_name import \
+    GetLastExistingTransitionVersion
 
 
-def get_last_existing_version_identity(
-        cmd: command.GetLastExistingVersionCommand
+def get_last_existing_transition_version_identity(
+        cmd: command.GetLastExistingTransitionVersionNameCommand
 ) -> Union[ProgramTreeVersionIdentity, None]:
-    return GetLastExistingVersion().get_last_existing_version_identity(
+    return GetLastExistingTransitionVersion().get_last_existing_transition_version_identity(
         version_name=cmd.version_name,
-        offer_acronym=cmd.offer_acronym,
-        transition_name=cmd.transition_name,
+        offer_acronym=cmd.offer_acronym
     )

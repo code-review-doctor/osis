@@ -25,41 +25,25 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
-    PostponeProgramTreeCommand, UpdateProgramTreeVersionCommand, ExtendProgramTreeVersionCommand
+from program_management.ddd.command import PostponeProgramTreeVersionCommand, CreateProgramTreeSpecificVersionCommand, \
+    PostponeProgramTreeCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.write import postpone_tree_specific_version_service, \
-    postpone_program_tree_service, update_program_tree_version_service
+    postpone_program_tree_service, create_program_tree_specific_version_service
 
 
-def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> List[ProgramTreeVersionIdentity]:
-    # GIVEN
-    identity_to_create = ProgramTreeVersionIdentity(
-        offer_acronym=command.offer_acronym,
-        year=command.year,
-        version_name=command.version_name,
-        transition_name=command.transition_name,
-    )
-    last_existing_tree_version = ProgramTreeVersionRepository().get_last_in_past(identity_to_create)
+def create_and_postpone_program_tree_specific_version(
+        command: 'CreateProgramTreeSpecificVersionCommand'
+) -> List[ProgramTreeVersionIdentity]:
 
-    identity = update_program_tree_version_service.update_program_tree_version(
-        UpdateProgramTreeVersionCommand(
-            end_year=command.end_year_of_existence,
-            offer_acronym=last_existing_tree_version.entity_identity.offer_acronym,
-            version_name=last_existing_tree_version.entity_identity.version_name,
-            year=last_existing_tree_version.entity_identity.year,
-            transition_name=last_existing_tree_version.entity_identity.transition_name,
-            title_en=last_existing_tree_version.title_en,
-            title_fr=last_existing_tree_version.title_fr,
-        )
-    )
+    identity = create_program_tree_specific_version_service.create_program_tree_specific_version(command)
+    tree_version = ProgramTreeVersionRepository().get(identity)
 
     postpone_program_tree_service.postpone_program_tree(
         PostponeProgramTreeCommand(
-            from_code=last_existing_tree_version.program_tree_identity.code,
-            from_year=last_existing_tree_version.program_tree_identity.year,
+            from_code=tree_version.program_tree_identity.code,
+            from_year=tree_version.program_tree_identity.year,
             offer_acronym=identity.offer_acronym,
         )
     )
@@ -70,8 +54,7 @@ def extend_existing_past_version(command: 'ExtendProgramTreeVersionCommand') -> 
             from_year=identity.year,
             from_transition_name=identity.transition_name,
             from_version_name=identity.version_name,
-            from_code=GroupIdentitySearch().get_from_tree_version_identity(identity).code
         )
     )
 
-    return created_identities
+    return [identity] + created_identities
