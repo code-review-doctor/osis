@@ -53,10 +53,10 @@ class GenerateNodeCode(interface.DomainService):
             duplicate_to_transition: bool
     ) -> NodeCode:
         code = TRANSITION_FIRST_LETTER + parent_node.code[1:] if duplicate_to_transition else parent_node.code
-        return cls.generate_node_code(code=code, child_node_type=child_node_type)
+        return cls.__generate_node_code(code=code, child_node_type=child_node_type)
 
     @classmethod
-    def generate_node_code(cls, code: str, child_node_type: EducationGroupTypesEnum) -> NodeCode:
+    def __generate_node_code(cls, code: str, child_node_type: EducationGroupTypesEnum) -> NodeCode:
         reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
         reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
         # FIXME : Sometimes parent does not have a partial acronym, it is a dirty situation. We have to clean the DB.

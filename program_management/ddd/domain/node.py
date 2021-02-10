@@ -136,7 +136,7 @@ class NodeFactory:
         child = self.get_node(
             type=NodeType.GROUP,
             node_type=child_type,
-            code=GenerateNodeCode.generate_node_code(parent_node.code, child_type),
+            code=GenerateNodeCode.generate_from_parent_node(parent_node, child_type, False),
             title=GenerateNodeAbbreviatedTitle.generate(
                 parent_node=parent_node,
                 child_node_type=child_type,
