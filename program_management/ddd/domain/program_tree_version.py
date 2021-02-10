@@ -132,12 +132,20 @@ class ProgramTreeVersionBuilder:
             new_tree_identity: 'ProgramTreeIdentity',
             command: Union['CreateProgramTreeSpecificVersionCommand', 'CreateProgramTreeTransitionVersionCommand'],
     ) -> 'ProgramTreeVersion':
-        validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
-            command.start_year,
-            command.offer_acronym,
-            command.version_name,
-            command.transition_name
-        )
+        if command.transition_name:
+            validator = validators_by_business_action.CreateProgramTreeTransitionVersionValidatorList(
+                command.start_year,
+                command.offer_acronym,
+                command.version_name,
+                command.transition_name
+            )
+        else:
+            validator = validators_by_business_action.CreateProgramTreeVersionValidatorList(
+                command.start_year,
+                command.offer_acronym,
+                command.version_name,
+                command.transition_name
+            )
         if validator.is_valid():
             assert isinstance(from_existing_version, ProgramTreeVersion)
             assert not from_existing_version.is_transition, "Forbidden to create a version from a transition"
