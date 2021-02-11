@@ -825,12 +825,6 @@ msgstr ""
 msgid "Transition name"
 msgstr ""
 
-#, python-format
-msgid ""
-"Transition version for education group year <a href='%(link)s'> "
-"%(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
-msgstr ""
-
 msgid "Tutors"
 msgstr ""
 
