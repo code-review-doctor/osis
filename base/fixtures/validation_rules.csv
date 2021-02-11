@@ -1254,7 +1254,7 @@ Examples: <i>MAPHM280K, LDATI111K, LMATH100K</i>","Code d’un Module complémen
 </ul>
 Exemples: <i>MAPHM280K, LDATI111K, LMATH100K</i>",Ex: LBIOL100K
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.abbreviated_title,REQUIRED,,,,,,Ex: BIOL1PM
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.title_fr,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.title_fr,REQUIRED,Enseignements supplémentaires (module complémentaire) au master,,,,,
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.teaching_campus,REQUIRED,,,,,,
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.academic_year,REQUIRED,,,,,,
 base.validationrule,GroupForm.COMPLEMENTARY_MODULE.management_entity,REQUIRED,,,,,,
@@ -1274,7 +1274,7 @@ Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix m
 </ul>
 Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>",Ex: LBIOL100G
 base.validationrule,GroupForm.MINOR_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: LISTEAUCHOIXMINEURESBIOL1BA
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.title_fr,REQUIRED,Liste au choix Mineures,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.title_fr,REQUIRED,Mineure ou approfondissement,,,,,
 base.validationrule,GroupForm.MINOR_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
 base.validationrule,GroupForm.MINOR_LIST_CHOICE.academic_year,REQUIRED,,,,,,
 base.validationrule,GroupForm.MINOR_LIST_CHOICE.management_entity,REQUIRED,,,,,,
@@ -1314,7 +1314,7 @@ Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix O
 </ul>
 Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>",Ex: LBIOL300G
 base.validationrule,GroupForm.OPTION_LIST_CHOICE.abbreviated_title,REQUIRED,,,,,,Ex: LISTEAUCHOIXOPTIONSBIOL2M
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.title_fr,REQUIRED,Liste au choix Options,,,,,
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.title_fr,REQUIRED,Liste des options,,,,,
 base.validationrule,GroupForm.OPTION_LIST_CHOICE.teaching_campus,REQUIRED,,,,,,
 base.validationrule,GroupForm.OPTION_LIST_CHOICE.academic_year,REQUIRED,,,,,,
 base.validationrule,GroupForm.OPTION_LIST_CHOICE.management_entity,REQUIRED,,,,,,
@@ -2009,3 +2009,7 @@ base.validationrule,LearningUnitYearModelForm.NEW_PARTIM.internship_subtype,DISA
 base.validationrule,LearningUnitYearModelForm.NEW_PARTIM_PROPOSAL.internship_subtype,DISABLED,,,,,,
 base.validationrule,LearningUnitYearModelForm.NEW_PARTIM.academic_year,DISABLED,,,,,,
 base.validationrule,LearningUnitYearModelForm.NEW_PARTIM_PROPOSAL.academic_year,DISABLED,,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.title_en,NOT_REQUIRED,Minor or additional module,,,,,
+base.validationrule,GroupForm.OPTION_LIST_CHOICE.title_en,NOT_REQUIRED,List of electives,,,,,
+base.validationrule,GroupForm.COMPLEMENTARY_MODULE.title_en,NOT_REQUIRED,Additional courses (preparatory module) to the master,,,,,
+base.validationrule,GroupForm.MINOR_LIST_CHOICE.credits,NOT_REQUIRED,30,,,,,

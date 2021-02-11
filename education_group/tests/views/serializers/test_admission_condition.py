@@ -84,12 +84,12 @@ class TestGetCommonAdmissionConditionSerializer(TestCase):
                 'text_en': cls.common_admission_training_120.text_non_university_bachelors_en
             },
             'adults_taking_up_university_training': {
-                'label_translated': _('Adults taking up their university training'),
+                'label_translated': _('Access based on validation of professional experience'),
                 'text_fr': cls.common_admission_training_120.text_adults_taking_up_university_training,
                 'text_en': cls.common_admission_training_120.text_adults_taking_up_university_training_en
             },
             'personalized_access': {
-                'label_translated': _('Personalized access'),
+                'label_translated': _('Access based on application'),
                 'text_fr': cls.common_admission_training_120.text_personalized_access,
                 'text_en': cls.common_admission_training_120.text_personalized_access_en
             },
