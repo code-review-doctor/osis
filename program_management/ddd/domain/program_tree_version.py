@@ -245,11 +245,13 @@ class ProgramTreeVersion(interface.RootEntity):
 
 
 # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
-def version_label(entity_id: 'ProgramTreeVersionIdentity'):
-    if entity_id.is_official_standard:
-        return ''
-    elif entity_id.is_standard_transition:
-        return '[{}]'.format(entity_id.transition_name)
-    elif entity_id.is_specific_official:
-        return '[{}]'.format(entity_id.version_name)
-    return '[{}-{}]'.format(entity_id.version_name, entity_id.transition_name)
+def version_label(entity_id: 'ProgramTreeVersionIdentity', only_label: bool = False):
+    if not entity_id.is_official_standard:
+        if entity_id.is_standard_transition:
+            label = '[{}]'.format(entity_id.transition_name)
+        elif entity_id.is_specific_official:
+            label = '[{}]'.format(entity_id.version_name)
+        else:
+            label = '[{}-{}]'.format(entity_id.version_name, entity_id.transition_name)
+        return label[1:len(label) - 1] if only_label else label
+    return ''

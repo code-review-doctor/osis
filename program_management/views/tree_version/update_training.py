@@ -95,7 +95,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": version_label(identity),
+                    "acronym": version_label(identity, only_label=True),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
@@ -113,7 +113,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
                 "offer_acronym": last_identity.offer_acronym,
-                "acronym": version_label(last_identity),
+                "acronym": version_label(last_identity, only_label=True),
                 "academic_year": display_as_academic_year(self.training_version_form.cleaned_data["end_year"] + 1)
             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
