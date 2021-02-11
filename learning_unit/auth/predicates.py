@@ -420,7 +420,7 @@ def has_learning_unit_no_attribution_this_year(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This learning unit has application"))
+@predicate_failed_msg(message=_("This learning unit has attribution"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_attribution_all_years(self, user, learning_unit_year):
     if learning_unit_year:
