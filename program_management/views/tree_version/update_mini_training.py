@@ -59,8 +59,9 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
             "cancel_url": self.get_cancel_url(),
-            "version_suffix": "-{}".format(version.transition_name)
-            if version.entity_id.is_specific_transition else "{}".format(version.transition_name)
+            "version_suffix": (
+                "-{}" if version.entity_id.is_specific_transition else "{}"
+            ).format(version.transition_name)
         }
         return render(request, self.template_name, context)
 
