@@ -16,7 +16,7 @@ def add_default_titles_to_common_core_and_complementary_module(apps, schema_edit
     )
     complementary_modules = groups.filter(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
     for cm in complementary_modules:
-        cm.title_en = 'Additional lessons (complementary module) to the master course'
+        cm.title_en = 'Additional courses (preparatory module) to the master course'
         cm.changed = timezone.now()
 
     common_cores = groups.filter(
