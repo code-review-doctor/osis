@@ -25,7 +25,7 @@ def add_default_titles_to_common_core_and_complementary_module(apps, schema_edit
         title_fr__startswith='Contenu'
     )
     for cc in common_cores:
-        cc.title_en = 'Content :'
+        cc.title_en = 'Content:'
         cc.changed = timezone.now()
     GroupYear.objects.bulk_update(
         list(common_cores) + list(complementary_modules),
