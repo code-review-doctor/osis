@@ -337,6 +337,8 @@ class GetLastExistingVersionCommand(interface.CommandRequest):
 class GetLastExistingTransitionVersionNameCommand(interface.CommandRequest):
     version_name = attr.ib(type=str)
     offer_acronym = attr.ib(type=str)
+    transition_name = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
