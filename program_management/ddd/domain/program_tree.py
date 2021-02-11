@@ -443,6 +443,10 @@ class ProgramTree(interface.RootEntity):
         """
         path_to_paste_to = paste_command.path_where_to_paste
         node_to_paste_to = self.get_node(path_to_paste_to)
+        is_mandatory = paste_command.is_mandatory
+        if node_to_paste_to.is_minor_major_option_list_choice():
+            is_mandatory = False
+
         if node_to_paste_to.is_minor_major_list_choice() and node_to_paste.is_minor_major_deepening():
             link_type = LinkTypes.REFERENCE
         else:
@@ -461,7 +465,7 @@ class ProgramTree(interface.RootEntity):
         return node_to_paste_to.add_child(
             node_to_paste,
             access_condition=paste_command.access_condition,
-            is_mandatory=paste_command.is_mandatory,
+            is_mandatory=is_mandatory,
             block=paste_command.block,
             link_type=link_type,
             comment=paste_command.comment,
