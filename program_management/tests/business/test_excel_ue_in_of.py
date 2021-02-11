@@ -741,5 +741,5 @@ class TestXlsContent(TestCase):
 def _assert_format_title(tree: 'ProgramTree', tree_version: 'ProgramTreeVersion') -> str:
     return "{}{}".format(
         tree.root_node.title,
-        version_label(tree_version.program_tree_identity)
+        version_label(tree_version.entity_id)
     ) if tree_version else tree.root_node.title

@@ -529,7 +529,7 @@ def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['Pro
         node_version_title = _get_gathering_node_version_title(pgm_tree_version, language)
         return "{}{} - {}{}".format(
             gathering_node.title,
-            version_label(pgm_tree_version.program_tree_identity) if pgm_tree_version else '',
+            version_label(pgm_tree_version.entity_identity) if pgm_tree_version else '',
             node_title,
             node_version_title
         )
@@ -620,5 +620,5 @@ def _get_program_tree_version_from_tree_versions_list(year: int, code: str, tree
 def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
     return "{}{}".format(
         tree.root_node.title,
-        version_label(program_tree_version.program_tree_identity)
+        version_label(program_tree_version.entity_id)
     ) if program_tree_version else tree.root_node.title
