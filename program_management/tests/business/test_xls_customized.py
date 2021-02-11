@@ -53,8 +53,9 @@ from program_management.business.xls_customized import _build_headers, TRAINING_
     WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
     _build_additional_info_data, _build_validity_data, _get_start_year, _get_end_year, _get_titles_en, \
     _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
-    _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, _build_funding_data, \
-    _build_diploma_certicat_data, _build_enrollment_data
+    _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, \
+    _build_funding_data, _build_diploma_certicat_data, _build_enrollment_data, \
+    _build_other_legal_information_data
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -170,7 +171,6 @@ class XlsCustomizedContentTestCase(TestCase):
     def setUpTestData(cls):
         remark = RemarkFactory(text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>",
                                text_en="Remarque fr")
-
         cls.current_year = get_current_year()
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.training_version = StandardEducationGroupVersionFactory(
@@ -204,7 +204,9 @@ class XlsCustomizedContentTestCase(TestCase):
                                                   offer_partial_title_fr='LDROI200M',
                                                   start_year=cls.current_year,
                                                   end_year=cls.current_year+3,)
-        cls.current_training_tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=root_node_training))
+        cls.current_training_tree_version = StandardProgramTreeVersionFactory(
+            tree=ProgramTreeFactory(root_node=root_node_training)
+        )
 
         cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPDRT",
@@ -224,8 +226,10 @@ class XlsCustomizedContentTestCase(TestCase):
             type=education_group_types.MiniTrainingType[cls.education_group_type.name],
         )
         root_node_mini_training = NodeGroupYearFactory(node_type=cls.mini_training.type,
-                                            offer_partial_title_fr='LDRT100P')
-        cls.current_mini_training_tree_version = StandardProgramTreeVersionFactory(tree=ProgramTreeFactory(root_node=root_node_mini_training))
+                                                       offer_partial_title_fr='LDRT100P')
+        cls.current_mini_training_tree_version = StandardProgramTreeVersionFactory(
+            tree=ProgramTreeFactory(root_node=root_node_mini_training)
+        )
 
         cls.group_mini_training = GroupFactory(
             entity_identity__code=cls.mini_training_version.root_group.partial_acronym,
@@ -243,11 +247,13 @@ class XlsCustomizedContentTestCase(TestCase):
         )
 
     def test_build_validity_for_training(self):
-        version = StandardProgramTreeVersionFactory()
-        # mock_get_program_tree_version.return_value = version
         expected = ['Actif', str(self.training.start_year), str(self.training.end_year)]
         data = _build_validity_data(self.training, None, self.group_training, self.current_training_tree_version)
         self.assertListEqual(data, expected)
+
+    def test_build_validity_no_data(self):
+        data = _build_validity_data(None, None, self.group_training, self.current_training_tree_version)
+        self.assertListEqual(data, _build_array_with_empty_string(3))
 
     def test_get_start_year(self):
         standard_current_version = StandardProgramTreeVersionFactory()
@@ -269,7 +275,8 @@ class XlsCustomizedContentTestCase(TestCase):
                          '')
 
     def test_build_additional_info_for_training(self):
-        expected = [self.group_training.content_constraint.type.value.title(), self.group_training.content_constraint.minimum,
+        expected = [self.group_training.content_constraint.type.value.title(),
+                    self.group_training.content_constraint.minimum,
                     self.group_training.content_constraint.maximum, self.training.internal_comment,
                     "Remarque voir Google", self.group_training.remark.text_en]
         data = _build_additional_info_data(self.training, None, self.group_training)
@@ -363,7 +370,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         self.assertListEqual(_get_titles_en(self.particular_current_version, self.training_finality, None, self.group),
                              [
                                  "{}[{}]".format(self.training.titles.title_en,
-                                               self.particular_current_version.title_en),
+                                                 self.particular_current_version.title_en),
                                  self.training.titles.partial_title_fr,
                                  self.training.titles.partial_title_en
                              ]
@@ -408,7 +415,6 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             education_group_year=education_group_version.offer
         )
 
-        # education_group_yr = academic_responsible_contact.education_group_year
         other_academic_responsible_contact = EducationGroupPublicationContactFactory(
             type=PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
             role_fr='dummy role in french',
@@ -502,7 +508,6 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
     def test_title_yes_no_empty(self):
         self.assertEqual(_title_yes_no_empty(True), 'Oui')
         self.assertEqual(_title_yes_no_empty(False), 'Non')
-        self.assertEqual(_title_yes_no_empty(None), "")
 
     def test_build_funding_data(self):
         self.assertListEqual(_build_funding_data(None), _build_array_with_empty_string(4))
@@ -537,28 +542,34 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         training_diploma = TrainingFactory(diploma=diploma)
         self.assertListEqual(_build_diploma_certicat_data(training_diploma),
                              ['Non', '', '', ''])
+        training_without_diploma = TrainingFactory(diploma=None)
+        self.assertListEqual(_build_diploma_certicat_data(training_without_diploma),
+                             _build_array_with_empty_string(4))
 
     def test_build_enrollment_data(self):
         self.assertListEqual(_build_enrollment_data(None), _build_array_with_empty_string(6))
+        self.assertListEqual(_build_enrollment_data(self.training),
+                             ["{} - {}".format(self.training.enrollment_campus.name,
+                                               self.training.enrollment_campus.university_name),
+                              "Oui",
+                              "Oui",
+                              "Oui",
+                              "Oui",
+                              self.training.rate_code.value])
+
+    def test_build_other_legal_information_data(self):
+        self.assertListEqual(_build_other_legal_information_data(None), _build_array_with_empty_string(3))
+        self.assertListEqual(_build_other_legal_information_data(self.training),
+                             [self.training.academic_type.value,
+                              "Oui",
+                              "{} - {}".format(self.training.decree_category.name,
+                                               self.training.decree_category.value)
+                              ]
+                             )
 
 
 def _build_array_with_empty_string(nb_of_occurence):
     return ['' for _ in range(0, nb_of_occurence)]
-#
-# def _build_enrollment_data(training):
-#     data = list()
-#     if training:
-#         data.append("{} - {}".format(
-#             training.enrollment_campus.name,
-#             training.enrollment_campus.university_name) if training.enrollment_campus else '')
-#         data.append(_title_yes_no_empty(training.is_enrollment_enabled))
-#         data.append(_title_yes_no_empty(training.has_online_re_registration))
-#         data.append(_title_yes_no_empty(training.has_partial_deliberation))
-#         data.append(_title_yes_no_empty(training.has_admission_exam))
-#         data.append(training.rate_code.value if training.rate_code else '')
-#     else:
-#         data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ENROLLMENT])))
-#     return data
 
 
 def _get_co_organization_data(co_organization):
@@ -585,4 +596,3 @@ def _build_line(title, boolean_value):
     return "{} : {}{}".format(str(_(title)),
                               'Oui' if boolean_value else 'Non',
                               CARRIAGE_RETURN)
-

@@ -355,7 +355,7 @@ def build_title_fr(training: 'Training', current_version: 'ProgramTreeVersion', 
     else:
         return ''
     if (not current_version.is_standard or current_version.is_transition) and current_version.title_fr:
-        title_fr += current_version.title_fr
+        title_fr += "[{}]".format(current_version.title_fr)
     return title_fr
 
 
@@ -549,9 +549,10 @@ def _build_diploma_certicat_data(training: 'Training') -> List[str]:
             data.append(_title_yes_no_empty(training.diploma.leads_to_diploma))
             data.append(training.diploma.printing_title if training.diploma.printing_title else '')
             data.append(training.diploma.professional_title if training.diploma.professional_title else '')
+            data.append(_build_aims_data(training))
         else:
-            data.extend(['', '', ''])
-        data.append(_build_aims_data(training))
+            data.extend(['', '', '', ''])
+
     else:
         data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_DIPLOMA_CERTIFICAT])))
     return data
@@ -575,6 +576,7 @@ def _build_enrollment_data(training: 'Training') -> List[str]:
 
 def _build_other_legal_information_data(training: 'Training') -> List[str]:
     data = list()
+
     if training:
         data.append(training.academic_type.value if training.academic_type else '')
         data.append(_title_yes_no_empty(training.produce_university_certificate))
