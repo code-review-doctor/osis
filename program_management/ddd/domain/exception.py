@@ -368,7 +368,7 @@ class InvalidVersionNameException(BusinessException):
 
 class InvalidTransitionNameException(BusinessException):
     def __init__(self):
-        message = _("Invalid transition name")
+        message = _("This value is invalid.")
         super().__init__(message)
 
 

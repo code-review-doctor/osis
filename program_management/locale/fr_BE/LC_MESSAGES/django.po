@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-11 14:51+0100\n"
+"POT-Creation-Date: 2021-02-11 15:36+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -343,9 +343,6 @@ msgstr "Stage"
 
 msgid "Invalid name version"
 msgstr "Nom de version invalide"
-
-msgid "Invalid transition name"
-msgstr "Sigle de transition invalide"
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
@@ -847,6 +844,9 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
+msgid "This value is invalid."
+msgstr "Cette valeur semble non valide."
+
 msgid "This version exists until"
 msgstr "Dernière année d'organisation"
 
@@ -1115,3 +1115,6 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
+
+#~ msgid "Invalid transition name"
+#~ msgstr "Sigle de transition invalide"
