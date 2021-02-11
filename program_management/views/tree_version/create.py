@@ -262,10 +262,11 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
     def _display_success_messages(self, identities: List['ProgramTreeVersionIdentity']):
         success_messages = []
         for created_identity in identities:
-            suffix_version_name = " - Transition" if created_identity.version_name else "Transition"
+            suffix_version_name = "-{}".format(created_identity.transition_name) \
+                if created_identity.version_name else created_identity.transition_name
             success_messages.append(
                 _(
-                    "Transition version for education group year "
+                    "Specific version for education group year "
                     "<a href='%(link)s'> %(offer_acronym)s[%(acronym)s] (%(academic_year)s) </a> successfully created."
                 ) % {
                     "link": self.get_url_program_version(created_identity),
