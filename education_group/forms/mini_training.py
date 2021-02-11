@@ -29,6 +29,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.utils.fields import OsisRichTextFormField
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
@@ -99,10 +100,8 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
         label=_("Learning location"),
         to_field_name="name"
     )
-    remark_fr = forms.CharField(widget=CKEditorWidget(config_name='link_only'),
-                                label=_("Remark"), required=False)
-    remark_en = forms.CharField(widget=CKEditorWidget(config_name='link_only'),
-                                label=_("remark in english"), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_en = OsisRichTextFormField(config_name='link_only', label=_("remark in english"), required=False)
 
     def __init__(self, *args, user: User, mini_training_type: str, attach_path: Optional[str], **kwargs):
         self.user = user

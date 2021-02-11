@@ -65,7 +65,7 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         self.form.fields["academic_year"].required = True
 
     def filter_queryset(self, queryset: 'LearningUnitYearQuerySet'):
-        qs = super().filter_queryset(queryset).select_related("element")
+        qs = super().filter_queryset(queryset).select_related("element").exclude(element__isnull=True)
 
         faculty_borrowing_id = None
         faculty_borrowing_acronym = self.form.cleaned_data.get('faculty_borrowing_acronym')
@@ -124,9 +124,10 @@ def _get_management_entity_of_roots_by_elements(
 
     dict_group_year_entities_for_learning_unit_year = defaultdict(list)
     for list_element in root_child_lists:
-        dict_group_year_entities_for_learning_unit_year[list_element["child_id"]].append(
-            dict_entity_of_element_id.get(list_element["root_id"])
-        )
+        if dict_entity_of_element_id.get(list_element["root_id"]):
+            dict_group_year_entities_for_learning_unit_year[list_element["child_id"]].append(
+                dict_entity_of_element_id.get(list_element["root_id"])
+            )
     return dict_group_year_entities_for_learning_unit_year
 
 

@@ -40,7 +40,7 @@ def reorder_children(parent_element_id: int):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0558_auto_20210202_1029'),
+        ('base', '0565_auto_20210203_1310'),
     ]
 
     operations = [

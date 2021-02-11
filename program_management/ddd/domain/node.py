@@ -30,6 +30,7 @@ from typing import List, Set, Optional, Iterator, Tuple, Generator
 
 import attr
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
@@ -595,3 +596,19 @@ class NodeLearningClassYear(Node):
 class NodeNotFoundException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__("The node cannot be found on the current tree")
+
+
+def build_title(node: 'NodeGroupYear', language: str):
+    if language == LANGUAGE_CODE_EN and node.offer_title_en:
+        offer_title = " - {}".format(
+            node.offer_title_en
+        ) if node.offer_title_en else ''
+    else:
+        offer_title = " - {}".format(
+            node.offer_title_fr
+        ) if node.offer_title_fr else ''
+    if language == LANGUAGE_CODE_EN and node.version_title_en:
+        version_title = " [{}]".format(node.version_title_en)
+    else:
+        version_title = " [{}]".format(node.version_title_fr) if node.version_title_fr else ''
+    return "{}{}".format(offer_title, version_title)
