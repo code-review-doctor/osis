@@ -26,6 +26,7 @@
 from typing import Dict
 
 import attr
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
@@ -33,6 +34,7 @@ from django.urls import reverse
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.utils.fields import OsisRichTextFormField
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
@@ -221,8 +223,12 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
     )
 
     # panel_remarks_form.html
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_english = OsisRichTextFormField(
+        config_name='link_only',
+        label=_("remark in english").capitalize(),
+        required=False
+    )
 
     # HOPS panel
     ares_code = forms.CharField(label=_('ARES study code'), widget=forms.TextInput(), required=False, disabled=True)
@@ -337,8 +343,13 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
     offer_title_fr = forms.CharField(label=_("Title in French"), required=False, disabled=True)
     offer_title_en = forms.CharField(label=_("Title in English"), required=False, disabled=True)
     keywords = forms.CharField(label=_('Keywords'), required=False, disabled=True)
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
+
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_en = OsisRichTextFormField(
+        config_name='link_only',
+        label=_("remark in english").capitalize(),
+        required=False
+    )
 
     def __init__(
             self,

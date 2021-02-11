@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-01 10:50+0100\n"
+"POT-Creation-Date: 2021-02-11 08:40+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -568,6 +568,9 @@ msgstr "Consolider"
 
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
+
+msgid "Continuing Education"
+msgstr "Formation Continue"
 
 msgid "Coordinator"
 msgstr "Coordinateur"
@@ -1827,7 +1830,8 @@ msgid "Password"
 msgstr "Mot de passe"
 
 msgid "Pay attention! This learning unit is used in more than one formation"
-msgstr "Attention cette unité d'enseignement fait partie de plusieurs formations:"
+msgstr ""
+"Attention cette unité d'enseignement fait partie de plusieurs formations:"
 
 msgid "Pending"
 msgstr "En attente"
