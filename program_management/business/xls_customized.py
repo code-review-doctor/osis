@@ -25,24 +25,24 @@
 ##############################################################################
 from typing import List
 
-from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from openpyxl.styles import Font
 
 from base.business.education_group import ordering_data
 from base.business.xls import get_name_or_username
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.utils.excel import get_html_to_text
 from education_group.ddd import command
+from education_group.ddd.domain._funding import Funding
 from education_group.ddd.service.read import get_group_service, get_training_service, get_mini_training_service
 from education_group.models.group_year import GroupYear
 from education_group.views import serializers
 from osis_common.document import xls_build
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.domain import exception
-from openpyxl.styles import Font
 
 ARES_ONLY = [str(_('ARES study code')), str(_('ARES-GRACA')), str(_('ARES ability'))]
 
@@ -208,50 +208,25 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ACTIVITIES])))
 
     if WITH_DIPLOMA_CERTIFICAT in other_params:
-        if training:
-            data.append(yesno(training.diploma.leads_to_diploma).title())
-            data.append(yesno(training.diploma.printing_title))
-            data.append(yesno(training.diploma.professional_title))
-            data.append(_build_aims_data(training))
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_DIPLOMA_CERTIFICAT])))
+        data.extend(_build_diploma_certicat_data(training))
 
     if WITH_CO_GRADUATION_AND_PARTNERSHIP in other_params:
         if training:
-            data.extend(_build_common_ares_code_data(training))
-            data.append(get_co_organizations(training))
+            data.extend(_build_common_ares_code_data(training.co_graduation))
+            data.append(_get_co_organizations(training.co_organizations))
         else:
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_CO_GRADUATION_AND_PARTNERSHIP])))
 
     if WITH_ENROLLMENT in other_params:
-        if training:
-            data.append("{} - {}".format(training.enrollment_campus.name, training.enrollment_campus.university_name))
-            data.append(yesno(training.is_enrollment_enabled).title())
-            data.append(yesno(training.has_online_re_registration).title())
-            data.append(yesno(training.has_partial_deliberation).title())
-            data.append(yesno(training.has_admission_exam).title())
-            data.append(training.rate_code.value if training.rate_code else '')
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ENROLLMENT])))
+        data.extend(_build_enrollment_data(training))
 
     if WITH_FUNDING in other_params:
-        if training:
-            data.append(yesno(training.funding.can_be_funded).title())
-            data.append(
-                training.funding.funding_orientation.value.title() if training.funding.funding_orientation else ''
-            )
-            data.append(yesno(training.funding.can_be_international_funded).title())
-            data.append(
-                training.funding.international_funding_orientation.value.title()
-                if training.funding.international_funding_orientation else ''
-            )
-        else:
-            data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_FUNDING])))
+        data.extend(_build_funding_data(training.funding if training else None))
 
     if WITH_ARES_CODE in other_params:
         if training:
             if WITH_CO_GRADUATION_AND_PARTNERSHIP not in other_params:
-                data.extend(_build_common_ares_code_data(training))
+                data.extend(_build_common_ares_code_data(training.co_graduation))
             data.append(training.hops.ares_code)
             data.append(training.hops.ares_graca)
             data.append(training.hops.ares_authorization)
@@ -262,11 +237,12 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
                 data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ARES_CODE])))
 
     if WITH_OTHER_LEGAL_INFORMATION in other_params:
+        data.extend(_build_other_legal_information_data(training))
         if training:
             data.append(training.academic_type.value if training.academic_type else '')
-            data.append(yesno(training.produce_university_certificate).title())
+            data.append(_title_yes_no_empty(training.produce_university_certificate))
             data.append("{} - {}".format(training.decree_category.name,
-                                         training.decree_category.value) if training.decree_category.value else '')
+                                         training.decree_category.value) if training.decree_category else '')
         else:
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_OTHER_LEGAL_INFORMATION])))
 
@@ -279,7 +255,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
     return data
 
 
-def _build_keywords_data(training, mini_training):
+def _build_keywords_data(training: 'Training', mini_training: 'Mini-Training') -> str:
     if training:
         return training.keywords
     elif mini_training:
@@ -287,7 +263,7 @@ def _build_keywords_data(training, mini_training):
     return ''
 
 
-def _build_aims_data(training):
+def _build_aims_data(training: 'Training') -> str:
     aims = ''
     for aim in training.diploma.aims:
         aims += "{} - {} - {}{}".format(aim.section, aim.code, aim.description, CARRIAGE_RETURN)
@@ -316,7 +292,7 @@ def _get_training(year: int, acronym: str) -> 'Training':
 
 
 def _add_empty_characters(number_of_occurences):
-    return ['' for occurence in range(number_of_occurences)]
+    return ['' for _ in range(number_of_occurences)]
 
 
 def _get_end_year(current_version: 'ProgramTreeVersion', training: 'Training', mini_training: 'MiniTraining',
@@ -331,7 +307,7 @@ def _get_end_year(current_version: 'ProgramTreeVersion', training: 'Training', m
     return ''
 
 
-def get_category(training, mini_training, group):
+def get_category(training: 'Training', mini_training: 'MiniTraining', group: 'Group') -> str:
     if training:
         return str(_('Training'))
     elif mini_training:
@@ -371,7 +347,7 @@ def _get_titles_en(current_version: 'ProgramTreeVersion', training: 'Training', 
     return titles
 
 
-def build_title_fr(training, current_version, mini_training):
+def build_title_fr(training: 'Training', current_version: 'ProgramTreeVersion', mini_training: 'MiniTraining') -> str:
     if training:
         title_fr = training.titles.title_fr
     elif mini_training:
@@ -383,14 +359,14 @@ def build_title_fr(training, current_version, mini_training):
     return title_fr
 
 
-def management_entity(training, group, current_version):
+def management_entity(training: 'Training', group: 'Group', current_version: 'ProgramTreeVersion') -> str:
     if current_version.is_standard:
         return training.management_entity.acronym
     else:
         return group.management_entity.acronym
 
 
-def _get_responsibles_and_contacts(group):
+def _get_responsibles_and_contacts(group: 'Group') -> str:
     responsibles_and_contacts = ''
 
     contacts = serializers.general_information.get_contacts(group)
@@ -407,7 +383,7 @@ def _get_responsibles_and_contacts(group):
     return responsibles_and_contacts
 
 
-def get_contacts(contact_persons, title):
+def get_contacts(contact_persons: List[dict], title: str) -> str:
     if contact_persons:
         responsibles_and_contacts = '{}{}'.format(title, CARRIAGE_RETURN)
         for contact in contact_persons:
@@ -425,43 +401,41 @@ def get_contacts(contact_persons, title):
     return ''
 
 
-def get_co_organizations(training):
+def _get_co_organizations(training_co_organizations) -> str:
     co_organizations = ''
-    if training.co_organizations:
-        for idx, coorganization in enumerate(training.co_organizations):
+    if training_co_organizations:
+        for idx, co_organization in enumerate(training_co_organizations):
             if idx > 0:
                 co_organizations += CARRIAGE_RETURN
-            co_organizations += "{} - {} {}{}".format(
-                coorganization.partner.address.country_name,
-                coorganization.partner.address.city,
+            co_organizations += "{} - {} {}{} ".format(
+                co_organization.partner.address.country_name if co_organization.partner.address else '',
+                co_organization.partner.address.city if co_organization.partner.address else '',
                 CARRIAGE_RETURN,
-                coorganization.partner.name
+                co_organization.partner.name
             )
-            co_organizations += "{} : {}{}".format(str(_('For all students')),
-                                                   yesno(coorganization.is_for_all_students).title(),
-                                                   CARRIAGE_RETURN)
-            co_organizations += "{} : {}{}".format(str(_('Reference institution')),
-                                                   yesno(coorganization.is_reference_institution).title(),
-                                                   CARRIAGE_RETURN)
+            co_organizations += _build_line('For all students', co_organization.is_for_all_students)
+            co_organizations += _build_line('Reference institution', co_organization.is_reference_institution)
             co_organizations += "{} : {}{}".format(
                 str(_('UCL Diploma')),
-                coorganization.certificate_type.value if coorganization.certificate_type else '', CARRIAGE_RETURN
+                co_organization.certificate_type.value if co_organization.certificate_type else '', CARRIAGE_RETURN
             )
-            co_organizations += "{} : {}{}".format(str(_('Producing certificat')),
-                                                   yesno(coorganization.is_producing_certificate).title(),
-                                                   CARRIAGE_RETURN)
-            co_organizations += "{} : {}{}".format(str(_('Producing annexe')),
-                                                   yesno(coorganization.is_producing_certificate_annexes).title(),
-                                                   CARRIAGE_RETURN)
-    return ''
+            co_organizations += _build_line('Producing certificat', co_organization.is_producing_certificate)
+            co_organizations += _build_line('Producing annexe', co_organization.is_producing_certificate_annexes)
+    return co_organizations
 
 
-def _build_common_ares_code_data(training):
-    return [training.co_graduation.code_inter_cfb,
-            training.co_graduation.coefficient if training.co_graduation.coefficient else '']
+def _build_line(title: str, boolean_value: bool) -> str:
+    return "{} : {}{}".format(str(_(title)), _title_yes_no_empty(boolean_value), CARRIAGE_RETURN)
 
 
-def activities_data(training):
+def _build_common_ares_code_data(co_graduation) -> List[str]:
+    if co_graduation:
+        return [co_graduation.code_inter_cfb if co_graduation.code_inter_cfb else '',
+                '{0:.4g}'.format(co_graduation.coefficient) if co_graduation.coefficient else '']
+    return ['', '']
+
+
+def activities_data(training: 'Training') -> List[str]:
     data = list()
     data.append(training.other_campus_activities.value if training.other_campus_activities else '')
     data.append(training.internship_presence.value.title() if training.internship_presence else '')
@@ -500,7 +474,7 @@ def _build_validity_data(training: 'Training', mini_training: 'MiniTraining', gr
     return data
 
 
-def _build_additional_info_data(training, mini_training, group):
+def _build_additional_info_data(training: 'Training', mini_training: 'MiniTraining', group: 'Group') -> List[str]:
     data = []
     if training or mini_training or group:
         data.append(group.content_constraint.type.value.title() if group.content_constraint.type else '')
@@ -524,18 +498,88 @@ def _get_start_year(current_version: 'ProgramTreeVersion', training: 'Training',
     return ''
 
 
-def _build_organization_data(current_version, training, group):
+def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'Training', group: 'Group') -> List[str]:
     data = []
     if training:
         data.append(training.schedule_type.value)
-        data.append(training.management_entity.acronym if current_version.is_standard else group.management_entity.acronym)
+        data.append(
+            training.management_entity.acronym if current_version.is_standard else group.management_entity.acronym
+        )
         data.append(training.administration_entity.acronym)
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
-        if training.duration and training.duration_unit.value:
-            data.append("{} {}".format(training.duration, training.duration_unit.value))
-        else:
-            data.append("")
+        data.append(_build_duration_data(training))
         data.extend(activities_data(training))
     else:
         data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ORGANIZATION])))
+    return data
+
+
+def _build_duration_data(training: 'Training') -> str:
+    return "{} {}".format(training.duration,
+                          training.duration_unit.value) if training.duration and training.duration_unit.value else ''
+
+
+def _title_yes_no_empty(boolean_value: bool) -> str:
+    if boolean_value is None:
+        return ''
+    return _('Yes') if boolean_value else _('No')
+
+
+def _build_funding_data(funding: Funding) -> List[str]:
+    data = []
+    if funding:
+        data.append(_title_yes_no_empty(funding.can_be_funded))
+        data.append(
+            funding.funding_orientation.value.title() if funding.funding_orientation else ''
+        )
+        data.append(_title_yes_no_empty(funding.can_be_international_funded))
+        data.append(
+            funding.international_funding_orientation.value.title()
+            if funding.international_funding_orientation else ''
+        )
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_FUNDING])))
+    return data
+
+
+def _build_diploma_certicat_data(training: 'Training') -> List[str]:
+    data = list()
+    if training:
+        if training.diploma:
+            data.append(_title_yes_no_empty(training.diploma.leads_to_diploma))
+            data.append(training.diploma.printing_title if training.diploma.printing_title else '')
+            data.append(training.diploma.professional_title if training.diploma.professional_title else '')
+        else:
+            data.extend(['', '', ''])
+        data.append(_build_aims_data(training))
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_DIPLOMA_CERTIFICAT])))
+    return data
+
+
+def _build_enrollment_data(training: 'Training') -> List[str]:
+    data = list()
+    if training:
+        data.append("{} - {}".format(
+            training.enrollment_campus.name,
+            training.enrollment_campus.university_name) if training.enrollment_campus else '')
+        data.append(_title_yes_no_empty(training.is_enrollment_enabled))
+        data.append(_title_yes_no_empty(training.has_online_re_registration))
+        data.append(_title_yes_no_empty(training.has_partial_deliberation))
+        data.append(_title_yes_no_empty(training.has_admission_exam))
+        data.append(training.rate_code.value if training.rate_code else '')
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ENROLLMENT])))
+    return data
+
+
+def _build_other_legal_information_data(training: 'Training') -> List[str]:
+    data = list()
+    if training:
+        data.append(training.academic_type.value if training.academic_type else '')
+        data.append(_title_yes_no_empty(training.produce_university_certificate))
+        data.append("{} - {}".format(training.decree_category.name,
+                                     training.decree_category.value) if training.decree_category else '')
+    else:
+        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_OTHER_LEGAL_INFORMATION])))
     return data

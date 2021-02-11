@@ -24,58 +24,47 @@
 #
 ##############################################################################
 from django.test import TestCase, SimpleTestCase
+from django.test.utils import override_settings
+from django.utils.translation import gettext_lazy as _
 
-
+from base.models.enums import education_group_types
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from base.models.enums.publication_contact_type import PublicationContactType
+from base.tests.factories.academic_year import get_current_year
+from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
+from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.mini_training import MiniTrainingIdentity
+from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
+from education_group.tests.ddd.factories.address import AddressFactory
+from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
+from education_group.tests.ddd.factories.co_organization import CoorganizationFactory
+from education_group.tests.ddd.factories.content_constraint import ContentConstraintFactory
+from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory
+from education_group.tests.ddd.factories.funding import FundingFactory
+from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.remark import RemarkFactory
+from education_group.tests.ddd.factories.titles import TitlesFactory
+from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.business.xls_customized import _build_headers, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS, \
     WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
     _build_additional_info_data, _build_validity_data, _get_start_year, _get_end_year, _get_titles_en, \
-    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data
-from django.test.utils import override_settings
-from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
-    SpecificProgramTreeVersionFactory, ProgramTreeVersionFactory
-from django.utils.translation import gettext_lazy as _
-from base.models.enums import organization_type, education_group_types
-from education_group.tests.ddd.factories.titles import TitlesFactory
-from base.models.education_group_publication_contact import EducationGroupPublicationContact
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
-from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
-from base.tests.factories.person import PersonFactory
-from education_group.ddd.domain.exception import MiniTrainingNotFoundException, MiniTrainingHaveLinkWithEPC
-from education_group.templatetags.academic_year_display import display_as_academic_year
-from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
-
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
+    _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, _build_funding_data, \
+    _build_diploma_certicat_data, _build_enrollment_data
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory as \
-    StandardEducationGroupVersionDbFactory
-from education_group.ddd.domain.group import GroupIdentity
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
-from base.tests.factories.academic_year import get_current_year
-from base.tests.factories.person import PersonWithPermissionsFactory
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
+    SpecificProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-from education_group.tests.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.content_constraint import ContentConstraintFactory
-from education_group.tests.ddd.factories.remark import RemarkFactory
-from base.models.enums.constraint_type import ConstraintTypeEnum
-from education_group.tests.factories.mini_training import MiniTrainingFactory
-from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.training import TrainingIdentity
-from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
-from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.models.enums.publication_contact_type import PublicationContactType
-from base.tests.factories.education_group_year import TrainingFactory as DbTrainingFactory
-from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory, DiplomaAimIdentityFactory
 
 UNSPECIFIED_FR = "Indéterminé"
 
-REMARK = RemarkFactory(text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>", text_en="Remarque fr")
 
 DEFAULT_FR_HEADERS = ['Anac.', 'Sigle/Int. abr.', 'Intitulé', 'Catégorie', 'Type', 'Crédits']
 VALIDITY_HEADERS = ["Statut", "Début", "Dernière année d'org."]
@@ -179,6 +168,9 @@ class XlsCustomizedHeadersTestCase(SimpleTestCase):
 class XlsCustomizedContentTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
+        remark = RemarkFactory(text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>",
+                               text_en="Remarque fr")
+
         cls.current_year = get_current_year()
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.training_version = StandardEducationGroupVersionFactory(
@@ -200,7 +192,7 @@ class XlsCustomizedContentTestCase(TestCase):
         cls.group_training = GroupFactory(entity_identity__code=cls.training_version.root_group.partial_acronym,
                                           entity_identity__year=cls.current_year,
                                           content_constraint=cls.constraint,
-                                          remark=REMARK
+                                          remark=remark
                                           )
         cls.training = TrainingFactory(entity_identity__acronym=cls.training_version.root_group.partial_acronym,
                                        entity_identity__year=cls.current_year,
@@ -239,7 +231,7 @@ class XlsCustomizedContentTestCase(TestCase):
             entity_identity__code=cls.mini_training_version.root_group.partial_acronym,
             entity_identity__year=cls.current_year,
             content_constraint=cls.constraint,
-            remark=REMARK
+            remark=remark
         )
 
         cls.group = GroupFactory(
@@ -247,7 +239,7 @@ class XlsCustomizedContentTestCase(TestCase):
             start_year=cls.current_year,
             type=GroupType.COMMON_CORE.name,
             content_constraint=cls.constraint,
-            remark=REMARK
+            remark=remark
         )
 
     def test_build_validity_for_training(self):
@@ -273,6 +265,8 @@ class XlsCustomizedContentTestCase(TestCase):
                          str(standard_current_version.start_year))
         self.assertEqual(_get_start_year(particular_current_version, None, mini_training, group),
                          str(particular_current_version.start_year))
+        self.assertEqual(_get_start_year(particular_current_version, None, None, group),
+                         '')
 
     def test_build_additional_info_for_training(self):
         expected = [self.group_training.content_constraint.type.value.title(), self.group_training.content_constraint.minimum,
@@ -296,6 +290,10 @@ class XlsCustomizedContentTestCase(TestCase):
                     "Remarque voir Google", self.group.remark.text_en]
         data = _build_additional_info_data(None, None, self.group)
         self.assertListEqual(data, expected)
+
+    def test_build_additional_info_no_data(self):
+        data = _build_additional_info_data(None, None, None)
+        self.assertListEqual(data, _build_array_with_empty_string(6))
 
     def test_end_year(self):
         standard_current_version = StandardProgramTreeVersionFactory()
@@ -357,7 +355,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
     def test_get_titles_en_for_training_particular_version_not_finality(self):
         self.assertListEqual(_get_titles_en(self.particular_current_version, self.training, None, self.group),
                              ["{}[{}]".format(self.training.titles.title_en,
-                                            self.particular_current_version.title_en),
+                                              self.particular_current_version.title_en),
                               '', '']
                              )
 
@@ -376,25 +374,27 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                              [self.group.titles.title_en, '', ''])
 
     def test_build_organization_data_for_training(self):
+        result = _build_organization_data(self.standard_current_version, self.training, self.group)
+        expected = [
+            self.training.schedule_type.value, self.training.management_entity.acronym,
+            self.training.administration_entity.acronym,
+            "{} - {}".format(self.group.teaching_campus.name,
+                             self.group.teaching_campus.university_name),
+            "{} {}".format(self.training.duration, self.training.duration_unit.value),
+            self.training.other_campus_activities.value if self.training.other_campus_activities else '',
+            self.training.internship_presence.value.title() if self.training.internship_presence else '',
+            str(_('Yes')) if self.training.has_dissertation else str(_('No')),
+            self.training.main_language.name if self.training.main_language else '',
+            self.training.english_activities.value.title() if self.training.english_activities else '',
+            self.training.other_language_activities.value.title() if self.training.other_language_activities else ''
+        ]
         self.assertListEqual(
-            _build_organization_data(self.standard_current_version, self.training, self.group),
-            [
-                self.training.schedule_type.value, self.training.management_entity.acronym,
-                self.training.administration_entity.acronym,
-                "{} - {}".format(self.group.teaching_campus.name,
-                                 self.group.teaching_campus.university_name),
-                "{} {}".format(self.training.duration, self.training.duration_unit.value),
-                self.training.other_campus_activities.value if self.training.other_campus_activities else '',
-                self.training.internship_presence.value.title() if self.training.internship_presence else '',
-                str(_('Yes')) if self.training.has_dissertation else str(_('No')),
-                self.training.main_language.name if self.training.main_language else '',
-                self.training.english_activities.value.title() if self.training.english_activities else '',
-                self.training.other_language_activities.value.title() if self.training.other_language_activities else ''
-            ])
+            result,
+            expected)
 
     def test_build_organization_data_when_not_training(self):
         self.assertListEqual(_build_organization_data(None, None, None),
-                             ['', '', '', '', '', '', '', '', '', '', ''])
+                             _build_array_with_empty_string(11))
 
     def test_get_responsibles_and_contacts(self):
         education_group_version = StandardEducationGroupVersionFactory()
@@ -469,3 +469,120 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         self.assertEqual(_build_keywords_data(self.training, None), self.training.keywords)
         self.assertEqual(_build_keywords_data(None, self.mini_training), self.mini_training.keywords)
         self.assertEqual(_build_keywords_data(None, None), '')
+
+    def test_get_co_organizations_no_data(self):
+        self.assertEqual(_get_co_organizations([]), '')
+
+    def test_get_co_organizations(self):
+        co_organization_1 = CoorganizationFactory(partner=AcademicPartnerFactory(address=AddressFactory()))
+        co_organization_2 = CoorganizationFactory()
+        expected = '{}{}{}'.format(_get_co_organization_data(co_organization_1),
+                                   CARRIAGE_RETURN,
+                                   _get_co_organization_data(co_organization_2)
+                                   )
+
+        res = _get_co_organizations([co_organization_1, co_organization_2])
+        self.assertEqual(res, expected)
+
+    def test_build_duration_data(self):
+        self.assertEqual(_build_duration_data(self.training),
+                         "{} {}".format(self.training.duration, self.training.duration_unit.value))
+        self.assertEqual(_build_duration_data(TrainingFactory(duration=None)),
+                         '')
+
+    def test_build_common_ares_code_data(self):
+        co_graduation = CoGraduationFactory(code_inter_cfb='A', coefficient=2.5)
+        self.assertListEqual(_build_common_ares_code_data(co_graduation), ['A', '2.5'])
+
+        co_graduation = CoGraduationFactory(code_inter_cfb=None, coefficient=None)
+        self.assertListEqual(_build_common_ares_code_data(co_graduation), _build_array_with_empty_string(2))
+
+        self.assertListEqual(_build_common_ares_code_data(None), _build_array_with_empty_string(2))
+
+    def test_title_yes_no_empty(self):
+        self.assertEqual(_title_yes_no_empty(True), 'Oui')
+        self.assertEqual(_title_yes_no_empty(False), 'Non')
+        self.assertEqual(_title_yes_no_empty(None), "")
+
+    def test_build_funding_data(self):
+        self.assertListEqual(_build_funding_data(None), _build_array_with_empty_string(4))
+        # can_be_funded = False
+        # funding_orientation = factory.fuzzy.FuzzyChoice(FundingCodes)
+        # can_be_international_funded = False
+        # international_funding_orientation = factory.fuzzy.FuzzyCho
+        funding = FundingFactory()
+        self.assertListEqual(_build_funding_data(funding), ['Oui' if funding.can_be_funded else 'Non',
+                                                            funding.funding_orientation.value.title(),
+                                                            'Oui' if funding.can_be_international_funded else 'Non',
+                                                            funding.international_funding_orientation.value.title()])
+        funding = FundingFactory(funding_orientation=None, international_funding_orientation=None)
+        self.assertListEqual(_build_funding_data(funding), ['Oui' if funding.can_be_funded else 'Non',
+                                                            '',
+                                                            'Oui' if funding.can_be_international_funded else 'Non',
+                                                            ''])
+
+    def test_build_diploma_certicat_data(self):
+        diploma = DiplomaFactory(leads_to_diploma=True,
+                                 printing_title='Printing title',
+                                 professional_title='Professional title',
+                                 aims=[])
+        training_diploma = TrainingFactory(diploma=diploma)
+        self.assertListEqual(_build_diploma_certicat_data(training_diploma),
+                             ['Oui', 'Printing title', 'Professional title', ''])
+        diploma = DiplomaFactory(leads_to_diploma=False,
+                                 printing_title=None,
+                                 professional_title=None,
+                                 aims=[])
+
+        training_diploma = TrainingFactory(diploma=diploma)
+        self.assertListEqual(_build_diploma_certicat_data(training_diploma),
+                             ['Non', '', '', ''])
+
+    def test_build_enrollment_data(self):
+        self.assertListEqual(_build_enrollment_data(None), _build_array_with_empty_string(6))
+
+
+def _build_array_with_empty_string(nb_of_occurence):
+    return ['' for _ in range(0, nb_of_occurence)]
+#
+# def _build_enrollment_data(training):
+#     data = list()
+#     if training:
+#         data.append("{} - {}".format(
+#             training.enrollment_campus.name,
+#             training.enrollment_campus.university_name) if training.enrollment_campus else '')
+#         data.append(_title_yes_no_empty(training.is_enrollment_enabled))
+#         data.append(_title_yes_no_empty(training.has_online_re_registration))
+#         data.append(_title_yes_no_empty(training.has_partial_deliberation))
+#         data.append(_title_yes_no_empty(training.has_admission_exam))
+#         data.append(training.rate_code.value if training.rate_code else '')
+#     else:
+#         data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ENROLLMENT])))
+#     return data
+
+
+def _get_co_organization_data(co_organization):
+    line1 = "{} - {} {}{} ".format(
+        co_organization.partner.address.country_name if co_organization.partner.address else '',
+        co_organization.partner.address.city if co_organization.partner.address else '',
+        CARRIAGE_RETURN,
+        co_organization.partner.name
+    )
+    line2 = _build_line('For all students', co_organization.is_for_all_students)
+    line3 = _build_line('Reference institution', co_organization.is_reference_institution)
+
+    line5 = _build_line('Producing certificat', co_organization.is_producing_certificate)
+    line6 = _build_line('Producing annexe', co_organization.is_producing_certificate_annexes)
+
+    line4 = "{} : {}{}".format(
+        str(_('UCL Diploma')),
+        co_organization.certificate_type.value if co_organization.certificate_type else '', CARRIAGE_RETURN
+    )
+    return line1 + line2 + line3 + line4 + line5 + line6
+
+
+def _build_line(title, boolean_value):
+    return "{} : {}{}".format(str(_(title)),
+                              'Oui' if boolean_value else 'Non',
+                              CARRIAGE_RETURN)
+

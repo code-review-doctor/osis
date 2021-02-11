@@ -2736,7 +2736,7 @@ msgid "Title specific complement"
 msgstr "Intitulé compl. spéc. à l'UE"
 
 msgid "Titles(partial/English)"
-msgstr "Intitulés (partials/anglais)"
+msgstr "Intitulés (partiels/anglais)"
 
 msgid "To complete"
 msgstr "A compléter"
