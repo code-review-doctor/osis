@@ -1,4 +1,5 @@
 from django.db import migrations
+from django.db.models import Q
 from django.utils import timezone
 
 from base.models.enums.education_group_types import GroupType
@@ -18,7 +19,11 @@ def add_default_titles_to_common_core_and_complementary_module(apps, schema_edit
         cm.title_en = 'Additional lessons (complementary module) to the master course'
         cm.changed = timezone.now()
 
-    common_cores = groups.filter(education_group_type__name=GroupType.COMMON_CORE.name)
+    common_cores = groups.filter(
+        Q(title_en__isnull=True) | Q(title_en=''),
+        education_group_type__name=GroupType.COMMON_CORE.name,
+        title_fr__startswith='Contenu'
+    )
     for cc in common_cores:
         cc.title_en = 'Content :'
         cc.changed = timezone.now()
