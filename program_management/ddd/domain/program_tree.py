@@ -138,21 +138,21 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
-    # TODO copy content to next year should take next year tree to delete links
     def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
-        validators_by_business_action.CopyProgramTreeValidatorList(copy_from).validate()
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:
             # Case update program tree to next year
             program_tree_next_year = repository.get(identity_next_year)
+            validators_by_business_action.CopyContentProgramTreeValidatorList(copy_from, program_tree_next_year).validate()
             program_tree_next_year.root_node = self._copy_node_and_children_to_next_year(copy_from.root_node)
         except exception.ProgramTreeNotFoundException:
+            validators_by_business_action.CopyContentProgramTreeValidatorList(copy_from, None).validate()
             # Case create program tree to next year
             root_next_year = self._copy_node_and_children_to_next_year(copy_from.root_node)
             program_tree_next_year = ProgramTree(
                 entity_id=identity_next_year,
                 root_node=root_next_year,
-                authorized_relationships=load_authorized_relationship.load()
+                authorized_relationships=copy_from.authorized_relationships
             )
 
         program_tree_next_year.prerequisites = Prerequisites(

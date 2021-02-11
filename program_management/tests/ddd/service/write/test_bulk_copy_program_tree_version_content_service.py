@@ -104,6 +104,11 @@ class TestBulkCopyProgramTreeVersion(MockPatcherMixin, TestCase):
             len(next_year_tree.prerequisites.prerequisites)
         )
 
+    def test_should_not_copy_content_when_tree_next_year_already_exists_and_is_not_empty(self):
+        first_copy_result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version([self.cmd])
+        second_copy_result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version([self.cmd])
+        self.assertListEqual([], second_copy_result)
+
     def _get_next_year_tree_version_identity(self):
         return ProgramTreeVersionIdentityFactory(
             offer_acronym=self.tree_version.entity_id.offer_acronym,

@@ -249,8 +249,20 @@ class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidat
 class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTree'):
         self.validators = [
-            CheckProgramTreeEndDateValidator(copy_from)
+            CheckProgramTreeEndDateValidator(copy_from),
         ]
+        super().__init__()
+
+
+class CopyContentProgramTreeValidatorList(business_validator.BusinessListValidator):
+    def __init__(self, copy_from: 'ProgramTree', next_year_tree: Optional['ProgramTree']):
+        self.validators = [
+            CheckProgramTreeEndDateValidator(copy_from),
+        ]
+        if next_year_tree:
+            self.validators.append(
+                EmptyProgramTreeValidator(next_year_tree)
+            )
         super().__init__()
 
 
