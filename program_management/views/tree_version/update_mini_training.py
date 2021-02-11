@@ -26,6 +26,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
 from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
@@ -92,7 +93,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_name,
+                    "acronym": version_label(identity),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
@@ -109,7 +110,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
                 "offer_acronym": last_identity.offer_acronym,
-                "acronym": last_identity.version_name,
+                "acronym": version_label(last_identity),
                 "academic_year": display_as_academic_year(
                     self.mini_training_version_form.cleaned_data["end_year"] + 1
                 )

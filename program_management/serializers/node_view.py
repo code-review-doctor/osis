@@ -24,19 +24,19 @@
 #
 ##############################################################################
 from collections import namedtuple
-from typing import List, Dict
+from typing import List
 
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from base.utils.urls import reverse_with_get
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.models.enums.node_type import NodeType
 
@@ -200,7 +200,7 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
         program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(node_identity)
         return next(
             (
-                program_tree_version.version_label for program_tree_version in tree_versions
+                version_label(program_tree_version.program_tree_identity) for program_tree_version in tree_versions
                 if program_tree_version.program_tree_identity == program_tree_identity
             ),
             ''

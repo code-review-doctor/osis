@@ -236,20 +236,20 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_official_standard(self) -> bool:
         return self.entity_id.is_official_standard
 
-    # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
-    @property
-    def version_label(self):
-        if self.entity_id.is_official_standard:
-            return ''
-        elif self.entity_id.is_standard_transition:
-            return '[{}]'.format(self.transition_name)
-        elif self.entity_id.is_specific_official:
-            return '[{}]'.format(self.version_name)
-        return '[{}-{}]'.format(self.version_name, self.transition_name)
-
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)
         for field, new_value in data_as_dict.items():
             setattr(self, field, new_value)
         validators_by_business_action.UpdateProgramTreeVersionValidatorList(self).validate()
         return self
+
+
+# FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
+def version_label(entity_id: 'ProgramTreeVersionIdentity'):
+    if entity_id.is_official_standard:
+        return ''
+    elif entity_id.is_standard_transition:
+        return '[{}]'.format(entity_id.transition_name)
+    elif entity_id.is_specific_official:
+        return '[{}]'.format(entity_id.version_name)
+    return '[{}-{}]'.format(entity_id.version_name, entity_id.transition_name)

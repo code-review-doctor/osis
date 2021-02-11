@@ -62,6 +62,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import SearchAllVersionsFromRootNodesCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.read.search_all_versions_from_root_nodes import search_all_versions_from_root_nodes
@@ -528,7 +529,7 @@ def _build_main_gathering_label(gathering_node: 'Node', tree_versions: List['Pro
         node_version_title = _get_gathering_node_version_title(pgm_tree_version, language)
         return "{}{} - {}{}".format(
             gathering_node.title,
-            pgm_tree_version.version_label if pgm_tree_version else '',
+            version_label(pgm_tree_version.program_tree_identity) if pgm_tree_version else '',
             node_title,
             node_version_title
         )
@@ -619,5 +620,5 @@ def _get_program_tree_version_from_tree_versions_list(year: int, code: str, tree
 def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersion') -> str:
     return "{}{}".format(
         tree.root_node.title,
-        program_tree_version.version_label
+        version_label(program_tree_version.program_tree_identity)
     ) if program_tree_version else tree.root_node.title
