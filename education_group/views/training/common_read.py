@@ -52,7 +52,7 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
-from program_management.ddd.command import GetLastExistingVersionCommand
+from program_management.ddd.command import GetLastExistingTransitionVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
@@ -90,10 +90,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     @cached_property
     def has_transition_version(self) -> 'bool':
-        cmd = GetLastExistingVersionCommand(
+        cmd = GetLastExistingTransitionVersionNameCommand(
             version_name=self.program_tree_version_identity.version_name,
             offer_acronym=self.program_tree_version_identity.offer_acronym,
-            transition_name=self.program_tree_version_identity.transition_name
+            transition_name=self.program_tree_version_identity.transition_name,
+            year=self.program_tree_version_identity.year
         )
         return bool(get_last_existing_transition_version_service.get_last_existing_transition_version_identity(cmd))
 

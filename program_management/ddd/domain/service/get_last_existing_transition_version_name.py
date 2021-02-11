@@ -39,10 +39,12 @@ class GetLastExistingTransitionVersion(interface.DomainService):
             cls,
             version_name: str,
             offer_acronym: str,
+            year: int
     ) -> Union[ProgramTreeVersionIdentity, None]:
         group_version = EducationGroupVersion.objects.filter(
             version_name=version_name,
-            root_group__acronym=offer_acronym
+            root_group__acronym=offer_acronym,
+            offer__academic_year__year=year
         ).exclude(
             transition_name=NOT_A_TRANSITION
         ).annotate(
