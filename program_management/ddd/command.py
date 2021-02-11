@@ -714,3 +714,10 @@ class CheckVersionNameCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CheckTransitionNameCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    transition_name = attr.ib(type=str)

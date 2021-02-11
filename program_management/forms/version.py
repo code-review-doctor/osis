@@ -156,6 +156,7 @@ class TransitionVersionForm(forms.Form):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
         self._init_academic_year_choices()
+        self._set_remote_validation_on_version_name()
 
     def _init_academic_year_choices(self):
         max_year = get_transition_version_max_end_year_service.calculate_transition_version_max_end_year(
@@ -173,6 +174,15 @@ class TransitionVersionForm(forms.Form):
         self.fields["end_year"].choices = choices_years
         if not self.fields["end_year"].initial:
             self.fields["end_year"].initial = choices_years[0]
+
+    def _set_remote_validation_on_version_name(self):
+        set_remote_validation(
+            self.fields["transition_name"],
+            reverse(
+                "check_transition_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
+            )
+        )
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
