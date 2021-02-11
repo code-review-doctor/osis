@@ -132,8 +132,9 @@ class TransitionVersionForm(forms.Form):
         widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
     )
     transition_name = forms.CharField(
-        max_length=25,
+        max_length=14,
         required=False,
+        label=_('Acronym/Short title'),
         widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
     )
     version_title_fr = forms.CharField(
