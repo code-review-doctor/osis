@@ -1106,6 +1106,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-#~ msgid "Invalid transition name"
-#~ msgstr "Sigle de transition invalide"
