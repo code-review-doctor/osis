@@ -21,19 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Union
-
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.get_last_existing_transition_version_name import \
-    GetLastExistingTransitionVersion
+from program_management.ddd.validators import validators_by_business_action
 
 
-def get_last_existing_transition_version_identity(
-        cmd: command.GetLastExistingTransitionVersionNameCommand
-) -> Union[ProgramTreeVersionIdentity, None]:
-    return GetLastExistingTransitionVersion().get_last_existing_transition_version_identity(
-        version_name=cmd.version_name,
-        offer_acronym=cmd.offer_acronym,
-        year=cmd.year
-    )
+def check_transition_name(cmd: command.CheckTransitionNameCommand) -> None:
+    validators_by_business_action.CheckTransitionNameValidatorList(
+        cmd.transition_name
+    ).validate()

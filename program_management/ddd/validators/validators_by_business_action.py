@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -55,7 +55,8 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
-from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator
+from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator, \
+    FullTransitionNamePatternValidator
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
@@ -274,11 +275,10 @@ class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
 
 class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
-
     def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
-            TransitionNamePatternValidator(transition_name=transition_name)
+            FullTransitionNamePatternValidator(transition_name=transition_name)
         ]
         super().__init__()
 
@@ -289,5 +289,13 @@ class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
             VersionNamePatternValidator(version_name),
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
             VersionNameExistedValidator(year, offer_acronym, version_name, transition_name),
+        ]
+        super().__init__()
+
+
+class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, transition_name: str):
+        self.validators = [
+            TransitionNamePatternValidator(transition_name=transition_name)
         ]
         super().__init__()
