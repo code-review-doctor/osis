@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-08 14:09+0100\n"
+"POT-Creation-Date: 2021-02-12 07:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -215,6 +215,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Activities"
+msgstr ""
+
 msgid "Activities on other campus"
 msgstr ""
 
@@ -231,6 +234,9 @@ msgid "Add. requ. ent. 1"
 msgstr ""
 
 msgid "Add. requ. ent. 2"
+msgstr ""
+
+msgid "Additional info"
 msgstr ""
 
 msgid "Additional requirement entity 1"
@@ -3034,9 +3040,6 @@ msgid "optional"
 msgstr ""
 
 msgid "parameters"
-msgstr ""
-
-msgid "partnership_year_education_fields"
 msgstr ""
 
 msgid "partnerships_financing_configuration"

@@ -511,10 +511,6 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
 
     def test_build_funding_data(self):
         self.assertListEqual(_build_funding_data(None), _build_array_with_empty_string(4))
-        # can_be_funded = False
-        # funding_orientation = factory.fuzzy.FuzzyChoice(FundingCodes)
-        # can_be_international_funded = False
-        # international_funding_orientation = factory.fuzzy.FuzzyCho
         funding = FundingFactory()
         self.assertListEqual(_build_funding_data(funding), ['Oui' if funding.can_be_funded else 'Non',
                                                             funding.funding_orientation.value.title(),
