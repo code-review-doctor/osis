@@ -198,8 +198,8 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
 
     def get_permission_required(self):
         if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
-            return ("base.add_training_version",)
-        return ("base.add_minitraining_version",)
+            return ("base.add_training_transition_version",)
+        return ("base.add_minitraining_transition_version",)
 
     def get(self, request, *args, **kwargs):
         form = TransitionVersionForm(tree_version_identity=self.tree_version_identity)

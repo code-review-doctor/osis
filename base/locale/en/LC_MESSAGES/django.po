@@ -554,9 +554,6 @@ msgstr ""
 msgid "Consolidate the proposal"
 msgstr ""
 
-msgid "Continuing Education"
-msgstr ""
-
 msgid "Coordinator"
 msgstr ""
 
@@ -576,9 +573,6 @@ msgid "Create"
 msgstr ""
 
 msgid "Create specific version"
-msgstr ""
-
-msgid "Create transition version"
 msgstr ""
 
 msgid "Creation"

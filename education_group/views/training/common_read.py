@@ -198,6 +198,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "create_specific_version_url": self.get_create_specific_version_url(),
             "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
+            "create_transition_version_permission_name": self.get_create_transition_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -299,6 +300,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def get_create_version_permission_name(self) -> str:
         return "base.add_training_version"
+
+    def get_create_transition_version_permission_name(self) -> str:
+        return "base.add_training_transition_version"
 
     def get_tab_urls(self):
         tab_urls = OrderedDict({

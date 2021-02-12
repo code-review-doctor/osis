@@ -52,6 +52,10 @@ class TestGetCreateProgramTreeSpecificVersion(TestCase):
             reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
             data_year=cls.current_academic_year
         )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            data_year=cls.current_academic_year
+        )
         cls.factulty_manager = FacultyManagerFactory(entity=cls.central_manager.entity)
 
         cls.training_type = TrainingEducationGroupTypeFactory()
@@ -157,6 +161,10 @@ class TestGetCreateProgramTreeTransitionVersion(TestCase):
             reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
             data_year=cls.current_academic_year
         )
+        OpenAcademicCalendarFactory(
+            reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+            data_year=cls.current_academic_year
+        )
         cls.factulty_manager = FacultyManagerFactory(entity=cls.central_manager.entity)
 
         cls.training_type = TrainingEducationGroupTypeFactory()
@@ -232,13 +240,6 @@ class TestGetCreateProgramTreeTransitionVersion(TestCase):
         response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
-
-    def test_case_user_as_faculty_manager_for_create_training_version(self):
-        self.client.force_login(self.factulty_manager.person.user)
-        response = self.client.get(self.create_training_version_url, data={}, follow=True)
-
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
 
     @mock.patch('education_group.calendar.education_group_preparation_calendar.'
                 'EducationGroupPreparationCalendar.is_target_year_authorized', return_value=True)
