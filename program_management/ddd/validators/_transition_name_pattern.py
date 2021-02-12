@@ -28,8 +28,8 @@ import re
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.domain.exception import InvalidTransitionNameException
 
-TRANSITION_NAME_REGEX = "^[A-Z]*"
-FULL_TRANSITION_NAME_REGEX = "^TRANSITION [A-Z]*"
+TRANSITION_NAME_REGEX = r"^[A-Z]*"
+FULL_TRANSITION_NAME_REGEX = r"^TRANSITION(\s[A-Z]+)?"
 
 
 class TransitionNamePatternValidator(BusinessValidator):
