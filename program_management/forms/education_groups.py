@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
+from base.models import campus
 
 PARTICULAR = "PARTICULAR"
 STANDARD = "STANDARD"
@@ -97,6 +98,12 @@ class GroupFilter(FilterSet):
         required=False,
         label=_('Title')
     )
+    main_teaching_campus = filters.ModelChoiceFilter(
+        queryset=campus.find_main_campuses(),
+        label=_("Learning location"),
+        required=False,
+        empty_label=pgettext_lazy("male plural", "All"),
+    )
     partial_acronym = filters.CharFilter(
         field_name="partial_acronym",
         method='filter_education_group_year_field',
@@ -128,7 +135,8 @@ class GroupFilter(FilterSet):
             ('academic_year__year', 'academic_year'),
             ('full_title_fr', 'full_title_fr'),
             ('type_ordering', 'type'),
-            ('entity_management_version', 'management_entity')
+            ('entity_management_version', 'management_entity'),
+            ('main_teaching_campus', 'main_teaching_campus'),
         ),
         widget=forms.HiddenInput
     )
@@ -143,7 +151,8 @@ class GroupFilter(FilterSet):
             'management_entity',
             'with_entity_subordinated',
             'version',
-            'with_entity_transition'
+            'with_entity_transition',
+            'main_teaching_campus'
         ]
 
     def __init__(self, *args, **kwargs):
