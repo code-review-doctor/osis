@@ -102,3 +102,13 @@ class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
         year=factory.SelfAttribute("..tree.root_node.year"),
         version_name="SPECIFIC"
     )
+
+
+class SpecificTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name="SPECIFIC",
+        transition_name=TRANSITION_PREFIX
+    )
