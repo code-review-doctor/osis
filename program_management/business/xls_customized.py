@@ -163,8 +163,6 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         current_version = ProgramTreeVersionRepository.get(program_tree_version_identity)
     except exception.ProgramTreeVersionNotFoundException:
         current_version = None
-    # get_group_cmd = command.GetGroupCommand(year=group_year.academic_year.year, code=group_year.partial_acronym)
-    # group = get_group_service.get_group(get_group_cmd)
 
     data = [
         group_year.academic_year.name,
