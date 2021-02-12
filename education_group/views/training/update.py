@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -35,7 +35,8 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages, \
+    check_formations_impacted_by_update
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -102,6 +103,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     updated_trainings
                 )
                 display_success_messages(request, success_messages, extra_tags='safe')
+                check_formations_impacted_by_update(self.get_training_obj().code, self.get_training_obj().year, request)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
