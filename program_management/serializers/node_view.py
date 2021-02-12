@@ -208,7 +208,7 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
 
 
 def _format_node_group_text(node: 'NodeGroupYear') -> str:
-    transition_suffix = node.get_formated_transition_name()
+    transition_suffix = node.get_formatted_transition_name()
     if node.version_name:
         return "{node.code} - {node.title}[{node.version_name}{transition_name}]".format(
             node=node, transition_name=transition_suffix
