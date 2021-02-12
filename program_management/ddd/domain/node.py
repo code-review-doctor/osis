@@ -507,6 +507,7 @@ class NodeGroupYear(Node):
     version_name = attr.ib(type=str, default=None)
     version_title_fr = attr.ib(type=str, default=None)
     version_title_en = attr.ib(type=str, default=None)
+    transition_name = attr.ib(type=str, default=None)
     category = attr.ib(type=GroupType, default=None)
     management_entity_acronym = attr.ib(type=str, default=None)
     teaching_campus = attr.ib(type=Campus, default=None)
@@ -516,13 +517,17 @@ class NodeGroupYear(Node):
 
     def __str__(self):
         if self.version_name:
-            return "{}[{}] - {} ({})".format(self.title, self.version_name, self.code, self.academic_year)
-        return "{} - {} ({})".format(self.title, self.code, self.academic_year)
+            return "{}[{}{}] - {} ({})".format(self.title,
+                                               self.version_name,
+                                               self.get_formatted_transition_name(),
+                                               self.code,
+                                               self.academic_year)
+        return "{}{} - {} ({})".format(self.title, self.get_formatted_transition_name(), self.code, self.academic_year)
 
     def full_acronym(self) -> str:
         if self.version_name:
-            return "{}[{}]".format(self.title, self.version_name)
-        return self.title
+            return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
+        return '{}{}'.format(self.title, self.get_formatted_transition_name())
 
     def full_title(self) -> str:
         title = self.offer_title_fr
@@ -533,6 +538,11 @@ class NodeGroupYear(Node):
         if self.version_title_fr:
             return "{}[{}]".format(title, self.version_title_fr)
         return title
+
+    def get_formatted_transition_name(self):
+        if self.transition_name:
+            return '-{}'.format(self.transition_name) if self.version_name else '[{}]'.format(self.transition_name)
+        return ''
 
 
 @attr.s(slots=True, hash=False, eq=False)

@@ -28,6 +28,7 @@ from django.urls import include, path
 
 import program_management.views.tree.copy_cut
 import program_management.views.tree_version.check_version_name
+import program_management.views.tree_version.check_transition_name
 from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
@@ -136,6 +137,11 @@ urlpatterns = [
             'check_version_name/',
             program_management.views.tree_version.check_version_name.check_version_name,
             name="check_version_name"
+        ),
+        path(
+            'check_transition_name/',
+            program_management.views.tree_version.check_transition_name.check_transition_name,
+            name="check_transition_name"
         ),
     ])),
 ]
