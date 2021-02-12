@@ -23,32 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
-from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import InvalidTransitionNameException
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
-TRANSITION_NAME_REGEX = r"^[A-Z]*"
-FULL_TRANSITION_NAME_REGEX = r"^TRANSITION(\s[A-Z]+)?"
-
-
-class TransitionNamePatternValidator(BusinessValidator):
-
-    def __init__(self, transition_name: str):
-        super().__init__()
-        self.transition_name = transition_name
-
-    def validate(self, *args, **kwargs):
-        if not bool(re.fullmatch(TRANSITION_NAME_REGEX, self.transition_name.upper())):
-            raise InvalidTransitionNameException()
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from osis_common.decorators.ajax import ajax_required
+from program_management.ddd import command
+from program_management.ddd.service.read import check_transition_name_service
 
 
-class FullTransitionNamePatternValidator(BusinessValidator):
+@login_required
+@ajax_required
+@require_http_methods(['GET'])
+def check_transition_name(request, year, acronym):
+    transition_name = request.GET['transition_name']
+    cmd = command.CheckTransitionNameCommand(
+        year=year,
+        offer_acronym=acronym,
+        transition_name=transition_name
+    )
 
-    def __init__(self, transition_name: str):
-        super().__init__()
-        self.transition_name = transition_name
-
-    def validate(self, *args, **kwargs):
-        if not bool(re.fullmatch(FULL_TRANSITION_NAME_REGEX, self.transition_name.upper())):
-            raise InvalidTransitionNameException()
+    try:
+        check_transition_name_service.check_transition_name(cmd)
+    except MultipleBusinessExceptions as multiple_exceptions:
+        first_exception = next(e for e in multiple_exceptions.exceptions)
+        return JsonResponse({
+            "valid": False,
+            "msg": first_exception.message
+        })
+    return JsonResponse({
+        "valid": True,
+        "msg": None
+    })

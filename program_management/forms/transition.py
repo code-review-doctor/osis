@@ -28,11 +28,13 @@ from typing import Dict
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
+from django.urls import reverse
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
@@ -56,8 +58,9 @@ class TransitionVersionForm(forms.Form):
         widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
     )
     transition_name = forms.CharField(
-        max_length=25,
+        max_length=14,
         required=False,
+        label=_('Acronym/Short title'),
         widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
     )
     version_title_fr = forms.CharField(
@@ -79,6 +82,7 @@ class TransitionVersionForm(forms.Form):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
         self._init_academic_year_choices()
+        self._set_remote_validation_on_version_name()
 
     def _init_academic_year_choices(self):
         max_year = get_transition_version_max_end_year_service.calculate_transition_version_max_end_year(
@@ -96,6 +100,15 @@ class TransitionVersionForm(forms.Form):
         self.fields["end_year"].choices = choices_years
         if not self.fields["end_year"].initial:
             self.fields["end_year"].initial = choices_years[0]
+
+    def _set_remote_validation_on_version_name(self):
+        set_remote_validation(
+            self.fields["transition_name"],
+            reverse(
+                "check_transition_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
+            )
+        )
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
