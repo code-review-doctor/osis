@@ -433,7 +433,9 @@ class ProgramTree(interface.RootEntity):
         return my_map.get(str(child.entity_id) + str(parent.entity_id))
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
-        copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
+        copied_root_node = copy.deepcopy(self.root_node)
+        if ignore_children_from:
+            copied_root_node.prune(ignore_children_from)
         return ProgramTree(
             root_node=copied_root_node,
             authorized_relationships=self.authorized_relationships,
@@ -531,9 +533,16 @@ class ProgramTree(interface.RootEntity):
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
+        return self.__deepcopy__(memodict={})
+
+    def __deepcopy__(self, memodict: Dict = None) -> 'ProgramTree':
+        if memodict is None:
+            memodict = {}
+
         return ProgramTree(
-            root_node=_copy(self.root_node),
-            authorized_relationships=copy.copy(self.authorized_relationships)
+            root_node=self.root_node.__deepcopy__(memodict),
+            authorized_relationships=copy.copy(self.authorized_relationships),
+            prerequisites=copy.deepcopy(self.prerequisites)
         )
 
     def get_relative_credits_values(self, child_node: 'NodeIdentity'):
@@ -673,20 +682,6 @@ def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) 
 
 def build_path(*nodes):
     return '{}'.format(PATH_SEPARATOR).join((str(n.node_id) for n in nodes))
-
-
-def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    new_node = node_factory.deepcopy_node_without_copy_children_recursively(root)
-    new_children = []
-    for link in root.children:
-        if ignore_children_from and link.parent.node_type in ignore_children_from:
-            continue
-        new_child = _copy(link.child, ignore_children_from=ignore_children_from)
-        new_link = link_factory.deepcopy_link_without_copy_children_recursively(link)
-        new_link.child = new_child
-        new_children.append(new_link)
-    new_node.children = new_children
-    return new_node
 
 
 def _path_contains(path: 'Path', node: 'Node') -> bool:
