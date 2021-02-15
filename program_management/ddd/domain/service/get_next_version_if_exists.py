@@ -32,7 +32,7 @@ from program_management.models.education_group_version import EducationGroupVers
 class GetNextVersionIfExists(interface.DomainService):
 
     @classmethod
-    def get_next_transition_version(cls, version: 'ProgramTreeVersion') -> Union[EducationGroupVersion, None]:
+    def get_next_transition_version(cls, version: 'ProgramTreeVersion') -> Union[int, None]:
         next_transitions = EducationGroupVersion.objects.filter(
             Q(root_group__academic_year__year__gt=version.entity_id.year) &
             Q(root_group__academic_year__year__lte=version.end_year_of_existence),
@@ -42,5 +42,5 @@ class GetNextVersionIfExists(interface.DomainService):
             Q(transition_name__isnull=True) | Q(transition_name='')
         ).order_by('root_group__academic_year__year')
         if next_transitions:
-            return next_transitions.first()
+            return next_transitions.first().academic_year.year
         return None

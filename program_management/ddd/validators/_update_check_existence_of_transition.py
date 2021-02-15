@@ -36,7 +36,9 @@ class CheckExistenceOfTransition(business_validator.BusinessValidator):
         if not self.tree_version.is_transition:
             return
 
-        other_transition = HasOtherVersion.get_next_transition_version(self.tree_version)
-        if other_transition:
-            transition_year = other_transition.first().academic_year.year
-            raise exception.CannotExtendTransitionDueToExistenceOfOtherTransition(self.tree_version, transition_year)
+        other_transition_year = GetNextVersionIfExists.get_next_transition_version(self.tree_version)
+        if other_transition_year:
+            raise exception.CannotExtendTransitionDueToExistenceOfOtherTransition(
+                self.tree_version,
+                other_transition_year
+            )

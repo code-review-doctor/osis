@@ -156,11 +156,12 @@ class ProgramTreeVersionMismatch(BusinessException):
 class CannotExtendTransitionDueToExistenceOfOtherTransition(BusinessException):
     def __init__(self, version: 'ProgramTreeVersion', transition_year: int, *args, **kwargs):
         message = _(
-            "You can't extend the program tree '{code}' in {year} as other transition version exists in {t_year}"
+            "You can't extend the program tree '{code}' in {year} as other transition version exists in "
+            "{transition_year}"
         ).format(
             code=version.program_tree_identity.code,
             year=version.entity_id.year,
-            t_year=transition_year
+            transition_year=transition_year
         )
         super().__init__(message, **kwargs)
 
