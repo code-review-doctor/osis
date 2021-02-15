@@ -26,7 +26,7 @@
 import collections
 import copy
 from _decimal import Decimal
-from typing import List, Set, Optional, Iterator, Tuple, Generator
+from typing import List, Set, Optional, Iterator, Tuple, Generator, Dict
 
 import attr
 
@@ -152,13 +152,6 @@ class NodeFactory:
         )
         child._has_changed = True
         return child
-
-    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
-        original_children = original_node.children
-        original_node.children = []  # To avoid recursive deep copy of all children behind
-        copied_node = copy.deepcopy(original_node)
-        original_node.children = original_children
-        return copied_node
 
 
 factory = NodeFactory()
@@ -475,6 +468,25 @@ class Node(interface.Entity):
         self.children[index].order_down()
         self.children[index+1].order_up()
 
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum]) -> None:
+        if self.node_type in ignore_children_from:
+            self.children = []
+        for child_link in self.children:
+            child_link.child.prune(ignore_children_from=ignore_children_from)
+
+    def __deepcopy__(self, memodict: Dict = None) -> 'Node':
+        if memodict is None:
+            memodict = {}
+
+        if self.entity_id in memodict:
+            return memodict[self.entity_id]
+
+        copy_node = attr.evolve(self, children=[])
+        memodict[copy_node.entity_id] = copy_node
+        copy_node.children = [l.__deepcopy__(memodict) for l in self.children]
+
+        return copy_node
+
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Generator[Tuple['Path', 'Node'], None, None]:
     if current_path is None:
@@ -507,6 +519,7 @@ class NodeGroupYear(Node):
     version_name = attr.ib(type=str, default=None)
     version_title_fr = attr.ib(type=str, default=None)
     version_title_en = attr.ib(type=str, default=None)
+    transition_name = attr.ib(type=str, default=None)
     category = attr.ib(type=GroupType, default=None)
     management_entity_acronym = attr.ib(type=str, default=None)
     teaching_campus = attr.ib(type=Campus, default=None)
@@ -516,13 +529,17 @@ class NodeGroupYear(Node):
 
     def __str__(self):
         if self.version_name:
-            return "{}[{}] - {} ({})".format(self.title, self.version_name, self.code, self.academic_year)
-        return "{} - {} ({})".format(self.title, self.code, self.academic_year)
+            return "{}[{}{}] - {} ({})".format(self.title,
+                                               self.version_name,
+                                               self.get_formatted_transition_name(),
+                                               self.code,
+                                               self.academic_year)
+        return "{}{} - {} ({})".format(self.title, self.get_formatted_transition_name(), self.code, self.academic_year)
 
     def full_acronym(self) -> str:
         if self.version_name:
-            return "{}[{}]".format(self.title, self.version_name)
-        return self.title
+            return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
+        return '{}{}'.format(self.title, self.get_formatted_transition_name())
 
     def full_title(self) -> str:
         title = self.offer_title_fr
@@ -533,6 +550,11 @@ class NodeGroupYear(Node):
         if self.version_title_fr:
             return "{}[{}]".format(title, self.version_title_fr)
         return title
+
+    def get_formatted_transition_name(self):
+        if self.transition_name:
+            return '-{}'.format(self.transition_name) if self.version_name else '[{}]'.format(self.transition_name)
+        return ''
 
 
 @attr.s(slots=True, hash=False, eq=False)
