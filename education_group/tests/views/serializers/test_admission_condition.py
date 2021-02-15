@@ -97,6 +97,11 @@ class TestGetCommonAdmissionConditionSerializer(TestCase):
                 'label_translated': _('Admission and Enrolment Procedures for general registration'),
                 'text_fr': cls.common_admission_training_120.text_admission_enrollment_procedures,
                 'text_en': cls.common_admission_training_120.text_admission_enrollment_procedures_en
+            },
+            'specific_condition_requirements': {
+                'label_translated': _('Specific admission requirements'),
+                'text_fr': cls.common_admission_training_120.text_free,
+                'text_en': cls.common_admission_training_120.text_free_en
             }
         }
 
