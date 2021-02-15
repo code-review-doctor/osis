@@ -180,6 +180,8 @@ def get_common_admission_condition(offer_type: str, year: int):
             personalized_access_en=F('text_personalized_access_en'),
             admission_enrollment_procedures_fr=F('text_admission_enrollment_procedures'),
             admission_enrollment_procedures_en=F('text_admission_enrollment_procedures_en'),
+            specific_condition_requirements_fr=F('text_free'),
+            specific_condition_requirements_en=F('text_free_en')
         ).values(
             'alert_message_fr',
             'alert_message_en',
@@ -205,6 +207,8 @@ def get_common_admission_condition(offer_type: str, year: int):
             'personalized_access_en',
             'admission_enrollment_procedures_fr',
             'admission_enrollment_procedures_en',
+            'specific_condition_requirements_fr',
+            'specific_condition_requirements_en'
         ).get()
     except AdmissionCondition.DoesNotExist:
         return __default_common_admission_condition()
@@ -270,6 +274,11 @@ def __default_common_admission_condition():
         },
         'admission_enrollment_procedures': {
             'label_translated': _('Admission and Enrolment Procedures for general registration'),
+            'text_fr': '',
+            'text_en': ''
+        },
+        'specific_condition_requirements': {
+            'label_translated': _('Specific admission requirements'),
             'text_fr': '',
             'text_en': ''
         }
