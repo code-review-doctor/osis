@@ -128,7 +128,7 @@ SECTION_LIST = [
 COMMON_TYPE_ADMISSION_CONDITIONS = {
     TrainingType.BACHELOR.name:
         ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
-         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales',),
+         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', 'free',),
     TrainingType.AGGREGATION.name:
         ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr',
          'ca_allegement', 'ca_ouv_adultes',),
