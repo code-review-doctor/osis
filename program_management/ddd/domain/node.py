@@ -26,7 +26,7 @@
 import collections
 import copy
 from _decimal import Decimal
-from typing import List, Set, Optional, Iterator, Tuple, Generator
+from typing import List, Set, Optional, Iterator, Tuple, Generator, Dict
 
 import attr
 
@@ -152,13 +152,6 @@ class NodeFactory:
         )
         child._has_changed = True
         return child
-
-    def deepcopy_node_without_copy_children_recursively(self, original_node: 'Node') -> 'Node':
-        original_children = original_node.children
-        original_node.children = []  # To avoid recursive deep copy of all children behind
-        copied_node = copy.deepcopy(original_node)
-        original_node.children = original_children
-        return copied_node
 
 
 factory = NodeFactory()
@@ -474,6 +467,25 @@ class Node(interface.Entity):
 
         self.children[index].order_down()
         self.children[index+1].order_up()
+
+    def prune(self, ignore_children_from: Set[EducationGroupTypesEnum]) -> None:
+        if self.node_type in ignore_children_from:
+            self.children = []
+        for child_link in self.children:
+            child_link.child.prune(ignore_children_from=ignore_children_from)
+
+    def __deepcopy__(self, memodict: Dict = None) -> 'Node':
+        if memodict is None:
+            memodict = {}
+
+        if self.entity_id in memodict:
+            return memodict[self.entity_id]
+
+        copy_node = attr.evolve(self, children=[])
+        memodict[copy_node.entity_id] = copy_node
+        copy_node.children = [l.__deepcopy__(memodict) for l in self.children]
+
+        return copy_node
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Generator[Tuple['Path', 'Node'], None, None]:
