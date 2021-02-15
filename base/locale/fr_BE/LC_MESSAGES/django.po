@@ -593,6 +593,9 @@ msgstr "Créer"
 msgid "Create specific version"
 msgstr "Créer une version particulière"
 
+msgid "Create transition version"
+msgstr "Créer une version de transition"
+
 msgid "Creation"
 msgstr "Création"
 
