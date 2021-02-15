@@ -41,6 +41,7 @@ from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 
 PARTICULAR = "PARTICULAR"
 STANDARD = "STANDARD"
@@ -171,7 +172,7 @@ class GroupFilter(FilterSet):
     @staticmethod
     def filter_by_transition(queryset, name, value):
         if not value:
-            return queryset.exclude(educationgroupversion__is_transition=True)
+            return queryset.filter(educationgroupversion__transition_name=NOT_A_TRANSITION)
         return queryset
 
     def get_queryset(self):
@@ -202,15 +203,15 @@ class GroupFilter(FilterSet):
                 output_field=CharField(),)
         ).annotate(
             complete_title_fr=Case(
-                When(Q(educationgroupversion__is_transition=True) &
+                When(~Q(educationgroupversion__transition_name=NOT_A_TRANSITION) &
                      Q(educationgroupversion__version_name=''),
                      then=Concat('acronym', Value('[Transition]'))),
                 When(~Q(educationgroupversion__version_name='') &
-                     Q(educationgroupversion__is_transition=True),
-                     then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
+                     ~Q(educationgroupversion__transition_name=NOT_A_TRANSITION),
+                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
                 When(~Q(educationgroupversion__version_name='') &
-                     Q(educationgroupversion__is_transition=False),
-                     then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
+                     Q(educationgroupversion__transition_name=NOT_A_TRANSITION),
+                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
                 default='acronym',
                 output_field=CharField()
             )
