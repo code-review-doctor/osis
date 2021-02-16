@@ -42,7 +42,7 @@ def _build_map(apps):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0563_auto_20210201_1051'),
+        ('base', '0567_auto_20210211_0843'),
     ]
 
     operations = [
