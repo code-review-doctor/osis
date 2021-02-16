@@ -21,28 +21,22 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from base.ddd.utils import business_validator
+from django.db.models import Q
+
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import exception
-from program_management.ddd.domain.service import has_specific_version_with_greater_end_year, \
-    has_transition_version_with_greater_end_year
+from program_management.models.education_group_version import EducationGroupVersion
 
 
-class CheckVersionsEndDateValidator(business_validator.BusinessValidator):
-    def __init__(self, tree_version: 'ProgramTreeVersion'):
-        self.tree_version = tree_version
-        super().__init__()
+class HasTransitionVersionWithGreaterEndYear(interface.DomainService):
 
-    def validate(self, *args, **kwargs):
-        if not self.tree_version.is_official_standard:
-            return
-
-        exists = has_specific_version_with_greater_end_year.HasSpecificVersionWithGreaterEndYear.\
-            specific_version_greater_than_standard_year(self.tree_version)
-        if exists:
-            raise exception.CannotDeleteStandardDueToSpecificVersionEndDate(self.tree_version)
-
-        exists = has_transition_version_with_greater_end_year.HasTransitionVersionWithGreaterEndYear.\
-            transition_version_greater_than_standard_year(self.tree_version)
-        if exists:
-            raise exception.CannotDeleteStandardDueToTransitionVersionEndDate(self.tree_version)
+    @classmethod
+    def transition_version_greater_than_standard_year(cls, standard_version: 'ProgramTreeVersion') -> bool:
+        return EducationGroupVersion.objects.filter(
+            Q(root_group__group__end_year__isnull=True) |
+            Q(root_group__group__end_year__year__gte=standard_version.entity_id.year),
+            offer__acronym=standard_version.entity_id.offer_acronym,
+        ).exclude(
+            version_name=standard_version.version_name,
+            transition_name=standard_version.transition_name
+        ).exists()
