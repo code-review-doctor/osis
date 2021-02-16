@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,12 +24,13 @@
 #
 ##############################################################################
 import re
-from typing import Optional
+from typing import Optional, List
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Prefetch
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
+from django.utils.translation import get_language
 
 from base import models as mdl
 from base.business.learning_unit import get_organization_from_learning_unit_year, get_all_attributions, \
@@ -43,6 +44,12 @@ from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
+from django.contrib import messages
+
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
+from program_management.ddd.domain.node import NodeIdentity, build_title
+from program_management.serializers.program_trees_utilizations import utilizations_serializer
 
 
 def show_success_learning_unit_year_creation_message(request, learning_unit_year_created):
@@ -123,8 +130,10 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
     return context
 
 
-def get_common_context_learning_unit_year(person, learning_unit_year_id: Optional[int] = None,
-                                          code: Optional[str] = None, year: Optional[int] = None):
+def get_common_context_learning_unit_year(person,
+                                          learning_unit_year_id: Optional[int] = None,
+                                          code: Optional[str] = None,
+                                          year: Optional[int] = None):
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -138,6 +147,7 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
         learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     else:
         learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
+
     return {
         'learning_unit_year': learning_unit_year,
         'current_academic_year': mdl.academic_year.starting_academic_year(),
@@ -164,3 +174,21 @@ def get_common_context_to_publish(person, learning_unit_year: LearningUnitYear):
         'can_edit_information': perm_to_edit,
         'can_edit_force_majeur_section': perm_to_edit_force_majeure
     }
+
+
+def check_formations_impacted_by_update(learning_unit_year: LearningUnitYear, request):
+    formations_using_ue = _find_root_trainings_using_ue(learning_unit_year)
+    if len(formations_using_ue) > 1:
+        for formation in formations_using_ue:
+            messages.add_message(request, 50, formation)
+
+
+def _find_root_trainings_using_ue(learning_unit_year: LearningUnitYear) -> List['str']:
+    node_identity = NodeIdentity(code=learning_unit_year.acronym, year=learning_unit_year.academic_year.year)
+    direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
+    formations_using_ue = set()
+    for direct_link in direct_parents:
+        for indirect_parent in direct_link.get('indirect_parents'):
+            formations_using_ue.add("{}{}".format(indirect_parent.get('node').full_acronym(),
+                                                  build_title(indirect_parent.get('node'), get_language())))
+    return list(sorted(formations_using_ue))

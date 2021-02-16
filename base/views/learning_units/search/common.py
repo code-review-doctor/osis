@@ -156,6 +156,6 @@ def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["filter"].qs
     for luy in luys:
-        learning_unit_year_with_context.append_latest_entities(luy, service_course_search=False)
+        learning_unit_year_with_context.append_latest_entities(luy)
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_proposal_comparison(user, luys, filters)
