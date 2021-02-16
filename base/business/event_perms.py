@@ -177,7 +177,7 @@ class AcademicEventRepository:
     def update(self, academic_event: AcademicEvent):
         academic_event_db = AcademicCalendar.objects.get(pk=academic_event.id)
         academic_event_db.start_date = academic_event.start_date
-        academic_event_db.end_date = academic_event_db.end_date
+        academic_event_db.end_date = academic_event.end_date
         academic_event_db.save()
 
 
