@@ -36,7 +36,8 @@ class AcademicCalendarUpdateForm(forms.Form):
 
     def clean(self):
         cleaned_data = self.cleaned_data
-        if cleaned_data['end_date'] is not None and cleaned_data['end_date'] < cleaned_data['start_date']:
+        if all([cleaned_data.get('end_date'), cleaned_data.get('start_date')]) \
+                and cleaned_data['end_date'] < cleaned_data['start_date']:
             raise ValidationError({
                 'end_date': _("%(max)s must be greater or equals than %(min)s") % {
                     "max": _("End date"),

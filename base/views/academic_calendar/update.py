@@ -12,7 +12,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class AcademicCalendarUpdate(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
-    template_name = "academic_calendar/update.html"
+    template_name = "academic_calendar/update_inner.html"
     permission_required = 'base.can_access_academic_calendar'
     raise_exception = True
     form_class = AcademicCalendarUpdateForm
