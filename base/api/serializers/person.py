@@ -42,7 +42,8 @@ class PersonDetailSerializer(serializers.ModelSerializer):
             'last_name',
             'email',
             'gender',
-            'uuid'
+            'uuid',
+            'birth_date'
         )
 
 

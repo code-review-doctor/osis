@@ -48,7 +48,7 @@ class UpdateLinkAuthorizedRelationshipValidator(business_validator.BusinessValid
 
 class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', parent_node: 'Node', link_type: LinkTypes = None):
-        self.tree = copy.copy(tree)
+        self.tree = copy.deepcopy(tree)
         self.parent_node = self.tree.get_node_by_code_and_year(parent_node.code, parent_node.year)
         self.link_created = self.parent_node.add_child(node_to_paste, link_type=link_type)
 
@@ -85,6 +85,8 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
         if self.link.is_reference() and \
                 self._is_child_a_minor_major_or_deepening_inside_a_list_minor_major_choice_parent():
             return
+        if self._is_child_a_minor_major_list_inside_a_list_minor_major_choice_parent():
+            return
 
         ChildTypeValidator(self.tree, self.link.parent).validate()
         MinimumChildrenTypeAuthorizedValidator(self.tree, self.link.parent).validate()
@@ -92,8 +94,11 @@ class AuthorizedRelationshipValidator(business_validator.BusinessValidator):
         if self.link.parent.is_finality_list_choice():
             MaximumFinalitiesAuthorizedValidator(self.tree, self.link.parent).validate()
 
-    def _is_child_a_minor_major_or_deepening_inside_a_list_minor_major_choice_parent(self):
+    def _is_child_a_minor_major_or_deepening_inside_a_list_minor_major_choice_parent(self) -> bool:
         return self.link.parent.is_minor_major_list_choice() and self.link.child.is_minor_major_deepening()
+
+    def _is_child_a_minor_major_list_inside_a_list_minor_major_choice_parent(self) -> bool:
+        return self.link.parent.is_minor_major_list_choice() and self.link.child.is_minor_major_list_choice()
 
 
 class AuthorizedRelationshipLearningUnitValidator(business_validator.BusinessValidator):

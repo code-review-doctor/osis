@@ -28,6 +28,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.business.entities import EntitiesHierarchyFactory
+from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
@@ -37,7 +39,12 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_years = AcademicYearFactory.produce()
-        cls.luys = LearningUnitYearFactory.create_batch(4)
+        main_entity = MainEntityVersionFactory(parent=None)
+        cls.luys = LearningUnitYearFactory.create_batch(
+            4,
+            academic_year__current=True,
+            learning_container_year__requirement_entity=main_entity.entity
+        )
         cls.url = reverse("learning_units_service_course")
         cls.get_data = {
             "academic_year": str(cls.luys[0].academic_year.id),
@@ -55,3 +62,89 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
+
+
+class TestFilter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce()
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.entities_hierarchy = EntitiesHierarchyFactory()
+
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit")
+
+        cls.url = reverse("learning_units_service_course")
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_should_not_return_learning_having_requirement_and_allocation_contained_in_same_faculty(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__requirement_entity=self.entities_hierarchy.faculty_1_1.entity,
+            learning_container_year__allocation_entity=self.entities_hierarchy.school_1_1_1.entity
+        )
+
+        response = self.client.get(self.url, self.generate_get_data())
+        self.assertQuerysetEqual(
+            response.context["page_obj"].object_list,
+            [],
+        )
+
+    def test_should_not_return_learning_having_same_requirement_and_allocation_entities(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__requirement_entity=self.entities_hierarchy.sector_1.entity,
+            learning_container_year__allocation_entity=self.entities_hierarchy.sector_1.entity
+        )
+
+        response = self.client.get(self.url, self.generate_get_data())
+        self.assertQuerysetEqual(
+            response.context["page_obj"].object_list,
+            [],
+        )
+
+    def test_should_return_learning_unit_having_different_faculties_for_requirement_and_allocation_entities(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__requirement_entity=self.entities_hierarchy.faculty_1_1.entity,
+            learning_container_year__allocation_entity=self.entities_hierarchy.faculty_1_2.entity
+        )
+
+        response = self.client.get(self.url, self.generate_get_data())
+        self.assertQuerysetEqual(
+            response.context["page_obj"].object_list,
+            [luy],
+            transform=lambda obj: obj
+        )
+
+    def test_should_return_learning_unit_having_requirement_and_allocation_contained_in_different_faculties(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__requirement_entity=self.entities_hierarchy.school_1_1_1.entity,
+            learning_container_year__allocation_entity=self.entities_hierarchy.school_2_1_1.entity
+        )
+
+        response = self.client.get(self.url, self.generate_get_data())
+        self.assertQuerysetEqual(
+            response.context["page_obj"].object_list,
+            [luy],
+            transform=lambda obj: obj
+        )
+
+    def test_should_consider_entity_not_contained_inside_faculty_nor_faculty_as_a_faculty(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__requirement_entity=self.entities_hierarchy.school_1_1_1.entity,
+            learning_container_year__allocation_entity=self.entities_hierarchy.sector_1.entity
+        )
+
+        response = self.client.get(self.url, self.generate_get_data())
+        self.assertQuerysetEqual(
+            response.context["page_obj"].object_list,
+            [luy],
+            transform=lambda obj: obj
+        )
+
+    def generate_get_data(self):
+        return {"academic_year": self.academic_year.id}

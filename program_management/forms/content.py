@@ -33,6 +33,7 @@ import program_management.ddd.domain.exception
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.forms.exceptions import InvalidFormException
 from base.forms.utils import choice_field
+from base.forms.utils.fields import OsisRichTextFormField
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
@@ -47,10 +48,8 @@ class LinkForm(forms.Form):
     access_condition = forms.BooleanField(required=False)
     link_type = forms.ChoiceField(choices=choice_field.add_blank(LinkTypes.choices()), required=False)
     block = forms.IntegerField(required=False)
-    comment_fr = forms.CharField(widget=CKEditorWidget(config_name='comment_link_only'),
-                                 required=False)
-    comment_en = forms.CharField(widget=CKEditorWidget(config_name='comment_link_only'),
-                                 required=False)
+    comment_fr = OsisRichTextFormField(config_name='comment_link_only', required=False)
+    comment_en = OsisRichTextFormField(config_name='comment_link_only', required=False)
 
     def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', **kwargs):
         self.parent_obj = parent_obj
@@ -60,8 +59,7 @@ class LinkForm(forms.Form):
         self.__initialize_fields()
 
     def __initialize_fields(self):
-        if self.is_a_parent_minor_major_option_list_choice() and \
-           not self.is_a_child_minor_major_option_list_choice():
+        if self.is_a_parent_minor_major_option_list_choice():
             fields_to_exclude = (
                 'relative_credits',
                 'is_mandatory',

@@ -80,7 +80,7 @@ def pdf_content(request, year, code, language):
 
     context = {
         'root': tree.root_node,
-        'tree': tree.root_node.children,
+        'tree': tree,
         'language': language,
         'created': datetime.datetime.now(),
         'max_block': tree.get_greater_block_value(),
