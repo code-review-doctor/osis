@@ -2676,7 +2676,7 @@ msgid "To complete"
 msgstr "A compléter"
 
 msgid "Today"
-msgstr ""
+msgstr "Aujourd'hui"
 
 msgid "Total"
 msgstr "Total"
@@ -2762,7 +2762,7 @@ msgid "Up"
 msgstr "Haut"
 
 msgid "Update"
-msgstr ""
+msgstr "Mise à jour"
 
 msgid "Update for teacher locked"
 msgstr "Mise-à-jour bloquée pour l'enseignant"
