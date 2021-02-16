@@ -153,7 +153,7 @@ class ProgramTreeVersionMismatch(BusinessException):
         return str(_('Standard')) if version_identity.is_official_standard else version_identity.version_name
 
 
-class CannotExtendTransitionDueToExistenceOfOtherTransition(BusinessException):
+class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessException):
     def __init__(self, version: 'ProgramTreeVersion', transition_year: int, *args, **kwargs):
         message = _(
             "You can't extend the program tree '{code}' in {year} as other transition version exists in "

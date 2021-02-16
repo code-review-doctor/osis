@@ -42,5 +42,5 @@ class GetNextVersionIfExists(interface.DomainService):
             Q(transition_name__isnull=True) | Q(transition_name='')
         ).order_by('root_group__academic_year__year')
         if next_transitions:
-            return next_transitions.first().academic_year.year
+            return next_transitions.first().offer.academic_year.year
         return None
