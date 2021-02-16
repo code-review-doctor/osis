@@ -149,7 +149,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             exception.MiniTrainingHaveLinkWithEPC,
             exception.MiniTrainingHaveEnrollments,
             program_management_exception.NodeHaveLinkException,
-            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+            program_management_exception.CannotDeleteStandardDueToSpecificVersionEndDate
         ) as e:
             self.mini_training_form.add_error("end_year", "")
             self.mini_training_form.add_error(
