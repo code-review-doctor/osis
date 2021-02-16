@@ -153,6 +153,19 @@ class ProgramTreeVersionMismatch(BusinessException):
         return str(_('Standard')) if version_identity.is_official_standard else version_identity.version_name
 
 
+class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessException):
+    def __init__(self, version: 'ProgramTreeVersion', transition_year: int, *args, **kwargs):
+        message = _(
+            "You can't extend the program tree '{code}' in {year} as other transition version exists in "
+            "{transition_year}"
+        ).format(
+            code=version.program_tree_identity.code,
+            year=version.entity_id.year,
+            transition_year=transition_year
+        )
+        super().__init__(message, **kwargs)
+
+
 class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
     def __init__(self, node_2m: 'Node', **kwargs):
         message = _("The end date of %(acronym)s must be higher or equal to its finalities") % {
