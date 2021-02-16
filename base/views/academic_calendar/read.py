@@ -80,7 +80,7 @@ class AcademicCalendarFilter(django_filters.FilterSet):
             )
         if self.form.cleaned_data.get('to_date'):
             academic_events = filter(
-                lambda event: event.end_date is None or event.end_date <= self.form.cleaned_data['to_date'],
+                lambda event: event.start_date <= self.form.cleaned_data['to_date'],
                 academic_events
             )
         if self.form.cleaned_data.get('event_type'):
