@@ -41,6 +41,5 @@ class ScoreSheetAddressEntityForm(forms.ModelForm):
             'location',
             'postal_code',
             'city',
-            'offer_year',
             'education_group',
         ]

@@ -45,7 +45,7 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
         'email',
     )
     search_fields = ['location', 'education_group__educationgroupyear__acronym']
-    list_filter = ('entity_address_choice', 'education_group__educationgroupyear__academic_year__year')
+    list_filter = ('entity_address_choice', )
 
 
 class ScoreSheetAddress(models.Model):
@@ -88,7 +88,7 @@ class ScoreSheetAddress(models.Model):
                 "Please set either entity_address_choice nor location, postal_code, city... but not all of them.")
 
     def __str__(self):
-        return "{0} - {1}".format(self.offer_year, self.entity_address_choice)
+        return "{0} - {1}".format(self.education_group, self.entity_address_choice)
 
 
 def search_from_education_group_ids(education_group_ids: List[int]) -> List[ScoreSheetAddress]:

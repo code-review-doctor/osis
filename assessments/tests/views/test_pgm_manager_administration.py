@@ -39,7 +39,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import ProgramManagerGroupFactory, EntityManagerGroupFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
-from base.tests.factories.structure import StructureFactory
 
 
 class PgmManagerAdministrationTest(TestCase):
@@ -322,18 +321,18 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertEqual(ProgramManager.objects.filter(person=self.person).count(), 2)
 
     def test_get_administrator_entities_acronym_list(self):
-        structure_root_1 = StructureFactory(acronym='A')
+        structure_root_1 = EntityVersionFactory(acronym='A')
 
-        structure_child_1 = StructureFactory(acronym='AA', part_of=structure_root_1)
-        structure_child_2 = StructureFactory(acronym='BB', part_of=structure_root_1)
+        structure_child_1 = EntityVersionFactory(acronym='AA', parent=structure_root_1.entity)
+        structure_child_2 = EntityVersionFactory(acronym='BB', parent=structure_root_1.entity)
 
-        structure_root_2 = StructureFactory(acronym='B')
+        structure_root_2 = EntityVersionFactory(acronym='B')
 
         data = [{'root': structure_root_1, 'structures': [structure_root_1, structure_child_1, structure_child_2]},
                 {'root': structure_root_2, 'structures': []}]
 
         EntityManagerFactory(person=self.person,
-                             structure=structure_root_1)
+                             entity=structure_root_1.entity)
 
         data = pgm_manager_administration._get_administrator_entities_acronym_list(data)
 

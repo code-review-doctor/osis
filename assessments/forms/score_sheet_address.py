@@ -41,4 +41,4 @@ class ScoreSheetAddressForm(forms.ModelForm):
 
     class Meta:
         model = ScoreSheetAddress
-        exclude = ['external_id', 'changed']
+        exclude = ['external_id', 'education_group', 'changed']
