@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0568_sessionexam_education_group_year'),
+        ('base', '0569_populate_not_null_fields'),
         ('continuing_education', '0084_auto_20210127_1119'),
         ('dissertation', '0051_auto_20191211_1458'),
     ]
@@ -17,6 +17,16 @@ class Migration(migrations.Migration):
             model_name='offerenrollment',
             name='education_group_year',
             field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='base.EducationGroupYear'),
+        ),
+        migrations.AlterField(
+            model_name='offeryearcalendar',
+            name='education_group_year',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear'),
+        ),
+        migrations.AlterField(
+            model_name='sessionexam',
+            name='education_group_year',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear'),
         ),
         migrations.RemoveField(
             model_name='offeryear',
