@@ -27,18 +27,13 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils.translation import gettext_lazy as _
 from faker import Faker
 
 from base.models import academic_calendar
-from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
-from base.models.enums import academic_calendar_type
-from base.models.enums.academic_calendar_type import EXAM_ENROLLMENTS, SCORES_EXAM_SUBMISSION
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.signals.publisher import compute_all_scores_encodings_deadlines
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory, \
     CloseAcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 
 class AcademicCalendarTest(TestCase):
