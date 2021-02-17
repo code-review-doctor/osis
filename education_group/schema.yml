@@ -1405,6 +1405,7 @@ components:
         - access_condition
         - comment
         - remark
+        - remark_en
         - link_type
         - link_type_text
         - children
