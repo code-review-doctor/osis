@@ -25,7 +25,7 @@
 ##############################################################################
 from datetime import date
 
-from base.models.enums.entity_type import SECTOR, FACULTY
+from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL
 from base.models.enums.organization_type import MAIN
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -62,3 +62,70 @@ def create_entities_hierarchy(root_entity=None, organization_type=MAIN):
                                                     start_date=start_date)
 
     return locals()
+
+
+class EntitiesHierarchyFactory:
+    def __init__(self):
+        self.generate_hierarchy()
+
+    def generate_hierarchy(self):
+        org = OrganizationFactory(type=MAIN)
+        country = CountryFactory()
+        self.root = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=None,
+            entity_type=""
+        )
+
+        self.sector_1 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.root.entity,
+            entity_type=SECTOR
+        )
+        self.sector_2 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.root.entity,
+            entity_type=SECTOR
+        )
+
+        self.faculty_1_1 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.sector_1.entity,
+            entity_type=FACULTY
+        )
+        self.faculty_1_2 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.sector_1.entity,
+            entity_type=FACULTY
+        )
+        self.faculty_2_1 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.sector_2.entity,
+            entity_type=FACULTY
+        )
+
+        self.school_1_1_1 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.faculty_1_1.entity,
+            entity_type=SCHOOL
+        )
+        self.school_1_1_2 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.faculty_1_1.entity,
+            entity_type=SCHOOL
+        )
+        self.school_2_1_1 = EntityVersionFactory(
+            entity__country=country,
+            entity__organization=org,
+            parent=self.faculty_2_1.entity,
+            entity_type=SCHOOL
+        )
+

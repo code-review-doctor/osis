@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ckeditor.widgets import CKEditorWidget
 from typing import Dict
 
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.utils.fields import OsisRichTextFormField
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
@@ -64,8 +66,8 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         required=False,
         to_field_name='name',
     )
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_en = OsisRichTextFormField(config_name='link_only', label=_("remark in english"), required=False)
 
     def __init__(self, *args, user: User, group_type: str, **kwargs):
         self.user = user
