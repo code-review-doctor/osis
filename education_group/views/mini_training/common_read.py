@@ -259,7 +259,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return "program_management.change_minitraining_version"
 
     def get_create_specific_version_url(self):
-        if self.is_root_node() and self.program_tree_version_identity.is_official_standard:
+        if self.is_root_node() and self.program_tree_version_identity.is_standard:
             return reverse(
                 'create_education_group_specific_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}

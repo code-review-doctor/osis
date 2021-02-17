@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-11 15:36+0100\n"
+"POT-Creation-Date: 2021-02-17 09:44+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -328,6 +328,9 @@ msgstr "Domaine ISCED/CITE"
 
 msgid "Identification"
 msgstr "Identification"
+
+msgid "Impossible to create a specific version from a transition version."
+msgstr "Impossible de créer une version particulière depuis une version de transition."
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"

@@ -139,6 +139,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
             'training_identity': self.training_identity,
             'node_identity': self.node_identity,
             'form': form,
+            "error": self.get_error()
         }
 
     def get_url_program_version(self, created_version_id: 'ProgramTreeVersionIdentity'):
@@ -166,6 +167,10 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
+
+    def get_error(self):
+        if self.tree_version_identity.is_transition:
+            return _("Impossible to create a specific version from a transition version.")
 
 
 class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
