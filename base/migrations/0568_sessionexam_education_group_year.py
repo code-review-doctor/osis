@@ -39,6 +39,30 @@ def _build_map(apps):
     }
 
 
+def populate_or_delete_educationgroup_year_id(apps, schema_editor):
+    OfferEnrollment = apps.get_model('base', 'offerenrollment')
+    EducationGroupYear = apps.get_model('base', 'educationgroupyear')
+    off_enrollments_without_educ_group = OfferEnrollment.objects.filter(
+        education_group_year_id__isnull=True
+    ).select_related(
+        'offer_year__academic_year'
+    )
+    deleted = set()
+    for obj in off_enrollments_without_educ_group:
+        education_group_year_id = EducationGroupYear.objects.filter(
+            acronym=obj.offer_year.acronym,
+            academic_year=obj.offer_year.academic_year,
+        ).values_list('pk', flat=True).first()
+        if not education_group_year_id:
+            deleted.add('Removing all offerenrollments of {} in {}'.format(obj.offer_year.acronym, obj.offer_year.academic_year.year))
+            obj.delete()
+        else:
+            obj.education_group_year_id = education_group_year_id
+            obj.save()
+    for msg in sorted(deleted):
+        print(msg)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -52,4 +76,5 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroupYear'),
         ),
         migrations.RunPython(set_session_exam_education_group_year_field),
+        migrations.RunPython(populate_or_delete_educationgroup_year_id),
     ]
