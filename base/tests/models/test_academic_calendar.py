@@ -69,33 +69,6 @@ class AcademicCalendarTest(TestCase):
             AcademicCalendarFactory()
             self.assertTrue(mock_method.called)
 
-    def test_get_academic_calendar_by_date_and_reference_and_data_year_exists(self):
-        data_year = AcademicYearFactory()
-        cal = AcademicCalendarFactory(
-            start_date=self.past_date,
-            end_date=self.future_date,
-            reference=EXAM_ENROLLMENTS,
-            data_year=data_year
-        )
-        self.assertEqual(
-            get_academic_calendar_by_date_and_reference_and_data_year(data_year, EXAM_ENROLLMENTS),
-            cal
-        )
-
-    def test_get_academic_calendar_by_date_and_reference_and_data_year_none(self):
-        AcademicCalendar.objects.filter(reference=EXAM_ENROLLMENTS).delete()
-        data_year = AcademicYearFactory()
-        AcademicCalendarFactory(
-            start_date=self.past_date,
-            end_date=self.future_date,
-            reference=SCORES_EXAM_SUBMISSION,
-            data_year=data_year
-        )
-        self.assertEqual(
-            get_academic_calendar_by_date_and_reference_and_data_year(data_year, EXAM_ENROLLMENTS),
-            None
-        )
-
 
 class TestGetStartingAcademicCalendar(TestCase):
     @classmethod
