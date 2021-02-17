@@ -44,6 +44,7 @@ from psycopg2._psycopg import OperationalError as PsycopOperationalError, Interf
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
+from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
@@ -59,7 +60,7 @@ queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
 
 
 def _is_inside_scores_encodings_period(user):
-    return mdl.session_exam_calendar.current_session_exam()
+    return bool(mdl.session_exam_calendar.current_session_exam())
 
 
 def _is_not_inside_scores_encodings_period(user):
@@ -81,15 +82,15 @@ def outside_period(request):
     closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
 
     if latest_session_exam:
-        session_number = latest_session_exam.number_session
-        str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
+        session_number = latest_session_exam.session
+        str_date = latest_session_exam.end_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
                              _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
                              % {'session_number': session_number, 'str_date': str_date})
 
     if closest_new_session_exam:
-        session_number = closest_new_session_exam.number_session
-        str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
+        session_number = closest_new_session_exam.session
+        str_date = closest_new_session_exam.start_date.strftime(date_format)
         messages.add_message(request, messages.WARNING,
                              _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
                              % {'session_number': session_number, 'str_date': str_date})
