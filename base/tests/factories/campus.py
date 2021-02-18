@@ -34,7 +34,6 @@ from base.tests.factories.organization import OrganizationFactory
 class CampusFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Campus'
-        django_get_or_create = ('name',)
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
 
