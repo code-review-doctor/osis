@@ -25,35 +25,31 @@
 ##############################################################################
 import datetime
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 
-from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
-from base.business.event_perms import AcademicEvent
-from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.forms.academic_calendar.update import AcademicCalendarUpdateForm
 
 
-class ApplicationCourseCalendarSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.event_open = AcademicEvent(
-            id=10,
-            title="Candidature en ligne",
-            authorized_target_year=2020,
-            start_date=datetime.date.today() - datetime.timedelta(days=2),
-            end_date=datetime.date.today() + datetime.timedelta(days=10),
-            type=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name
-        )
-        cls.serializer = ApplicationCourseCalendarSerializer(cls.event_open)
+class TesAcademicCalendarUpdateForm(SimpleTestCase):
+    def test_end_date_lower_than_start_date_assert_raise_exception(self):
+        form = AcademicCalendarUpdateForm(data={
+            'start_date': datetime.date.today(),
+            'end_date': datetime.date.today() - datetime.timedelta(days=5)
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('end_date', form.errors)
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'title',
-            'start_date',
-            'end_date',
-            'authorized_target_year',
-            'is_open',
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+    def test_start_date_empty_assert_raise_error_because_start_date_mandatory(self):
+        form = AcademicCalendarUpdateForm(data={
+            'start_date': '',
+            'end_date': ''
+        })
+        self.assertFalse(form.is_valid())
+        self.assertIn('start_date', form.errors)
 
-    def test_ensure_is_open_correctly_computed(self):
-        self.assertEquals(self.serializer.data['is_open'], self.event_open.is_open_now())
+    def test_assert_end_date_can_be_empty(self):
+        form = AcademicCalendarUpdateForm(data={
+            'start_date': datetime.date.today(),
+            'end_date': ''
+        })
+        self.assertTrue(form.is_valid())
