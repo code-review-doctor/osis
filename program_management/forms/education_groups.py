@@ -136,7 +136,7 @@ class GroupFilter(FilterSet):
             ('full_title_fr', 'full_title_fr'),
             ('type_ordering', 'type'),
             ('entity_management_version', 'management_entity'),
-            ('main_teaching_campus', 'main_teaching_campus'),
+            ('main_teaching_campus_name', 'main_teaching_campus'),
         ),
         widget=forms.HiddenInput
     )
@@ -223,7 +223,11 @@ class GroupFilter(FilterSet):
                 default='acronym',
                 output_field=CharField()
             )
-        ).annotate_full_titles()
+        ).annotate_full_titles().annotate(
+            main_teaching_campus_name=Case(
+                default='main_teaching_campus__name',
+                output_field=CharField())
+        )
 
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)

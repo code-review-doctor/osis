@@ -54,7 +54,7 @@ class EducationGroupSerializer(serializers.Serializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-    main_teaching_campus = serializers.StringRelatedField()
+    main_teaching_campus = serializers.SerializerMethodField()
 
     class Meta:
         fields = (
@@ -67,3 +67,6 @@ class EducationGroupSerializer(serializers.Serializer):
             'management_entity',
             'main_teaching_campus'
         )
+
+    def get_main_teaching_campus(self, obj):
+        return obj.main_teaching_campus.name if obj.main_teaching_campus else '-'
