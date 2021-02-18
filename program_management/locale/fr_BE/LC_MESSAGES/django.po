@@ -1,3 +1,4 @@
+
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -7,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-08 08:21+0100\n"
+"POT-Creation-Date: 2021-02-11 15:36+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -517,6 +518,9 @@ msgstr "Nouvelle version particulière"
 msgid "New training"
 msgstr "Nouvelle Formation"
 
+msgid "New transition version"
+msgstr "Nouvelle version de transition"
+
 msgid "No"
 msgstr "Non"
 
@@ -847,6 +851,9 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
 
+msgid "This value is invalid."
+msgstr "Cette valeur semble non valide."
+
 msgid "This version exists until"
 msgstr "Dernière année d'organisation"
 
@@ -887,8 +894,8 @@ msgstr "Autres informations"
 msgid "Transformation and modification"
 msgstr "Transformation et modification"
 
-msgid "Transition"
-msgstr "Transition"
+msgid "Transition name"
+msgstr "Sigle de la transition"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
