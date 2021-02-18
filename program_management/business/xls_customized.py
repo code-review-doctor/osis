@@ -237,7 +237,6 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
     if WITH_OTHER_LEGAL_INFORMATION in other_params:
         data.extend(_build_other_legal_information_data(training))
 
-
     if WITH_ADDITIONAL_INFO in other_params:
         data.extend(_build_additional_info_data(offer, group))
 
