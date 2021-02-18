@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.contrib.messages import get_messages, SUCCESS
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from waffle.testutils import override_flag
 
@@ -41,6 +41,7 @@ from reference.tests.factories.language import FrenchLanguageFactory
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
 
+@override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
 @override_flag('learning_unit_external_create', active=True)
 class TestCreateExternalLearningUnitView(TestCase):
     @classmethod
