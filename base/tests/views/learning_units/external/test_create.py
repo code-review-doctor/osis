@@ -41,7 +41,6 @@ from reference.tests.factories.language import FrenchLanguageFactory
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
 
-@override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
 @override_flag('learning_unit_external_create', active=True)
 class TestCreateExternalLearningUnitView(TestCase):
     @classmethod
@@ -73,6 +72,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_create_post(self):
         response = self.client.post(self.url, data=self.data)
         self.assertEqual(response.status_code, 302)
