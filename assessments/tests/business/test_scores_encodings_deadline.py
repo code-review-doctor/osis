@@ -263,15 +263,6 @@ class ComputeScoresEncodingsDeadlinesTest(TestCase):
         for obj in persistent_session_exams:
             self._assert_date_equal(obj.deadline, scores_encodings_deadline._one_day_before(new_global_submission_date))
 
-    def test_get_oyc_by_reference_when_education_group_year_is_null(self):
-        ac_cal = AcademicCalendarFactory(reference=academic_calendar_type.DELIBERATION)
-        SessionExamCalendarFactory(academic_calendar=ac_cal)
-        OfferYearCalendarFactory(academic_calendar=ac_cal, education_group_year=None)
-        off_year_cal_expected = OfferYearCalendarFactory(academic_calendar=ac_cal, education_group_year=None)
-        oyc = scores_encodings_deadline._get_oyc_by_reference(off_year_cal_expected,
-                                                              academic_calendar_type.DELIBERATION)
-        self.assertEqual(oyc, off_year_cal_expected)
-
     def test_get_oyc_by_reference_when_no_matching_result(self):
         ac_cal = AcademicCalendarFactory(reference=academic_calendar_type.DELIBERATION)
         SessionExamCalendarFactory(academic_calendar=ac_cal)
