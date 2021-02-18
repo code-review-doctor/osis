@@ -31,6 +31,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
+from base.views.common import check_formations_impacted_by_update
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -69,6 +70,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             if not self.training_version_form.errors:
                 self.display_success_messages(version_identities)
                 self.display_delete_messages(version_identities)
+                check_formations_impacted_by_update(self.get_group_obj().code,
+                                                    self.get_group_obj().year,
+                                                    request, self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
