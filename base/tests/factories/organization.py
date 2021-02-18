@@ -32,6 +32,7 @@ from osis_common.utils.datetime import get_tzinfo
 class OrganizationFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Organization'
+        django_get_or_create = ('name',)
 
     external_id = factory.Faker('text', max_nb_chars=100)
     changed = factory.Faker('date_time_this_month', tzinfo=get_tzinfo())
