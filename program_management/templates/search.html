@@ -265,21 +265,12 @@
         $("#btn_xls_with_parameters").click(function(e) {
             set_order_hidden_fields();
             prepare_xls(e, 'xls_customized');
-            $("#hdn_with_validity").val('');
-            $("#hdn_with_osis_code").val('');
-            $("#hdn_with_partial_english_titles").val('');
-            $("#hdn_with_education_fields").val('');
-            $("#hdn_with_organization").val('');
-            $("#hdn_with_activities").val('');
-            $("#hdn_with_responsibles_and_contacts").val('');
-            $("#hdn_with_diploma_and_certificat").val('');
-            $("#hdn_with_co_graduation_and_partnership").val('');
-            $("#hdn_with_ares_code").val('');
-            $("#hdn_with_enrollment").val('');
-            $("#hdn_with_funding").val('');
-            $("#hdn_with_other_legal_information").val('');
-            $("#hdn_with_additional_info").val('');
-            $("#hdn_with_keywords").val('');
+            parameters = ['validity', 'osis_code', 'partial_english_titles', 'education_fields', 'organization',
+                'activities', 'responsibles_and_contacts', 'diploma_and_certificat', 'co_graduation_and_partnership',
+                'ares_code', 'enrollment', 'funding', 'other_legal_information', 'additional_info', 'keywords'];
+            for (i = 0; i < parameters.length; i++) {
+               $("#hdn_with_" + parameters[i]).val('');
+            }
             reset_order_hidden_fields();
         });
 

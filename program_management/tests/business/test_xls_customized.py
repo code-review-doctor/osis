@@ -34,7 +34,6 @@ from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
@@ -54,7 +53,7 @@ from program_management.business.xls_customized import _build_headers, TRAINING_
     _build_additional_info_data, _build_validity_data, _get_start_year, _get_end_year, _get_titles_en, \
     _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
     _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, \
-    _build_funding_data, _build_diploma_certicat_data, _build_enrollment_data, \
+    _build_funding_data, _build_diploma_certificat_data, _build_enrollment_data, \
     _build_other_legal_information_data
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -167,12 +166,12 @@ class XlsCustomizedHeadersTestCase(SimpleTestCase):
 
 
 class XlsCustomizedContentTestCase(TestCase):
+
     @classmethod
     def setUpTestData(cls):
         remark = RemarkFactory(text_fr="<p>Remarque voir <a href='https://www.google.com/'>Google</a></p>",
                                text_en="Remarque fr")
         cls.current_year = get_current_year()
-        cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.training_version = StandardEducationGroupVersionFactory(
             offer__acronym="DROI2M",
             offer__partial_acronym="LDROI200M",
@@ -248,11 +247,11 @@ class XlsCustomizedContentTestCase(TestCase):
 
     def test_build_validity_for_training(self):
         expected = ['Actif', str(self.training.start_year), str(self.training.end_year)]
-        data = _build_validity_data(self.training, None, self.group_training, self.current_training_tree_version)
+        data = _build_validity_data(self.training, self.group_training, self.current_training_tree_version)
         self.assertListEqual(data, expected)
 
     def test_build_validity_no_data(self):
-        data = _build_validity_data(None, None, self.group_training, self.current_training_tree_version)
+        data = _build_validity_data(None, self.group_training, self.current_training_tree_version)
         self.assertListEqual(data, _build_array_with_empty_string(3))
 
     def test_get_start_year(self):
@@ -264,14 +263,14 @@ class XlsCustomizedContentTestCase(TestCase):
                                             end_year=2023)
         group = GroupFactory(start_year=2018,
                              end_year=2019)
-        self.assertEqual(_get_start_year(standard_current_version, training, None, group), str(training.start_year))
-        self.assertEqual(_get_start_year(particular_current_version, training, None, group),
+        self.assertEqual(_get_start_year(standard_current_version, training, group), str(training.start_year))
+        self.assertEqual(_get_start_year(particular_current_version, training, group),
                          str(group.start_year))
-        self.assertEqual(_get_start_year(standard_current_version, None, mini_training, group),
+        self.assertEqual(_get_start_year(standard_current_version, mini_training, group),
                          str(standard_current_version.start_year))
-        self.assertEqual(_get_start_year(particular_current_version, None, mini_training, group),
+        self.assertEqual(_get_start_year(particular_current_version, mini_training, group),
                          str(particular_current_version.start_year))
-        self.assertEqual(_get_start_year(particular_current_version, None, None, group),
+        self.assertEqual(_get_start_year(particular_current_version, None, group),
                          '')
 
     def test_build_additional_info_for_training(self):
@@ -279,7 +278,7 @@ class XlsCustomizedContentTestCase(TestCase):
                     self.group_training.content_constraint.minimum,
                     self.group_training.content_constraint.maximum, self.training.internal_comment,
                     "Remarque voir Google", self.group_training.remark.text_en]
-        data = _build_additional_info_data(self.training, None, self.group_training)
+        data = _build_additional_info_data(self.training, self.group_training)
         self.assertListEqual(data, expected)
 
     def test_build_additional_info_for_mini_training(self):
@@ -287,7 +286,7 @@ class XlsCustomizedContentTestCase(TestCase):
                     self.group_mini_training.content_constraint.minimum,
                     self.group_mini_training.content_constraint.maximum, '',
                     "Remarque voir Google", self.group_mini_training.remark.text_en]
-        data = _build_additional_info_data(None, self.mini_training, self.group_mini_training)
+        data = _build_additional_info_data(self.mini_training, self.group_mini_training)
         self.assertListEqual(data, expected)
 
     def test_build_additional_info_for_group(self):
@@ -295,11 +294,11 @@ class XlsCustomizedContentTestCase(TestCase):
                     self.group.content_constraint.minimum,
                     self.group.content_constraint.maximum, '',
                     "Remarque voir Google", self.group.remark.text_en]
-        data = _build_additional_info_data(None, None, self.group)
+        data = _build_additional_info_data(None, self.group)
         self.assertListEqual(data, expected)
 
     def test_build_additional_info_no_data(self):
-        data = _build_additional_info_data(None, None, None)
+        data = _build_additional_info_data(None, None)
         self.assertListEqual(data, _build_array_with_empty_string(6))
 
     def test_end_year(self):
@@ -312,16 +311,16 @@ class XlsCustomizedContentTestCase(TestCase):
                                             end_year=2023)
         group = GroupFactory(start_year=2018,
                              end_year=2019)
-        self.assertEqual(_get_end_year(standard_current_version, training, None, group), str(training.end_year))
-        self.assertEqual(_get_end_year(particular_current_version, training, None, group), str(group.end_year))
-        self.assertEqual(_get_end_year(standard_current_version, training_without_end_year, None, group),
+        self.assertEqual(_get_end_year(standard_current_version, training, group), str(training.end_year))
+        self.assertEqual(_get_end_year(particular_current_version, training, group), str(group.end_year))
+        self.assertEqual(_get_end_year(standard_current_version, training_without_end_year, group),
                          UNSPECIFIED_FR)
 
         standard_current_version = ProgramTreeVersionFactory(end_year_of_existence=2021)
         standard_current_version_without_end_year = ProgramTreeVersionFactory(end_year_of_existence=None)
-        self.assertEqual(_get_end_year(standard_current_version, None, mini_training, group),
+        self.assertEqual(_get_end_year(standard_current_version, mini_training, group),
                          str(standard_current_version.end_year_of_existence))
-        self.assertEqual(_get_end_year(standard_current_version_without_end_year, None, mini_training, group),
+        self.assertEqual(_get_end_year(standard_current_version_without_end_year, mini_training, group),
                          UNSPECIFIED_FR)
 
 
@@ -347,11 +346,11 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         cls.group = GroupFactory(titles=titles)
 
     def test_get_titles_en_for_training_standard_version_not_finality(self):
-        self.assertListEqual(_get_titles_en(self.standard_current_version, self.training, None, self.group),
+        self.assertListEqual(_get_titles_en(self.standard_current_version, self.training, self.group),
                              [self.training.titles.title_en, '', ''])
 
     def test_get_titles_en_for_training_standard_version_finality(self):
-        self.assertListEqual(_get_titles_en(self.standard_current_version, self.training_finality, None, self.group),
+        self.assertListEqual(_get_titles_en(self.standard_current_version, self.training_finality, self.group),
                              [
                                  self.training.titles.title_en,
                                  self.training.titles.partial_title_fr,
@@ -360,14 +359,14 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                              )
 
     def test_get_titles_en_for_training_particular_version_not_finality(self):
-        self.assertListEqual(_get_titles_en(self.particular_current_version, self.training, None, self.group),
+        self.assertListEqual(_get_titles_en(self.particular_current_version, self.training, self.group),
                              ["{}[{}]".format(self.training.titles.title_en,
                                               self.particular_current_version.title_en),
                               '', '']
                              )
 
     def test_get_titles_en_for_training_particular_version_finality(self):
-        self.assertListEqual(_get_titles_en(self.particular_current_version, self.training_finality, None, self.group),
+        self.assertListEqual(_get_titles_en(self.particular_current_version, self.training_finality, self.group),
                              [
                                  "{}[{}]".format(self.training.titles.title_en,
                                                  self.particular_current_version.title_en),
@@ -377,7 +376,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                              )
 
     def test_get_titles_en_for_group(self):
-        self.assertListEqual(_get_titles_en(None, None, None, self.group),
+        self.assertListEqual(_get_titles_en(None, None, self.group),
                              [self.group.titles.title_en, '', ''])
 
     def test_build_organization_data_for_training(self):
@@ -472,9 +471,9 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         self.assertEqual(_build_aims_data(training_without_aims), '')
 
     def test_build_keywords_data(self):
-        self.assertEqual(_build_keywords_data(self.training, None), self.training.keywords)
-        self.assertEqual(_build_keywords_data(None, self.mini_training), self.mini_training.keywords)
-        self.assertEqual(_build_keywords_data(None, None), '')
+        self.assertEqual(_build_keywords_data(self.training), self.training.keywords)
+        self.assertEqual(_build_keywords_data(self.mini_training), self.mini_training.keywords)
+        self.assertEqual(_build_keywords_data(None), '')
 
     def test_get_co_organizations_no_data(self):
         self.assertEqual(_get_co_organizations([]), '')
@@ -528,7 +527,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                                  professional_title='Professional title',
                                  aims=[])
         training_diploma = TrainingFactory(diploma=diploma)
-        self.assertListEqual(_build_diploma_certicat_data(training_diploma),
+        self.assertListEqual(_build_diploma_certificat_data(training_diploma),
                              ['Oui', 'Printing title', 'Professional title', ''])
         diploma = DiplomaFactory(leads_to_diploma=False,
                                  printing_title=None,
@@ -536,10 +535,10 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                                  aims=[])
 
         training_diploma = TrainingFactory(diploma=diploma)
-        self.assertListEqual(_build_diploma_certicat_data(training_diploma),
+        self.assertListEqual(_build_diploma_certificat_data(training_diploma),
                              ['Non', '', '', ''])
         training_without_diploma = TrainingFactory(diploma=None)
-        self.assertListEqual(_build_diploma_certicat_data(training_without_diploma),
+        self.assertListEqual(_build_diploma_certificat_data(training_without_diploma),
                              _build_array_with_empty_string(4))
 
     def test_build_enrollment_data(self):
