@@ -38,6 +38,7 @@ from django.utils import translation
 from django.utils.translation import gettext_lazy as _, get_language
 
 from base import models as mdl
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.utils import native
 from osis_common.models import application_notice
 from program_management.ddd.business_types import *
@@ -279,12 +280,18 @@ def show_error_message_for_form_invalid(request):
     display_error_messages(request, msg)
 
 
-def check_formations_impacted_by_update(code: str, year: int, request, type_of_training: str = None):
+def check_formations_impacted_by_update(code: str, year: int, request, type_of_training):
     formations_using_element = _find_root_trainings_using_element(code, year)
     if len(formations_using_element) > 1:
         if type_of_training:
+            if type_of_training in TrainingType:
+                type_of_training_str = _('this training')
+            elif type_of_training in MiniTrainingType:
+                type_of_training_str = _('this mini-training')
+            else:
+                type_of_training_str = _('this group')
             message_str = "{} {} {} :".format(_('Pay attention'),
-                                              type_of_training,
+                                              type_of_training_str,
                                               _('is part of several trainings'))
         else:
             message_str = _('Pay attention! This learning unit is used in more than one formation')
