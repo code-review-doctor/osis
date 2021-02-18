@@ -35,6 +35,7 @@
             {% csrf_token %}
             <div class="panel panel-default">
                 <div class="panel-body">
+
                     {% bootstrap_field form.transition_name addon_before=training_identity.acronym|add:"["|add:version_name addon_after=']' %}
                     {% bootstrap_field form.version_title_fr %}
                     {% bootstrap_field form.version_title_en %}

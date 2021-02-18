@@ -27,5 +27,5 @@ from program_management.ddd.validators import validators_by_business_action
 
 def check_transition_name(cmd: command.CheckTransitionNameCommand) -> None:
     validators_by_business_action.CheckTransitionNameValidatorList(
-        cmd.transition_name
+        cmd.year, cmd.offer_acronym, cmd.version_name, cmd.transition_name
     ).validate()
