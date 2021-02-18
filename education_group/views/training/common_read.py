@@ -291,8 +291,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.path)
 
-    def get_fill_transition_version_url(self):
-        return "TODO"
+    def get_fill_transition_version_url(self) -> str:
+        return reverse("fill_content")
 
     def get_tree_json_url(self) -> str:
         return reverse_with_get(

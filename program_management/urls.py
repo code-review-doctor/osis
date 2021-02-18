@@ -37,6 +37,7 @@ from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
     update_mini_training
+from program_management.views.tree_version import fill_content
 from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
@@ -72,6 +73,7 @@ urlpatterns = [
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
     path('update/<str:parent_code>/<int:parent_year>/<str:child_code>/<int:child_year>',
          tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
+    path('fill_content/', fill_content.FillContentView.as_view(), name="fill_content"),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
     path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
