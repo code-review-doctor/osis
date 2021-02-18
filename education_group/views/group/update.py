@@ -84,7 +84,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if group_form.is_valid():
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 check_formations_impacted_by_update(self.get_group_obj().code,
-                                                    self.get_group_obj().year, request)
+                                                    self.get_group_obj().year, request, _('this group'))
                 return HttpResponseRedirect(self.get_success_url(group_id))
         else:
             msg = _("Error(s) in form: The modifications are not saved")

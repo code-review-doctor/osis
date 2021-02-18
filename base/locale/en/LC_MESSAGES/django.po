@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 10:35+0100\n"
+"POT-Creation-Date: 2021-02-18 14:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1771,7 +1771,7 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
-msgid "Pay attention! This education group is part of several trainings"
+msgid "Pay attention"
 msgstr ""
 
 msgid "Pay attention! This learning unit is used in more than one formation"
@@ -2967,6 +2967,9 @@ msgid "hourly volume total annual"
 msgstr ""
 
 msgid "initial value"
+msgstr ""
+
+msgid "is part of several trainings"
 msgstr ""
 
 msgid "items per page"

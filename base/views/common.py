@@ -279,16 +279,20 @@ def show_error_message_for_form_invalid(request):
     display_error_messages(request, msg)
 
 
-def check_formations_impacted_by_update(code: str, year: int, request, is_check_for_ue: bool = False):
+def check_formations_impacted_by_update(code: str, year: int, request, type_of_training: str = None):
     formations_using_element = _find_root_trainings_using_element(code, year)
     if len(formations_using_element) > 1:
-
+        if type_of_training:
+            message_str = "{} {} {} :".format(_('Pay attention'),
+                                              type_of_training,
+                                              _('is part of several trainings'))
+        else:
+            message_str = _('Pay attention! This learning unit is used in more than one formation')
         messages.add_message(request,
                              MSG_SPECIAL_WARNING_TITLE_LEVEL,
-                             _('Pay attention! This learning unit is used in more than one formation')
-                             if is_check_for_ue
-                             else _('Pay attention! This education group is part of several trainings')
+                             message_str
                              )
+
         for formation in formations_using_element:
             messages.add_message(request, MSG_SPECIAL_WARNING_LEVEL, formation)
 
