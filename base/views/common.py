@@ -309,7 +309,14 @@ def _find_root_trainings_using_element(code: str, year: int) -> List['str']:
     direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
     formations_using_element = set()
     for direct_link in direct_parents:
-        for indirect_parent in direct_link.get('indirect_parents'):
-            formations_using_element.add("{}{}".format(indirect_parent.get('node').full_acronym(),
-                                                       build_title(indirect_parent.get('node'), get_language())))
+        if direct_link.get('indirect_parents') == [] and (
+                direct_link['link'].parent.node_type in TrainingType or
+                direct_link['link'].parent.node_type in MiniTrainingType
+        ):
+            formations_using_element.add("{}{}".format(direct_link['link'].parent.full_acronym(),
+                                                       build_title(direct_link['link'].parent, get_language())))
+        else:
+            for indirect_parent in direct_link.get('indirect_parents'):
+                formations_using_element.add("{}{}".format(indirect_parent.get('node').full_acronym(),
+                                                           build_title(indirect_parent.get('node'), get_language())))
     return list(sorted(formations_using_element))
