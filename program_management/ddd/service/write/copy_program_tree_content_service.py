@@ -46,6 +46,7 @@ def copy_program_tree_content_to_next_year(copy_cmd: CopyProgramTreeToNextYearCo
 
     # WHEN
     program_tree_next_year = ProgramTreeBuilder().copy_content_to_next_year(existing_program_tree, repository)
+    # TODO :: add report cms call for mandatory children
 
     # THEN
     # TODO :: remove this try except and add Repository.upsert() function
