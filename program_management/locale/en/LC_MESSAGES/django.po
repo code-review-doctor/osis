@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-08 13:45+0100\n"
+"POT-Creation-Date: 2021-02-11 15:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -513,6 +513,9 @@ msgstr ""
 msgid "New training"
 msgstr ""
 
+msgid "New transition version"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
@@ -837,6 +840,9 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
+msgid "This value is invalid"
+msgstr ""
+
 msgid "This version exists until"
 msgstr ""
 
@@ -873,7 +879,7 @@ msgstr ""
 msgid "Transformation and modification"
 msgstr ""
 
-msgid "Transition"
+msgid "Transition name"
 msgstr ""
 
 msgid "Tutors"

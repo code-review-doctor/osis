@@ -911,6 +911,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         prerequisites_string:
           type: string
           example: (codeA OR codeB) AND (codeC)
@@ -927,6 +929,8 @@ components:
           type: string
           format: uri
         title:
+          type: string
+        title_en:
           type: string
     Hops:
       type: object
@@ -951,13 +955,13 @@ components:
           type: string
         code:
           type: string
-        is_transition:
-          type: boolean
+        transition_name:
+          type: string
       required:
         - url
         - version_name
         - code
-        - is_transition
+        - transition_name
     PaginatedTraining:
       allOf:
         - $ref: '#/components/schemas/Pagination'
@@ -1147,8 +1151,8 @@ components:
               type: string
             version_name:
               type: string
-            is_transition:
-              type: boolean
+            transition_name:
+              type: string
             versions:
               $ref: '#/components/schemas/ArrayOfVersions'
     GroupDetailed:
