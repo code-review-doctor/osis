@@ -124,6 +124,21 @@
                 <input type="hidden" id="xls_status" name="xls_status">
                 <input type="hidden" id="xls_order_col" name="xls_order_col">
                 <input type="hidden" id="xls_order" name="xls_order">
+                <input type="hidden" id="hdn_with_validity" name="with_validity">
+                <input type="hidden" id="hdn_with_osis_code" name="with_osis_code">
+                <input type="hidden" id="hdn_with_partial_english_titles" name="with_partial_english_titles">
+                <input type="hidden" id="hdn_with_education_fields" name="with_education_fields">
+                <input type="hidden" id="hdn_with_organization" name="with_organization">
+                <input type="hidden" id="hdn_with_activities" name="with_activities">
+                <input type="hidden" id="hdn_with_responsibles_and_contacts" name="with_responsibles_and_contacts">
+                <input type="hidden" id="hdn_with_diploma_and_certificat" name="with_diploma_and_certificat">
+                <input type="hidden" id="hdn_with_co_graduation_and_partnership" name="with_co_graduation_and_partnership">
+                <input type="hidden" id="hdn_with_ares_code" name="with_ares_code">
+                <input type="hidden" id="hdn_with_enrollment" name="with_enrollment">
+                <input type="hidden" id="hdn_with_funding" name="with_funding">
+                <input type="hidden" id="hdn_with_other_legal_information" name="with_other_legal_information">
+                <input type="hidden" id="hdn_with_additional_info" name="with_additional_info">
+                <input type="hidden" id="hdn_with_keywords" name="with_keywords">
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
@@ -146,9 +161,10 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                                 <li>
-                                    <a id="btn_produce_xls"
-                                       class="no_spinner"
+                                    <a id="btn_produce_personnalized_xls"
+                                       class="download"
                                        style="margin-right:10px;"
+                                       data-toggle="modal" data-target="#modalXlsTrainingsListWithParameters"
                                        title="{% trans 'Produce xls with a list of trainings' %}">
                                         &nbsp;{% trans 'List of trainings' %}
                                     </a>
@@ -190,6 +206,7 @@
             </div>
         </div>
     </div>
+    {% include 'education_group/blocks/modal/modal_xls_trainings_list_with_parameters.html' %}
 {% endblock %}
 
 
@@ -218,11 +235,7 @@
         });
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
         $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
-
-            let table = $('#table_education_groups').DataTable();
-            let order = table.order();
-            $("#xls_order_col").val(get_ordering_column(order));
-            $("#xls_order").val(order[0][1]);
+            set_order_hidden_fields();
 
             let action_value;
             if ($(this).attr('id') === 'btn_produce_xls') {
@@ -231,8 +244,7 @@
                 action_value = 'xls_administrative';
             }
             prepare_xls(e, action_value);
-            $("#xls_order").val('');
-            $("#xls_order_col").val('');
+            reset_order_hidden_fields();
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
@@ -249,6 +261,31 @@
             let $searchfield = $(this).parent().find('.select2-search__field');
             $searchfield.prop('disabled', true);
         });
+
+        $("#btn_xls_with_parameters").click(function(e) {
+            set_order_hidden_fields();
+            prepare_xls(e, 'xls_customized');
+            parameters = ['validity', 'osis_code', 'partial_english_titles', 'education_fields', 'organization',
+                'activities', 'responsibles_and_contacts', 'diploma_and_certificat', 'co_graduation_and_partnership',
+                'ares_code', 'enrollment', 'funding', 'other_legal_information', 'additional_info', 'keywords'];
+            for (i = 0; i < parameters.length; i++) {
+               $("#hdn_with_" + parameters[i]).val('');
+            }
+            reset_order_hidden_fields();
+        });
+
+        function set_order_hidden_fields(){
+            let table = $('#table_education_groups').DataTable();
+            let order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+        }
+
+        function reset_order_hidden_fields() {
+            $("#xls_order").val('');
+            $("#xls_order_col").val('');
+        }
+
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
 {% endblock %}

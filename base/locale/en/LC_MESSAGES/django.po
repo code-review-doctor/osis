@@ -116,6 +116,9 @@ msgstr ""
 msgid "ARES ability"
 msgstr ""
 
+msgid "ARES code"
+msgstr ""
+
 msgid "ARES study code"
 msgstr ""
 
@@ -216,6 +219,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Activities"
+msgstr ""
+
 msgid "Activities on other campus"
 msgstr ""
 
@@ -232,6 +238,9 @@ msgid "Add. requ. ent. 1"
 msgstr ""
 
 msgid "Add. requ. ent. 2"
+msgstr ""
+
+msgid "Additional info"
 msgstr ""
 
 msgid "Additional requirement entity 1"
@@ -464,6 +473,11 @@ msgstr ""
 msgid "Cheating"
 msgstr ""
 
+msgid ""
+"Checkbox present for informational purposes, checked by default and not "
+"editable."
+msgstr ""
+
 msgid "Choose academic years"
 msgstr ""
 
@@ -492,6 +506,9 @@ msgid "Co-graduation"
 msgstr ""
 
 msgid "Co-graduation total coefficient"
+msgstr ""
+
+msgid "Co-graduation/partnership"
 msgstr ""
 
 msgid "Co-holder"
@@ -634,6 +651,11 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
+msgid ""
+"Default information (ac. yr., acronym/short title, title, category, type, "
+"credits)"
+msgstr ""
+
 msgid "Default learning unit enrollment"
 msgstr ""
 
@@ -671,6 +693,9 @@ msgid "Details"
 msgstr ""
 
 msgid "Diploma title"
+msgstr ""
+
+msgid "Diploma/certificat"
 msgstr ""
 
 msgid "Direct Access"
@@ -731,6 +756,9 @@ msgid "Edit"
 msgstr ""
 
 msgid "Edit the proposal"
+msgstr ""
+
+msgid "Education fields"
 msgstr ""
 
 msgid "Education group"
@@ -815,6 +843,9 @@ msgid "Enrolled"
 msgstr ""
 
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrollment"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1678,6 +1709,9 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
+msgid "Osis code"
+msgstr ""
+
 msgid "Other academic responsible"
 msgstr ""
 
@@ -1691,6 +1725,9 @@ msgid "Other individual"
 msgstr ""
 
 msgid "Other languages activities"
+msgstr ""
+
+msgid "Other legal information"
 msgstr ""
 
 msgid "Other remark (intended for publication)"
@@ -2083,6 +2120,9 @@ msgstr ""
 msgid "Residential"
 msgstr ""
 
+msgid "Responsibles and contacts"
+msgstr ""
+
 msgid "Result"
 msgstr ""
 
@@ -2147,6 +2187,9 @@ msgid "Select all"
 msgstr ""
 
 msgid "Select all the messages"
+msgstr ""
+
+msgid "Select/deselect all"
 msgstr ""
 
 msgid "Separate"
@@ -2557,6 +2600,9 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Title specific complement"
+msgstr ""
+
+msgid "Titles(partial/English)"
 msgstr ""
 
 msgid "To complete"

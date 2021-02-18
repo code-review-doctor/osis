@@ -1,0 +1,148 @@
+{% extends 'blocks/modal/generic_modal.html' %}
+{% load i18n %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block modal_id %}modalXlsTrainingsListWithParameters{% endblock %}
+
+{% block modal_header %}
+{% endblock %}
+
+{% block modal_content %}
+    <form method="POST" id="form_xls_with_parameters">
+        {% csrf_token %}
+        <div class="modal-body" id="parameters_selections">
+            {% csrf_token %}
+            <label>{% trans 'Do you want to export the following informations' %}?</label><br>
+            <input type="checkbox" disabled id="unmutable_chb" checked title="{% trans 'Checkbox present for informational purposes, checked by default and not editable.' %}"> {% trans 'Default information (ac. yr., acronym/short title, title, category, type, credits)' %}<br>
+            <input type="checkbox" id="chb_all_param" title="{% trans 'Select/deselect all' %}">{% trans 'Select/deselect all' %}<br>
+            <input type="checkbox" id="chb_with_validity" value="chb_with_validity" class="chb_parameters"> {% trans 'Validity' %}<br>
+            <input type="checkbox" id="chb_with_osis_code" value="chb_with_osis_code" class="chb_parameters"> {% trans 'Osis code' %}<br>
+            <input type="checkbox" id="chb_with_partial_english_titles" value="chb_with_partial_english_titles" class="chb_parameters"> {% trans 'Titles(partial/English)' %}<br>
+            <input type="checkbox" id="chb_with_education_fields" value="chb_with_education_fields" class="chb_parameters"> {% trans 'Education fields' %}<br>
+            <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"> {% trans 'Organization' %}<br>
+            <input type="checkbox" id="chb_with_responsibles_and_contacts" value="chb_with_responsibles_and_contacts" class="chb_parameters"> {% trans 'Responsibles and contacts' %}<br>
+            <input type="checkbox" id="chb_with_activities" value="chb_with_activities" class="chb_parameters"> {% trans 'Activities' %}<br>
+            <input type="checkbox" id="chb_with_diploma_and_certificat" value="chb_with_diploma_and_certificat" class="chb_parameters"> {% trans 'Diploma/certificat' %}<br>
+            <input type="checkbox" id="chb_with_co_graduation_and_partnership" value="chb_with_co_graduation_and_partnership" class="chb_parameters"> {% trans 'Co-graduation/partnership' %}<br>
+            <input type="checkbox" id="chb_with_enrollment" value="chb_with_enrollment" class="chb_parameters"> {% trans 'Enrollment' %}<br>
+            <input type="checkbox" id="chb_with_funding" value="chb_with_funding" class="chb_parameters"> {% trans 'Funding' %}<br>
+            <input type="checkbox" id="chb_with_ares_code" value="chb_with_ares_code" class="chb_parameters"> {% trans 'ARES code' %}<br>
+            <input type="checkbox" id="chb_with_other_legal_information" value="chb_with_other_legal_information" class="chb_parameters"> {% trans 'Other legal information' %}<br>
+            <input type="checkbox" id="chb_with_additional_info" value="chb_with_additional_info" class="chb_parameters"> {% trans 'Additional info' %}<br>
+            <input type="checkbox" id="chb_with_keywords" value="chb_with_keywords" class="chb_parameters"> {% trans 'Keywords' %}<br>
+            <input type="hidden" id="xls_status" name="xls_status"  value="xls_customized">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            <button type="button"
+                    onclick="get_parameters();"
+                    class="btn btn-primary download"
+                    id="btn_xls_with_parameters"
+                    data-dismiss="modal">
+                {% trans "Produce Xls" %}
+            </button>
+        </div>
+    </form>
+
+    <script type="application/javascript">
+        function get_parameters(){
+            $('#hdn_with_validity').val(false);
+            $('#hdn_with_osis_code').val(false);
+            $('#hdn_with_partial_english_titles').val(false);
+            $('#hdn_with_education_fields').val(false);
+            $('#hdn_with_organization').val(false);
+            $('#hdn_with_activities').val(false);
+            $('#hdn_with_responsibles_and_contacts').val(false);
+            $('#hdn_with_co_graduation_and_partnership').val(false);
+            $('#hdn_with_diploma_and_certificat').val(false);
+            $('#hdn_with_ares_code').val(false);
+            $('#hdn_with_enrollment').val(false);
+            $('#hdn_with_funding').val(false);
+            $('#hdn_with_other_legal_information').val(false);
+            $('#hdn_with_additional_info').val(false);
+            $('#hdn_with_keywords').val(false);
+
+
+            if($('#chb_with_validity').prop('checked')){
+                $('#hdn_with_validity').val(true);
+            }
+            if($('#chb_with_osis_code').prop('checked')){
+                $('#hdn_with_osis_code').val(true);
+            }
+            if($('#chb_with_partial_english_titles').prop('checked')){
+                $('#hdn_with_partial_english_titles').val(true);
+            }
+            if($('#chb_with_education_fields').prop('checked')){
+                $('#hdn_with_education_fields').val(true);
+            }
+            if($('#chb_with_organization').prop('checked')){
+                $('#hdn_with_organization').val(true);
+            }
+            if($('#chb_with_activities').prop('checked')){
+                $('#hdn_with_activities').val(true);
+            }
+            if($('#chb_with_responsibles_and_contacts').prop('checked')){
+                $('#hdn_with_responsibles_and_contacts').val(true);
+            }
+            if($('#chb_with_diploma_and_certificat').prop('checked')){
+                $('#hdn_with_diploma_and_certificat').val(true);
+            }
+            if($('#chb_with_co_graduation_and_partnership').prop('checked')){
+                $('#hdn_with_co_graduation_and_partnership').val(true);
+            }
+            if($('#chb_with_ares_code').prop('checked')){
+                $('#hdn_with_ares_code').val(true);
+            }
+            if($('#chb_with_enrollment').prop('checked')){
+                $('#hdn_with_enrollment').val(true);
+            }
+            if($('#chb_with_funding').prop('checked')){
+                $('#hdn_with_funding').val(true);
+            }
+            if($('#chb_with_other_legal_information').prop('checked')){
+                $('#hdn_with_other_legal_information').val(true);
+            }
+            if($('#chb_with_additional_info').prop('checked')){
+                $('#hdn_with_additional_info').val(true);
+            }
+            if($('#chb_with_keywords').prop('checked')){
+                $('#hdn_with_keywords').val(true);
+            }
+
+        }
+
+        $("#chb_all_param").click(function(){
+            var chboxes =$('.chb_parameters').not(this);
+            var status = this.checked;
+
+            $.each(chboxes, function() {
+                if (! $(this).prop('disabled')){
+                    $(this).prop('checked', status);
+                }
+            });
+
+        });
+    </script>
+{% endblock %}
