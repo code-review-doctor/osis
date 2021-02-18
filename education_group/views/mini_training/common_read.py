@@ -207,6 +207,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
+            "fill_transition_version_url": self.get_fill_transition_version_url(),
             "create_specific_version_url": self.get_create_specific_version_url(),
             "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
@@ -271,6 +272,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
+
+    def get_fill_transition_version_url(self):
+        pass
 
     def get_create_version_permission_name(self) -> str:
         return "base.add_minitraining_version"
