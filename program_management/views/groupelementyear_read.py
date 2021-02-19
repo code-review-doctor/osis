@@ -85,7 +85,7 @@ def pdf_content(request, year, code, language):
         'created': datetime.datetime.now(),
         'max_block': tree.get_greater_block_value(),
         'main_part_col_length': get_main_part_col_length(tree.get_greater_block_value()),
-        'title': title
+        'title': title.strip()
     }
 
     with translation.override(language):
