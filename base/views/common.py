@@ -283,18 +283,7 @@ def show_error_message_for_form_invalid(request):
 def check_formations_impacted_by_update(code: str, year: int, request, type_of_training):
     formations_using_element = _find_root_trainings_using_element(code, year)
     if len(formations_using_element) > 1:
-        if type_of_training:
-            if type_of_training in TrainingType:
-                type_of_training_str = _('this training')
-            elif type_of_training in MiniTrainingType:
-                type_of_training_str = _('this mini-training')
-            else:
-                type_of_training_str = _('this group')
-            message_str = "{} {} {} :".format(_('Pay attention'),
-                                              type_of_training_str,
-                                              _('is part of several trainings'))
-        else:
-            message_str = _('Pay attention! This learning unit is used in more than one formation')
+        message_str = _build_attention_message(type_of_training)
         messages.add_message(request,
                              MSG_SPECIAL_WARNING_TITLE_LEVEL,
                              message_str
@@ -310,8 +299,8 @@ def _find_root_trainings_using_element(code: str, year: int) -> List['str']:
     formations_using_element = set()
     for direct_link in direct_parents:
         if direct_link.get('indirect_parents') == [] and (
-                direct_link['link'].parent.node_type in TrainingType or
-                direct_link['link'].parent.node_type in MiniTrainingType
+                direct_link['link'].parent.is_training() or
+                direct_link['link'].parent.is_mini_training()
         ):
             formations_using_element.add("{}{}".format(direct_link['link'].parent.full_acronym(),
                                                        build_title(direct_link['link'].parent, get_language())))
@@ -320,3 +309,16 @@ def _find_root_trainings_using_element(code: str, year: int) -> List['str']:
                 formations_using_element.add("{}{}".format(indirect_parent.get('node').full_acronym(),
                                                            build_title(indirect_parent.get('node'), get_language())))
     return list(sorted(formations_using_element))
+
+
+def _build_attention_message(training_type):
+    if training_type:
+        if training_type in TrainingType:
+            type_of_training_str = _('this training')
+        elif training_type in MiniTrainingType:
+            type_of_training_str = _('this mini-training')
+        else:
+            type_of_training_str = _('this group')
+        return "{} {} {} :".format(_('Pay attention'), type_of_training_str, _('is part of several trainings'))
+
+    return _('Pay attention! This learning unit is used in more than one formation')
