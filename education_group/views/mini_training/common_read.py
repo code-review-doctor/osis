@@ -274,7 +274,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             ) + "?path={}".format(self.get_path())
 
     def get_fill_transition_version_url(self):
-        return reverse("fill_content")
+        return reverse("fill_content", kwargs={'year': self.node_identity.year, 'code': self.node_identity.code})
 
     def get_create_version_permission_name(self) -> str:
         return "base.add_minitraining_version"

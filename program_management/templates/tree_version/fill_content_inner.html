@@ -24,22 +24,18 @@
 {% endcomment %}
 
 <div class="modal-content" id="form-modal-content">
-    <div id="form-modal-body" class="modal-body">
-{#        {% if error %}#}
-{#            <div class="alert alert-danger">{{ error }}</div>#}
-{#        {% else %}#}
-{#            <form method="post" id="form_education_group_type" action="{{ request.path }}?{{ request.GET.urlencode }}">#}
-{#                {% csrf_token %}#}
-{#                {% bootstrap_field form.name %}#}
-{#            </form>#}
-{#        {% endif %}#}
-    </div>
-    <div class="modal-footer">
-{#        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>#}
-{#        {% if not error %}#}
-{#            <input type="submit" value="{% trans "Continue" %}" class="btn btn-primary"#}
-{#                   onclick="$('#form_education_group_type').submit();"/>#}
-{#        {% endif %}#}
-    </div>
+    <form method="post" id="form_fill_content" action="{{ request.path }}?{{ request.GET.urlencode }}">
+        <div id="form-modal-body" class="modal-body">
+                {% csrf_token %}
+            <strong>{% blocktrans %}Fill {{ tree_version_name }} in {{ year }}{% endblocktrans %}</strong>
+                {% bootstrap_field form.strategy show_label=False %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+            <button type="submit" class="btn btn-primary">
+                <span class="far fa-save" aria-hidden="true"></span> {% trans "Recopy" %}
+            </button>
+        </div>
+    </form>
 </div>
 

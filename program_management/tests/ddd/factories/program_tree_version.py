@@ -75,6 +75,11 @@ class ProgramTreeVersionFactory(factory.Factory):
             program_tree_identity=tree_standard.entity_id,
         )
 
+    class Params:
+        transition = factory.Trait(
+            entity_id__transition_name=factory.Sequence(lambda n: 'TRANS%02d' % n)
+        )
+
 
 class StandardProgramTreeVersionFactory(ProgramTreeVersionFactory):
     entity_id = factory.SubFactory(

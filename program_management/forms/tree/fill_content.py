@@ -22,4 +22,65 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Tuple, Optional
 
+from django import forms
+from django.utils.translation import gettext_lazy as _
+
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.formatter import format_tree_version_acronym
+
+
+class FillContentForm(forms.Form):
+    strategy = forms.ChoiceField(
+        widget=forms.RadioSelect,
+    )
+
+    def __init__(
+            self,
+            past_transition_tree: Optional['ProgramTreeVersion'],
+            standard_tree: 'ProgramTreeVersion',
+            past_standard_tree: Optional['ProgramTreeVersion'],
+            *args,
+            **kwargs
+    ):
+        self.past_transition_tree = past_transition_tree
+        self.standard_tree = standard_tree
+        self.past_standard_tree = past_standard_tree
+        super(FillContentForm, self).__init__(*args, **kwargs)
+        self.fields["strategy"].choices = self.__define_choices()
+
+    def __define_choices(self) -> Tuple:
+        choices = []
+        if self.past_transition_tree:
+            choices.append(
+                (
+                    "1",
+                    _("Copy from transition version from past year: %(program_name)s in %(year)s") % {
+                        "program_name": format_tree_version_acronym(self.past_transition_tree),
+                        "year": self.past_transition_tree.get_tree().root_node.academic_year
+                    }
+                )
+            )
+        if self.past_standard_tree:
+            choices.append(
+                (
+                    "2",
+                    _("Copy from standard version from past year: %(program_name)s in %(year)s") % {
+                        "program_name": format_tree_version_acronym(self.past_standard_tree),
+                        "year": self.past_standard_tree.get_tree().root_node.academic_year
+                    }
+                )
+            )
+        if self.standard_tree:
+            choices.append(
+                (
+                    "3",
+                    _("Copy from standard version from this year: %(program_name)s in %(year)s") % {
+                        "program_name": format_tree_version_acronym(self.standard_tree),
+                        "year": self.standard_tree.get_tree().root_node.academic_year
+                    }
+                )
+            )
+
+        return tuple(choices)

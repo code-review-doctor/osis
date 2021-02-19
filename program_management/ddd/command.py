@@ -363,6 +363,12 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
         return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)
 
 
+@attr.s(frozen=True, slots=True)
+class GetStandardProgramTreeVersionFromTransitionVersionCommand(interface.CommandRequest):
+    offer_acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
 class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
     def __init__(self, code: str, year: int):
         self.code = code
