@@ -477,6 +477,9 @@ msgstr ""
 msgid "New training"
 msgstr ""
 
+msgid "New transition version"
+msgstr ""
+
 msgid "No"
 msgstr ""
 
@@ -780,6 +783,9 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
+msgid "This value is invalid"
+msgstr ""
+
 msgid "This version exists until"
 msgstr ""
 
@@ -816,7 +822,7 @@ msgstr ""
 msgid "Transformation and modification"
 msgstr ""
 
-msgid "Transition"
+msgid "Transition name"
 msgstr ""
 
 msgid "Tutors"

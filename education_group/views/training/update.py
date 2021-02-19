@@ -61,6 +61,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.domain.exception import Program2MEndDateLowerThanItsFinalitiesException, \
     FinalitiesEndDateGreaterThanTheirMasters2MException
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_training_with_program_tree_service
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
@@ -516,6 +517,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             code=cleaned_data["code"],
             offer_acronym=cleaned_data["acronym"],
             version_name='',
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
             from_year=cleaned_data["end_year"].year+1
         )

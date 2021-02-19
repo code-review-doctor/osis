@@ -578,6 +578,9 @@ msgstr ""
 msgid "Create specific version"
 msgstr ""
 
+msgid "Create transition version"
+msgstr ""
+
 msgid "Creation"
 msgstr ""
 
