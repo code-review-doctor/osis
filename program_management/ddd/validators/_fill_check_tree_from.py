@@ -37,10 +37,58 @@ class CheckValidTreeVersionToFillFrom(business_validator.BusinessValidator):
         if self.tree_version_to.is_specific_official:
             return self._validate_for_specific_official()
 
+        elif self.tree_version_to.is_standard_transition:
+            return self._validate_for_standard_transition()
+
+        elif self.tree_version_to.is_specific_transition:
+            return self._validate_for_specific_transition()
+
     def _validate_for_specific_official(self):
         if not self.__is_last_year_tree():
             raise InvalidTreeVersionToFillFrom(self.tree_version_from)
 
+    def _validate_for_standard_transition(self):
+        if self.__is_last_year_tree():
+            return
+        elif self.__is_standard_tree():
+            return
+        elif self.__is_past_standard_tree():
+            return
+
+        raise InvalidTreeVersionToFillFrom(self.tree_version_from)
+
+    def _validate_for_specific_transition(self):
+        if self.__is_last_year_tree():
+            return
+        elif self.__is_specific_tree():
+            return
+        elif self.__is_past_specific_tree():
+            return
+
+        raise InvalidTreeVersionToFillFrom(self.tree_version_from)
+
     def __is_last_year_tree(self) -> bool:
         return self.tree_version_from.entity_id.year + 1 == self.tree_version_to.entity_id.year and \
                self.tree_version_from.get_tree().root_node.code == self.tree_version_to.get_tree().root_node.code
+
+    def __is_standard_tree(self):
+        return self.tree_version_from.entity_id.year == self.tree_version_to.entity_id.year and \
+               self.tree_version_from.entity_id.offer_acronym == self.tree_version_to.entity_id.offer_acronym and\
+               self.tree_version_from.is_standard
+
+    def __is_past_standard_tree(self):
+        return self.tree_version_from.entity_id.year + 1 == self.tree_version_to.entity_id.year and \
+               self.tree_version_from.entity_id.offer_acronym == self.tree_version_to.entity_id.offer_acronym and \
+               self.tree_version_from.is_standard
+
+    def __is_specific_tree(self):
+        return self.tree_version_from.entity_id.year == self.tree_version_to.entity_id.year and \
+               self.tree_version_from.entity_id.offer_acronym == self.tree_version_to.entity_id.offer_acronym and \
+               self.tree_version_from.entity_id.version_name == self.tree_version_to.entity_id.version_name and \
+               self.tree_version_from.is_specific_official
+
+    def __is_past_specific_tree(self):
+        return self.tree_version_from.entity_id.year + 1 == self.tree_version_to.entity_id.year and \
+               self.tree_version_from.entity_id.offer_acronym == self.tree_version_to.entity_id.offer_acronym and \
+               self.tree_version_from.entity_id.version_name == self.tree_version_to.entity_id.version_name and \
+               self.tree_version_from.is_specific_official

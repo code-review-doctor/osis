@@ -255,6 +255,10 @@ class ProgramTreeVersion(interface.RootEntity):
     def is_specific_transition(self) -> bool:
         return self.entity_id.is_specific_transition
 
+    @property
+    def is_standard_transition(self) -> bool:
+        return self.entity_id.is_standard_transition
+
     # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
     @property
     def version_label(self):

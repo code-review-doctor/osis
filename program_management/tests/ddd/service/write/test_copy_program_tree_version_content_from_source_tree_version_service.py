@@ -102,9 +102,40 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, D
             len(self.tree_version_to_fill.tree.prerequisites.prerequisites)
         )
 
-    def test_can_only_fill_program_specific_version_from_its_last_year_version(self):
+    # TODO :: use property to generate
+    def test_can_only_fill_program_specific_official_from_its_last_year_self(self):
         tree_to_fill_from = ProgramTreeVersionFactory()
         tree_to_fill = SpecificProgramTreeVersionFactory()
+        self.fake_program_tree_version_repository.root_entities.append(tree_to_fill_from)
+        self.fake_program_tree_version_repository.root_entities.append(tree_to_fill)
+
+        cmd = self._generate_cmd(tree_to_fill_from, tree_to_fill)
+
+        self.assertRaisesBusinessException(
+            InvalidTreeVersionToFillFrom,
+            copy_program_tree_version_content_from_source_tree_version,
+            cmd
+        )
+
+    # TODO :: use property to generate
+    def test_can_only_fill_standard_transition_from_its_last_year_self_or_standard_or_last_year_standard(self):
+        tree_to_fill_from = ProgramTreeVersionFactory()
+        tree_to_fill = StandardProgramTreeVersionFactory(transition=True)
+        self.fake_program_tree_version_repository.root_entities.append(tree_to_fill_from)
+        self.fake_program_tree_version_repository.root_entities.append(tree_to_fill)
+
+        cmd = self._generate_cmd(tree_to_fill_from, tree_to_fill)
+
+        self.assertRaisesBusinessException(
+            InvalidTreeVersionToFillFrom,
+            copy_program_tree_version_content_from_source_tree_version,
+            cmd
+        )
+
+    # TODO :: use property to generate
+    def test_can_only_fill_specific_transition_from_its_last_year_self_or_specific_or_last_year_specific(self):
+        tree_to_fill_from = ProgramTreeVersionFactory()
+        tree_to_fill = SpecificProgramTreeVersionFactory(transition=True)
         self.fake_program_tree_version_repository.root_entities.append(tree_to_fill_from)
         self.fake_program_tree_version_repository.root_entities.append(tree_to_fill)
 
