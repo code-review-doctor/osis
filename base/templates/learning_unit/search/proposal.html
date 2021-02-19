@@ -204,5 +204,30 @@
         $("#btn_produce_xls_proposal_comparison").click(function(e) {
             prepare_xls(e, 'xls_comparison');
         });
+        $("#btn_modal_get_back_to_initial").click(function() {
+            var form = $(this).closest("form");
+            $.ajax({
+                data: form.serialize(),
+                url: "{% url 'proposal_partim_check'  %}",
+                method: "POST",
+                dataType: 'json',
+                success: function (data) {
+                    var div_warning_partims = $("#div_warning_partims");
+                    var div_warning_partims_detail = $("#div_warning_partims_detail");
+                    div_warning_partims_detail.empty();
+                    if(data.length > 0){
+                        div_warning_partims_detail.append("<ul id='list_warning'></ul>");
+                        div_warning_partims.show();
+                    }else{
+                        div_warning_partims.hide();
+                    }
+                    for (var i=0; i < data.length; i++){
+                        $("#list_warning").append("<li>" + data[i]['learning_unit_year'] + " : " + data[i]['partims'] + "</li>");
+                    }
+
+
+            }
+            });
+        });
     </script>
     {% endblock %}
