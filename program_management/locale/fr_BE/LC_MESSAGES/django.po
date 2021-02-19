@@ -1096,7 +1096,7 @@ msgid "secondary domains"
 msgstr "domaines secondaires"
 
 msgid "this group"
-msgstr "cd groupement"
+msgstr "ce groupement"
 
 msgid "this mini-training"
 msgstr "cette mini-formation"

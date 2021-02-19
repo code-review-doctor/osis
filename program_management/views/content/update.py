@@ -71,11 +71,6 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 self.content_formset.save()
                 success_messages = self.get_success_msg_updated_links()
                 display_success_messages(request, success_messages, extra_tags='safe')
-                type_of_training = _('this group')
-                if self.get_group_obj().is_training():
-                    type_of_training = _('this training')
-                elif self.get_group_obj().is_mini_training():
-                    type_of_training = _('this mini-training')
                 check_formations_impacted_by_update(self.get_group_obj().code,
                                                     self.get_group_obj().year, request,
                                                     self.get_group_obj().type)
