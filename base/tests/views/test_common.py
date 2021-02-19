@@ -90,4 +90,3 @@ class TestBuildAttentionMessage(SimpleTestCase):
             _build_attention_message(None),
             "Attention cette unité d'enseignement fait partie de plusieurs formations :"
         )
-        return _('Pay attention! This learning unit is used in more than one formation')
