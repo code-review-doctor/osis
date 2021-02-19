@@ -33,6 +33,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand, \
     CreateProgramTreeTransitionVersionCommand, CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year, program_tree
+from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
@@ -80,6 +81,7 @@ class ProgramTreeVersionBuilder:
             copy_from: 'ProgramTreeVersion',
             copy_to: 'ProgramTreeVersion'
     ) -> 'ProgramTreeVersion':
+        ProgramTreeBuilder().copy_content_from_source_to(copy_from.get_tree(), copy_to.get_tree())
         return copy_to
 
     def copy_to_next_year(

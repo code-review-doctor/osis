@@ -154,6 +154,21 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
+    def copy_content_from_source_to(self, copy_from: 'ProgramTree', copy_to: 'ProgramTree') -> 'ProgramTree':
+        validators_by_business_action.CopyContentProgramTreeValidatorList(
+            copy_from,
+            copy_to
+        ).validate()
+        copy_to.root_node = self._copy_node_and_children_to_next_year(copy_from.root_node)
+
+        copy_to.prerequisites = Prerequisites(
+            copy_to.entity_id,
+            [prerequisite_factory.copy_to_next_year(prerequisite)
+             for prerequisite in copy_from.prerequisites.prerequisites]
+        )
+
+        return copy_to
+
     def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
         try:

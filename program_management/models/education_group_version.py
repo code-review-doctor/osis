@@ -33,24 +33,23 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 def copy_to_next_year(modeladmin, request, queryset):
-    from program_management.ddd.command import CopyTreeVersionToNextYearCommand
+    from program_management.ddd.command import CopyTreeVersionFromPastYearCommand
     from program_management.ddd.service.write import bulk_copy_program_tree_version_content_service
     cmds = []
     qs = queryset.select_related("offer", "root_group")
     for obj in qs:
-        cmd = CopyTreeVersionToNextYearCommand(
-            from_year=obj.offer.academic_year.year,
-            from_offer_acronym=obj.offer.acronym,
-            from_offer_code=obj.root_group.partial_acronym,
-            from_version_name=obj.version_name,
-            from_is_transition=obj.is_transition
+        cmd = CopyTreeVersionFromPastYearCommand(
+            to_year=obj.offer.academic_year.year,
+            to_offer_acronym=obj.offer.acronym,
+            to_version_name=obj.version_name,
+            to_transition_name=obj.is_transition
         )
         cmds.append(cmd)
     result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version(cmds)
     modeladmin.message_user(request, "{} programs have been copied".format(len(result)))
 
 
-copy_to_next_year.short_description = _("Copy program tree content to next year")
+copy_to_next_year.short_description = _("Copy program tree content from last year")
 
 
 class StandardListFilter(admin.SimpleListFilter):

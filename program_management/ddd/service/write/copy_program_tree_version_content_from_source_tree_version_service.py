@@ -31,7 +31,7 @@ from program_management.ddd.repositories import program_tree_version as tree_ver
 
 def copy_program_tree_version_content_from_source_tree_version(
         cmd: 'CopyProgramTreeVersionContentFromSourceTreeVersionCommand'
-):
+) -> 'ProgramTreeVersionIdentity':
     repository = tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
 

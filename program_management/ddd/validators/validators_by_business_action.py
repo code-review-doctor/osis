@@ -255,7 +255,7 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
         super().__init__()
 
 
-class CopyContentProgramTreeValidatorList(business_validator.BusinessListValidator):
+class CopyContentProgramTreeValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, copy_from: 'ProgramTree', next_year_tree: Optional['ProgramTree']):
         self.validators = [
             CheckProgramTreeEndDateValidator(copy_from),

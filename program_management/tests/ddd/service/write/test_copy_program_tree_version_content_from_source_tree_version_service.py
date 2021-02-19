@@ -25,17 +25,18 @@
 from django.test import TestCase
 
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
     copy_program_tree_version_content_from_source_tree_version
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
-    StandardProgramTreeVersionFactory
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository
 from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
-class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, TestCase):
+class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, DDDTestCase):
     def setUp(self) -> None:
         self.standard_tree_version = StandardProgramTreeVersionFactory(
             tree=ProgramTreeBachelorFactory(current_year=2020, end_year=2021)
@@ -75,3 +76,34 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, T
         result = copy_program_tree_version_content_from_source_tree_version(self.cmd)
         expected_identity = self.transition_tree_version.entity_id
         self.assertEqual(expected_identity, result)
+
+    def test_should_persist_copy_to_tree_with_same_content(self):
+        copy_program_tree_version_content_from_source_tree_version(self.cmd)
+        self.assertCountEqual(
+            [(node.code, node.year) for node in self.standard_tree_version.tree.get_all_nodes()],
+            [(node.code, node.year-1) for node in self.transition_tree_version.tree.get_all_nodes()]
+        )
+
+    def test_should_omit_nodes_that_have_end_date_inferior_to_next_year(self):
+        self.standard_tree_version.tree.get_node("1|22|32").end_date = 2020
+        copy_program_tree_version_content_from_source_tree_version(self.cmd)
+
+        self.assertTrue(
+            len(self.standard_tree_version.tree.get_all_nodes()) > len(self.transition_tree_version.tree.get_all_nodes())
+        )
+
+    def test_should_not_copy_content_when_tree_next_year_already_exists_and_is_not_empty(self):
+        copy_program_tree_version_content_from_source_tree_version(self.cmd)
+        self.assertRaisesBusinessException(
+            ProgramTreeNonEmpty,
+            copy_program_tree_version_content_from_source_tree_version,
+            self.cmd
+        )
+
+    def test_should_copy_prerequisites_to_next_year(self):
+        copy_program_tree_version_content_from_source_tree_version(self.cmd)
+
+        self.assertEqual(
+            len(self.standard_tree_version.tree.prerequisites.prerequisites),
+            len(self.transition_tree_version.tree.prerequisites.prerequisites)
+        )

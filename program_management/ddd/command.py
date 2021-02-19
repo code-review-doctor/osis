@@ -465,6 +465,14 @@ class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class CopyTreeVersionFromPastYearCommand(interface.CommandRequest):
+    to_year = attr.ib(type=int)
+    to_offer_acronym = attr.ib(type=str)
+    to_version_name = attr.ib(type=str)
+    to_transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class CreateAndAttachTrainingCommand(education_group_command.CreateTrainingCommand):
     path_to_paste = attr.ib(type=str)
 
