@@ -27,7 +27,6 @@ from django.db import transaction
 
 from education_group.ddd.domain import exception
 from education_group.ddd.service.write import copy_group_service
-from education_group.ddd.service.write.create_group_service import create_orphan_group
 from program_management.ddd.command import CopyProgramTreeToNextYearCommand
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
 from program_management.ddd.repositories import program_tree as program_tree_repository

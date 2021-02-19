@@ -75,6 +75,13 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
+    def copy_content_from_source_to(
+            self,
+            copy_from: 'ProgramTreeVersion',
+            copy_to: 'ProgramTreeVersion'
+    ) -> 'ProgramTreeVersion':
+        return copy_to
+
     def copy_to_next_year(
             self,
             copy_from: 'ProgramTreeVersion',

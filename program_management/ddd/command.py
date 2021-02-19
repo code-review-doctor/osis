@@ -369,6 +369,18 @@ class GetStandardProgramTreeVersionFromTransitionVersionCommand(interface.Comman
     year = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
+class CopyProgramTreeVersionContentFromSourceTreeVersionCommand(interface.CommandRequest):
+    from_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_transition_name = attr.ib(type=str)
+    to_year = attr.ib(type=int)
+    to_offer_acronym = attr.ib(type=str)
+    to_version_name = attr.ib(type=str)
+    to_transition_name = attr.ib(type=str)
+
+
 class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
     def __init__(self, code: str, year: int):
         self.code = code

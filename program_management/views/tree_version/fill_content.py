@@ -25,8 +25,10 @@
 import functools
 from typing import Dict, Tuple, Optional
 
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic import FormView
 
+from base.forms.exceptions import InvalidFormException
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -39,9 +41,10 @@ from program_management.ddd.service.read.get_standard_program_tree_version_from_
     get_standard_program_tree_version_from_transition_version
 from program_management.formatter import format_tree_version_acronym
 from program_management.forms.tree.fill_content import FillContentForm
+from django.utils.translation import gettext_lazy as _
 
 
-class FillContentView(PermissionRequiredMixin, AjaxTemplateMixin, FormView):
+class FillContentView(PermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
     permission_required = 'program_management.change_training_version'
     raise_exception = True
     form_class = FillContentForm
@@ -57,13 +60,24 @@ class FillContentView(PermissionRequiredMixin, AjaxTemplateMixin, FormView):
     def get_form_kwargs(self) -> Dict:
         form_kwargs = super().get_form_kwargs()
 
+        form_kwargs["transition_tree"] = self.tree_version
         form_kwargs["past_transition_tree"] = self.get_past_tree_version()
         form_kwargs["standard_tree"] = self.get_standard_tree_version()
         form_kwargs["past_standard_tree"] = self.get_past_standard_tree_version()
         return form_kwargs
 
-    def _get_version_transition_choices(self) -> Tuple:
-        pass
+    def form_valid(self, form: 'FillContentForm'):
+        try:
+            form.save()
+            return super().form_valid(form)
+        except InvalidFormException:
+            return self.form_invalid(form)
+
+    def get_success_url(self):
+        return None
+
+    def get_success_message(self, cleaned_data):
+        return _("Content has been filled")
 
     @functools.cached_property
     def tree_version(self) -> 'ProgramTreeVersion':
