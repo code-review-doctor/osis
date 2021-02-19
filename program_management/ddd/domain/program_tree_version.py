@@ -35,6 +35,7 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
 from program_management.ddd.domain import exception, academic_year, program_tree
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 from program_management.ddd.validators import validators_by_business_action
+from program_management.ddd.validators.validators_by_business_action import FillProgramTreeVersionValidatorList
 
 STANDARD = ""
 NOT_A_TRANSITION = ""
@@ -81,6 +82,7 @@ class ProgramTreeVersionBuilder:
             copy_from: 'ProgramTreeVersion',
             copy_to: 'ProgramTreeVersion'
     ) -> 'ProgramTreeVersion':
+        FillProgramTreeVersionValidatorList(copy_from, copy_to).validate()
         ProgramTreeBuilder().copy_content_from_source_to(copy_from.get_tree(), copy_to.get_tree())
         return copy_to
 
@@ -244,6 +246,14 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def is_official_standard(self) -> bool:
         return self.entity_id.is_official_standard
+
+    @property
+    def is_specific_official(self) -> bool:
+        return self.entity_id.is_specific_official
+
+    @property
+    def is_specific_transition(self) -> bool:
+        return self.entity_id.is_specific_transition
 
     # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
     @property

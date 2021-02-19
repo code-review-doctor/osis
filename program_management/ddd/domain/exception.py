@@ -382,3 +382,9 @@ class VersionNameExistedException(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} existed").format(version_name)
         super().__init__(message, **kwargs)
+
+
+class InvalidTreeVersionToFillFrom(BusinessException):
+    def __init__(self, tree_version_to_fill_from: 'ProgramTreeVersion', **kwargs):
+        message = _("Cannot fill content from {}").format(tree_version_to_fill_from)
+        super().__init__(message, **kwargs)

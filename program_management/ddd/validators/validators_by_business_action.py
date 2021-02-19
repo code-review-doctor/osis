@@ -46,6 +46,7 @@ from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._empty_program_tree import EmptyProgramTreeValidator
 from program_management.ddd.validators._end_date_between_finalities_and_masters import \
     CheckEndDateBetweenFinalitiesAndMasters2M
+from program_management.ddd.validators._fill_check_tree_from import CheckValidTreeVersionToFillFrom
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
@@ -243,6 +244,14 @@ class CopyProgramTreeVersionValidatorList(business_validator.BusinessListValidat
     def __init__(self, copy_from: 'ProgramTreeVersion'):
         self.validators = [
             CheckTreeVersionEndDateValidator(copy_from)
+        ]
+        super().__init__()
+
+
+class FillProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, tree_to_fill_from: 'ProgramTreeVersion', tree_to_fill_to: 'ProgramTreeVersion'):
+        self.validators = [
+            CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to)
         ]
         super().__init__()
 

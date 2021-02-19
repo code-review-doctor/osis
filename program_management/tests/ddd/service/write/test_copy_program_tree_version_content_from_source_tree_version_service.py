@@ -25,74 +25,68 @@
 from django.test import TestCase
 
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty, InvalidTreeVersionToFillFrom
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
     copy_program_tree_version_content_from_source_tree_version
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory
+from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
+    SpecificProgramTreeVersionFactory, ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository
 from testing.mocks import MockPatcherMixin
 from testing.testcases import DDDTestCase
 
 
+# TODO rename to fill content
 class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, DDDTestCase):
     def setUp(self) -> None:
-        self.standard_tree_version = StandardProgramTreeVersionFactory(
+        self.tree_version_from = StandardProgramTreeVersionFactory(
             tree=ProgramTreeBachelorFactory(current_year=2020, end_year=2021)
         )
-        self.transition_tree_version = StandardProgramTreeVersionFactory(
+        self.tree_version_to_fill = StandardProgramTreeVersionFactory(
             transition=True,
-            tree__root_node__title=self.standard_tree_version.entity_id.offer_acronym,
+            tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
             tree__root_node__year=2021
         )
-        self.cmd = CopyProgramTreeVersionContentFromSourceTreeVersionCommand(
-            from_year=self.standard_tree_version.entity_id.year,
-            from_offer_acronym=self.standard_tree_version.entity_id.offer_acronym,
-            from_version_name=self.standard_tree_version.entity_id.version_name,
-            from_transition_name=self.standard_tree_version.entity_id.transition_name,
-            to_year=self.transition_tree_version.entity_id.year,
-            to_offer_acronym=self.transition_tree_version.entity_id.offer_acronym,
-            to_version_name=self.transition_tree_version.entity_id.version_name,
-            to_transition_name=self.transition_tree_version.entity_id.transition_name
-        )
+        self.cmd = self._generate_cmd(self.tree_version_from, self.tree_version_to_fill)
 
         self.fake_program_tree_version_repository = get_fake_program_tree_version_repository(
-            [self.standard_tree_version, self.transition_tree_version]
+            [self.tree_version_from, self.tree_version_to_fill]
         )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
             self.fake_program_tree_version_repository
         )
         self.fake_program_tree_repository = get_fake_program_tree_repository(
-            [self.standard_tree_version.tree, self.transition_tree_version.tree]
+            [self.tree_version_from.tree, self.tree_version_to_fill.tree]
         )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
             self.fake_program_tree_repository
         )
 
-    def test_should_return_copied_tree_identity(self):
+    def test_should_return_identify_of_tree_version_that_has_its_content_filled(self):
         result = copy_program_tree_version_content_from_source_tree_version(self.cmd)
-        expected_identity = self.transition_tree_version.entity_id
+        expected_identity = self.tree_version_to_fill.entity_id
         self.assertEqual(expected_identity, result)
 
-    def test_should_persist_copy_to_tree_with_same_content(self):
+    def test_should_persist_filled_content(self):
         copy_program_tree_version_content_from_source_tree_version(self.cmd)
         self.assertCountEqual(
-            [(node.code, node.year) for node in self.standard_tree_version.tree.get_all_nodes()],
-            [(node.code, node.year-1) for node in self.transition_tree_version.tree.get_all_nodes()]
+            [(node.code, node.year) for node in self.tree_version_from.tree.get_all_nodes()],
+            [(node.code, node.year-1) for node in self.tree_version_to_fill.tree.get_all_nodes()]
         )
 
-    def test_should_omit_nodes_that_have_end_date_inferior_to_next_year(self):
-        self.standard_tree_version.tree.get_node("1|22|32").end_date = 2020
+    def test_should_omit_nodes_that_have_end_year_inferior_to_tree_to_fill(self):
+        self.tree_version_from.tree.get_node("1|22|32").end_date = 2020
         copy_program_tree_version_content_from_source_tree_version(self.cmd)
 
         self.assertTrue(
-            len(self.standard_tree_version.tree.get_all_nodes()) > len(self.transition_tree_version.tree.get_all_nodes())
+            len(self.tree_version_from.tree.get_all_nodes()) > len(self.tree_version_to_fill.tree.get_all_nodes())
         )
 
-    def test_should_not_copy_content_when_tree_next_year_already_exists_and_is_not_empty(self):
+    def test_should_raise_exception_when_tree_to_fill_is_not_empty(self):
         copy_program_tree_version_content_from_source_tree_version(self.cmd)
         self.assertRaisesBusinessException(
             ProgramTreeNonEmpty,
@@ -100,10 +94,40 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, D
             self.cmd
         )
 
-    def test_should_copy_prerequisites_to_next_year(self):
+    def test_should_copy_prerequisites_from_tree_to_copy_from_to_tree_to_fill(self):
         copy_program_tree_version_content_from_source_tree_version(self.cmd)
 
         self.assertEqual(
-            len(self.standard_tree_version.tree.prerequisites.prerequisites),
-            len(self.transition_tree_version.tree.prerequisites.prerequisites)
+            len(self.tree_version_from.tree.prerequisites.prerequisites),
+            len(self.tree_version_to_fill.tree.prerequisites.prerequisites)
+        )
+
+    def test_can_only_fill_program_specific_version_from_its_last_year_version(self):
+        tree_to_fill_from = ProgramTreeVersionFactory()
+        tree_to_fill = SpecificProgramTreeVersionFactory()
+        self.fake_program_tree_version_repository.root_entities.append(tree_to_fill_from)
+        self.fake_program_tree_version_repository.root_entities.append(tree_to_fill)
+
+        cmd = self._generate_cmd(tree_to_fill_from, tree_to_fill)
+
+        self.assertRaisesBusinessException(
+            InvalidTreeVersionToFillFrom,
+            copy_program_tree_version_content_from_source_tree_version,
+            cmd
+        )
+
+    def _generate_cmd(
+            self,
+            tree_from: 'ProgramTreeVersion',
+            tree_to: 'ProgramTreeVersion',
+    ) -> 'CopyProgramTreeVersionContentFromSourceTreeVersionCommand':
+        return CopyProgramTreeVersionContentFromSourceTreeVersionCommand(
+            from_year=tree_from.entity_id.year,
+            from_offer_acronym=tree_from.entity_id.offer_acronym,
+            from_version_name=tree_from.entity_id.version_name,
+            from_transition_name=tree_from.entity_id.transition_name,
+            to_year=tree_to.entity_id.year,
+            to_offer_acronym=tree_to.entity_id.offer_acronym,
+            to_version_name=tree_to.entity_id.version_name,
+            to_transition_name=tree_to.entity_id.transition_name
         )
