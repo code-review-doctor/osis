@@ -96,8 +96,7 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
             )
             check_formations_impacted_by_update(learning_unit_year.acronym,
                                                 learning_unit_year.academic_year.year,
-                                                request,
-                                                True)
+                                                request, None)
             return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
         else:
             show_error_message_for_form_invalid(request)

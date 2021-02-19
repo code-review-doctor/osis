@@ -104,7 +104,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     updated_trainings
                 )
                 display_success_messages(request, success_messages, extra_tags='safe')
-                check_formations_impacted_by_update(self.get_training_obj().code, self.get_training_obj().year, request)
+                check_formations_impacted_by_update(self.get_training_obj().code, self.get_training_obj().year,
+                                                    request, self.get_training_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)

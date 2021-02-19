@@ -38,6 +38,7 @@ from django.utils import translation
 from django.utils.translation import gettext_lazy as _, get_language
 
 from base import models as mdl
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.utils import native
 from osis_common.models import application_notice
 from program_management.ddd.business_types import *
@@ -279,16 +280,15 @@ def show_error_message_for_form_invalid(request):
     display_error_messages(request, msg)
 
 
-def check_formations_impacted_by_update(code: str, year: int, request, is_check_for_ue: bool = False):
+def check_formations_impacted_by_update(code: str, year: int, request, type_of_training):
     formations_using_element = _find_root_trainings_using_element(code, year)
     if len(formations_using_element) > 1:
-
+        message_str = _build_attention_message(type_of_training)
         messages.add_message(request,
                              MSG_SPECIAL_WARNING_TITLE_LEVEL,
-                             _('Pay attention! This learning unit is used in more than one formation')
-                             if is_check_for_ue
-                             else _('Pay attention! This education group is part of several trainings')
+                             message_str
                              )
+
         for formation in formations_using_element:
             messages.add_message(request, MSG_SPECIAL_WARNING_LEVEL, formation)
 
@@ -298,7 +298,27 @@ def _find_root_trainings_using_element(code: str, year: int) -> List['str']:
     direct_parents = utilizations_serializer(node_identity, search_program_trees_using_node, NodeRepository())
     formations_using_element = set()
     for direct_link in direct_parents:
-        for indirect_parent in direct_link.get('indirect_parents'):
-            formations_using_element.add("{}{}".format(indirect_parent.get('node').full_acronym(),
-                                                       build_title(indirect_parent.get('node'), get_language())))
+        if direct_link.get('indirect_parents') == [] and (
+                direct_link['link'].parent.is_training() or
+                direct_link['link'].parent.is_mini_training()
+        ):
+            formations_using_element.add("{}{}".format(direct_link['link'].parent.full_acronym(),
+                                                       build_title(direct_link['link'].parent, get_language())))
+        else:
+            for indirect_parent in direct_link.get('indirect_parents'):
+                formations_using_element.add("{}{}".format(indirect_parent.get('node').full_acronym(),
+                                                           build_title(indirect_parent.get('node'), get_language())))
     return list(sorted(formations_using_element))
+
+
+def _build_attention_message(training_type):
+    if training_type:
+        if training_type in TrainingType:
+            type_of_training_str = _('this training')
+        elif training_type in MiniTrainingType:
+            type_of_training_str = _('this mini-training')
+        else:
+            type_of_training_str = _('this group')
+        return "{} {} {} :".format(_('Pay attention'), type_of_training_str, _('is part of several trainings'))
+
+    return _('Pay attention! This learning unit is used in more than one formation')

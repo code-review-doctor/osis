@@ -190,8 +190,7 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
             display_success_messages(request, _('The learning unit has been updated (without report).'))
         check_formations_impacted_by_update(learning_unit_year.acronym,
                                             learning_unit_year.academic_year.year,
-                                            request,
-                                            True)
+                                            request, None)
 
     except ConsistencyError as e:
         error_list = e.error_list
