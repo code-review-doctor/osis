@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.fields import OsisRichTextFormField
 from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -225,8 +226,12 @@ class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMi
     )
 
     # panel_remarks_form.html
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_english = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_english = OsisRichTextFormField(
+        config_name='link_only',
+        label=_("remark in english").capitalize(),
+        required=False
+    )
 
     # HOPS panel
     ares_code = forms.CharField(label=_('ARES study code'), widget=forms.TextInput(), required=False, disabled=True)
@@ -341,8 +346,12 @@ class UpdateMiniTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFie
     offer_title_fr = forms.CharField(label=_("Title in French"), required=False, disabled=True)
     offer_title_en = forms.CharField(label=_("Title in English"), required=False, disabled=True)
     keywords = forms.CharField(label=_('Keywords'), required=False, disabled=True)
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english").capitalize(), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_en = OsisRichTextFormField(
+        config_name='link_only',
+        label=_("remark in english").capitalize(),
+        required=False
+    )
 
     def __init__(
             self,
