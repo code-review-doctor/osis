@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
-
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 
@@ -44,9 +42,9 @@ def has_related_partims(request):
         partims = proposal.learning_unit_year.get_partims_related().values_list('acronym', flat=True)
         if partims:
             related_partims_by_ue.append(
-                OrderedDict({
+                {
                     'learning_unit_year': proposal.learning_unit_year.acronym,
                     'partims': ', '.join(list(partims))
-                })
+                }
             )
     return JsonResponse(related_partims_by_ue, safe=False)
