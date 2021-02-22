@@ -43,6 +43,13 @@ class FieldValidationRule(interface.DomainService):
         return ValidationRule.objects.get(field_reference=field_reference_value)
 
     @classmethod
+    def get_initial_value_or_none(cls, node_type: EducationGroupTypesEnum, field_name: str, is_version: bool = False):
+        try:
+            return cls.get(node_type, field_name, is_version).initial_value
+        except ValidationRule.DoesNotExist:
+            return None
+
+    @classmethod
     def _get_prefix(cls, node_type: EducationGroupTypesEnum, is_version: bool = False) -> str:
         prefix = 'Group'
         if isinstance(node_type, TrainingType):

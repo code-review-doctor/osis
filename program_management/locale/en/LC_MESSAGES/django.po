@@ -92,10 +92,6 @@ msgstr ""
 msgid "Access condition"
 msgstr ""
 
-msgctxt "UE acronym"
-msgid "Acronym"
-msgstr ""
-
 msgid "Acronym/Short title"
 msgstr ""
 
@@ -152,12 +148,6 @@ msgid "Block"
 msgstr ""
 
 msgid "Cancel"
-msgstr ""
-
-#, python-format
-msgid ""
-"Cannot add \"%(child)s\" because the number of children of type(s) "
-"\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
 msgstr ""
 
 #, python-format
@@ -726,6 +716,12 @@ msgstr ""
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit %(acronym)s is used inside %(mini_trainings)s but not "
+"inside %(training)s"
 msgstr ""
 
 msgid "The learning unit has prerequisites"

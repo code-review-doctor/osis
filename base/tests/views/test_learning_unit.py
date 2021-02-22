@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -561,51 +561,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
-    def test_learning_units_search_with_service_course_no_result(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'AGRO',
-            'with_entity_subordinated': True
-        }
-        number_of_results = 0
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_learning_units_search_with_service_course_without_entity_subordinated(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'ELOG',
-            'with_entity_subordinated': False
-        }
-        number_of_results = 1
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_learning_units_search_with_service_course_with_entity_subordinated(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'PSP',
-            'with_entity_subordinated': True
-        }
-
-        number_of_results = 1
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'PSP',
-            'allocation_entity': 'ELOG',
-            'with_entity_subordinated': True
-        }
-        number_of_results = 0
-        self.service_course_search(filter_data, number_of_results)
-
-    def service_course_search(self, filter_data, number_of_results):
-        self._prepare_context_learning_units_search()
-        response = self.client.get(reverse("learning_units_service_course"), data=filter_data)
-
-        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
-        self.assertEqual(response.context['learning_units_count'], number_of_results)
-
     def test_learning_units_search_quadrimester(self):
         self._prepare_context_learning_units_search()
         self.luy_LBIR1100C.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.name
@@ -877,7 +832,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
-    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
     def test_learning_unit_pedagogy_publish_button_enabled(self, mock_perm_pedagogy):
         mock_perm_pedagogy.return_value = True
         response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
@@ -886,8 +841,8 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTrue(response.context['enable_publish_button'])
 
     @mock.patch(
-        "base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
-    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
+        "base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
+    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
     def test_learning_unit_pedagogy_publish_button_disabled(self, mock_perm_pedagogy, mock_perm_force_majeure):
         mock_perm_pedagogy.return_value = False
         mock_perm_force_majeure.return_value = False
@@ -896,7 +851,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTrue(response.context['luy_in_current_or_future_anac'])
         self.assertFalse(response.context['enable_publish_button'])
 
-    def test_learning_unit_specification(self):
+    @mock.patch(
+        "base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
+    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
+    def test_learning_unit_specification(self, mock_perm_pedagogy, mock_perm_force_majeure):
         learning_unit_year = LearningUnitYearFactory()
         fr = FrenchLanguageFactory()
         en = EnglishLanguageFactory()
@@ -914,6 +872,10 @@ class LearningUnitViewTestCase(TestCase):
             response.context['achievements'],
             list(itertools.zip_longest([learning_unit_achievements_fr], [learning_unit_achievements_en]))
         )
+        self.assertIn('luy_in_current_or_future_anac', response.context)
+        self.assertIn('can_edit_information', response.context)
+        self.assertIn('can_edit_force_majeur_section', response.context)
+        self.assertIn('enable_publish_button', response.context)
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
