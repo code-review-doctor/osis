@@ -22,7 +22,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+import mock
+from django.core import management
 
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty, InvalidTreeVersionToFillFrom
@@ -45,26 +46,40 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, D
             tree=ProgramTreeBachelorFactory(current_year=2020, end_year=2021)
         )
         self.tree_version_to_fill = StandardProgramTreeVersionFactory(
+            tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
+            tree__root_node__year=2021
+        )
+        self.transition_tree_version_to_fill = StandardProgramTreeVersionFactory(
             transition=True,
             tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
             tree__root_node__year=2021
         )
         self.cmd = self._generate_cmd(self.tree_version_from, self.tree_version_to_fill)
+        self.cmd_for_transition = self._generate_cmd(self.tree_version_from, self.transition_tree_version_to_fill)
 
         self.fake_program_tree_version_repository = get_fake_program_tree_version_repository(
-            [self.tree_version_from, self.tree_version_to_fill]
+            [self.tree_version_from, self.transition_tree_version_to_fill, self.tree_version_to_fill]
         )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
             self.fake_program_tree_version_repository
         )
         self.fake_program_tree_repository = get_fake_program_tree_repository(
-            [self.tree_version_from.tree, self.tree_version_to_fill.tree]
+            [self.tree_version_from.tree, self.transition_tree_version_to_fill.tree, self.tree_version_to_fill.tree]
         )
         self.mock_repo(
             "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
             self.fake_program_tree_repository
         )
+        self.mock_generate_code()
+
+    def mock_generate_code(self):
+        patcher = mock.patch(
+            "program_management.ddd.domain.node.GenerateNodeCode.generate_from_parent_node",
+            side_effect=lambda parent_node, **kwargs: "T" + parent_node.code
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_should_return_identify_of_tree_version_that_has_its_content_filled(self):
         result = copy_program_tree_version_content_from_source_tree_version(self.cmd)
@@ -80,18 +95,18 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, D
 
     def test_should_omit_nodes_that_have_end_year_inferior_to_tree_to_fill(self):
         self.tree_version_from.tree.get_node("1|22|32").end_date = 2020
-        copy_program_tree_version_content_from_source_tree_version(self.cmd)
+        copy_program_tree_version_content_from_source_tree_version(self.cmd_for_transition)
 
         self.assertTrue(
-            len(self.tree_version_from.tree.get_all_nodes()) > len(self.tree_version_to_fill.tree.get_all_nodes())
+            len(self.tree_version_from.tree.get_all_nodes()) > len(self.transition_tree_version_to_fill.tree.get_all_nodes())
         )
 
     def test_should_raise_exception_when_tree_to_fill_is_not_empty(self):
-        copy_program_tree_version_content_from_source_tree_version(self.cmd)
+        copy_program_tree_version_content_from_source_tree_version(self.cmd_for_transition)
         self.assertRaisesBusinessException(
             ProgramTreeNonEmpty,
             copy_program_tree_version_content_from_source_tree_version,
-            self.cmd
+            self.cmd_for_transition
         )
 
     def test_should_copy_prerequisites_from_tree_to_copy_from_to_tree_to_fill(self):
@@ -145,6 +160,16 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, D
             InvalidTreeVersionToFillFrom,
             copy_program_tree_version_content_from_source_tree_version,
             cmd
+        )
+
+    def test_when_transition_should_rename_group_code_with_replacing_first_letter_by_T(self):
+        copy_program_tree_version_content_from_source_tree_version(self.cmd_for_transition)
+
+        groups = [node for node in self.transition_tree_version_to_fill.tree.get_all_nodes() if node.is_group()]
+        self.assertTrue(
+            all(
+                [group.code.startswith("T") for group in groups]
+            )
         )
 
     def _generate_cmd(

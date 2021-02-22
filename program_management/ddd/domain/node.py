@@ -73,6 +73,42 @@ class NodeFactory:
         return node_next_year
 
     @classmethod
+    def copy_to_year(cls, copy_from_node: 'Node', year: int) -> 'Node':
+        attributes_to_update = {
+            'entity_id': NodeIdentity(copy_from_node.entity_id.code, year),
+            'year': year,
+            'children': [],
+            'node_id': None,
+        }
+        if hasattr(copy_from_node, "end_year"):
+            end_year = cls._get_next_end_year(copy_from_node)
+            attributes_to_update["end_year"] = end_year
+        node_next_year = attr.evolve(copy_from_node, **attributes_to_update)
+        node_next_year._has_changed = True
+        return node_next_year
+
+    @classmethod
+    def copy_to_year_transition(cls, copy_from_node: 'Node', year: int) -> 'Node':
+        new_code = GenerateNodeCode().generate_from_parent_node(
+            parent_node=copy_from_node,
+            child_node_type=copy_from_node.node_type,
+            duplicate_to_transition=True
+        ) if copy_from_node.is_group() else copy_from_node.code
+        attributes_to_update = {
+            'entity_id': NodeIdentity(copy_from_node.entity_id.code, year),
+            'year': year,
+            'children': [],
+            'node_id': None,
+            'code': new_code,
+        }
+        if hasattr(copy_from_node, "end_year"):
+            end_year = cls._get_next_end_year(copy_from_node)
+            attributes_to_update["end_year"] = end_year
+        node_next_year = attr.evolve(copy_from_node, **attributes_to_update)
+        node_next_year._has_changed = True
+        return node_next_year
+
+    @classmethod
     def _get_next_end_year(cls, copy_from_node: 'Node') -> Optional[int]:
         if not copy_from_node.end_year:
             return copy_from_node.end_year

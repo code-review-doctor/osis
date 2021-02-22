@@ -154,12 +154,18 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
-    def copy_content_from_source_to(self, copy_from: 'ProgramTree', copy_to: 'ProgramTree') -> 'ProgramTree':
-        validators_by_business_action.CopyContentProgramTreeValidatorList(
-            copy_from,
-            copy_to
-        ).validate()
-        copy_to.root_node = self._copy_node_and_children_to_next_year(copy_from.root_node)
+    def copy_content_from_source_to(
+            self,
+            copy_from: 'ProgramTree',
+            copy_to: 'ProgramTree',
+            node_factory_strategy
+    ) -> 'ProgramTree':
+        validators_by_business_action.CopyContentProgramTreeValidatorList(copy_from, copy_to).validate()
+        copy_to.root_node = self._copy_node_content_from_source(
+            copy_from.root_node,
+            copy_to.root_node.year,
+            node_factory_strategy
+        )
 
         copy_to.prerequisites = Prerequisites(
             copy_to.entity_id,
@@ -168,6 +174,17 @@ class ProgramTreeBuilder:
         )
 
         return copy_to
+
+    def _copy_node_content_from_source(self, copy_from_node: 'Node', year: int, node_factory_strategy) -> 'Node':
+        parent_next_year = node_factory_strategy(copy_from_node, year)
+        links_to_copy = (link for link in copy_from_node.children
+                         if not link.child.end_date or link.child.end_date >= year)
+        for copy_from_link in links_to_copy:
+            child_node = copy_from_link.child
+            child_next_year = self._copy_node_content_from_source(child_node, year, node_factory_strategy)
+            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
+            parent_next_year.children.append(link_next_year)
+        return parent_next_year
 
     def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)

@@ -114,7 +114,11 @@ class ProgramTreeBachelorFactory:
                         },
                     ]
                 },
-                {"node_type": NodeType.LEARNING_UNIT}
+                {
+                    "node_type": NodeType.LEARNING_UNIT,
+                    "year": current_year,
+                    "end_date": end_year,
+                }
             ]
         }
         tree = tree_builder(tree_data)

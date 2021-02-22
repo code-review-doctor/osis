@@ -36,6 +36,7 @@ from program_management.ddd.domain import exception, academic_year, program_tree
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import FillProgramTreeVersionValidatorList
+from program_management.ddd.domain.node import factory as node_factory
 
 STANDARD = ""
 NOT_A_TRANSITION = ""
@@ -83,7 +84,11 @@ class ProgramTreeVersionBuilder:
             copy_to: 'ProgramTreeVersion'
     ) -> 'ProgramTreeVersion':
         FillProgramTreeVersionValidatorList(copy_from, copy_to).validate()
-        ProgramTreeBuilder().copy_content_from_source_to(copy_from.get_tree(), copy_to.get_tree())
+        ProgramTreeBuilder().copy_content_from_source_to(
+            copy_from.get_tree(),
+            copy_to.get_tree(),
+            node_factory.copy_to_year_transition if copy_to.is_transition else node_factory.copy_to_year
+        )
         return copy_to
 
     def copy_to_next_year(

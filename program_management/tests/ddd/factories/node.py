@@ -46,7 +46,7 @@ def generate_node_identity(node: Node) -> NodeIdentity:
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
-    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    code = factory.Sequence(lambda n: 'OSIS%03dR' % n)
     title = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     start_year = factory.SelfAttribute("year")
