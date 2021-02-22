@@ -61,7 +61,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             "cancel_url": self.get_cancel_url(),
             "version_suffix": (
                 "-{}" if version.entity_id.is_specific_transition else "{}"
-            ).format(version.transition_name)
+            ).format(version.transition_name),
+            "version_label": version_label(version.entity_id)
         }
         return render(request, self.template_name, context)
 

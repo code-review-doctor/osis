@@ -63,7 +63,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "is_finality_types": self.get_training_obj().is_finality(),
             "version_suffix": (
                 "-{}" if version.entity_id.is_specific_transition else "{}"
-            ).format(version.transition_name)
+            ).format(version.transition_name),
+            "version_label": version_label(version.entity_id)
         }
         return render(request, self.template_name, context)
 

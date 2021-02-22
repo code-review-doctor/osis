@@ -51,6 +51,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.command import GetLastExistingTransitionVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import node_identity_service, get_last_existing_transition_version_service
@@ -183,6 +184,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             ) if self.is_root_node() else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
+            "version_label": version_label(self.program_tree_version_identity),
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.get_education_group_version().root_group.academic_year.year,
