@@ -29,7 +29,7 @@ from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
 from base.utils.search import RenderToExcel
 from base.views.learning_units.search.common import _create_xls_with_parameters, \
     _create_xls_attributions, _create_xls_comparison, _create_xls, \
-    BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes
+    BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes, _create_xls_ue_utilizations_with_one_training_per_line
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
@@ -38,6 +38,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls_comparison", _create_xls_comparison)
 @RenderToExcel("xls_educational_specifications", _create_xls_educational_specifications)
 @RenderToExcel("xls", _create_xls)
+@RenderToExcel("xls_with_parameters_one_pgm_per_line", _create_xls_ue_utilizations_with_one_training_per_line)
 class BorrowedLearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
     search_type = SearchTypes.BORROWED_COURSE
