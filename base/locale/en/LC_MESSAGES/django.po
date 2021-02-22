@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 11:02+0100\n"
+"POT-Creation-Date: 2021-02-22 15:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1292,7 +1292,10 @@ msgstr ""
 msgid "List of learning units with educational information and specifications"
 msgstr ""
 
-msgid "List of learning units with with one line per attribution"
+msgid "List of learning units with one line per attribution"
+msgstr ""
+
+msgid "List of learning units with one line per training"
 msgstr ""
 
 msgid "List of teachers"
@@ -1847,6 +1850,9 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
+msgstr ""
+
+msgid "Produce a customizable xls of learning units with one line per training"
 msgstr ""
 
 msgid ""

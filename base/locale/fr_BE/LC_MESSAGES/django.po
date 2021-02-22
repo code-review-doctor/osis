@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 11:02+0100\n"
+"POT-Creation-Date: 2021-02-22 15:00+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -90,6 +90,7 @@ msgstr ""
 "%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
 
+#, python-format
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
@@ -1323,8 +1324,11 @@ msgstr "Comparaison entre unités d'enseignement"
 msgid "List of learning units with educational information and specifications"
 msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
-msgid "List of learning units with with one line per attribution"
+msgid "List of learning units with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
+
+msgid "List of learning units with one line per training"
+msgstr "Liste des UE avec une formation par ligne"
 
 msgid "List of teachers"
 msgstr "Liste des enseignants"
@@ -1903,6 +1907,10 @@ msgstr "Produire Excel"
 
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
+
+msgid "Produce a customizable xls of learning units with one line per training"
+msgstr ""
+"Produire une liste personnalisable des unités d'enseignement avec une ligne par formation"
 
 msgid ""
 "Produce a xls of learning units with educational information and "
