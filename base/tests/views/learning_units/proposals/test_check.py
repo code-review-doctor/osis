@@ -87,21 +87,21 @@ class TestCheck(TestCase):
              learning_unit_year=cls.learning_unit_year_without_partim,
          )
         cls.person = PersonFactory()
-        cls.url_name = 'proposal_partim_check'
+        cls.url_name = 'get_related_partims_by_ue'
 
     def setUp(self):
         self.client.force_login(self.person.user)
 
-    def test_with_partim(self):
+    def test_get_related_partims_by_ue_with_partim(self):
         response = self.client.post(reverse(self.url_name), HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     data={'selected_action': [self.learning_unit_year.acronym]})
         self.assertEqual(response.status_code, 200)
-        json_response = json.loads(response.content)
+        json_response = json.loads(response.content.decode("utf-8"))
         self.assertDictEqual(list(json_response)[0],
                              {"learning_unit_year": "LOSIS4512", "partims": "LOSIS4512A, LOSIS4512B"}
                              )
 
-    def test_without_partim(self):
+    def test_get_related_partims_by_ue_without_partim(self):
         response = self.client.post(reverse(self.url_name), HTTP_X_REQUESTED_WITH='XMLHttpRequest',
                                     data={'selected_action': [self.learning_unit_year_without_partim.acronym]})
         self.assertEqual(response.status_code, 200)

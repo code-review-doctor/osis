@@ -208,7 +208,7 @@
             var form = $(this).closest("form");
             $.ajax({
                 data: form.serialize(),
-                url: "{% url 'proposal_partim_check'  %}",
+                url: "{% url 'get_related_partims_by_ue'  %}",
                 method: "POST",
                 dataType: 'json',
                 success: function (data) {

@@ -32,7 +32,7 @@ from osis_common.decorators.ajax import ajax_required
 
 @login_required
 @ajax_required
-def has_related_partims(request):
+def get_related_partims_by_ue(request):
     selected_proposals_acronym = request.POST.getlist("selected_action", default=[])
     selected_proposals = ProposalLearningUnit.objects.filter(
         learning_unit_year__acronym__in=selected_proposals_acronym
