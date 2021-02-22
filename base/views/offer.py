@@ -29,6 +29,7 @@ from django.shortcuts import render
 from base import models as mdl
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
+from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
 
 
@@ -60,16 +61,21 @@ def offers_search(request):
 
     academic_years = AcademicYear.objects.all()
 
+    cte = EntityVersion.objects.with_parents(acronym__icontains=entity)
+    entity_ids_with_children = cte.queryset().with_cte(cte).values_list('entity_id').distinct()
+
     offer_years = EducationGroupYear.objects.filter(
-        management_entity__entityversion__acronym__icontains=entity,
+        management_entity_id__in=entity_ids_with_children,
         academic_year=academic_yr,
         acronym__icontains=acronym,
         education_group_type__category=Categories.TRAINING.name,
+    ).exclude(
+        acronym__icontains="common-"
     ).select_related(
         'education_group',
         'management_entity',
         'academic_year',
-    )
+    ).order_by('acronym')
 
     return render(request, "offers.html", {'academic_year': academic_yr,
                                            'entity_acronym': entity,
