@@ -238,6 +238,7 @@ MAIL_SENDER_CLASSES = os.environ.get(
     'MAIL_SENDER_CLASSES',
     'osis_common.messaging.mail_sender_classes.MessageHistorySender'
 ).split()
+ACADEMIC_CALENDAR_REMINDER_EMAILS = os.environ.get('ACADEMIC_CALENDAR_REMINDER_EMAILS', '').split()
 
 # Authentication settings
 LOGIN_URL = os.environ.get('LOGIN_URL', reverse_lazy('login'))

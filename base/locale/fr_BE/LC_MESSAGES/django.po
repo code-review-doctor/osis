@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-18 14:25+0100\n"
+"POT-Creation-Date: 2021-02-23 15:04+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -90,6 +90,7 @@ msgstr ""
 "%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
 
+#, python-format
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
@@ -2215,6 +2216,9 @@ msgstr "Sélectionner tout"
 msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
 
+msgid "Send calendar reminder notice"
+msgstr "Envoyer un rappel sur les événements académiques"
+
 msgid "Separate"
 msgstr "Séparer"
 
@@ -2629,8 +2633,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application this year"
-msgstr "L'unité d'enseignement dispose d'au moins une candidature cette année"
+msgid "This learning unit has application"
+msgstr "L'unité d'enseignement a au moins une candidature"
 
 msgid ""
 "This learning unit is not editable by central managers during this period."
