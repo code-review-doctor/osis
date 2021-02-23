@@ -24,5 +24,5 @@
 {% endcomment %}
 <form action="{{ publish_url }}" method="post">
     {% csrf_token %}
-    {% submit_btn_has_perm inner_html=_('Refresh publication') perm='base.change_admissioncondition' user=user obj=group_year class_btn='btn btn-default btn-publish' %}
+    {% submit_btn_has_perm inner_html=_('Refresh publication') perm='base.can_update_publication' user=user obj=group_year class_btn='btn btn-default btn-publish' %}
 </form>
