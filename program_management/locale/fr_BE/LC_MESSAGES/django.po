@@ -1105,6 +1105,15 @@ msgstr "remarque en anglais"
 msgid "secondary domains"
 msgstr "domaines secondaires"
 
+msgid "this group"
+msgstr "ce groupement"
+
+msgid "this mini-training"
+msgstr "cette mini-formation"
+
+msgid "this training"
+msgstr "cette formation"
+
 msgid "training"
 msgstr "formation"
 
