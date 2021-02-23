@@ -214,12 +214,17 @@ def force_state_of_proposals(proposals, author, new_state):
         _("cannot be changed state"),
         None,
         None,
-        can_edit_proposal
+        can_edit_proposal if new_state != proposal_state.ProposalState.REFUSED.name else can_refused_proposal
     )
 
 
 def can_edit_proposal(proposal, author, raise_exception):
     perm = 'base.can_edit_learning_unit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
+
+
+def can_refused_proposal(proposal, author, raise_exception):
+    perm = 'base.can_refuse_learning_unit_proposal'
     return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 
