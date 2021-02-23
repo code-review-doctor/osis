@@ -348,6 +348,9 @@ msgstr "Stage"
 msgid "Invalid name version"
 msgstr "Nom de version invalide"
 
+msgid "Invalid transition name"
+msgstr "Nom de transition invalide"
+
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
 
@@ -822,9 +825,9 @@ msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
-"La version de formation %(offer_acronym)s %(version_name)s a été supprimée "
+"La version de formation %(offer_acronym)s%(version_name)s a été supprimée "
 "avec succès."
 
 msgid "The registration form is available at the Secretariat of"
