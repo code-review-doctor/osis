@@ -55,23 +55,25 @@ class TransitionVersionForm(forms.Form):
         max_length=28,
         required=False,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     transition_name = forms.CharField(
         max_length=14,
         required=False,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     end_year = forms.ChoiceField(
         required=False,
