@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
 from base.utils.search import RenderToExcel
 from base.views.learning_units.search.common import _create_xls_with_parameters, \
     _create_xls_attributions, _create_xls_comparison, _create_xls, \
-    BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes, _create_xls_ue_utilizations_with_one_training_per_line
+    BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes, \
+    _create_xls_ue_utilizations_with_one_training_per_line
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
