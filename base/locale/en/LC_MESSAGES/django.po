@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-18 14:25+0100\n"
+"POT-Creation-Date: 2021-02-23 07:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,7 +116,7 @@ msgstr ""
 msgid "ARES ability"
 msgstr ""
 
-msgid "ARES code"
+msgid "ARES codes"
 msgstr ""
 
 msgid "ARES study code"
@@ -473,11 +473,6 @@ msgstr ""
 msgid "Cheating"
 msgstr ""
 
-msgid ""
-"Checkbox present for informational purposes, checked by default and not "
-"editable."
-msgstr ""
-
 msgid "Choose academic years"
 msgstr ""
 
@@ -758,6 +753,7 @@ msgstr ""
 msgid "Edit the proposal"
 msgstr ""
 
+msgctxt "list"
 msgid "Education fields"
 msgstr ""
 
@@ -1033,6 +1029,10 @@ msgstr ""
 msgid "Function"
 msgstr ""
 
+msgid "Funding"
+msgstr ""
+
+msgctxt "list"
 msgid "Funding"
 msgstr ""
 

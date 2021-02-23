@@ -51,10 +51,10 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.business.xls_customized import _build_headers, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS, \
     WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
     _build_additional_info_data, _build_validity_data, _get_start_year, _get_end_year, _get_titles_en, \
-    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
+    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, _build_keywords_data, \
     _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, \
     _build_funding_data, _build_diploma_certificat_data, _build_enrollment_data, \
-    _build_other_legal_information_data
+    _build_other_legal_information_data, _build_title_fr, _build_secondary_domains
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -62,6 +62,7 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
     SpecificProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 
 UNSPECIFIED_FR = "Indéterminé"
 
@@ -246,7 +247,11 @@ class XlsCustomizedContentTestCase(TestCase):
         )
 
     def test_build_validity_for_training(self):
-        expected = ['Actif', str(self.training.start_year), str(self.training.end_year)]
+        expected = [
+            'Actif',
+            "{}-{}".format(str(self.training.start_year), str(self.training.start_year + 1)[-2:]),
+            "{}-{}".format(str(self.training.end_year), str(self.training.end_year + 1)[-2:])
+        ]
         data = _build_validity_data(self.training, self.group_training, self.current_training_tree_version)
         self.assertListEqual(data, expected)
 
@@ -263,13 +268,16 @@ class XlsCustomizedContentTestCase(TestCase):
                                             end_year=2023)
         group = GroupFactory(start_year=2018,
                              end_year=2019)
-        self.assertEqual(_get_start_year(standard_current_version, training, group), str(training.start_year))
+        self.assertEqual(_get_start_year(standard_current_version, training, group),
+                         "{}-{}".format(str(training.start_year), str(training.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, training, group),
-                         str(group.start_year))
+                         "{}-{}".format(str(group.start_year), str(group.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(standard_current_version, mini_training, group),
-                         str(standard_current_version.start_year))
+                         "{}-{}".format(str(standard_current_version.start_year),
+                                        str(standard_current_version.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, mini_training, group),
-                         str(particular_current_version.start_year))
+                         "{}-{}".format(str(particular_current_version.start_year),
+                                        str(particular_current_version.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, None, group),
                          '')
 
@@ -311,15 +319,18 @@ class XlsCustomizedContentTestCase(TestCase):
                                             end_year=2023)
         group = GroupFactory(start_year=2018,
                              end_year=2019)
-        self.assertEqual(_get_end_year(standard_current_version, training, group), str(training.end_year))
-        self.assertEqual(_get_end_year(particular_current_version, training, group), str(group.end_year))
+        self.assertEqual(_get_end_year(standard_current_version, training, group),
+                         "{}-{}".format(str(training.end_year), str(training.end_year + 1)[-2:]))
+        self.assertEqual(_get_end_year(particular_current_version, training, group),
+                         "{}-{}".format(str(group.end_year), str(group.end_year + 1)[-2:]))
         self.assertEqual(_get_end_year(standard_current_version, training_without_end_year, group),
                          UNSPECIFIED_FR)
 
         standard_current_version = ProgramTreeVersionFactory(end_year_of_existence=2021)
         standard_current_version_without_end_year = ProgramTreeVersionFactory(end_year_of_existence=None)
         self.assertEqual(_get_end_year(standard_current_version, mini_training, group),
-                         str(standard_current_version.end_year_of_existence))
+                         "{}-{}".format(str(standard_current_version.end_year_of_existence),
+                                        str(standard_current_version.end_year_of_existence + 1)[-2:]))
         self.assertEqual(_get_end_year(standard_current_version_without_end_year, mini_training, group),
                          UNSPECIFIED_FR)
 
@@ -329,7 +340,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.standard_current_version = StandardProgramTreeVersionFactory()
-        cls.particular_current_version = SpecificProgramTreeVersionFactory(title_en='Title en')
+        cls.particular_current_version = SpecificProgramTreeVersionFactory(title_en='Title en', title_fr='Title fr')
 
         titles = TitlesFactory()
         cls.aims1 = DiplomaAimFactory(entity_id__section=1, entity_id__code=191, description="description 1")
@@ -338,7 +349,8 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             cls.aims1,
             cls.aims2,
         ])
-        cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory)
+        cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory,
+                                       type=TrainingType.BACHELOR)
         cls.training_finality = TrainingFactory(titles=titles,
                                                 type=TrainingType.MASTER_MA_120)
 
@@ -380,14 +392,15 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                              [self.group.titles.title_en, '', ''])
 
     def test_build_organization_data_for_training(self):
-        result = _build_organization_data(self.standard_current_version, self.training, self.group)
+        result = _build_organization_data(self.standard_current_version, self.training, None, self.group)
         expected = [
-            self.training.schedule_type.value, self.training.management_entity.acronym,
+            self.training.schedule_type.value,
+            self.training.management_entity.acronym,
             self.training.administration_entity.acronym,
             "{} - {}".format(self.group.teaching_campus.name,
                              self.group.teaching_campus.university_name),
             "{} {}".format(self.training.duration, self.training.duration_unit.value),
-            self.training.other_campus_activities.value if self.training.other_campus_activities else '',
+            self.training.other_campus_activities.value.title() if self.training.other_campus_activities else '',
             self.training.internship_presence.value.title() if self.training.internship_presence else '',
             str(_('Yes')) if self.training.has_dissertation else str(_('No')),
             self.training.main_language.name if self.training.main_language else '',
@@ -398,9 +411,45 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             result,
             expected)
 
-    def test_build_organization_data_when_not_training(self):
-        self.assertListEqual(_build_organization_data(None, None, None),
-                             _build_array_with_empty_string(11))
+    def test_build_organization_data_for_mini_training(self):
+        result = _build_organization_data(None, None, self.mini_training, self.group)
+        expected = [
+            self.mini_training.schedule_type.value,
+            self.group.management_entity.acronym,
+            "",
+            "{} - {}".format(self.group.teaching_campus.name,
+                             self.group.teaching_campus.university_name),
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+        self.assertListEqual(
+            result,
+            expected)
+
+    def test_build_organization_data_for_group(self):
+        result = _build_organization_data(None, None, None, self.group)
+        expected = [
+            "",
+            self.group.management_entity.acronym,
+            "",
+            "{} - {}".format(self.group.teaching_campus.name,
+                             self.group.teaching_campus.university_name),
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+        self.assertListEqual(
+            result,
+            expected)
 
     def test_get_responsibles_and_contacts(self):
         education_group_version = StandardEducationGroupVersionFactory()
@@ -413,7 +462,12 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             role_en='dummy role in english',
             education_group_year=education_group_version.offer
         )
-
+        academic_responsible_contact_2 = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+            role_fr='dummy role2 in french',
+            role_en='dummy role2 in english',
+            education_group_year=education_group_version.offer
+        )
         other_academic_responsible_contact = EducationGroupPublicationContactFactory(
             type=PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
             role_fr='dummy role in french',
@@ -433,36 +487,26 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             education_group_year=education_group_version.offer
         )
         contacts = _get_responsibles_and_contacts(g)
-
-        expected = "{}{}{}{}".format(
-            "Responsable académique{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(
-                CARRIAGE_RETURN, academic_responsible_contact.email, CARRIAGE_RETURN, CARRIAGE_RETURN, CARRIAGE_RETURN,
-                CARRIAGE_RETURN),
-            "Autres responsables académiques{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(
-                CARRIAGE_RETURN, other_academic_responsible_contact.email, CARRIAGE_RETURN,
-                CARRIAGE_RETURN, CARRIAGE_RETURN, CARRIAGE_RETURN),
-            "Membres du jury{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(CARRIAGE_RETURN,
-                                                                                                    jury_member.email,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN),
-            "Autres contacts{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(CARRIAGE_RETURN,
-                                                                                                    other_contact.email,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN))
-
+        basic_titles = "Responsable académique\n{}\n{}\n\n" \
+                       "Autres responsables académiques\n{}\n\n" \
+                       "Membres du jury\n{}\n\n" \
+                       "Autres contacts\n{}\n\n"
+        expected = basic_titles.format(
+            _build_person_detail(academic_responsible_contact),
+            _build_person_detail(academic_responsible_contact_2),
+            _build_person_detail(other_academic_responsible_contact),
+            _build_person_detail(
+                jury_member),
+            _build_person_detail(other_contact)
+        )
         self.assertEqual(contacts, expected)
 
     def test_build_aims_data(self):
-        data_aims_1 = "{} - {} - {}{}".format(
-            self.aims1.section, self.aims1.code, self.aims1.description, CARRIAGE_RETURN
+        data_aims_1 = "{} - {} - {} ;".format(
+            self.aims1.section, self.aims1.code, self.aims1.description
         )
-        data_aims_2 = "{} - {} - {}{}".format(self.aims2.section, self.aims2.code, self.aims2.description,
-                                              CARRIAGE_RETURN)
-        expected = "{}{}".format(data_aims_1, data_aims_2)
+        data_aims_2 = "{} - {} - {} ;".format(self.aims2.section, self.aims2.code, self.aims2.description)
+        expected = "{}\n{}".format(data_aims_1, data_aims_2)
         aims_data = _build_aims_data(self.training)
         self.assertEqual(aims_data, expected)
 
@@ -481,8 +525,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
     def test_get_co_organizations(self):
         co_organization_1 = CoorganizationFactory(partner=AcademicPartnerFactory(address=AddressFactory()))
         co_organization_2 = CoorganizationFactory()
-        expected = '{}{}{}'.format(_get_co_organization_data(co_organization_1),
-                                   CARRIAGE_RETURN,
+        expected = '{}\n{}'.format(_get_co_organization_data(co_organization_1),
                                    _get_co_organization_data(co_organization_2)
                                    )
 
@@ -562,16 +605,44 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                               ]
                              )
 
+    def test_build_title_fr_training(self):
+        self.assertEqual(_build_title_fr(self.training, None, None), self.training.titles.title_fr)
+
+    def test_build_title_fr_minitraining(self):
+        self.assertEqual(_build_title_fr(self.mini_training, None, None), self.mini_training.titles.title_fr)
+
+    def test_build_title_fr_group(self):
+        self.assertEqual(_build_title_fr(None, self.group, None), self.group.titles.title_fr)
+
+    def test_build_title_fr_training_with_version(self):
+        self.assertEqual(_build_title_fr(self.training, None, self.particular_current_version),
+                         "{}[{}]".format(self.training.titles.title_fr,
+                                         self.particular_current_version.title_fr))
+
+    def test_build_secondary_domains_no_data(self):
+        self.assertEqual(_build_secondary_domains(None), '')
+        self.assertEqual(_build_secondary_domains([]), '')
+
+    def test_build_secondary_domains(self):
+        secondary_domain_1 = StudyDomainFactory()
+        secondary_domain_2 = StudyDomainFactory()
+        self.assertCountEqual(
+            _build_secondary_domains([secondary_domain_1, secondary_domain_2]),
+            "{}\n{}".format(
+                "{} : {} {}".format(secondary_domain_1.decree_name, secondary_domain_1.code, secondary_domain_1.name),
+                "{} : {} {}".format(secondary_domain_2.decree_name, secondary_domain_2.code, secondary_domain_2.name)
+            )
+        )
+
 
 def _build_array_with_empty_string(nb_of_occurence):
     return ['' for _ in range(0, nb_of_occurence)]
 
 
 def _get_co_organization_data(co_organization):
-    line1 = "{} - {} {}{} ".format(
+    line1 = "{} - {} \n{}\n".format(
         co_organization.partner.address.country_name if co_organization.partner.address else '',
         co_organization.partner.address.city if co_organization.partner.address else '',
-        CARRIAGE_RETURN,
         co_organization.partner.name
     )
     line2 = _build_line('For all students', co_organization.is_for_all_students)
@@ -580,14 +651,22 @@ def _get_co_organization_data(co_organization):
     line5 = _build_line('Producing certificat', co_organization.is_producing_certificate)
     line6 = _build_line('Producing annexe', co_organization.is_producing_certificate_annexes)
 
-    line4 = "{} : {}{}".format(
+    line4 = "{} : {}\n".format(
         str(_('UCL Diploma')),
-        co_organization.certificate_type.value if co_organization.certificate_type else '', CARRIAGE_RETURN
+        co_organization.certificate_type.value if co_organization.certificate_type else ''
     )
     return line1 + line2 + line3 + line4 + line5 + line6
 
 
 def _build_line(title, boolean_value):
-    return "{} : {}{}".format(str(_(title)),
-                              'Oui' if boolean_value else 'Non',
-                              CARRIAGE_RETURN)
+    return "{} : {}\n".format(str(_(title)),
+                              'Oui' if boolean_value else 'Non')
+
+
+def _build_person_detail(person):
+    return "{}\n(fr) {}\n(en) {}".format(
+                person.email,
+                person.role_fr,
+                person.role_en,
+            )
+
