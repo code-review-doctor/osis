@@ -288,11 +288,12 @@ def _get_end_year(current_version: 'ProgramTreeVersion', offer: Union['Training'
                   group: 'Group') -> str:
     if _is_training(offer):
         if current_version.is_standard:
-            return str(offer.end_year) if offer.end_year else str(_("Unspecified"))
+            return _format_year_to_academic_year(offer.end_year) if offer.end_year else str(_("Unspecified"))
         else:
-            return str(group.end_year) if group.end_year else str(_("Unspecified"))
+            return _format_year_to_academic_year(group.end_year) if group.end_year else str(_("Unspecified"))
     elif _is_minitraining(offer):
-        return str(current_version.end_year_of_existence) if current_version.end_year_of_existence else _('Unspecified')
+        return _format_year_to_academic_year(current_version.end_year_of_existence) \
+            if current_version.end_year_of_existence else _('Unspecified')
     return ''
 
 
@@ -475,9 +476,10 @@ def _build_additional_info_data(offer: Union['Training', 'MiniTraining'], group:
 def _get_start_year(current_version: 'ProgramTreeVersion', offer: Union['Training', 'MiniTraining'],
                     group: 'Group') -> str:
     if _is_training(offer):
-        return str(offer.start_year) if current_version.is_standard else str(group.start_year)
+        return _format_year_to_academic_year(offer.start_year) \
+            if current_version.is_standard else _format_year_to_academic_year(group.start_year)
     elif _is_minitraining(offer):
-        return str(current_version.start_year)
+        return _format_year_to_academic_year(current_version.start_year)
 
     return ''
 
@@ -576,3 +578,7 @@ def _is_training(offer: Union['Training', 'MiniTraining']) -> bool:
 
 def _is_minitraining(offer: Union['Training', 'MiniTraining']) -> bool:
     return isinstance(offer, MiniTraining)
+
+
+def _format_year_to_academic_year(year):
+    return "{}-{}".format(str(year), str(year + 1)[-2:])

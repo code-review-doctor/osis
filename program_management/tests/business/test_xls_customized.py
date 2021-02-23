@@ -246,7 +246,11 @@ class XlsCustomizedContentTestCase(TestCase):
         )
 
     def test_build_validity_for_training(self):
-        expected = ['Actif', str(self.training.start_year), str(self.training.end_year)]
+        expected = [
+            'Actif',
+            "{}-{}".format(str(self.training.start_year), str(self.training.start_year + 1)[-2:]),
+            "{}-{}".format(str(self.training.end_year), str(self.training.end_year + 1)[-2:])
+        ]
         data = _build_validity_data(self.training, self.group_training, self.current_training_tree_version)
         self.assertListEqual(data, expected)
 
@@ -263,13 +267,16 @@ class XlsCustomizedContentTestCase(TestCase):
                                             end_year=2023)
         group = GroupFactory(start_year=2018,
                              end_year=2019)
-        self.assertEqual(_get_start_year(standard_current_version, training, group), str(training.start_year))
+        self.assertEqual(_get_start_year(standard_current_version, training, group),
+                         "{}-{}".format(str(training.start_year), str(training.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, training, group),
-                         str(group.start_year))
+                         "{}-{}".format(str(group.start_year), str(group.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(standard_current_version, mini_training, group),
-                         str(standard_current_version.start_year))
+                         "{}-{}".format(str(standard_current_version.start_year),
+                                        str(standard_current_version.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, mini_training, group),
-                         str(particular_current_version.start_year))
+                         "{}-{}".format(str(particular_current_version.start_year),
+                                        str(particular_current_version.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, None, group),
                          '')
 
@@ -311,15 +318,18 @@ class XlsCustomizedContentTestCase(TestCase):
                                             end_year=2023)
         group = GroupFactory(start_year=2018,
                              end_year=2019)
-        self.assertEqual(_get_end_year(standard_current_version, training, group), str(training.end_year))
-        self.assertEqual(_get_end_year(particular_current_version, training, group), str(group.end_year))
+        self.assertEqual(_get_end_year(standard_current_version, training, group),
+                         "{}-{}".format(str(training.end_year), str(training.end_year + 1)[-2:]))
+        self.assertEqual(_get_end_year(particular_current_version, training, group),
+                         "{}-{}".format(str(group.end_year), str(group.end_year + 1)[-2:]))
         self.assertEqual(_get_end_year(standard_current_version, training_without_end_year, group),
                          UNSPECIFIED_FR)
 
         standard_current_version = ProgramTreeVersionFactory(end_year_of_existence=2021)
         standard_current_version_without_end_year = ProgramTreeVersionFactory(end_year_of_existence=None)
         self.assertEqual(_get_end_year(standard_current_version, mini_training, group),
-                         str(standard_current_version.end_year_of_existence))
+                         "{}-{}".format(str(standard_current_version.end_year_of_existence),
+                                        str(standard_current_version.end_year_of_existence + 1)[-2:]))
         self.assertEqual(_get_end_year(standard_current_version_without_end_year, mini_training, group),
                          UNSPECIFIED_FR)
 
@@ -338,7 +348,8 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             cls.aims1,
             cls.aims2,
         ])
-        cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory)
+        cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory,
+                                       type=TrainingType.BACHELOR)
         cls.training_finality = TrainingFactory(titles=titles,
                                                 type=TrainingType.MASTER_MA_120)
 
