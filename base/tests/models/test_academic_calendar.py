@@ -27,18 +27,13 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils.translation import gettext_lazy as _
 from faker import Faker
 
 from base.models import academic_calendar
-from base.models.academic_calendar import get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
-from base.models.enums import academic_calendar_type
-from base.models.enums.academic_calendar_type import EXAM_ENROLLMENTS, SCORES_EXAM_SUBMISSION
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.signals.publisher import compute_all_scores_encodings_deadlines
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory, \
     CloseAcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 
 class AcademicCalendarTest(TestCase):
@@ -68,33 +63,6 @@ class AcademicCalendarTest(TestCase):
         with mock.patch.object(compute_all_scores_encodings_deadlines, 'send') as mock_method:
             AcademicCalendarFactory()
             self.assertTrue(mock_method.called)
-
-    def test_get_academic_calendar_by_date_and_reference_and_data_year_exists(self):
-        data_year = AcademicYearFactory()
-        cal = AcademicCalendarFactory(
-            start_date=self.past_date,
-            end_date=self.future_date,
-            reference=EXAM_ENROLLMENTS,
-            data_year=data_year
-        )
-        self.assertEqual(
-            get_academic_calendar_by_date_and_reference_and_data_year(data_year, EXAM_ENROLLMENTS),
-            cal
-        )
-
-    def test_get_academic_calendar_by_date_and_reference_and_data_year_none(self):
-        AcademicCalendar.objects.filter(reference=EXAM_ENROLLMENTS).delete()
-        data_year = AcademicYearFactory()
-        AcademicCalendarFactory(
-            start_date=self.past_date,
-            end_date=self.future_date,
-            reference=SCORES_EXAM_SUBMISSION,
-            data_year=data_year
-        )
-        self.assertEqual(
-            get_academic_calendar_by_date_and_reference_and_data_year(data_year, EXAM_ENROLLMENTS),
-            None
-        )
 
 
 class TestGetStartingAcademicCalendar(TestCase):
