@@ -115,7 +115,6 @@ def get_entity_version_choices(education_group_year: 'EducationGroupYear') -> Li
     return list(qs)
 
 
-# TODO :: to refactor inside Osis-protal + osis-common
 def scores_sheet_data(exam_enrollments, tutor=None):
     date_format = str(_('date_format'))
     exam_enrollments = sort_encodings(exam_enrollments)

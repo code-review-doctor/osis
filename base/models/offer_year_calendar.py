@@ -41,7 +41,7 @@ class OfferYearCalendarAdmin(VersionAdmin, OsisModelAdmin):
 
 
 class OfferYearCalendar(AbstractCalendar):
-    education_group_year = models.ForeignKey('EducationGroupYear', blank=True, null=True, on_delete=models.CASCADE)  # TODO :: set not null
+    education_group_year = models.ForeignKey('EducationGroupYear', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ('academic_calendar', 'education_group_year')
