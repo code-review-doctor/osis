@@ -31,7 +31,7 @@ from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
 from program_management.ddd.domain._campus import Campus
-from program_management.ddd.domain.program_tree_version import STANDARD
+from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.models.enums.node_type import NodeType
 
 
@@ -86,6 +86,7 @@ class NodeGroupYearFactory(NodeFactory):
     teaching_campus = factory.SubFactory(CampusFactory)
     constraint_type = factory.fuzzy.FuzzyChoice(ConstraintTypes)
     version_name = STANDARD
+    transition_name = NOT_A_TRANSITION
 
     class Params:
         minitraining = factory.Trait(

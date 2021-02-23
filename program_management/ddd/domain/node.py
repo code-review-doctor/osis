@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import collections
-import copy
 from _decimal import Decimal
 from typing import List, Set, Optional, Iterator, Tuple, Generator, Dict
 
@@ -88,7 +87,9 @@ class NodeFactory:
         return node_next_year
 
     @classmethod
-    def copy_to_year_transition(cls, copy_from_node: 'Node', year: int) -> 'Node':
+    def copy_to_year_transition(cls, training_node_func, copy_from_node: 'Node', year: int) -> 'Node':
+        if copy_from_node.is_training():
+            return training_node_func(copy_from_node, year)
         new_code = GenerateNodeCode().generate_from_parent_node(
             parent_node=copy_from_node,
             child_node_type=copy_from_node.node_type,

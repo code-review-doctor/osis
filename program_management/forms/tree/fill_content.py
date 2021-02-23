@@ -32,7 +32,7 @@ from base.forms.exceptions import InvalidFormException
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
-    copy_program_tree_version_content_from_source_tree_version
+    fill_program_tree_version_content_from_source
 from program_management.formatter import format_tree_version_acronym
 
 
@@ -95,7 +95,7 @@ class FillContentForm(forms.Form):
     def save(self):
         if self.is_valid():
             try:
-                return copy_program_tree_version_content_from_source_tree_version(
+                return fill_program_tree_version_content_from_source(
                     self._generate_copy_content_command()
                 )
             except MultipleBusinessExceptions as e:

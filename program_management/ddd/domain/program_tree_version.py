@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from functools import partial
 from typing import Union
 
 import attr
@@ -34,9 +35,10 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
     CreateProgramTreeTransitionVersionCommand, CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year, program_tree
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
+from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators.validators_by_business_action import FillProgramTreeVersionValidatorList
-from program_management.ddd.domain.node import factory as node_factory
+from program_management.ddd.domain.node import NodeIdentity
 
 STANDARD = ""
 NOT_A_TRANSITION = ""
@@ -75,20 +77,58 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
         return bool(self.transition_name)
 
 
+def fun(root_node: 'NodeGroupYear', repo, service, copy_from_node: 'Node', year: int):
+    if copy_from_node.is_training():
+        identity = ProgramTreeVersionIdentity(
+            offer_acronym=copy_from_node.title,
+            year=year,
+            version_name=root_node.version_name,
+            transition_name=root_node.transition_name
+        )
+        try:
+            tree_version = repo.get(identity)
+            return node_repository.NodeRepository().get(
+                NodeIdentity(code=tree_version.program_tree_identity.code, year=year)
+            )
+        except exception.ProgramTreeVersionNotFoundException:
+            cmd = CreateProgramTreeTransitionVersionCommand(
+                end_year=root_node.end_year,
+                offer_acronym=copy_from_node.title,
+                version_name=root_node.version_name,
+                start_year=root_node.start_year,
+                transition_name=root_node.transition_name,
+                title_en="",
+                title_fr=""
+            )
+            service(cmd)
+            tree_version = repo.get(identity)
+            return node_repository.NodeRepository().get(
+                NodeIdentity(code=tree_version.program_tree_identity.code, year=year)
+            )
+
+
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
     def copy_content_from_source_to(
             self,
             copy_from: 'ProgramTreeVersion',
-            copy_to: 'ProgramTreeVersion'
+            copy_to: 'ProgramTreeVersion',
+            repo,
+            service
     ) -> 'ProgramTreeVersion':
         FillProgramTreeVersionValidatorList(copy_from, copy_to).validate()
-        ProgramTreeBuilder().copy_content_from_source_to(
-            copy_from.get_tree(),
-            copy_to.get_tree(),
-            node_factory.copy_to_year_transition if copy_to.is_transition else node_factory.copy_to_year
-        )
+        if copy_to.is_transition:
+            ProgramTreeBuilder().copy_content_from_source_to_transition(
+                copy_from.get_tree(),
+                copy_to.get_tree(),
+                partial(fun, copy_to.get_tree().root_node, repo, service)
+            )
+        else:
+            ProgramTreeBuilder().copy_content_from_source_to(
+                copy_from.get_tree(),
+                copy_to.get_tree(),
+            )
         return copy_to
 
     def copy_to_next_year(

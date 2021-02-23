@@ -29,8 +29,8 @@ from django.db import transaction
 from education_group.ddd.service.write import create_group_service
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder, ProgramTreeIdentity
-from program_management.ddd.domain.service.validation_rule import FieldValidationRule
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.service import validation_rule as validation_rule_service
+from program_management.ddd.repositories import program_tree as tree_repository
 
 
 @transaction.atomic()
@@ -38,7 +38,7 @@ def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'Pr
 
     # GIVEN
     program_tree_identity = ProgramTreeIdentity(code=cmd.from_root_code, year=cmd.from_root_year)
-    existing_tree = ProgramTreeRepository().get(entity_id=program_tree_identity)
+    existing_tree = tree_repository.ProgramTreeRepository().get(entity_id=program_tree_identity)
 
     # WHEN
     program_tree = ProgramTreeBuilder().create_and_fill_from_program_tree(
@@ -49,13 +49,13 @@ def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'Pr
     )
 
     # TODO: Move validation_rule to initial credit Node
-    validation_rule = FieldValidationRule.get(
+    validation_rule = validation_rule_service.FieldValidationRule.get(
         program_tree.root_node.node_type, 'credits', is_version=True
     )
     program_tree.root_node.credits = validation_rule.initial_value
 
     # THEN
-    program_tree_identity = ProgramTreeRepository().create(
+    program_tree_identity = tree_repository.ProgramTreeRepository().create(
         program_tree=program_tree,
         create_orphan_group_service=create_group_service.create_orphan_group
     )

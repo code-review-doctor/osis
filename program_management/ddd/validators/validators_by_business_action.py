@@ -276,6 +276,14 @@ class CopyContentProgramTreeValidatorList(MultipleExceptionBusinessListValidator
         super().__init__()
 
 
+class FillContentProgramTreeValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, copy_from: 'ProgramTree', next_year_tree: 'ProgramTree'):
+        self.validators = [
+            EmptyProgramTreeValidator(next_year_tree),
+        ]
+        super().__init__()
+
+
 class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
         tree = tree_version.get_tree()

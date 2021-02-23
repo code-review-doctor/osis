@@ -158,13 +158,11 @@ class ProgramTreeBuilder:
             self,
             copy_from: 'ProgramTree',
             copy_to: 'ProgramTree',
-            node_factory_strategy
     ) -> 'ProgramTree':
-        validators_by_business_action.CopyContentProgramTreeValidatorList(copy_from, copy_to).validate()
+        validators_by_business_action.FillContentProgramTreeValidatorList(copy_from, copy_to).validate()
         copy_to.root_node = self._copy_node_content_from_source(
             copy_from.root_node,
             copy_to.root_node.year,
-            node_factory_strategy
         )
 
         copy_to.prerequisites = Prerequisites(
@@ -175,13 +173,46 @@ class ProgramTreeBuilder:
 
         return copy_to
 
-    def _copy_node_content_from_source(self, copy_from_node: 'Node', year: int, node_factory_strategy) -> 'Node':
-        parent_next_year = node_factory_strategy(copy_from_node, year)
+    def copy_content_from_source_to_transition(
+            self,
+            copy_from: 'ProgramTree',
+            copy_to: 'ProgramTree',
+            fun
+    ) -> 'ProgramTree':
+        validators_by_business_action.FillContentProgramTreeValidatorList(copy_from, copy_to).validate()
+        copy_to.root_node = self._copy_node_content_from_source_to_transition(
+            copy_from.root_node,
+            copy_to.root_node.year,
+            fun,
+            copy_to.root_node
+        )
+
+        copy_to.prerequisites = Prerequisites(
+            copy_to.entity_id,
+            [prerequisite_factory.copy_to_next_year(prerequisite)
+             for prerequisite in copy_from.prerequisites.prerequisites]
+        )
+
+        return copy_to
+
+    def _copy_node_content_from_source_to_transition(self, copy_from_node: 'Node', year: int, fun, root_node: Optional['NodeGroupYear']) -> 'Node':
+        parent_next_year = node_factory.copy_to_year_transition(fun, copy_from_node, year) if not root_node else root_node
         links_to_copy = (link for link in copy_from_node.children
                          if not link.child.end_date or link.child.end_date >= year)
         for copy_from_link in links_to_copy:
             child_node = copy_from_link.child
-            child_next_year = self._copy_node_content_from_source(child_node, year, node_factory_strategy)
+            child_next_year = self._copy_node_content_from_source_to_transition(child_node, year, fun, None)
+            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
+            parent_next_year.children.append(link_next_year)
+        return parent_next_year
+
+    def _copy_node_content_from_source(self, copy_from_node: 'Node', year: int) -> 'Node':
+        parent_next_year = node_factory.copy_to_year(copy_from_node, year)
+        links_to_copy = (link for link in copy_from_node.children
+                         if not link.child.end_date or link.child.end_date >= year)
+        for copy_from_link in links_to_copy:
+            child_node = copy_from_link.child
+            child_next_year = self._copy_node_content_from_source(child_node, year)
             link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
             parent_next_year.children.append(link_next_year)
         return parent_next_year

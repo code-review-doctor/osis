@@ -29,12 +29,12 @@ from program_management.ddd.command import CopyTreeVersionFromPastYearCommand, \
     CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
-    copy_program_tree_version_content_from_source_tree_version
+    fill_program_tree_version_content_from_source
 
 
 @transaction.atomic()
 def copy_tree_version_from_past_year(copy_cmd: CopyTreeVersionFromPastYearCommand) -> 'ProgramTreeVersionIdentity':
-    return copy_program_tree_version_content_from_source_tree_version(
+    return fill_program_tree_version_content_from_source(
         CopyProgramTreeVersionContentFromSourceTreeVersionCommand(
             from_year=copy_cmd.to_year-1,
             from_offer_acronym=copy_cmd.to_offer_acronym,
