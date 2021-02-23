@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-17 15:56+0100\n"
+"POT-Creation-Date: 2021-02-23 15:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1757,6 +1757,9 @@ msgstr ""
 msgid "Password"
 msgstr ""
 
+msgid "Pay attention"
+msgstr ""
+
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
 
@@ -2522,7 +2525,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application this year"
+msgid "This learning unit has application"
 msgstr ""
 
 msgid ""
@@ -2921,6 +2924,9 @@ msgstr ""
 msgid "initial value"
 msgstr ""
 
+msgid "is part of several trainings"
+msgstr ""
+
 msgid "items per page"
 msgstr ""
 
@@ -3038,6 +3044,15 @@ msgid ""
 msgstr ""
 
 msgid "the sum of repartition volumes must be equal to the global volume"
+msgstr ""
+
+msgid "this group"
+msgstr ""
+
+msgid "this mini-training"
+msgstr ""
+
+msgid "this training"
 msgstr ""
 
 msgid "to"
