@@ -51,7 +51,7 @@ from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.business.xls_customized import _build_headers, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS, \
     WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
     _build_additional_info_data, _build_validity_data, _get_start_year, _get_end_year, _get_titles_en, \
-    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
+    _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, _build_keywords_data, \
     _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, \
     _build_funding_data, _build_diploma_certificat_data, _build_enrollment_data, \
     _build_other_legal_information_data, _build_title_fr, _build_secondary_domains
@@ -525,8 +525,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
     def test_get_co_organizations(self):
         co_organization_1 = CoorganizationFactory(partner=AcademicPartnerFactory(address=AddressFactory()))
         co_organization_2 = CoorganizationFactory()
-        expected = '{}{}{}'.format(_get_co_organization_data(co_organization_1),
-                                   CARRIAGE_RETURN,
+        expected = '{}\n{}'.format(_get_co_organization_data(co_organization_1),
                                    _get_co_organization_data(co_organization_2)
                                    )
 
@@ -641,10 +640,9 @@ def _build_array_with_empty_string(nb_of_occurence):
 
 
 def _get_co_organization_data(co_organization):
-    line1 = "{} - {} {}{}\n".format(
+    line1 = "{} - {} \n{}\n".format(
         co_organization.partner.address.country_name if co_organization.partner.address else '',
         co_organization.partner.address.city if co_organization.partner.address else '',
-        CARRIAGE_RETURN,
         co_organization.partner.name
     )
     line2 = _build_line('For all students', co_organization.is_for_all_students)
@@ -653,17 +651,16 @@ def _get_co_organization_data(co_organization):
     line5 = _build_line('Producing certificat', co_organization.is_producing_certificate)
     line6 = _build_line('Producing annexe', co_organization.is_producing_certificate_annexes)
 
-    line4 = "{} : {}{}".format(
+    line4 = "{} : {}\n".format(
         str(_('UCL Diploma')),
-        co_organization.certificate_type.value if co_organization.certificate_type else '', CARRIAGE_RETURN
+        co_organization.certificate_type.value if co_organization.certificate_type else ''
     )
     return line1 + line2 + line3 + line4 + line5 + line6
 
 
 def _build_line(title, boolean_value):
-    return "{} : {}{}".format(str(_(title)),
-                              'Oui' if boolean_value else 'Non',
-                              CARRIAGE_RETURN)
+    return "{} : {}\n".format(str(_(title)),
+                              'Oui' if boolean_value else 'Non')
 
 
 def _build_person_detail(person):

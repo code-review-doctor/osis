@@ -121,7 +121,6 @@ PARAMETER_HEADERS = {
     WITH_KEYWORDS: [str(_('Keywords'))]
 }
 
-CARRIAGE_RETURN = "\n"
 BOLD_FONT = Font(bold=True)
 
 
@@ -377,18 +376,18 @@ def _get_responsibles_and_contacts(group: 'Group') -> str:
 
 def get_contacts(contact_persons: List[dict], title: str) -> str:
     if contact_persons:
-        responsibles_and_contacts = '{}{}'.format(title, CARRIAGE_RETURN)
+        responsibles_and_contacts = '{}\n'.format(title)
         for contact in contact_persons:
             if contact.get('email'):
                 responsibles_and_contacts += contact.get('email')
             else:
                 responsibles_and_contacts += contact.get('description', '')
-            responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+            responsibles_and_contacts += "\n"
             if contact.get('role_fr'):
-                responsibles_and_contacts += "(fr) {}{}".format(contact.get('role_fr'), CARRIAGE_RETURN)
+                responsibles_and_contacts += "(fr) {}\n".format(contact.get('role_fr'))
             if contact.get('role_en'):
-                responsibles_and_contacts += "(en) {}{}".format(contact.get('role_en'), CARRIAGE_RETURN)
-        responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+                responsibles_and_contacts += "(en) {}\n".format(contact.get('role_en'))
+        responsibles_and_contacts += "\n"
         return responsibles_and_contacts
     return ''
 
@@ -398,18 +397,17 @@ def _get_co_organizations(training_co_organizations) -> str:
     if training_co_organizations:
         for idx, co_organization in enumerate(training_co_organizations):
             if idx > 0:
-                co_organizations += CARRIAGE_RETURN
-            co_organizations += "{} - {} {}{}\n".format(
+                co_organizations += "\n"
+            co_organizations += "{} - {} \n{}\n".format(
                 co_organization.partner.address.country_name if co_organization.partner.address else '',
                 co_organization.partner.address.city if co_organization.partner.address else '',
-                CARRIAGE_RETURN,
                 co_organization.partner.name
             )
             co_organizations += _build_line('For all students', co_organization.is_for_all_students)
             co_organizations += _build_line('Reference institution', co_organization.is_reference_institution)
-            co_organizations += "{} : {}{}".format(
+            co_organizations += "{} : {}\n".format(
                 str(_('UCL Diploma')),
-                co_organization.certificate_type.value if co_organization.certificate_type else '', CARRIAGE_RETURN
+                co_organization.certificate_type.value if co_organization.certificate_type else ''
             )
             co_organizations += _build_line('Producing certificat', co_organization.is_producing_certificate)
             co_organizations += _build_line('Producing annexe', co_organization.is_producing_certificate_annexes)
@@ -417,7 +415,7 @@ def _get_co_organizations(training_co_organizations) -> str:
 
 
 def _build_line(title: str, boolean_value: bool) -> str:
-    return "{} : {}{}".format(str(_(title)), _title_yes_no_empty(boolean_value), CARRIAGE_RETURN)
+    return "{} : {}\n".format(str(_(title)), _title_yes_no_empty(boolean_value))
 
 
 def _build_common_ares_code_data(co_graduation) -> List[str]:
@@ -627,6 +625,6 @@ def _build_secondary_domains(secondary_domains: 'StudyDomain'):
         for cpt, secondary_domain in enumerate(secondary_domains, 1):
             data += str(secondary_domain)
             if cpt != len(secondary_domains):
-                data += CARRIAGE_RETURN
+                data += "\n"
         return data
     return ''
