@@ -44,11 +44,11 @@ from psycopg2._psycopg import OperationalError as PsycopOperationalError, Interf
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
+from base.models import session_exam_calendar
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
 from base.models.person import Person
 from base.utils import send_mail
@@ -105,7 +105,7 @@ def outside_period(request):
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 def scores_encoding(request):
     template_name = "scores_encoding.html"
-    academic_yr = mdl.academic_year.current_academic_year()
+    academic_yr = session_exam_calendar.current_opened_academic_year()
     number_session = mdl.session_exam_calendar.find_session_exam_number()
     score_encoding_progress_list = None
     context = {'academic_year': academic_yr,
@@ -618,7 +618,7 @@ def _get_specific_criteria_context(request):
     first_name = post_data.get('first_name')
     justification = post_data.get('justification')
     educ_group_year_id = post_data.get('education_group_year_id')
-    current_academic_year = mdl.academic_year.current_academic_year()
+    current_academic_year = session_exam_calendar.current_opened_academic_year()
     educ_group_years_managed = mdl.education_group_year.find_by_user(request.user, current_academic_year)
     is_program_manager = program_manager.is_program_manager(request.user)
 
@@ -688,7 +688,7 @@ def get_json_data_scores_sheets(tutor_global_id):
         person = mdl.person.find_by_global_id(tutor_global_id)
         tutor = mdl.tutor.find_by_person(person)
         number_session = mdl.session_exam_calendar.find_session_exam_number()
-        academic_yr = mdl.academic_year.current_academic_year()
+        academic_yr = session_exam_calendar.current_opened_academic_year()
 
         if tutor:
             exam_enrollments = list(mdl.exam_enrollment.find_for_score_encodings(number_session,
