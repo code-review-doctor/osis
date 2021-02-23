@@ -2635,8 +2635,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application this year"
-msgstr "L'unité d'enseignement dispose d'au moins une candidature cette année"
+msgid "This learning unit has application"
+msgstr "L'unité d'enseignement a au moins une candidature"
 
 msgid ""
 "This learning unit is not editable by central managers during this period."

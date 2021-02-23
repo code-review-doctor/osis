@@ -93,6 +93,12 @@ msgstr ""
 msgid "This learning unit has application this year"
 msgstr ""
 
+msgid "This learning unit has attribution"
+msgstr ""
+
+msgid "This learning unit has attribution this year"
+msgstr ""
+
 msgid "This learning unit is not editable this period."
 msgstr ""
 
@@ -106,6 +112,9 @@ msgid "This learning unit is not of type suppression"
 msgstr ""
 
 msgid "This learning unit is of type creation"
+msgstr ""
+
+msgid "This learning unit is of type suppression"
 msgstr ""
 
 #, python-format
