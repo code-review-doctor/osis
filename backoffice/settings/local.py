@@ -30,6 +30,7 @@ OPTIONAL_APPS = (
     'assistant',
     'continuing_education',
     'dissertation',
+    'partnership',
     'internship',
     'assessments',
     'cms',
