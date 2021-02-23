@@ -636,22 +636,12 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         )
 
 
-# def _build_secondary_domains(secondary_domains):
-#     if secondary_domains:
-#         data = ''
-#         for cpt, secondary_domain in enumerate(secondary_domains, 1):
-#             data += str(secondary_domain)
-#             if cpt != len(secondary_domains):
-#                 data += CARRIAGE_RETURN
-#         return data
-#     return ''
-
 def _build_array_with_empty_string(nb_of_occurence):
     return ['' for _ in range(0, nb_of_occurence)]
 
 
 def _get_co_organization_data(co_organization):
-    line1 = "{} - {} {}{} ".format(
+    line1 = "{} - {} {}{}\n".format(
         co_organization.partner.address.country_name if co_organization.partner.address else '',
         co_organization.partner.address.city if co_organization.partner.address else '',
         CARRIAGE_RETURN,

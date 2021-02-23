@@ -399,7 +399,7 @@ def _get_co_organizations(training_co_organizations) -> str:
         for idx, co_organization in enumerate(training_co_organizations):
             if idx > 0:
                 co_organizations += CARRIAGE_RETURN
-            co_organizations += "{} - {} {}{} ".format(
+            co_organizations += "{} - {} {}{}\n".format(
                 co_organization.partner.address.country_name if co_organization.partner.address else '',
                 co_organization.partner.address.city if co_organization.partner.address else '',
                 CARRIAGE_RETURN,
@@ -498,7 +498,8 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
     if training:
         data.append(training.schedule_type.value)
         data.append(
-            training.management_entity.acronym if current_version and current_version.is_standard else group.management_entity.acronym
+            training.management_entity.acronym
+            if current_version and current_version.is_standard else group.management_entity.acronym
         )
         data.append(training.administration_entity.acronym)
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
@@ -508,7 +509,8 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
     elif mini_training:
         data.append(mini_training.schedule_type.value)
         data.append(
-            mini_training.management_entity.acronym if current_version and current_version.is_standard else group.management_entity.acronym
+            mini_training.management_entity.acronym
+            if current_version and current_version.is_standard else group.management_entity.acronym
         )
         data.append("")
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
