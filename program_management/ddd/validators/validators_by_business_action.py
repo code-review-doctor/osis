@@ -48,6 +48,7 @@ from program_management.ddd.validators._end_date_between_finalities_and_masters 
     CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
+from program_management.ddd.validators._match_transition import MatchTransitionValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -143,6 +144,12 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_paste, path, tree_repository),
                 ValidateFinalitiesEndDateAndOptions(tree.get_node(path), node_to_paste, tree_repository),
                 MatchVersionValidator(
+                    tree.get_node(path),
+                    node_to_paste,
+                    tree_repository,
+                    tree_version_repository
+                ),
+                MatchTransitionValidator(
                     tree.get_node(path),
                     node_to_paste,
                     tree_repository,
@@ -259,10 +266,11 @@ class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
 class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
         tree = tree_version.get_tree()
+        initial_end_year = tree.root_node.end_year
         tree.root_node.end_year = tree_version.end_year_of_existence
         self.validators = [
             CheckEndDateBetweenFinalitiesAndMasters2M(tree, tree_version.program_tree_repository),
-            CheckExistenceOfTransition(tree_version)
+            CheckExistenceOfTransition(tree_version, initial_end_year)
         ]
         super().__init__()
 
