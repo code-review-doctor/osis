@@ -120,8 +120,6 @@ def update_to_mandatory(apps) -> int:
 
 
 def run(apps, schema_editor):
-    GroupElementYear = apps.get_model('base', 'GroupElementYear')
-    GroupYear = apps.get_model('education_group', 'GroupYear')
     start_time = datetime.datetime.now()
     print("\n\tUpdate to mandatory for empty skeleton with year_gte: {}".format(YEAR))
     result = update_to_mandatory(apps)
