@@ -133,6 +133,10 @@ msgctxt "female plural"
 msgid "All"
 msgstr ""
 
+msgctxt "male plural"
+msgid "All"
+msgstr ""
+
 msgid "Alloc. Ent."
 msgstr ""
 
@@ -339,6 +343,9 @@ msgid "Internship"
 msgstr ""
 
 msgid "Invalid name version"
+msgstr ""
+
+msgid "Invalid transition name"
 msgstr ""
 
 msgid "Invalid tree path"
@@ -820,7 +827,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"

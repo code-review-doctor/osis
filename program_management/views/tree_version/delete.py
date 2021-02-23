@@ -97,9 +97,16 @@ class TreeVersionDeleteView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, Dele
         }
 
     def get_success_message(self):
-        return _("The program tree version %(offer_acronym)s %(version_name)s has been deleted.") % {
+        if self.tree_version_identity.version_name:
+            version_transition_name = '[{}{}]'.format(self.tree_version_identity.version_name,
+                                                      '-{}'.format(self.tree_version_identity.transition_name)
+                                                      if self.tree_version_identity.transition_name else '')
+        else:
+            version_transition_name = '[{}]'.format(self.tree_version_identity.transition_name) \
+                if self.tree_version_identity.transition_name else ''
+        return _("The program tree version %(offer_acronym)s%(version_name)s has been deleted.") % {
             'offer_acronym': self.tree_version_identity.offer_acronym,
-            'version_name': self.tree_version_identity.version_name,
+            'version_name': version_transition_name,
         }
 
     def get_success_url(self) -> str:
