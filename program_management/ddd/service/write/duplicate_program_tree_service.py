@@ -28,7 +28,7 @@ from django.db import transaction
 
 from education_group.ddd.service.write import create_group_service
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTreeBuilder, ProgramTreeIdentity
+from program_management.ddd.domain import program_tree as tree_domain
 from program_management.ddd.domain.service import validation_rule as validation_rule_service
 from program_management.ddd.repositories import program_tree as tree_repository
 
@@ -37,11 +37,11 @@ from program_management.ddd.repositories import program_tree as tree_repository
 def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'ProgramTreeIdentity':
 
     # GIVEN
-    program_tree_identity = ProgramTreeIdentity(code=cmd.from_root_code, year=cmd.from_root_year)
+    program_tree_identity = tree_domain.ProgramTreeIdentity(code=cmd.from_root_code, year=cmd.from_root_year)
     existing_tree = tree_repository.ProgramTreeRepository().get(entity_id=program_tree_identity)
 
     # WHEN
-    program_tree = ProgramTreeBuilder().create_and_fill_from_program_tree(
+    program_tree = tree_domain.ProgramTreeBuilder().create_and_fill_from_program_tree(
         duplicate_from=existing_tree,
         duplicate_to_transition=cmd.duplicate_to_transition,
         override_end_year_to=cmd.override_end_year_to,

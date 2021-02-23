@@ -27,8 +27,6 @@ from program_management.ddd.command import CopyProgramTreeVersionContentFromSour
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.repositories import program_tree_version as tree_version_repository,\
     program_tree as program_tree_repository
-from program_management.ddd.service.write.create_program_tree_transition_version_service import \
-    create_program_tree_transition_version
 
 
 def fill_program_tree_version_content_from_source(
@@ -54,11 +52,9 @@ def fill_program_tree_version_content_from_source(
         )
     )
 
-    resulted_tree = ProgramTreeVersionBuilder().copy_content_from_source_to(
+    resulted_tree = ProgramTreeVersionBuilder().fill_tree_version_content_from_tree_version(
         source_tree_version,
         to_tree_version,
-        repository,
-        create_program_tree_transition_version
     )
     # TODO :: add report cms call for mandatory children
 

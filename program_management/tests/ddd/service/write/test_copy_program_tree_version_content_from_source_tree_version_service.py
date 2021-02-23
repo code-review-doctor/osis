@@ -93,8 +93,8 @@ class TestCopyProgramTreeVersionContentFromSourceTreeVersion(MockPatcherMixin, D
     def test_should_persist_filled_content(self):
         fill_program_tree_version_content_from_source(self.cmd)
         self.assertCountEqual(
-            [(node.code, node.year) for node in self.tree_version_from.tree.get_all_nodes()],
-            [(node.code, node.year-1) for node in self.tree_version_to_fill.tree.get_all_nodes()]
+            [(node.code, node.year) for node in self.tree_version_from.tree.get_all_nodes() - {self.tree_version_from.tree.root_node}],
+            [(node.code, node.year-1) for node in self.tree_version_to_fill.tree.get_all_nodes() - {self.tree_version_to_fill.tree.root_node}]
         )
 
     def test_should_omit_nodes_that_have_end_year_inferior_to_tree_to_fill(self):

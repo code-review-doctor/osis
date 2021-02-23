@@ -44,9 +44,10 @@ from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.prerequisite import factory as prerequisite_factory, Prerequisites
-from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.get_or_create_corresponding_transition import get_or_create_transition_node
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -154,68 +155,94 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
-    def copy_content_from_source_to(
-            self,
-            copy_from: 'ProgramTree',
-            copy_to: 'ProgramTree',
-    ) -> 'ProgramTree':
-        validators_by_business_action.FillContentProgramTreeValidatorList(copy_from, copy_to).validate()
-        copy_to.root_node = self._copy_node_content_from_source(
-            copy_from.root_node,
-            copy_to.root_node.year,
-        )
+    def fill_tree_content_from_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
+        validators_by_business_action.FillContentProgramTreeValidatorList(to_tree).validate()
 
-        copy_to.prerequisites = Prerequisites(
-            copy_to.entity_id,
+        self._delete_mandatory_links(to_tree)
+
+        self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node)
+        to_tree.prerequisites = Prerequisites(
+            to_tree.entity_id,
             [prerequisite_factory.copy_to_next_year(prerequisite)
-             for prerequisite in copy_from.prerequisites.prerequisites]
+             for prerequisite in from_tree.prerequisites.prerequisites]
         )
 
-        return copy_to
+        return to_tree
 
-    def copy_content_from_source_to_transition(
+    def fill_transition_tree_content_from_tree(
             self,
-            copy_from: 'ProgramTree',
-            copy_to: 'ProgramTree',
-            fun
+            from_tree: 'ProgramTree',
+            to_transition_tree: 'ProgramTree',
     ) -> 'ProgramTree':
-        validators_by_business_action.FillContentProgramTreeValidatorList(copy_from, copy_to).validate()
-        copy_to.root_node = self._copy_node_content_from_source_to_transition(
-            copy_from.root_node,
-            copy_to.root_node.year,
-            fun,
-            copy_to.root_node
+        validators_by_business_action.FillContentProgramTreeValidatorList(to_transition_tree).validate()
+
+        self._delete_mandatory_links(to_transition_tree)
+
+        self._fill_node_content_from_node_in_case_of_transition(
+            from_tree.root_node,
+            to_transition_tree.root_node,
+            to_transition_tree
         )
 
-        copy_to.prerequisites = Prerequisites(
-            copy_to.entity_id,
+        to_transition_tree.prerequisites = Prerequisites(
+            to_transition_tree.entity_id,
             [prerequisite_factory.copy_to_next_year(prerequisite)
-             for prerequisite in copy_from.prerequisites.prerequisites]
+             for prerequisite in from_tree.prerequisites.prerequisites]
         )
 
-        return copy_to
+        return to_transition_tree
 
-    def _copy_node_content_from_source_to_transition(self, copy_from_node: 'Node', year: int, fun, root_node: Optional['NodeGroupYear']) -> 'Node':
-        parent_next_year = node_factory.copy_to_year_transition(fun, copy_from_node, year) if not root_node else root_node
-        links_to_copy = (link for link in copy_from_node.children
-                         if not link.child.end_date or link.child.end_date >= year)
-        for copy_from_link in links_to_copy:
-            child_node = copy_from_link.child
-            child_next_year = self._copy_node_content_from_source_to_transition(child_node, year, fun, None)
-            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
-            parent_next_year.children.append(link_next_year)
-        return parent_next_year
+    def _delete_mandatory_links(self, tree: 'ProgramTree'):
+        for link_to_delete in tree.root_node.children:
+            tree.root_node.detach_child(link_to_delete.child)
 
-    def _copy_node_content_from_source(self, copy_from_node: 'Node', year: int) -> 'Node':
-        parent_next_year = node_factory.copy_to_year(copy_from_node, year)
-        links_to_copy = (link for link in copy_from_node.children
-                         if not link.child.end_date or link.child.end_date >= year)
+    def _fill_node_content_from_node_in_case_of_transition(
+            self,
+            from_node: 'Node',
+            to_node: 'Node',
+            to_tree: 'ProgramTree'
+    ) -> 'Node':
+        links_to_copy = (
+            link for link in from_node.children if not link.child.end_date or link.child.end_date >= to_node.year
+        )
         for copy_from_link in links_to_copy:
-            child_node = copy_from_link.child
-            child_next_year = self._copy_node_content_from_source(child_node, year)
-            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
-            parent_next_year.children.append(link_next_year)
-        return parent_next_year
+            if copy_from_link.child.is_group():
+                new_code = GenerateNodeCode().generate_from_parent_node(
+                    parent_node=copy_from_link.child,
+                    child_node_type=copy_from_link.child.node_type,
+                    duplicate_to_transition=True
+                )
+                copied_child = node_factory.copy_to_year(copy_from_link.child, to_node.year, new_code)
+            elif copy_from_link.child.is_training():
+                copied_child = get_or_create_transition_node(
+                    offer_acronym=copy_from_link.child.title,
+                    year=to_node.year,
+                    version_name=to_tree.root_node.version_name,
+                    transition_name=to_tree.root_node.transition_name,
+                    end_year=to_tree.root_node.end_year
+                )
+            else:
+                copied_child = node_factory.copy_to_year(copy_from_link.child, to_node.year, copy_from_link.child.code)
+
+            copied_link = LinkBuilder().from_link(copy_from_link, to_node, copied_child)
+            to_node.children.append(copied_link)
+
+            self._fill_node_content_from_node_in_case_of_transition(copy_from_link.child, copied_child, to_tree)
+
+        return to_node
+
+    def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node') -> 'Node':
+        links_to_copy = (
+            link for link in from_node.children if not link.child.end_date or link.child.end_date >= to_node.year
+        )
+        for link_to_copy in links_to_copy:
+            copied_child = node_factory.copy_to_year(link_to_copy.child, to_node.year, link_to_copy.child.code)
+            copied_link = LinkBuilder().from_link(link_to_copy, to_node, copied_child)
+            to_node.children.append(copied_link)
+
+            self._fill_node_content_from_node(link_to_copy.child, copied_child)
+
+        return to_node
 
     def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)

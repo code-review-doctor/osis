@@ -72,32 +72,10 @@ class NodeFactory:
         return node_next_year
 
     @classmethod
-    def copy_to_year(cls, copy_from_node: 'Node', year: int) -> 'Node':
+    def copy_to_year(cls, copy_from_node: 'Node', to_year: int, new_code) -> 'Node':
         attributes_to_update = {
-            'entity_id': NodeIdentity(copy_from_node.entity_id.code, year),
-            'year': year,
-            'children': [],
-            'node_id': None,
-        }
-        if hasattr(copy_from_node, "end_year"):
-            end_year = cls._get_next_end_year(copy_from_node)
-            attributes_to_update["end_year"] = end_year
-        node_next_year = attr.evolve(copy_from_node, **attributes_to_update)
-        node_next_year._has_changed = True
-        return node_next_year
-
-    @classmethod
-    def copy_to_year_transition(cls, training_node_func, copy_from_node: 'Node', year: int) -> 'Node':
-        if copy_from_node.is_training():
-            return training_node_func(copy_from_node, year)
-        new_code = GenerateNodeCode().generate_from_parent_node(
-            parent_node=copy_from_node,
-            child_node_type=copy_from_node.node_type,
-            duplicate_to_transition=True
-        ) if copy_from_node.is_group() else copy_from_node.code
-        attributes_to_update = {
-            'entity_id': NodeIdentity(copy_from_node.entity_id.code, year),
-            'year': year,
+            'entity_id': NodeIdentity(new_code, to_year),
+            'year': to_year,
             'children': [],
             'node_id': None,
             'code': new_code,
