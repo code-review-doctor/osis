@@ -148,6 +148,7 @@ def prepare_xls_content_with_parameters(found_education_groups: List[GroupYear],
 def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear, other_params: List['str']) -> List:
     offer = None
     training = None
+    mini_training = None
 
     group = _get_group(group_year.academic_year.year, group_year.partial_acronym)
 
@@ -185,7 +186,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
     if WITH_EDUCATION_FIELDS in other_params:
         if training:
             data.append(training.main_domain if training.main_domain else '')
-            data.append(training.secondary_domains if training.secondary_domains else '')
+            data.append(_build_secondary_domains(training.secondary_domains))
             data.append("{} {}".format(training.isced_domain.code,
                                        training.isced_domain.title_fr) if training.isced_domain else '')
         else:
@@ -616,3 +617,14 @@ def _common_training_mini_training_organization_data(current_version, group, off
     data.append(offer.administration_entity.acronym)
     data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
     return data
+
+
+def _build_secondary_domains(secondary_domains: 'StudyDomain'):
+    if secondary_domains:
+        data = ''
+        for cpt, secondary_domain in enumerate(secondary_domains, 1):
+            data += str(secondary_domain)
+            if cpt != len(secondary_domains):
+                data += CARRIAGE_RETURN
+        return data
+    return ''

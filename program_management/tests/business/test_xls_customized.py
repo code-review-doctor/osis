@@ -54,7 +54,7 @@ from program_management.business.xls_customized import _build_headers, TRAINING_
     _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
     _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, \
     _build_funding_data, _build_diploma_certificat_data, _build_enrollment_data, \
-    _build_other_legal_information_data, _build_title_fr
+    _build_other_legal_information_data, _build_title_fr, _build_secondary_domains
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -62,6 +62,7 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
     SpecificProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 
 UNSPECIFIED_FR = "Indéterminé"
 
@@ -619,6 +620,31 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                          "{}[{}]".format(self.training.titles.title_fr,
                                          self.particular_current_version.title_fr))
 
+    def test_build_secondary_domains_no_data(self):
+        self.assertEqual(_build_secondary_domains(None), '')
+        self.assertEqual(_build_secondary_domains([]), '')
+
+    def test_build_secondary_domains(self):
+        secondary_domain_1 = StudyDomainFactory()
+        secondary_domain_2 = StudyDomainFactory()
+        self.assertCountEqual(
+            _build_secondary_domains([secondary_domain_1, secondary_domain_2]),
+            "{}\n{}".format(
+                "{} : {} {}".format(secondary_domain_1.decree_name, secondary_domain_1.code, secondary_domain_1.name),
+                "{} : {} {}".format(secondary_domain_2.decree_name, secondary_domain_2.code, secondary_domain_2.name)
+            )
+        )
+
+
+# def _build_secondary_domains(secondary_domains):
+#     if secondary_domains:
+#         data = ''
+#         for cpt, secondary_domain in enumerate(secondary_domains, 1):
+#             data += str(secondary_domain)
+#             if cpt != len(secondary_domains):
+#                 data += CARRIAGE_RETURN
+#         return data
+#     return ''
 
 def _build_array_with_empty_string(nb_of_occurence):
     return ['' for _ in range(0, nb_of_occurence)]
@@ -656,3 +682,4 @@ def _build_person_detail(person):
                 person.role_fr,
                 person.role_en,
             )
+
