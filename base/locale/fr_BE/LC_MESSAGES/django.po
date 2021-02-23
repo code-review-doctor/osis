@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 11:02+0100\n"
+"POT-Creation-Date: 2021-02-18 14:25+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1814,9 +1814,12 @@ msgstr "Partenariats"
 msgid "Password"
 msgstr "Mot de passe"
 
+msgid "Pay attention"
+msgstr "Attention"
+
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
-"Attention cette unité d'enseignement fait partie de plusieurs formations:"
+"Attention cette unité d'enseignement fait partie de plusieurs formations :"
 
 msgid "Pending"
 msgstr "En attente"
@@ -3059,6 +3062,9 @@ msgstr "volume horaire total annuel"
 msgid "initial value"
 msgstr "valeur initiale"
 
+msgid "is part of several trainings"
+msgstr "fait partie de plusieurs formations"
+
 msgid "items per page"
 msgstr "éléments par page"
 
@@ -3184,6 +3190,15 @@ msgid "the sum of repartition volumes must be equal to the global volume"
 msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
+
+msgid "this group"
+msgstr "ce groupement"
+
+msgid "this mini-training"
+msgstr "cette mini-formation"
+
+msgid "this training"
+msgstr "cette formation"
 
 msgid "to"
 msgstr "à"
