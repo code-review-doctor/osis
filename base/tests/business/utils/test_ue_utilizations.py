@@ -31,7 +31,7 @@ from django.test import TestCase
 from base.business.learning_unit_xls import XLS_DESCRIPTION, WRAP_TEXT_ALIGNMENT, annotate_qs
 from base.business.learning_unit_xls import get_significant_volume
 from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_WHITE_FONT, CELLS_WITH_BORDER_TOP, \
-    WHITE_FONT, BOLD_FONT, prepare_xls_content
+    WHITE_FONT, BOLD_FONT, _prepare_xls_content
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.learning_unit_year import LearningUnitYear
@@ -47,6 +47,12 @@ from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+
+TRAINING_TITLE_COLUMN = 27
+
+TRAINING_CODE_COLUMN = 26
+
+GATHERING_COLMUN = 25
 
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
@@ -131,7 +137,7 @@ class TestUeUtilization(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        result = _prepare_xls_content(qs, with_grp=True, with_attributions=True)
         self.assertEqual(len(result.get("working_sheets_data")), 1)
 
         luy = annotate_qs(qs).get()
@@ -145,24 +151,49 @@ class TestUeUtilization(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        result = _prepare_xls_content(qs, with_grp=True, with_attributions=True)
         self.assertEqual(len(result.get("working_sheets_data")), 2)
+        first_training_occurence = result.get("working_sheets_data")[0]
+        second_training_occurence = result.get("working_sheets_data")[1]
 
-        res1 = "{} ({}) - {} - {}".format(
+        res1 = "{} ({})".format(
             self.a_group_year_parent.partial_acronym,
             "{0:.2f}".format(self.group_element_child_1.relative_credits),
-            self.a_group_year_parent.acronym,
-            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr))
+            )
 
-        res2 = "{} ({}) - {} - {}".format(
+        res2 = "{} ({})".format(
             self.a_group_year_parent_2.partial_acronym,
             "{0:.2f}".format(self.group_element_child_2.relative_credits),
-            self.a_group_year_parent_2.acronym,
-            self.a_group_year_parent_2.title_fr + ' [{}]'.format(self.standard_version_2.title_fr))
+            )
         results = [res1, res2]
         self.assertCountEqual(
             results,
-            [result.get("working_sheets_data")[0][25], result.get("working_sheets_data")[1][25]]
+            [
+                first_training_occurence[GATHERING_COLMUN],
+                second_training_occurence[GATHERING_COLMUN]
+            ]
+        )
+        res1 = "{}".format(self.a_group_year_parent.acronym)
+
+        res2 = "{}".format(self.a_group_year_parent_2.acronym)
+
+        results = [res1, res2]
+        self.assertCountEqual(
+            results,
+            [
+                first_training_occurence[TRAINING_CODE_COLUMN],
+                second_training_occurence[TRAINING_CODE_COLUMN]
+            ]
+        )
+        res1 = "{}".format(self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr))
+        res2 = "{}".format(self.a_group_year_parent_2.title_fr + ' [{}]'.format(self.standard_version_2.title_fr))
+        results = [res1, res2]
+        self.assertCountEqual(
+            results,
+            [
+                first_training_occurence[TRAINING_TITLE_COLUMN],
+                second_training_occurence[TRAINING_TITLE_COLUMN]
+            ]
         )
 
     def _get_luy_expected_data(self, luy):
@@ -192,10 +223,8 @@ class TestUeUtilization(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
-            "{} ({}) - {} - {}".format(
-                self.a_group_year_parent.partial_acronym,
-                "{0:.2f}".format(self.group_element_child.relative_credits),
-                self.a_group_year_parent.acronym,
-                self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
-            )
+            "{} ({})".format(self.a_group_year_parent.partial_acronym,
+                             "{0:.2f}".format(self.group_element_child.relative_credits)),
+            self.a_group_year_parent.acronym,
+            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
         ]

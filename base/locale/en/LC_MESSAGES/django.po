@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-22 15:00+0100\n"
+"POT-Creation-Date: 2021-02-23 11:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1012,6 +1012,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "Gathering"
 msgstr ""
 
 msgid "Gender"
@@ -2578,6 +2581,12 @@ msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+msgid "Training code"
+msgstr ""
+
+msgid "Training title"
 msgstr ""
 
 msgid "Trainings"

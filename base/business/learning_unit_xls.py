@@ -157,15 +157,15 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
     titles_part1.extend(titles_part2)
 
     ws_data = xls_build.prepare_xls_parameters_list(working_sheets_data,
-                                                    get_parameters_configurable_list(learning_units,
-                                                                                     titles_part1,
-                                                                                     user))
+                                                    _get_parameters_configurable_list(learning_units,
+                                                                                      titles_part1,
+                                                                                      user))
     ws_data.update({xls_build.WORKSHEETS_DATA: [ws_data.get(xls_build.WORKSHEETS_DATA)[0],
                                                 prepare_proposal_legend_ws_data()]})
     return xls_build.generate_xls(ws_data, filters)
 
 
-def get_parameters_configurable_list(learning_units, titles, user) -> dict:
+def _get_parameters_configurable_list(learning_units, titles, user) -> dict:
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION,
         xls_build.USER: get_name_or_username(user),

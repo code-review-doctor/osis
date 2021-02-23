@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-22 15:00+0100\n"
+"POT-Creation-Date: 2021-02-23 11:35+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1039,6 +1039,9 @@ msgstr "Financement coopération internationale CCD/CUD"
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
+msgid "Gathering"
+msgstr "Regroupement"
+
 msgid "Gender"
 msgstr "Genre"
 
@@ -1910,7 +1913,8 @@ msgstr "Produire une liste personnalisable des unités d'enseignement"
 
 msgid "Produce a customizable xls of learning units with one line per training"
 msgstr ""
-"Produire une liste personnalisable des unités d'enseignement avec une ligne par formation"
+"Produire une liste personnalisable des unités d'enseignement avec une ligne "
+"par formation"
 
 msgid ""
 "Produce a xls of learning units with educational information and "
@@ -2694,6 +2698,12 @@ msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"
+
+msgid "Training code"
+msgstr "Formation sigle"
+
+msgid "Training title"
+msgstr "Formation intitulé"
 
 msgid "Trainings"
 msgstr "Formations"

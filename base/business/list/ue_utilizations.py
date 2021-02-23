@@ -23,25 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict
+from typing import Dict, List
 
 from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
 from openpyxl.styles import Color, Font
 
-from base.business.learning_unit_xls import WITH_ATTRIBUTIONS, WITH_GRP, HEADER_PROGRAMS, HEADER_TEACHERS, \
+from base.business.learning_unit_xls import WITH_ATTRIBUTIONS, WITH_GRP, HEADER_TEACHERS, \
     learning_unit_titles_part_1, learning_unit_titles_part2, annotate_qs, get_data_part1, get_data_part2, \
-    get_parameters_configurable_list, prepare_proposal_legend_ws_data, title_with_version_title, \
-    acronym_with_version_label, BOLD_FONT
+    prepare_proposal_legend_ws_data, title_with_version_title, \
+    acronym_with_version_label, BOLD_FONT, XLS_DESCRIPTION, get_name_or_username, XLS_FILENAME, WORKSHEET_TITLE, \
+    WRAP_TEXT_ALIGNMENT, _get_font_rows, _get_col_letter
 from base.business.xls import _get_all_columns_reference
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
+from django.utils.translation import gettext_lazy as _
 
 CELLS_WITH_BORDER_TOP = 'cells_with_border_top'
 
 CELLS_WITH_WHITE_FONT = 'cells_with_white_font'
 
 WHITE_FONT = Font(color=Color('00FFFFFF'))
+
+HEADER_PROGRAMS = [str(_('Gathering')), str(_('Training code')), str(_('Training title'))]
 
 
 def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters, extra_configuration):
@@ -51,12 +55,12 @@ def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, 
     titles_part2 = learning_unit_titles_part2()
 
     if with_grp:
-        titles_part2.append(str(HEADER_PROGRAMS))
+        titles_part2.extend(HEADER_PROGRAMS)
 
     if with_attributions:
         titles_part1.append(str(HEADER_TEACHERS))
 
-    data = prepare_xls_content(learning_units, with_grp, with_attributions)
+    data = _prepare_xls_content(learning_units, with_grp, with_attributions)
     working_sheets_data = data.get('working_sheets_data')
 
     titles_part1.extend(titles_part2)
@@ -75,7 +79,7 @@ def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, 
 
 
 def _get_parameters(data: Dict, learning_units, titles_part1, user) -> dict:
-    parameters = get_parameters_configurable_list(learning_units, titles_part1, user)
+    parameters = _get_parameters_configurable_list(learning_units, titles_part1, user)
     parameters.update(
         {
             xls_build.FONT_CELLS: {WHITE_FONT: data.get(CELLS_WITH_WHITE_FONT)},
@@ -86,7 +90,7 @@ def _get_parameters(data: Dict, learning_units, titles_part1, user) -> dict:
     return parameters
 
 
-def prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attributions=False) -> Dict:
+def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attributions=False) -> Dict:
     qs = annotate_qs(learning_unit_years)
 
     if with_grp:
@@ -111,22 +115,27 @@ def prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attr
 
                     partial_acronym = group_element_year.parent_element.group_year.partial_acronym or ''
                     credits = group_element_year.relative_credits \
-                        if group_element_year.relative_credits else group_element_year.child_element.learning_unit_year.credits
+                        if group_element_year.relative_credits else \
+                        group_element_year.child_element.learning_unit_year.credits
                     leaf_credits = "{0:.2f}".format(credits) if credits else '-'
-                    nb_parents = '-' if len(learning_unit_yr.closest_trainings) > 0 else ''
 
                     for training in learning_unit_yr.closest_trainings:
                         if training['gs_origin'] == group_element_year.pk:
-                            training_data = _build_training_data(leaf_credits, nb_parents, partial_acronym, training)
+                            training_data = _build_training_data_columns(leaf_credits, partial_acronym, training)
                             if training_data:
-                                lines.append(lu_data_part1 + lu_data_part2 + [training_data])
+                                lines.append(lu_data_part1 + lu_data_part2 + training_data)
+                                nb_columns = len(lu_data_part1) + len(lu_data_part2)
                                 if idx >= 1:
                                     cells_with_white_font.extend(
-                                        ["{}{}".format(letter, len(lines)+1) for letter in _get_all_columns_reference(len(lu_data_part1) + len(lu_data_part2))]
+                                        ["{}{}".format(letter, len(lines)+1)
+                                         for letter in _get_all_columns_reference(nb_columns)
+                                         ]
                                     )
                                 else:
                                     cells_with_border_top.extend(
-                                        ["{}{}".format(letter, len(lines)+1) for letter in _get_all_columns_reference(len(lu_data_part1) + len(lu_data_part2)+1)]
+                                        ["{}{}".format(letter, len(lines)+1)
+                                         for letter in _get_all_columns_reference(nb_columns + 3)
+                                         ]
                                     )
                                 idx = idx + 1
 
@@ -143,13 +152,41 @@ def prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attr
             }
 
 
-def _build_training_data(leaf_credits: str, nb_parents: str, partial_acronym: str, training: dict) -> str:
-    return "{} ({}) {} {} - {}".format(
-        partial_acronym,
-        leaf_credits,
-        nb_parents,
-        acronym_with_version_label(
-            training['acronym'], training['transition_name'], training['version_name']
-        ),
-        title_with_version_title(training['title_fr'], training['version_title_fr']),
+def _build_training_data_columns(leaf_credits: str, partial_acronym: str, training: dict) -> List:
+    data = list()
+    data.append("{} ({})".format(partial_acronym, leaf_credits))
+    data.append("{}".format(acronym_with_version_label(training['acronym'],
+                                                       training['transition_name'],
+                                                       training['version_name'])))
+    data.append("{}".format(
+        title_with_version_title(training['title_fr'], training['version_title_fr']))
     )
+    return data
+
+
+def _get_parameters_configurable_list(learning_units: List, titles: List, user) -> dict:
+    parameters = {
+        xls_build.DESCRIPTION: XLS_DESCRIPTION,
+        xls_build.USER: get_name_or_username(user),
+        xls_build.FILENAME: XLS_FILENAME,
+        xls_build.HEADER_TITLES: titles,
+        xls_build.WS_TITLE: WORKSHEET_TITLE,
+        xls_build.ALIGN_CELLS: {
+            WRAP_TEXT_ALIGNMENT: _get_wrapped_cells(
+                learning_units,
+                _get_col_letter(titles, HEADER_TEACHERS)
+            )
+        },
+        xls_build.FONT_ROWS: _get_font_rows(learning_units),
+    }
+    return parameters
+
+
+def _get_wrapped_cells(learning_units: List, teachers_col_letter: str) -> List:
+    wrapped_styled_cells = []
+
+    for idx, luy in enumerate(learning_units, start=2):
+        if teachers_col_letter:
+            wrapped_styled_cells.append("{}{}".format(teachers_col_letter, idx))
+
+    return wrapped_styled_cells
