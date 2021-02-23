@@ -36,7 +36,7 @@
             {% csrf_token %}
             <label>{% trans 'Do you want to export the following informations' %}?</label><br>
             <input type="checkbox" disabled id="unmutable_chb" checked> {% trans 'Default information (ac. yr., acronym/short title, title, category, type, credits)' %}<br>
-            <input type="checkbox" id="chb_all_param" title="{% trans 'Select/deselect all' %}"> {% trans 'Select all' %}<br>
+            <input type="checkbox" id="chb_all_param" title="{% trans 'Select/deselect all' %}"> <strong>{% trans 'Select all' %}</strong><br>
             <input type="checkbox" id="chb_with_validity" value="chb_with_validity" class="chb_parameters"> {% trans 'Validity' %}<br>
             <input type="checkbox" id="chb_with_osis_code" value="chb_with_osis_code" class="chb_parameters"> {% trans 'Osis code' %}<br>
             <input type="checkbox" id="chb_with_partial_english_titles" value="chb_with_partial_english_titles" class="chb_parameters"> {% trans 'Titles(partial/English)' %}<br>
