@@ -235,7 +235,6 @@ class TestLearningUnitModificationProposal(TestCase):
         expected_initial_data_fields = {
             'learning_container_year': [
                 "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
-                "is_vacant", "type_declaration_vacant",
                 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
             ],
             'learning_unit': [
@@ -244,7 +243,7 @@ class TestLearningUnitModificationProposal(TestCase):
             'learning_unit_year': [
                 "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
                 "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester",
-                "session", "attribution_procedure", "faculty_remark", "other_remark", "other_remark_english"
+                "session", "faculty_remark", "other_remark", "other_remark_english"
             ],
             'learning_component_year': [
                 "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",

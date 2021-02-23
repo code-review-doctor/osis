@@ -46,7 +46,7 @@ class ErrorViewTestCase(TestCase):
     @override_settings(DEBUG=False)
     def test_404_error(self):
         self.client.force_login(self.user)
-        response = self.client.get(reverse('academic_calendar_read', args=[46898]), follow=True)
+        response = self.client.get(reverse('entity_read', args=[46898]), follow=True)
         self.assertEqual(response.status_code, 404)
 
 
