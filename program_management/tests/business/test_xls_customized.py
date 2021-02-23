@@ -464,12 +464,11 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         self.assertEqual(contacts, expected)
 
     def test_build_aims_data(self):
-        data_aims_1 = "{} - {} - {}{}".format(
-            self.aims1.section, self.aims1.code, self.aims1.description, CARRIAGE_RETURN
+        data_aims_1 = "{} - {} - {} ;".format(
+            self.aims1.section, self.aims1.code, self.aims1.description
         )
-        data_aims_2 = "{} - {} - {}{}".format(self.aims2.section, self.aims2.code, self.aims2.description,
-                                              CARRIAGE_RETURN)
-        expected = "{}{}".format(data_aims_1, data_aims_2)
+        data_aims_2 = "{} - {} - {} ;".format(self.aims2.section, self.aims2.code, self.aims2.description)
+        expected = "{}\n{}".format(data_aims_1, data_aims_2)
         aims_data = _build_aims_data(self.training)
         self.assertEqual(aims_data, expected)
 

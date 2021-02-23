@@ -254,8 +254,10 @@ def _build_keywords_data(offer: Union['Training', 'Mini-Training']) -> str:
 
 def _build_aims_data(training: 'Training') -> str:
     aims = ''
-    for aim in training.diploma.aims:
-        aims += "{} - {} - {}{}".format(aim.section, aim.code, aim.description, CARRIAGE_RETURN)
+    for cpt, aim in enumerate(training.diploma.aims, 1):
+        aims += "{} - {} - {} ;".format(aim.section, aim.code, aim.description)
+        if cpt != len(training.diploma.aims):
+            aims += "\n"
     return aims
 
 
