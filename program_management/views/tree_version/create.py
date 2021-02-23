@@ -46,12 +46,14 @@ from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.command import CreateProgramTreeSpecificVersionCommand, \
     ProlongExistingProgramTreeVersionCommand, \
-    GetLastExistingVersionCommand, CreateProgramTreeTransitionVersionCommand
+    GetLastExistingVersionCommand, CreateProgramTreeTransitionVersionCommand, \
+    GetLastExistingTransitionVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch, ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_last_existing_version_service
+from program_management.ddd.service.read import get_last_existing_version_service, \
+    get_last_existing_transition_version_service
 from program_management.ddd.service.write import create_and_postpone_tree_specific_version_service, \
     prolong_existing_tree_version_service, create_and_postpone_tree_transition_version_service
 from program_management.forms.version import SpecificVersionForm, TransitionVersionForm
@@ -112,7 +114,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
             if not last_existing_version:
                 command = _convert_form_to_create_specific_version_command(form)
                 try:
-                    identities = create_and_postpone_tree_specific_version_service.\
+                    identities = create_and_postpone_tree_specific_version_service. \
                         create_and_postpone_program_tree_specific_version(command=command)
                 except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
                         exception.MultipleEntitiesFoundException) as e:
@@ -138,8 +140,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
         return {
             'training_identity': self.training_identity,
             'node_identity': self.node_identity,
-            'form': form,
-            "error": self.get_error()
+            'form': form
         }
 
     def get_url_program_version(self, created_version_id: 'ProgramTreeVersionIdentity'):
@@ -167,10 +168,6 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
                 }
             )
         display_success_messages(self.request, success_messages, extra_tags='safe')
-
-    def get_error(self):
-        if self.tree_version_identity.is_transition:
-            return _("Impossible to create a specific version from a transition version.")
 
 
 class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTemplateMixin, View):
@@ -205,6 +202,22 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
         if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
             return ("base.add_training_version",)
         return ("base.add_minitraining_version",)
+
+    @cached_property
+    def has_transition_version(self) -> 'bool':
+        cmd = GetLastExistingTransitionVersionNameCommand(
+            version_name=self.tree_version_identity.version_name,
+            offer_acronym=self.tree_version_identity.offer_acronym,
+            transition_name=self.tree_version_identity.transition_name,
+            year=self.tree_version_identity.year
+        )
+        return bool(get_last_existing_transition_version_service.get_last_existing_transition_version_identity(cmd))
+
+    def get_error(self):
+        if self.has_transition_version:
+            return _(
+                "Impossible to create a transition version : an other transition version exists already on this year."
+            )
 
     def get(self, request, *args, **kwargs):
         form = TransitionVersionForm(tree_version_identity=self.tree_version_identity)
@@ -252,6 +265,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             'version_name': self.tree_version_identity.version_name + suffix_version_name,
             'node_identity': self.node_identity,
             'form': form,
+            'error': self.get_error()
         }
 
     def get_url_program_version(self, created_version_id: 'ProgramTreeVersionIdentity'):
