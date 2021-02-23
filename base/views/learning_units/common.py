@@ -125,6 +125,7 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
         'can_edit_learning_unit_proposal': person.user.has_perm('base.can_edit_learning_unit_proposal', luy),
         'can_consolidate_proposal': person.user.has_perm('base.can_consolidate_learningunit_proposal', luy),
         'can_manage_volume': person.user.has_perm('base.can_edit_learningunit', luy),
+        'can_cancel_proposal': person.user.has_perm('base.can_cancel_proposal', luy),
     })
 
     return context

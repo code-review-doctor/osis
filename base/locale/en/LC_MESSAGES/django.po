@@ -2549,7 +2549,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application this year"
+msgid "This learning unit has application"
 msgstr ""
 
 msgid ""
