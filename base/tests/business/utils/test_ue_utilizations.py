@@ -118,14 +118,13 @@ class TestUeUtilization(TestCase):
         ).values('acronym')[:1]
 
     def test_get_parameters(self):
-        user_name = 'Ducon'
-        an_user = UserFactory(username=user_name)
+        an_user = UserFactory()
         titles = ['title1', 'title2']
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
         data = {CELLS_WITH_BORDER_TOP: [], CELLS_WITH_WHITE_FONT: []}
         param = _get_parameters(data, learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
-        self.assertEqual(param.get(xls_build.USER), user_name)
+        self.assertEqual(param.get(xls_build.USER), an_user.username)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
         self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: []})
         self.assertEqual(param.get(xls_build.FONT_ROWS), {BOLD_FONT: [0]})

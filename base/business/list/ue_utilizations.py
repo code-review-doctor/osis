@@ -51,23 +51,13 @@ HEADER_PROGRAMS = [str(_('Gathering')), str(_('Training code')), str(_('Training
 def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters, extra_configuration):
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
-    titles_part1 = learning_unit_titles_part_1()
-    titles_part2 = learning_unit_titles_part2()
-
-    if with_grp:
-        titles_part2.extend(HEADER_PROGRAMS)
-
-    if with_attributions:
-        titles_part1.append(str(HEADER_TEACHERS))
 
     data = _prepare_xls_content(learning_units, with_grp, with_attributions)
     working_sheets_data = data.get('working_sheets_data')
 
-    titles_part1.extend(titles_part2)
-    parameters = _get_parameters(data, learning_units, titles_part1, user)
+    parameters = _get_parameters(data, learning_units, _prepare_titles(with_attributions, with_grp), user)
 
-    ws_data = xls_build.prepare_xls_parameters_list(working_sheets_data,
-                                                    parameters)
+    ws_data = xls_build.prepare_xls_parameters_list(working_sheets_data, parameters)
 
     ws_data.update(
         {
@@ -76,6 +66,17 @@ def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, 
     )
 
     return xls_build.generate_xls(ws_data, filters)
+
+
+def _prepare_titles(with_attributions: bool, with_grp: bool) -> List['str']:
+    titles_part1 = learning_unit_titles_part_1()
+    titles_part2 = learning_unit_titles_part2()
+    if with_grp:
+        titles_part2.extend(HEADER_PROGRAMS)
+    if with_attributions:
+        titles_part1.append(str(HEADER_TEACHERS))
+    titles_part1.extend(titles_part2)
+    return titles_part1
 
 
 def _get_parameters(data: Dict, learning_units, titles_part1, user) -> dict:
@@ -115,8 +116,8 @@ def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_att
 
                     partial_acronym = group_element_year.parent_element.group_year.partial_acronym or ''
                     credits = group_element_year.relative_credits \
-                        if group_element_year.relative_credits else \
-                        group_element_year.child_element.learning_unit_year.credits
+                        if group_element_year.relative_credits \
+                        else group_element_year.child_element.learning_unit_year.credits
                     leaf_credits = "{0:.2f}".format(credits) if credits else '-'
 
                     for training in learning_unit_yr.closest_trainings:
@@ -146,18 +147,19 @@ def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_att
             lu_data_part1.extend(lu_data_part2)
             lines.append(lu_data_part1)
 
-    return {'working_sheets_data': lines,
-            CELLS_WITH_WHITE_FONT: cells_with_white_font,
-            CELLS_WITH_BORDER_TOP: cells_with_border_top
-            }
+    return {
+        'working_sheets_data': lines,
+        CELLS_WITH_WHITE_FONT: cells_with_white_font,
+        CELLS_WITH_BORDER_TOP: cells_with_border_top
+    }
 
 
 def _build_training_data_columns(leaf_credits: str, partial_acronym: str, training: dict) -> List:
     data = list()
     data.append("{} ({})".format(partial_acronym, leaf_credits))
-    data.append("{}".format(acronym_with_version_label(training['acronym'],
-                                                       training['transition_name'],
-                                                       training['version_name'])))
+    data.append("{}".format(acronym_with_version_label(
+        training['acronym'], training['transition_name'], training['version_name']))
+    )
     data.append("{}".format(
         title_with_version_title(training['title_fr'], training['version_title_fr']))
     )
