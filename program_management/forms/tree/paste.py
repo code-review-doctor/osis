@@ -87,10 +87,10 @@ class PasteNodeForm(LinkForm):
 
 
 class BasePasteNodesFormset(BaseFormSet):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for form in self.forms:
-            form.empty_permitted = False
+    def _construct_form(self, i, **kwargs):
+        form = super()._construct_form(i, **kwargs)
+        form.empty_permitted = False
+        return form
 
     def get_form_kwargs(self, index):
         if self.form_kwargs:
