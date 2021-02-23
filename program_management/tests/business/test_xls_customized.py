@@ -424,7 +424,12 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             role_en='dummy role in english',
             education_group_year=education_group_version.offer
         )
-
+        academic_responsible_contact_2 = EducationGroupPublicationContactFactory(
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
+            role_fr='dummy role2 in french',
+            role_en='dummy role2 in english',
+            education_group_year=education_group_version.offer
+        )
         other_academic_responsible_contact = EducationGroupPublicationContactFactory(
             type=PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
             role_fr='dummy role in french',
@@ -444,27 +449,18 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             education_group_year=education_group_version.offer
         )
         contacts = _get_responsibles_and_contacts(g)
-
-        expected = "{}{}{}{}".format(
-            "Responsable académique{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(
-                CARRIAGE_RETURN, academic_responsible_contact.email, CARRIAGE_RETURN, CARRIAGE_RETURN, CARRIAGE_RETURN,
-                CARRIAGE_RETURN),
-            "Autres responsables académiques{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(
-                CARRIAGE_RETURN, other_academic_responsible_contact.email, CARRIAGE_RETURN,
-                CARRIAGE_RETURN, CARRIAGE_RETURN, CARRIAGE_RETURN),
-            "Membres du jury{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(CARRIAGE_RETURN,
-                                                                                                    jury_member.email,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN),
-            "Autres contacts{}{}{}(fr) dummy role in french{}(en) dummy role in english{}{}".format(CARRIAGE_RETURN,
-                                                                                                    other_contact.email,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN,
-                                                                                                    CARRIAGE_RETURN))
-
+        basic_titles = "Responsable académique\n{}\n{}\n" \
+                       "Autres responsables académiques\n{}\n" \
+                       "Membres du jury\n{}\n" \
+                       "Autres contacts\n{}\n"
+        expected = basic_titles.format(
+            _build_person_detail(academic_responsible_contact),
+            _build_person_detail(academic_responsible_contact_2),
+            _build_person_detail(other_academic_responsible_contact),
+            _build_person_detail(
+                jury_member),
+            _build_person_detail(other_contact)
+        )
         self.assertEqual(contacts, expected)
 
     def test_build_aims_data(self):
@@ -602,3 +598,11 @@ def _build_line(title, boolean_value):
     return "{} : {}{}".format(str(_(title)),
                               'Oui' if boolean_value else 'Non',
                               CARRIAGE_RETURN)
+
+
+def _build_person_detail(person):
+    return "{}\n(fr) {}\n(en) {}".format(
+                person.email,
+                person.role_fr,
+                person.role_en,
+            )

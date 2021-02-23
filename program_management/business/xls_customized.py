@@ -381,7 +381,7 @@ def get_contacts(contact_persons: List[dict], title: str) -> str:
                 responsibles_and_contacts += "(fr) {}{}".format(contact.get('role_fr'), CARRIAGE_RETURN)
             if contact.get('role_en'):
                 responsibles_and_contacts += "(en) {}{}".format(contact.get('role_en'), CARRIAGE_RETURN)
-            responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+        # responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
         return responsibles_and_contacts
     return ''
 
