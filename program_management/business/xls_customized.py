@@ -167,7 +167,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
     data = [
         group_year.academic_year.name,
         group_year.complete_title_fr,
-        build_title_fr(offer, current_version),
+        _build_title_fr(offer, group, current_version),
         get_category(offer, group),
         group.type.value,
         group.credits if group.credits else ""
@@ -337,12 +337,15 @@ def _get_titles_en(current_version: 'ProgramTreeVersion', offer: Union['Training
     return titles
 
 
-def build_title_fr(offer: Union['Training', 'MiniTraining'], current_version: 'ProgramTreeVersion') -> str:
+def _build_title_fr(offer: Union['Training', 'MiniTraining'],
+                    group: 'Group',
+                    current_version: 'ProgramTreeVersion') -> str:
     if offer:
         title_fr = offer.titles.title_fr
     else:
-        return ''
-    if (not current_version.is_standard or current_version.is_transition) and current_version.title_fr:
+        return group.titles.title_fr
+    if current_version and (not current_version.is_standard or current_version.is_transition) and \
+            current_version.title_fr:
         title_fr += "[{}]".format(current_version.title_fr)
     return title_fr
 

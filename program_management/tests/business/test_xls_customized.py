@@ -54,7 +54,7 @@ from program_management.business.xls_customized import _build_headers, TRAINING_
     _build_organization_data, _get_responsibles_and_contacts, _build_aims_data, CARRIAGE_RETURN, _build_keywords_data, \
     _get_co_organizations, _build_duration_data, _build_common_ares_code_data, _title_yes_no_empty, \
     _build_funding_data, _build_diploma_certificat_data, _build_enrollment_data, \
-    _build_other_legal_information_data
+    _build_other_legal_information_data, _build_title_fr
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -339,7 +339,7 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.standard_current_version = StandardProgramTreeVersionFactory()
-        cls.particular_current_version = SpecificProgramTreeVersionFactory(title_en='Title en')
+        cls.particular_current_version = SpecificProgramTreeVersionFactory(title_en='Title en', title_fr='Title fr')
 
         titles = TitlesFactory()
         cls.aims1 = DiplomaAimFactory(entity_id__section=1, entity_id__code=191, description="description 1")
@@ -567,6 +567,20 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                                                self.training.decree_category.value)
                               ]
                              )
+
+    def test_build_title_fr_training(self):
+        self.assertEqual(_build_title_fr(self.training, None, None), self.training.titles.title_fr)
+
+    def test_build_title_fr_minitraining(self):
+        self.assertEqual(_build_title_fr(self.mini_training, None, None), self.mini_training.titles.title_fr)
+
+    def test_build_title_fr_group(self):
+        self.assertEqual(_build_title_fr(None, self.group, None), self.group.titles.title_fr)
+
+    def test_build_title_fr_training_with_version(self):
+        self.assertEqual(_build_title_fr(self.training, None, self.particular_current_version),
+                         "{}[{}]".format(self.training.titles.title_fr,
+                                         self.particular_current_version.title_fr))
 
 
 def _build_array_with_empty_string(nb_of_occurence):
