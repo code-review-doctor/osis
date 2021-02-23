@@ -255,6 +255,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         administration_entity_obj = entity_version.find(training_obj.administration_entity.acronym)
 
         form_initial_values = {
+            'transition_name': training_version.transition_name,
             'version_name': training_version.version_name,
             'version_title_fr': training_version.title_fr,
             'version_title_en': training_version.title_en,

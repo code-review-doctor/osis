@@ -290,6 +290,7 @@ class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMi
 
         super().__init__(training_version_identity, **kwargs)
         self.fields['version_name'].disabled = True
+        self.fields['transition_name'].disabled = True
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
