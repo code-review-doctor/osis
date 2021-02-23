@@ -155,7 +155,8 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         offer = _get_training(group_year.academic_year.year, group_year.acronym)
         training = offer
     elif group.is_mini_training():
-        offer = _get_mini_training(group_year.academic_year.year, group_year.acronym)
+        mini_training = _get_mini_training(group_year.academic_year.year, group_year.acronym)
+        offer = mini_training
 
     node_identity = NodeIdentity(code=group_year.partial_acronym, year=group_year.academic_year.year)
     program_tree_version_identity = ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
@@ -191,7 +192,7 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
             data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_EDUCATION_FIELDS])))
 
     if WITH_ORGANIZATION in other_params:
-        data.extend(_build_organization_data(current_version, training, group))
+        data.extend(_build_organization_data(current_version, training, mini_training, group))
 
     if WITH_RESPONSIBLES_AND_CONTACTS in other_params:
         if training:
@@ -386,7 +387,7 @@ def get_contacts(contact_persons: List[dict], title: str) -> str:
                 responsibles_and_contacts += "(fr) {}{}".format(contact.get('role_fr'), CARRIAGE_RETURN)
             if contact.get('role_en'):
                 responsibles_and_contacts += "(en) {}{}".format(contact.get('role_en'), CARRIAGE_RETURN)
-        # responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
+        responsibles_and_contacts += "{}".format(CARRIAGE_RETURN)
         return responsibles_and_contacts
     return ''
 
@@ -427,7 +428,7 @@ def _build_common_ares_code_data(co_graduation) -> List[str]:
 
 def activities_data(training: 'Training') -> List[str]:
     data = list()
-    data.append(training.other_campus_activities.value if training.other_campus_activities else '')
+    data.append(training.other_campus_activities.value.title() if training.other_campus_activities else '')
     data.append(training.internship_presence.value.title() if training.internship_presence else '')
     data.append(str(_('Yes')) if training.has_dissertation else str(_('No')))
     data.append(training.main_language.name if training.main_language else '')
@@ -489,19 +490,36 @@ def _get_start_year(current_version: 'ProgramTreeVersion', offer: Union['Trainin
     return ''
 
 
-def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'Training', group: 'Group') -> List[str]:
+def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'Training',
+                             mini_training: 'MiniTraining', group: 'Group') -> List[str]:
     data = []
+    no_activities_data = ['', '', '', '', '', '']
     if training:
         data.append(training.schedule_type.value)
         data.append(
-            training.management_entity.acronym if current_version.is_standard else group.management_entity.acronym
+            training.management_entity.acronym if current_version and current_version.is_standard else group.management_entity.acronym
         )
         data.append(training.administration_entity.acronym)
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
+
         data.append(_build_duration_data(training))
         data.extend(activities_data(training))
+    elif mini_training:
+        data.append(mini_training.schedule_type.value)
+        data.append(
+            mini_training.management_entity.acronym if current_version and current_version.is_standard else group.management_entity.acronym
+        )
+        data.append("")
+        data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
+        data.append("")
+        data.extend(no_activities_data)
     else:
-        data.extend(_add_empty_characters(len(PARAMETER_HEADERS[WITH_ORGANIZATION])))
+        data.append("")
+        data.append(group.management_entity.acronym)
+        data.append("")
+        data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
+        data.append("")
+        data.extend(no_activities_data)
     return data
 
 
@@ -587,3 +605,14 @@ def _is_minitraining(offer: Union['Training', 'MiniTraining']) -> bool:
 
 def _format_year_to_academic_year(year):
     return "{}-{}".format(str(year), str(year + 1)[-2:])
+
+
+def _common_training_mini_training_organization_data(current_version, group, offer):
+    data = []
+    data.append(offer.schedule_type.value)
+    data.append(
+        offer.management_entity.acronym if current_version.is_standard else group.management_entity.acronym
+    )
+    data.append(offer.administration_entity.acronym)
+    data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
+    return data

@@ -391,14 +391,15 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
                              [self.group.titles.title_en, '', ''])
 
     def test_build_organization_data_for_training(self):
-        result = _build_organization_data(self.standard_current_version, self.training, self.group)
+        result = _build_organization_data(self.standard_current_version, self.training, None, self.group)
         expected = [
-            self.training.schedule_type.value, self.training.management_entity.acronym,
+            self.training.schedule_type.value,
+            self.training.management_entity.acronym,
             self.training.administration_entity.acronym,
             "{} - {}".format(self.group.teaching_campus.name,
                              self.group.teaching_campus.university_name),
             "{} {}".format(self.training.duration, self.training.duration_unit.value),
-            self.training.other_campus_activities.value if self.training.other_campus_activities else '',
+            self.training.other_campus_activities.value.title() if self.training.other_campus_activities else '',
             self.training.internship_presence.value.title() if self.training.internship_presence else '',
             str(_('Yes')) if self.training.has_dissertation else str(_('No')),
             self.training.main_language.name if self.training.main_language else '',
@@ -409,9 +410,45 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             result,
             expected)
 
-    def test_build_organization_data_when_not_training(self):
-        self.assertListEqual(_build_organization_data(None, None, None),
-                             _build_array_with_empty_string(11))
+    def test_build_organization_data_for_mini_training(self):
+        result = _build_organization_data(None, None, self.mini_training, self.group)
+        expected = [
+            self.mini_training.schedule_type.value,
+            self.group.management_entity.acronym,
+            "",
+            "{} - {}".format(self.group.teaching_campus.name,
+                             self.group.teaching_campus.university_name),
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+        self.assertListEqual(
+            result,
+            expected)
+
+    def test_build_organization_data_for_group(self):
+        result = _build_organization_data(None, None, None, self.group)
+        expected = [
+            "",
+            self.group.management_entity.acronym,
+            "",
+            "{} - {}".format(self.group.teaching_campus.name,
+                             self.group.teaching_campus.university_name),
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+        ]
+        self.assertListEqual(
+            result,
+            expected)
 
     def test_get_responsibles_and_contacts(self):
         education_group_version = StandardEducationGroupVersionFactory()
@@ -449,10 +486,10 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             education_group_year=education_group_version.offer
         )
         contacts = _get_responsibles_and_contacts(g)
-        basic_titles = "Responsable académique\n{}\n{}\n" \
-                       "Autres responsables académiques\n{}\n" \
-                       "Membres du jury\n{}\n" \
-                       "Autres contacts\n{}\n"
+        basic_titles = "Responsable académique\n{}\n{}\n\n" \
+                       "Autres responsables académiques\n{}\n\n" \
+                       "Membres du jury\n{}\n\n" \
+                       "Autres contacts\n{}\n\n"
         expected = basic_titles.format(
             _build_person_detail(academic_responsible_contact),
             _build_person_detail(academic_responsible_contact_2),
