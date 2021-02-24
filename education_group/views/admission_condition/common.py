@@ -29,6 +29,11 @@ from base.models.education_group_year import EducationGroupYear
 
 
 class AdmissionConditionMixin:
+    def get_permission_required(self):
+        if self.get_permission_object().is_common:
+            return ('base.change_commonadmissioncondition', )
+        return ('base.change_admissioncondition', )
+
     def get_admission_condition_object(self) -> 'AdmissionCondition':
         try:
             return AdmissionCondition.objects.get(
