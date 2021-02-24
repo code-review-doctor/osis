@@ -153,22 +153,11 @@ CATEGORIES = (
 
 
 
-TODO :: à développer ? 
 ### API
 - Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
 - Incrémenter la version du schema.yml à chaque modification de celui-ci
 - Tout champs utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champs "filtre" doit se trouver dans la donnée renvoyée)
 
-
-
-TODO :: à supprimer
-### Documentation du code :
-- Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
-- Ne pas hésiter à laisser une ligne de commentaire dans le code, décrivant brièvement le fonctionnement d'algorithme plus compliqué/plus longs
-
-TODO :: à supprimer
-### Réutilisation du code :
-- Ne pas faire de copier/coller ; tout code dupliqué ou faisant la même chose doit être implémenté dans une fonction documentée qui est réutilisable
 
 ##### Performance
 Suivre les guidelines et bonnes pratiques proposées par Django :
@@ -190,25 +179,20 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - Regroupe les modèles Django et les classes pour la partie administration de Django
 - 1 classe par fichier héritant de `django.db.models.Model`
 - 1 classe par fichier héritant de `osis_common.models.osis_model_admin.OsisModelAdmin`
-- [TODO :: à supprimer] Chaque fichier contenant une classe du modèle ne peut renvoyer que des instances du modèle qu'elle déclare. Autrement dit, un fichier my_model.py contient une classe MyModel() et des méthodes qui ne peuvent renvoyer que des records venant de MyModel
 - Ne pas utiliser de `ManyToManyField` et déclarer explicitement les modèles de liaison (pour faciliter les noms de tables et synchronisations)
-- [TODO :: à supprimer] Lorsqu'un nouveau modèle est créé (ou que de nouveaux champs sont ajoutés), il faut penser à mettre à jour l'admin en conséquence (raw_id_fields, search_fields, list_filter...). 
 - Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
 
 
 
-TODO :: à supprimer
 ### Business :
 - Les fonctions propres à des fonctionnalités business (calculs de crédits ou volumes, etc.) doivent se trouver dans un fichier business. Ces fichiers sont utilisés par les Views et peuvent appeler des fonctions du modèle (et non l'inverse !). 
 - Les fonctions business ne peuvent pas recevoir l'argument 'request', qui est un argument propre aux views.
 
 
-TODO :: à supprimer
 ### Migration :
 - Ne pas utiliser le framework de persistence de Django lorsqu'il y a du code à exécuter dans les fichiers de migration. Il faut plutôt utiliser du SQL natif (voir https://docs.djangoproject.com/fr/1.10/topics/db/sql/ et https://docs.djangoproject.com/fr/1.10/ref/migration-operations/)
 
 
-TODO :: à supprimer
 ### Dépendances entre applications : 
 - Ne pas faire de références des applications principales ("base" et "reference") vers des applications tierces (Internship, assistant...)
 - Une application peut faire référence à une autre app' en cas de dépendance business (exemple: 'assessments' a besoin de 'attribution').
@@ -277,7 +261,6 @@ TODO :: à supprimer
 - Il est permis aux développeurs de merger la branche source (dev pour les branches technical et feature, qa ou master pour les branche hotfix) dans leur branche technical/feature/hotfix et de pusher cette modification directement sur la branche technical/feature/hotfix.
 - La possibilité susvisée permet, techniquement, de merger toute PR vers ses propres branches technical/feature/hotfix. Il est donc impératif de respecter le principe selon lequel on ne merge pas son propre code vers les branches technical/feature/hotfix tant que ce code n'a pas été approuvé par un autre développeur. Quand la review est faite et le code approuvé, on peut merger sa PR si les checks sont au vert (Travis, codeclimate, Quality check).
 
-TODO :: à supprimer
 ### Pull request de màj de la référence d'un submodule :
 Quand la PR correspond à la mise-à-jour de la référence pour un submodule, indiquer dans la description de la PR les références des tickets Jira du submodule qui passent dans cette mise-à-jour de référence (format : "IUFC-123").
 
@@ -287,7 +270,6 @@ Pour les trouver :
 3) Cela ouvre la liste des commits qui vont passer dans la mise-à-jour de référence -> les références des tickets Jira sont indiquées dans les messages de commits.
 
 
-TODO :: à supprimer
 ### Ressources et dépendances :
 - Ne pas faire de référence à des librairie/ressources externes ; ajouter la librairie utilisée dans le dossier 'static'
 
@@ -323,21 +305,9 @@ def send_an_email(receiver: Person):
 
 ```
 
-TODO :: à déplacer dans manuel technique ? On n'utilisait pas une autre librairie pour les PDFs ?
 ### PDF : 
 - Utiliser WeasyPrint ou pour la création de documents PDF (https://weasyprint.org/)
 - Utilisation de ReportLab dépréciée (car compliqué d'utilisation)
-
-
-TODO :: à supprimer (fera l'objet d'une page plus complète et plus spécifique dédiée à la manière e tester unitairement les couches)
-### Tests : 
-#### Vues :
-Idéalement lorsqu'on teste une view, on doit vérifier :
-- Le template utilisé (assertTemplateUsed)
-- Les redirections en cas de succès/erreurs
-- Le contenu du contexte utilisé dans le render du template
-- Les éventuels ordres de listes attendus
-
 
 
 ### Domain driven design
