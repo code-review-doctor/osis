@@ -540,14 +540,14 @@ class NodeGroupYear(Node):
             return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
         return '{}{}'.format(self.title, self.get_formatted_transition_name())
 
-    def version_label(self, only_label: bool = False) -> str:
+    def version_label(self) -> str:
         if self.version_name and self.transition_name:
-            version_label = '[{}-{}]'.format(self.version_name, self.get_formatted_transition_name())
+            version_label = '{}-{}'.format(self.version_name, self.get_formatted_transition_name())
         elif self.version_name or self.transition_name:
-            version_label = '[{}]'.format(self.version_name if self.version_name else self.transition_name)
+            version_label = '{}'.format(self.version_name if self.version_name else self.transition_name)
         else:
             return ''
-        return version_label[1:len(version_label) - 1] if only_label else version_label
+        return version_label
 
     def full_title(self) -> str:
         title = self.offer_title_fr

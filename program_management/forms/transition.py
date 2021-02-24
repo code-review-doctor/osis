@@ -125,6 +125,13 @@ class TransitionVersionForm(forms.Form):
 
 
 class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMixin, TransitionVersionForm):
+    transition_name = forms.CharField(
+        max_length=25,
+        required=False,
+        label=_('Acronym/Short title'),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        disabled=True
+    )
     # panel_informations_form.html
     code = forms.CharField(label=_("Code"), disabled=True, required=False)
     category = forms.CharField(label=_("Category"), disabled=True, required=False)
@@ -290,7 +297,6 @@ class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMi
 
         super().__init__(training_version_identity, **kwargs)
         self.fields['version_name'].disabled = True
-        self.fields['transition_name'].disabled = True
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
@@ -313,14 +319,15 @@ class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMi
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
 
-    def clean(self):
-        # Max length in forms = 14 but in DB it is 25 ("TRANSITION " is added in front of user data in creation)
-        if 'transition_name' in self._errors:
-            del self._errors['transition_name']
-        return self.cleaned_data
-
 
 class UpdateMiniTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMixin, TransitionVersionForm):
+    transition_name = forms.CharField(
+        max_length=25,
+        required=False,
+        label=_('Acronym/Short title'),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        disabled=True
+    )
     code = forms.CharField(label=_("Code"), disabled=True, required=False)
     category = forms.CharField(label=_("Category"), disabled=True, required=False)
     type = forms.CharField(label=_("Type of training"), disabled=True, required=False)
@@ -395,9 +402,3 @@ class UpdateMiniTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFie
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
-
-    def clean(self):
-        # Max length in forms = 14 but in DB it is 25 ("TRANSITION " is added in front of user data in creation)
-        if 'transition_name' in self._errors:
-            del self._errors['transition_name']
-        return self.cleaned_data
