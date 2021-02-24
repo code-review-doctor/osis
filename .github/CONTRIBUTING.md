@@ -1,4 +1,4 @@
-### Table of Contents
+## Table of Contents
 - [Coding styles](#coding-styles)
     - [Indentation](#indentation)
     - [Signature des fonctions](#signature-des-fonctions)
@@ -27,14 +27,20 @@
     - [Validator](#dddvalidator)
 
 
+<br/><br/>
 
 ## Coding styles
 
 #### PEP8
-On se conforme au [guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
+- [Guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
+
+
+#### Style de code Django
+- [Coding Style de Django](https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/).
 
 
 #### Indentation
+
 ```python
 # Bon
 return render(
@@ -77,7 +83,6 @@ def my_function(arg1: str,
     pass
 ```
 
-Voir en plus le [Coding Style de Django](https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/).
 
 #### Traductions
 - Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
@@ -155,8 +160,8 @@ CATEGORIES = (
 
 #### Performance
 Suivre les guidelines et bonnes pratiques proposées par Django :
-- [Guide des performances Django](#https://docs.djangoproject.com/en/2.2/topics/performance/)
-- [Guide des optimisations Django](#https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
+- [Guide des performances Django](https://docs.djangoproject.com/en/2.2/topics/performance/)
+- [Guide des optimisations Django](https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
 
 
 #### Sécurité
@@ -166,13 +171,14 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
     - Alternative : utiliser un UUID 
 - Dans le cas d'insertion/modification des données venant de l'extérieur (exemple : fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur ces données qu'il désire injecter.
 
+<br/><br/>
 
 ## API
 - Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
 - Incrémenter la version du schema.yml à chaque modification de celui-ci
 - Tout champs utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champs "filtre" doit se trouver dans la donnée renvoyée)
  
-
+<br/><br/>
 
 ## Modèle (Django Model)
 - Regroupe les modèles Django et les classes pour la partie administration de Django
@@ -181,11 +187,12 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - Ne pas utiliser de `ManyToManyField` et déclarer explicitement les modèles de liaison (pour faciliter les noms de tables et synchronisations)
 - Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
 
+<br/><br/>
 
 ## Vue (Django View)
 - Ajouter les annotations pour sécuriser les méthodes dans les vues (user_passes_tests, login_required, require_permission)
 - Les vues servent de "proxy" pour aller chercher les données nécessaires à la génération des pages html, qu'elles vont chercher dans la couche "business" ou directement dans la couche "modèle". Elles ne doivent donc pas contenir de logique business
-- Utiliser les [Class Based Views](#https://docs.djangoproject.com/fr/2.2/topics/class-based-views/) à la place des function bases views
+- Utiliser les [Class Based Views](https://docs.djangoproject.com/fr/2.2/topics/class-based-views/) à la place des function bases views
 - Accès :
   - [couche Django Forms](#formulaire-django-forms)
   - [couche Application Service](#dddservice-application-service)
@@ -193,7 +200,7 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
   - [couche Template Tags](#template-django-template-tags)
   - Uniquement vues "list" et "excel" : [couche Django Models](#modle-django-model) (à analyser au cas par cas ; le DDD risquerait de complexifier ces vues)
 
-
+<br/><br/>
 
 ## Formulaire (Django Forms)
 - Regroupe les objets qui permettent de faciliter l'affichage du code HTML côté template
@@ -201,6 +208,7 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - Accès :
   - [couche application service](#dddservice-application-service)
 
+<br/><br/>
 
 ## Template (Django templates)
 - Regroupe les fichiers `html` structurés en "blocks" afin de m'aximiser la réutilisation de templates
@@ -230,20 +238,26 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
         ├── [templates/learning_unit/simple/list.html]list.html
         └── [templates/learning_unit/simple/update.html]update_***.html
 ```
+<br/><br/>
 
 ## Gabarits (Django Template Tags)
 - Regroupe les template tags Django
 - Accès : 
   - Aucun (un template tag ne doit avoir aucune dépendance externe à lui-même)
 
+<br/><br/>
+
 ## Permissions
-- Cf. [Osis-role](#https://github.com/uclouvain/osis/blob/dev/osis_role/README.md)
+- Voir [Osis-role](https://github.com/uclouvain/osis/blob/dev/osis_role/README.md)
 - Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions frounies par Django), créer un décorateur dans le dossier "perms" des "views". Le code business propre à la permission devra se trouver dans un dossier "perms" dans "business". Voir "base/views/learning_units/perms/" et "base/business/learning_units/perms/".
+
+<br/><br/>
 
 ## Droits de merge et reviews
 - Il est permis aux développeurs de merger la branche source (dev pour les branches technical et feature, qa ou master pour les branche hotfix) dans leur branche technical/feature/hotfix et de pusher cette modification directement sur la branche technical/feature/hotfix.
 - La possibilité susvisée permet, techniquement, de merger toute PR vers ses propres branches technical/feature/hotfix. Il est donc impératif de respecter le principe selon lequel on ne merge pas son propre code vers les branches technical/feature/hotfix tant que ce code n'a pas été approuvé par un autre développeur. Quand la review est faite et le code approuvé, on peut merger sa PR si les checks sont au vert (Travis, codeclimate, Quality check).
 
+<br/><br/>
 
 ## Emails
 - Utiliser la fonction d'envoi de mail décrite dans `osis_common/messaging/send_mail.py`. Exemple:
@@ -276,12 +290,13 @@ def send_an_email(receiver: Person):
 
 ```
 
-
+<br/><br/>
 
 ## PDF : 
 - Utiliser WeasyPrint ou pour la création de documents PDF (https://weasyprint.org/)
 - Utilisation de ReportLab dépréciée (car compliqué d'utilisation)
 
+<br/><br/>
 
 ## Domain driven design
 
