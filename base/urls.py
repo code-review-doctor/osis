@@ -33,6 +33,7 @@ import base.views.autocomplete
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
+import base.views.learning_units.proposal.check
 import base.views.learning_units.proposal.consolidate
 import base.views.learning_units.proposal.delete
 import base.views.learning_units.search.borrowed
@@ -257,7 +258,8 @@ urlpatterns = [
     ])),
     url(r'^proposals/search/$', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
         name="learning_unit_proposal_search"),
-
+    url(r'^proposal_get_related_partims_by_ue/$', base.views.learning_units.proposal.check.get_related_partims_by_ue,
+        name="get_related_partims_by_ue"),
     url(r'^my_osis/', include([
         url(r'^$', my_osis.my_osis_index, name="my_osis"),
         url(r'^management_tasks/messages_templates', my_osis.messages_templates_index, name="messages_templates"),
