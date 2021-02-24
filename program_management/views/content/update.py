@@ -44,7 +44,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "version": version,
             "tree_different_versions": get_program_tree_version_for_tree(self.get_program_tree_obj().get_all_nodes()),
             "training_obj": self.get_training_obj() if obj.is_training() else None,
-            "version_label": version_label(version.entity_id)
+            "version_label": version_label(version.entity_id) if version else ''
 
         }
         return render(request, self.template_name, context)

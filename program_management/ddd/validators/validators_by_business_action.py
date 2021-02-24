@@ -48,7 +48,6 @@ from program_management.ddd.validators._end_date_between_finalities_and_masters 
     CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
-from program_management.ddd.validators._match_transition import MatchTransitionValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -149,12 +148,6 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                     tree_repository,
                     tree_version_repository
                 ),
-                MatchTransitionValidator(
-                    tree.get_node(path),
-                    node_to_paste,
-                    tree_repository,
-                    tree_version_repository
-                )
             ]
 
         elif node_to_paste.is_learning_unit():

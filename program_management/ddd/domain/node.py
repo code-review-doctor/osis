@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import collections
-import copy
 from _decimal import Decimal
 from typing import List, Set, Optional, Iterator, Tuple, Generator, Dict
 
@@ -540,6 +539,13 @@ class NodeGroupYear(Node):
         if self.version_name:
             return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
         return '{}{}'.format(self.title, self.get_formatted_transition_name())
+
+    def version_label(self) -> str:
+        if self.version_name and self.transition_name:
+            return '{}-{}'.format(self.version_name, self.get_formatted_transition_name())
+        elif self.version_name or self.transition_name:
+            return '{}'.format(self.version_name if self.version_name else self.transition_name)
+        return ''
 
     def full_title(self) -> str:
         title = self.offer_title_fr
