@@ -2,6 +2,7 @@
 from . import check_academic_calendar
 from . import extend_learning_units
 from . import synchronize_entities
+from . import calendar_reminder_notice
 
 
 from celery.schedules import crontab
