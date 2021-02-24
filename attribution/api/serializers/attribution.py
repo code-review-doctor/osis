@@ -23,17 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from attribution.api.views.attribution import AttributionListView
-from attribution.api.views.calendar import ApplicationCoursesCalendarListView
+from attribution.models.enums.function import Functions
 
-app_name = "attribution"
-urlpatterns = [
-    url(
-        r'^application/calendars$',
-        ApplicationCoursesCalendarListView.as_view(),
-        name=ApplicationCoursesCalendarListView.name
-    ),
-    url(r'^attribution/(?P<year>[0-9]{4})/me$', AttributionListView.as_view(), name=AttributionListView.name),
-]
+
+class AttributionSerializer(serializers.Serializer):
+    acronym = serializers.CharField()
+    title = serializers.CharField()
+    year = serializers.IntegerField()
+    credits = serializers.DecimalField(max_digits=5, decimal_places=2)
+    start_year = serializers.IntegerField()
+    function = serializers.CharField()
+    function_text = serializers.SerializerMethodField()
+    catalog_app_url = serializers.SerializerMethodField()
+    schedule_app_url = serializers.SerializerMethodField()
+
+    def get_function_text(self, obj) -> str:
+        if obj.function:
+            return Functions.get_value(obj.function)
+        return ""
+
+    def get_catalog_app_url(self, obj) -> str:
+        return ""
+
+    def get_schedule_app_url(self, obj) -> str:
+        return ""
