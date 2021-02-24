@@ -38,7 +38,7 @@ class TransitionNamePatternValidator(BusinessValidator):
         super().__init__()
         self.transition_name = transition_name
 
-    def validate(self, *args, **kwargs):
+    def validate(self):
         if not bool(re.fullmatch(TRANSITION_NAME_REGEX, self.transition_name.upper())):
             raise InvalidTransitionNameException()
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-18 15:12+0100\n"
+"POT-Creation-Date: 2021-02-24 16:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -124,6 +124,10 @@ msgid "Admission exam"
 msgstr ""
 
 msgctxt "female plural"
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -763,7 +767,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -783,7 +787,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-msgid "This value is invalid"
+msgid "This value is invalid."
 msgstr ""
 
 msgid "This version exists until"
@@ -823,6 +827,12 @@ msgid "Transformation and modification"
 msgstr ""
 
 msgid "Transition name"
+msgstr ""
+
+msgid "Transition name {} already exists"
+msgstr ""
+
+msgid "Transition name {} existed"
 msgstr ""
 
 msgid "Tutors"
@@ -909,6 +919,12 @@ msgstr ""
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
 "versions exists during this year and/or in the future."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists in {transition_year}"
 msgstr ""
 
 #, python-format

@@ -385,25 +385,25 @@ class InvalidTransitionNameException(BusinessException):
         super().__init__(message)
 
 
-class VersionNameAlreadyExist(BusinessException):
+class VersionNameExistsCurrentYearAndInFuture(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} already exists").format(version_name)
         super().__init__(message, **kwargs)
 
 
-class VersionNameExistedException(BusinessException):
+class VersionNameExistsInPast(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} existed").format(version_name)
         super().__init__(message, **kwargs)
 
 
-class TransitionNameAlreadyExist(BusinessException):
+class TransitionNameExistsCurrentYearAndInFuture(BusinessException):
     def __init__(self, transition_name: str, *args, **kwargs):
         message = _("Transition name {} already exists").format(transition_name)
         super().__init__(message, **kwargs)
 
 
-class TransitionNameExistedException(BusinessException):
+class TransitionNameExistsInPast(BusinessException):
     def __init__(self, transition_name: str, *args, **kwargs):
         message = _("Transition name {} existed").format(transition_name)
         super().__init__(message, **kwargs)

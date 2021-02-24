@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-18 15:12+0100\n"
+"POT-Creation-Date: 2021-02-24 16:19+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -347,9 +347,6 @@ msgstr "Stage"
 
 msgid "Invalid name version"
 msgstr "Nom de version invalide"
-
-msgid "Invalid transition name"
-msgstr "Nom de transition invalide"
 
 msgid "Invalid tree path"
 msgstr "Chemin invalide"
@@ -897,6 +894,12 @@ msgstr "Transformation et modification"
 msgid "Transition name"
 msgstr "Sigle de la transition"
 
+msgid "Transition name {} already exists"
+msgstr "Nom de transition {} existe déjà"
+
+msgid "Transition name {} existed"
+msgstr "Nom de transition {} a déjà existé dans le passé"
+
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
@@ -992,12 +995,13 @@ msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
 "qu'il existe une version particulière pour cette année et/ou dans le futur."
 
+#, python-brace-format
 msgid ""
 "You can't extend the program tree '{code}' in {year} as other transition "
 "version exists in {transition_year}"
 msgstr ""
-"Vous ne pouvez pas étendre la formation '{code}' en {year} parce "
-"qu'il existe une autre version de transition en {transition_year}"
+"Vous ne pouvez pas étendre la formation '{code}' en {year} parce qu'il "
+"existe une autre version de transition en {transition_year}"
 
 #, python-format
 msgid ""
@@ -1114,15 +1118,6 @@ msgstr "remarque en anglais"
 
 msgid "secondary domains"
 msgstr "domaines secondaires"
-
-msgid "this group"
-msgstr "ce groupement"
-
-msgid "this mini-training"
-msgstr "cette mini-formation"
-
-msgid "this training"
-msgstr "cette formation"
 
 msgid "training"
 msgstr "formation"

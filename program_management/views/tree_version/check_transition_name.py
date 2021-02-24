@@ -32,7 +32,7 @@ from django.views.decorators.http import require_http_methods
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.decorators.ajax import ajax_required
 from program_management.ddd import command
-from program_management.ddd.domain.exception import TransitionNameExistedException
+from program_management.ddd.domain.exception import TransitionNameExistsInPast
 from program_management.ddd.service.read import check_transition_name_service
 
 
@@ -52,7 +52,7 @@ def check_transition_name(request, year, acronym, version_name):
         check_transition_name_service.check_transition_name(cmd)
     except MultipleBusinessExceptions as multiple_exceptions:
         first_exception = next(e for e in multiple_exceptions.exceptions)
-        if isinstance(first_exception, TransitionNameExistedException):
+        if isinstance(first_exception, TransitionNameExistsInPast):
             msg = ". ".join([first_exception.message, str(_("Save will prolong the past version"))])
             return JsonResponse({
                 "valid": True,
@@ -85,7 +85,7 @@ def check_standard_transition_name(request, year, acronym):
         check_transition_name_service.check_transition_name(cmd)
     except MultipleBusinessExceptions as multiple_exceptions:
         first_exception = next(e for e in multiple_exceptions.exceptions)
-        if isinstance(first_exception, TransitionNameExistedException):
+        if isinstance(first_exception, TransitionNameExistsInPast):
             msg = ". ".join([first_exception.message, str(_("Save will prolong the past version"))])
             return JsonResponse({
                 "valid": True,

@@ -115,7 +115,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
                 try:
                     identities = create_and_postpone_tree_specific_version_service.\
                         create_and_postpone_program_tree_specific_version(command=command)
-                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
+                except (program_management.ddd.domain.exception.VersionNameExistsCurrentYearAndInFuture,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             else:
@@ -221,7 +221,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
                 try:
                     identities = create_and_postpone_tree_transition_version_service. \
                         create_and_postpone_program_tree_transition_version(command=command)
-                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
+                except (program_management.ddd.domain.exception.TransitionNameExistsCurrentYearAndInFuture,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             else:
