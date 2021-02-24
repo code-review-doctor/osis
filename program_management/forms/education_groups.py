@@ -181,7 +181,9 @@ class GroupFilter(FilterSet):
     @staticmethod
     def filter_by_transition(queryset, name, value):
         if not value:
-            return queryset.filter(educationgroupversion__transition_name=NOT_A_TRANSITION)
+            return queryset.filter(
+                Q(educationgroupversion__transition_name=NOT_A_TRANSITION) | Q(educationgroupversion__isnull=True)
+            )
         return queryset
 
     def get_queryset(self):
