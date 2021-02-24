@@ -344,6 +344,9 @@ msgid ""
 "UE"
 msgstr ""
 
+msgid "At least one learning unit has partim:"
+msgstr ""
+
 msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
@@ -425,7 +428,16 @@ msgstr ""
 msgid "Cancel proposal"
 msgstr ""
 
+msgid "Cancel proposal(s)"
+msgstr ""
+
+msgid "Cancel proposal(s)?"
+msgstr ""
+
 msgid "Cancel the proposal"
+msgstr ""
+
+msgid "Cancel the proposal?"
 msgstr ""
 
 msgid "Catalogue"
@@ -697,7 +709,7 @@ msgstr ""
 msgid "Do not assign"
 msgstr ""
 
-msgid "Do you want to cancel proposal?"
+msgid "Do not cancel"
 msgstr ""
 
 msgid "Do you want to change the status of this proposals?"
@@ -2508,6 +2520,12 @@ msgid "There is not the learning unit %(acronym)s - %(next_year)s"
 msgstr ""
 
 msgid "Thesis"
+msgstr ""
+
+msgid "This action will permanently cancel the proposal"
+msgstr ""
+
+msgid "This action will permanently cancel the selected proposal(s)"
 msgstr ""
 
 msgid "This code already exists for this learning unit"
