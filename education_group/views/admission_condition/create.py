@@ -38,10 +38,9 @@ from education_group.views.admission_condition.common import AdmissionConditionM
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class CreateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin,
-                                   AdmissionConditionMixin, CreateView):
+class CreateAdmissionConditionLine(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin,
+                                   AjaxTemplateMixin, CreateView):
     template_name = "education_group_app/admission_condition/line_edit.html"
-    permission_required = 'base.change_admissioncondition'
     raise_exception = True
     force_reload = True
     model = AdmissionConditionLine
