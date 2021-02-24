@@ -149,6 +149,7 @@ CATEGORIES = (
 - Réduire au minimum le nombre de fichiers de migrations par fonctionnalité (limite le temps de création de la DB de test, facilite la review, limite les conflits)
 - Ajouter la référence au ticket Jira dans le titre de la pull request (format = "OSIS-12345")
 - Utiliser un titre de pull request qui identifie son contenu (facilite la recherche de pull requests et permet aux contributeurs du projet d'avoir une idée sur son contenu)
+    - Le titre doit correspondre à l'intitulé du ticket Jira associé
 
 
 
@@ -170,9 +171,9 @@ TODO :: à supprimer
 - Ne pas faire de copier/coller ; tout code dupliqué ou faisant la même chose doit être implémenté dans une fonction documentée qui est réutilisable
 
 ##### Performance
-- Ne pas faire d'appel à la DB (pas de queryset) dans une boucle 'for'
-- Utiliser le `prefetch_related` et `select_related` pour récupérer toutes les données nécessaires en une seule requête avant d'effectuer des opérations (boucles `for`, etc.)
-- Préférer les `tuple` à `list` (moins d'espace en mémoire)
+Suivre les guidelines et bonnes pratiques proposées par Django :
+- [Guide des performances Django](#https://docs.djangoproject.com/en/2.2/topics/performance/)
+- [Guide des optimisations Django](#https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
 
 
 ##### Sécurité
