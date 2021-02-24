@@ -143,14 +143,44 @@ class ProgramTreeVersionMismatch(BusinessException):
             "%(node_to_add)s or its children must have the same version as %(node_to_paste_to)s "
             "and all of it's parent's [%(version_mismatched)s]"
         ) % {
-            'node_to_add': str(node_to_add),
-            'node_to_paste_to': str(node_to_paste_to),
-            'version_mismatched': ",".join(parents_version_names)
-        }
+                       'node_to_add': str(node_to_add),
+                       'node_to_paste_to': str(node_to_paste_to),
+                       'version_mismatched': ",".join(parents_version_names)
+                   }
         super().__init__(messages, **kwargs)
 
-    def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
-        return str(_('Standard')) if version_identity.is_official_standard else version_identity.version_name
+    @staticmethod
+    def _get_version_name(version_identity: 'ProgramTreeVersionIdentity'):
+        from program_management.ddd.domain.program_tree_version import version_label
+        return str(_('Standard')) \
+            if version_identity.is_official_standard else version_label(version_identity, only_label=True)
+
+
+class ProgramTreeTransitionMismatch(BusinessException):
+    def __init__(
+            self,
+            node_to_add: 'Node',
+            node_to_paste_to: 'Node',
+            parents_transition_mismatched_identity: List['ProgramTreeVersionIdentity'],
+            *args,
+            **kwargs
+    ):
+        parents_transition_names = {
+            self._get_transition_name(version_identity) for version_identity in parents_transition_mismatched_identity
+        }
+        messages = _(
+            "%(node_to_add)s or its children must have the same transition as %(node_to_paste_to)s "
+            "and all of it's parent's [%(transition_mismatched)s]"
+        ) % {
+                       'node_to_add': str(node_to_add),
+                       'node_to_paste_to': str(node_to_paste_to),
+                       'transition_mismatched': ",".join(parents_transition_names)
+                   }
+        super().__init__(messages, **kwargs)
+
+    @staticmethod
+    def _get_transition_name(version_identity: 'ProgramTreeVersionIdentity'):
+        return str(_('Standard')) if version_identity.is_official_standard else version_identity.transition_name
 
 
 class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessException):
