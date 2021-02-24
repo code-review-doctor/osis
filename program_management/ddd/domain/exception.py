@@ -163,7 +163,7 @@ class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessExc
             "{transition_year}"
         ).format(
             code=version.program_tree_identity.code,
-            year=version.entity_id.year,
+            year=version.end_year_of_existence,
             transition_year=transition_year
         )
         super().__init__(message, **kwargs)
