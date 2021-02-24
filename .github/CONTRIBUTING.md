@@ -183,22 +183,6 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
 
 
-
-### Business :
-- Les fonctions propres à des fonctionnalités business (calculs de crédits ou volumes, etc.) doivent se trouver dans un fichier business. Ces fichiers sont utilisés par les Views et peuvent appeler des fonctions du modèle (et non l'inverse !). 
-- Les fonctions business ne peuvent pas recevoir l'argument 'request', qui est un argument propre aux views.
-
-
-### Migration :
-- Ne pas utiliser le framework de persistence de Django lorsqu'il y a du code à exécuter dans les fichiers de migration. Il faut plutôt utiliser du SQL natif (voir https://docs.djangoproject.com/fr/1.10/topics/db/sql/ et https://docs.djangoproject.com/fr/1.10/ref/migration-operations/)
-
-
-### Dépendances entre applications : 
-- Ne pas faire de références des applications principales ("base" et "reference") vers des applications tierces (Internship, assistant...)
-- Une application peut faire référence à une autre app' en cas de dépendance business (exemple: 'assessments' a besoin de 'attribution').
-
-
-
 ### Vue (Django View)
 - Ajouter les annotations pour sécuriser les méthodes dans les vues (user_passes_tests, login_required, require_permission)
 - Les vues servent de "proxy" pour aller chercher les données nécessaires à la génération des pages html, qu'elles vont chercher dans la couche "business" ou directement dans la couche "modèle". Elles ne doivent donc pas contenir de logique business
@@ -260,18 +244,6 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 ### Droits de merge et reviews
 - Il est permis aux développeurs de merger la branche source (dev pour les branches technical et feature, qa ou master pour les branche hotfix) dans leur branche technical/feature/hotfix et de pusher cette modification directement sur la branche technical/feature/hotfix.
 - La possibilité susvisée permet, techniquement, de merger toute PR vers ses propres branches technical/feature/hotfix. Il est donc impératif de respecter le principe selon lequel on ne merge pas son propre code vers les branches technical/feature/hotfix tant que ce code n'a pas été approuvé par un autre développeur. Quand la review est faite et le code approuvé, on peut merger sa PR si les checks sont au vert (Travis, codeclimate, Quality check).
-
-### Pull request de màj de la référence d'un submodule :
-Quand la PR correspond à la mise-à-jour de la référence pour un submodule, indiquer dans la description de la PR les références des tickets Jira du submodule qui passent dans cette mise-à-jour de référence (format : "IUFC-123").
-
-Pour les trouver : 
-1) Une fois la PR ouverte, cliquer sur l'onglet "Files Changed"
-2) Cliquer sur "x files" dans le texte "Submodule xyz updated x files"
-3) Cela ouvre la liste des commits qui vont passer dans la mise-à-jour de référence -> les références des tickets Jira sont indiquées dans les messages de commits.
-
-
-### Ressources et dépendances :
-- Ne pas faire de référence à des librairie/ressources externes ; ajouter la librairie utilisée dans le dossier 'static'
 
 
 ### Emails
