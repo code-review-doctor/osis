@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-19 13:59+0100\n"
+"POT-Creation-Date: 2021-02-23 15:04+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1818,9 +1818,12 @@ msgstr "Partenariats"
 msgid "Password"
 msgstr "Mot de passe"
 
+msgid "Pay attention"
+msgstr "Attention"
+
 msgid "Pay attention! This learning unit is used in more than one formation"
 msgstr ""
-"Attention cette unité d'enseignement fait partie de plusieurs formations:"
+"Attention cette unité d'enseignement fait partie de plusieurs formations :"
 
 msgid "Pending"
 msgstr "En attente"
@@ -2224,6 +2227,9 @@ msgstr "Sélectionner tout"
 
 msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
+
+msgid "Send calendar reminder notice"
+msgstr "Envoyer un rappel sur les événements académiques"
 
 msgid "Separate"
 msgstr "Séparer"
@@ -2646,8 +2652,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application this year"
-msgstr "L'unité d'enseignement dispose d'au moins une candidature cette année"
+msgid "This learning unit has application"
+msgstr "L'unité d'enseignement a au moins une candidature"
 
 msgid ""
 "This learning unit is not editable by central managers during this period."
@@ -3073,6 +3079,9 @@ msgstr "volume horaire total annuel"
 msgid "initial value"
 msgstr "valeur initiale"
 
+msgid "is part of several trainings"
+msgstr "fait partie de plusieurs formations"
+
 msgid "items per page"
 msgstr "éléments par page"
 
@@ -3198,6 +3207,15 @@ msgid "the sum of repartition volumes must be equal to the global volume"
 msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
+
+msgid "this group"
+msgstr "ce groupement"
+
+msgid "this mini-training"
+msgstr "cette mini-formation"
+
+msgid "this training"
+msgstr "cette formation"
 
 msgid "to"
 msgstr "à"

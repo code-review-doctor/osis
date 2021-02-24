@@ -44,6 +44,7 @@ class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ('academic_year', 'reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
+    actions = ['send_calendar_reminder_notice']
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -53,6 +54,11 @@ class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
 
     def get_actions(self, request):
         return remove_delete_action(super(AcademicCalendarAdmin, self).get_actions(request))
+
+    def send_calendar_reminder_notice(self, request, queryset):
+        from base.tasks import calendar_reminder_notice
+        return calendar_reminder_notice.run()
+    send_calendar_reminder_notice.short_description = _("Send calendar reminder notice")
 
 
 class AcademicCalendarQuerySet(models.QuerySet):
@@ -143,18 +149,3 @@ def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, 
 
 def _list_types(calendar_types):
     return [calendar_type[0] for calendar_type in calendar_types]
-
-
-def get_academic_calendar_by_date_and_reference_and_data_year(data_year, reference, date=None):
-    if date is None:
-        date = timezone.now()
-
-    try:
-        return AcademicCalendar.objects.get(
-            data_year=data_year,
-            reference=reference,
-            start_date__lte=date,
-            end_date__gte=date,
-        )
-    except AcademicCalendar.DoesNotExist:
-        return None
