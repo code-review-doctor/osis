@@ -6,7 +6,7 @@
     - [Enumérations](#enums)
     - [Kwargs](#kwargs)
     - [Commits](#commits)
-    - [Pull request](#pull-request)
+    - [Pull request](#pull-requests)
     - [Performance](#performance)
     - [Sécurité](#scurit)
 - [API](#api)
@@ -28,13 +28,13 @@
 
 
 
-### Coding styles
+## Coding styles
 
-##### PEP8
+#### PEP8
 On se conforme au [guide PEP8](https://www.python.org/dev/peps/pep-0008/#indentation)
 
 
-##### Indentation
+#### Indentation
 ```python
 # Bon
 return render(
@@ -79,12 +79,12 @@ def my_function(arg1: str,
 
 Voir en plus le [Coding Style de Django](https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/).
 
-##### Traductions
+#### Traductions
 - Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
 - Les "Fuzzy" doivent être supprimés si la traduction du développeur diffère de la traduction proposée (le "fuzzy" signifiant que GetText a tenté de traduire la clé en retrouvant une similitude dans une autre clé).
 
 
-##### Signature des fonctions
+#### Signature des fonctions
 - Doit être typé ([python typing](https://docs.python.org/fr/3.6/library/typing.html))
 - Types de retour de fonctions non autorisés (pas assez explicites) :
   - `dict` ==> utiliser `Dict[KeyType, ValueType]`
@@ -92,7 +92,7 @@ Voir en plus le [Coding Style de Django](https://docs.djangoproject.com/en/2.2/i
 - Éviter l'utilisation de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
 
 
-##### Constantes
+#### Constantes
 - Ne pas utiliser de 'magic_number' (constante non déclarée dans une variable). 
 ```python
 # Bon
@@ -118,7 +118,7 @@ def verbose_value(value: int) -> str:
     return str(value) if value else "-"
 ```
 
-##### Enums
+#### Enums
 - Utiliser des ChoiceEnum plutôt que des CONST contenant des tuples.
 ```python
 # Bon
@@ -138,14 +138,14 @@ CATEGORIES = (
 )
 ```
 
-##### kwargs
+#### kwargs
 - Toujours déclarer `kwarg=None` (jamais instancier un objet mutable comme une `list`, `dict`...)
 
-##### Commits
+#### Commits
 - Ajouter un message explicite à chaque commit
 - Commiter souvent = diff limité = facilité d'identification de commits amenant une régression = facilité de revert = Facilité et rapidité de review
 
-##### Pull request
+#### Pull requests
 - Réduire au minimum le nombre de fichiers de migrations par fonctionnalité (limite le temps de création de la DB de test, facilite la review, limite les conflits)
 - Ajouter la référence au ticket Jira dans le titre de la pull request (format = "OSIS-12345")
 - Utiliser un titre de pull request qui identifie son contenu (facilite la recherche de pull requests et permet aux contributeurs du projet d'avoir une idée sur son contenu)
@@ -153,19 +153,13 @@ CATEGORIES = (
 
 
 
-### API
-- Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
-- Incrémenter la version du schema.yml à chaque modification de celui-ci
-- Tout champs utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champs "filtre" doit se trouver dans la donnée renvoyée)
-
-
-##### Performance
+#### Performance
 Suivre les guidelines et bonnes pratiques proposées par Django :
 - [Guide des performances Django](#https://docs.djangoproject.com/en/2.2/topics/performance/)
 - [Guide des optimisations Django](#https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
 
 
-##### Sécurité
+#### Sécurité
 - Ne pas laisser de données sensibles/privées dans les commentaires/dans le code
 - Dans les URL (url.py), on ne peut jamais passer un ID auto-incrémenté (fourni par le moteur DB) en paramètre 
     - À éviter : `<site_url>/?tutor_id=1234` ou `<site_url>/score_encoding/print/34`
@@ -173,9 +167,14 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - Dans le cas d'insertion/modification des données venant de l'extérieur (exemple : fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur ces données qu'il désire injecter.
 
 
+## API
+- Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
+- Incrémenter la version du schema.yml à chaque modification de celui-ci
+- Tout champs utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champs "filtre" doit se trouver dans la donnée renvoyée)
  
 
-### Modèle (Django Model)
+
+## Modèle (Django Model)
 - Regroupe les modèles Django et les classes pour la partie administration de Django
 - 1 classe par fichier héritant de `django.db.models.Model`
 - 1 classe par fichier héritant de `osis_common.models.osis_model_admin.OsisModelAdmin`
@@ -183,7 +182,7 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
 
 
-### Vue (Django View)
+## Vue (Django View)
 - Ajouter les annotations pour sécuriser les méthodes dans les vues (user_passes_tests, login_required, require_permission)
 - Les vues servent de "proxy" pour aller chercher les données nécessaires à la génération des pages html, qu'elles vont chercher dans la couche "business" ou directement dans la couche "modèle". Elles ne doivent donc pas contenir de logique business
 - Utiliser les [Class Based Views](#https://docs.djangoproject.com/fr/2.2/topics/class-based-views/) à la place des function bases views
@@ -196,14 +195,14 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 
 
 
-### Formulaire (Django Forms)
+## Formulaire (Django Forms)
 - Regroupe les objets qui permettent de faciliter l'affichage du code HTML côté template
 - Ne peut pas contenir de logique métier
 - Accès :
   - [couche application service](#dddservice-application-service)
 
 
-### Template (Django templates)
+## Template (Django templates)
 - Regroupe les fichiers `html` structurés en "blocks" afin de m'aximiser la réutilisation de templates
 - Utilise Django-Bootstrap3 pour le rendering des [Django Forms](#formulaire-django-forms)
 - Arborescence des fichiers :
@@ -232,21 +231,21 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
         └── [templates/learning_unit/simple/update.html]update_***.html
 ```
 
-### Gabarits (Django Template Tags)
+## Gabarits (Django Template Tags)
 - Regroupe les template tags Django
 - Accès : 
   - Aucun (un template tag ne doit avoir aucune dépendance externe à lui-même)
 
-### Permissions
+## Permissions
 - Cf. [Osis-role](#https://github.com/uclouvain/osis/blob/dev/osis_role/README.md)
 - Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions frounies par Django), créer un décorateur dans le dossier "perms" des "views". Le code business propre à la permission devra se trouver dans un dossier "perms" dans "business". Voir "base/views/learning_units/perms/" et "base/business/learning_units/perms/".
 
-### Droits de merge et reviews
+## Droits de merge et reviews
 - Il est permis aux développeurs de merger la branche source (dev pour les branches technical et feature, qa ou master pour les branche hotfix) dans leur branche technical/feature/hotfix et de pusher cette modification directement sur la branche technical/feature/hotfix.
 - La possibilité susvisée permet, techniquement, de merger toute PR vers ses propres branches technical/feature/hotfix. Il est donc impératif de respecter le principe selon lequel on ne merge pas son propre code vers les branches technical/feature/hotfix tant que ce code n'a pas été approuvé par un autre développeur. Quand la review est faite et le code approuvé, on peut merger sa PR si les checks sont au vert (Travis, codeclimate, Quality check).
 
 
-### Emails
+## Emails
 - Utiliser la fonction d'envoi de mail décrite dans `osis_common/messaging/send_mail.py`. Exemple:
 ```python
 from osis_common.messaging import message_config, send_message as message_service
@@ -277,12 +276,14 @@ def send_an_email(receiver: Person):
 
 ```
 
-### PDF : 
+
+
+## PDF : 
 - Utiliser WeasyPrint ou pour la création de documents PDF (https://weasyprint.org/)
 - Utilisation de ReportLab dépréciée (car compliqué d'utilisation)
 
 
-### Domain driven design
+## Domain driven design
 
 #### Conventions générales
 - Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
