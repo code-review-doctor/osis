@@ -33,6 +33,8 @@ from django.urls import reverse
 
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -43,6 +45,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 
@@ -57,6 +60,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.tutor = TutorFactory()
         cls.user = cls.tutor.person.user
         cls.academic_year = AcademicYearFactory(current=True)
+        SessionExamCalendarFactory.create_academic_event(cls.academic_year)
 
         # New structure model
         entities_hierarchy = create_entities_hierarchy()

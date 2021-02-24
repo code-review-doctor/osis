@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import datetime
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -32,6 +32,8 @@ from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
 from base.auth.roles.program_manager import ProgramManager
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
@@ -39,6 +41,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import ProgramManagerGroupFactory, EntityManagerGroupFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 
 
 class PgmManagerAdministrationTest(TestCase):
@@ -59,6 +62,7 @@ class PgmManagerAdministrationTest(TestCase):
         cls.entity_manager = EntityManagerFactory(entity=cls.structure_parent1.entity)
         cls.academic_year_previous, cls.academic_year_current = AcademicYearFactory.produce_in_past(quantity=2)
         cls.person = PersonFactory()
+        SessionExamCalendarFactory.create_academic_event(cls.academic_year_current)
 
     def setUp(self) -> None:
         user = self.entity_manager.person.user

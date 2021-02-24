@@ -42,7 +42,7 @@ class SessionExamCalendarMockMixin:
                 end_date=current_session_exam.academic_calendar.end_date,
                 id=current_session_exam.id,
                 title=current_session_exam.academic_calendar.title,
-                authorized_target_year=current_session_exam.academic_calendar.data_year,
+                authorized_target_year=current_session_exam.academic_calendar.data_year.year,
                 type=current_session_exam.academic_calendar.reference,
             )
         self.patch_session_exam_calendar = patch.multiple(

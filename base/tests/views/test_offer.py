@@ -32,6 +32,7 @@ from django.urls import reverse
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import SuperUserFactory
 
 
@@ -45,6 +46,7 @@ class OfferViewTestCase(TestCase):
 
     def test_offers(self):
         academic_year = AcademicYearFactory(current=True)
+        SessionExamCalendarFactory.create_academic_event(academic_year)
 
         response = self.client.get(reverse('offers'))
 
