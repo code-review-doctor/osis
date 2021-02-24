@@ -18,7 +18,7 @@ celery_app.conf.beat_schedule.update({
     },
     'Calendar reminder notice': {
         'task': 'base.tasks.calendar_reminder_notice.run',
-        'schedule': crontab(minute=0, hour=9)
+        'schedule': crontab(minute=0, hour=8)
     },
     'Synchronize entities': {
         'task': 'base.tasks.synchronize_entities.run',
