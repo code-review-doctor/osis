@@ -191,11 +191,11 @@ class ManageMyCoursesViewTestCase(TestCase):
         response = self.client.get(self.url)
         context = response.context
         self.assertTrue(context['event_perm_force_majeure_open'])
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_start_date'],
             self.academic_calendar_force_majeure.start_date
         )
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_end_date'],
             self.academic_calendar_force_majeure.end_date
         )
