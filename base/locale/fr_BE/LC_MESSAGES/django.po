@@ -127,6 +127,9 @@ msgstr "ET"
 msgid "ARES ability"
 msgstr "Habilitation ARES"
 
+msgid "ARES codes"
+msgstr "Codes ARES"
+
 msgid "ARES study code"
 msgstr "Code étude ARES"
 
@@ -227,6 +230,9 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+msgid "Activities"
+msgstr "Activités"
+
 msgid "Activities on other campus"
 msgstr "Activités sur d'autres sites"
 
@@ -244,6 +250,9 @@ msgstr "Ent.charges compl. 1"
 
 msgid "Add. requ. ent. 2"
 msgstr "Ent.charges compl. 2"
+
+msgid "Additional info"
+msgstr "Informations complémentaires"
 
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
@@ -521,6 +530,9 @@ msgstr "Co-diplomation"
 msgid "Co-graduation total coefficient"
 msgstr "Coefficient total de co-diplômation"
 
+msgid "Co-graduation/partnership"
+msgstr "Co-diplômation/co-organisation"
+
 msgid "Co-holder"
 msgstr "Co-titulaire"
 
@@ -666,6 +678,13 @@ msgstr "Catégorie décret"
 msgid "Deepening"
 msgstr "Approfondissement"
 
+msgid ""
+"Default information (ac. yr., acronym/short title, title, category, type, "
+"credits)"
+msgstr ""
+"Informations par défaut (anac, sigle/int abr, intitulé complet en français, "
+"catégorie, type de formation, nombre de crédits)"
+
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
 
@@ -704,6 +723,9 @@ msgstr "Détails"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
+
+msgid "Diploma/certificat"
+msgstr "Diplôme/certificat"
 
 msgid "Direct Access"
 msgstr "Accès direct"
@@ -765,6 +787,10 @@ msgstr "Modifier"
 
 msgid "Edit the proposal"
 msgstr "Modifier la proposition"
+
+msgctxt "list"
+msgid "Education fields"
+msgstr "Domaines d'études"
 
 msgid "Education group"
 msgstr "Organisation de formations"
@@ -849,6 +875,9 @@ msgstr "Inscrit"
 
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
+
+msgid "Enrollment"
+msgstr "Inscription"
 
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
@@ -1041,6 +1070,10 @@ msgstr "Fonction"
 
 msgid "Funding"
 msgstr "Finançable"
+
+msgctxt "list"
+msgid "Funding"
+msgstr "Financement"
 
 msgid "Funding direction"
 msgstr "Orientation de financement"
@@ -1743,6 +1776,9 @@ msgstr "Organigramme"
 msgid "Organizations"
 msgstr "Organisations"
 
+msgid "Osis code"
+msgstr "Code Osis"
+
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
@@ -1757,6 +1793,9 @@ msgstr "Autre individuel"
 
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
+
+msgid "Other legal information"
+msgstr "Autres infos légales"
 
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
@@ -2173,6 +2212,9 @@ msgstr "Réservé aux internes"
 msgid "Residential"
 msgstr "Domicile"
 
+msgid "Responsibles and contacts"
+msgstr "Responsables et contacts"
+
 msgid "Result"
 msgstr "Résultat"
 
@@ -2238,6 +2280,9 @@ msgstr "Sélectionner tout"
 
 msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
+
+msgid "Select/deselect all"
+msgstr "Sélectionner/Dé-sélectionner tout"
 
 msgid "Send calendar reminder notice"
 msgstr "Envoyer un rappel sur les événements académiques"
@@ -2708,6 +2753,9 @@ msgstr "Intitulé en français"
 
 msgid "Title specific complement"
 msgstr "Intitulé compl. spéc. à l'UE"
+
+msgid "Titles(partial/English)"
+msgstr "Intitulés (partiels/anglais)"
 
 msgid "To complete"
 msgstr "A compléter"
