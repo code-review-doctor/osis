@@ -847,7 +847,7 @@ msgstr ""
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr ""
 
-msgid "This value is invalid"
+msgid "This value is invalid."
 msgstr ""
 
 msgid "This version exists until"
@@ -979,6 +979,12 @@ msgstr ""
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
 "versions exists during this year and/or in the future."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists in {transition_year}"
 msgstr ""
 
 #, python-format

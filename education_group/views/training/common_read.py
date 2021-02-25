@@ -54,6 +54,7 @@ from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.command import GetLastExistingTransitionVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import node_identity_service, get_last_existing_transition_version_service
@@ -181,6 +182,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
             "is_root_node": self.is_root_node,
+            "version_label": version_label(self.program_tree_version_identity),
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
