@@ -14,16 +14,17 @@ from base.views.common import display_success_messages, display_error_messages, 
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
+from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.service.read import get_group_service, get_training_service
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_exception
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
+from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.forms import content as content_forms
-from education_group.ddd.domain.exception import TrainingNotFoundException
-from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
 
 
 class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -34,14 +35,17 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_group_obj()
+        version = self.get_version()
         context = {
             "content_formset": self.content_formset,
             "tabs": self.get_tabs(),
             "group_obj": obj,
             "cancel_url": self.get_cancel_url(),
-            "version": self.get_version(),
+            "version": version,
             "tree_different_versions": get_program_tree_version_for_tree(self.get_program_tree_obj().get_all_nodes()),
-            "training_obj": self.get_training_obj() if obj.is_training() else None
+            "training_obj": self.get_training_obj() if obj.is_training() else None,
+            "version_label": version_label(version.entity_id) if version else ''
+
         }
         return render(request, self.template_name, context)
 
