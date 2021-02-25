@@ -542,7 +542,7 @@ class NodeGroupYear(Node):
 
     def version_label(self) -> str:
         if self.version_name and self.transition_name:
-            return '{}-{}'.format(self.version_name, self.get_formatted_transition_name())
+            return '{}-{}'.format(self.version_name, self.transition_name)
         elif self.version_name or self.transition_name:
             return '{}'.format(self.version_name if self.version_name else self.transition_name)
         return ''
