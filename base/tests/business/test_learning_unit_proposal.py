@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ class TestConsolidateProposals(TestCase):
         self.assertTrue(mock_mail.called)
 
     def test_apply_action_on_proposals_with_tutor_application(self):
-        proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, state=ProposalState.ACCEPTED.name)
+        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name, state=ProposalState.ACCEPTED.name)
         learning_container_year = proposal.learning_unit_year.learning_container_year
         TutorApplicationFactory(learning_container_year=learning_container_year)
         manager = FacultyManagerFactory(entity=learning_container_year.requirement_entity)
@@ -282,7 +282,7 @@ class TestConsolidateProposals(TestCase):
             proposals_with_results[0],
             (
                 proposal,
-                {ERROR: _("This learning unit has application this year")}
+                {ERROR: _("This learning unit has application")}
             )
         )
 

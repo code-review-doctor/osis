@@ -56,7 +56,8 @@ from program_management.ddd.service.read import get_last_existing_version_servic
     get_last_existing_transition_version_service
 from program_management.ddd.service.write import create_and_postpone_tree_specific_version_service, \
     prolong_existing_tree_version_service, create_and_postpone_tree_transition_version_service
-from program_management.forms.version import SpecificVersionForm, TransitionVersionForm
+from program_management.forms.transition import TransitionVersionForm
+from program_management.forms.version import SpecificVersionForm
 
 
 class CreateProgramTreeVersionType(ChoiceEnum):

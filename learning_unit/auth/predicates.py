@@ -405,3 +405,36 @@ def is_learning_unit_with_container(self, user, learning_unit_year):
     if learning_unit_year:
         return learning_unit_year.learning_container_year
     return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has attribution this year"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_attribution_this_year(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container_year = learning_unit_year.learning_container_year
+        return not AttributionChargeNew.objects.filter(
+            learning_component_year__learning_unit_year__learning_container_year=learning_container_year
+        ).exists()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has attribution"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_attribution_all_years(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not AttributionChargeNew.objects.filter(
+            learning_component_year__learning_unit_year__learning_container_year__learning_container=learning_container
+        ).exists()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is of type suppression"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_not_proposal_of_type_suppression(self, user, learning_unit_year):
+    if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
+        return learning_unit_year.proposallearningunit.type != ProposalType.SUPPRESSION.name
+    return None

@@ -83,6 +83,9 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
+msgid "Academic responsible"
+msgstr ""
+
 msgid "Academic type"
 msgstr ""
 
@@ -117,6 +120,9 @@ msgstr ""
 msgid "Add potential courses"
 msgstr ""
 
+msgid "Admin. ent."
+msgstr ""
+
 msgid "Administration entity"
 msgstr ""
 
@@ -124,6 +130,10 @@ msgid "Admission exam"
 msgstr ""
 
 msgctxt "female plural"
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -142,6 +152,9 @@ msgid "Are you sure you want to detach %(child)s ?"
 msgstr "Are you sure you want to remove %(child)s ?"
 
 msgid "Attribution entity"
+msgstr ""
+
+msgid "Beginning"
 msgstr ""
 
 msgid "Block"
@@ -232,7 +245,13 @@ msgstr ""
 msgid "Direct gathering"
 msgstr ""
 
+msgid "Dissertation"
+msgstr ""
+
 msgid "Duration"
+msgstr ""
+
+msgid "Education_groups"
 msgstr ""
 
 msgid "English comment"
@@ -272,6 +291,9 @@ msgstr[1] ""
 msgid "Firstname"
 msgstr ""
 
+msgid "For all students"
+msgstr ""
+
 msgid "For approval,"
 msgstr ""
 
@@ -294,6 +316,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "General informations"
 msgstr ""
 
 msgid "Group"
@@ -325,6 +350,9 @@ msgstr ""
 msgid "Invalid name version"
 msgstr ""
 
+msgid "Invalid transition name"
+msgstr ""
+
 msgid "Invalid tree path"
 msgstr ""
 
@@ -348,6 +376,9 @@ msgid ""
 "academic year %(parent_node)s."
 msgstr ""
 
+msgid "Jury members"
+msgstr ""
+
 msgid "Keywords"
 msgstr ""
 
@@ -364,6 +395,9 @@ msgid "Last update description fiche by"
 msgstr ""
 
 msgid "Last update description fiche on"
+msgstr ""
+
+msgid "Last year of org."
 msgstr ""
 
 msgid "Leads to diploma/certificate"
@@ -419,6 +453,9 @@ msgstr ""
 msgid "List UE"
 msgstr ""
 
+msgid "List education groups"
+msgstr ""
+
 msgid "List of teachers"
 msgstr ""
 
@@ -432,6 +469,9 @@ msgid "Made in"
 msgstr ""
 
 msgid "Main gathering"
+msgstr ""
+
+msgid "Manag. ent."
 msgstr ""
 
 msgid "Mandatory"
@@ -450,6 +490,9 @@ msgstr ""
 msgid ""
 "Mini-Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
+msgstr ""
+
+msgid "Mini-training"
 msgstr ""
 
 msgid "Mobile phone"
@@ -530,6 +573,12 @@ msgstr[1] ""
 msgid "Optional"
 msgstr ""
 
+msgid "Other academic responsibles"
+msgstr ""
+
+msgid "Other contacts"
+msgstr ""
+
 msgid "Other informations"
 msgstr ""
 
@@ -600,7 +649,16 @@ msgstr ""
 msgid "Produce xls with a list of trainings"
 msgstr ""
 
+msgid "Producing annexe"
+msgstr ""
+
+msgid "Producing certificat"
+msgstr ""
+
 msgid "Professionnal title"
+msgstr ""
+
+msgid "Program organized with other institutes"
 msgstr ""
 
 #, python-brace-format
@@ -622,6 +680,9 @@ msgstr ""
 msgid "Rate code"
 msgstr ""
 
+msgid "Reference institution"
+msgstr ""
+
 msgid "Registration ID"
 msgstr ""
 
@@ -641,6 +702,9 @@ msgid "Relative credits must be lower or equals to 999"
 msgstr ""
 
 msgid "Remark"
+msgstr ""
+
+msgid "Remark in English"
 msgstr ""
 
 msgid "Req. Entity"
@@ -768,7 +832,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -842,11 +906,17 @@ msgstr ""
 msgid "Type of training"
 msgstr ""
 
+msgid "UCL Diploma"
+msgstr ""
+
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
 msgstr ""
 
 msgid "University certificate"
+msgstr ""
+
+msgid "Unspecified"
 msgstr ""
 
 msgid "Update Content"
@@ -916,6 +986,12 @@ msgid ""
 "versions exists during this year and/or in the future."
 msgstr ""
 
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists in {transition_year}"
+msgstr ""
+
 #, python-format
 msgid ""
 "You cannot add \"%(child)s\" to \"%(parent)s\" of type \"%(parent_type)s\""
@@ -950,6 +1026,9 @@ msgid "certificate aims"
 msgstr ""
 
 msgid "comment (internal)"
+msgstr ""
+
+msgid "contacts"
 msgstr ""
 
 msgid "dissertation"
@@ -1026,7 +1105,19 @@ msgstr ""
 msgid "secondary domains"
 msgstr ""
 
+msgid "this group"
+msgstr ""
+
+msgid "this mini-training"
+msgstr ""
+
+msgid "this training"
+msgstr ""
+
 msgid "training"
+msgstr ""
+
+msgid "unspecified"
 msgstr ""
 
 msgid "yes"
