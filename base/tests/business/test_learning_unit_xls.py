@@ -38,8 +38,8 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data, _get_wrapped_cells, \
     _get_font_rows, _get_attribution_line, _add_training_data, \
-    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
+    get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
+    get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
 from base.business.learning_unit_xls import _get_col_letter
 from base.business.learning_unit_xls import get_significant_volume
@@ -319,7 +319,7 @@ class TestLearningUnitXls(TestCase):
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = _get_data_part1(luy)
+        data = get_data_part1(luy)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -404,9 +404,9 @@ class TestLearningUnitXls(TestCase):
             luy.get_session_display() or '',
             "",
         ]
-        self.assertEqual(_get_data_part2(luy, False), expected_common)
+        self.assertEqual(get_data_part2(luy, False), expected_common)
         self.assertEqual(
-            _get_data_part2(luy, True),
+            get_data_part2(luy, True),
             expected_attribution_data(
                 attribution_charge_new_lecturing, attribution_charge_new_practical,
                 expected_common,

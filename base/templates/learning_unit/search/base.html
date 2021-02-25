@@ -64,15 +64,14 @@
     </div>
 
     {% endblock pageheader %}
-
+    {% url 'learning_units' as learning_units_url %}
+    {% url 'learning_units_service_course' as service_course_url %}
+    {% url 'learning_units_borrowed_course' as borrowed_course_url %}
+    {% url 'learning_units_proposal' as learning_units_proposal_url %}
+    {% url 'learning_unit_proposal_search' as learning_units_proposal_search_url %}
+    {% url 'learning_units_external' as learning_units_external_url %}
+    {% url 'learning_units_summary' as learning_units_summary_url %}
     {% block navtab %}
-        {% url 'learning_units' as learning_units_url %}
-        {% url 'learning_units_service_course' as service_course_url %}
-        {% url 'learning_units_borrowed_course' as borrowed_course_url %}
-        {% url 'learning_units_proposal' as learning_units_proposal_url %}
-        {% url 'learning_unit_proposal_search' as learning_units_proposal_search_url %}
-        {% url 'learning_units_external' as learning_units_external_url %}
-        {% url 'learning_units_summary' as learning_units_summary_url %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" {% if request.path == learning_units_url %}class="active"{% endif %}>
             <a href="{{ learning_units_url }}" role="tab" id="lnk_activity_search">
@@ -154,7 +153,7 @@
                                     <a id="btn_produce_xls_detailled_attributions"
                                        class="download"
                                        style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with one line per attribution' %}">
-                                        &nbsp;{% trans 'List of learning units with with one line per attribution' %}
+                                        &nbsp;{% trans 'List of learning units with one line per attribution' %}
                                     </a>
                                 </li>
                                 <li>
@@ -164,6 +163,16 @@
                                         &nbsp;{% trans 'List of learning units with educational information and specifications' %}
                                     </a>
                                 </li>
+                                {% if request.path == service_course_url  or request.path == borrowed_course_url %}
+                                <li>
+                                    <a id="btn_produce_xls_with_parameters_one_pgm_per_line"
+                                       class="download"
+                                       style="margin-right:10px;"
+                                       title="{% trans 'Produce a customizable xls of learning units with one line per training' %}"
+                                       data-toggle="modal" data-target="#modalXlsLuyWithParameters">
+                                        &nbsp;{% trans 'List of learning units with one line per training' %}
+                                    </a>
+                                {% endif %}
                             </ul>
                         </div>
                         <div class="pull-right" style="margin-right: 10px">
@@ -272,9 +281,16 @@
         });
 
         $("#btn_xls_with_parameters").click(function(e) {
-            prepare_xls(e, 'xls_with_parameters');
+            var action_value = 'xls_with_parameters';
+            if ($('#hdn_lst_type').val() == 'btn_produce_xls_with_parameters_one_pgm_per_line'){
+                action_value = 'xls_with_parameters_one_pgm_per_line'
+            }
+            let status = $("#xls_status");
+            status.val('xls_with_parameters_one_pgm_per_line');
+            prepare_xls(e, action_value);
             $("#hdn_with_grp").val('');
             $("#hdn_with_attributions").val('');
+
         });
         $("#btn_produce_xls_detailled_attributions").click(function (e) {
             prepare_xls(e, 'xls_attributions');
@@ -282,5 +298,9 @@
         $("#btn_produce_xls_educational_specifications").click(function (e) {
             prepare_xls(e, 'xls_educational_specifications');
         });
+        $("#btn_produce_xls_with_parameters_one_pgm_per_line").click(function (e) {
+            $("#hdn_lst_type").val(this.id);
+        });
+
     </script>
 {% endblock script %}

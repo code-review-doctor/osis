@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.utils.search import RenderToExcel
 from base.views.learning_units.search.common import _create_xls_with_parameters, \
     _create_xls_attributions, \
-    _create_xls_comparison, _create_xls, BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes
+    _create_xls_comparison, _create_xls, BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes,\
+    _create_xls_ue_utilizations_with_one_training_per_line
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
@@ -38,6 +39,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls_comparison", _create_xls_comparison)
 @RenderToExcel("xls_educational_specifications", _create_xls_educational_specifications)
 @RenderToExcel("xls", _create_xls)
+@RenderToExcel("xls_with_parameters_one_pgm_per_line", _create_xls_ue_utilizations_with_one_training_per_line)
 class ServiceCourseSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
     search_type = SearchTypes.SERVICE_COURSES_SEARCH
