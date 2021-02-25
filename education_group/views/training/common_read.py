@@ -52,12 +52,11 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
-from program_management.ddd.command import GetLastExistingTransitionVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import node_identity_service, get_last_existing_transition_version_service
+from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
@@ -88,16 +87,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             command_program_management.GetNodeIdentityFromElementId(element_id=self.get_root_id())
         )
         return node_identity == self.node_identity
-
-    @cached_property
-    def has_transition_version(self) -> 'bool':
-        cmd = GetLastExistingTransitionVersionNameCommand(
-            version_name=self.program_tree_version_identity.version_name,
-            offer_acronym=self.program_tree_version_identity.offer_acronym,
-            transition_name=self.program_tree_version_identity.transition_name,
-            year=self.program_tree_version_identity.year
-        )
-        return bool(get_last_existing_transition_version_service.get_last_existing_transition_version_identity(cmd))
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
@@ -284,9 +273,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ) + "?path={}".format(self.path)
 
     def get_create_transition_version_url(self):
-        if self.is_root_node and \
-                not self.program_tree_version_identity.is_transition and \
-                not self.has_transition_version:
+        if self.is_root_node and not self.program_tree_version_identity.is_transition:
             return reverse(
                 'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}

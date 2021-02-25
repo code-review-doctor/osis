@@ -112,7 +112,7 @@ class LinkForm(forms.Form):
             child_node_code=self.child_obj.code,
             child_node_year=self.child_obj.year,
             access_condition=self.cleaned_data.get('access_condition', False),
-            is_mandatory=self.cleaned_data.get('is_mandatory', True),
+            is_mandatory=self.cleaned_data.get('is_mandatory', False),
             block=self.cleaned_data.get('block'),
             link_type=self.cleaned_data.get('link_type'),
             comment=self.cleaned_data.get('comment_fr'),
