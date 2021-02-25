@@ -41,6 +41,7 @@ from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
@@ -69,10 +70,11 @@ class TestLearningAchievementView(TestCase):
         self.language_fr = FrenchLanguageFactory()
         self.language_en = EnglishLanguageFactory()
         self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
+        self.person = CentralManagerFactory(user=self.user).person
         self.person_entity = PersonEntityFactory(person=self.person)
 
         self.academic_year = create_current_academic_year()
+        generate_learning_unit_edition_calendars([self.academic_year])
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=self.academic_year,
             subtype=learning_unit_year_subtypes.FULL,
@@ -397,6 +399,7 @@ class TestLearningAchievementPostponement(TestCase):
         cls.learning_component_years = [LearningComponentYearFactory(
             learning_unit_year=luy,
         ) for luy in cls.learning_unit_years]
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
     def setUp(self):
         self.client.force_login(self.central_manager.person.user)

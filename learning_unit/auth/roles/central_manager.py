@@ -86,7 +86,6 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_external_learning_unit_with_cograduation,
             'base.can_edit_learningunit_date':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
-                predicates.is_learning_unit_year_not_in_past &
                 predicates.has_learning_unit_no_application_in_future &
                 predicates.has_learning_unit_no_attribution_in_future &
                 predicates.is_learning_unit_edition_for_central_manager_period_open &
