@@ -26,18 +26,28 @@
 {% block modal_id %}modalBackToInitial{% endblock %}
 
 {% block modal_header %}
-    <h3>{% trans 'Do you want to cancel proposal?' %}</h3>
+    <strong>{% trans 'Cancel proposal(s)?' %}</strong>
     <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
 {% endblock %}
 
 {% block modal_body %}
-    {% trans 'Do you want to cancel proposal?' %}
+    {% trans 'This action will permanently cancel the selected proposal(s)' %}
+                <div id="div_warning_partims" >
+                <br>
+                <div>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    {% trans "At least one learning unit has partim:" %}
+                    <div id="div_warning_partims_detail">
+                    </div>
+                </div>
+                </div>
+
     <input type="hidden" id="action" name="action" class="action"/>
 {% endblock %}
 
 {% block modal_footer %}
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-    <button type="button" class="btn btn-primary" onclick="submit_form_initial();">{% trans 'Yes' %}</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Do not cancel" %}</button>
+    <button type="button" class="btn btn-danger" onclick="submit_form_initial();">{% trans 'Cancel proposal(s)' %}</button>
     <script>
         function submit_form_initial(){
         $(".action").val('back_to_initial');
