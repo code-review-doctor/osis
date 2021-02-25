@@ -23,29 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from rest_framework import serializers
 
 from attribution.models.enums.function import Functions
 
 
 class AttributionSerializer(serializers.Serializer):
-    acronym = serializers.CharField()
-    title = serializers.CharField()
+    code = serializers.CharField()
+    title_fr = serializers.CharField()
+    title_en = serializers.CharField()
     year = serializers.IntegerField()
     credits = serializers.DecimalField(max_digits=5, decimal_places=2)
     start_year = serializers.IntegerField()
     function = serializers.CharField()
     function_text = serializers.SerializerMethodField()
-    catalog_app_url = serializers.SerializerMethodField()
-    schedule_app_url = serializers.SerializerMethodField()
+    links = serializers.SerializerMethodField()
 
     def get_function_text(self, obj) -> str:
         if obj.function:
             return Functions.get_value(obj.function)
         return ""
 
-    def get_catalog_app_url(self, obj) -> str:
-        return ""
+    def get_links(self, obj) -> dict:
+        return {
+            "catalog": self.__get_catalog_url(obj),
+            "schedule": self.__get_schedule_url(obj)
+        }
 
-    def get_schedule_app_url(self, obj) -> str:
-        return ""
+    def __get_catalog_url(self, obj):
+        if settings.LEARNING_UNIT_PORTAL_URL:
+            return settings.LEARNING_UNIT_PORTAL_URL.format(year=obj.year, code=obj.code)
+
+    def __get_schedule_url(self, obj):
+        if settings.SCHEDULE_APP_URL and "access_schedule_calendar" in self.context and \
+                obj.year in self.context["access_schedule_calendar"].get_target_years_opened():
+            return settings.SCHEDULE_APP_URL.format(code=obj.code)

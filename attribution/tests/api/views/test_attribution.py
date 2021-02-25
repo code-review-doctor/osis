@@ -68,7 +68,6 @@ class AttributionListViewTestCase(APITestCase):
         self.assertCountEqual(
             list(results[0].keys()),
             [
-                "acronym", "title", "year", "credits", "start_year", "function", "function_text",
-                "catalog_app_url", "schedule_app_url"
+                "code", "title_fr", "title_en", "year", "credits", "start_year", "function", "function_text", "links"
             ]
         )

@@ -35,5 +35,5 @@ urlpatterns = [
         ApplicationCoursesCalendarListView.as_view(),
         name=ApplicationCoursesCalendarListView.name
     ),
-    url(r'^attribution/(?P<year>[0-9]{4})/me$', AttributionListView.as_view(), name=AttributionListView.name),
+    url(r'^(?P<year>[0-9]{4})/me$', AttributionListView.as_view(), name=AttributionListView.name),
 ]

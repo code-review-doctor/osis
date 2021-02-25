@@ -23,39 +23,69 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from decimal import Decimal
 from types import SimpleNamespace
 
-from django.test import TestCase
+import mock
+from django.test import TestCase, override_settings
 
 from attribution.api.serializers.attribution import AttributionSerializer
+from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.enums.function import Functions
+from base.business.event_perms import AcademicEvent
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
+@override_settings(
+    LEARNING_UNIT_PORTAL_URL="https://dummy_url.be/cours-{year}-{code}",
+    SCHEDULE_APP_URL="https://schedule_dummy.uclouvain.be/{code}"
+)
 class AttributionSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        attribution_obj = SimpleNamespace(
-            acronym="LDROI1001",
-            title="Introduction aux droits Partie I",
+        cls.attribution_obj = SimpleNamespace(
+            code="LDROI1001",
+            title_fr="Introduction aux droits Partie I",
+            title_en="Introduction aux droits Partie I",
             year=2020,
             credits=Decimal("15.5"),
             start_year=2015,
             function=Functions.COORDINATOR.name,
         )
-        cls.serializer = AttributionSerializer(attribution_obj)
+
+        cls.academic_event = AcademicEvent(
+            id=15,
+            title="Accès horaire ADE",
+            authorized_target_year=2020,
+            start_date=datetime.date.today() - datetime.timedelta(days=2),
+            end_date=datetime.date.today() + datetime.timedelta(days=10),
+            type=AcademicCalendarTypes.ACCESS_SCHEDULE_CALENDAR.name
+        )
+        cls.serializer = AttributionSerializer(cls.attribution_obj, context={
+            'access_schedule_calendar': AccessScheduleCalendar()
+        })
+
+    def setUp(self) -> None:
+        self.patcher_get_academic_events = mock.patch(
+            'attribution.api.views.attribution.AccessScheduleCalendar._get_academic_events',
+            new_callable=mock.PropertyMock
+        )
+        self.mock_get_academic_events = self.patcher_get_academic_events.start()
+        self.mock_get_academic_events.return_value = [self.academic_event]
+        self.addCleanup(self.patcher_get_academic_events.stop)
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'acronym',
-            'title',
+            'code',
+            'title_fr',
+            'title_en',
             'year',
             'credits',
             'start_year',
             'function',
             'function_text',
-            'catalog_app_url',
-            'schedule_app_url',
+            'links'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -63,7 +93,14 @@ class AttributionSerializerTestCase(TestCase):
         self.assertEquals(self.serializer.data['function_text'], Functions.COORDINATOR.value)
 
     def test_ensure_catalog_app_url_correctly_computed(self):
-        self.assertEquals(self.serializer.data['catalog_app_url'], "")
+        expected_url = "https://dummy_url.be/cours-{year}-{code}".format(
+            year=self.attribution_obj.year,
+            code=self.attribution_obj.code
+        )
+        self.assertEquals(self.serializer.data['links']['catalog'], expected_url)
 
-    def test_ensure_schedule_app_url_correctly_computed(self):
-        self.assertEquals(self.serializer.data['schedule_app_url'], "")
+    def test_ensure_schedule_app_url_correctly_computed_case_calendar_opened(self):
+        expected_url = "https://schedule_dummy.uclouvain.be/{code}".format(
+            code=self.attribution_obj.code
+        )
+        self.assertEquals(self.serializer.data['links']['schedule'], expected_url)

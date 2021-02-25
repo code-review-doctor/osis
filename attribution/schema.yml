@@ -37,34 +37,34 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - application
-    /attribution/{year}/me:
-      get:
-        description: Return all attributions of connected user in a specific year.
-        operationId: attributions_list
-        parameters:
-          - in: path
-            name: year
-            required: true
-            schema:
-              description: ''
-              type: string
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/Attribution'
-          '400':
-            $ref: '#/components/responses/BadRequest'
-          '401':
-            $ref: '#/components/responses/Unauthorized'
-          '404':
-            $ref: '#/components/responses/NotFound'
-        tags:
-          - attribution
+  /{year}/me:
+    get:
+      description: Return all attributions of connected user in a specific year.
+      operationId: attributions_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attribution'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - attribution
 components:
   securitySchemes:
     Token:
@@ -117,9 +117,12 @@ components:
         acronym:
           type: string
           example: 'LDROI1001'
-        title:
+        title_fr:
           type: string
           example: 'Introduction au droit - Partie I'
+        title_en:
+          type: string
+          example: 'Introduction to Law - Part I'
         year:
           type: integer
           example: 2020
@@ -136,12 +139,8 @@ components:
         function_text:
           type: string
           example: 'Coordinateur'
-        catalog_app_url:
-          type: string
-          example: 'https://catalog.com/LDROI1001'
-        schedule_app_url:
-          type: string
-          example: 'https://schedule.com/LDROI1001'
+        links:
+          $ref: '#/components/schemas/AttributionLinks'
     AttributionFunctionEnum:
       type: string
       enum:
@@ -155,6 +154,13 @@ components:
         - 'PROFESSOR'
         - 'INTERNSHIP_SUPERVISOR'
         - 'INTERNSHIP_CO_SUPERVISOR'
+    AttributionLinks:
+      type: object
+      properties:
+        catalog:
+          type: string
+        schedule:
+          type: string
     Error:
       type: object
       properties:

@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
+from django.db.models import F, Case, When, Q, Value, CharField
+from django.db.models.functions import Concat
 from rest_framework import generics
 from rest_framework.response import Response
 
 from attribution.api.serializers.attribution import AttributionSerializer
+from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
 
 
@@ -48,18 +50,55 @@ class AttributionListView(generics.ListAPIView):
             attribution__tutor__person__user=self.request.user,
             attribution__decision_making=''
         ).annotate(
-            acronym=F('learning_component_year__learning_unit_year__acronym'),
-            title=F('learning_component_year__learning_unit_year__specific_title'),
+            code=F('learning_component_year__learning_unit_year__acronym'),
+            title_fr=Case(
+                When(
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title__isnull=True) |
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title__exact=''),
+                    then='learning_component_year__learning_unit_year__specific_title'
+                ),
+                When(
+                    Q(learning_component_year__learning_unit_year__specific_title__isnull=True) |
+                    Q(learning_component_year__learning_unit_year__specific_title__exact=''),
+                    then='learning_component_year__learning_unit_year__learning_container_year__common_title'
+                ),
+                default=Concat(
+                    'learning_component_year__learning_unit_year__learning_container_year__common_title',
+                    Value(' - '),
+                    'learning_component_year__learning_unit_year__specific_title'
+                ),
+                output_field=CharField(),
+            ),
+            title_en=Case(
+                When(
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__isnull
+                      =True) |
+                    Q(learning_component_year__learning_unit_year__learning_container_year__common_title_english__exact
+                      =''),
+                    then='learning_component_year__learning_unit_year__specific_title_english'
+                ),
+                When(
+                    Q(learning_component_year__learning_unit_year__specific_title_english__isnull=True) |
+                    Q(learning_component_year__learning_unit_year__specific_title_english__exact=''),
+                    then='learning_component_year__learning_unit_year__learning_container_year__common_title_english'
+                ),
+                default=Concat(
+                    'learning_component_year__learning_unit_year__learning_container_year__common_title_english',
+                    Value(' - '),
+                    'learning_component_year__learning_unit_year__specific_title_english'
+                ),
+                output_field=CharField(),
+            ),
             year=F('learning_component_year__learning_unit_year__academic_year__year'),
             credits=F('learning_component_year__learning_unit_year__credits'),
             start_year=F('attribution__start_year'),
             function=F('attribution__function')
         )
-        serializer = AttributionSerializer(qs, many=True)
+        serializer = AttributionSerializer(qs, many=True, context=self.get_serializer_context())
         return Response(serializer.data)
 
     def get_serializer_context(self):
         return {
             **super().get_serializer_context(),
-            'access_schedule_calendar': ''
+            'access_schedule_calendar': AccessScheduleCalendar()
         }
