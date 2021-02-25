@@ -77,6 +77,19 @@ def get_base_skeleton_per_type():
         education_group_types.TrainingType.MASTER_M1.name: [education_group_types.GroupType.COMMON_CORE.name],
         education_group_types.TrainingType.MASTER_MC.name: [education_group_types.GroupType.COMMON_CORE.name],
         education_group_types.TrainingType.INTERNSHIP.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.DEEPENING.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.SOCIETY_MINOR.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.ACCESS_MINOR.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.OPEN_MINOR.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR.name: [
+            education_group_types.GroupType.COMMON_CORE.name
+        ],
+        education_group_types.MiniTrainingType.FSA_SPECIALITY.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.OPTION.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.MiniTrainingType.MOBILITY_PARTNERSHIP.name: [
+            education_group_types.GroupType.COMMON_CORE.name
+        ],
+
     }
 
 
@@ -106,10 +119,11 @@ def update_skeleton(apps, group_year) -> int:
 
 
 def update_to_mandatory(apps) -> int:
+    categories_to_update = [education_group_categories.TRAINING, education_group_categories.MINI_TRAINING]
     GroupYear = apps.get_model('education_group', 'GroupYear')
     parent_elements_group_year = GroupYear.objects.filter(
         academic_year__year__gte=YEAR,
-        education_group_type__category=education_group_categories.TRAINING
+        education_group_type__category__in=categories_to_update
     )
     record_modified = 0
     for group_year in parent_elements_group_year:
@@ -132,7 +146,7 @@ def run(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0567_auto_20210211_0843'),
+        ('base', '0568_auto_20210217_1149'),
     ]
 
     operations = [
