@@ -29,7 +29,7 @@ from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
 from openpyxl.styles import Color, Font
 
-from base.business.learning_unit_xls import WITH_ATTRIBUTIONS, WITH_GRP, HEADER_TEACHERS, \
+from base.business.learning_unit_xls import HEADER_TEACHERS, \
     learning_unit_titles_part_1, learning_unit_titles_part2, annotate_qs, get_data_part1, get_data_part2, \
     prepare_proposal_legend_ws_data, title_with_version_title, \
     acronym_with_version_label, BOLD_FONT, XLS_DESCRIPTION, get_name_or_username, WORKSHEET_TITLE, \
@@ -38,6 +38,9 @@ from base.business.xls import _get_all_columns_reference
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Q
+from base.models.entity_version import EntityVersion
+from base.models.academic_year import AcademicYear
 
 XLS_FILENAME = _('LearningUnitsTrainingsList')
 CELLS_WITH_BORDER_TOP = 'cells_with_border_top'
@@ -46,7 +49,9 @@ CELLS_WITH_WHITE_FONT = 'cells_with_white_font'
 
 WHITE_FONT = Font(color=Color('00FFFFFF'))
 
-HEADER_PROGRAMS = [str(_('Gathering')), str(_('Training code')), str(_('Training title'))]
+HEADER_PROGRAMS = [
+    str(_('Gathering')), str(_('Training code')), str(_('Training title')), str(_('Training management entity'))
+]
 
 
 def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters):
@@ -123,7 +128,12 @@ def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_att
 
                     for training in learning_unit_yr.closest_trainings:
                         if training['gs_origin'] == group_element_year.pk:
-                            training_data = _build_training_data_columns(leaf_credits, partial_acronym, training)
+                            training_data = _build_training_data_columns(
+                                leaf_credits,
+                                partial_acronym,
+                                training,
+                                learning_unit_yr.academic_year
+                            )
                             if training_data:
                                 lines.append(lu_data_part1 + lu_data_part2 + training_data)
                                 nb_columns = len(lu_data_part1) + len(lu_data_part2)
@@ -155,7 +165,10 @@ def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_att
     }
 
 
-def _build_training_data_columns(leaf_credits: str, partial_acronym: str, training: dict) -> List:
+def _build_training_data_columns(leaf_credits: str,
+                                 partial_acronym: str,
+                                 training: dict,
+                                 an_academic_year: AcademicYear) -> List:
     data = list()
     data.append("{} ({})".format(partial_acronym, leaf_credits))
     data.append("{}".format(acronym_with_version_label(
@@ -164,6 +177,11 @@ def _build_training_data_columns(leaf_credits: str, partial_acronym: str, traini
     data.append("{}".format(
         title_with_version_title(training['title_fr'], training['version_title_fr']))
     )
+    management_entity = EntityVersion.objects.filter(
+        Q(entity__id=training['management_entity'], start_date__lte=an_academic_year.end_date),
+        Q(end_date__isnull=True) | Q(end_date__gt=an_academic_year.end_date)
+    ).last()
+    data.append(management_entity.acronym if management_entity else '-')
     return data
 
 
