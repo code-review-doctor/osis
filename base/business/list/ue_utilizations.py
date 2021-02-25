@@ -32,13 +32,14 @@ from openpyxl.styles import Color, Font
 from base.business.learning_unit_xls import WITH_ATTRIBUTIONS, WITH_GRP, HEADER_TEACHERS, \
     learning_unit_titles_part_1, learning_unit_titles_part2, annotate_qs, get_data_part1, get_data_part2, \
     prepare_proposal_legend_ws_data, title_with_version_title, \
-    acronym_with_version_label, BOLD_FONT, XLS_DESCRIPTION, get_name_or_username, XLS_FILENAME, WORKSHEET_TITLE, \
+    acronym_with_version_label, BOLD_FONT, XLS_DESCRIPTION, get_name_or_username, WORKSHEET_TITLE, \
     WRAP_TEXT_ALIGNMENT, _get_font_rows, _get_col_letter
 from base.business.xls import _get_all_columns_reference
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
 from django.utils.translation import gettext_lazy as _
 
+XLS_FILENAME = _('LearningUnitsTrainingsList')
 CELLS_WITH_BORDER_TOP = 'cells_with_border_top'
 
 CELLS_WITH_WHITE_FONT = 'cells_with_white_font'
