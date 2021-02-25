@@ -39,7 +39,7 @@ from program_management.ddd.service.read import check_transition_name_service
 @login_required
 @ajax_required
 @require_http_methods(['GET'])
-def check_transition_name(request, year, acronym, version_name):
+def check_transition_name(request, year, acronym, version_name=""):
     transition_name = request.GET['transition_name']
     cmd = command.CheckTransitionNameCommand(
         year=year,
@@ -57,39 +57,6 @@ def check_transition_name(request, year, acronym, version_name):
             return JsonResponse({
                 "valid": True,
                 "msg": msg
-            })
-
-        return JsonResponse({
-            "valid": False,
-            "msg": first_exception.message
-        })
-    return JsonResponse({
-        "valid": True,
-        "msg": None
-    })
-
-
-@login_required
-@ajax_required
-@require_http_methods(['GET'])
-def check_standard_transition_name(request, year, acronym):
-    transition_name = request.GET['transition_name']
-    cmd = command.CheckTransitionNameCommand(
-        year=year,
-        offer_acronym=acronym,
-        version_name="",
-        transition_name=transition_name
-    )
-
-    try:
-        check_transition_name_service.check_transition_name(cmd)
-    except MultipleBusinessExceptions as multiple_exceptions:
-        first_exception = next(e for e in multiple_exceptions.exceptions)
-        if isinstance(first_exception, TransitionNameExistsInPast):
-            msg = ". ".join([first_exception.message, str(_("Save will prolong the past version"))])
-            return JsonResponse({
-                "valid": True,
-                "msg": first_exception.message
             })
 
         return JsonResponse({
