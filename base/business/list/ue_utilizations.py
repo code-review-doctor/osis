@@ -55,13 +55,10 @@ HEADER_PROGRAMS = [
 
 
 def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters):
-    with_grp = True
-    with_attributions = True
-
-    data = _prepare_xls_content(learning_units, with_grp, with_attributions)
+    data = _prepare_xls_content(learning_units)
     working_sheets_data = data.get('working_sheets_data')
 
-    parameters = _get_parameters(data, learning_units, _prepare_titles(with_attributions, with_grp), user)
+    parameters = _get_parameters(data, learning_units, _prepare_titles(), user)
 
     ws_data = xls_build.prepare_xls_parameters_list(working_sheets_data, parameters)
 
@@ -74,13 +71,11 @@ def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, 
     return xls_build.generate_xls(ws_data, filters)
 
 
-def _prepare_titles(with_attributions: bool, with_grp: bool) -> List['str']:
+def _prepare_titles() -> List['str']:
     titles_part1 = learning_unit_titles_part_1()
     titles_part2 = learning_unit_titles_part2()
-    if with_grp:
-        titles_part2.extend(HEADER_PROGRAMS)
-    if with_attributions:
-        titles_part1.append(str(HEADER_TEACHERS))
+    titles_part2.extend(HEADER_PROGRAMS)
+    titles_part1.append(str(HEADER_TEACHERS))
     titles_part1.extend(titles_part2)
     return titles_part1
 
@@ -97,13 +92,11 @@ def _get_parameters(data: Dict, learning_units, titles_part1, user) -> dict:
     return parameters
 
 
-def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attributions=False) -> Dict:
+def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
     qs = annotate_qs(learning_unit_years)
-
-    if with_grp:
-        qs = qs.annotate(
-            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
-        ).prefetch_related('element')
+    qs = qs.annotate(
+        closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+    ).prefetch_related('element')
 
     lines = []
     cells_with_white_font = []
@@ -111,11 +104,11 @@ def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_att
 
     for learning_unit_yr in qs:
         lu_data_part1 = get_data_part1(learning_unit_yr)
-        lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions)
+        lu_data_part2 = get_data_part2(learning_unit_yr, True)
 
-        if with_grp:
-            if hasattr(learning_unit_yr, "element"):
-                idx = 0
+        if hasattr(learning_unit_yr, "element"):
+            idx = 0
+            if learning_unit_yr.element.children_elements.all():
                 for group_element_year in learning_unit_yr.element.children_elements.all():
                     if not learning_unit_yr.closest_trainings or group_element_year.parent_element.group_year is None:
                         break
@@ -150,13 +143,10 @@ def _prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_att
                                          ]
                                     )
                                 idx = idx + 1
-
             else:
                 lines.append(lu_data_part1 + lu_data_part2)
-
         else:
-            lu_data_part1.extend(lu_data_part2)
-            lines.append(lu_data_part1)
+            lines.append(lu_data_part1 + lu_data_part2)
 
     return {
         'working_sheets_data': lines,
