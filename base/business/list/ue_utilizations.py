@@ -49,9 +49,9 @@ WHITE_FONT = Font(color=Color('00FFFFFF'))
 HEADER_PROGRAMS = [str(_('Gathering')), str(_('Training code')), str(_('Training title'))]
 
 
-def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters, extra_configuration):
-    with_grp = extra_configuration.get(WITH_GRP)
-    with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
+def create_xls_ue_utilizations_with_one_training_per_line(user, learning_units, filters):
+    with_grp = True
+    with_attributions = True
 
     data = _prepare_xls_content(learning_units, with_grp, with_attributions)
     working_sheets_data = data.get('working_sheets_data')

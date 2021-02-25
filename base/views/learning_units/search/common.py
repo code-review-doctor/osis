@@ -164,12 +164,7 @@ def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
 
 def _create_xls_ue_utilizations_with_one_training_per_line(view_obj, context, **response_kwargs):
     filters = _get_filter(context["form"], view_obj.search_type)
-    other_params = {
-        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
-        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
-    }
     return create_xls_ue_utilizations_with_one_training_per_line(view_obj.request.user,
                                                                  context["filter"].qs,
-                                                                 filters,
-                                                                 other_params
+                                                                 filters
                                                                  )
