@@ -52,7 +52,7 @@ class PasteNodeForm(LinkForm):
             node_to_paste_year=self.child_obj.year,
             path_where_to_paste=str(self.parent_obj.node_id),
             access_condition=self.cleaned_data.get("access_condition", False),
-            is_mandatory=self.cleaned_data.get("is_mandatory", True),
+            is_mandatory=self.cleaned_data.get("is_mandatory", False),
             block=self.cleaned_data.get("block"),
             link_type=self.cleaned_data.get("link_type"),
             comment=self.cleaned_data.get("comment_fr", ""),
@@ -87,6 +87,11 @@ class PasteNodeForm(LinkForm):
 
 
 class BasePasteNodesFormset(BaseFormSet):
+    def _construct_form(self, i, **kwargs):
+        form = super()._construct_form(i, **kwargs)
+        form.empty_permitted = False
+        return form
+
     def get_form_kwargs(self, index):
         if self.form_kwargs:
             return self.form_kwargs[index]
