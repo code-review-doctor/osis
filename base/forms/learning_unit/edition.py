@@ -57,6 +57,7 @@ class LearningUnitEndDateForm(forms.Form):
         self.fields['academic_year'].empty_label = self.EMPTY_LABEL
         self.fields['academic_year'].required = self.REQUIRED
         end_year = self.learning_unit.end_year
+        self.start_year = self.learning_unit.start_year
 
         self._set_initial_value(end_year)
 
@@ -138,8 +139,7 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
         ).order_by('learning_container_year__academic_year__year')
         if not max_year and applications:
             max_year = applications.first().learning_container_year.academic_year.year
-        academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
-
+        academic_years = AcademicYear.objects.filter(year__gte=self.start_year.year, year__in=target_years_opened)
         return academic_years.filter(year__lte=max_year) if max_year else academic_years
 
 

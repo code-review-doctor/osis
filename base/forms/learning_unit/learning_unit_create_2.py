@@ -34,13 +34,16 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
-from base.models import academic_year
-from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
+from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
 from learning_unit.auth.roles.central_manager import CentralManager
 from learning_unit.auth.roles.faculty_manager import FacultyManager
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
@@ -240,15 +243,9 @@ class FullForm(LearningUnitBaseForm):
 
     def _restrict_academic_years_choice(self, postposal, proposal_type):
         if postposal:
-            starting_academic_year = academic_year.starting_academic_year()
-            end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager \
-                else MAX_ACADEMIC_YEAR_CENTRAL
-
-            self.fields["academic_year"].queryset = AcademicYear.objects.min_max_years(
-                starting_academic_year.year, starting_academic_year.year + end_year_range
-            )
+            self._restrict_academic_years_choice_for_daily_management()
         else:
-            self._restrict_academic_years_choice_for_proposal_creation_suppression(proposal_type)
+            self._restrict_academic_years_choice_for_proposal_management(proposal_type)
 
     def _build_instance_data(self, data, default_ac_year, proposal):
         return {
@@ -339,7 +336,7 @@ class FullForm(LearningUnitBaseForm):
 
         return learning_unit_yr
 
-    def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
+    def _restrict_academic_years_choice_for_proposal_management(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
             if EntityRoleHelper.has_role(self.person, FacultyManager):
                 target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
@@ -348,3 +345,12 @@ class FullForm(LearningUnitBaseForm):
             else:
                 target_years_opened = []
             self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+
+    def _restrict_academic_years_choice_for_daily_management(self):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        elif EntityRoleHelper.has_role(self.person, CentralManager):
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        else:
+            target_years_opened = []
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
