@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -104,18 +104,6 @@ EDUCATION_GROUP_TITLES_ADMINISTRATIVE = [
     EXAM_BOARD_SIGNATORY_COL,
     SIGNATORY_QUALIFICATION_COL,
 ]
-
-
-def create_xls(user, found_education_groups_param, filters, order_data):
-    found_education_groups = ordering_data(found_education_groups_param, order_data)
-    working_sheets_data = prepare_xls_content(found_education_groups)
-    parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
-                  xls_build.USER: get_name_or_username(user),
-                  xls_build.FILENAME: XLS_FILENAME,
-                  xls_build.HEADER_TITLES: EDUCATION_GROUP_TITLES,
-                  xls_build.WS_TITLE: WORKSHEET_TITLE}
-
-    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
 def prepare_xls_content(found_education_groups: List[GroupYear]) -> List:

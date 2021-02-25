@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 11:02+0100\n"
+"POT-Creation-Date: 2021-02-23 15:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,6 +116,9 @@ msgstr ""
 msgid "ARES ability"
 msgstr ""
 
+msgid "ARES codes"
+msgstr ""
+
 msgid "ARES study code"
 msgstr ""
 
@@ -216,6 +219,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Activities"
+msgstr ""
+
 msgid "Activities on other campus"
 msgstr ""
 
@@ -232,6 +238,9 @@ msgid "Add. requ. ent. 1"
 msgstr ""
 
 msgid "Add. requ. ent. 2"
+msgstr ""
+
+msgid "Additional info"
 msgstr ""
 
 msgid "Additional requirement entity 1"
@@ -344,6 +353,9 @@ msgid ""
 "UE"
 msgstr ""
 
+msgid "At least one learning unit has partim:"
+msgstr ""
+
 msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
@@ -425,7 +437,16 @@ msgstr ""
 msgid "Cancel proposal"
 msgstr ""
 
+msgid "Cancel proposal(s)"
+msgstr ""
+
+msgid "Cancel proposal(s)?"
+msgstr ""
+
 msgid "Cancel the proposal"
+msgstr ""
+
+msgid "Cancel the proposal?"
 msgstr ""
 
 msgid "Catalogue"
@@ -492,6 +513,9 @@ msgid "Co-graduation"
 msgstr ""
 
 msgid "Co-graduation total coefficient"
+msgstr ""
+
+msgid "Co-graduation/partnership"
 msgstr ""
 
 msgid "Co-holder"
@@ -634,6 +658,11 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
+msgid ""
+"Default information (ac. yr., acronym/short title, title, category, type, "
+"credits)"
+msgstr ""
+
 msgid "Default learning unit enrollment"
 msgstr ""
 
@@ -673,6 +702,9 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
+msgid "Diploma/certificat"
+msgstr ""
+
 msgid "Direct Access"
 msgstr ""
 
@@ -697,7 +729,7 @@ msgstr ""
 msgid "Do not assign"
 msgstr ""
 
-msgid "Do you want to cancel proposal?"
+msgid "Do not cancel"
 msgstr ""
 
 msgid "Do you want to change the status of this proposals?"
@@ -731,6 +763,10 @@ msgid "Edit"
 msgstr ""
 
 msgid "Edit the proposal"
+msgstr ""
+
+msgctxt "list"
+msgid "Education fields"
 msgstr ""
 
 msgid "Education group"
@@ -815,6 +851,9 @@ msgid "Enrolled"
 msgstr ""
 
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrollment"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1002,6 +1041,10 @@ msgstr ""
 msgid "Function"
 msgstr ""
 
+msgid "Funding"
+msgstr ""
+
+msgctxt "list"
 msgid "Funding"
 msgstr ""
 
@@ -1678,6 +1721,9 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
+msgid "Osis code"
+msgstr ""
+
 msgid "Other academic responsible"
 msgstr ""
 
@@ -1691,6 +1737,9 @@ msgid "Other individual"
 msgstr ""
 
 msgid "Other languages activities"
+msgstr ""
+
+msgid "Other legal information"
 msgstr ""
 
 msgid "Other remark (intended for publication)"
@@ -1755,6 +1804,9 @@ msgid "Partnerships"
 msgstr ""
 
 msgid "Password"
+msgstr ""
+
+msgid "Pay attention"
 msgstr ""
 
 msgid "Pay attention! This learning unit is used in more than one formation"
@@ -2083,6 +2135,9 @@ msgstr ""
 msgid "Residential"
 msgstr ""
 
+msgid "Responsibles and contacts"
+msgstr ""
+
 msgid "Result"
 msgstr ""
 
@@ -2147,6 +2202,12 @@ msgid "Select all"
 msgstr ""
 
 msgid "Select all the messages"
+msgstr ""
+
+msgid "Select/deselect all"
+msgstr ""
+
+msgid "Send calendar reminder notice"
 msgstr ""
 
 msgid "Separate"
@@ -2504,6 +2565,12 @@ msgstr ""
 msgid "Thesis"
 msgstr ""
 
+msgid "This action will permanently cancel the proposal"
+msgstr ""
+
+msgid "This action will permanently cancel the selected proposal(s)"
+msgstr ""
+
 msgid "This code already exists for this learning unit"
 msgstr ""
 
@@ -2519,7 +2586,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application this year"
+msgid "This learning unit has application"
 msgstr ""
 
 msgid ""
@@ -2557,6 +2624,9 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Title specific complement"
+msgstr ""
+
+msgid "Titles(partial/English)"
 msgstr ""
 
 msgid "To complete"
@@ -2918,6 +2988,9 @@ msgstr ""
 msgid "initial value"
 msgstr ""
 
+msgid "is part of several trainings"
+msgstr ""
+
 msgid "items per page"
 msgstr ""
 
@@ -3035,6 +3108,15 @@ msgid ""
 msgstr ""
 
 msgid "the sum of repartition volumes must be equal to the global volume"
+msgstr ""
+
+msgid "this group"
+msgstr ""
+
+msgid "this mini-training"
+msgstr ""
+
+msgid "this training"
 msgstr ""
 
 msgid "to"

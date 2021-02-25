@@ -23,37 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+import factory.fuzzy
 
-from django.test import TestCase
-
-from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
-from base.business.event_perms import AcademicEvent
-from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from education_group.ddd.domain._address import Address
 
 
-class ApplicationCourseCalendarSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.event_open = AcademicEvent(
-            id=10,
-            title="Candidature en ligne",
-            authorized_target_year=2020,
-            start_date=datetime.date.today() - datetime.timedelta(days=2),
-            end_date=datetime.date.today() + datetime.timedelta(days=10),
-            type=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name
-        )
-        cls.serializer = ApplicationCourseCalendarSerializer(cls.event_open)
+class AddressFactory(factory.Factory):
+    class Meta:
+        model = Address
+        abstract = False
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'title',
-            'start_date',
-            'end_date',
-            'authorized_target_year',
-            'is_open',
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
-
-    def test_ensure_is_open_correctly_computed(self):
-        self.assertEqual(self.serializer.data['is_open'], self.event_open.is_open_now())
+    country_name = factory.Sequence(lambda n: 'Country %02d' % n)
+    city = factory.Sequence(lambda n: 'city %02d' % n)
