@@ -127,6 +127,9 @@ msgstr "ET"
 msgid "ARES ability"
 msgstr "Habilitation ARES"
 
+msgid "ARES codes"
+msgstr "Codes ARES"
+
 msgid "ARES study code"
 msgstr "Code étude ARES"
 
@@ -185,7 +188,7 @@ msgid "Access contest"
 msgstr "Concours d’accès"
 
 msgid "Access denied!"
-msgstr "Accès refusé!"
+msgstr "Accès refusé !"
 
 msgid "Access minor"
 msgstr "Mineure d’accès"
@@ -227,6 +230,9 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+msgid "Activities"
+msgstr "Activités"
+
 msgid "Activities on other campus"
 msgstr "Activités sur d'autres sites"
 
@@ -244,6 +250,9 @@ msgstr "Ent.charges compl. 1"
 
 msgid "Add. requ. ent. 2"
 msgstr "Ent.charges compl. 2"
+
+msgid "Additional info"
+msgstr "Informations complémentaires"
 
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
@@ -326,13 +335,13 @@ msgstr ""
 "d'enseignement ?"
 
 msgid "Are you sure you want to delete the achievement?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage ?"
 
 msgid "Are you sure you want to delete the teaching material?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
 
 msgid "Are you sure?"
-msgstr "Êtes-vous sûr·e?"
+msgstr "Êtes-vous sûr·e ?"
 
 msgid "Arrangement additional time"
 msgstr "Aménagement Tiers-Temps"
@@ -358,6 +367,9 @@ msgid ""
 msgstr ""
 "Au moins une valeur de volume d'un partim est supérieure à celle du volume "
 "correspondant de l'UE complète"
+
+msgid "At least one learning unit has partim:"
+msgstr "Au moins une unité d'enseignement dispose d'au moins un partim"
 
 msgid "At the end of this learning unit, the student is able to:"
 msgstr "A la fin de cette unité d'enseignement, l'étudiant est capable de:"
@@ -440,8 +452,17 @@ msgstr "Annuler"
 msgid "Cancel proposal"
 msgstr "Annuler proposition"
 
+msgid "Cancel proposal(s)"
+msgstr "Annuler proposition(s)"
+
+msgid "Cancel proposal(s)?"
+msgstr "Annuler proposition(s) ?"
+
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
+
+msgid "Cancel the proposal?"
+msgstr "Annuler la proposition ?"
 
 msgid "Catalogue"
 msgstr "Catalogue"
@@ -508,6 +529,9 @@ msgstr "Co-diplomation"
 
 msgid "Co-graduation total coefficient"
 msgstr "Coefficient total de co-diplômation"
+
+msgid "Co-graduation/partnership"
+msgstr "Co-diplômation/co-organisation"
 
 msgid "Co-holder"
 msgstr "Co-titulaire"
@@ -654,6 +678,13 @@ msgstr "Catégorie décret"
 msgid "Deepening"
 msgstr "Approfondissement"
 
+msgid ""
+"Default information (ac. yr., acronym/short title, title, category, type, "
+"credits)"
+msgstr ""
+"Informations par défaut (anac, sigle/int abr, intitulé complet en français, "
+"catégorie, type de formation, nombre de crédits)"
+
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
 
@@ -693,6 +724,9 @@ msgstr "Détails"
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
 
+msgid "Diploma/certificat"
+msgstr "Diplôme/certificat"
+
 msgid "Direct Access"
 msgstr "Accès direct"
 
@@ -717,11 +751,11 @@ msgstr "Remise du mémoire"
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
-msgid "Do you want to cancel proposal?"
-msgstr "Voulez-vous annuler ces propositions?"
+msgid "Do not cancel"
+msgstr "Ne pas annuler"
 
 msgid "Do you want to change the status of this proposals?"
-msgstr "Voulez-vous changer le statut de ces propositions?"
+msgstr "Voulez-vous changer le statut de ces propositions ?"
 
 msgid "Do you want to consolidate ?"
 msgstr "Voulez-vous consolider ?"
@@ -753,6 +787,10 @@ msgstr "Modifier"
 
 msgid "Edit the proposal"
 msgstr "Modifier la proposition"
+
+msgctxt "list"
+msgid "Education fields"
+msgstr "Domaines d'études"
 
 msgid "Education group"
 msgstr "Organisation de formations"
@@ -837,6 +875,9 @@ msgstr "Inscrit"
 
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
+
+msgid "Enrollment"
+msgstr "Inscription"
 
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
@@ -1029,6 +1070,10 @@ msgstr "Fonction"
 
 msgid "Funding"
 msgstr "Finançable"
+
+msgctxt "list"
+msgid "Funding"
+msgstr "Financement"
 
 msgid "Funding direction"
 msgstr "Orientation de financement"
@@ -1633,7 +1678,7 @@ msgid "No proposals was selected."
 msgstr "Aucune proposition n'a été sélectionnée."
 
 msgid "No result!"
-msgstr "Aucun résultat!"
+msgstr "Aucun résultat !"
 
 msgid "No. Session"
 msgstr "No. session"
@@ -1725,6 +1770,9 @@ msgstr "Organigramme"
 msgid "Organizations"
 msgstr "Organisations"
 
+msgid "Osis code"
+msgstr "Code Osis"
+
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
@@ -1739,6 +1787,9 @@ msgstr "Autre individuel"
 
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
+
+msgid "Other legal information"
+msgstr "Autres infos légales"
 
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
@@ -2150,6 +2201,9 @@ msgstr "Réservé aux internes"
 msgid "Residential"
 msgstr "Domicile"
 
+msgid "Responsibles and contacts"
+msgstr "Responsables et contacts"
+
 msgid "Result"
 msgstr "Résultat"
 
@@ -2215,6 +2269,9 @@ msgstr "Sélectionner tout"
 
 msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
+
+msgid "Select/deselect all"
+msgstr "Sélectionner/Dé-sélectionner tout"
 
 msgid "Send calendar reminder notice"
 msgstr "Envoyer un rappel sur les événements académiques"
@@ -2616,6 +2673,13 @@ msgstr "Il n'existe pas d'unité d'enseigmenent %(acronym)s - %(next_year)s"
 msgid "Thesis"
 msgstr "Thèse"
 
+msgid "This action will permanently cancel the proposal"
+msgstr "Cette action annulera définitivement la proposition"
+
+msgid "This action will permanently cancel the selected proposal(s)"
+msgstr ""
+"Cette action annulera définitivement la (les) proposition(s) sélectionnée(s)"
+
 msgid "This code already exists for this learning unit"
 msgstr "Ce code existe déja pour cette unité d'enseignement"
 
@@ -2678,6 +2742,9 @@ msgstr "Intitulé en français"
 
 msgid "Title specific complement"
 msgstr "Intitulé compl. spéc. à l'UE"
+
+msgid "Titles(partial/English)"
+msgstr "Intitulés (partiels/anglais)"
 
 msgid "To complete"
 msgstr "A compléter"

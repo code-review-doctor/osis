@@ -2,6 +2,7 @@
 from . import check_academic_calendar
 from . import extend_learning_units
 from . import synchronize_entities
+from . import calendar_reminder_notice
 
 
 from celery.schedules import crontab
@@ -17,7 +18,7 @@ celery_app.conf.beat_schedule.update({
     },
     'Calendar reminder notice': {
         'task': 'base.tasks.calendar_reminder_notice.run',
-        'schedule': crontab(minute=0, hour=9)
+        'schedule': crontab(minute=0, hour=8)
     },
     'Synchronize entities': {
         'task': 'base.tasks.synchronize_entities.run',

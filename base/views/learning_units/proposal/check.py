@@ -23,37 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
-from django.test import TestCase
-
-from attribution.api.serializers.calendar import ApplicationCourseCalendarSerializer
-from base.business.event_perms import AcademicEvent
-from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.models.proposal_learning_unit import ProposalLearningUnit
+from osis_common.decorators.ajax import ajax_required
 
 
-class ApplicationCourseCalendarSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.event_open = AcademicEvent(
-            id=10,
-            title="Candidature en ligne",
-            authorized_target_year=2020,
-            start_date=datetime.date.today() - datetime.timedelta(days=2),
-            end_date=datetime.date.today() + datetime.timedelta(days=10),
-            type=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name
-        )
-        cls.serializer = ApplicationCourseCalendarSerializer(cls.event_open)
-
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'title',
-            'start_date',
-            'end_date',
-            'authorized_target_year',
-            'is_open',
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
-
-    def test_ensure_is_open_correctly_computed(self):
-        self.assertEqual(self.serializer.data['is_open'], self.event_open.is_open_now())
+@login_required
+@ajax_required
+def get_related_partims_by_ue(request):
+    selected_proposals_acronym = request.POST.getlist("selected_action", default=[])
+    selected_proposals = ProposalLearningUnit.objects.filter(
+        learning_unit_year__acronym__in=selected_proposals_acronym
+    )
+    related_partims_by_ue = []
+    for proposal in selected_proposals:
+        partims = proposal.learning_unit_year.get_partims_related().values_list('acronym', flat=True)
+        if partims:
+            related_partims_by_ue.append(
+                {
+                    'learning_unit_year': proposal.learning_unit_year.acronym,
+                    'partims': ', '.join(list(partims))
+                }
+            )
+    return JsonResponse(related_partims_by_ue, safe=False)
