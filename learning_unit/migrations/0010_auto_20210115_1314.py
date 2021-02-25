@@ -67,7 +67,7 @@ def remove_proposal_extended_calendar(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('learning_unit', '0006_auto_20210112_1041'),
+        ('learning_unit', '0009_auto_20210203_1310'),
     ]
 
     operations = [

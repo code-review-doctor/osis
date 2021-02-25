@@ -60,7 +60,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                  predicates.is_user_attached_to_requirement_entity) &
                 predicates.has_faculty_proposal_state &
                 predicates.is_not_modification_proposal_type,
-            'base.add_externallearningunityear': rules.always_allow,
+            'base.add_externallearningunityear': predicates.is_learning_unit_edition_for_faculty_manager_period_open,
             'base.can_propose_learningunit':
                 predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_year_not_a_partim &
@@ -98,8 +98,10 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 (predicates.is_learning_unit_year_a_partim | predicates.is_learning_unit_date_container_type_editable),
             'base.can_edit_learningunit_pedagogy':
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
-            'base.can_edit_learningunit_specification': rules.always_allow,
+            'base.can_edit_learningunit_specification':
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open,
             'base.can_consolidate_learningunit_proposal':
                 predicates.is_in_proposal_state &
                 predicates.is_year_in_proposal_state &
@@ -116,15 +118,18 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_change_attribution':
                 predicates.is_learning_unit_type_allowed_for_attributions &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_delete_attribution':
                 (predicates.is_learning_unit_year_a_partim |
                  predicates.is_learning_unit_type_allowed_for_attributions) &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_edit_summary_locked_field':
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_update_learning_achievement':
                 predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year,
             'base.can_refuse_learning_unit_proposal':
                 predicates.is_in_proposal_state &
