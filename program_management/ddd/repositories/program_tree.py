@@ -39,7 +39,8 @@ from program_management.ddd.domain import exception, program_tree
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import NullPrerequisites
-from program_management.ddd.repositories import persist_tree, node, load_node, load_authorized_relationship
+from program_management.ddd.repositories import persist_tree, node, load_node, load_authorized_relationship, \
+    tree_prerequisites
 from program_management.models.element import Element
 
 # Typing
@@ -161,7 +162,9 @@ class ProgramTreeRepository(interface.AbstractRepository):
         structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
         nodes = _load_tree_nodes(structure)
         links = _load_tree_links(structure)
-        prerequisites_of_all_trees = TreePrerequisitesRepository().search(tree_root_ids=tree_root_ids)
+        prerequisites_of_all_trees = tree_prerequisites.TreePrerequisitesRepository().search(
+            tree_root_ids=tree_root_ids
+        )
         root_nodes = load_node.load_multiple(tree_root_ids)
         nodes.update({n.pk: n for n in root_nodes})
         for root_node in root_nodes:
