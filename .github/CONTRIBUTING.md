@@ -6,15 +6,15 @@
     - [Enumérations](#enums)
     - [Kwargs](#kwargs)
     - [Commits](#commits)
-    - [Pull request](#pull-requests)
+    - [Pull requests](#pull-requests)
     - [Performance](#performance)
     - [Sécurité](#scurit)
 - [API](#api)
 - [Modèle (Django Model)](#modle-django-model)
 - [Vue (Django View)](#vue-django-view)
 - [Formulaire (Django Forms)](#formulaire-django-forms)
-- [Template (Django templates)](#template-django-templates)
-- [Gabarits (Django Template Tags)](#gabarits-django-template-tags)
+- [Gabarit (Django templates)](#gabarit-django-templates)
+- [Filtre de gabarit (Django Template Tags)](#filtres-de-gabarits-django-template-tags)
 - [Permissions](#permissions)
 - [Droits de merge et reviews](#droits-de-merge-et-reviews)
 - [Emails](#emails)
@@ -22,7 +22,7 @@
 - [Domain driven design](#domain-driven-design)
     - [Conventions générales](#conventions-gnrales)
     - [Arborescence des packages](#arborescence-des-packages)
-    - [Commandes](#dddcommandpy)
+    - [Commande](#dddcommandpy)
     - [Domaine](#ddddomain)
     - [Repository](#dddrepository)
     - [Application service](#dddservice-application-service)
@@ -217,12 +217,12 @@ CATEGORIES = (
 
 <br/><br/>
 
-## Template (Django Templates)
+## Gabarit (Django Templates)
 - Regroupe les fichiers `html` structurés en "blocks" afin de m'aximiser la réutilisation de templates
 - Utilise Django-Bootstrap3 pour le rendering des [Django Forms](#formulaire-django-forms)
 - Accès :
-  - [couche Dango Templates](#template-django-templates) (un template peut inclure d'autres templates)
-  - [couche Dango Template Tags](#gabarits-django-template-tags)
+  - [couche Dango Templates](#gabarit-django-templates) (un template peut inclure d'autres templates)
+  - [couche Dango Template Tags](#filtres-de-gabarits-django-template-tags)
 - Arborescence des fichiers :
 ```
 [templates]templates                                  # Root structure
@@ -250,7 +250,7 @@ CATEGORIES = (
 ```
 <br/><br/>
 
-## Gabarits (Django Template Tags)
+## Filtres de gabarits (Django Template Tags)
 - Regroupe les template tags Django
 - Accès : 
   - Aucun (un template tag ne doit avoir aucune dépendance externe à lui-même)
