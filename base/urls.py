@@ -33,6 +33,7 @@ import base.views.autocomplete
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
+import base.views.learning_units.proposal.check
 import base.views.learning_units.proposal.consolidate
 import base.views.learning_units.proposal.delete
 import base.views.learning_units.search.borrowed
@@ -48,7 +49,6 @@ from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, student
 from base.views import teaching_material
-from base.views.education_groups import urls as education_groups_urls
 from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import publish_and_access_publication
@@ -59,11 +59,17 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete, \
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
-    EntityRequirementAutocomplete, EmployeeAutocomplete
+    EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
+from education_group import urls as education_group_urls
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
     path('autocomplete/', include([
+        path(
+            'academic-calendar-types/',
+            AcademicCalendarTypeAutocomplete.as_view(),
+            name='academic_calendar_type_autocomplete'
+        ),
         path('entities/', EntityAutocomplete.as_view(), name='entity_autocomplete'),
         # FIXME: Merge with entity_autocomplete (Find a fix with use forward...)
         path('allocation-entities/', AllocationEntityAutocomplete.as_view(), name='allocation_entity_autocomplete'),
@@ -92,13 +98,12 @@ urlpatterns = [
     ])),
 
     url(r'^academic_calendars/', include([
-        url(r'^$', academic_calendar.academic_calendars, name='academic_calendars'),
-        url(r'^(?P<academic_calendar_id>[0-9]+)/$', academic_calendar.academic_calendar_read,
-            name='academic_calendar_read'),
-        url(r'^form(?:/(?P<academic_calendar_id>[0-9]+))?/$', academic_calendar.academic_calendar_form,
-            name='academic_calendar_form'),
-        url(r'^delete(?:/(?P<pk>[0-9]+))?/$', academic_calendar.AcademicCalendarDelete.as_view(),
-            name='academic_calendar_delete'),
+        url(r'^$', academic_calendar.AcademicCalendarsView.as_view(), name='academic_calendars'),
+        url(
+            r'^(?P<academic_calendar_id>[0-9]+)/$',
+            academic_calendar.AcademicCalendarUpdate.as_view(),
+            name='academic_calendar_update'
+        ),
     ])),
 
     url(r'^admin/', include([
@@ -253,7 +258,8 @@ urlpatterns = [
     ])),
     url(r'^proposals/search/$', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
         name="learning_unit_proposal_search"),
-
+    url(r'^proposal_get_related_partims_by_ue/$', base.views.learning_units.proposal.check.get_related_partims_by_ue,
+        name="get_related_partims_by_ue"),
     url(r'^my_osis/', include([
         url(r'^$', my_osis.my_osis_index, name="my_osis"),
         url(r'^management_tasks/messages_templates', my_osis.messages_templates_index, name="messages_templates"),
@@ -280,7 +286,7 @@ urlpatterns = [
         url(r'^search$', offer.offers_search, name='offers_search'),
     ])),
 
-    url(r'^educationgroups/', include(education_groups_urls.urlpatterns)),
+    url(r'^educationgroups/', include(education_group_urls.urlpatterns)),
 
     url(r'^organizations/', include([
         url(r'^$', organization.OrganizationSearch.as_view(), name='organizations'),

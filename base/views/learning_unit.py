@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.views.decorators.http import require_http_methods
 
-import program_management.ddd.repositories.find_roots
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
@@ -60,7 +59,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
-from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
+from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated, \
+    get_common_context_to_publish
 from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.ddd.domain.node import NodeIdentity
@@ -68,6 +68,7 @@ from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
 from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from reference.models.language import find_language_in_settings
+from django.contrib.messages import get_messages
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -99,7 +100,12 @@ def learning_unit_formations(request, learning_unit_year_id=None, code=None, yea
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_components(request, learning_unit_year_id=None, code=None, year=None):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id, code, year)
+    context = get_common_context_learning_unit_year(
+        person,
+        learning_unit_year_id,
+        code,
+        year
+    )
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
     data_components = get_same_container_year_components(context['learning_unit_year'])
@@ -131,6 +137,7 @@ def learning_unit_specifications(request, learning_unit_year_id=None, code=None,
         'base.can_update_learning_achievement', learning_unit_year
     )
     context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
+    context.update(get_common_context_to_publish(person, learning_unit_year))
     return render(request, "learning_unit/specifications.html", context)
 
 

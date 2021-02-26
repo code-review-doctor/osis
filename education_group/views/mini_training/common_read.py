@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.urls import reverse_with_get
+from base.views.common import display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.domain.service.identity_search import MiniTrainingIdentitySearch
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
@@ -47,20 +48,15 @@ from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd import command as command_program_management
+from program_management.ddd.command import GetLastExistingTransitionVersionNameCommand
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import node_identity_service, get_last_existing_transition_version_service
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.ddd import command as command_program_management
-from program_management.ddd.service.read import node_identity_service
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from program_management.serializers.program_tree_view import program_tree_view_serializer
-from education_group.forms.tree_version_choices import get_tree_versions_choices
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.forms.custom_xls import CustomXlsForm
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -88,6 +84,16 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             command_program_management.GetNodeIdentityFromElementId(element_id=self.get_root_id())
         )
         return node_identity == self.node_identity
+
+    @cached_property
+    def has_transition_version(self) -> 'bool':
+        cmd = GetLastExistingTransitionVersionNameCommand(
+            version_name=self.program_tree_version_identity.version_name,
+            offer_acronym=self.program_tree_version_identity.offer_acronym,
+            transition_name=self.program_tree_version_identity.transition_name,
+            year=self.program_tree_version_identity.year
+        )
+        return bool(get_last_existing_transition_version_service.get_last_existing_transition_version_identity(cmd))
 
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
@@ -144,7 +150,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             ).format(
                 root=root_node,
                 version="[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard() else ""
+                if version_identity and not version_identity.is_official_standard else ""
             )
             display_warning_messages(self.request, message)
             return root_node
@@ -157,9 +163,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return int(self.get_path().split("|")[0])
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "group": self.get_group(),
             "mini_training": self.get_mini_training(),
@@ -200,9 +207,14 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
-            "create_version_url": self.get_create_version_url(),
+            "create_specific_version_url": self.get_create_specific_version_url(),
+            "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "is_root_node": self.is_root_node(),
+            "view_publish_btn":
+                self.request.user.has_perm('base.view_publish_btn') and
+                (self.have_general_information_tab() or self.have_skills_and_achievements_tab()),
+            "publish_url": self.get_publish_url()
         }
 
     def get_permission_object(self):
@@ -221,7 +233,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                "?path_to={}".format(self.get_path())
 
     def get_update_mini_training_url(self) -> str:
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return reverse_with_get(
                 'mini_training_update',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code,
@@ -242,14 +254,22 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         )
 
     def get_update_permission_name(self) -> str:
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return "base.change_minitraining"
         return "program_management.change_minitraining_version"
 
-    def get_create_version_url(self):
-        if self.is_root_node() and self.program_tree_version_identity.is_standard():
+    def get_create_specific_version_url(self):
+        if self.is_root_node() and self.program_tree_version_identity.is_official_standard:
             return reverse(
-                'create_education_group_version',
+                'create_education_group_specific_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.get_path())
+
+    def get_create_transition_version_url(self):
+        if self.is_root_node() and \
+                not self.program_tree_version_identity.is_transition and not self.has_transition_version:
+            return reverse(
+                'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
 
@@ -257,7 +277,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return "base.add_minitraining_version"
 
     def get_delete_permanently_tree_version_url(self):
-        if not self.program_tree_version_identity.is_standard():
+        if not self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'delete_permanently_tree_version',
                 kwargs={
@@ -270,7 +290,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return "program_management.delete_permanently_minitraining_version"
 
     def get_delete_permanently_mini_training_url(self):
-        if self.program_tree_version_identity.is_standard():
+        if self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'mini_training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
@@ -319,16 +339,22 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return read.validate_active_tab(tab_urls)
 
     def have_general_information_tab(self):
-        return self.current_version.is_standard_version and \
-            self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
+        return self.current_version.is_official_standard and \
+               self.get_group().type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
 
     def have_skills_and_achievements_tab(self):
-        return self.current_version.is_standard_version and \
-            self.get_group().type.name in MiniTrainingType.with_skills_achievements()
+        return self.current_version.is_official_standard and \
+               self.get_group().type.name in MiniTrainingType.with_skills_achievements()
 
     def have_admission_condition_tab(self):
-        return self.current_version.is_standard_version and \
-            self.get_group().type.name in MiniTrainingType.with_admission_condition()
+        return self.current_version.is_official_standard and \
+               self.get_group().type.name in MiniTrainingType.with_admission_condition()
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.get_path())
 
 
 def _get_view_name_from_tab(tab: Tab):

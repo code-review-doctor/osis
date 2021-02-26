@@ -24,9 +24,9 @@ pypom==2.2.0
 selenium==3.11.0
 python-magic==0.4.15
 django-ajax-selects==1.7.1
-celery==4.2.0
-django-celery-beat==1.1.1
-django-celery-results==1.0.1
+celery==4.4.7
+django-celery-beat==1.5.0
+django-celery-results==1.1.2
 django-filter==2.2.0
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
@@ -41,6 +41,7 @@ attrs==19.3.0
 pycodestyle==2.4.0
 pylint==2.4.4
 diff-cover==3.0.1
+numpy==1.17.4
 # setuptools 50.0 causes issues
 setuptools==49.6.0
 

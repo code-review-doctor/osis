@@ -25,13 +25,12 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List
+from typing import List, Optional
 
 import attr
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.db.models.query import QuerySet
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -43,10 +42,12 @@ from base.models.learning_unit_year import LearningUnitYear
 
 @attr.s(frozen=True, slots=True)
 class AcademicEvent:
+    id = attr.ib(type=int)
     title = attr.ib(type=str)
     authorized_target_year = attr.ib(type=int)
     start_date = attr.ib(type=datetime.date)
     end_date = attr.ib(type=datetime.date)
+    type = attr.ib(type=str)
 
     def is_open_now(self) -> bool:
         """
@@ -90,9 +91,60 @@ class AcademicEventCalendarHelper(ABC):
             if academic_event.is_open(date)
         ])
 
+    def get_opened_academic_events(self, date=None) -> List[AcademicEvent]:
+        """
+        Return all current academic event opened based on date provided in kwargs
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+        return [academic_event for academic_event in self._get_academic_events if academic_event.is_open(date)]
+
+    def get_next_academic_event(self, date=None) -> AcademicEvent:
+        """
+        Return next academic event based on date provided in kwargs
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+
+        events_filtered = [
+            event for event in self._get_academic_events
+            if event.end_date is None or event.end_date > date
+        ]
+        return events_filtered[0] if events_filtered else None
+
+    def get_previous_academic_event(self, date=None) -> AcademicEvent:
+        """
+        Return previous academic event based on date provided in kwargs
+        If no date provided, it will assume as today
+        """
+        if date is None:
+            date = datetime.date.today()
+
+        events_filtered = [
+            event for event in self._get_academic_events if
+            event.end_date is not None and event.end_date < date
+        ]
+        return events_filtered[-1] if events_filtered else None
+
+    def get_academic_event(self, target_year: int) -> AcademicEvent:
+        """
+        Return academic event related to target_year provided
+        """
+        return next(
+            (academic_event for academic_event in self._get_academic_events
+             if academic_event.authorized_target_year == target_year
+             ),
+            None
+        )
+
     @cached_property
     def _get_academic_events(self) -> List[AcademicEvent]:
-        return AcademicEventFactory().get_academic_events(self.event_reference)
+        return sorted(
+            AcademicEventRepository().get_academic_events(self.event_reference),
+            key=lambda academic_event: academic_event.start_date
+        )
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):
@@ -103,14 +155,70 @@ class AcademicEventCalendarHelper(ABC):
         raise NotImplementedError()
 
 
-class AcademicEventFactory:
-    def get_academic_events(self, event_reference: str) -> List[AcademicEvent]:
+class AcademicEventRepository:
+    def get_academic_events(self, event_reference: Optional[str] = None) -> List[AcademicEvent]:
+        qs = AcademicCalendar.objects.all()
+        if event_reference:
+            qs = qs.filter(reference=event_reference)
+        qs = qs.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')
+        return [AcademicEvent(**obj) for obj in qs]
+
+    def get(self, academic_event_id: int) -> AcademicEvent:
+        obj = AcademicCalendar.objects.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')\
+         .get(pk=academic_event_id)
+        return AcademicEvent(**obj)
+
+    def update(self, academic_event: AcademicEvent):
+        academic_event_db = AcademicCalendar.objects.get(pk=academic_event.id)
+        academic_event_db.start_date = academic_event.start_date
+        academic_event_db.end_date = academic_event.end_date
+        academic_event_db.save()
+
+
+@attr.s(frozen=True, slots=True)
+class AcademicSessionEvent(AcademicEvent):
+    session = attr.ib(type=int)
+
+
+class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
+    def get_academic_session_event(self, target_year: int, session: int) -> AcademicSessionEvent:
+        """
+        Return academic session event related to target_year and session provided
+        """
+        return next(
+            (academic_session_event for academic_session_event in self._get_academic_events
+             if academic_session_event.authorized_target_year == target_year and
+                academic_session_event.session == session
+             ),
+            None
+        )
+
+    @cached_property
+    def _get_academic_events(self) -> List[AcademicSessionEvent]:
+        return sorted(
+            AcademicEventSessionRepository().get_academic_session_events(self.event_reference),
+            key=lambda academic_session_event: academic_session_event.start_date
+        )
+
+
+class AcademicEventSessionRepository:
+    def get_academic_session_events(self, event_reference: str) -> List[AcademicSessionEvent]:
         qs = AcademicCalendar.objects.filter(
             reference=event_reference
+        ).exclude(
+            sessionexamcalendar__isnull=True
         ).annotate(
-            authorized_target_year=F('data_year__year')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year')
-        return [AcademicEvent(**obj) for obj in qs]
+            authorized_target_year=F('data_year__year'),
+            type=F('reference'),
+            session=F('sessionexamcalendar__number_session')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
+        return [AcademicSessionEvent(**obj) for obj in qs]
 
 
 class EventPerm(ABC):
@@ -177,28 +285,6 @@ class EventPerm(ABC):
             qs = qs.filter(data_year__year__lte=max_academic_y)
         return qs.values_list('data_year', flat=True)
 
-    @classmethod
-    def get_previous_opened_calendar(cls, date=None) -> AcademicCalendar:
-        if not date:
-            date = timezone.now()
-        qs = AcademicCalendar.objects.filter(end_date__lte=date).order_by('end_date')
-
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-
-        return qs.last()
-
-    @classmethod
-    def get_next_opened_calendar(cls, date=None) -> AcademicCalendar:
-        if not date:
-            date = timezone.now()
-        qs = AcademicCalendar.objects.filter(start_date__gte=date).order_by('start_date')
-
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-
-        return qs.first()
-
 
 class EventPermClosed(EventPerm):
     def is_open(self):
@@ -207,11 +293,6 @@ class EventPermClosed(EventPerm):
     @classmethod
     def get_open_academic_calendars_queryset(cls) -> QuerySet:
         return AcademicCalendar.objects.none()
-
-
-class EventPermOpened(EventPerm):
-    def is_open(self):
-        return True
 
 
 class EventPermLearningUnitFacultyManagerEdition(EventPerm):
@@ -276,15 +357,3 @@ def generate_event_perm_modification_transformation_proposal(person, obj=None, r
         return EventPermModificationOrTransformationProposalFacultyManager(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)
-
-
-class EventPermSummaryCourseSubmission(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-    error_msg = _("Summary course submission is not allowed for tutors during this period.")
-
-
-class EventPermSummaryCourseSubmissionForceMajeure(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
-    error_msg = _("Summary course submission (Force majeure) is not allowed for tutors during this period.")

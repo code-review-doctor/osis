@@ -21,6 +21,10 @@ document.addEventListener("formAjaxSubmit:error", function (e){
     init();
 })
 
+$('#form-ajax-modal').on("shown.bs.modal", function (e){
+    init();
+})
+
 function init() {
     styleBusinessErrorMessages();
     window.Parsley.addAsyncValidator('async-osis', remoteFieldValidation);
@@ -77,6 +81,7 @@ function remoteFieldValidation(xhr) {
     const inputField = this;
     return xhr.then(function(jsonResponse) {
         if (!jsonResponse["valid"]) {
+            hideWarning(inputField);
             return $.Deferred().reject(jsonResponse["msg"]);
         }
         inputField.warning = jsonResponse["msg"];

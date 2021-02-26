@@ -152,8 +152,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             msg[0].get('message'),
             _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": self.academic_calendar.data_year,
-                "end_date": (self.academic_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                "end_date": self.academic_calendar.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
@@ -192,11 +191,11 @@ class ManageMyCoursesViewTestCase(TestCase):
         response = self.client.get(self.url)
         context = response.context
         self.assertTrue(context['event_perm_force_majeure_open'])
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_start_date'],
             self.academic_calendar_force_majeure.start_date
         )
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_end_date'],
             self.academic_calendar_force_majeure.end_date
         )
@@ -208,8 +207,7 @@ class ManageMyCoursesViewTestCase(TestCase):
                 "start_date":
                     self.academic_calendar_force_majeure.start_date.strftime('%d/%m/%Y'),
                 "end_date":
-                    (self.academic_calendar_force_majeure.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                    self.academic_calendar_force_majeure.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.WARNING)

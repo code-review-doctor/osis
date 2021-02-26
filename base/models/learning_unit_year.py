@@ -72,7 +72,7 @@ MAXIMUM_CREDITS = 500
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name,
+    0 AS level, parent_element_id, child_element_id, version.transition_name, version.version_name,
     version.title_fr AS version_title_fr
     FROM base_groupelementyear AS gs
     INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
@@ -85,7 +85,7 @@ WITH RECURSIVE group_element_year_parent AS (
     UNION ALL
     SELECT parent.id, gs_origin,
     gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name,
+    child.level + 1, parent.parent_element_id, parent.child_element_id, version.transition_name, version.version_name,
     version.title_fr AS version_title_fr
     FROM base_groupelementyear AS parent
     INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
@@ -695,15 +695,6 @@ def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
                                            proposallearningunit__isnull=True) \
         .order_by('academic_year') \
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
-
-
-def find_learning_unit_years_by_academic_year_tutor_attributions(academic_year, tutor):
-    """ In this function, only learning unit year with containers is visible! [no classes] """
-    qs = LearningUnitYear.objects_with_container.filter(
-        academic_year=academic_year,
-        attribution__tutor=tutor,
-    ).distinct().order_by('academic_year__year', 'acronym')
-    return qs
 
 
 def toggle_summary_locked(learning_unit_year_id):
