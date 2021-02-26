@@ -25,10 +25,9 @@
 ##############################################################################
 from unittest.mock import patch
 
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree import build_path, ProgramTree
@@ -67,9 +66,10 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self._patch_load_trees_from_children()
 
     def _patch_persist_tree(self):
-        patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
+        patcher_persist = patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository.update")
         self.addCleanup(patcher_persist.stop)
         self.mock_persist = patcher_persist.start()
+        self.mock_persist.return_value = self.tree.entity_id
 
     def _patch_search_tree_identity(self):
         patcher_search_identity = patch("program_management.ddd.domain.service.identity_search."

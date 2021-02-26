@@ -33,7 +33,7 @@ from django.views.generic import FormView
 from base.ddd.utils.validation_message import MessageLevel
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.repositories import persist_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
 from program_management.models.enums.node_type import NodeType
@@ -74,7 +74,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
         error_messages = [msg for msg in messages if msg.level == MessageLevel.ERROR]
         if error_messages:
             raise PermissionDenied([msg.message for msg in error_messages])
-        persist_tree.persist(self.program_tree)
+        ProgramTreeRepository.update(self.program_tree)
         return super().form_valid(form)
 
     def _get_learning_unit_year_node(self):
