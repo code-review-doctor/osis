@@ -38,7 +38,7 @@ from program_management.ddd import command
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -213,7 +213,7 @@ class TestLoadTree(TestCase):
         root_ids_where_one_root_is_contained_into_the_second_root = [
             node_contained_in_training.pk, training_containing_root_node.pk
         ]
-        result = load_tree.load_trees(root_ids_where_one_root_is_contained_into_the_second_root)
+        result = ProgramTreeRepository.search(root_ids=root_ids_where_one_root_is_contained_into_the_second_root)
         self.assertTrue(len(result) == 2)
         first_root = result[0].root_node
         self.assertEqual(first_root.code, node_contained_in_training.group_year.partial_acronym)
