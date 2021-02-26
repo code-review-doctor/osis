@@ -69,11 +69,7 @@ class LearningUnitEndDateForm(forms.Form):
         self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
-        if not has_proposal(self.learning_unit) and self.learning_unit.is_past():
-            raise ValueError(
-                'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
-                    self.learning_unit.end_year)
-            )
+        pass
 
     def save(self, update_learning_unit_year=True):
         learning_unit_full_instance = None
@@ -103,7 +99,11 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
         self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
 
     def _get_academic_years(self, max_year):
-        super()._get_academic_years(max_year)
+        if not has_proposal(self.learning_unit) and self.learning_unit.is_past():
+            raise ValueError(
+                'Learning_unit.end_year {} cannot be less than the current academic_year'.format(
+                    self.learning_unit.end_year)
+            )
 
         self.luy_current_year = self.learning_unit_year.academic_year.year
         # Allow previous year as last organisation year for suppression proposal
@@ -118,8 +118,6 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
     REQUIRED = False
 
     def _get_academic_years(self, max_year):
-        super()._get_academic_years(max_year)
-
         # only select Extended Calendar because central AND faculty have to be able to put the end_date until N+6
         # dropdown end_year is different of permission
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
