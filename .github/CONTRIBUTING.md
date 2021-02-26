@@ -16,7 +16,9 @@
 - [Template (Django templates)](#template-django-templates)
 - [Gabarits (Django Template Tags)](#gabarits-django-template-tags)
 - [Permissions](#permissions)
+- [Droits de merge et reviews](#droits-de-merge-et-reviews)
 - [Emails](#emails)
+- [PDF](#pdf)
 - [Domain driven design](#domain-driven-design)
     - [Conventions générales](#conventions-gnrales)
     - [Arborescence des packages](#arborescence-des-packages)
@@ -86,7 +88,7 @@ def my_function(arg1: str,
 
 #### Traductions
 - Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
-- Les "Fuzzy" doivent être supprimés si la traduction du développeur diffère de la traduction proposée (le "fuzzy" signifiant que GetText a tenté de traduire la clé en retrouvant une similitude dans une autre clé).
+- Supprimer les `Fuzzy` après avoir vérifié la traduction
 
 
 #### Signature des fonctions
@@ -98,7 +100,7 @@ def my_function(arg1: str,
 
 
 #### Constantes
-- Ne pas utiliser de 'magic_number' (constante non déclarée dans une variable). 
+- Ne pas utiliser de 'magic number' (constante non déclarée dans une variable) 
 ```python
 # Bon
 MINIMUM_AUTHORIZED_UPDATE_YEAR = 2026
@@ -124,8 +126,10 @@ def verbose_value(value: int) -> str:
 ```
 
 #### Enums
-- Utiliser des ChoiceEnum plutôt que des CONST contenant des tuples.
+- Utiliser des `ChoiceEnum` plutôt que des `CONSTANTES` contenant des tuples
 ```python
+from base.models.utils.utils import ChoiceEnum
+
 # Bon
 class Categories(ChoiceEnum):
     TRAINING = _("Training")
@@ -148,7 +152,7 @@ CATEGORIES = (
 
 #### Commits
 - Ajouter un message explicite à chaque commit
-- Commiter souvent = diff limité = facilité d'identification de commits amenant une régression = facilité de revert = Facilité et rapidité de review
+- Commiter souvent = diff limité = facilité d'identification de commits amenant une régression = facilité de revert = facilité et rapidité de review
 
 #### Pull requests
 - Réduire au minimum le nombre de fichiers de migrations par fonctionnalité (limite le temps de création de la DB de test, facilite la review, limite les conflits)
@@ -159,17 +163,17 @@ CATEGORIES = (
 
 
 #### Performance
-Suivre les guidelines et bonnes pratiques proposées par Django :
-- [Guide des performances Django](https://docs.djangoproject.com/en/2.2/topics/performance/)
-- [Guide des optimisations Django](https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
+- Suivre les bonnes pratiques Django :
+    - [Guide des performances Django](https://docs.djangoproject.com/en/2.2/topics/performance/)
+    - [Guide des optimisations Django](https://docs.djangoproject.com/en/2.2/topics/db/optimization/)
 
 
 #### Sécurité
 - Ne pas laisser de données sensibles/privées dans les commentaires/dans le code
-- Dans les URL (url.py), on ne peut jamais passer un ID auto-incrémenté (fourni par le moteur DB) en paramètre 
+- Dans les URL (`urls.py`), ne jamais passer un ID auto-incrémenté (fourni par le moteur DB) en paramètre 
     - À éviter : `<site_url>/?tutor_id=1234` ou `<site_url>/score_encoding/print/34`
     - Alternative : utiliser un UUID 
-- Dans le cas d'insertion/modification des données venant de l'extérieur (exemple : fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur ces données qu'il désire injecter.
+- Dans le cas d'insertion/modification des données venant de l'extérieur (exemple : fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur les données qu'il désire injecter.
 
 <br/><br/>
 
@@ -186,12 +190,15 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 - 1 classe par fichier héritant de `osis_common.models.osis_model_admin.OsisModelAdmin`
 - Ne pas utiliser de `ManyToManyField` et déclarer explicitement les modèles de liaison (pour faciliter les noms de tables et synchronisations)
 - Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
+- Ne peut pas contenir de logique métier
+- Accès : 
+  - [couche Django Model](#modle-django-model) (un modèle peut référencer un autre modèle via FK)
 
 <br/><br/>
 
 ## Vue (Django View)
 - Ajouter les annotations pour sécuriser les méthodes dans les vues (user_passes_tests, login_required, require_permission)
-- Les vues servent de "proxy" pour aller chercher les données nécessaires à la génération des pages html, qu'elles vont chercher dans la couche "business" ou directement dans la couche "modèle". Elles ne doivent donc pas contenir de logique business
+- Ne peut pas contenir de logique métier
 - Utiliser les [Class Based Views](https://docs.djangoproject.com/fr/2.2/topics/class-based-views/) à la place des function bases views
 - Accès :
   - [couche Django Forms](#formulaire-django-forms)
@@ -210,9 +217,12 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 
 <br/><br/>
 
-## Template (Django templates)
+## Template (Django Templates)
 - Regroupe les fichiers `html` structurés en "blocks" afin de m'aximiser la réutilisation de templates
 - Utilise Django-Bootstrap3 pour le rendering des [Django Forms](#formulaire-django-forms)
+- Accès :
+  - [couche Dango Templates](#template-django-templates) (un template peut inclure d'autres templates)
+  - [couche Dango Template Tags](#gabarits-django-template-tags)
 - Arborescence des fichiers :
 ```
 [templates]templates                                  # Root structure
@@ -249,7 +259,9 @@ Suivre les guidelines et bonnes pratiques proposées par Django :
 
 ## Permissions
 - Voir [Osis-role](https://github.com/uclouvain/osis/blob/dev/osis_role/README.md)
-- Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions frounies par Django), créer un décorateur dans le dossier "perms" des "views". Le code business propre à la permission devra se trouver dans un dossier "perms" dans "business". Voir "base/views/learning_units/perms/" et "base/business/learning_units/perms/".
+- Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions fournies par Django) : 
+    - créer un décorateur dans le dossier `app_django/views/perms`
+    - exemple : `base/views/learning_units/perms/`
 
 <br/><br/>
 
@@ -292,7 +304,7 @@ def send_an_email(receiver: Person):
 
 <br/><br/>
 
-## PDF : 
+## PDF
 - Utiliser WeasyPrint ou pour la création de documents PDF (https://weasyprint.org/)
 - Utilisation de ReportLab dépréciée (car compliqué d'utilisation)
 
