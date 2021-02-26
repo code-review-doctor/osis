@@ -29,6 +29,7 @@ from django.db import models
 
 from base.business.event_perms import AcademicSessionEvent
 from base.models import offer_year_calendar
+from base.models.academic_year import AcademicYear
 from base.models.enums import number_session, academic_calendar_type
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -48,6 +49,12 @@ class SessionExamCalendar(models.Model):
 
     def __str__(self):
         return u"%s - %s" % (self.academic_calendar, self.number_session)
+
+
+def current_opened_academic_year() -> 'AcademicYear':
+    return AcademicYear.objects.get(
+        year=current_session_exam().authorized_target_year
+    )
 
 
 def current_session_exam(date=None) -> 'AcademicSessionEvent':

@@ -55,13 +55,12 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.student import StudentFactory
-from base.tests.mixin.academic_year import AcademicYearMockMixin
 from base.tests.mixin.session_exam_calendar import SessionExamCalendarMockMixin
 from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment, \
     test_session_exam
 
 
-class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMixin):
+class MixinSetupOnlineEncoding(SessionExamCalendarMockMixin):
     def setUp(self):
         Group.objects.get_or_create(name="tutors")
         Group.objects.get_or_create(name="program_managers")
@@ -76,11 +75,6 @@ class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMix
         ]
         [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0, 2)]
 
-        # Mock academic_year / session_exam_calendar in order to be decouple test from system time
-        self.mock_academic_year(
-            current_academic_year=data["academic_year"],
-            starting_academic_year=data["academic_year"],
-        )
         self.mock_session_exam_calendar(current_session_exam=data["session_exam_calendar"])
 
     def assert_exam_enrollments(self, exam_enrollment, score_draft, score_final, justification_draft,
@@ -355,7 +349,7 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.assertEqual(response.status_code, 302)
 
 
-class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):
+class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='score_encoding', password='score_encoding')
         add_permission(self.user, "can_access_scoreencoding")
@@ -368,11 +362,6 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
-        # Mock academic_year / session_exam_calendar in order to be decouple test from system time
-        self.mock_academic_year(
-            current_academic_year=self.academic_year,
-            starting_academic_year=self.academic_year,
-        )
         self.mock_session_exam_calendar(current_session_exam=None)
 
     def test_redirection_to_current_exam_session(self):
@@ -437,7 +426,7 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
                          % {'session_number': 2, 'str_date': start_date_str})
 
 
-class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):
+class GetScoreEncodingViewProgramManagerTest(SessionExamCalendarMockMixin, TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='score_encoding', password='score_encoding')
         self.person = PersonFactory(user=self.user)
@@ -461,6 +450,7 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
         # Create an score submission event - with an session exam
         academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
                                                     academic_year=academic_year,
+                                                    data_year=academic_year,
                                                     reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         academic_calendar.save()
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=academic_calendar,
@@ -492,11 +482,6 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
                                                                           self.educ_group_year_bio2bac)
 
         self._create_context_exam_enrollment()
-        # Mock academic_year / session_exam_calendar in order to be decouple from system time
-        self.mock_academic_year(
-            current_academic_year=academic_year,
-            starting_academic_year=academic_year,
-        )
         self.mock_session_exam_calendar(current_session_exam=self.session_exam_calendar)
 
     def test_get_score_encoding_list_empty(self):

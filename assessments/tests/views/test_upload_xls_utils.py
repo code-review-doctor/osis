@@ -46,7 +46,6 @@ from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.student import StudentFactory
-from base.tests.mixin.academic_year import AcademicYearMockMixin
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -66,14 +65,13 @@ def generate_exam_enrollments(year, with_different_offer=False):
     number_enrollments = 2
     academic_year = AcademicYearFactory(year=year)
 
-    an_academic_calendar = AcademicCalendarFactory(academic_year=academic_year,
-                                                   start_date=(
-                                                           datetime.datetime.today() - datetime.timedelta(
-                                                       days=20)).date(),
-                                                   end_date=(
-                                                           datetime.datetime.today() + datetime.timedelta(
-                                                       days=20)).date(),
-                                                   reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+    an_academic_calendar = AcademicCalendarFactory(
+        academic_year=academic_year,
+        data_year=academic_year,
+        start_date=(datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+        end_date=(datetime.datetime.today() + datetime.timedelta(days=20)).date(),
+        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+    )
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
                                                        academic_calendar=an_academic_calendar)
 
@@ -104,7 +102,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
     return locals()
 
 
-class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
+class MixinTestUploadScoresFile(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -137,10 +135,6 @@ class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
     def setUp(self):
         self.a_user = self.attribution.tutor.person.user
         self.client.force_login(user=self.a_user)
-        self.mock_academic_year(
-            current_academic_year=self.academic_year,
-            starting_academic_year=self.academic_year
-        )
 
     def assert_enrollments_equal(self, exam_enrollments, attribute_value_list):
         [enrollment.refresh_from_db() for enrollment in exam_enrollments]

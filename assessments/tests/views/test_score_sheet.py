@@ -31,8 +31,11 @@ from django.urls import reverse
 
 from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.views import score_sheet
+from base.models.enums import academic_calendar_type
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import SuperUserFactory
 
 
@@ -46,6 +49,7 @@ class OfferScoreSheetTabViewTest(TestCase):
         cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.COMMON_CONTEXT_KEYS = ['education_group_year', 'countries', 'is_program_manager', 'entity_versions']
         cls.a_superuser = SuperUserFactory()
+        SessionExamCalendarFactory.create_academic_event(cls.academic_year)
 
     def setUp(self):
         self.client.force_login(self.a_superuser)

@@ -88,7 +88,7 @@ def populate_or_delete_offer_year_calendar_education_group_year_id(apps, schema_
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0568_sessionexam_education_group_year'),
+        ('base', '0569_sessionexam_education_group_year'),
     ]
 
     operations = [

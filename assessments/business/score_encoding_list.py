@@ -30,16 +30,18 @@ from decimal import Decimal, Context, Inexact
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from base.models import academic_year, session_exam_calendar, exam_enrollment, tutor, \
-    learning_unit_year, education_group_year
+from base.models import exam_enrollment, tutor, learning_unit_year, education_group_year
 from base.auth.roles import program_manager
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import exam_enrollment_justification_type
+from base.models import session_exam_calendar
 
 
 def get_scores_encoding_list(user, **kwargs):
-    current_academic_year = academic_year.current_academic_year()
-    current_number_session = session_exam_calendar.find_session_exam_number()
+    current_event = session_exam_calendar.current_session_exam()
+    current_academic_year = AcademicYear.objects.get(year=current_event.authorized_target_year)
+    current_number_session = current_event.session
     is_program_manager = program_manager.is_program_manager(user)
     learning_unit_year_id = kwargs.get('learning_unit_year_id')
     educ_group_year_id = kwargs.get('education_group_year_id')
