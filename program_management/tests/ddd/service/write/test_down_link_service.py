@@ -49,6 +49,13 @@ class TestDownLink(TestCase):
         self.mocked_load_tree = self.load_tree_patcher.start()
         self.addCleanup(self.load_tree_patcher.stop)
 
+        self.get_node_from_element_id_patcher = mock.patch(
+            "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
+            return_value=self.tree.root_node
+        )
+        self.mocked_get_node_from_element_id = self.get_node_from_element_id_patcher.start()
+        self.addCleanup(self.get_node_from_element_id_patcher.stop)
+
         self.persist_tree_patcher = mock.patch(
             "program_management.ddd.repositories.persist_tree.persist",
             return_value=None
