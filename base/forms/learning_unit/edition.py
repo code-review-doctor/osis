@@ -36,10 +36,6 @@ from base.models.proposal_learning_unit import find_by_learning_unit
 # TODO Convert it in ModelForm
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
-from education_group.calendar.education_group_limited_daily_management import \
-    EducationGroupLimitedDailyManagementCalendar
-from learning_unit.auth.roles.faculty_manager import FacultyManager
-from osis_role.contrib.helper import EntityRoleHelper
 
 
 class LearningUnitEndDateForm(forms.Form):
@@ -57,6 +53,7 @@ class LearningUnitEndDateForm(forms.Form):
         self.fields['academic_year'].empty_label = self.EMPTY_LABEL
         self.fields['academic_year'].required = self.REQUIRED
         end_year = self.learning_unit.end_year
+        self.start_year = self.learning_unit.start_year
 
         self._set_initial_value(end_year)
 
@@ -123,10 +120,9 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
     def _get_academic_years(self, max_year):
         super()._get_academic_years(max_year)
 
+        # only select Extended Calendar because central AND faculty have to be able to put the end_date until N+6
+        # dropdown end_year is different of permission
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-
-        if EntityRoleHelper.has_role(self.person, FacultyManager):
-            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
 
         self.luy_current_year = self.learning_unit_year.academic_year.year
 
@@ -138,8 +134,7 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
         ).order_by('learning_container_year__academic_year__year')
         if not max_year and applications:
             max_year = applications.first().learning_container_year.academic_year.year
-        academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
-
+        academic_years = AcademicYear.objects.filter(year__gte=self.start_year.year, year__in=target_years_opened)
         return academic_years.filter(year__lte=max_year) if max_year else academic_years
 
 

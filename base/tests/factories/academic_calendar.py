@@ -79,8 +79,8 @@ def generate_proposal_calendars(academic_years):
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 6,  9, 15),
-            end_date=datetime.datetime(academic_year.year + 1, 9, 14),
+            start_date=datetime.datetime(academic_year.year - 6,  9, 14),
+            end_date=datetime.datetime(academic_year.year + 1, 9, 13),
         )
         for academic_year in academic_years
     ]
@@ -88,8 +88,8 @@ def generate_proposal_calendars(academic_years):
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 2,  9, 15),
-            end_date=datetime.datetime(academic_year.year, 9, 14),
+            start_date=datetime.datetime(academic_year.year - 2,  9, 14),
+            end_date=datetime.datetime(academic_year.year, 9, 13),
         )
         for academic_year in academic_years
     ]
@@ -117,7 +117,7 @@ def generate_learning_unit_edition_calendars(academic_years):
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 6, 9, 15),
+            start_date=datetime.datetime(academic_year.year - 6, 9, 14),
             end_date=None,
         )
         for academic_year in academic_years
@@ -126,7 +126,7 @@ def generate_learning_unit_edition_calendars(academic_years):
         OpenAcademicCalendarFactory(
             reference=academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
             data_year=academic_year,
-            start_date=datetime.datetime(academic_year.year - 2, 9, 15),
+            start_date=datetime.datetime(academic_year.year - 2, 9, 14),
             end_date=None
         )
         for academic_year in academic_years

@@ -22,8 +22,8 @@ def create_proposal_limited_calendar(apps, schema_editor):
                 data_year=ac_year,
                 defaults={
                     "title": "Gestion des propositions limitée",
-                    "start_date": datetime.date(ac_year.year - 2,  9, 15),
-                    "end_date": datetime.date(ac_year.year, 9, 14),
+                    "start_date": datetime.date(ac_year.year - 2,  9, 14),
+                    "end_date": datetime.date(ac_year.year, 9, 13),
                     "academic_year": ac_year
                 }
             )
@@ -43,8 +43,8 @@ def create_proposal_extended_calendar(apps, schema_editor):
                 data_year=ac_year,
                 defaults={
                     "title": "Gestion des propositions étendue",
-                    "start_date": datetime.date(ac_year.year - 6,  9, 15),
-                    "end_date": datetime.date(ac_year.year + 1, 9, 14),
+                    "start_date": datetime.date(ac_year.year - 6,  9, 14),
+                    "end_date": datetime.date(ac_year.year + 1, 9, 13),
                     "academic_year": ac_year
                 }
             )
@@ -67,7 +67,7 @@ def remove_proposal_extended_calendar(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('learning_unit', '0006_auto_20210112_1041'),
+        ('learning_unit', '0009_auto_20210203_1310'),
     ]
 
     operations = [

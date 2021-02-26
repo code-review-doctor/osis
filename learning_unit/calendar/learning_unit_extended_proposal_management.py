@@ -45,8 +45,8 @@ class LearningUnitExtendedProposalManagementCalendar(AcademicEventCalendarHelper
                 data_year=ac_year,
                 defaults={
                     "title": "Gestion des propositions étendue",
-                    "start_date": datetime.date(ac_year.year - 6,  9, 15),
-                    "end_date": datetime.date(ac_year.year + 1, 9, 14),
+                    "start_date": datetime.date(ac_year.year - 6,  9, 14),
+                    "end_date": datetime.date(ac_year.year + 1, 9, 13),
                     "academic_year": ac_year  # To remove after refactoring
                 }
             )
