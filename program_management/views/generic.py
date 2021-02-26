@@ -47,11 +47,12 @@ from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
-from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.read import get_program_tree_service
 from program_management.models.enums.node_type import NodeType
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
@@ -95,7 +96,9 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
 
     @cached_property
     def program_tree(self):
-        return load_tree.load(self.get_root_id())
+        return get_program_tree_service.get_program_tree_from_root_element_id(
+            command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.get_root_id())
+        )
 
     def get_root_id(self) -> int:
         return int(self.kwargs['root_element_id'])

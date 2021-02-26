@@ -28,53 +28,17 @@ from typing import List, Dict, Any
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 # Typing
 from program_management.ddd.domain.prerequisite import Prerequisites, NullPrerequisites
 from program_management.ddd.repositories import load_node, load_authorized_relationship
-from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
 NodeKey = int  # Element.pk
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
-
-
-@deprecated  # use ProgramTreeRepository.get() instead
-def load(tree_root_id: int) -> 'ProgramTree':
-    trees = load_trees([tree_root_id])
-    if not trees:
-        raise ProgramTreeNotFoundException
-    return trees[0]
-
-
-@deprecated  # use ProgramTreeRepository.search() instead
-def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
-    trees = []
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
-    nodes = __load_tree_nodes(structure)
-    links = __load_tree_links(structure)
-    prerequisites_of_all_trees = TreePrerequisitesRepository().search(tree_root_ids=tree_root_ids)
-    root_nodes = load_node.load_multiple(tree_root_ids)
-    nodes.update({n.pk: n for n in root_nodes})
-    for root_node in root_nodes:
-        tree_root_id = root_node.pk
-        structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
-        tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, prerequisites_of_all_trees)
-        trees.append(tree)
-    return trees
-
-
-def load_trees_from_children(
-        child_element_ids: list,
-        link_type: LinkTypes = None
-) -> List['ProgramTree']:
-    root_ids = _get_root_ids(child_element_ids, link_type)
-    return load_trees(list(root_ids))
 
 
 def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:

@@ -24,8 +24,20 @@
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository
+from program_management.ddd.service.read import node_identity_service
 
 
 def get_program_tree(cmd: command.GetProgramTree) -> ProgramTree:
     program_tree_id = ProgramTreeIdentity(code=cmd.code, year=cmd.year)
     return program_tree_repository.ProgramTreeRepository.get(program_tree_id)
+
+
+def get_program_tree_from_root_element_id(cmd: command.GetProgramTreeFromRootElementIdCommand) -> ProgramTree:
+    node_identity = node_identity_service.get_node_identity_from_element_id(
+        command.GetNodeIdentityFromElementId(element_id=cmd.root_element_id)
+    )
+    tree_identity = ProgramTreeIdentity(
+        code=node_identity.code,
+        year=node_identity.year
+    )
+    return program_tree_repository.ProgramTreeRepository.get(tree_identity)
