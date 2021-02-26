@@ -55,8 +55,6 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
     :param person: Person
     :return: bool
     """
-    if person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
-        return True
     # Case Tutor: We need to check if today is between submission date
     if tutor.is_tutor(person.user):
         return CanUserEditEducationalInformation(
@@ -64,22 +62,27 @@ def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
             learning_unit_year_id=learning_unit_year.id
         ).is_valid()
 
+    if person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
+        return True
+
     return False
 
 
 # TODO : migrate with tutor role creation
 def is_eligible_to_update_learning_unit_pedagogy_force_majeure_section(learning_unit_year, person):
+    if not is_year_editable(learning_unit_year, raise_exception=False):
+        return False
+
+    # Case Tutor: We need to check if today is between submission date of force majeure section
+    if tutor.is_tutor(person.user):
+        return CanUserEditEducationalInformationForceMajeure(
+            user=person.user,
+            learning_unit_year_id=learning_unit_year.id
+        ).is_valid()
+
     if person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year):
         return True
 
-    if is_year_editable(learning_unit_year, raise_exception=False):
-
-        # Case Tutor: We need to check if today is between submission date of force majeure section
-        if tutor.is_tutor(person.user):
-            return CanUserEditEducationalInformationForceMajeure(
-                user=person.user,
-                learning_unit_year_id=learning_unit_year.id
-            ).is_valid()
     return False
 
 
