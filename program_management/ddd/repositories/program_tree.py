@@ -37,7 +37,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception, program_tree
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
-from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 from program_management.ddd.domain.prerequisite import NullPrerequisites
 from program_management.ddd.repositories import persist_tree, node, load_node, load_authorized_relationship, \
     tree_prerequisites
