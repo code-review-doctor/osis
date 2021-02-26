@@ -544,7 +544,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
 
     def _patch_load_tree(self):
         patcher_load_tree = mock.patch(
-            "program_management.ddd.repositories.load_tree.load"
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.get"
         )
         self.mock_load_tree = patcher_load_tree.start()
         self.mock_load_tree.return_value = self.tree

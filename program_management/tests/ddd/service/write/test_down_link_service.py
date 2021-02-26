@@ -23,9 +23,9 @@
 # ############################################################################
 from unittest import mock
 
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
-from program_management.ddd.domain import program_tree, link, node
+from program_management.ddd.domain import program_tree, node
 from program_management.ddd.service.write import down_link_service
 from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -43,7 +43,7 @@ class TestDownLink(TestCase):
         self.link2 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=2)
 
         self.load_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.load_tree.load",
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.get",
             return_value=self.tree
         )
         self.mocked_load_tree = self.load_tree_patcher.start()
