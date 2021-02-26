@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from typing import Dict, List
-
+from collections import defaultdict
 from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
 from openpyxl.styles import Color, Font
@@ -32,10 +32,10 @@ from openpyxl.styles import Color, Font
 from base.business.learning_unit_xls import HEADER_TEACHERS, \
     learning_unit_titles_part_1, learning_unit_titles_part2, annotate_qs, get_data_part1, get_data_part2, \
     prepare_proposal_legend_ws_data, title_with_version_title, \
-    acronym_with_version_label, BOLD_FONT, XLS_DESCRIPTION, get_name_or_username, WORKSHEET_TITLE, \
-    WRAP_TEXT_ALIGNMENT, _get_font_rows, _get_col_letter
+    acronym_with_version_label, BOLD_FONT, get_name_or_username, \
+    WRAP_TEXT_ALIGNMENT, _get_col_letter, PROPOSAL_LINE_STYLES
 from base.business.xls import _get_all_columns_reference
-from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
+from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from osis_common.document import xls_build
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
@@ -44,11 +44,12 @@ from base.models.academic_year import AcademicYear
 
 XLS_FILENAME = _('LearningUnitsTrainingsList')
 CELLS_WITH_BORDER_TOP = 'cells_with_border_top'
-
-CELLS_WITH_WHITE_FONT = 'cells_with_white_font'
-
+CELLS_TO_COLOR = 'cells_to_color'
+XLS_DESCRIPTION = _('List of learning units with one line per training')
+WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
-
+FIRST_TRAINING_COLUMN = 26
+TOTAL_NB_OF_COLUMNS = 29
 HEADER_PROGRAMS = [
     str(_('Gathering')), str(_('Training code')), str(_('Training title')), str(_('Training management entity'))
 ]
@@ -84,9 +85,9 @@ def _get_parameters(data: Dict, learning_units, titles_part1, user) -> dict:
     parameters = _get_parameters_configurable_list(learning_units, titles_part1, user)
     parameters.update(
         {
-            xls_build.FONT_CELLS: {WHITE_FONT: data.get(CELLS_WITH_WHITE_FONT)},
+            xls_build.FONT_CELLS: data.get(CELLS_TO_COLOR),
             xls_build.BORDER_CELLS: {xls_build.BORDER_TOP: data.get(CELLS_WITH_BORDER_TOP)},
-            xls_build.FONT_ROWS: {BOLD_FONT: [0]}
+            xls_build.FONT_ROWS: {BOLD_FONT: [0]},
         }
     )
     return parameters
@@ -99,15 +100,14 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
     ).prefetch_related('element')
 
     lines = []
-    cells_with_white_font = []
     cells_with_border_top = []
-
+    cells_to_color = defaultdict(list)
     for learning_unit_yr in qs:
         lu_data_part1 = get_data_part1(learning_unit_yr)
         lu_data_part2 = get_data_part2(learning_unit_yr, True)
-        nb_columns = len(lu_data_part1) + len(lu_data_part2)
+
         if hasattr(learning_unit_yr, "element") and learning_unit_yr.element.children_elements.all():
-            idx = 0
+            training_occurence = 1
             for group_element_year in learning_unit_yr.element.children_elements.all():
                 if not learning_unit_yr.closest_trainings or group_element_year.parent_element.group_year is None:
                     break
@@ -128,24 +128,22 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                         )
                         if training_data:
                             lines.append(lu_data_part1 + lu_data_part2 + training_data)
+                            cells_to_color = _check_cell_to_color(
+                                cells_to_color, learning_unit_yr, len(lines) + 1, training_occurence
+                            )
+                            if training_occurence == 1:
+                                cells_with_border_top.extend(_add_border_top(len(lines)+1))
 
-                            if idx >= 1:
-                                cells_with_white_font.extend(
-                                    ["{}{}".format(letter, len(lines)+1)
-                                     for letter in _get_all_columns_reference(nb_columns)
-                                     ]
-                                )
-                            else:
-                                cells_with_border_top.extend(_add_border_top(lines, nb_columns))
-                            idx = idx + 1
+                            training_occurence += 1
         else:
             lines.append(lu_data_part1 + lu_data_part2)
-            cells_with_border_top.extend(_add_border_top(lines, nb_columns))
+            cells_with_border_top.extend(_add_border_top(len(lines)+1))
+            cells_to_color = _check_cell_to_color(cells_to_color, learning_unit_yr, len(lines) + 1)
 
     return {
         'working_sheets_data': lines,
-        CELLS_WITH_WHITE_FONT: cells_with_white_font,
-        CELLS_WITH_BORDER_TOP: cells_with_border_top
+        CELLS_WITH_BORDER_TOP: cells_with_border_top,
+        CELLS_TO_COLOR: cells_to_color
     }
 
 
@@ -182,7 +180,6 @@ def _get_parameters_configurable_list(learning_units: List, titles: List, user) 
                 _get_col_letter(titles, HEADER_TEACHERS)
             )
         },
-        xls_build.FONT_ROWS: _get_font_rows(learning_units),
     }
     return parameters
 
@@ -197,7 +194,28 @@ def _get_wrapped_cells(learning_units: List, teachers_col_letter: str) -> List:
     return wrapped_styled_cells
 
 
-def _add_border_top(lines, nb_cols):
+def _add_border_top(row: int) -> List['str']:
     return [
-        "{}{}".format(letter, len(lines) + 1) for letter in _get_all_columns_reference(nb_cols + len(HEADER_PROGRAMS))
+        "{}{}".format(letter, row) for letter in _get_all_columns_reference(TOTAL_NB_OF_COLUMNS)
     ]
+
+
+def _check_cell_to_color(dict_to_update: dict, learning_unit_yr: LearningUnitYear, row_number: int,
+                         training_occurence: int = 1) -> dict:
+    colored_cells = dict_to_update.copy()
+    cells_with_white_font = []
+    if training_occurence > 1:
+        cells_with_white_font = [
+            "{}{}".format(letter, row_number) for letter in _get_all_columns_reference(FIRST_TRAINING_COLUMN-1)
+        ]
+
+        colored_cells[WHITE_FONT].extend(cells_with_white_font)
+
+    if getattr(learning_unit_yr, "proposallearningunit", None):
+        cells_to_color = []
+        for letter in _get_all_columns_reference(TOTAL_NB_OF_COLUMNS):
+            cell_ref = "{}{}".format(letter, row_number)
+            if cell_ref not in cells_with_white_font:
+                cells_to_color.append(cell_ref)
+        colored_cells[PROPOSAL_LINE_STYLES.get(learning_unit_yr.proposallearningunit.type)].extend(cells_to_color)
+    return colored_cells

@@ -223,6 +223,7 @@ def _get_font_rows(learning_units):
     for idx, luy in enumerate(learning_units, start=1):
         if getattr(luy, "proposallearningunit", None):
             colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
+    colored_cells.update({BOLD_FONT: [0]})
     return colored_cells
 
 

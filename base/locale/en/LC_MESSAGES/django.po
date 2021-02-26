@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-25 14:42+0100\n"
+"POT-Creation-Date: 2021-02-26 13:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1294,6 +1294,9 @@ msgid "Learning units list with attributions"
 msgstr ""
 
 msgid "Learning units proposal comparison"
+msgstr ""
+
+msgid "Learning units training list"
 msgstr ""
 
 msgid "LearningUnitsList"
