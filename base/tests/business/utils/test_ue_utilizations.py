@@ -31,7 +31,7 @@ from django.test import TestCase
 from base.business.learning_unit_xls import XLS_DESCRIPTION, WRAP_TEXT_ALIGNMENT, annotate_qs
 from base.business.learning_unit_xls import get_significant_volume
 from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_WHITE_FONT, CELLS_WITH_BORDER_TOP, \
-    WHITE_FONT, BOLD_FONT, _prepare_xls_content
+    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.learning_unit_year import LearningUnitYear
@@ -47,13 +47,11 @@ from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
+from django.utils.translation import gettext_lazy as _
 
 TRAINING_TITLE_COLUMN = 27
-
 TRAINING_CODE_COLUMN = 26
-
-GATHERING_COLMUN = 25
-
+GATHERING_COLUMN = 25
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -117,6 +115,41 @@ class TestUeUtilization(TestCase):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
+    def test_headers(self):
+        self.assertListEqual(_prepare_titles(),
+                             [
+                                 str(_('Code')),
+                                 str(_('Ac yr.')),
+                                 str(_('Title')),
+                                 str(_('Type')),
+                                 str(_('Subtype')),
+                                 str(_('Req. Entity')),
+                                 str(_('Proposal type')),
+                                 str(_('Proposal status')),
+                                 str(_('Credits')),
+                                 str(_('Alloc. Ent.')),
+                                 str(_('Title in English')),
+                                 str(_('List of teachers')),
+
+                                 str(_('Periodicity')),
+                                 str(_('Active')),
+                                 "{} - {}".format(_('Lecturing vol.'), _('Annual')),
+                                 "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
+                                 "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
+                                 "{}".format(_('Lecturing planned classes')),
+                                 "{} - {}".format(_('Practical vol.'), _('Annual')),
+                                 "{} - {}".format(_('Practical vol.'), _('1st quadri')),
+                                 "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
+                                 "{}".format(_('Practical planned classes')),
+                                 str(_('Quadrimester')),
+                                 str(_('Session derogation')),
+                                 str(_('Language')),
+                                 str(_('Gathering')), str(_('Training code')), str(_('Training title')),
+                                 str(_('Training management entity')),
+
+                             ]
+                             )
+
     def test_get_parameters(self):
         an_user = UserFactory()
         titles = ['title1', 'title2']
@@ -136,7 +169,7 @@ class TestUeUtilization(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = _prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        result = _prepare_xls_content(qs)
         self.assertEqual(len(result.get("working_sheets_data")), 1)
 
         luy = annotate_qs(qs).get()
@@ -150,7 +183,7 @@ class TestUeUtilization(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = _prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        result = _prepare_xls_content(qs)
         self.assertEqual(len(result.get("working_sheets_data")), 2)
         first_training_occurence = result.get("working_sheets_data")[0]
         second_training_occurence = result.get("working_sheets_data")[1]
@@ -168,8 +201,8 @@ class TestUeUtilization(TestCase):
         self.assertCountEqual(
             results,
             [
-                first_training_occurence[GATHERING_COLMUN],
-                second_training_occurence[GATHERING_COLMUN]
+                first_training_occurence[GATHERING_COLUMN],
+                second_training_occurence[GATHERING_COLUMN]
             ]
         )
         res1 = "{}".format(self.a_group_year_parent.acronym)
@@ -225,5 +258,6 @@ class TestUeUtilization(TestCase):
             "{} ({})".format(self.a_group_year_parent.partial_acronym,
                              "{0:.2f}".format(self.group_element_child.relative_credits)),
             self.a_group_year_parent.acronym,
-            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
+            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr),
+            '-'
         ]

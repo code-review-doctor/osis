@@ -39,7 +39,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls_comparison", _create_xls_comparison)
 @RenderToExcel("xls_educational_specifications", _create_xls_educational_specifications)
 @RenderToExcel("xls", _create_xls)
-@RenderToExcel("xls_with_parameters_one_pgm_per_line", _create_xls_ue_utilizations_with_one_training_per_line)
+@RenderToExcel("xls_one_pgm_per_line", _create_xls_ue_utilizations_with_one_training_per_line)
 class BorrowedLearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
     search_type = SearchTypes.BORROWED_COURSE

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-23 15:04+0100\n"
+"POT-Creation-Date: 2021-02-25 14:42+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1332,6 +1332,9 @@ msgstr "Fiche comparative de la proposition"
 
 msgid "LearningUnitsList"
 msgstr "Liste-UEs"
+
+msgid "LearningUnitsTrainingsList"
+msgstr "Liste-UEs-formations"
 
 msgid "Lecturing"
 msgstr "Partie magistrale"
@@ -2774,6 +2777,9 @@ msgstr "Formation"
 
 msgid "Training code"
 msgstr "Formation sigle"
+
+msgid "Training management entity"
+msgstr "Formation entité de gestion"
 
 msgid "Training title"
 msgstr "Formation intitulé"

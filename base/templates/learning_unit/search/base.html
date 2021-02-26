@@ -163,15 +163,15 @@
                                         &nbsp;{% trans 'List of learning units with educational information and specifications' %}
                                     </a>
                                 </li>
-                                {% if request.path == service_course_url  or request.path == borrowed_course_url %}
+                                {% if request.path == learning_units_url or request.path == service_course_url  or request.path == borrowed_course_url %}
                                 <li>
-                                    <a id="btn_produce_xls_with_parameters_one_pgm_per_line"
+                                    <a id="btn_produce_xls_one_pgm_per_line"
                                        class="download"
                                        style="margin-right:10px;"
-                                       title="{% trans 'Produce a customizable xls of learning units with one line per training' %}"
-                                       data-toggle="modal" data-target="#modalXlsLuyWithParameters">
+                                       title="{% trans 'Produce a customizable xls of learning units with one line per training' %}">
                                         &nbsp;{% trans 'List of learning units with one line per training' %}
                                     </a>
+                                </li>   
                                 {% endif %}
                             </ul>
                         </div>
@@ -281,16 +281,9 @@
         });
 
         $("#btn_xls_with_parameters").click(function(e) {
-            var action_value = 'xls_with_parameters';
-            if ($('#hdn_lst_type').val() == 'btn_produce_xls_with_parameters_one_pgm_per_line'){
-                action_value = 'xls_with_parameters_one_pgm_per_line'
-            }
-            let status = $("#xls_status");
-            status.val('xls_with_parameters_one_pgm_per_line');
-            prepare_xls(e, action_value);
+            prepare_xls(e, 'xls_with_parameters');
             $("#hdn_with_grp").val('');
             $("#hdn_with_attributions").val('');
-
         });
         $("#btn_produce_xls_detailled_attributions").click(function (e) {
             prepare_xls(e, 'xls_attributions');
@@ -298,8 +291,8 @@
         $("#btn_produce_xls_educational_specifications").click(function (e) {
             prepare_xls(e, 'xls_educational_specifications');
         });
-        $("#btn_produce_xls_with_parameters_one_pgm_per_line").click(function (e) {
-            $("#hdn_lst_type").val(this.id);
+        $("#btn_produce_xls_one_pgm_per_line").click(function (e) {
+            prepare_xls(e, 'xls_one_pgm_per_line');
         });
 
     </script>
