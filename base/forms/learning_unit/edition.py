@@ -36,10 +36,6 @@ from base.models.proposal_learning_unit import find_by_learning_unit
 # TODO Convert it in ModelForm
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
-from education_group.calendar.education_group_limited_daily_management import \
-    EducationGroupLimitedDailyManagementCalendar
-from learning_unit.auth.roles.faculty_manager import FacultyManager
-from osis_role.contrib.helper import EntityRoleHelper
 
 
 class LearningUnitEndDateForm(forms.Form):
@@ -124,10 +120,9 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
     def _get_academic_years(self, max_year):
         super()._get_academic_years(max_year)
 
+        # only select Extended Calendar because central AND faculty have to be able to put the end_date until N+6
+        # dropdown end_year is different of permission
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-
-        if EntityRoleHelper.has_role(self.person, FacultyManager):
-            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
 
         self.luy_current_year = self.learning_unit_year.academic_year.year
 

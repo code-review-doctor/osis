@@ -74,7 +74,8 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         form = LearningUnitDailyManagementEndDateForm(
             None, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertEqual(list(form.fields['academic_year'].queryset),
-                         list(AcademicYear.objects.filter(year__in=target_years_opened)))
+                         list(AcademicYear.objects.filter(year__gte=self.learning_unit.start_year.year,
+                                                          year__in=target_years_opened)))
         self.assertFalse(form.fields['academic_year'].required)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
 
@@ -84,7 +85,8 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         form = LearningUnitDailyManagementEndDateForm(
             None, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertEqual(list(form.fields['academic_year'].queryset),
-                         list(AcademicYear.objects.filter(year__in=target_years_opened)))
+                         list(AcademicYear.objects.filter(year__gte=self.learning_unit.start_year.year,
+                                                          year__in=target_years_opened)))
         self.assertFalse(form.fields['academic_year'].required)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
 
