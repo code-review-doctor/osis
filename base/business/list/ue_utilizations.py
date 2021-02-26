@@ -106,45 +106,42 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
         lu_data_part1 = get_data_part1(learning_unit_yr)
         lu_data_part2 = get_data_part2(learning_unit_yr, True)
 
-        if hasattr(learning_unit_yr, "element"):
+        if hasattr(learning_unit_yr, "element") and learning_unit_yr.element.children_elements.all():
             idx = 0
-            if learning_unit_yr.element.children_elements.all():
-                for group_element_year in learning_unit_yr.element.children_elements.all():
-                    if not learning_unit_yr.closest_trainings or group_element_year.parent_element.group_year is None:
-                        break
+            for group_element_year in learning_unit_yr.element.children_elements.all():
+                if not learning_unit_yr.closest_trainings or group_element_year.parent_element.group_year is None:
+                    break
 
-                    partial_acronym = group_element_year.parent_element.group_year.partial_acronym or ''
-                    credits = group_element_year.relative_credits \
-                        if group_element_year.relative_credits \
-                        else group_element_year.child_element.learning_unit_year.credits
-                    leaf_credits = "{0:.2f}".format(credits) if credits else '-'
+                partial_acronym = group_element_year.parent_element.group_year.partial_acronym or ''
+                credits = group_element_year.relative_credits \
+                    if group_element_year.relative_credits \
+                    else group_element_year.child_element.learning_unit_year.credits
+                leaf_credits = "{0:.2f}".format(credits) if credits else '-'
 
-                    for training in learning_unit_yr.closest_trainings:
-                        if training['gs_origin'] == group_element_year.pk:
-                            training_data = _build_training_data_columns(
-                                leaf_credits,
-                                partial_acronym,
-                                training,
-                                learning_unit_yr.academic_year
-                            )
-                            if training_data:
-                                lines.append(lu_data_part1 + lu_data_part2 + training_data)
-                                nb_columns = len(lu_data_part1) + len(lu_data_part2)
-                                if idx >= 1:
-                                    cells_with_white_font.extend(
-                                        ["{}{}".format(letter, len(lines)+1)
-                                         for letter in _get_all_columns_reference(nb_columns)
-                                         ]
-                                    )
-                                else:
-                                    cells_with_border_top.extend(
-                                        ["{}{}".format(letter, len(lines)+1)
-                                         for letter in _get_all_columns_reference(nb_columns + 3)
-                                         ]
-                                    )
-                                idx = idx + 1
-            else:
-                lines.append(lu_data_part1 + lu_data_part2)
+                for training in learning_unit_yr.closest_trainings:
+                    if training['gs_origin'] == group_element_year.pk:
+                        training_data = _build_training_data_columns(
+                            leaf_credits,
+                            partial_acronym,
+                            training,
+                            learning_unit_yr.academic_year
+                        )
+                        if training_data:
+                            lines.append(lu_data_part1 + lu_data_part2 + training_data)
+                            nb_columns = len(lu_data_part1) + len(lu_data_part2)
+                            if idx >= 1:
+                                cells_with_white_font.extend(
+                                    ["{}{}".format(letter, len(lines)+1)
+                                     for letter in _get_all_columns_reference(nb_columns)
+                                     ]
+                                )
+                            else:
+                                cells_with_border_top.extend(
+                                    ["{}{}".format(letter, len(lines)+1)
+                                     for letter in _get_all_columns_reference(nb_columns + 3)
+                                     ]
+                                )
+                            idx = idx + 1
         else:
             lines.append(lu_data_part1 + lu_data_part2)
 
