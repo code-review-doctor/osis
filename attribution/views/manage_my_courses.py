@@ -29,6 +29,7 @@ from typing import Iterable
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
@@ -169,16 +170,18 @@ def _fetch_achievements_by_language(learning_unit_year: LearningUnitYear) -> Ite
 @login_required
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def edit_educational_information(request, learning_unit_year_id):
-    return edit_learning_unit_pedagogy(request, learning_unit_year_id)
+    redirect_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
 
 
 @login_required
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, "learning_unit_year_id",
                      LearningUnitYear)
 def edit_educational_information_force_majeure(request, learning_unit_year_id):
+    redirect_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
     if request.method == 'POST':
-        return post_method_edit_force_majeure_pedagogy(request)
-    return edit_learning_unit_pedagogy(request, learning_unit_year_id)
+        return post_method_edit_force_majeure_pedagogy(request, redirect_url)
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
 
 
 @login_required

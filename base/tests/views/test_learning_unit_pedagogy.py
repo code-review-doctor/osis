@@ -36,6 +36,8 @@ from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_units.xls_generator import generate_xls_teaching_material
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.models.enums import academic_calendar_type, entity_type
 from base.models.enums import organization_type
 from base.models.enums.learning_unit_year_subtypes import FULL
@@ -56,8 +58,6 @@ from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, LearningUnitYearTranslatedTextFactory
-from base.business.learning_units.xls_generator import generate_xls_teaching_material
-from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
@@ -467,7 +467,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             'trans_text': 'test',
             'learning_unit_year': self.learning_unit_year
         })
-        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         msg = get_messages_from_response(response)
         return msg
 
