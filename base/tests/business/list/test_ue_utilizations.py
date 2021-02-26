@@ -23,17 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import defaultdict
 
 from django.db.models.expressions import Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit_xls import XLS_DESCRIPTION, WRAP_TEXT_ALIGNMENT, annotate_qs
-from base.business.learning_unit_xls import get_significant_volume
-from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_WHITE_FONT, CELLS_WITH_BORDER_TOP, \
-    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles
+from base.business.learning_unit_xls import WRAP_TEXT_ALIGNMENT, annotate_qs, PROPOSAL_LINE_STYLES, \
+    get_significant_volume
+from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_BORDER_TOP, \
+    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles, CELLS_TO_COLOR, XLS_DESCRIPTION, _check_cell_to_color
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
+from base.models.enums import proposal_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -41,13 +44,13 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
-from django.utils.translation import gettext_lazy as _
 
 TRAINING_TITLE_COLUMN = 27
 TRAINING_CODE_COLUMN = 26
@@ -114,6 +117,11 @@ class TestUeUtilization(TestCase):
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
+        cls.learning_unit_yr_with_proposal = LearningUnitYearFactory(academic_year=cls.academic_year)
+        cls.proposal = ProposalLearningUnitFactory(
+            learning_unit_year=cls.learning_unit_yr_with_proposal,
+            type=proposal_type.ProposalType.MODIFICATION.name,
+        )
 
     def test_headers(self):
         self.assertListEqual(_prepare_titles(),
@@ -154,7 +162,8 @@ class TestUeUtilization(TestCase):
         an_user = UserFactory()
         titles = ['title1', 'title2']
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
-        data = {CELLS_WITH_BORDER_TOP: [], CELLS_WITH_WHITE_FONT: []}
+        data = {CELLS_WITH_BORDER_TOP: [], CELLS_TO_COLOR: []}
+
         param = _get_parameters(data, learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
         self.assertEqual(param.get(xls_build.USER), an_user.username)
@@ -162,7 +171,7 @@ class TestUeUtilization(TestCase):
         self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: []})
         self.assertEqual(param.get(xls_build.FONT_ROWS), {BOLD_FONT: [0]})
         self.assertEqual(param.get(xls_build.BORDER_CELLS), {xls_build.BORDER_TOP: data.get(CELLS_WITH_BORDER_TOP)})
-        self.assertEqual(param.get(xls_build.FONT_CELLS), {WHITE_FONT: data.get(CELLS_WITH_WHITE_FONT)})
+        self.assertEqual(param.get(xls_build.FONT_CELLS), [])
 
     def test_prepare_xls_content_ue_used_in_one_training(self):
         qs = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
@@ -227,6 +236,59 @@ class TestUeUtilization(TestCase):
                 second_training_occurence[TRAINING_TITLE_COLUMN]
             ]
         )
+
+    def test_no_white_cells(self):
+        dict_to_update = defaultdict(list)
+        result = _check_cell_to_color(
+            dict_to_update=dict_to_update, learning_unit_yr=self.learning_unit_yr_1, row_number=1
+        )
+        self.assertListEqual(result[WHITE_FONT], [])
+
+    def test_white_cells_because_second_line_of_usage_of_an_UE(self):
+        dict_to_update = defaultdict(list)
+        result = _check_cell_to_color(
+            dict_to_update=dict_to_update, learning_unit_yr=self.learning_unit_yr_1, row_number=1, training_occurence=2
+        )
+
+        first_row_cells_without_training_data = [
+            'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1'
+        ]
+        self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
+
+    def test_colored_cells_because_of_proposal(self):    
+
+        dict_to_update = defaultdict(list)
+        result = _check_cell_to_color(
+            dict_to_update=dict_to_update, learning_unit_yr=self.proposal.learning_unit_year, row_number=1
+        )        
+        row_colored_because_of_proposal = [
+            'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1'
+        ]
+        self.assertDictEqual(result, {PROPOSAL_LINE_STYLES.get(self.proposal.type): row_colored_because_of_proposal})
+
+    def test_colored_cells_because_of_proposal_on_second_training_usage(self):    
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=self.learning_unit_yr_1,
+            type=proposal_type.ProposalType.MODIFICATION.name,
+        )
+        dict_to_update = defaultdict(list)
+        result = _check_cell_to_color(
+            dict_to_update=dict_to_update,
+            learning_unit_yr=proposal.learning_unit_year,
+            row_number=1,
+            training_occurence=2
+        )        
+        first_row_cells_without_training_data = [
+            'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1'
+        ]
+        row_colored_because_of_proposal = [
+            'Z1', 'AA1', 'AB1', 'AC1'
+        ]
+        self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
+        self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
 
     def _get_luy_expected_data(self, luy):
         return [
