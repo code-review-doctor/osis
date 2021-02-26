@@ -572,7 +572,12 @@ def send_messages_to_notify_encoding_progress(
         pgm_manager: mdl.person.Person
 ):
     if is_program_manager:
-        __send_messages_for_each_education_group_year(all_enrollments, learning_unit_year, updated_enrollments, pgm_manager)
+        __send_messages_for_each_education_group_year(
+            all_enrollments,
+            learning_unit_year,
+            updated_enrollments,
+            pgm_manager
+        )
 
 
 def online_double_encoding_get_form(request, data=None, learning_unit_year_id=None):

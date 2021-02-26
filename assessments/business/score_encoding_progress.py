@@ -30,7 +30,13 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.session_exam_deadline import compute_deadline_tutor
 
 
-def get_scores_encoding_progress(user, education_group_year_id, number_session, academic_year, learning_unit_year_ids=None):
+def get_scores_encoding_progress(
+        user,
+        education_group_year_id,
+        number_session,
+        academic_year,
+        learning_unit_year_ids=None
+):
     queryset = exam_enrollment.get_progress_by_learning_unit_years_and_offer_years(
         user=user,
         education_group_year_id=education_group_year_id,
