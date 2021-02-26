@@ -66,6 +66,7 @@ class TestEditAttributionGet(TestCase):
             learning_component_year=cls.practical_component
         )
         cls.person = FacultyManagerFactory(entity=cls.learning_container_year.requirement_entity).person
+        generate_learning_unit_edition_calendars([cls.learning_unit_year.academic_year])
 
     def setUp(self):
         self.client.force_login(self.person.user)

@@ -69,8 +69,8 @@ class TestLearningAchievementView(TestCase):
     def setUp(self):
         self.language_fr = FrenchLanguageFactory()
         self.language_en = EnglishLanguageFactory()
-        self.user = UserFactory()
-        self.person = CentralManagerFactory(user=self.user).person
+        self.person = CentralManagerFactory().person
+        self.user = self.person.user
         self.person_entity = PersonEntityFactory(person=self.person)
 
         self.academic_year = create_current_academic_year()

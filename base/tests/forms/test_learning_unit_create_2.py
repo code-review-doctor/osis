@@ -48,6 +48,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -187,6 +188,7 @@ class LearningUnitFullFormContextMixin(TestCase):
         cls.central_person = cls.central_manager.person
 
         cls.post_data = get_valid_form_data(cls.current_academic_year, entity=cls.entity)
+        generate_learning_unit_edition_calendars(cls.acs)
 
     def setUp(self):
         del self.acs[3]
