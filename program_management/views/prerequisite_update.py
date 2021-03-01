@@ -33,7 +33,9 @@ from django.views.generic import FormView
 from base.ddd.utils.validation_message import MessageLevel
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd import command
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.service.read.node_identity_service import get_node_identity_from_element_id
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
 from program_management.models.enums.node_type import NodeType
@@ -78,10 +80,10 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
         return super().form_valid(form)
 
     def _get_learning_unit_year_node(self):
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs["child_element_id"]),
-            NodeType.LEARNING_UNIT
+        node_identity = get_node_identity_from_element_id(
+            command.GetNodeIdentityFromElementId(element_id=int(self.kwargs['child_element_id']))
         )
+        node = self.program_tree.get_node_by_code_and_year(code=node_identity.code, year=node_identity.year)
         if node is None:
             raise Http404('No learning unit match the given query')
         return node
