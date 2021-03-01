@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,9 +26,11 @@
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
 
@@ -52,3 +54,36 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
+
+class TestListButtons(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        academic_year = create_current_academic_year()
+        AcademicYearFactory(year=academic_year.year+1)
+        luy = LearningUnitYearFactory(academic_year=academic_year)
+        ProposalLearningUnitFactory(learning_unit_year=luy)
+        cls.url = reverse("learning_units_proposal")
+        cls.get_data = {
+            "academic_year": str(luy.academic_year.id),
+        }
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit")
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_presence_of_buttons(self):
+        response = self.client.get(self.url, data=self.get_data)
+        self.assertContains(response, 'id="btn_produce_xls_', count=6, status_code=200)
+
+    def test_value_of_buttons(self):
+        response = self.client.get(self.url, data=self.get_data)
+        titles_expected = [
+            _('List proposals'),
+            _('List comparison LU / Proposal'),
+            _('Configurable list of learning units'),
+            _('List of learning units with one line per attribution'),
+            _('List of learning units with educational information and specifications'),
+            _('List of learning units with one line per training')
+        ]
+        for title in titles_expected:
+            self.assertContains(response, title, count=1, status_code=200)
