@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% block header_content %}
-    {% navigation_group request.user group_year request.resolver_match.url_name current_version %}
+    {% navigation_group request.user group_year request.resolver_match.url_name version_label %}
 {% endblock %}
 
 {% block tabs %}
