@@ -133,12 +133,12 @@ components:
           type: string
           example: 'Cours'
         credits:
-          type: number
-          multipleOf: 0.01
+          type: string
+          example: '60.00'
         total_learning_unit_charge:
-          type: number
+          type: string
           description: 'Total charge for learning unit year'
-          multipleOf: 0.1
+          example: '55.5'
         start_year:
           type: integer
           example: 2018
@@ -149,11 +149,11 @@ components:
           type: string
           example: 'Coordinateur'
         lecturing_charge:
-          type: number
-          multipleOf: 0.1
+          type: string
+          example: '15.0'
         practical_charge:
-          type: number
-          multipleOf: 0.1
+          type: string
+          example: '10.5'
         links:
           $ref: '#/components/schemas/AttributionLinks'
     AttributionFunctionEnum:
