@@ -43,6 +43,7 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from osis_common.document import xls_build
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
@@ -488,12 +489,8 @@ def volume_information(learning_unit_yr):
 
 # FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
 def acronym_with_version_label(acronym: str, transition_name: str, version_name: str) -> str:
-    if version_name or transition_name:
-        if version_name == '':
-            version_label = '[{}]'.format(transition_name)
-        elif transition_name:
-            version_label = '[{}-{}]'.format(version_name, transition_name)
-        else:
-            version_label = '[{}]'.format(version_name)
-        return "{}{}".format(acronym, version_label)
-    return acronym
+    identity = ProgramTreeVersionIdentity(
+        offer_acronym=acronym, transition_name=transition_name, version_name=version_name, year=None
+    )
+    version_str = version_label(identity)
+    return "{}{}".format(acronym, version_str)
