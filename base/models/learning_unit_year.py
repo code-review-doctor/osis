@@ -73,7 +73,7 @@ SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
     0 AS level, parent_element_id, child_element_id, version.transition_name, version.version_name,
-    version.title_fr AS version_title_fr
+    version.title_fr AS version_title_fr, gy.management_entity_id as management_entity
     FROM base_groupelementyear AS gs
     INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON gs.child_element_id = element_child.id
@@ -86,7 +86,7 @@ WITH RECURSIVE group_element_year_parent AS (
     SELECT parent.id, gs_origin,
     gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
     child.level + 1, parent.parent_element_id, parent.child_element_id, version.transition_name, version.version_name,
-    version.title_fr AS version_title_fr
+    version.title_fr AS version_title_fr, gy.management_entity_id as management_entity
     FROM base_groupelementyear AS parent
     INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id
