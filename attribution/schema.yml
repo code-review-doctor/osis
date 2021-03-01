@@ -114,7 +114,7 @@ components:
     Attribution:
       type: object
       properties:
-        acronym:
+        code:
           type: string
           example: 'LDROI1001'
         title_fr:
@@ -127,9 +127,18 @@ components:
           type: integer
           example: 2020
           description: 'Year of learning unit'
+        type:
+          $ref: '#/components/schemas/LearningUnitTypeEnum'
+        type_text:
+          type: string
+          example: 'Cours'
         credits:
           type: number
           multipleOf: 0.01
+        total_learning_unit_charge:
+          type: number
+          description: 'Total charge for learning unit year'
+          multipleOf: 0.1
         start_year:
           type: integer
           example: 2018
@@ -139,6 +148,12 @@ components:
         function_text:
           type: string
           example: 'Coordinateur'
+        lecturing_charge:
+          type: number
+          multipleOf: 0.1
+        practical_charge:
+          type: number
+          multipleOf: 0.1
         links:
           $ref: '#/components/schemas/AttributionLinks'
     AttributionFunctionEnum:
@@ -161,6 +176,16 @@ components:
           type: string
         schedule:
           type: string
+    LearningUnitTypeEnum:
+      type: string
+      enum:
+        - 'COURSE'
+        - 'INTERNSHIP'
+        - 'DISSERTATION'
+        - 'OTHER_COLLECTIVE'
+        - 'OTHER_INDIVIDUAL'
+        - 'MASTER_THESIS'
+        - 'EXTERNAL'
     Error:
       type: object
       properties:
