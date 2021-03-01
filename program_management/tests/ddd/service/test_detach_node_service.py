@@ -62,8 +62,7 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self._patch_persist_tree()
         self._patch_search_tree_identity()
         self._patch_get_tree()
-        self._patch_load_tree()
-        self._patch_load_trees_from_children()
+        self._patch_search_from_children()
 
     def _patch_persist_tree(self):
         patcher_persist = patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository.update")
@@ -84,20 +83,17 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self.mock_get = patcher_load.start()
         self.mock_get.return_value = self.tree
 
-    def _patch_load_tree(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load = patcher_load.start()
-        self.mock_load.return_value = self.tree
-
-    def _patch_load_trees_from_children(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")
+    def _patch_search_from_children(self):
+        patcher_load = patch(
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children"
+        )
         self.addCleanup(patcher_load.stop)
         self.mock_load_tress_from_children = patcher_load.start()
         self.mock_load_tress_from_children.return_value = [self.tree]
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
-    def test_should_return_link_created_identity_and_persist_it_when_valid_and_commit_set_to_true(self, mock_detach_node):
+    def test_should_return_link_created_identity_and_persist_it_when_valid_and_commit_set_to_true(self,
+                                                                                                  mock_detach_node):
         mock_detach_node.return_value = self.link
         link_identity = detach_node_service.detach_node(self.detach_command)
 

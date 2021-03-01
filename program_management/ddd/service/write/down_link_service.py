@@ -25,7 +25,9 @@ from django.db import transaction
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_tree, load_node, program_tree
+from program_management.ddd.repositories import load_node
+from program_management.ddd.repositories import program_tree
+from program_management.ddd.service.read import get_program_tree_service
 
 
 @transaction.atomic()
@@ -36,7 +38,9 @@ def down_link(command_up: command.OrderDownLinkCommand) -> 'NodeIdentity':
     parent_node = load_node.load(parent_id)
     child_node = load_node.load(child_id)
 
-    tree = load_tree.load(root_id)
+    tree = get_program_tree_service.get_program_tree_from_root_element_id(
+        command.GetProgramTreeFromRootElementIdCommand(root_element_id=root_id)
+    )
     link_to_down = tree.get_link(parent_node, child_node)
     parent_node = link_to_down.parent
     parent_node.down_child(child_node)

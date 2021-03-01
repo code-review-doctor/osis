@@ -300,7 +300,7 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) 
                  for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
                     learning_unit_yr
                 ).values()
-                ]
+                 ]
             )
         )
     lu_data_part2.append(learning_unit_yr.get_periodicity_display())
@@ -445,7 +445,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             learning_unit_yr).values()
         if attributions_values:
             for value in attributions_values:
-                data.append(lu_data_part1+_get_attribution_detail(value))
+                data.append(lu_data_part1 + _get_attribution_detail(value))
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
