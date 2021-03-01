@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-23 15:04+0100\n"
+"POT-Creation-Date: 2021-02-26 13:26+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1084,6 +1084,9 @@ msgstr "Financement coopération internationale CCD/CUD"
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
+msgid "Gathering"
+msgstr "Regroupement"
+
 msgid "Gender"
 msgstr "Genre"
 
@@ -1327,8 +1330,14 @@ msgstr "Liste des UEs avec les attributions"
 msgid "Learning units proposal comparison"
 msgstr "Fiche comparative de la proposition"
 
+msgid "Learning units training list"
+msgstr "Liste UEs formations"
+
 msgid "LearningUnitsList"
 msgstr "Liste-UEs"
+
+msgid "LearningUnitsTrainingsList"
+msgstr "Liste-UEs-formations"
 
 msgid "Lecturing"
 msgstr "Partie magistrale"
@@ -1369,8 +1378,11 @@ msgstr "Comparaison entre unités d'enseignement"
 msgid "List of learning units with educational information and specifications"
 msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
-msgid "List of learning units with with one line per attribution"
+msgid "List of learning units with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
+
+msgid "List of learning units with one line per training"
+msgstr "Liste des UE avec une formation par ligne"
 
 msgid "List of teachers"
 msgstr "Liste des enseignants"
@@ -1958,6 +1970,11 @@ msgstr "Produire Excel"
 
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
+
+msgid "Produce a customizable xls of learning units with one line per training"
+msgstr ""
+"Produire une liste personnalisable des unités d'enseignement avec une ligne "
+"par formation"
 
 msgid ""
 "Produce a xls of learning units with educational information and "
@@ -2760,6 +2777,15 @@ msgstr "Total d'inscrits à la formation"
 
 msgid "Training"
 msgstr "Formation"
+
+msgid "Training code"
+msgstr "Formation sigle"
+
+msgid "Training management entity"
+msgstr "Formation entité de gestion"
+
+msgid "Training title"
+msgstr "Formation intitulé"
 
 msgid "Trainings"
 msgstr "Formations"
