@@ -20,9 +20,10 @@ def get_base_skeleton_per_type():
         education_group_types.TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: [
             education_group_types.GroupType.COMMON_CORE.name
         ],
-        education_group_types.TrainingType.BACHELOR.name: [education_group_types.GroupType.COMMON_CORE.name,
-                                                           education_group_types.GroupType.MINOR_LIST_CHOICE.name,
-                                                           education_group_types.GroupType.MAJOR_LIST_CHOICE.name],
+        education_group_types.TrainingType.BACHELOR.name: [
+            education_group_types.GroupType.COMMON_CORE.name,
+            education_group_types.GroupType.MINOR_LIST_CHOICE.name
+        ],
         education_group_types.TrainingType.CERTIFICATE.name: [education_group_types.GroupType.COMMON_CORE.name],
         education_group_types.TrainingType.CAPAES.name: [education_group_types.GroupType.COMMON_CORE.name],
         education_group_types.TrainingType.RESEARCH_CERTIFICATE.name: [
@@ -43,8 +44,7 @@ def get_base_skeleton_per_type():
         education_group_types.TrainingType.PGRM_MASTER_120.name: [
             education_group_types.GroupType.COMMON_CORE.name,
             education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
-            education_group_types.GroupType.OPTION_LIST_CHOICE.name,
-            education_group_types.GroupType.COMPLEMENTARY_MODULE.name
+            education_group_types.GroupType.OPTION_LIST_CHOICE.name
         ],
         education_group_types.TrainingType.MASTER_MA_120.name: [
             education_group_types.GroupType.COMMON_CORE.name,
@@ -60,7 +60,8 @@ def get_base_skeleton_per_type():
         ],
         education_group_types.TrainingType.PGRM_MASTER_180_240.name: [
             education_group_types.GroupType.COMMON_CORE.name,
-            education_group_types.GroupType.FINALITY_180_LIST_CHOICE.name
+            education_group_types.GroupType.FINALITY_180_LIST_CHOICE.name,
+            education_group_types.GroupType.OPTION_LIST_CHOICE.name
         ],
         education_group_types.TrainingType.MASTER_MA_180_240.name: [
             education_group_types.GroupType.COMMON_CORE.name,
@@ -74,8 +75,14 @@ def get_base_skeleton_per_type():
             education_group_types.GroupType.COMMON_CORE.name,
             education_group_types.GroupType.OPTION_LIST_CHOICE.name
         ],
-        education_group_types.TrainingType.MASTER_M1.name: [education_group_types.GroupType.COMMON_CORE.name],
-        education_group_types.TrainingType.MASTER_MC.name: [education_group_types.GroupType.COMMON_CORE.name],
+        education_group_types.TrainingType.MASTER_M1.name: [
+            education_group_types.GroupType.COMMON_CORE.name,
+            education_group_types.GroupType.OPTION_LIST_CHOICE.name
+        ],
+        education_group_types.TrainingType.MASTER_MC.name: [
+            education_group_types.GroupType.COMMON_CORE.name,
+            education_group_types.GroupType.OPTION_LIST_CHOICE.name
+        ],
         education_group_types.TrainingType.INTERNSHIP.name: [education_group_types.GroupType.COMMON_CORE.name],
         education_group_types.MiniTrainingType.DEEPENING.name: [education_group_types.GroupType.COMMON_CORE.name],
         education_group_types.MiniTrainingType.SOCIETY_MINOR.name: [education_group_types.GroupType.COMMON_CORE.name],
