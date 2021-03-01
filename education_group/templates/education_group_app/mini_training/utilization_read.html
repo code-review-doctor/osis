@@ -30,7 +30,7 @@
             {% url 'mini_training_identification' group.year group.code as url_identification %}
             <a href="{{ url_identification }}"
                id="lnk_identification">{{ group.code }} -
-                {{ group.abbreviated_title }}{% if not current_version.is_standard %}{{ version_label }}</a>
+                {{ group.abbreviated_title }}{{ version_label }}</a>
             {% trans 'is using in' %} :
             <br><br>
             {% include 'blocks/node_trees_utilizations_table.html' %}
