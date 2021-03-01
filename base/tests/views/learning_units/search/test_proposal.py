@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,6 +59,7 @@ class TestListButtons(TestCase):
     @classmethod
     def setUpTestData(cls):
         academic_year = create_current_academic_year()
+        AcademicYearFactory(year=academic_year.year+1)
         luy = LearningUnitYearFactory(academic_year=academic_year)
         ProposalLearningUnitFactory(learning_unit_year=luy)
         cls.url = reverse("learning_units_proposal")
