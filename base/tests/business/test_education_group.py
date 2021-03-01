@@ -202,9 +202,12 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
         an_education_group_year = a_version.offer
         data = _extract_main_data(a_version, LANGUAGE_CODE_FR)
 
-        self.assertEqual(data[TRANING_COL],
-                         "{}{}".format(an_education_group_year.acronym, "[{}]".format(a_version.version_name))
-                         )
+        self.assertEqual(
+            data[TRANING_COL],
+            "{}{}".format(an_education_group_year.acronym, "[{}-{}]".format(
+                a_version.version_name, a_version.transition_name
+            ))
+        )
         self.assertEqual(data[TYPE_COL],
                          "{}{}".format(an_education_group_year.education_group_type, " [{}]".format(a_version.title_fr))
                          )
@@ -222,11 +225,10 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
                          )
         self.assertEqual(data[TYPE_COL],
                          "{}{}".format(an_education_group_year.education_group_type,
-                                       " [{}]".format(a_version.title_fr)if a_version and a_version.title_fr else '')
+                                       " [{}]".format(a_version.title_fr) if a_version and a_version.title_fr else '')
                          )
 
     def get_xls_administrative_data(self):
-
         an_education_group_year = self.version.offer
         return [
             an_education_group_year.management_entity_version.acronym,
