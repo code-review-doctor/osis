@@ -23,14 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import logging
+import traceback
+
+import requests
+from django.conf import settings
 from django.db.models import F, Case, When, Q, Value, CharField
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, Replace
 from rest_framework import generics
 from rest_framework.response import Response
 
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class AttributionListView(generics.ListAPIView):
@@ -44,13 +51,17 @@ class AttributionListView(generics.ListAPIView):
             'attribution',
             'learning_component_year__learning_unit_year__academic_year'
         ).distinct(
-            'learning_component_year__learning_unit_year_id'
+            'attribution_id'
         ).filter(
             learning_component_year__learning_unit_year__academic_year__year=self.kwargs['year'],
             attribution__tutor__person__user=self.request.user,
             attribution__decision_making=''
         ).annotate(
+            # Technical ID for making a match with data in EPC. Remove after refactoring...
+            allocation_id=Replace('attribution__external_id', Value('osis.attribution_'), Value('')),
+
             code=F('learning_component_year__learning_unit_year__acronym'),
+            type=F('learning_component_year__learning_unit_year__learning_container_year__container_type'),
             title_fr=Case(
                 When(
                     Q(learning_component_year__learning_unit_year__learning_container_year__common_title__isnull=True) |
@@ -98,5 +109,39 @@ class AttributionListView(generics.ListAPIView):
     def get_serializer_context(self):
         return {
             **super().get_serializer_context(),
-            'access_schedule_calendar': AccessScheduleCalendar()
+            'access_schedule_calendar': AccessScheduleCalendar(),
+            'attribution_charges': self.get_attribution_charges()
         }
+
+    # TODO: Remove after find synchronization solution because make a remote call to EPC to get right value
+    def get_attribution_charges(self):
+        attribution_charges = []
+        if not all([
+            settings.EPC_API_URL, settings.EPC_API_USER, settings.EPC_API_PASSWORD,
+            settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT
+        ]):
+            logger.error("[Attribution API] Missing at least one env. settings (EPC_API_URL, EPC_API_USER, "
+                         "EPC_API_PASSWORD, EPC_ATTRIBUTIONS_TUTOR_ENDPOINT)  ) ")
+            return attribution_charges
+
+        try:
+            url = "{base_url}{endpoint}".format(
+                base_url=settings.EPC_API_URL,
+                endpoint=settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT.format(
+                    global_id=self.request.user.person.global_id,
+                    year=self.kwargs['year']
+                )
+            )
+            response = requests.get(url, auth=(settings.EPC_API_USER, settings.EPC_API_PASSWORD,), timeout=100)
+            response.raise_for_status()
+            attribution_charges = response.json().get("tutorAllocations", [])
+            # Fix when the webservice return a dictionnary in place of a list.
+            # Occur when the tutor has a single attribution.
+            if type(attribution_charges) is dict:
+                attribution_charges = [attribution_charges]
+            return attribution_charges
+        except Exception:
+            log_trace = traceback.format_exc()
+            logger.warning('Error when returning attributions charge duration: \n {}'.format(log_trace))
+        finally:
+            return attribution_charges

@@ -424,6 +424,14 @@ ESB_GEOCODING_ENDPOINT = os.environ.get('ESB_GEOCODING_ENDPOINT')
 ESB_ENTITIES_HISTORY_ENDPOINT = os.environ.get('ESB_ENTITIES_HISTORY_ENDPOINT')
 ESB_ENTITY_ADDRESS_ENDPOINT = os.environ.get('ESB_ENTITY_ADDRESS_ENDPOINT')
 
+# EPC Configuration
+EPC_API_URL = os.environ.get('EPC_API_URL')
+EPC_API_USER = os.environ.get('EPC_API_USER')
+EPC_API_PASSWORD = os.environ.get('EPC_API_PASSWORD')
+EPC_ATTRIBUTIONS_TUTOR_ENDPOINT = os.environ.get(
+    'EPC_ATTRIBUTIONS_TUTOR_ENDPOINT', "resources/AllocationCharges/tutors/{global_id}/{year}"
+)
+
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
 # Selenium Testing

@@ -35,6 +35,7 @@ from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.enums.function import Functions
 from base.business.event_perms import AcademicEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 
 
 @override_settings(
@@ -45,7 +46,9 @@ class AttributionSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.attribution_obj = SimpleNamespace(
+            allocation_id="265656",  # Technical ID for making a match with data in EPC. Remove after refactoring...
             code="LDROI1001",
+            type=LearningContainerYearType.COURSE.name,
             title_fr="Introduction aux droits Partie I",
             title_en="Introduction aux droits Partie I",
             year=2020,
@@ -62,8 +65,19 @@ class AttributionSerializerTestCase(TestCase):
             end_date=datetime.date.today() + datetime.timedelta(days=10),
             type=AcademicCalendarTypes.ACCESS_SCHEDULE_CALENDAR.name
         )
+        # Fake remote data from EPC API Call
+        cls.attributions_charges = [
+            {
+                'allocationId': cls.attribution_obj.allocation_id,
+                'allocationChargePractical': '10.5',
+                'allocationChargeLecturing': '15.0',
+                'learningUnitCharge': '55.5',
+            }
+        ]
+
         cls.serializer = AttributionSerializer(cls.attribution_obj, context={
-            'access_schedule_calendar': AccessScheduleCalendar()
+            'access_schedule_calendar': AccessScheduleCalendar(),
+            'attribution_charges': cls.attributions_charges
         })
 
     def setUp(self) -> None:
@@ -81,16 +95,24 @@ class AttributionSerializerTestCase(TestCase):
             'title_fr',
             'title_en',
             'year',
+            'type',
+            'type_text',
             'credits',
             'start_year',
             'function',
             'function_text',
+            'lecturing_charge',
+            'practical_charge',
+            'total_learning_unit_charge',
             'links'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_function_text_correctly_computed(self):
         self.assertEquals(self.serializer.data['function_text'], Functions.COORDINATOR.value)
+
+    def test_ensure_type_text_correctly_computed(self):
+        self.assertEquals(self.serializer.data['type_text'], LearningContainerYearType.COURSE.value)
 
     def test_ensure_catalog_app_url_correctly_computed(self):
         expected_url = "https://dummy_url.be/cours-{year}-{code}".format(
@@ -104,3 +126,15 @@ class AttributionSerializerTestCase(TestCase):
             code=self.attribution_obj.code
         )
         self.assertEquals(self.serializer.data['links']['schedule'], expected_url)
+
+    def test_ensure_lecturing_charge_correctly_found(self):
+        expected_lecturing_charge = "15.0"
+        self.assertEquals(self.serializer.data['lecturing_charge'], expected_lecturing_charge)
+
+    def test_ensure_practical_charge_correctly_found(self):
+        expected_practical_charge = "10.5"
+        self.assertEquals(self.serializer.data['practical_charge'], expected_practical_charge)
+
+    def test_ensure_total_learning_unit_charge_correctly_found(self):
+        expected_total_learning_unit_charge = "55.5"
+        self.assertEquals(self.serializer.data['total_learning_unit_charge'], expected_total_learning_unit_charge)

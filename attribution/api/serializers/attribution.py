@@ -27,6 +27,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from attribution.models.enums.function import Functions
+from base.models.enums.learning_container_year_types import LearningContainerYearType
 
 
 class AttributionSerializer(serializers.Serializer):
@@ -34,22 +35,48 @@ class AttributionSerializer(serializers.Serializer):
     title_fr = serializers.CharField()
     title_en = serializers.CharField()
     year = serializers.IntegerField()
+    type = serializers.CharField()
+    type_text = serializers.SerializerMethodField()
     credits = serializers.DecimalField(max_digits=5, decimal_places=2)
     start_year = serializers.IntegerField()
     function = serializers.CharField()
     function_text = serializers.SerializerMethodField()
+    lecturing_charge = serializers.SerializerMethodField()
+    practical_charge = serializers.SerializerMethodField()
+    total_learning_unit_charge = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
+
+    def get_type_text(self, obj) -> str:
+        if obj.type:
+            return LearningContainerYearType.get_value(obj.type)
+        return ""
 
     def get_function_text(self, obj) -> str:
         if obj.function:
             return Functions.get_value(obj.function)
         return ""
 
+    def get_lecturing_charge(self, obj):
+        attribution_charge = self.__get_attribution_charge_row(obj)
+        return attribution_charge.get('allocationChargeLecturing')
+
+    def get_practical_charge(self, obj):
+        attribution_charge = self.__get_attribution_charge_row(obj)
+        return attribution_charge.get('allocationChargePractical')
+
+    def get_total_learning_unit_charge(self, obj):
+        attribution_charge = self.__get_attribution_charge_row(obj)
+        return attribution_charge.get('learningUnitCharge')
+
     def get_links(self, obj) -> dict:
         return {
             "catalog": self.__get_catalog_url(obj),
             "schedule": self.__get_schedule_url(obj)
         }
+
+    def __get_attribution_charge_row(self, obj):
+        attribution_charges = self.context.get("attribution_charges", [])
+        return next((row for row in attribution_charges if row['allocationId'] == obj.allocation_id), {})
 
     def __get_catalog_url(self, obj):
         if settings.LEARNING_UNIT_PORTAL_URL:
