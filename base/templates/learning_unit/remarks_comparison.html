@@ -1,0 +1,60 @@
+{% load i18n learning_unit dictionnary %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% with key=_('Faculty remark (unpublished)') %}
+    <tr style="border-top: groove">
+        <td class="table_header">{{ key }}</td>
+        {% if previous %}
+            {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% endif %}
+        {% changed_label current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% if next %}
+            {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% endif %}
+    </tr>
+{% endwith %}
+{% with key=_('Other remark (intended for publication)') %}
+    <tr>
+        <td class="table_header">{{ key }}</td>
+        {% if previous %}
+            {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% endif %}
+        {% changed_label current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% if next %}
+            {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% endif %}
+    </tr>
+{% endwith %}
+{% with key=_('Other remark in english (intended for publication)') %}
+    <tr>
+        <td class="table_header">{{ key }}</td>
+        {% if previous %}
+            {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% endif %}
+        {% changed_label current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% if next %}
+            {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+        {% endif %}
+    </tr>
+{% endwith %}

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-23 15:04+0100\n"
+"POT-Creation-Date: 2021-02-26 13:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1057,6 +1057,9 @@ msgstr ""
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr ""
 
+msgid "Gathering"
+msgstr ""
+
 msgid "Gender"
 msgstr ""
 
@@ -1293,7 +1296,13 @@ msgstr ""
 msgid "Learning units proposal comparison"
 msgstr ""
 
+msgid "Learning units training list"
+msgstr ""
+
 msgid "LearningUnitsList"
+msgstr ""
+
+msgid "LearningUnitsTrainingsList"
 msgstr ""
 
 msgid "Lecturing"
@@ -1335,7 +1344,10 @@ msgstr ""
 msgid "List of learning units with educational information and specifications"
 msgstr ""
 
-msgid "List of learning units with with one line per attribution"
+msgid "List of learning units with one line per attribution"
+msgstr ""
+
+msgid "List of learning units with one line per training"
 msgstr ""
 
 msgid "List of teachers"
@@ -1899,6 +1911,9 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
+msgstr ""
+
+msgid "Produce a customizable xls of learning units with one line per training"
 msgstr ""
 
 msgid ""
@@ -2642,6 +2657,15 @@ msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+msgid "Training code"
+msgstr ""
+
+msgid "Training management entity"
+msgstr ""
+
+msgid "Training title"
 msgstr ""
 
 msgid "Trainings"

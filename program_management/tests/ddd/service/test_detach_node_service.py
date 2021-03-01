@@ -65,9 +65,10 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self._patch_search_from_children()
 
     def _patch_persist_tree(self):
-        patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
+        patcher_persist = patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository.update")
         self.addCleanup(patcher_persist.stop)
         self.mock_persist = patcher_persist.start()
+        self.mock_persist.return_value = self.tree.entity_id
 
     def _patch_search_tree_identity(self):
         patcher_search_identity = patch("program_management.ddd.domain.service.identity_search."

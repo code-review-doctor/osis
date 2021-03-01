@@ -35,6 +35,7 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from program_management.ddd import command
 from program_management.ddd.repositories import persist_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -79,7 +80,7 @@ class TestPersistTree(TestCase):
         tree.root_node.add_child(self.common_core_node)
         tree.root_node.children_as_nodes[0].add_child(self.learning_unit_year_node)
 
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
 
         link_root_with_common_core = GroupElementYear.objects.filter(
             parent_element_id=self.root_node.node_id,
@@ -102,7 +103,7 @@ class TestPersistTree(TestCase):
         # Append UE to common core
         tree.root_node.children[0].child.add_child(self.learning_unit_year_node)
 
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
 
         self.assertTrue(
             GroupElementYear.objects.filter(
@@ -117,7 +118,7 @@ class TestPersistTree(TestCase):
         tree = get_program_tree_service.get_program_tree_from_root_element_id(
             command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.root_node.node_id)
         )
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
         assertion_msg = "No changes made, so function GroupelementYear.save() should not have been called"
         self.assertFalse(mock.called, assertion_msg)
 
@@ -128,7 +129,7 @@ class TestPersistTree(TestCase):
             command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.root_node.node_id)
         )
         tree.root_node.children[0]._has_changed = True  # Made some changes
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
         assertion_msg = """
             Changes were triggered in the Link object, so function GroupelementYear.save() should have been called
         """
@@ -148,7 +149,7 @@ class TestPersistTree(TestCase):
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
         tree.detach_node(path_to_detach, mock.Mock(), mock.Mock())
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
         self.assertEqual(qs_link_will_be_detached.count(), 0)
 
     @patch("program_management.ddd.repositories.persist_tree.__delete_group_element_year")
@@ -157,7 +158,7 @@ class TestPersistTree(TestCase):
         tree = get_program_tree_service.get_program_tree_from_root_element_id(
             command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.root_node.node_id)
         )
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
         assertion_msg = "No changes made, so function GroupelementYear.delete() should not have been called"
         self.assertFalse(mock.called, assertion_msg)
 
@@ -168,7 +169,7 @@ class TestPersistPrerequisites(TestCase):
         tree = ProgramTreeFactory()
         LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
 
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
 
         mock_persist_prerequisite.assert_called_once_with(tree)
 
@@ -213,7 +214,7 @@ class TestPersistPrerequisites(TestCase):
         root_node_child = tree.root_node.children_as_nodes[0]
         tree.root_node.detach_child(root_node_child)
 
-        persist_tree.persist(tree)
+        ProgramTreeRepository.update(tree)
         number_learning_unit_removed = 2
         self.assertNotEqual(
             mock_persist_prerequisite.call_count,

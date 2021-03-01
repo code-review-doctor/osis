@@ -25,7 +25,8 @@ from django.db import transaction
 
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import persist_tree, load_node
+from program_management.ddd.repositories import load_node
+from program_management.ddd.repositories import program_tree
 from program_management.ddd.service.read import get_program_tree_service
 
 
@@ -44,5 +45,5 @@ def down_link(command_up: command.OrderDownLinkCommand) -> 'NodeIdentity':
     parent_node = link_to_down.parent
     parent_node.down_child(child_node)
 
-    persist_tree.persist(tree)
+    program_tree.ProgramTreeRepository.update(tree)
     return child_node.entity_id

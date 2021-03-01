@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Optional, List, Dict, Any
 
+from django.db import transaction
 from django.db.models import Q
 
 from base.models import group_element_year
@@ -39,6 +40,7 @@ from program_management.ddd.domain import exception, program_tree
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 from program_management.ddd.domain.prerequisite import NullPrerequisites
+from program_management.ddd.repositories import _persist_prerequisite
 from program_management.ddd.repositories import persist_tree, node, load_node, load_authorized_relationship, \
     tree_prerequisites
 from program_management.models.element import Element
@@ -125,13 +127,20 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     )
                 )
 
-        persist_tree.persist(program_tree)
+        cls.__persist(program_tree)
         return program_tree.entity_id
 
     @classmethod
     def update(cls, program_tree: 'ProgramTree', **_) -> 'ProgramTreeIdentity':
-        persist_tree.persist(program_tree)
+        cls.__persist(program_tree)
         return program_tree.entity_id
+
+    @classmethod
+    @transaction.atomic
+    def __persist(cls, tree: 'ProgramTree') -> None:
+        persist_tree._update_or_create_links(tree)
+        persist_tree._delete_links(tree, tree.root_node)
+        _persist_prerequisite.persist(tree)
 
     @classmethod
     def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':

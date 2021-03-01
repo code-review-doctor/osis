@@ -7,7 +7,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -63,27 +63,29 @@
                                 {% endif %}
                             </tr>
                         {% else %}
-                            <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
+                            {% if key != _('Faculty remark (unpublished)')  and key != _('Other remark (intended for publication)') and key != _('Other remark in english (intended for publication)') %}
+                                <tr{% if forloop.first %} style="border-top: groove"{% endif %}>
 
-                                {% if key == _('French title proper') %}
-                                    {% include 'learning_unit/common_title_comparison.html' with key='fr' title=_('Common title') %}
-                                {% elif key == _('English title proper') %}
-                                    {% include 'learning_unit/common_title_comparison.html' with key='en' title=_('Common English title') %}
-                                {% endif %}
+                                    {% if key == _('French title proper') %}
+                                        {% include 'learning_unit/common_title_comparison.html' with key='fr' title=_('Common title') %}
+                                    {% elif key == _('English title proper') %}
+                                        {% include 'learning_unit/common_title_comparison.html' with key='en' title=_('Common English title') %}
+                                    {% endif %}
 
-                                <td class="table_header">{{ key }}</td>
-                                {% if previous %}
-                                    {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
-                                {% endif %}
-                                {% changed_label current.learning_unit_year_fields|get_item:key|default:'-' %}
-                                {% if next %}
-                                    {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
-                                {% endif %}
+                                    <td class="table_header">{{ key }}</td>
+                                    {% if previous %}
+                                        {% changed_label previous.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+                                    {% endif %}
+                                    {% changed_label current.learning_unit_year_fields|get_item:key|default:'-' %}
+                                    {% if next %}
+                                        {% changed_label next.learning_unit_year_fields|get_item:key|default:'-' other=current.learning_unit_year_fields|get_item:key|default:'-' %}
+                                    {% endif %}
 
-                                {% if forloop.first %}
-                                    {% include 'learning_unit/partims_comparison.html' %}
-                                {% endif %}
-                            </tr>
+                                    {% if forloop.first %}
+                                        {% include 'learning_unit/partims_comparison.html' %}
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
                         {% endif %}
                     {% endfor %}
                     {% for key_lcy in current.learning_container_year_fields %}
@@ -145,6 +147,7 @@
                         </tr>
                     {% endfor %}
                     {% include 'learning_unit/components_comparison.html' %}
+                    {% include 'learning_unit/remarks_comparison.html' %}
                     </tbody>
                 </table>
             </div>

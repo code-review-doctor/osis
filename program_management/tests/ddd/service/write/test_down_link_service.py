@@ -57,8 +57,8 @@ class TestDownLink(TestCase):
         self.addCleanup(self.get_node_from_element_id_patcher.stop)
 
         self.persist_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.persist_tree.persist",
-            return_value=None
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.update",
+            return_value=self.tree.entity_id
         )
         self.mocked_persist_tree = self.persist_tree_patcher.start()
         self.addCleanup(self.persist_tree_patcher.stop)
