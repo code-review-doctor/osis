@@ -33,6 +33,7 @@ def get_program_tree(cmd: command.GetProgramTree) -> ProgramTree:
     return program_tree_repository.ProgramTreeRepository.get(program_tree_id)
 
 
+# FIXME:: Do not use this service, use get_program_tree above. Idea : do not use id (code & year instead)
 def get_program_tree_from_root_element_id(cmd: command.GetProgramTreeFromRootElementIdCommand) -> ProgramTree:
     node_identity = node_identity_service.get_node_identity_from_element_id(
         command.GetNodeIdentityFromElementId(element_id=cmd.root_element_id)

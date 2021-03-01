@@ -61,19 +61,14 @@ class ProgramTreeRepository(interface.AbstractRepository):
         if entity_ids:
             root_ids = _search_root_ids(entity_ids)
         if root_ids:
-            return cls.__load_trees(root_ids)
+            return _load_trees(root_ids)
         return []
 
     @classmethod
     def search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['ProgramTree']:
         nodes = node.NodeRepository.search(entity_ids=node_ids)
         node_db_ids = [n.node_id for n in nodes]
-        return cls.__load_trees_from_children(node_db_ids, **kwargs)
-
-    @classmethod
-    def __load_trees_from_children(cls, child_element_ids: list, link_type: LinkTypes = None) -> List['ProgramTree']:
-        root_ids = _get_root_ids(child_element_ids, link_type)
-        return cls.__load_trees(list(root_ids))
+        return _load_trees_from_children(node_db_ids, **kwargs)
 
     @classmethod
     def delete(
@@ -145,35 +140,35 @@ class ProgramTreeRepository(interface.AbstractRepository):
                 group_year__partial_acronym=entity_id.code,
                 group_year__academic_year__year=entity_id.year
             ).pk
-            return cls.__load(tree_root_id)
+            return _load(tree_root_id)
         except Element.DoesNotExist:
             raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
 
-    @classmethod
-    def __load(cls, tree_root_id: int) -> 'ProgramTree':
-        trees = cls.__load_trees([tree_root_id])
-        if not trees:
-            raise ProgramTreeNotFoundException
-        return trees[0]
 
-    @classmethod
-    def __load_trees(cls, tree_root_ids: List[int]) -> List['ProgramTree']:
-        trees = []
-        structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
-        nodes = _load_tree_nodes(structure)
-        links = _load_tree_links(structure)
-        prerequisites_of_all_trees = tree_prerequisites.TreePrerequisitesRepository().search(
-            tree_root_ids=tree_root_ids
-        )
-        root_nodes = load_node.load_multiple(tree_root_ids)
-        nodes.update({n.pk: n for n in root_nodes})
-        for root_node in root_nodes:
-            tree_root_id = root_node.pk
-            structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
-            tree = _build_tree(root_node, structure_for_current_root_node, nodes, links,
-                               prerequisites_of_all_trees)
-            trees.append(tree)
-        return trees
+def _load(tree_root_id: int) -> 'ProgramTree':
+    trees = _load_trees([tree_root_id])
+    if not trees:
+        raise ProgramTreeNotFoundException
+    return trees[0]
+
+
+def _load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
+    trees = []
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list(tree_root_ids)
+    nodes = _load_tree_nodes(structure)
+    links = _load_tree_links(structure)
+    prerequisites_of_all_trees = tree_prerequisites.TreePrerequisitesRepository().search(
+        tree_root_ids=tree_root_ids
+    )
+    root_nodes = load_node.load_multiple(tree_root_ids)
+    nodes.update({n.pk: n for n in root_nodes})
+    for root_node in root_nodes:
+        tree_root_id = root_node.pk
+        structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
+        tree = _build_tree(root_node, structure_for_current_root_node, nodes, links,
+                           prerequisites_of_all_trees)
+        trees.append(tree)
+    return trees
 
 
 def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:
@@ -337,3 +332,8 @@ def _get_root_ids(child_element_ids: list, link_type: LinkTypes = None) -> List[
         parent_id for parent_id in all_parents
         if not parent_by_child.get(parent_id)
     )
+
+
+def _load_trees_from_children(child_element_ids: list, link_type: LinkTypes = None) -> List['ProgramTree']:
+    root_ids = _get_root_ids(child_element_ids, link_type)
+    return _load_trees(list(root_ids))
