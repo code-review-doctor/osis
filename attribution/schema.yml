@@ -123,6 +123,7 @@ components:
         title_en:
           type: string
           example: 'Introduction to Law - Part I'
+          nullable: true
         year:
           type: integer
           example: 2020
@@ -139,6 +140,7 @@ components:
           type: string
           description: 'Total charge for learning unit year'
           example: '55.5'
+          nullable: true
         start_year:
           type: integer
           example: 2018
@@ -151,9 +153,11 @@ components:
         lecturing_charge:
           type: string
           example: '15.0'
+          nullable: true
         practical_charge:
           type: string
           example: '10.5'
+          nullable: true
         links:
           $ref: '#/components/schemas/AttributionLinks'
     AttributionFunctionEnum:
@@ -174,8 +178,10 @@ components:
       properties:
         catalog:
           type: string
+          nullable: true
         schedule:
           type: string
+          nullable: true
     LearningUnitTypeEnum:
       type: string
       enum:
