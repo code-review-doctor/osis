@@ -26,7 +26,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 import program_management.ddd.service.write.up_link_service
-from program_management.ddd.domain import program_tree, link, node
+from program_management.ddd.domain import program_tree, node
 from program_management.tests.ddd.factories.commands.order_up_link_command import OrderUpLinkCommandFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -50,8 +50,8 @@ class TestUpLink(SimpleTestCase):
         self.addCleanup(self.load_tree_patcher.stop)
 
         self.persist_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.persist_tree.persist",
-            return_value=None
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.update",
+            return_value=self.tree.entity_id
         )
         self.mocked_persist_tree = self.persist_tree_patcher.start()
         self.addCleanup(self.persist_tree_patcher.stop)

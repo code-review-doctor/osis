@@ -23,18 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Union
+from typing import Optional, List
 
+from django.db import transaction
 from django.db.models import Q
 
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from osis_common.ddd import interface
-from osis_common.ddd.interface import Entity
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.repositories import persist_tree, load_tree, node
+from program_management.ddd.repositories import persist_tree, load_tree, node, _persist_prerequisite
 from program_management.models.element import Element
 
 
@@ -113,13 +113,20 @@ class ProgramTreeRepository(interface.AbstractRepository):
                     )
                 )
 
-        persist_tree.persist(program_tree)
+        cls.__persist(program_tree)
         return program_tree.entity_id
 
     @classmethod
     def update(cls, program_tree: 'ProgramTree', **_) -> 'ProgramTreeIdentity':
-        persist_tree.persist(program_tree)
+        cls.__persist(program_tree)
         return program_tree.entity_id
+
+    @classmethod
+    @transaction.atomic
+    def __persist(cls, tree: 'ProgramTree') -> None:
+        persist_tree._update_or_create_links(tree)
+        persist_tree._delete_links(tree, tree.root_node)
+        _persist_prerequisite.persist(tree)
 
     @classmethod
     def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
