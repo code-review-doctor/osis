@@ -90,14 +90,6 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         self.assertFalse(form.fields['academic_year'].required)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
 
-    def test_edit_end_date_send_dates_with_end_date_of_learning_unit_inferior_to_current_academic_year(self):
-        self.learning_unit.end_year = self.oldest_academic_year
-        form = LearningUnitDailyManagementEndDateForm(
-            None, learning_unit_year=self.learning_unit_year, person=self.person_central)
-        self.assertEqual(form.fields['academic_year'].disabled, True)
-        self.assertFalse(form.fields['academic_year'].required)
-        self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
-
     def test_edit_end_date(self):
         self.learning_unit.end_year = self.last_academic_year
         form_data = {"academic_year": self.starting_academic_year.pk}
