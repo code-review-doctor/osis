@@ -162,11 +162,11 @@ class ProgramTreeBuilder:
         self._delete_mandatory_links(to_tree)
 
         self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node)
-        to_tree.prerequisites = Prerequisites(
-            to_tree.entity_id,
-            [prerequisite_factory.copy_to_next_year(prerequisite)
-             for prerequisite in from_tree.prerequisites.prerequisites]
-        )
+        # to_tree.prerequisites = Prerequisites(
+        #     to_tree.entity_id,
+        #     [prerequisite_factory.copy_to_next_year(prerequisite)
+        #      for prerequisite in from_tree.prerequisites.prerequisites]
+        # )
 
         return to_tree
 
@@ -176,27 +176,41 @@ class ProgramTreeBuilder:
             tree.root_node.detach_child(link_to_delete.child)
 
     def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node') -> 'Node':
-        links_to_copy = (
-            link for link in from_node.children if not link.child.end_date or link.child.end_date >= to_node.year or link.child.is_group()
-        )
-        for link_to_copy in links_to_copy:
-            copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_copy.child, to_node.year)
-            copied_link = LinkBuilder().from_link(link_to_copy, to_node, copied_child)
+        link_to_ues = (child_link for child_link in from_node.children if child_link.child.is_learning_unit())
+        link_to_groups = (child_link for child_link in from_node.children if child_link.child.is_group())
+        link_trainings_or_mini_trainings = (child_link for child_link in from_node.children
+                                            if child_link.child.is_training() or child_link.child.is_mini_training())
+
+        for link_to_ue in link_to_ues:
+            if self._is_end_date_inferior_to(link_to_ue.child, to_node):
+                copied_child = link_to_ue.child
+            else:
+                copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_ue.child, to_node.year)
+            copied_link = LinkBuilder().from_link(link_to_ue, to_node, copied_child)
             to_node.children.append(copied_link)
 
-            if not link_to_copy.is_reference():
-                self._fill_node_content_from_node(link_to_copy.child, copied_child)
-
-        old_ue_links = (
-            link for link in from_node.children if link.child.end_date and link.child.end_date < to_node.year
-            and link.child.is_learning_unit()
-        )
-        for old_link in old_ue_links:
-            copied_child = old_link.child
-            copied_link = LinkBuilder().from_link(old_link, to_node, copied_child)
+        for link_to_group in link_to_groups:
+            copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_group.child, to_node.year)
+            copied_link = LinkBuilder().from_link(link_to_group, to_node, copied_child)
             to_node.children.append(copied_link)
+
+            if not link_to_group.is_reference():
+                self._fill_node_content_from_node(link_to_group.child, copied_child)
+
+        for link_to_training_or_mini in link_trainings_or_mini_trainings:
+            if self._is_end_date_inferior_to(link_to_training_or_mini.child, to_node):
+                continue
+            copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_training_or_mini.child, to_node.year)
+            copied_link = LinkBuilder().from_link(link_to_training_or_mini, to_node, copied_child)
+            to_node.children.append(copied_link)
+
+            if not link_to_training_or_mini.is_reference():
+                self._fill_node_content_from_node(link_to_training_or_mini.child, copied_child)
 
         return to_node
+
+    def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
+        return from_node.end_date and from_node.end_date < to_node.year
 
     def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
         identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)

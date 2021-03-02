@@ -22,7 +22,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
 
 import attr
 
@@ -30,11 +29,9 @@ from education_group.ddd.command import CreateOrphanGroupCommand
 from education_group.ddd.service.write import create_group_service
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import NodeNotFoundException
-from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
-from program_management.ddd.domain.service.get_or_create_corresponding_transition import get_or_create_transition_node
-from program_management.ddd.repositories import node as node_repository
 from program_management.ddd.domain import node
+from program_management.ddd.domain.exception import NodeNotFoundException
+from program_management.ddd.repositories import node as node_repository
 
 
 class GetOrCreateNode(interface.DomainService):
@@ -48,6 +45,7 @@ class GetOrCreateNode(interface.DomainService):
             existing_node = repo.get(node_identity)
         except NodeNotFoundException:
             existing_node = None
+
         if existing_node:
             return existing_node
 
