@@ -108,10 +108,11 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         node_identity = get_node_identity_from_element_id(
             command.GetNodeIdentityFromElementId(element_id=int(self.kwargs['child_element_id']))
         )
-        node = self.program_tree.get_node_by_code_and_year(code=node_identity.code, year=node_identity.year)
-        if node is None:
-            raise Http404
-        return node
+        if node_identity:
+            node = self.program_tree.get_node_by_code_and_year(code=node_identity.code, year=node_identity.year)
+            if node:
+                return node
+        raise Http404('No learning unit match the given query')
 
     @cached_property
     def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
@@ -150,7 +151,8 @@ class LearningUnitGeneric(ElementSelectedClipBoardMixin, TemplateView):
         )
         return context
 
-    def show_prerequisites(self, root_node: 'NodeGroupYear'):
+    @staticmethod
+    def show_prerequisites(root_node: 'NodeGroupYear'):
         return root_node.node_type not in NO_PREREQUISITES
 
     def get_tree_json_url(self) -> str:

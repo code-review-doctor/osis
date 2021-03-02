@@ -38,7 +38,6 @@ from program_management.ddd.repositories.program_tree import ProgramTreeReposito
 from program_management.ddd.service.read.node_identity_service import get_node_identity_from_element_id
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.forms.prerequisite import PrerequisiteForm
-from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import LearningUnitGeneric, Tab
 
 
@@ -83,10 +82,11 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
         node_identity = get_node_identity_from_element_id(
             command.GetNodeIdentityFromElementId(element_id=int(self.kwargs['child_element_id']))
         )
-        node = self.program_tree.get_node_by_code_and_year(code=node_identity.code, year=node_identity.year)
-        if node is None:
-            raise Http404('No learning unit match the given query')
-        return node
+        if node_identity:
+            node = self.program_tree.get_node_by_code_and_year(code=node_identity.code, year=node_identity.year)
+            if node:
+                return node
+        raise Http404('No learning unit match the given query')
 
     #  FIXME refactor permission with new permission module
     def check_can_update_prerequisite(self):
