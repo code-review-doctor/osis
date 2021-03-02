@@ -22,22 +22,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils import business_validator
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import InvalidTreeVersionToFillFrom
+from base.models import academic_year
+from osis_common.ddd import interface
+from program_management.ddd.domain.academic_year import AcademicYear
 
 
-class CheckValidTreeVersionToFillFrom(business_validator.BusinessValidator):
-    def __init__(self, tree_version_to_fill_from: 'ProgramTreeVersion', tree_version_to_fill: 'ProgramTreeVersion'):
-        self.tree_version_from = tree_version_to_fill_from
-        self.tree_version_to = tree_version_to_fill
-        super().__init__()
+class GetAcademicYear(interface.DomainService):
+    @classmethod
+    def get_next_academic_year(cls) -> 'AcademicYear':
+        year = academic_year.current_academic_year().year + 1
+        return AcademicYear(year)
 
-    def validate(self, *args, **kwargs):
-        if self.tree_version_to.is_specific_official and self.__is_last_year_tree():
-            return
-        raise InvalidTreeVersionToFillFrom(self.tree_version_from)
-
-    def __is_last_year_tree(self) -> bool:
-        return self.tree_version_from.entity_id.year + 1 == self.tree_version_to.entity_id.year and \
-               self.tree_version_from.get_tree().root_node.code == self.tree_version_to.get_tree().root_node.code
+    @classmethod
+    def get_current_academic_year(cls) -> 'AcademicYear':
+        year = academic_year.current_academic_year().year
+        return AcademicYear(year)

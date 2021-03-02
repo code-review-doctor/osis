@@ -25,9 +25,31 @@
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
+    get_fake_program_tree_repository, get_fake_node_repository
+from testing.mocks import MockPatcherMixin
 
 
-class DDDTestCase(TestCase):
+class DDDTestCase(MockPatcherMixin, TestCase):
+    def _init_fake_repos(self):
+        self.fake_program_tree_version_repository = get_fake_program_tree_version_repository([])
+        self.mock_repo(
+            "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
+            self.fake_program_tree_version_repository
+        )
+
+        self.fake_program_tree_repository = get_fake_program_tree_repository([])
+        self.mock_repo(
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
+            self.fake_program_tree_repository
+        )
+
+        self.fake_node_repository = get_fake_node_repository([])
+        self.mock_repo(
+            "program_management.ddd.repositories.node.NodeRepository",
+            self.fake_node_repository
+        )
+
     def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
         with self.assertRaises(MultipleBusinessExceptions) as e:
             func(*args, **kwargs)
