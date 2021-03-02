@@ -61,6 +61,7 @@ class CommonGeneralInformation(PermissionRequiredMixin, TemplateView):
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonpedagogyinformation", self.get_object()
             ),
+            "view_publish_btn": True,
         }
 
     def get_tab_urls(self):

@@ -57,7 +57,8 @@ class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
                 "base.change_commonadmissioncondition", self.get_object()
             ),
             "update_text_url": self.get_update_text_url(),
-            "publish_url": self.get_publish_url()
+            "publish_url": self.get_publish_url(),
+            "view_publish_btn": True,
         }
 
     def get_tab_urls(self):
