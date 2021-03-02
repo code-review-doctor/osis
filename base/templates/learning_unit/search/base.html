@@ -133,45 +133,21 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-large row pull-right">
                                 <li>
-                                    <a id="btn_produce_xls_with_parameters"
-                                       class="download"
-                                       style="margin-right:10px;"
-                                       title="{% trans 'Produce a customizable xls of learning units' %}"
-                                       data-toggle="modal" data-target="#modalXlsLuyWithParameters">
-                                        &nbsp;{% trans 'Configurable list of learning units' %}
-                                    </a>
+                                    {% include 'learning_unit/blocks/list_button/with_parameters.html' %}
                                 </li>
                                 <li>
-                                    <a id="btn_produce_xls_comparison"
-                                       class="download"
-                                       style="margin-right:10px;" title="Produce xls of comparison"
-                                       data-toggle="modal" data-target="#modalComparisonLuy">
-                                        &nbsp;{% trans 'List of learning units with comparison' %}
-                                    </a>
+                                     {% include 'learning_unit/blocks/list_button/comparison.html' %}
                                 </li>
                                 <li>
-                                    <a id="btn_produce_xls_detailled_attributions"
-                                       class="download"
-                                       style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with one line per attribution' %}">
-                                        &nbsp;{% trans 'List of learning units with one line per attribution' %}
-                                    </a>
+                                    {% include 'learning_unit/blocks/list_button/detailled_attributions.html' %}
                                 </li>
                                 <li>
-                                    <a id="btn_produce_xls_educational_specifications"
-                                       class="download"
-                                       style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with educational information and specifications' %}">
-                                        &nbsp;{% trans 'List of learning units with educational information and specifications' %}
-                                    </a>
+                                    {% include 'learning_unit/blocks/list_button/educational_specifications.html' %}
                                 </li>
                                 {% if request.path == learning_units_url or request.path == service_course_url  or request.path == borrowed_course_url %}
-                                <li>
-                                    <a id="btn_produce_xls_one_pgm_per_line"
-                                       class="download"
-                                       style="margin-right:10px;"
-                                       title="{% trans 'Produce a customizable xls of learning units with one line per training' %}">
-                                        &nbsp;{% trans 'List of learning units with one line per training' %}
-                                    </a>
-                                </li>   
+                                    <li>
+                                        {% include 'learning_unit/blocks/list_button/one_pgm_per_line.html' %}
+                                    </li>
                                 {% endif %}
                             </ul>
                         </div>
@@ -279,21 +255,6 @@
             prepare_xls(e, 'xls_comparison');
             $("#comparison_year").val('');
         });
-
-        $("#btn_xls_with_parameters").click(function(e) {
-            prepare_xls(e, 'xls_with_parameters');
-            $("#hdn_with_grp").val('');
-            $("#hdn_with_attributions").val('');
-        });
-        $("#btn_produce_xls_detailled_attributions").click(function (e) {
-            prepare_xls(e, 'xls_attributions');
-        });
-        $("#btn_produce_xls_educational_specifications").click(function (e) {
-            prepare_xls(e, 'xls_educational_specifications');
-        });
-        $("#btn_produce_xls_one_pgm_per_line").click(function (e) {
-            prepare_xls(e, 'xls_one_pgm_per_line');
-        });
-
     </script>
+    <script type="text/javascript" src="{% static "js/ue_xls_common.js" %}"></script>
 {% endblock script %}
