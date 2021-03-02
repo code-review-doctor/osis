@@ -106,9 +106,9 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 (predicates.is_not_proposal_of_type_suppression |
-                 (predicates.has_learning_unit_no_application_all_years &
-                  predicates.has_learning_unit_no_attribution_this_year
-                  )
+                    (predicates.has_learning_unit_no_application_all_years &
+                     predicates.has_learning_unit_no_attribution_this_year
+                     )
                  ),
             'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
@@ -131,7 +131,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 (predicates.is_not_proposal_of_type_creation |
-                 (predicates.has_learning_unit_no_attribution_this_year &
-                  predicates.has_learning_unit_no_application_this_year)
+                    (predicates.has_learning_unit_no_attribution_this_year &
+                     predicates.has_learning_unit_no_application_this_year)
                  ),
         })
