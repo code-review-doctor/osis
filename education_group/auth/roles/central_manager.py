@@ -173,4 +173,6 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.view_publish_btn': rules.always_allow,
+            'base.can_refresh_common_publication':
+                predicates.is_education_group_year_older_or_equals_than_limit_settings_year
         })
