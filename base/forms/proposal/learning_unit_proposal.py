@@ -165,9 +165,7 @@ class ProposalLearningUnitFilter(FilterSet):
         self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
             year__in=target_years_opened
         )
-        current_academic_year = self.form.fields['academic_year'].queryset.first()
-        self.form.fields["academic_year"].initial = current_academic_year.next() if current_academic_year \
-            else current_academic_year
+        self.form.fields["academic_year"].initial = self.form.fields['academic_year'].queryset.first()
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
         most_recent_acronym = EntityVersion.objects.filter(
