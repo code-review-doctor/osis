@@ -38,12 +38,8 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
-from learning_unit.auth.roles.faculty_manager import FacultyManager
-from learning_unit.calendar.learning_unit_extended_proposal_management import \
-    LearningUnitExtendedProposalManagementCalendar
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
     LearningUnitLimitedProposalManagementCalendar
-from osis_role.contrib.helper import EntityRoleHelper
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -157,17 +153,12 @@ class ProposalLearningUnitFilter(FilterSet):
         self.__init_academic_year_field()
 
     def __init_academic_year_field(self):
-        target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
-
-        if EntityRoleHelper.has_role(self.person, FacultyManager):
-            target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
+        target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
 
         self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
             year__in=target_years_opened
-        )
-        current_academic_year = self.form.fields['academic_year'].queryset.first()
-        self.form.fields["academic_year"].initial = current_academic_year.next() if current_academic_year \
-            else current_academic_year
+        ).order_by('year')
+        self.form.fields["academic_year"].initial = self.form.fields['academic_year'].queryset.first()
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
         most_recent_acronym = EntityVersion.objects.filter(

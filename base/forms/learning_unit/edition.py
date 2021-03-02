@@ -132,7 +132,7 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
         ).order_by('learning_container_year__academic_year__year')
         if not max_year and applications:
             max_year = applications.first().learning_container_year.academic_year.year
-        academic_years = AcademicYear.objects.filter(year__gte=self.start_year.year, year__in=target_years_opened)
+        academic_years = AcademicYear.objects.filter(year__gte=self.luy_current_year, year__in=target_years_opened)
         return academic_years.filter(year__lte=max_year) if max_year else academic_years
 
 
