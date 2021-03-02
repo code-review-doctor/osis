@@ -85,6 +85,8 @@ class NodeGroupYearFactory(NodeFactory):
     children = factory.LazyFunction(list)
     teaching_campus = factory.SubFactory(CampusFactory)
     constraint_type = factory.fuzzy.FuzzyChoice(ConstraintTypes)
+    min_constraint = 0
+    max_constraint = 5
     version_name = STANDARD
     transition_name = NOT_A_TRANSITION
 

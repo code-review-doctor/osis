@@ -23,6 +23,7 @@
 #
 ##############################################################################
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
@@ -77,6 +78,7 @@ class ProgramTreeBachelorFactory:
                     "node_id": 22,
                     "children": [
                         {
+                            "link_data": {"link_type": LinkTypes.REFERENCE},
                             "node_type": MiniTrainingType.DEEPENING,
                             "year": current_year,
                             "end_year": end_year,

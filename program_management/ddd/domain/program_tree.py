@@ -177,14 +177,24 @@ class ProgramTreeBuilder:
 
     def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node') -> 'Node':
         links_to_copy = (
-            link for link in from_node.children if not link.child.end_date or link.child.end_date >= to_node.year
+            link for link in from_node.children if not link.child.end_date or link.child.end_date >= to_node.year or link.child.is_group()
         )
         for link_to_copy in links_to_copy:
             copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_copy.child, to_node.year)
             copied_link = LinkBuilder().from_link(link_to_copy, to_node, copied_child)
             to_node.children.append(copied_link)
 
-            self._fill_node_content_from_node(link_to_copy.child, copied_child)
+            if not link_to_copy.is_reference():
+                self._fill_node_content_from_node(link_to_copy.child, copied_child)
+
+        old_ue_links = (
+            link for link in from_node.children if link.child.end_date and link.child.end_date < to_node.year
+            and link.child.is_learning_unit()
+        )
+        for old_link in old_ue_links:
+            copied_child = old_link.child
+            copied_link = LinkBuilder().from_link(old_link, to_node, copied_child)
+            to_node.children.append(copied_link)
 
         return to_node
 

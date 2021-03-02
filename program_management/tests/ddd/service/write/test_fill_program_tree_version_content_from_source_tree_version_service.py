@@ -22,8 +22,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 import mock
 
+from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
@@ -32,6 +34,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
     fill_program_tree_version_content_from_source
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     SpecificProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
@@ -133,6 +136,82 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             fill_program_tree_version_content_from_source,
             cmd
         )
+
+    def test_should_return_program_tree_version_identity_of_tree_filled(self):
+        result = fill_program_tree_version_content_from_source(self.cmd)
+
+        self.assertEqual(self.tree_version_to_fill.entity_id, result)
+
+    def test_should_persist(self):
+        self.tree_version_from.tree.get_node("1|22").detach_child(
+            self.tree_version_from.tree.get_node("1|22|32")
+        )
+        fill_program_tree_version_content_from_source(self.cmd)
+
+        expected = [
+            attr.evolve(child_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
+            for child_node in self.tree_version_from.tree.root_node.get_all_children_as_nodes()
+        ]
+        actual = [
+            child_node.entity_id
+            for child_node in self.tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
+        ]
+        self.assertCountEqual(expected, actual)
+
+    def test_if_learning_unit_is_not_present_in_next_year_then_attach_its_current_year_version(self):
+        ue_node = NodeLearningUnitYearFactory(year=CURRENT_ACADEMIC_YEAR_YEAR, end_date=CURRENT_ACADEMIC_YEAR_YEAR)
+        self.tree_version_from.tree.get_node("1|21|31").add_child(ue_node)
+
+        fill_program_tree_version_content_from_source(self.cmd)
+
+        self.assertIn(ue_node, self.tree_version_to_fill.tree.get_all_nodes())
+
+    def test_do_not_copy_training_and_mini_training_that_ends_before_next_year(self):
+        mini_training_node = NodeGroupYearFactory(
+            year=CURRENT_ACADEMIC_YEAR_YEAR,
+            end_date=CURRENT_ACADEMIC_YEAR_YEAR,
+            minitraining=True
+        )
+        self.tree_version_from.tree.get_node("1|22").add_child(mini_training_node)
+
+        fill_program_tree_version_content_from_source(self.cmd)
+
+        self.assertNotIn(mini_training_node, self.tree_version_to_fill.tree.get_all_nodes())
+
+    def test_always_copy_group_even_if_end_date_is_inferior_to_next_year(self):
+        group_node = NodeGroupYearFactory(
+            year=CURRENT_ACADEMIC_YEAR_YEAR,
+            end_date=CURRENT_ACADEMIC_YEAR_YEAR,
+            group=True
+        )
+        self.tree_version_from.tree.get_node("1|21").add_child(group_node)
+
+        fill_program_tree_version_content_from_source(self.cmd)
+
+        member = attr.evolve(group_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
+        containers = [
+            child_node.entity_id
+            for child_node in self.tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
+        ]
+        self.assertIn(member, containers)
+
+    def test_do_not_copy_content_of_reference_child(self):
+        fill_program_tree_version_content_from_source(self.cmd)
+
+        children_of_reference_link = self.tree_version_from.tree.get_node("1|22|32").get_all_children_as_nodes()
+        entities_ids = {
+            attr.evolve(child_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
+            for child_node in children_of_reference_link
+        }
+
+        tree_entities_ids = {
+            child_node.entity_id
+            for child_node in self.tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
+        }
+        self.assertFalse(tree_entities_ids.intersection(entities_ids))
+
+    def test_do_not_copy_content_of_non_empty_existing_node(self):
+        pass
 
     def _generate_cmd(
             self,

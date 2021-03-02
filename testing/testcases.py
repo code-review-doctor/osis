@@ -25,6 +25,7 @@
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository, get_fake_node_repository
 from testing.mocks import MockPatcherMixin
@@ -48,6 +49,12 @@ class DDDTestCase(MockPatcherMixin, TestCase):
         self.mock_repo(
             "program_management.ddd.repositories.node.NodeRepository",
             self.fake_node_repository
+        )
+
+        self.fake_group_repository = get_fake_group_repository([])
+        self.mock_repo(
+            "education_group.ddd.repository.group.GroupRepository",
+            self.fake_group_repository
         )
 
     def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
