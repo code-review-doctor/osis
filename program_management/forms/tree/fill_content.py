@@ -103,9 +103,9 @@ class FillContentForm(forms.Form):
 
         raise InvalidFormException()
 
-    def handle_save_exception(self, exceptions: 'MultipleBusinessExceptions'):
-        # todo :: treat exceptions
-        pass
+    def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
+        for e in business_exceptions.exceptions:
+            self.add_error("", e.message)
 
     def _generate_copy_content_command(self) -> 'CopyProgramTreeVersionContentFromSourceTreeVersionCommand':
         source_tree = {
@@ -123,4 +123,3 @@ class FillContentForm(forms.Form):
             to_version_name=self.transition_tree.entity_id.version_name,
             to_transition_name=self.transition_tree.entity_id.transition_name
         )
-

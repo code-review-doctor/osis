@@ -22,13 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import transaction
 
+from education_group.ddd.service.write import create_group_service
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.repositories import program_tree_version as tree_version_repository,\
     program_tree as program_tree_repository
 
 
+@transaction.atomic()
 def fill_program_tree_version_content_from_source(
         cmd: 'CopyProgramTreeVersionContentFromSourceTreeVersionCommand'
 ) -> 'ProgramTreeVersionIdentity':
@@ -59,6 +62,6 @@ def fill_program_tree_version_content_from_source(
     # TODO :: add report cms call for mandatory children
 
     identity = repository.update(resulted_tree)
-    tree_repository.update(resulted_tree.get_tree())
+    tree_repository.create(resulted_tree.get_tree())
 
     return identity

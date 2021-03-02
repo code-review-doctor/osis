@@ -1,0 +1,112 @@
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
+from typing import Optional
+
+import attr
+
+from education_group.ddd.command import CreateOrphanGroupCommand
+from education_group.ddd.service.write import create_group_service
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
+from program_management.ddd.domain.service.get_or_create_corresponding_transition import get_or_create_transition_node
+from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.domain import node
+
+
+class GetOrCreateNode(interface.DomainService):
+    @classmethod
+    def from_node(cls, source_node: 'Node', to_year: int) -> 'Node':
+        import time
+        a = time.time()
+        repo = node_repository.NodeRepository()
+
+        node_identity = attr.evolve(source_node.entity_id, year=to_year)
+
+        existing_node = repo.get(node_identity)
+        if existing_node:
+            print(f"- Total get from node {time.time() - a}")
+            return existing_node
+
+        result = node.factory.copy_to_year(source_node, to_year, source_node.code)
+        if not source_node.is_learning_unit():
+            cls._create_group(result)
+        print(f"- Total create node from node {time.time() - a}")
+        return result
+
+    @classmethod
+    def from_node_in_case_of_transition(cls, source_node: 'Node', to_year: int, version_name: str, transition_name: str, end_year: Optional[int]) -> 'Node':
+        import time
+        print("Create node in case of transitions:")
+        a = time.time()
+        if source_node.is_group():
+            new_code = GenerateNodeCode().generate_from_parent_node(
+                parent_node=source_node,
+                child_node_type=source_node.node_type,
+                duplicate_to_transition=True
+            )
+            b = time.time()
+            print(f"- Generate new code {b - a}")
+
+            n = node.factory.copy_to_year(source_node, to_year, new_code)
+            cls._create_group(n)
+            c = time.time()
+            print(f"- Create group {c - b}")
+            print(f" -- Total {c - a}")
+            return n
+        elif source_node.is_training():
+            copied_child = get_or_create_transition_node(
+                offer_acronym=source_node.title,
+                year=to_year,
+                version_name=version_name,
+                transition_name=transition_name,
+                end_year=end_year
+            )
+            return copied_child
+        return cls.from_node(source_node, to_year)
+
+    @classmethod
+    def _create_group(cls, n: 'NodeGroupYear'):
+        create_group_service.create_orphan_group(
+            CreateOrphanGroupCommand(
+                code=n.code,
+                year=n.year,
+                type=n.node_type.name,
+                abbreviated_title=n.title,
+                title_fr=n.group_title_fr,
+                title_en=n.group_title_en,
+                credits=int(n.credits) if n.credits else None,
+                constraint_type=n.constraint_type.name if n.constraint_type else None,
+                min_constraint=n.min_constraint,
+                max_constraint=n.max_constraint,
+                management_entity_acronym=n.management_entity_acronym,
+                teaching_campus_name=n.teaching_campus.name,
+                organization_name=n.teaching_campus.university_name,
+                remark_fr=n.remark_fr or "",
+                remark_en=n.remark_en or "",
+                start_year=n.start_year,
+                end_year=n.end_year,
+            )
+        )
