@@ -24,5 +24,10 @@
 {% endcomment %}
 <form action="{{ publish_url }}" method="post">
     {% csrf_token %}
-    {% submit_btn_has_perm inner_html=_('Refresh publication') perm='base.can_update_publication' user=user obj=group_year class_btn='btn btn-default btn-publish' %}
+    {% if perms.base.can_access_catalog_configuration %}
+        {% submit_btn_has_perm inner_html=_('Refresh publication') perm='base.can_access_catalog_configuration' user=user obj=group_year class_btn='btn btn-default btn-publish' %}
+    {% else%}
+        {% submit_btn_has_perm inner_html=_('Refresh publication') perm='base.can_update_publication' user=user obj=group_year class_btn='btn btn-default btn-publish' %}
+    {% endif%}
+
 </form>
