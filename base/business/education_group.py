@@ -224,7 +224,7 @@ def _extract_main_data(a_version: EducationGroupVersion, language) -> Dict:
             if an_education_group_year.management_entity_version else '',
         TRANING_COL: "{}{}".format(
             an_education_group_year.acronym,
-            "[{}]".format(a_version.version_name) if a_version and a_version.version_name else ''
+            a_version.version_label()
         ),
         TYPE_COL: "{}{}".format(
             an_education_group_year.education_group_type,
