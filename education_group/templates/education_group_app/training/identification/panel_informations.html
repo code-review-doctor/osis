@@ -28,13 +28,14 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-6" id="title">
-                {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
+                {% bootstrap_label _("Acronym/Short title") label_class='d-block' %}
                 <p>
-                    {{ group.abbreviated_title }}{% if current_version.version_label != '' %}<span id="version_label">{{ current_version.version_label }}</span>{% endif %}
+                    {{ group.abbreviated_title }}{% if version_label != '' %}
+                        <span id="version_label">{{ version_label }}</span>{% endif %}
                 </p>
             </div>
             <div class="col-md-6">
-                {% bootstrap_label _("Code") label_class='d-block'%}
+                {% bootstrap_label _("Code") label_class='d-block' %}
                 <p>{{ group.code }}</p>
             </div>
         </div>

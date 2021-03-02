@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _, get_language
 from django_filters.views import FilterView
 
-from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
+from base.business.education_group import ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
+from program_management.business.xls_customized import create_customized_xls, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_type import EducationGroupType
@@ -51,16 +52,6 @@ def _get_filter(form):
     return OrderedDict(itertools.chain(get_research_criteria(form)))
 
 
-def _create_xls(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    egys = context["filter"].qs
-    filters = _get_filter(context["form"])
-    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
-    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
-             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
-    return create_xls(user, egys, filters, order)
-
-
 def _create_xls_administrative_data(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     egys = context["filter"].qs
@@ -71,8 +62,26 @@ def _create_xls_administrative_data(view_obj, context, **response_kwargs):
     return create_xls_administrative_data(user, egys, filters, order, get_language())
 
 
-@RenderToExcel("xls", _create_xls)
+def _create_xls_customized(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    egys = context["filter"].qs
+    filters = _get_filter(context["form"])
+    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
+    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
+             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
+    return create_customized_xls(user, egys, filters, order, _get_xls_parameters(view_obj))
+
+
+def _get_xls_parameters(view_obj):
+    other_params = []
+    for parameter in TRAINING_LIST_CUSTOMIZABLE_PARAMETERS:
+        if view_obj.request.GET.get(parameter) == 'true':
+            other_params.append(parameter)
+    return other_params
+
+
 @RenderToExcel("xls_administrative", _create_xls_administrative_data)
+@RenderToExcel("xls_customized", _create_xls_customized)
 class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
     model = GroupYear
     template_name = "search.html"
