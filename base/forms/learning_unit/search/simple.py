@@ -30,7 +30,7 @@ from django_filters import FilterSet, filters, OrderingFilter
 
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
-from base.models.academic_year import AcademicYear
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
@@ -154,8 +154,10 @@ class LearningUnitFilter(FilterSet):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
         # prendre le basculement event
-        targeted_year_opened = EducationGroupSwitchCalendar().get_target_years_opened()[0]
-        self.form.fields["academic_year"].initial = AcademicYear.objects.get(year=targeted_year_opened)
+        targeted_year_opened = EducationGroupSwitchCalendar().get_target_years_opened()
+        self.form.fields["academic_year"].initial = AcademicYear.objects.filter(
+            year__in=targeted_year_opened
+        ).first() or current_academic_year()
 
     def filter_tutor(self, queryset, name, value):
         value = value.replace(' ', '\\s')
