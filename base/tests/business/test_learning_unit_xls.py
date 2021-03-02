@@ -342,7 +342,7 @@ class TestLearningUnitXls(TestCase):
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = get_data_part1(luy, False)
+        data = get_data_part1(luy, is_external_ue_list=False)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -577,7 +577,7 @@ class TestLearningUnitXls(TestCase):
         if is_external_ue:
             organization = luy.campus.organization
             external_data = [
-                organization.country if organization.country else '',
+                organization.country or '',
                 organization.main_address.city if organization.main_address else '',
                 organization.name,
                 self.external_luy.external_acronym,

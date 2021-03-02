@@ -151,11 +151,16 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
     titles_part1 = _prepare_titles(is_external_ue_list, with_attributions, with_grp)
 
-    working_sheet_data = prepare_xls_content(learning_units, is_external_ue_list, with_grp, with_attributions)
-    ws_data = xls_build.prepare_xls_parameters_list(working_sheet_data,
-                                                    _get_parameters_configurable_list(learning_units,
-                                                                                      titles_part1,
-                                                                                      user))
+    working_sheet_data = prepare_xls_content(
+        learning_units,
+        is_external_ue_list,
+        with_grp,
+        with_attributions
+    )
+    ws_data = xls_build.prepare_xls_parameters_list(
+        working_sheet_data,
+        _get_parameters_configurable_list(learning_units, titles_part1, user)
+    )
     working_sheets_data = [ws_data.get(xls_build.WORKSHEETS_DATA)[0]]
     if not is_external_ue_list:
         working_sheets_data.append(prepare_proposal_legend_ws_data())
@@ -450,8 +455,8 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
         first = True
         cells_with_top_border.extend(["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
 
-        lu_data_part1 = get_data_part1(learning_unit_yr, False)
-        lu_data_part2 = get_data_part2(learning_unit_yr, False)
+        lu_data_part1 = get_data_part1(learning_unit_yr, is_external_ue_list=False)
+        lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions=False)
 
         lu_data_part1.extend(lu_data_part2)
 
@@ -525,11 +530,11 @@ def _get_external_ue_data(learning_unit_yr: LearningUnitYear) -> List['str']:
     organization = learning_unit_yr.campus.organization
     external_learning_unit_yr = learning_unit_yr.externallearningunityear
     return [
-        organization.country if organization.country else '',
+        organization.country or '',
         organization.main_address.city if organization.main_address else '',
         organization.name,
         external_learning_unit_yr.external_acronym,
-        external_learning_unit_yr.url if external_learning_unit_yr.url else '',
+        external_learning_unit_yr.url or '',
         "{0:.2f}".format(external_learning_unit_yr.external_credits)
         if external_learning_unit_yr.external_credits else ''
     ]
