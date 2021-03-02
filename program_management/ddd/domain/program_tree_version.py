@@ -83,13 +83,7 @@ class ProgramTreeVersionBuilder:
             to_tree_version: 'ProgramTreeVersion',
     ) -> 'ProgramTreeVersion':
         FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        if to_tree_version.is_transition:
-            program_tree.ProgramTreeBuilder().fill_transition_tree_content_from_tree(
-                from_tree_version.get_tree(),
-                to_tree_version.get_tree(),
-            )
-        else:
-            program_tree.ProgramTreeBuilder().fill_tree_content_from_tree(
+        program_tree.ProgramTreeBuilder().fill_tree_content_from_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
             )

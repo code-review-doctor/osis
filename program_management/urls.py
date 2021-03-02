@@ -27,8 +27,8 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
-import program_management.views.tree_version.check_version_name
 import program_management.views.tree_version.check_transition_name
+import program_management.views.tree_version.check_version_name
 from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
@@ -37,7 +37,6 @@ from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
     update_mini_training
-from program_management.views.tree_version import fill_content
 from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
@@ -73,7 +72,6 @@ urlpatterns = [
     path('paste/', tree.paste.PasteNodesView.as_view(), name='tree_paste_node'),
     path('update/<str:parent_code>/<int:parent_year>/<str:child_code>/<int:child_year>',
          tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-    path('fill_content/<str:code>/<int:year>', fill_content.FillContentView.as_view(), name="fill_content"),
     path('cut_element/', tree.copy_cut.cut_to_cache, name='cut_element'),
     path('copy_element/', tree.copy_cut.copy_to_cache, name='copy_element'),
     path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),

@@ -170,67 +170,10 @@ class ProgramTreeBuilder:
 
         return to_tree
 
-    def fill_transition_tree_content_from_tree(
-            self,
-            from_tree: 'ProgramTree',
-            to_transition_tree: 'ProgramTree',
-    ) -> 'ProgramTree':
-        validators_by_business_action.FillContentProgramTreeValidatorList(to_transition_tree).validate()
-
-        self._delete_mandatory_links(to_transition_tree)
-
-        self._fill_node_content_from_node_in_case_of_transition(
-            from_tree.root_node,
-            to_transition_tree.root_node,
-            to_transition_tree,
-            {}
-        )
-
-        to_transition_tree.prerequisites = Prerequisites(
-            to_transition_tree.entity_id,
-            [prerequisite_factory.copy_to_next_year(prerequisite)
-             for prerequisite in from_tree.prerequisites.prerequisites]
-        )
-
-        return to_transition_tree
-
     def _delete_mandatory_links(self, tree: 'ProgramTree'):
         children = list(tree.root_node.children)
         for link_to_delete in children:
             tree.root_node.detach_child(link_to_delete.child)
-
-    def _fill_node_content_from_node_in_case_of_transition(
-            self,
-            from_node: 'Node',
-            to_node: 'Node',
-            to_tree: 'ProgramTree',
-            memo: Dict['Node', 'Node']
-    ) -> 'Node':
-        links_to_copy = (
-            link for link in from_node.children if not link.child.end_date or link.child.end_date >= to_node.year or link.child.is_group()
-        )
-
-        for copy_from_link in links_to_copy:
-            if copy_from_link.child.entity_id in memo:
-                copied_child = memo[copy_from_link.child.entity_id]
-                copied_link = LinkBuilder().from_link(copy_from_link, to_node, copied_child)
-                to_node.children.append(copied_link)
-            else:
-                copied_child = get_or_create_node.GetOrCreateNode().from_node_in_case_of_transition(
-                    copy_from_link.child,
-                    to_node.year,
-                    to_tree.root_node.version_name,
-                    to_tree.root_node.transition_name,
-                    to_tree.root_node.end_year
-                )
-
-                copied_link = LinkBuilder().from_link(copy_from_link, to_node, copied_child)
-                to_node.children.append(copied_link)
-
-                memo[copy_from_link.child.entity_id] = copied_child
-                self._fill_node_content_from_node_in_case_of_transition(copy_from_link.child, copied_child, to_tree, memo)
-
-        return to_node
 
     def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node') -> 'Node':
         links_to_copy = (

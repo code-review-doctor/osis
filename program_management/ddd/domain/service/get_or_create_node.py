@@ -39,53 +39,18 @@ from program_management.ddd.domain import node
 class GetOrCreateNode(interface.DomainService):
     @classmethod
     def from_node(cls, source_node: 'Node', to_year: int) -> 'Node':
-        import time
-        a = time.time()
         repo = node_repository.NodeRepository()
 
         node_identity = attr.evolve(source_node.entity_id, year=to_year)
 
         existing_node = repo.get(node_identity)
         if existing_node:
-            print(f"- Total get from node {time.time() - a}")
             return existing_node
 
         result = node.factory.copy_to_year(source_node, to_year, source_node.code)
         if not source_node.is_learning_unit():
             cls._create_group(result)
-        print(f"- Total create node from node {time.time() - a}")
         return result
-
-    @classmethod
-    def from_node_in_case_of_transition(cls, source_node: 'Node', to_year: int, version_name: str, transition_name: str, end_year: Optional[int]) -> 'Node':
-        import time
-        print("Create node in case of transitions:")
-        a = time.time()
-        if source_node.is_group():
-            new_code = GenerateNodeCode().generate_from_parent_node(
-                parent_node=source_node,
-                child_node_type=source_node.node_type,
-                duplicate_to_transition=True
-            )
-            b = time.time()
-            print(f"- Generate new code {b - a}")
-
-            n = node.factory.copy_to_year(source_node, to_year, new_code)
-            cls._create_group(n)
-            c = time.time()
-            print(f"- Create group {c - b}")
-            print(f" -- Total {c - a}")
-            return n
-        elif source_node.is_training():
-            copied_child = get_or_create_transition_node(
-                offer_acronym=source_node.title,
-                year=to_year,
-                version_name=version_name,
-                transition_name=transition_name,
-                end_year=end_year
-            )
-            return copied_child
-        return cls.from_node(source_node, to_year)
 
     @classmethod
     def _create_group(cls, n: 'NodeGroupYear'):
