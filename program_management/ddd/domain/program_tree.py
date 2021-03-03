@@ -160,21 +160,14 @@ class ProgramTreeBuilder:
     def fill_tree_content_from_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
         validators_by_business_action.FillContentProgramTreeValidatorList(to_tree).validate()
 
-        # self._delete_mandatory_links(to_tree)
-
-        self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node)
+        self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node, to_tree.authorized_relationships)
         to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(
             from_tree.prerequisites,
             to_tree
         )
         return to_tree
 
-    def _delete_mandatory_links(self, tree: 'ProgramTree'):
-        children = list(tree.root_node.children)
-        for link_to_delete in children:
-            tree.root_node.detach_child(link_to_delete.child)
-
-    def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node') -> 'Node':
+    def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node', relationships: 'AuthorizedRelationshipList') -> 'Node':
         link_to_ues = (child_link for child_link in from_node.children if child_link.child.is_learning_unit())
         link_to_groups = (child_link for child_link in from_node.children if child_link.child.is_group())
         link_trainings_or_mini_trainings = (child_link for child_link in from_node.children
@@ -194,8 +187,8 @@ class ProgramTreeBuilder:
             to_node.children.append(copied_link)
 
             # Check if mandatory children
-            if not link_to_group.is_reference() and not copied_child.children:
-                self._fill_node_content_from_node(link_to_group.child, copied_child)
+            if not link_to_group.is_reference() and self._is_empty(copied_child, relationships):
+                self._fill_node_content_from_node(link_to_group.child, copied_child, relationships)
 
         for link_to_training_or_mini in link_trainings_or_mini_trainings:
             if self._is_end_date_inferior_to(link_to_training_or_mini.child, to_node):
@@ -204,10 +197,19 @@ class ProgramTreeBuilder:
             copied_link = LinkBuilder().from_link(link_to_training_or_mini, to_node, copied_child)
             to_node.children.append(copied_link)
 
-            if not link_to_training_or_mini.is_reference() and not copied_child.children:
-                self._fill_node_content_from_node(link_to_training_or_mini.child, copied_child)
+            if not link_to_training_or_mini.is_reference() and self._is_empty(copied_child, relationships):
+                self._fill_node_content_from_node(link_to_training_or_mini.child, copied_child, relationships)
 
         return to_node
+
+    def _is_empty(self, node_to_check: 'Node', relationships: 'AuthorizedRelationshipList') -> bool:
+        if not node_to_check.children:
+            return True
+
+        return all(
+            node.node_type in relationships.get_ordered_mandatory_children_types(node_to_check.node_type)
+            for node in node_to_check.children_as_nodes
+        )
 
     def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
         return from_node.end_date and from_node.end_date < to_node.year
