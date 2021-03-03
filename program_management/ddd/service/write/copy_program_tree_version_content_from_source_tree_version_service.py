@@ -56,7 +56,6 @@ def fill_program_tree_version_content_from_source(
         )
     )
 
-    # Check why first only suppress
     resulted_tree = ProgramTreeVersionBuilder().fill_tree_version_content_from_tree_version(
         source_tree_version,
         to_tree_version,

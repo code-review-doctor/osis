@@ -160,7 +160,7 @@ class ProgramTreeBuilder:
     def fill_tree_content_from_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
         validators_by_business_action.FillContentProgramTreeValidatorList(to_tree).validate()
 
-        self._delete_mandatory_links(to_tree)
+        # self._delete_mandatory_links(to_tree)
 
         self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node)
         to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(
@@ -184,7 +184,7 @@ class ProgramTreeBuilder:
             if self._is_end_date_inferior_to(link_to_ue.child, to_node):
                 copied_child = link_to_ue.child
             else:
-                copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_ue.child, to_node.year)
+                copied_child = get_or_create_node.GetOrCreateNode().from_learning_unit_node(link_to_ue.child, to_node.year)
             copied_link = LinkBuilder().from_link(link_to_ue, to_node, copied_child)
             to_node.children.append(copied_link)
 
