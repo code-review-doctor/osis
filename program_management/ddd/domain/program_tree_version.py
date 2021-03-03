@@ -76,13 +76,13 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
-    def fill_tree_version_content_from_tree_version(
+    def fill_from_program_tree_version(
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        program_tree.ProgramTreeBuilder().fill_tree_content_from_tree(
+        program_tree.ProgramTreeBuilder().fill_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
             )

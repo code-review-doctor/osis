@@ -156,45 +156,46 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
-    def fill_tree_content_from_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
-        validators_by_business_action.FillContentProgramTreeValidatorList(to_tree).validate()
+    def fill_from_program_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
+        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node, to_tree.authorized_relationships)
+        self._fill_node_children_from_node(from_tree.root_node, to_tree.root_node, to_tree.authorized_relationships)
+
         to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(
             from_tree.prerequisites,
             to_tree
         )
         return to_tree
 
-    def _fill_node_content_from_node(
+    def _fill_node_children_from_node(
             self,
             from_node: 'Node',
             to_node: 'Node',
             relationships: 'AuthorizedRelationshipList'
     ) -> 'Node':
-        link_to_ues = (child_link for child_link in from_node.children if child_link.child.is_learning_unit())
-        link_to_groups = (child_link for child_link in from_node.children if not child_link.child.is_learning_unit())
+        learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
+        group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
 
-        for link_to_ue in link_to_ues:
-            if self._is_end_date_inferior_to(link_to_ue.child, to_node):
-                copied_child = link_to_ue.child
+        for learning_unit_link in learning_units_links:
+            if self._is_end_date_inferior_to(learning_unit_link.child, to_node):
+                child = learning_unit_link.child
             else:
-                copied_child = get_or_create_node.GetOrCreateNode().from_learning_unit_node(
-                    link_to_ue.child,
-                    to_node.year
+                child = get_or_create_node.GetOrCreateNode().for_learning_unit_node(
+                    to_node.year,
+                    learning_unit_link.child
                 )
-            copied_link = LinkBuilder().from_link(link_to_ue, to_node, copied_child)
+            copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
             to_node.children.append(copied_link)
 
-        for link_to_group in link_to_groups:
-            if not link_to_group.child.is_group() and self._is_end_date_inferior_to(link_to_group.child, to_node):
+        for group_year_link in group_year_links:
+            if not group_year_link.child.is_group() and self._is_end_date_inferior_to(group_year_link.child, to_node):
                 continue
-            copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_group.child, to_node.year)
-            copied_link = LinkBuilder().from_link(link_to_group, to_node, copied_child)
+            child = get_or_create_node.GetOrCreateNode().for_group_year_node(to_node.year, group_year_link.child)
+            copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
             to_node.children.append(copied_link)
 
-            if not link_to_group.is_reference() and self._is_empty(copied_child, relationships):
-                self._fill_node_content_from_node(link_to_group.child, copied_child, relationships)
+            if not group_year_link.is_reference() and self._is_empty(child, relationships):
+                self._fill_node_children_from_node(group_year_link.child, child, relationships)
 
         return to_node
 
@@ -209,17 +210,6 @@ class ProgramTreeBuilder:
 
     def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
         return from_node.end_date and from_node.end_date < to_node.year
-
-    def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
-        parent_next_year = node_factory.fill_from_past_year(copy_from_node)
-        links_to_copy = (link for link in copy_from_node.children
-                         if not link.child.end_date or link.child.end_date > link.child.year)
-        for copy_from_link in links_to_copy:
-            child_node = copy_from_link.child
-            child_next_year = self._copy_node_and_children_to_next_year(child_node)
-            link_next_year = link_factory.fill_from_past_year(copy_from_link, parent_next_year, child_next_year)
-            parent_next_year.children.append(link_next_year)
-        return parent_next_year
 
     def build_from_orphan_group_as_root(
             self,

@@ -55,7 +55,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    ProgramTreeVersionBuilder().fill_tree_version_content_from_tree_version(from_tree_version, to_tree_version,)
+    ProgramTreeVersionBuilder().fill_from_program_tree_version(from_tree_version, to_tree_version, )
     copy_tree_cms.CopyCms().from_past_year(to_tree_version.get_tree())
 
     identity = tree_version_repository.update(to_tree_version)

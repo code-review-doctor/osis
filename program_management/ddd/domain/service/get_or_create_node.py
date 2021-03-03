@@ -34,22 +34,22 @@ from program_management.ddd.repositories import program_tree as program_tree_rep
 
 class GetOrCreateNode(interface.DomainService):
     @classmethod
-    def from_node(cls, source_node: 'Node', to_year: int) -> 'Node':
+    def for_group_year_node(cls, to_year: int, base_node: 'NodeGroupYear') -> 'Node':
         repo = program_tree_repository.ProgramTreeRepository()
 
-        tree_identity = program_tree.ProgramTreeIdentity(code=source_node.code, year=to_year)
+        tree_identity = program_tree.ProgramTreeIdentity(code=base_node.code, year=to_year)
 
         try:
             return repo.get(tree_identity).root_node
         except ProgramTreeNotFoundException:
-            cls._create_group(source_node)
+            cls._create_group(base_node)
             return repo.get(tree_identity).root_node
 
     @classmethod
-    def from_learning_unit_node(cls, source_node: 'NodeLearningUnitYear', to_year: int) -> 'Node':
+    def for_learning_unit_node(cls, to_year: int, base_node: 'NodeLearningUnitYear') -> 'Node':
         repo = node_repository.NodeRepository()
 
-        node_identity = node.NodeIdentity(code=source_node.code, year=to_year)
+        node_identity = node.NodeIdentity(code=base_node.code, year=to_year)
 
         return repo.get(node_identity)
 
