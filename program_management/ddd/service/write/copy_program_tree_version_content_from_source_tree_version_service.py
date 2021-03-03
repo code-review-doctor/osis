@@ -27,6 +27,7 @@ from django.db import transaction
 from education_group.ddd.service.write import create_group_service
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
+from program_management.ddd.domain.service import copy_tree_cms
 from program_management.ddd.repositories import program_tree_version as tree_version_repository,\
     program_tree as program_tree_repository
 
@@ -55,11 +56,12 @@ def fill_program_tree_version_content_from_source(
         )
     )
 
+    # Check why first only suppress
     resulted_tree = ProgramTreeVersionBuilder().fill_tree_version_content_from_tree_version(
         source_tree_version,
         to_tree_version,
     )
-    # TODO :: add report cms call for mandatory children
+    copy_tree_cms.CopyCms().from_past_year(resulted_tree.get_tree())
 
     identity = repository.update(resulted_tree)
     tree_repository.create(resulted_tree.get_tree())

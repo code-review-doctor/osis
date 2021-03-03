@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import contextlib
 import re
 from typing import List, Dict
 
@@ -35,6 +36,7 @@ from base.models.enums.prerequisite_operator import OR, AND
 from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import CannotCopyPrerequisiteException
 from program_management.ddd.validators import validators_by_business_action
 
 AND_OPERATOR = "ET"
@@ -189,7 +191,9 @@ class PrerequisiteFactory:
             node_having_prerequisites.year
         )
 
-        return Prerequisite(main_operator, context_tree, node_having_prerequisites, prerequisite_item_groups)
+        result = Prerequisite(main_operator, context_tree, node_having_prerequisites, prerequisite_item_groups)
+        result.has_changed = True
+        return result
 
     @classmethod
     def _get_grouped_items_from_string(
@@ -229,23 +233,39 @@ class PrerequisiteFactory:
         return AND
 
     @classmethod
-    def copy_to_next_year(cls, to_copy: 'Prerequisite') -> 'Prerequisite':
+    def copy_to_next_year(cls, to_copy: 'Prerequisite', next_year_tree: 'ProgramTree') -> 'Prerequisite':
         next_year_identity = attr.evolve(
             to_copy.node_having_prerequisites,
             year=to_copy.node_having_prerequisites.year+1
         )
-        tree_next_year_identity = attr.evolve(
-            to_copy.context_tree,
-            year=to_copy.context_tree.year+1
-        )
+
+        code_presents = {node.code for node in next_year_tree.get_all_nodes()}
+        if next_year_identity.code not in code_presents:
+            raise CannotCopyPrerequisiteException()
+
+        items_code = {item.code for item in to_copy.get_all_prerequisite_items()}
+        if items_code.difference(code_presents):
+            raise CannotCopyPrerequisiteException()
+
         return cls().from_expression(
             to_copy.get_prerequisite_expression(translate=False),
             next_year_identity,
-            tree_next_year_identity
+            next_year_tree.entity_id
         )
 
 
 factory = PrerequisiteFactory()
+
+
+class PrerequisitesBuilder:
+    def copy_to_next_year(self, source_prerequisites: 'Prerequisites', next_year_tree: 'ProgramTree') -> 'Prerequisites':
+        next_year_prerequisites = list()
+        for prerequisite in source_prerequisites.prerequisites:
+            with contextlib.suppress(CannotCopyPrerequisiteException):
+                next_year_prerequisites.append(
+                    factory.copy_to_next_year(prerequisite, next_year_tree)
+                )
+        return Prerequisites(next_year_tree.entity_id, next_year_prerequisites)
 
 
 @attr.s(slots=True)

@@ -23,27 +23,25 @@
 #
 ##############################################################################
 
-import attr
-
 from education_group.ddd.command import CreateOrphanGroupCommand
 from education_group.ddd.service.write import create_group_service
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import node
-from program_management.ddd.domain.exception import NodeNotFoundException
-from program_management.ddd.repositories import node as node_repository
+from program_management.ddd.domain import node, program_tree
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
+from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 class GetOrCreateNode(interface.DomainService):
     @classmethod
     def from_node(cls, source_node: 'Node', to_year: int) -> 'Node':
-        repo = node_repository.NodeRepository()
+        repo = program_tree_repository.ProgramTreeRepository()
 
-        node_identity = attr.evolve(source_node.entity_id, year=to_year)
+        tree_identity = program_tree.ProgramTreeIdentity(code=source_node.code, year=to_year)
 
         try:
-            existing_node = repo.get(node_identity)
-        except NodeNotFoundException:
+            existing_node = repo.get(tree_identity).root_node
+        except ProgramTreeNotFoundException:
             existing_node = None
 
         if existing_node:

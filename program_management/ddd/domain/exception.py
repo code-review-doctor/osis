@@ -394,3 +394,9 @@ class InvalidTreeVersionToFillTo(BusinessException):
     def __init__(self, tree_version_to_fill_to: 'ProgramTreeVersion', **kwargs):
         message = _("Cannot fill content of {}").format(tree_version_to_fill_to)
         super().__init__(message, **kwargs)
+
+
+class CannotCopyPrerequisiteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Cannot copy prerequisite")
+        super().__init__(message, **kwargs)

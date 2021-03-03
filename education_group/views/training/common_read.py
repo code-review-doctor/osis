@@ -197,7 +197,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 self.get_delete_permanently_tree_version_permission_name(),
             "create_specific_version_url": self.get_create_specific_version_url(),
             "create_transition_version_url": self.get_create_transition_version_url(),
-            "fill_transition_version_url": self.get_fill_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
@@ -290,9 +289,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.path)
-
-    def get_fill_transition_version_url(self) -> str:
-        return reverse("fill_content", kwargs={'year': self.node_identity.year, 'code': self.node_identity.code})
 
     def get_tree_json_url(self) -> str:
         return reverse_with_get(

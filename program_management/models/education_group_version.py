@@ -42,7 +42,7 @@ def copy_to_next_year(modeladmin, request, queryset):
             to_year=obj.offer.academic_year.year,
             to_offer_acronym=obj.offer.acronym,
             to_version_name=obj.version_name,
-            to_transition_name=obj.is_transition
+            to_transition_name=obj.transition_name
         )
         cmds.append(cmd)
     result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version(cmds)

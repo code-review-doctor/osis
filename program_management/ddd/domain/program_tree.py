@@ -43,7 +43,8 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.prerequisite import factory as prerequisite_factory, Prerequisites
+from program_management.ddd.domain.prerequisite import factory as prerequisite_factory, Prerequisites, \
+    PrerequisitesBuilder
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.service import get_or_create_node
@@ -162,12 +163,10 @@ class ProgramTreeBuilder:
         self._delete_mandatory_links(to_tree)
 
         self._fill_node_content_from_node(from_tree.root_node, to_tree.root_node)
-        # to_tree.prerequisites = Prerequisites(
-        #     to_tree.entity_id,
-        #     [prerequisite_factory.copy_to_next_year(prerequisite)
-        #      for prerequisite in from_tree.prerequisites.prerequisites]
-        # )
-
+        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(
+            from_tree.prerequisites,
+            to_tree
+        )
         return to_tree
 
     def _delete_mandatory_links(self, tree: 'ProgramTree'):
@@ -194,7 +193,8 @@ class ProgramTreeBuilder:
             copied_link = LinkBuilder().from_link(link_to_group, to_node, copied_child)
             to_node.children.append(copied_link)
 
-            if not link_to_group.is_reference():
+            # Check if mandatory children
+            if not link_to_group.is_reference() and not copied_child.children:
                 self._fill_node_content_from_node(link_to_group.child, copied_child)
 
         for link_to_training_or_mini in link_trainings_or_mini_trainings:
@@ -204,7 +204,7 @@ class ProgramTreeBuilder:
             copied_link = LinkBuilder().from_link(link_to_training_or_mini, to_node, copied_child)
             to_node.children.append(copied_link)
 
-            if not link_to_training_or_mini.is_reference():
+            if not link_to_training_or_mini.is_reference() and not copied_child.children:
                 self._fill_node_content_from_node(link_to_training_or_mini.child, copied_child)
 
         return to_node

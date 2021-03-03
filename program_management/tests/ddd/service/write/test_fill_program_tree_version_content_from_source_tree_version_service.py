@@ -213,6 +213,9 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
     def test_do_not_copy_content_of_non_empty_existing_node(self):
         pass
 
+    def test_copy_prerequisites(self):
+        pass
+
     def _generate_cmd(
             self,
             tree_from: 'ProgramTreeVersion',
