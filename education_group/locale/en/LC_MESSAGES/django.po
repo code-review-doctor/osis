@@ -741,9 +741,6 @@ msgstr ""
 msgid "Special Requirements to access some programmes"
 msgstr ""
 
-msgid "Access based on validation of professional experience"
-msgstr ""
-
 msgid "Specific Access Requirements"
 msgstr ""
 

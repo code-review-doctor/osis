@@ -777,9 +777,6 @@ msgstr "Qualification du signataire"
 msgid "Special Requirements to access some programmes"
 msgstr "Conditions particulières d’accès à certains programmes"
 
-msgid "Access based on validation of professional experience"
-msgstr "Accès par valorisation des acquis de l'expérience"
-
 msgid "Specific Access Requirements"
 msgstr "Conditions d’accès spécifiques"
 
