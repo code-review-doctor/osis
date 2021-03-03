@@ -25,25 +25,27 @@
 ##############################################################################
 from django.db import transaction
 
-from program_management.ddd.command import CopyTreeVersionFromPastYearCommand, \
-    CopyProgramTreeVersionContentFromSourceTreeVersionCommand
+from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand, \
+    FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
-    fill_program_tree_version_content_from_source
+from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
+    fill_program_tree_version_content_from_program_tree_version
 
 
 @transaction.atomic()
-def copy_tree_version_from_past_year(copy_cmd: CopyTreeVersionFromPastYearCommand) -> 'ProgramTreeVersionIdentity':
-    return fill_program_tree_version_content_from_source(
-        CopyProgramTreeVersionContentFromSourceTreeVersionCommand(
-            from_year=copy_cmd.to_year-1,
-            from_offer_acronym=copy_cmd.to_offer_acronym,
-            from_version_name=copy_cmd.to_version_name,
-            from_transition_name=copy_cmd.to_transition_name,
-            to_year=copy_cmd.to_year,
-            to_offer_acronym=copy_cmd.to_offer_acronym,
-            to_version_name=copy_cmd.to_version_name,
-            to_transition_name=copy_cmd.to_transition_name
+def fill_program_tree_version_content_from_past_year(
+        cmd: FillTreeVersionContentFromPastYearCommand
+) -> 'ProgramTreeVersionIdentity':
+    return fill_program_tree_version_content_from_program_tree_version(
+        FillProgramTreeVersionContentFromProgramTreeVersionCommand(
+            from_year=cmd.to_year - 1,
+            from_offer_acronym=cmd.to_offer_acronym,
+            from_version_name=cmd.to_version_name,
+            from_transition_name=cmd.to_transition_name,
+            to_year=cmd.to_year,
+            to_offer_acronym=cmd.to_offer_acronym,
+            to_version_name=cmd.to_version_name,
+            to_transition_name=cmd.to_transition_name
         )
     )
 

@@ -25,13 +25,13 @@
 import attr
 import mock
 
-from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
+from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
     ProgramTreeNonEmpty
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
-    fill_program_tree_version_content_from_source
+from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
+    fill_program_tree_version_content_from_program_tree_version
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
@@ -117,7 +117,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
         self.assertRaisesBusinessException(
             InvalidTreeVersionToFillTo,
-            fill_program_tree_version_content_from_source,
+            fill_program_tree_version_content_from_program_tree_version,
             cmd
         )
 
@@ -137,7 +137,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
         self.assertRaisesBusinessException(
             InvalidTreeVersionToFillFrom,
-            fill_program_tree_version_content_from_source,
+            fill_program_tree_version_content_from_program_tree_version,
             cmd
         )
 
@@ -160,12 +160,12 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
         self.assertRaisesBusinessException(
             ProgramTreeNonEmpty,
-            fill_program_tree_version_content_from_source,
+            fill_program_tree_version_content_from_program_tree_version,
             cmd
         )
 
     def test_should_return_program_tree_version_identity_of_tree_filled(self):
-        result = fill_program_tree_version_content_from_source(self.cmd)
+        result = fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         self.assertEqual(self.tree_version_to_fill.entity_id, result)
 
@@ -173,7 +173,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.tree_version_from.tree.get_node("1|22").detach_child(
             self.tree_version_from.tree.get_node("1|22|32")
         )
-        fill_program_tree_version_content_from_source(self.cmd)
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         expected = [
             attr.evolve(child_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
@@ -189,7 +189,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         ue_node = NodeLearningUnitYearFactory(year=CURRENT_ACADEMIC_YEAR_YEAR, end_date=CURRENT_ACADEMIC_YEAR_YEAR)
         self.tree_version_from.tree.get_node("1|21|31").add_child(ue_node)
 
-        fill_program_tree_version_content_from_source(self.cmd)
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         self.assertIn(ue_node, self.tree_version_to_fill.tree.get_all_nodes())
 
@@ -201,7 +201,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         self.tree_version_from.tree.get_node("1|22").add_child(mini_training_node)
 
-        fill_program_tree_version_content_from_source(self.cmd)
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         self.assertNotIn(mini_training_node, self.tree_version_to_fill.tree.get_all_nodes())
 
@@ -213,7 +213,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         self.tree_version_from.tree.get_node("1|21").add_child(group_node)
 
-        fill_program_tree_version_content_from_source(self.cmd)
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         member = attr.evolve(group_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
         containers = [
@@ -223,7 +223,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.assertIn(member, containers)
 
     def test_do_not_copy_content_of_reference_child(self):
-        fill_program_tree_version_content_from_source(self.cmd)
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         children_of_reference_link = self.tree_version_from.tree.get_node("1|22|32").get_all_children_as_nodes()
         entities_ids = {
@@ -241,8 +241,8 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             self,
             tree_from: 'ProgramTreeVersion',
             tree_to: 'ProgramTreeVersion',
-    ) -> 'CopyProgramTreeVersionContentFromSourceTreeVersionCommand':
-        return CopyProgramTreeVersionContentFromSourceTreeVersionCommand(
+    ) -> 'FillProgramTreeVersionContentFromProgramTreeVersionCommand':
+        return FillProgramTreeVersionContentFromProgramTreeVersionCommand(
             from_year=tree_from.entity_id.year,
             from_offer_acronym=tree_from.entity_id.offer_acronym,
             from_version_name=tree_from.entity_id.version_name,

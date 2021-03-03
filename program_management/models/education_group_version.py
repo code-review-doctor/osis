@@ -31,24 +31,25 @@ from reversion.admin import VersionAdmin
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-def copy_to_next_year(modeladmin, request, queryset):
-    from program_management.ddd.command import CopyTreeVersionFromPastYearCommand
-    from program_management.ddd.service.write import bulk_copy_program_tree_version_content_service
+def fill_from_past_year(modeladmin, request, queryset):
+    from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
+    from program_management.ddd.service.write import bulk_fill_program_tree_version_content_service_from_past_year
     cmds = []
     qs = queryset.select_related("offer", "root_group")
     for obj in qs:
-        cmd = CopyTreeVersionFromPastYearCommand(
+        cmd = FillTreeVersionContentFromPastYearCommand(
             to_year=obj.offer.academic_year.year,
             to_offer_acronym=obj.offer.acronym,
             to_version_name=obj.version_name,
             to_transition_name=obj.transition_name
         )
         cmds.append(cmd)
-    result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version(cmds)
-    modeladmin.message_user(request, "{} programs have been copied".format(len(result)))
+    result = bulk_fill_program_tree_version_content_service_from_past_year.\
+        bulk_fill_program_tree_version_content_from_past_year(cmds)
+    modeladmin.message_user(request, "{} programs have been filled".format(len(result)))
 
 
-copy_to_next_year.short_description = _("Copy program tree content from last year")
+fill_from_past_year.short_description = _("Fill program tree content from last year")
 
 
 class StandardListFilter(admin.SimpleListFilter):
@@ -93,7 +94,7 @@ class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'transition_name')
     list_filter = (StandardListFilter, TransitionListFilter, 'offer__academic_year',)
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
-    actions = [copy_to_next_year]
+    actions = [fill_from_past_year]
 
 
 class StandardEducationGroupVersionManager(models.Manager):

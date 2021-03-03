@@ -363,18 +363,6 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
         return "GetNodeIdentityFromElementId({parameters})".format(parameters=parameters)
 
 
-@attr.s(frozen=True, slots=True)
-class CopyProgramTreeVersionContentFromSourceTreeVersionCommand(interface.CommandRequest):
-    from_year = attr.ib(type=int)
-    from_offer_acronym = attr.ib(type=str)
-    from_version_name = attr.ib(type=str)
-    from_transition_name = attr.ib(type=str)
-    to_year = attr.ib(type=int)
-    to_offer_acronym = attr.ib(type=str)
-    to_version_name = attr.ib(type=str)
-    to_transition_name = attr.ib(type=str)
-
-
 class SearchAllVersionsFromRootNodesCommand(interface.CommandRequest):
     def __init__(self, code: str, year: int):
         self.code = code
@@ -456,14 +444,6 @@ class CopyTreeVersionToNextYearCommand(interface.CommandRequest):
 
     from_version_name = attr.ib(type=str)
     from_transition_name = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class CopyTreeVersionFromPastYearCommand(interface.CommandRequest):
-    to_year = attr.ib(type=int)
-    to_offer_acronym = attr.ib(type=str)
-    to_version_name = attr.ib(type=str)
-    to_transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -582,7 +562,6 @@ class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 
 
-# Necessary because 'None' is a correct value that could be used to override the default end date
 DO_NOT_OVERRIDE = -1
 
 
@@ -595,6 +574,7 @@ class DuplicateProgramTree(interface.CommandRequest):
     override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
 
 
+# Necessary because 'None' is a correct value that could be used to override the default end date
 @attr.s(frozen=True, slots=True)
 class DeletePermanentlyTrainingStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
@@ -743,3 +723,23 @@ class CheckTransitionNameCommand(interface.CommandRequest):
     year = attr.ib(type=int)
     offer_acronym = attr.ib(type=str)
     transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class FillProgramTreeVersionContentFromProgramTreeVersionCommand(interface.CommandRequest):
+    from_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    from_transition_name = attr.ib(type=str)
+    to_year = attr.ib(type=int)
+    to_offer_acronym = attr.ib(type=str)
+    to_version_name = attr.ib(type=str)
+    to_transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class FillTreeVersionContentFromPastYearCommand(interface.CommandRequest):
+    to_year = attr.ib(type=int)
+    to_offer_acronym = attr.ib(type=str)
+    to_version_name = attr.ib(type=str)
+    to_transition_name = attr.ib(type=str)

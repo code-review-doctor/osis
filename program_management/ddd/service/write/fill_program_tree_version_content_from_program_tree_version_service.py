@@ -24,22 +24,21 @@
 ##############################################################################
 from django.db import transaction
 
-from education_group.ddd.service.write import create_group_service
-from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
+from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.domain.service import copy_tree_cms
-from program_management.ddd.repositories import program_tree_version as tree_version_repository,\
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository
 
 
 @transaction.atomic()
-def fill_program_tree_version_content_from_source(
-        cmd: 'CopyProgramTreeVersionContentFromSourceTreeVersionCommand'
+def fill_program_tree_version_content_from_program_tree_version(
+        cmd: 'FillProgramTreeVersionContentFromProgramTreeVersionCommand'
 ) -> 'ProgramTreeVersionIdentity':
-    repository = tree_version_repository.ProgramTreeVersionRepository()
+    tree_version_repository = program_tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
 
-    source_tree_version = repository.get(
+    from_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
             offer_acronym=cmd.from_offer_acronym,
             year=cmd.from_year,
@@ -47,7 +46,7 @@ def fill_program_tree_version_content_from_source(
             transition_name=cmd.from_transition_name
         )
     )
-    to_tree_version = repository.get(
+    to_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
             offer_acronym=cmd.to_offer_acronym,
             year=cmd.to_year,
@@ -56,13 +55,10 @@ def fill_program_tree_version_content_from_source(
         )
     )
 
-    resulted_tree = ProgramTreeVersionBuilder().fill_tree_version_content_from_tree_version(
-        source_tree_version,
-        to_tree_version,
-    )
-    copy_tree_cms.CopyCms().from_past_year(resulted_tree.get_tree())
+    ProgramTreeVersionBuilder().fill_tree_version_content_from_tree_version(from_tree_version, to_tree_version,)
+    copy_tree_cms.CopyCms().from_past_year(to_tree_version.get_tree())
 
-    identity = repository.update(resulted_tree)
-    tree_repository.create(resulted_tree.get_tree())
+    identity = tree_version_repository.update(to_tree_version)
+    tree_repository.update(to_tree_version.get_tree())
 
     return identity

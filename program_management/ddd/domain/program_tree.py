@@ -138,7 +138,7 @@ class ProgramTreeBuilder:
             program_tree_next_year = repository.get(identity_next_year)
         except exception.ProgramTreeNotFoundException:
             # Case create program tree to next year
-            root_next_year = node_factory.copy_to_next_year(copy_from.root_node)
+            root_next_year = node_factory.fill_from_past_year(copy_from.root_node)
             program_tree_next_year = ProgramTree(
                 entity_id=identity_next_year,
                 root_node=root_next_year,
@@ -152,7 +152,7 @@ class ProgramTreeBuilder:
         children_current_year = copy_from.root_node.get_direct_children_as_nodes()
         for child_current_year in children_current_year:
             if child_current_year.node_type in mandatory_types:
-                child_next_year = node_factory.copy_to_next_year(child_current_year)
+                child_next_year = node_factory.fill_from_past_year(child_current_year)
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
@@ -211,13 +211,13 @@ class ProgramTreeBuilder:
         return from_node.end_date and from_node.end_date < to_node.year
 
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
-        parent_next_year = node_factory.copy_to_next_year(copy_from_node)
+        parent_next_year = node_factory.fill_from_past_year(copy_from_node)
         links_to_copy = (link for link in copy_from_node.children
                          if not link.child.end_date or link.child.end_date > link.child.year)
         for copy_from_link in links_to_copy:
             child_node = copy_from_link.child
             child_next_year = self._copy_node_and_children_to_next_year(child_node)
-            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
+            link_next_year = link_factory.fill_from_past_year(copy_from_link, parent_next_year, child_next_year)
             parent_next_year.children.append(link_next_year)
         return parent_next_year
 

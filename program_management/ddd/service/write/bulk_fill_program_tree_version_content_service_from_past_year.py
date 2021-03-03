@@ -27,16 +27,19 @@ from typing import List
 
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CopyTreeVersionFromPastYearCommand
-from program_management.ddd.service.write import copy_program_version_from_past_year_service
+from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
+from program_management.ddd.service.write import fill_program_tree_version_content_from_past_year_service
 
 
-def bulk_copy_program_tree_version(
-        cmds: List[CopyTreeVersionFromPastYearCommand]
+def bulk_fill_program_tree_version_content_from_past_year(
+        cmds: List[FillTreeVersionContentFromPastYearCommand]
 ) -> List['ProgramTreeVersionIdentity']:
     result = []
     for cmd in cmds:
         with contextlib.suppress(BusinessException):
-            result.append(copy_program_version_from_past_year_service.copy_tree_version_from_past_year(cmd))
+            result.append(
+                fill_program_tree_version_content_from_past_year_service.
+                fill_program_tree_version_content_from_past_year(cmd)
+            )
 
     return result

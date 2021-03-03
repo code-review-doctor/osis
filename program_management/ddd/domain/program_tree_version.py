@@ -35,7 +35,6 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
 from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
 from program_management.ddd.validators import validators_by_business_action
-from program_management.ddd.validators.validators_by_business_action import FillProgramTreeVersionValidatorList
 
 STANDARD = ""
 NOT_A_TRANSITION = ""
@@ -82,7 +81,7 @@ class ProgramTreeVersionBuilder:
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
     ) -> 'ProgramTreeVersion':
-        FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
+        validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
         program_tree.ProgramTreeBuilder().fill_tree_content_from_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
