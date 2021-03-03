@@ -40,10 +40,44 @@ paths:
   /{year}/me:
     get:
       description: Return all attributions of connected user in a specific year.
+      operationId: myattributions_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Attribution'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - attribution
+  /{year}/{global_id}/:
+    get:
+      description: Return all attributions of specific user in a specific year.
       operationId: attributions_list
       parameters:
         - in: path
           name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: global_id
           required: true
           schema:
             description: ''

@@ -30,19 +30,21 @@ import requests
 from django.conf import settings
 from django.db.models import F, Case, When, Q, Value, CharField
 from django.db.models.functions import Concat, Replace
+from django.utils.functional import cached_property
 from rest_framework import generics
 from rest_framework.response import Response
 
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
 from attribution.models.attribution_charge_new import AttributionChargeNew
+from base.models.person import Person
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class AttributionListView(generics.ListAPIView):
     """
-       Return all attributions of connected user in a specific year
+       Return all attributions of a specific user in a specific year
     """
     name = 'attributions'
 
@@ -54,7 +56,7 @@ class AttributionListView(generics.ListAPIView):
             'attribution_id'
         ).filter(
             learning_component_year__learning_unit_year__academic_year__year=self.kwargs['year'],
-            attribution__tutor__person__user=self.request.user,
+            attribution__tutor__person=self.person,
             attribution__decision_making=''
         ).annotate(
             # Technical ID for making a match with data in EPC. Remove after refactoring...
@@ -106,6 +108,10 @@ class AttributionListView(generics.ListAPIView):
         serializer = AttributionSerializer(qs, many=True, context=self.get_serializer_context())
         return Response(serializer.data)
 
+    @cached_property
+    def person(self) -> Person:
+        return Person.objects.get(global_id=self.kwargs['global_id'])
+
     def get_serializer_context(self):
         return {
             **super().get_serializer_context(),
@@ -128,7 +134,7 @@ class AttributionListView(generics.ListAPIView):
             url = "{base_url}{endpoint}".format(
                 base_url=settings.EPC_API_URL,
                 endpoint=settings.EPC_ATTRIBUTIONS_TUTOR_ENDPOINT.format(
-                    global_id=self.request.user.person.global_id,
+                    global_id=self.person.global_id,
                     year=self.kwargs['year']
                 )
             )
@@ -145,3 +151,14 @@ class AttributionListView(generics.ListAPIView):
             logger.warning('Error when returning attributions charge duration: \n {}'.format(log_trace))
         finally:
             return attribution_charges
+
+
+class MyAttributionListView(AttributionListView):
+    """
+       Return all attributions of connected user in a specific year
+    """
+    name = 'my-attributions'
+
+    @cached_property
+    def person(self) -> Person:
+        return self.request.user.person
