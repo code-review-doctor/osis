@@ -3,6 +3,7 @@
 import datetime
 
 from django.db import migrations
+from django.db.models import F
 from django.utils import timezone
 
 from base.models.enums import academic_calendar_type
@@ -64,6 +65,33 @@ def remove_proposal_extended_calendar(apps, schema_editor):
     ).delete()
 
 
+def remove_old_calendars(apps, schema_editor):
+    AcademicCalendar = apps.get_model('base', 'academiccalendar')
+    references_to_delete = [
+        "LEARNING_UNIT_EDITION_CENTRAL_MANAGERS",
+        "LEARNING_UNIT_EDITION_FACULTY_MANAGERS",
+        "CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS",
+        "CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS",
+        "MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS",
+        "MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS"
+    ]
+    AcademicCalendar.objects.filter(reference__in=references_to_delete).delete()
+
+
+def update_start_date_of_daily_management_calendars(apps, schema_editor):
+    AcademicCalendar = apps.get_model('base', 'academiccalendar')
+    references_to_update = [
+        academic_calendar_type.EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT,
+        academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
+    ]
+    AcademicCalendar.objects.filter(
+        reference__in=references_to_update,
+        start_date__day=15
+    ).update(
+        start_date=F('start_date') - datetime.timedelta(days=1)
+    )
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -73,4 +101,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(create_proposal_limited_calendar, remove_proposal_limited_calendar),
         migrations.RunPython(create_proposal_extended_calendar, remove_proposal_extended_calendar),
+        migrations.RunPython(update_start_date_of_daily_management_calendars),
+        migrations.RunPython(remove_old_calendars),
     ]
