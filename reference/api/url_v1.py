@@ -32,5 +32,5 @@ app_name = "reference"
 urlpatterns = [
     url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
     url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
-    url(r'^study-domains/$', StudyDomainList.as_view(), name=StudyDomainList.name),
+    url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
 ]
