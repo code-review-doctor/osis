@@ -25,7 +25,6 @@
 import attr
 import mock
 
-from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import CopyProgramTreeVersionContentFromSourceTreeVersionCommand
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
@@ -33,12 +32,15 @@ from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, 
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.copy_program_tree_version_content_from_source_tree_version_service import \
     fill_program_tree_version_content_from_source
+from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     SpecificProgramTreeVersionFactory
+from program_management.ddd.domain.node import factory as node_factory
 from testing.testcases import DDDTestCase
 
+PAST_ACADEMIC_YEAR_YEAR = 2020
 CURRENT_ACADEMIC_YEAR_YEAR = 2021
 NEXT_ACADEMIC_YEAR_YEAR = 2022
 
@@ -57,15 +59,20 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         self.cmd = self._generate_cmd(self.tree_version_from, self.tree_version_to_fill)
 
-        self.fake_program_tree_version_repository.root_entities.extend(
-            [self.tree_version_from, self.tree_version_to_fill]
-        )
-        self.fake_program_tree_repository.root_entities.extend(
-            [self.tree_version_from.tree, self.tree_version_to_fill.tree]
-        )
+        self.add_tree_version_to_repo(self.tree_version_from)
+        self.add_tree_version_to_repo(self.tree_version_to_fill)
 
         self.mock_generate_code()
         self.mock_get_current_academic_year()
+        self.mock_copy_cms()
+        self.create_node_next_years()
+        self.mock_copy_group()
+
+    def create_node_next_years(self):
+        nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
+        for node in nodes:
+            next_year_node = node_factory.copy_to_next_year(node)
+            self.add_node_to_repo(next_year_node)
 
     def mock_generate_code(self):
         patcher = mock.patch(
@@ -83,12 +90,29 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
+    def mock_copy_cms(self):
+        patcher = mock.patch(
+            "program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_past_year",
+            side_effect=lambda *args, **kwargs: None
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def mock_copy_group(self):
+        patcher = mock.patch(
+            "program_management.ddd.domain.service.get_or_create_node.GetOrCreateNode._create_group",
+            side_effect=lambda node: self.add_node_to_repo(node_factory.copy_to_next_year(node))
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_can_only_fill_content_of_next_academic_year(self):
         tree_version_to_fill = StandardProgramTreeVersionFactory(
             tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
             tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
         )
-        self.fake_program_tree_version_repository.root_entities.append(tree_version_to_fill)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+
         cmd = self._generate_cmd(self.tree_version_from, tree_version_to_fill)
 
         self.assertRaisesBusinessException(
@@ -99,14 +123,16 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
     def test_if_specific_official_can_only_copy_from_its_previous_year(self):
         tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
-            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR - 1
+            tree__root_node__year=PAST_ACADEMIC_YEAR_YEAR
         )
         tree_version_to_fill = SpecificProgramTreeVersionFactory(
             tree__root_node__title=tree_version_to_fill_from.entity_id.offer_acronym,
             tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
         )
 
-        self.fake_program_tree_version_repository.root_entities.extend([tree_version_to_fill_from, tree_version_to_fill])
+        self.add_tree_version_to_repo(tree_version_to_fill_from)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+
         cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill)
 
         self.assertRaisesBusinessException(
@@ -127,8 +153,9 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
         )
 
-        self.fake_program_tree_version_repository.root_entities.append(tree_version_to_fill_to)
-        self.fake_program_tree_version_repository.root_entities.append(tree_version_to_fill_from)
+        self.add_tree_version_to_repo(tree_version_to_fill_to)
+        self.add_tree_version_to_repo(tree_version_to_fill_from)
+
         cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill_to)
 
         self.assertRaisesBusinessException(
@@ -209,12 +236,6 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             for child_node in self.tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
         }
         self.assertFalse(tree_entities_ids.intersection(entities_ids))
-
-    def test_do_not_copy_content_of_non_empty_existing_node(self):
-        pass
-
-    def test_copy_prerequisites(self):
-        pass
 
     def _generate_cmd(
             self,

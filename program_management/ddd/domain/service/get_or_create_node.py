@@ -28,7 +28,7 @@ from education_group.ddd.service.write import copy_group_service
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node, program_tree
-from program_management.ddd.domain.exception import ProgramTreeNotFoundException, NodeNotFoundException
+from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.repositories import program_tree as program_tree_repository, node as node_repository
 
 
@@ -40,17 +40,10 @@ class GetOrCreateNode(interface.DomainService):
         tree_identity = program_tree.ProgramTreeIdentity(code=source_node.code, year=to_year)
 
         try:
-            existing_node = repo.get(tree_identity).root_node
+            return repo.get(tree_identity).root_node
         except ProgramTreeNotFoundException:
-            existing_node = None
-
-        if existing_node:
-            return existing_node
-
-        if not source_node.is_learning_unit():
             cls._create_group(source_node)
             return repo.get(tree_identity).root_node
-        raise NodeNotFoundException()
 
     @classmethod
     def from_learning_unit_node(cls, source_node: 'NodeLearningUnitYear', to_year: int) -> 'Node':

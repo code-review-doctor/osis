@@ -167,38 +167,35 @@ class ProgramTreeBuilder:
         )
         return to_tree
 
-    def _fill_node_content_from_node(self, from_node: 'Node', to_node: 'Node', relationships: 'AuthorizedRelationshipList') -> 'Node':
+    def _fill_node_content_from_node(
+            self,
+            from_node: 'Node',
+            to_node: 'Node',
+            relationships: 'AuthorizedRelationshipList'
+    ) -> 'Node':
         link_to_ues = (child_link for child_link in from_node.children if child_link.child.is_learning_unit())
-        link_to_groups = (child_link for child_link in from_node.children if child_link.child.is_group())
-        link_trainings_or_mini_trainings = (child_link for child_link in from_node.children
-                                            if child_link.child.is_training() or child_link.child.is_mini_training())
+        link_to_groups = (child_link for child_link in from_node.children if not child_link.child.is_learning_unit())
 
         for link_to_ue in link_to_ues:
             if self._is_end_date_inferior_to(link_to_ue.child, to_node):
                 copied_child = link_to_ue.child
             else:
-                copied_child = get_or_create_node.GetOrCreateNode().from_learning_unit_node(link_to_ue.child, to_node.year)
+                copied_child = get_or_create_node.GetOrCreateNode().from_learning_unit_node(
+                    link_to_ue.child,
+                    to_node.year
+                )
             copied_link = LinkBuilder().from_link(link_to_ue, to_node, copied_child)
             to_node.children.append(copied_link)
 
         for link_to_group in link_to_groups:
+            if not link_to_group.child.is_group() and self._is_end_date_inferior_to(link_to_group.child, to_node):
+                continue
             copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_group.child, to_node.year)
             copied_link = LinkBuilder().from_link(link_to_group, to_node, copied_child)
             to_node.children.append(copied_link)
 
-            # Check if mandatory children
             if not link_to_group.is_reference() and self._is_empty(copied_child, relationships):
                 self._fill_node_content_from_node(link_to_group.child, copied_child, relationships)
-
-        for link_to_training_or_mini in link_trainings_or_mini_trainings:
-            if self._is_end_date_inferior_to(link_to_training_or_mini.child, to_node):
-                continue
-            copied_child = get_or_create_node.GetOrCreateNode().from_node(link_to_training_or_mini.child, to_node.year)
-            copied_link = LinkBuilder().from_link(link_to_training_or_mini, to_node, copied_child)
-            to_node.children.append(copied_link)
-
-            if not link_to_training_or_mini.is_reference() and self._is_empty(copied_child, relationships):
-                self._fill_node_content_from_node(link_to_training_or_mini.child, copied_child, relationships)
 
         return to_node
 

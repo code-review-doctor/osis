@@ -26,9 +26,11 @@ from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository, get_fake_node_repository
 from testing.mocks import MockPatcherMixin
+from program_management.ddd.business_types import *
 
 
 class DDDTestCase(MockPatcherMixin, TestCase):
@@ -55,6 +57,23 @@ class DDDTestCase(MockPatcherMixin, TestCase):
         self.mock_repo(
             "education_group.ddd.repository.group.GroupRepository",
             self.fake_group_repository
+        )
+
+    def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):
+        self.fake_program_tree_version_repository.root_entities.append(tree_version)
+        self.add_tree_to_repo(tree_version.get_tree())
+
+    def add_tree_to_repo(self, tree: 'ProgramTree'):
+        self.fake_program_tree_repository.root_entities.append(tree)
+
+        self.add_node_to_repo(tree.root_node)
+        for node in tree.root_node.get_all_children_as_nodes():
+            self.add_node_to_repo(node)
+
+    def add_node_to_repo(self, node: 'Node'):
+        self.fake_node_repository.root_entities.append(node)
+        self.fake_program_tree_repository.root_entities.append(
+            ProgramTreeFactory(root_node=node)
         )
 
     def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
