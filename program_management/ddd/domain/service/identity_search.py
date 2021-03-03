@@ -145,14 +145,18 @@ class NodeIdentitySearch(interface.DomainService):
     @classmethod
     def get_from_element_id(cls, element_id: int) -> Union['NodeIdentity', None]:
         try:
-            element = Element.objects.select_related(
-                'group_year',
-                'learning_unit_year'
+            element = Element.objects.values(
+                'group_year__partial_acronym',
+                'learning_unit_year__acronym',
+                'group_year__academic_year__year',
+                'learning_unit_year__academic_year__year'
             ).get(pk=element_id)
-            if element.group_year:
-                return NodeIdentity(code=element.group_year.partial_acronym, year=element.group_year.academic_year.year)
+            if element['group_year__partial_acronym']:
+                return NodeIdentity(
+                    code=element['group_year__partial_acronym'], year=element['group_year__academic_year__year']
+                )
             return NodeIdentity(
-                code=element.learning_unit_year.acronym, year=element.learning_unit_year.academic_year.year
+                code=element['learning_unit_year__acronym'], year=element['learning_unit_year__academic_year__year']
             )
         except Element.DoesNotExist:
             return None
