@@ -115,7 +115,8 @@ def export_xls(exam_enrollments: List[ExamEnrollment], is_program_manager: bool)
                 str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
                 str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
                 str(_('Yes')) if student_specific_profile.arrangement_other else '-',
-                str(student_specific_profile.comment) if student_specific_profile.comment else '-',
+                str(student_specific_profile.arrangement_comment)
+                if student_specific_profile.arrangement_comment else '-',
                 str(student_specific_profile.guide) if student_specific_profile.guide else '-',
             ])
         else:
