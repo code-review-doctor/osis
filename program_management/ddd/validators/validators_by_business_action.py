@@ -59,6 +59,7 @@ from program_management.ddd.validators._prerequisites_items import PrerequisiteI
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator, \
     FullTransitionNamePatternValidator
+from program_management.ddd.validators._update_check_existence_of_transition import CheckExistenceOfTransition
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
@@ -148,7 +149,7 @@ class CheckPasteNodeValidatorList(MultipleExceptionBusinessListValidator):
                     node_to_paste,
                     tree_repository,
                     tree_version_repository
-                )
+                ),
             ]
 
         elif node_to_paste.is_learning_unit():
@@ -289,9 +290,11 @@ class FillContentProgramTreeValidatorList(MultipleExceptionBusinessListValidator
 class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, tree_version: 'ProgramTreeVersion'):
         tree = tree_version.get_tree()
+        initial_end_year = tree.root_node.end_year
         tree.root_node.end_year = tree_version.end_year_of_existence
         self.validators = [
             CheckEndDateBetweenFinalitiesAndMasters2M(tree, tree_version.program_tree_repository),
+            CheckExistenceOfTransition(tree_version, initial_end_year)
         ]
         super().__init__()
 

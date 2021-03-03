@@ -28,6 +28,7 @@ from typing import List
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.program_tree_version import version_label
 
 
 class MatchVersionValidator(business_validator.BusinessValidator):
@@ -48,7 +49,7 @@ class MatchVersionValidator(business_validator.BusinessValidator):
 
     def validate(self):
         try:
-            child_version_name = self.get_node_to_add_version()
+            child_version_label = self.get_node_to_add_version()
         except StopIteration:
             return
 
@@ -58,7 +59,7 @@ class MatchVersionValidator(business_validator.BusinessValidator):
 
         version_mismatched = [
             parent_version.entity_id for parent_version in parent_versions
-            if parent_version.version_name != child_version_name
+            if version_label(parent_version.entity_id, only_label=True) != child_version_label
         ]
         if version_mismatched:
             raise exception.ProgramTreeVersionMismatch(
@@ -69,9 +70,9 @@ class MatchVersionValidator(business_validator.BusinessValidator):
 
     def get_node_to_add_version(self) -> str:
         if self.node_to_add.is_training():
-            return self.node_to_add.version_name
+            return self.node_to_add.version_label()
 
-        return next(node.version_name for node in self.node_to_add.get_training_children())
+        return next(node.version_label() for node in self.node_to_add.get_training_children())
 
     def _get_program_tree_version(self, node: 'Node') -> 'ProgramTreeVersion':
         from program_management.ddd.domain.program_tree import ProgramTreeIdentity

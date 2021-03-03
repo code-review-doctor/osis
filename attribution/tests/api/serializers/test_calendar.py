@@ -56,4 +56,4 @@ class ApplicationCourseCalendarSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_is_open_correctly_computed(self):
-        self.assertEquals(self.serializer.data['is_open'], self.event_open.is_open_now())
+        self.assertEqual(self.serializer.data['is_open'], self.event_open.is_open_now())

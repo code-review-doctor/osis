@@ -28,7 +28,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models.enums.education_group_types import TrainingType
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -145,15 +144,23 @@ class EducationGroupVersion(models.Model):
     standard = StandardEducationGroupVersionManager()
 
     def __str__(self):
-        offer_name = str(self.offer)
+        offer_name = self.offer.acronym
         if self.version_name and self.transition_name:
-            offer_name += ' ({} - TRANSITION {})'.format(self.version_name, self.transition_name)
+            offer_name += '[{}-{}]'.format(self.version_name, self.transition_name)
         elif self.version_name:
-            offer_name += ' ({})'.format(self.version_name)
+            offer_name += '[{}]'.format(self.version_name)
         elif self.transition_name:
-            offer_name += ' (TRANSITION {})'.format(self.transition_name)
+            offer_name += '[{}]'.format(self.transition_name)
+        offer_name += ' - {}'.format(self.offer.academic_year)
         return offer_name
 
     class Meta:
         unique_together = ('version_name', 'offer', 'transition_name')
         default_manager_name = 'objects'
+
+    def version_label(self):
+        if self.version_name and self.transition_name:
+            return '[{}-{}]'.format(self.version_name, self.transition_name)
+        elif self.version_name or self.transition_name:
+            return '[{}]'.format(self.version_name if self.version_name else self.transition_name)
+        return ''

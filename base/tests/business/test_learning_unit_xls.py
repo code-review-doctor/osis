@@ -38,9 +38,9 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data, _get_wrapped_cells, \
     _get_font_rows, _get_attribution_line, _add_training_data, \
-    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
-    prepare_xls_content_with_attributions
+    get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
+    get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
+    prepare_xls_content_with_attributions, BOLD_FONT
 from base.business.learning_unit_xls import _get_col_letter
 from base.business.learning_unit_xls import get_significant_volume
 from base.models.entity_version import EntityVersion
@@ -257,7 +257,9 @@ class TestLearningUnitXls(TestCase):
                                          self.learning_unit_yr_2,
                                          self.proposal_creation_1.learning_unit_year,
                                          self.proposal_creation_2.learning_unit_year]),
-                         {PROPOSAL_LINE_STYLES.get(self.proposal_creation_1.type): [3, 4]})
+                         {PROPOSAL_LINE_STYLES.get(self.proposal_creation_1.type): [3, 4],
+                          BOLD_FONT: [0]})
+        # self.assertEqual(param.get(xls_build.FONT_ROWS), {BOLD_FONT: [0]})
 
     def test_get_attributions_line(self):
         a_person = PersonFactory(last_name="Smith", first_name='Aaron')
@@ -319,7 +321,7 @@ class TestLearningUnitXls(TestCase):
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = _get_data_part1(luy)
+        data = get_data_part1(luy)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -327,16 +329,15 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(data[7], _(self.proposal_creation_1.state.title()))
 
     def test_get_parameters_configurable_list(self):
-        user_name = 'Ducon'
-        an_user = UserFactory(username=user_name)
+        an_user = UserFactory()
         titles = ['title1', 'title2']
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
-        self.assertEqual(param.get(xls_build.USER), user_name)
+        self.assertEqual(param.get(xls_build.USER), an_user.username)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
         self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: []})
-        self.assertEqual(param.get(xls_build.FONT_ROWS), {})
+        self.assertEqual(param.get(xls_build.FONT_ROWS), {BOLD_FONT: [0]})
 
         titles.append(HEADER_PROGRAMS)
 
@@ -404,9 +405,9 @@ class TestLearningUnitXls(TestCase):
             luy.get_session_display() or '',
             "",
         ]
-        self.assertEqual(_get_data_part2(luy, False), expected_common)
+        self.assertEqual(get_data_part2(luy, False), expected_common)
         self.assertEqual(
-            _get_data_part2(luy, True),
+            get_data_part2(luy, True),
             expected_attribution_data(
                 attribution_charge_new_lecturing, attribution_charge_new_practical,
                 expected_common,

@@ -27,7 +27,7 @@
 import factory.fuzzy
 
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
-    NOT_A_TRANSITION
+    NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
@@ -97,7 +97,17 @@ class StandardProgramTreeVersionFactory(ProgramTreeVersionFactory):
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year"),
-        version_name=""
+        version_name=STANDARD
+    )
+
+
+class StandardTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name=STANDARD,
+        transition_name=TRANSITION_PREFIX
     )
 
 
@@ -107,4 +117,14 @@ class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year"),
         version_name="SPECIFIC"
+    )
+
+
+class SpecificTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name="SPECIFIC",
+        transition_name=TRANSITION_PREFIX
     )

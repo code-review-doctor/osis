@@ -32,6 +32,7 @@ from django.views.generic import FormView, UpdateView
 from base.business.education_groups.admission_condition import postpone_admission_condition, \
     can_postpone_admission_condition
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.admission_condition import UpdateTextForm, UpdateLineFrenchForm, \
     UpdateLineEnglishForm
@@ -39,15 +40,14 @@ from education_group.views.admission_condition.common import AdmissionConditionM
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class UpdateAdmissionCondition(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, AdmissionConditionMixin,
+class UpdateAdmissionCondition(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin, AjaxTemplateMixin,
                                FormView):
     template_name = "education_group_app/admission_condition/edit.html"
-    permission_required = "base.change_admissioncondition"
     form_class = UpdateTextForm
     raise_exception = True
     force_reload = True
 
-    def get_permission_object(self):
+    def get_permission_object(self) -> 'EducationGroupYear':
         return self.object.education_group_year
 
     def get_initial(self):
@@ -97,9 +97,9 @@ class UpdateAdmissionCondition(SuccessMessageMixin, PermissionRequiredMixin, Aja
         return 'text_' + self.get_section() + '_en'
 
 
-class UpdateAdmissionConditionLine(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, UpdateView):
+class UpdateAdmissionConditionLine(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin,
+                                   AjaxTemplateMixin, UpdateView):
     template_name = "education_group_app/admission_condition/line_edit.html"
-    permission_required = 'base.change_admissioncondition'
     raise_exception = True
     force_reload = True
     model = AdmissionConditionLine
