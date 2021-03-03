@@ -38,14 +38,14 @@ def copy_to_next_year(modeladmin, request, queryset):
     cmds = []
     qs = queryset.select_related("offer", "root_group")
     for obj in qs:
-        cmd = CopyTreeVersionToNextYearCommand(
-            from_year=obj.offer.academic_year.year,
-            from_offer_acronym=obj.offer.acronym,
-            from_offer_code=obj.root_group.partial_acronym,
-            from_version_name=obj.version_name,
-            from_is_transition=obj.is_transition
-        )
-        cmds.append(cmd)
+        # cmd = CopyTreeVersionToNextYearCommand(
+        #     from_year=obj.offer.academic_year.year,
+        #     from_offer_acronym=obj.offer.acronym,
+        #     from_offer_code=obj.root_group.partial_acronym,
+        #     from_version_name=obj.version_name,
+        #     from_is_transition=obj.is_transition
+        # )
+        # cmds.append(cmd)
     result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version(cmds)
     modeladmin.message_user(request, "{} programs have been copied".format(len(result)))
 
@@ -73,8 +73,8 @@ class StandardListFilter(admin.SimpleListFilter):
 
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('offer', 'version_name', 'root_group', 'is_transition')
-    list_filter = (StandardListFilter, 'is_transition', 'offer__academic_year')
+    list_display = ('offer', 'version_name', 'root_group', 'transition_name')
+    list_filter = ('offer__academic_year',)
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
     actions = [copy_to_next_year]
 
@@ -88,7 +88,12 @@ class EducationGroupVersion(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    is_transition = models.BooleanField(verbose_name=_('Transition'))
+    transition_name = models.CharField(
+        blank=True,
+        max_length=25,
+        verbose_name=_('Transition name'),
+        default=''
+    )
     version_name = models.CharField(
         blank=True,
         max_length=25,
@@ -122,8 +127,23 @@ class EducationGroupVersion(models.Model):
     standard = StandardEducationGroupVersionManager()
 
     def __str__(self):
-        return "{} ({})".format(self.offer, self.version_name) if self.version_name else str(self.offer)
+        offer_name = self.offer.acronym
+        if self.version_name and self.transition_name:
+            offer_name += '[{}-{}]'.format(self.version_name, self.transition_name)
+        elif self.version_name:
+            offer_name += '[{}]'.format(self.version_name)
+        elif self.transition_name:
+            offer_name += '[{}]'.format(self.transition_name)
+        offer_name += ' - {}'.format(self.offer.academic_year)
+        return offer_name
 
     class Meta:
-        unique_together = ('version_name', 'offer', 'is_transition')
+        unique_together = ('version_name', 'offer', 'transition_name')
         default_manager_name = 'objects'
+
+    def version_label(self):
+        if self.version_name and self.transition_name:
+            return '[{}-{}]'.format(self.version_name, self.transition_name)
+        elif self.version_name or self.transition_name:
+            return '[{}]'.format(self.version_name if self.version_name else self.transition_name)
+        return ''

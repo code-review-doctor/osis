@@ -67,8 +67,7 @@ LABEL_ACTIVE = _('Active')
 LABEL_INACTIVE = _('Inactive')
 INITIAL_DATA_FIELDS = {
     'learning_container_year': [
-        "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team", "is_vacant",
-        "type_declaration_vacant",
+        "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
         'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
     ],
     'learning_unit': [
@@ -77,7 +76,7 @@ INITIAL_DATA_FIELDS = {
     'learning_unit_year': [
         "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
         "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
-        "attribution_procedure", "faculty_remark", "other_remark", "other_remark_english"
+        "faculty_remark", "other_remark", "other_remark_english"
     ],
     'learning_component_year': [
         "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
@@ -215,12 +214,17 @@ def force_state_of_proposals(proposals, author, new_state):
         _("cannot be changed state"),
         None,
         None,
-        can_edit_proposal
+        can_edit_proposal if new_state != proposal_state.ProposalState.REFUSED.name else can_refused_proposal
     )
 
 
 def can_edit_proposal(proposal, author, raise_exception):
     perm = 'base.can_edit_learning_unit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
+
+
+def can_refused_proposal(proposal, author, raise_exception):
+    perm = 'base.can_refuse_learning_unit_proposal'
     return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 

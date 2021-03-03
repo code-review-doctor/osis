@@ -43,6 +43,7 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from osis_common.document import xls_build
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
 
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
@@ -103,8 +104,8 @@ def prepare_xls_content(learning_unit_years: QuerySet, with_grp=False, with_attr
     result = []
 
     for learning_unit_yr in qs:
-        lu_data_part1 = _get_data_part1(learning_unit_yr)
-        lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
+        lu_data_part1 = get_data_part1(learning_unit_yr)
+        lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions)
 
         if with_grp:
             lu_data_part2.append(_add_training_data(learning_unit_yr))
@@ -165,7 +166,7 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
     return xls_build.generate_xls(ws_data, filters)
 
 
-def _get_parameters_configurable_list(learning_units, titles, user):
+def _get_parameters_configurable_list(learning_units, titles, user) -> dict:
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION,
         xls_build.USER: get_name_or_username(user),
@@ -223,6 +224,7 @@ def _get_font_rows(learning_units):
     for idx, luy in enumerate(learning_units, start=1):
         if getattr(luy, "proposallearningunit", None):
             colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
+    colored_cells.update({BOLD_FONT: [0]})
     return colored_cells
 
 
@@ -275,19 +277,21 @@ def _concatenate_training_data(learning_unit_year: LearningUnitYear, group_eleme
                 partial_acronym,
                 leaf_credits,
                 nb_parents,
-                __acronym_with_version_label(training['acronym'], training['is_transition'], training['version_name']),
-                __title_with_version_title(training['title_fr'], training['version_title_fr']),
+                acronym_with_version_label(
+                    training['acronym'], training['transition_name'], training['version_name']
+                ),
+                title_with_version_title(training['title_fr'], training['version_title_fr']),
             )
             concatenated_string += training_string
 
     return concatenated_string
 
 
-def __title_with_version_title(title_fr: str, version_title_fr: str):
+def title_with_version_title(title_fr: str, version_title_fr: str) -> str:
     return title_fr + (' [{}]'.format(version_title_fr) if version_title_fr else '')
 
 
-def _get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
+def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
     lu_data_part2 = []
     if with_attributions:
         lu_data_part2.append(
@@ -310,7 +314,7 @@ def _get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool)
     return lu_data_part2
 
 
-def _get_data_part1(learning_unit_yr: LearningUnitYear) -> List[str]:
+def get_data_part1(learning_unit_yr: LearningUnitYear) -> List[str]:
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
     requirement_acronym = learning_unit_yr.entity_requirement
     allocation_acronym = learning_unit_yr.entity_allocation
@@ -432,8 +436,8 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
         first = True
         cells_with_top_border.extend(["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
 
-        lu_data_part1 = _get_data_part1(learning_unit_yr)
-        lu_data_part2 = _get_data_part2(learning_unit_yr, False)
+        lu_data_part1 = get_data_part1(learning_unit_yr)
+        lu_data_part2 = get_data_part2(learning_unit_yr, False)
 
         lu_data_part1.extend(lu_data_part2)
 
@@ -483,13 +487,10 @@ def volume_information(learning_unit_yr):
             learning_unit_yr.pp_classes or 0]
 
 
-def __acronym_with_version_label(acronym: str, is_transition: bool, version_name: str) -> str:
-    if version_name or is_transition:
-        if version_name == '':
-            version_label = '[Transition]' if is_transition else ''
-        elif is_transition:
-            version_label = '[{}-Transition]'.format(version_name)
-        else:
-            version_label = '[{}]'.format(version_name)
-        return "{}{}".format(acronym, version_label)
-    return acronym
+# FIXME :: à discuter de la manière de faire à cause de code presque dupliqué
+def acronym_with_version_label(acronym: str, transition_name: str, version_name: str) -> str:
+    identity = ProgramTreeVersionIdentity(
+        offer_acronym=acronym, transition_name=transition_name, version_name=version_name, year=None
+    )
+    version_str = version_label(identity)
+    return "{}{}".format(acronym, version_str)

@@ -66,19 +66,26 @@
                 "name": "acronym",
                 "targets": 2,
                 "data": "acronym",
-                "render": function ( data, type, row, meta ) {
+                "render": function (data, type, row, meta) {
                     const version = row['version_name'];
-                    data += version ? `[${version}]`: '';
-                    return '<a href="'+ row['url'] +'">'+ data + '</a>';
+                    const transition = row['transition_name'];
+                    let version_label;
+                    if (version && transition) {
+                        version_label = `${version}-${transition}`
+                    } else if (version || transition) {
+                        version_label = version ? `${version}` : `${transition}`
+                    }
+                    data += version_label ? `[${version_label}]` : '';
+                    return '<a href="' + row['url'] + '">' + data + '</a>';
                 }
             },
-            { "name": "code", "targets": 3, "data": "code"},
+            {"name": "code", "targets": 3, "data": "code"},
             {
                 "name": "title",
                 "targets": 4,
                 "data": "title",
-                "render": function ( data, type, row, meta ) {
-                    return row['version_title'] ? row['version_title']: data;
+                "render": function (data, type, row, meta) {
+                    return row['version_title'] ? row['version_title'] : data;
                 }}
         ];
     </script>

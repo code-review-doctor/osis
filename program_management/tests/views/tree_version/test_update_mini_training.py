@@ -32,13 +32,14 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
-from program_management.forms.version import UpdateTrainingVersionForm, UpdateMiniTrainingVersionForm
+from program_management.forms.transition import UpdateMiniTrainingTransitionVersionForm
+from program_management.forms.version import UpdateMiniTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
-    StandardProgramTreeVersionFactory
+    StandardProgramTreeVersionFactory, StandardTransitionProgramTreeVersionFactory, \
+    SpecificTransitionProgramTreeVersionFactory
 from program_management.views.tree_version.update_mini_training import MiniTrainingVersionUpdateView
 
 
@@ -131,8 +132,8 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
 
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
-    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
-                'calculate_version_max_end_year', return_value=2025)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
     def test_assert_get_context(self, mock_max_postponement, mock_program_tree_version_repo):
         mock_program_tree_version_repo.return_value = self.mini_training_version_obj
         response = self.client.get(self.url)
@@ -142,6 +143,7 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
         self.assertEqual(response.context['mini_training_obj'], self.mini_training_obj)
         self.assertEqual(response.context['mini_training_version_obj'], self.mini_training_version_obj)
         self.assertEqual(response.context['group_obj'], self.group_obj)
+        self.assertEqual(response.context['version_suffix'], self.mini_training_version_obj.transition_name)
         expected_tabs = [
             {
                 "text": _("Identification"),
@@ -157,6 +159,34 @@ class TestMiniTrainingVersionUpdateGetView(TestCase):
             kwargs={"code": self.group_obj.code, "year": self.group_obj.year}
         )
         self.assertEqual(response.context['cancel_url'], expected_cancel_url)
+
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
+    def test_assert_get_context_when_transition(self, mock_max_postponement, mock_program_tree_version_repo):
+        transition_version = StandardTransitionProgramTreeVersionFactory()
+        mock_program_tree_version_repo.return_value = transition_version
+        self.mocked_get_mini_training_version.return_value = transition_version
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(response.context['mini_training_version_form'], UpdateMiniTrainingTransitionVersionForm)
+        self.assertEqual(response.context['mini_training_version_obj'], transition_version)
+        self.assertEqual(response.context['version_suffix'], transition_version.transition_name)
+
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
+    def test_assert_get_context_when_specific_transition(self, mock_max_postponement, mock_program_tree_version_repo):
+        transition_version = SpecificTransitionProgramTreeVersionFactory()
+        mock_program_tree_version_repo.return_value = transition_version
+        self.mocked_get_mini_training_version.return_value = transition_version
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(response.context['mini_training_version_form'], UpdateMiniTrainingTransitionVersionForm)
+        self.assertEqual(response.context['mini_training_version_obj'], transition_version)
+        self.assertEqual(response.context['version_suffix'], "-{}".format(transition_version.transition_name))
 
 
 class TestMiniTrainingVersionUpdatePostView(TestCase):
@@ -228,8 +258,8 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
                 '._convert_form_to_update_mini_training_version_command', return_value=None)
     @mock.patch('program_management.views.tree_version.update_mini_training.version'
                 '.UpdateMiniTrainingVersionForm.is_valid', return_value=True)
-    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
-                'calculate_version_max_end_year', return_value=2025)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
     @mock.patch('program_management.views.tree_version.update_mini_training.'
                 'update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version',
