@@ -68,7 +68,3 @@ def format_program_tree_complete_title(program_tree_version: 'ProgramTreeVersion
         }
     except ProgramTreeNotFoundException:
         raise Http404
-
-
-def format_tree_version_acronym(tree_version: 'ProgramTreeVersion'):
-    return "{}{}".format(tree_version.get_tree().root_node.title, tree_version.version_label)
