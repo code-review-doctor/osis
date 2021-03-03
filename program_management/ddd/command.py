@@ -562,6 +562,7 @@ class GetProgramTreesVersionFromNodeCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 
 
+# Necessary because 'None' is a correct value that could be used to override the default end date
 DO_NOT_OVERRIDE = -1
 
 
@@ -574,7 +575,6 @@ class DuplicateProgramTree(interface.CommandRequest):
     override_start_year_to = attr.ib(type=int, default=DO_NOT_OVERRIDE)
 
 
-# Necessary because 'None' is a correct value that could be used to override the default end date
 @attr.s(frozen=True, slots=True)
 class DeletePermanentlyTrainingStandardVersionCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
