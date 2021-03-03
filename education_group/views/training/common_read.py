@@ -370,7 +370,6 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         ]) + "?path={}".format(self.path)
 
 
-
 def _get_view_name_from_tab(tab: Tab):
     return {
         Tab.IDENTIFICATION: 'training_identification',

@@ -364,12 +364,6 @@ class GetNodeIdentityFromElementId(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class GetStandardProgramTreeVersionFromTransitionVersionCommand(interface.CommandRequest):
-    offer_acronym = attr.ib(type=str)
-    year = attr.ib(type=int)
-
-
-@attr.s(frozen=True, slots=True)
 class CopyProgramTreeVersionContentFromSourceTreeVersionCommand(interface.CommandRequest):
     from_year = attr.ib(type=int)
     from_offer_acronym = attr.ib(type=str)

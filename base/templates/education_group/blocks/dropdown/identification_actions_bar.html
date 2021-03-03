@@ -50,11 +50,6 @@
             {% endif %}
 
             <li class="divider"></li>
-            {% if fill_transition_version_url %}
-                <li>
-                    {% a_tag_modal_has_perm fill_transition_version_url _('Fill this transition version') update_permission_name user education_group_version.root_group %}
-                </li>
-            {% endif %}
             {% if update_group_url %}
                 <li>
                     {% a_tag_has_perm update_group_url _('Modify') update_permission_name user group_year %}

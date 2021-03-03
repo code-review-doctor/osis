@@ -79,15 +79,6 @@ def _search_by_entity_ids(entity_ids: List['NodeIdentity']) -> List['Node']:
     return load_node.load_multiple(qs.values_list('pk', flat=True))
 
 
-def _search_by_entity_ids_bis(entity_ids: List['NodeIdentity']) -> List['Node']:
-    qs = Element.objects.all()
-    filter_search_from = _build_where_clause(entity_ids[0])
-    for identity in entity_ids[1:]:
-        filter_search_from |= _build_where_clause(identity)
-    qs = qs.filter(filter_search_from)
-    return load_node.load_multiple(qs.values_list('pk', flat=True))
-
-
 def _build_group_year_where_clause(node_identity: 'NodeIdentity') -> Q:
     return Q(
         group_year__partial_acronym=node_identity.code,
@@ -99,16 +90,4 @@ def _build_learning_unit_year_where_clause(node_identity: 'NodeIdentity') -> Q:
     return Q(
         learning_unit_year__acronym=node_identity.code,
         learning_unit_year__academic_year__year=node_identity.year
-    )
-
-
-def _build_where_clause(node_identity: 'NodeIdentity') -> Q:
-    return Q(
-        Q(
-            group_year__partial_acronym=node_identity.code,
-            group_year__academic_year__year=node_identity.year
-        ) | Q(
-            learning_unit_year__acronym=node_identity.code,
-            learning_unit_year__academic_year__year=node_identity.year
-        )
     )

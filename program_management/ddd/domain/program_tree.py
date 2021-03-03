@@ -43,13 +43,12 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.prerequisite import factory as prerequisite_factory, Prerequisites, \
-    PrerequisitesBuilder
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
+from program_management.ddd.domain.prerequisite import Prerequisites, \
+    PrerequisitesBuilder
 from program_management.ddd.domain.service import get_or_create_node
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
-from program_management.ddd.domain.service.get_or_create_corresponding_transition import get_or_create_transition_node
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -210,31 +209,6 @@ class ProgramTreeBuilder:
 
     def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
         return from_node.end_date and from_node.end_date < to_node.year
-
-    def copy_content_to_next_year(self, copy_from: 'ProgramTree', repository: 'ProgramTreeRepository') -> 'ProgramTree':
-        identity_next_year = attr.evolve(copy_from.entity_id, year=copy_from.entity_id.year + 1)
-        try:
-            # Case update program tree to next year
-            program_tree_next_year = repository.get(identity_next_year)
-            validators_by_business_action.CopyContentProgramTreeValidatorList(copy_from, program_tree_next_year).validate()
-            program_tree_next_year.root_node = self._copy_node_and_children_to_next_year(copy_from.root_node)
-        except exception.ProgramTreeNotFoundException:
-            validators_by_business_action.CopyContentProgramTreeValidatorList(copy_from, None).validate()
-            # Case create program tree to next year
-            root_next_year = self._copy_node_and_children_to_next_year(copy_from.root_node)
-            program_tree_next_year = ProgramTree(
-                entity_id=identity_next_year,
-                root_node=root_next_year,
-                authorized_relationships=copy_from.authorized_relationships
-            )
-
-        program_tree_next_year.prerequisites = Prerequisites(
-            program_tree_next_year.entity_id,
-            [prerequisite_factory.copy_to_next_year(prerequisite)
-             for prerequisite in copy_from.prerequisites.prerequisites]
-        )
-
-        return program_tree_next_year
 
     def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
         parent_next_year = node_factory.copy_to_next_year(copy_from_node)
