@@ -34,15 +34,18 @@ class CheckVersionsEndDateValidator(business_validator.BusinessValidator):
         super().__init__()
 
     def validate(self, *args, **kwargs):
-        if not self.tree_version.is_official_standard:
-            return
+        if self.tree_version.is_official_standard:
+            exists = has_specific_version_with_greater_end_year.HasSpecificVersionWithGreaterEndYear.\
+                specific_version_greater_than_standard_year(self.tree_version)
+            if exists:
+                raise exception.CannotDeleteStandardDueToSpecificVersionEndDate(self.tree_version)
 
-        exists = has_specific_version_with_greater_end_year.HasSpecificVersionWithGreaterEndYear.\
-            specific_version_greater_than_standard_year(self.tree_version)
-        if exists:
-            raise exception.CannotDeleteStandardDueToSpecificVersionEndDate(self.tree_version)
-
-        exists = has_transition_version_with_greater_end_year.HasTransitionVersionWithGreaterEndYear.\
-            transition_version_greater_than_standard_year(self.tree_version)
-        if exists:
-            raise exception.CannotDeleteStandardDueToTransitionVersionEndDate(self.tree_version)
+            exists = has_transition_version_with_greater_end_year.HasTransitionVersionWithGreaterEndYear.\
+                transition_version_greater_than_standard_year(self.tree_version)
+            if exists:
+                raise exception.CannotDeleteStandardDueToTransitionVersionEndDate(self.tree_version)
+        else:
+            exists = has_transition_version_with_greater_end_year.HasTransitionVersionWithGreaterEndYear. \
+                transition_version_greater_than_specific_version_year(self.tree_version)
+            if exists:
+                raise exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate(self.tree_version)

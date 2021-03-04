@@ -135,6 +135,18 @@ class CannotDeleteStandardDueToTransitionVersionEndDate(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class CannotDeleteSpecificVersionDueToTransitionVersionEndDate(BusinessException):
+    def __init__(self, tree: 'ProgramTreeVersion', *args, **kwargs):
+        message = _(
+            "You can't delete the specific program tree '{code}' "
+            "in {year} as transition versions exists during this year and/or in the future."
+        ).format(
+            code=tree.program_tree_identity.code,
+            year=tree.entity_id.year,
+        )
+        super().__init__(message, **kwargs)
+
+
 class NodeIsUsedException(Exception):
     pass
 

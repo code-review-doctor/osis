@@ -27,6 +27,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
 from program_management.ddd.domain import program_tree_version, exception as program_exception
+from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
@@ -165,6 +166,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                     transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
+        except program_exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate as e:
+            self.training_version_form.add_error('end_year', "")
+            display_error_messages(self.request, e.message)
         return []
 
     @cached_property
