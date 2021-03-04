@@ -138,7 +138,7 @@ class ProgramTreeBuilder:
             program_tree_next_year = repository.get(identity_next_year)
         except exception.ProgramTreeNotFoundException:
             # Case create program tree to next year
-            root_next_year = node_factory.fill_from_past_year(copy_from.root_node)
+            root_next_year = node_factory.copy_to_next_year(copy_from.root_node)
             program_tree_next_year = ProgramTree(
                 entity_id=identity_next_year,
                 root_node=root_next_year,
@@ -152,7 +152,7 @@ class ProgramTreeBuilder:
         children_current_year = copy_from.root_node.get_direct_children_as_nodes()
         for child_current_year in children_current_year:
             if child_current_year.node_type in mandatory_types:
-                child_next_year = node_factory.fill_from_past_year(child_current_year)
+                child_next_year = node_factory.copy_to_next_year(child_current_year)
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
@@ -160,11 +160,8 @@ class ProgramTreeBuilder:
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
         self._fill_node_children_from_node(from_tree.root_node, to_tree.root_node, to_tree.authorized_relationships)
+        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
 
-        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(
-            from_tree.prerequisites,
-            to_tree
-        )
         return to_tree
 
     def _fill_node_children_from_node(
