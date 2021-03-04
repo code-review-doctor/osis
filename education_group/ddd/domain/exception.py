@@ -315,6 +315,12 @@ class HopsFieldsAllOrNone(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class HopsFields2OrNoneForPhd(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _('For Phd/Formation Ph at least 2 fields concerning ARES have to be filled-in or none of them')
+        super().__init__(message, **kwargs)
+
+
 class AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
