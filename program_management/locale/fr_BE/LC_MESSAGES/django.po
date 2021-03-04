@@ -1060,7 +1060,7 @@ msgid ""
 "versions exists during this year and/or in the future."
 msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
-"qu'il existe une version transition pour cette année et/ou dans le futur."
+"qu'il existe une version de transition pour cette année et/ou dans le futur."
 
 #, python-format
 msgid ""
