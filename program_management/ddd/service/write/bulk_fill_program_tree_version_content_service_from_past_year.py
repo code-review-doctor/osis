@@ -25,6 +25,7 @@
 import contextlib
 from typing import List
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
 from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
@@ -36,7 +37,7 @@ def bulk_fill_program_tree_version_content_from_past_year(
 ) -> List['ProgramTreeVersionIdentity']:
     result = []
     for cmd in cmds:
-        with contextlib.suppress(BusinessException):
+        with contextlib.suppress(BusinessException, MultipleBusinessExceptions):
             result.append(
                 fill_program_tree_version_content_from_past_year_service.
                 fill_program_tree_version_content_from_past_year(cmd)
