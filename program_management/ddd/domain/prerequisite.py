@@ -248,10 +248,15 @@ class PrerequisiteFactory:
             raise CannotCopyPrerequisiteException()
 
         return cls().from_expression(
-            to_copy.get_prerequisite_expression(translate=False),
+            cls._normalize_expression(to_copy.get_prerequisite_expression(translate=False)),
             next_year_identity,
             next_year_tree.entity_id
         )
+
+    # FIX: Because the expression varies with translation
+    @classmethod
+    def _normalize_expression(cls, prerequisite_expression: str) -> str:
+        return prerequisite_expression.replace(' AND ', ' ET ').replace(' OR ', ' OU ')
 
 
 factory = PrerequisiteFactory()
