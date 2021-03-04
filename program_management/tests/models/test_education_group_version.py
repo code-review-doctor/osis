@@ -49,11 +49,33 @@ class TestEducationGroupVersion(SimpleTestCase):
 
     def test_str_education_group_version(self):
         version = EducationGroupVersion(version_name='version', offer=self.offer, root_group=self.root_group)
-        self.assertEqual(str(version), '{} ({})'.format(version.offer, version.version_name))
+        self.assertEqual(str(version), '{}[{}] - {}'.format(
+            version.offer.acronym, version.version_name, version.offer.academic_year
+        ))
+
+    def test_str_education_group_version_transition(self):
+        version = EducationGroupVersion(transition_name='version', offer=self.offer, root_group=self.root_group)
+        self.assertEqual(str(version), '{}[{}] - {}'.format(
+            version.offer.acronym, version.transition_name, version.offer.academic_year
+        ))
+
+    def test_str_education_group_version_transition_specific(self):
+        version = EducationGroupVersion(
+            transition_name='transition',
+            version_name='version',
+            offer=self.offer,
+            root_group=self.root_group
+        )
+        self.assertEqual(
+            str(version),
+            '{}[{}-{}] - {}'.format(
+                version.offer.acronym, version.version_name, version.transition_name, version.offer.academic_year
+            )
+        )
 
     def test_str_standard_education_group_version(self):
         version = EducationGroupVersion(offer=self.offer, root_group=self.root_group)
-        self.assertEqual(str(version), str(version.offer))
+        self.assertEqual(str(version), '{} - {}'.format(self.offer.acronym, self.offer.academic_year))
 
 
 class TestStandardEducationGroupManager(TestCase):
