@@ -38,7 +38,9 @@ class CopyCms(interface.DomainService):
         root_node = to_tree.root_node
         mandatory_children = [
             node for node in root_node.children_as_nodes
-            if node.node_type in to_tree.authorized_relationships.get_ordered_mandatory_children_types(root_node.node_type)
+            if node.node_type in to_tree.authorized_relationships.get_ordered_mandatory_children_types(
+                root_node.node_type
+            )
         ]
 
         node_to_copy_cms = mandatory_children

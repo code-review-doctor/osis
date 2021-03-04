@@ -258,14 +258,14 @@ factory = PrerequisiteFactory()
 
 
 class PrerequisitesBuilder:
-    def copy_to_next_year(self, source_prerequisites: 'Prerequisites', next_year_tree: 'ProgramTree') -> 'Prerequisites':
+    def copy_to_next_year(self, from_prerequisites: 'Prerequisites', to_tree: 'ProgramTree') -> 'Prerequisites':
         next_year_prerequisites = list()
-        for prerequisite in source_prerequisites.prerequisites:
+        for prerequisite in from_prerequisites.prerequisites:
             with contextlib.suppress(CannotCopyPrerequisiteException):
                 next_year_prerequisites.append(
-                    factory.copy_to_next_year(prerequisite, next_year_tree)
+                    factory.copy_to_next_year(prerequisite, to_tree)
                 )
-        return Prerequisites(next_year_tree.entity_id, next_year_prerequisites)
+        return Prerequisites(to_tree.entity_id, next_year_prerequisites)
 
 
 @attr.s(slots=True)
