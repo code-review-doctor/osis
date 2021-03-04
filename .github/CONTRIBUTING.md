@@ -1,5 +1,8 @@
 ## Table of Contents
 - [Coding styles](#coding-styles)
+    - [PEP8](#pep8)
+    - [Style de code Django](#style-de-code-django)
+    - [Conventions de nommage](#conventions-de-nommage)
     - [Indentation](#indentation)
     - [Signature des fonctions](#signature-des-fonctions)
     - [Constantes](#constantes)
@@ -39,6 +42,48 @@
 
 #### Style de code Django
 - [Coding Style de Django](https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/).
+
+
+#### Conventions de nommage
+
+- Dans le code qui implémente le DDD, **seuls des termes métier doivent apparaître** (pas de termes techniques).
+Se référer aux termes utilisés dans la description des analyses.
+# TODO :: lien to FAQ
+the "semantic"
+"meaningful names"
+speaking same language as end users
+Separate the view and the logic
+
+- Toute fonction qui renvoie un seul résultat : get_<sth>
+    
+    Exemple : ```def get_something() -> object```
+    
+- Toute fonction qui renvoie un booléen doit être nommé sous forme de question fermée (dont la réponse ne peut être que "Oui" ou "Non")
+
+    Exemples : ```def has_something() -> bool```, ```def is_something() -> bool```, ```def containes_something() -> bool```
+
+- Toute fonction qui renvoie une `list`, `set`, `dict` :
+    - Types de retour de fonctions non autorisés (pas assez explicites) :
+        - `dict` ==> utiliser `Dict[KeyType, ValueType]`
+        - `list` ==> utiliser `List[TypeOfElement]`
+        - `set` ==> utiliser `Set[TypeOfElement]`
+
+    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
+    
+    Exemple: ```def get_nodes() -> List['Node']```
+
+    - Pour les fonctions de recherche : search_<nom_pluriel>()
+    
+    Exemple: ```def search_nodes(*typed_filters) -> List['Node']```
+
+- Nommage des fonctions, fichiers **privés** (uniquement scope de la classe ou du fichier) : __function
+
+    Exemple: ```def __my_private_function(param: str) -> None```
+
+- Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
+
+    Exemple: ```def _my_protected_function(param: str) -> None```
+
 
 
 #### Indentation
@@ -93,9 +138,6 @@ def my_function(arg1: str,
 
 #### Signature des fonctions
 - Doit être typé ([python typing](https://docs.python.org/fr/3.6/library/typing.html))
-- Types de retour de fonctions non autorisés (pas assez explicites) :
-  - `dict` ==> utiliser `Dict[KeyType, ValueType]`
-  - `list` ==> utiliser `List[TypeOfElement]`
 - Éviter l'utilisation de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
 
 
@@ -315,31 +357,11 @@ def send_an_email(receiver: Person):
 #### Conventions générales
 - Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
 Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
-- Tous les paramètres d'entrée et de sortie doivent être typés
-- Les fonctions qui renvoient une objet, int, str doivent être nommés "get_<sth>"
-- Les fonctions qui renvoient un booléen doivent être nommés de sorte à poser une question fermée 
-(où la réponse ne peut être que "Oui" ou "Non"). Exemples : `is_<sth>`, `has_<sth>`, `contains_<sth>`...
-- Les fonctions qui renvoient une list, set, dict :
-    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
-    
-    Exemple: ```def get_nodes() -> List['Node']```
-
-    - Pour les fonctions de recherche : search_<nom_pluriel>()
-    
-    Exemple: ```def search_nodes(*typed_filters) -> List['Node']```
-
-- Nommage des fonctions, fichiers **privés** (uniquement scope de la classe ou du fichier) : __function
-
-    Exemple: ```def __my_private_function(param: str) -> None```
-
-- Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
-
-    Exemple: ```def _my_protected_function(param: str) -> None```
- - Implémentation des Value Objects en utilisant la librairie **attrs** en définissant la classe comme étant frozen (immutable) et faisant usage de slots.
+- Implémentation des Value Objects en utilisant la librairie **attrs** en définissant la classe comme étant frozen (immutable) et faisant usage de slots.
 
 
 
-> :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour le DDD
+> :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour l'implémentation du DDD
 > (ValueObject, EntityObject...) sont définies [dans osis_common](https://github.com/uclouvain/osis-common/tree/master/ddd)**
 
 
