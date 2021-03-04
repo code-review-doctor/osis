@@ -13,6 +13,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version
 from base.utils import operator
 from base.utils.urls import reverse_with_get
+from base.views.common import check_formations_impacted_by_update
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
 from education_group.ddd import command as command_education_group
@@ -31,7 +32,6 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version
-from base.views.common import check_formations_impacted_by_update
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -165,6 +165,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                     transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
+        except program_exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate as e:
+            self.training_version_form.add_error('end_year', "")
+            display_error_messages(self.request, e.message)
         return []
 
     @cached_property

@@ -40,3 +40,14 @@ class HasTransitionVersionWithGreaterEndYear(interface.DomainService):
             version_name=standard_version.version_name,
             transition_name=standard_version.transition_name
         ).exists()
+
+    @classmethod
+    def transition_version_greater_than_specific_version_year(cls, specific_version: 'ProgramTreeVersion') -> bool:
+        return EducationGroupVersion.objects.filter(
+            Q(root_group__group__end_year__isnull=True) |
+            Q(root_group__group__end_year__year__gte=specific_version.entity_id.year),
+            offer__acronym=specific_version.entity_id.offer_acronym,
+            version_name=specific_version.version_name,
+        ).exclude(
+            transition_name=""
+        ).exists()
