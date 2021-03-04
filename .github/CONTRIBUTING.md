@@ -27,6 +27,8 @@
     - [Repository](#dddrepository)
     - [Application service](#dddservice-application-service)
     - [Validator](#dddvalidator)
+- [FAQ](faq.md)
+- [Références](references.md)
 
 
 <br/><br/>
@@ -205,7 +207,7 @@ CATEGORIES = (
   - [couche Application Service](#dddservice-application-service)
   - [couche Templates](#template-html)
   - [couche Template Tags](#template-django-template-tags)
-  - Uniquement vues "list" et "excel" : [couche Django Models](#modle-django-model) (à analyser au cas par cas ; le DDD risquerait de complexifier ces vues)
+  - Uniquement vues "list" et "excel" : [couche Django Models](#modle-django-model) (à analyser au cas par cas ; le DDD risquerait de complexifier ces vues - cf. [Quand doit-on appliquer le DDD ? Quid du CRUD ?](faq.md#question-quand-doit-on-appliquer-le-ddd--quid-du-crud--quid-des-views-de-recherche-fichiers-excels-pdfs-))
 
 <br/><br/>
 
@@ -313,6 +315,7 @@ def send_an_email(receiver: Person):
 ## Domain driven design
 
 #### Conventions générales
+- Cf. [Quand doit-on appliquer le DDD ? Quid du CRUD ?](faq.md#question-quand-doit-on-appliquer-le-ddd--quid-du-crud--quid-des-views-de-recherche-fichiers-excels-pdfs-)
 - Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
 Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
 - Tous les paramètres d'entrée et de sortie doivent être typés
