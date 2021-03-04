@@ -92,7 +92,7 @@ def my_function(arg1: str,
 
 
 #### Signature des fonctions
-- Doit être typé ([python typing](https://docs.python.org/fr/3.6/library/typing.html))
+- Doit être typée ([python typing](https://docs.python.org/fr/3.6/library/typing.html))
 - Types de retour de fonctions non autorisés (pas assez explicites) :
   - `dict` ==> utiliser `Dict[KeyType, ValueType]`
   - `list` ==> utiliser `List[TypeOfElement]`
@@ -152,7 +152,7 @@ CATEGORIES = (
 
 #### Commits
 - Ajouter un message explicite à chaque commit
-- Commiter souvent = diff limité = facilité d'identification de commits amenant une régression = facilité de revert = facilité et rapidité de review
+- Commiter souvent = diff limitée = facilité d'identification de commits amenant une régression = facilité de revert = facilité et rapidité de review
 
 #### Pull requests
 - Réduire au minimum le nombre de fichiers de migrations par fonctionnalité (limite le temps de création de la DB de test, facilite la review, limite les conflits)
@@ -179,7 +179,7 @@ CATEGORIES = (
 
 ## API
 - Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
-- Incrémenter la version du schema.yml à chaque modification de celui-ci
+- Incrémenter la version du schema.yml (cf. `info: version: 'X.Y'`) à chaque modification de celui-ci
 - Tout champs utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champs "filtre" doit se trouver dans la donnée renvoyée)
  
 <br/><br/>
@@ -189,7 +189,7 @@ CATEGORIES = (
 - 1 classe par fichier héritant de `django.db.models.Model`
 - 1 classe par fichier héritant de `osis_common.models.osis_model_admin.OsisModelAdmin`
 - Ne pas utiliser de `ManyToManyField` et déclarer explicitement les modèles de liaison (pour faciliter les noms de tables et synchronisations)
-- Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèe auth lors des écrasements des DB de Dev, Test et Qa.
+- Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèle `auth` lors des écrasements des DB de Dev, Test et Qa.
 - Ne peut pas contenir de logique métier
 - Accès : 
   - [couche Django Model](#modle-django-model) (un modèle peut référencer un autre modèle via FK)
@@ -218,7 +218,7 @@ CATEGORIES = (
 <br/><br/>
 
 ## Gabarit (Django Templates)
-- Regroupe les fichiers `html` structurés en "blocks" afin de m'aximiser la réutilisation de templates
+- Regroupe les fichiers `html` structurés en "blocks" afin de maximiser la réutilisation de templates
 - Utilise Django-Bootstrap3 pour le rendering des [Django Forms](#formulaire-django-forms)
 - Accès :
   - [couche Dango Templates](#gabarit-django-templates) (un template peut inclure d'autres templates)
