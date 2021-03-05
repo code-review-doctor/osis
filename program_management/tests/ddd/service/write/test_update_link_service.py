@@ -166,7 +166,6 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.assertTrue(update_link_service.update_link(cmd))
 
     def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(self):
-        print(self.tree.root_node.children_as_nodes[1].node_type)
         cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=self.tree.root_node.code,
