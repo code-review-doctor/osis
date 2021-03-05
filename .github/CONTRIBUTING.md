@@ -9,6 +9,7 @@
     - [Pull requests](#pull-requests)
     - [Performance](#performance)
     - [Sécurité](#scurit)
+    - [Scripts et fichiers de migration](#scripts-et-fichiers-de-migration)
 - [API](#api)
 - [Modèle (Django Model)](#modle-django-model)
 - [Vue (Django View)](#vue-django-view)
@@ -174,6 +175,38 @@ CATEGORIES = (
     - À éviter : `<site_url>/?tutor_id=1234` ou `<site_url>/score_encoding/print/34`
     - Alternative : utiliser un UUID 
 - Dans le cas d'insertion/modification des données venant de l'extérieur (exemple : fichiers excels), s'assurer que l'utilisateur qui injecte des données a bien tous les droits sur les données qu'il désire injecter.
+
+
+#### Scripts et fichiers de migration
+- Logger dans un fichier séparé (ne pas utiliser le `DEFAULT_LOGGER`, car les logs du script / fichier de migration se perdent dans les logs généraux d'Osis)
+- Tout code `RunPython()` doit obligatoirement utiliser `apps.get_model()` et ne jamais importer de `Model` dans les fichiers de migration
+```python
+from django.db import migrations
+
+
+def function_to_migrate_data(apps, schema_editor):
+    # GOOD
+    EducationGroupYear = apps.get_model('base', 'EducationGroupYear')
+    education_groups = EducationGroupYear.objects.all()
+    
+    # BAD
+    from base.models.education_group_year import EducationGroupYear
+    education_groups = EducationGroupYear.objects.all()
+    
+    pass
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        # ...
+    ]
+
+    operations = [
+        migrations.RunPython(function_to_migrate_data)
+    ]
+
+``` 
 
 <br/><br/>
 
