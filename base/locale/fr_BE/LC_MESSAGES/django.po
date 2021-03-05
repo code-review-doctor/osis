@@ -542,6 +542,9 @@ msgstr "Code"
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
 
+msgid "Comment"
+msgstr "Commentaire"
+
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
 
