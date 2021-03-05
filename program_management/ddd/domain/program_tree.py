@@ -215,7 +215,7 @@ class ProgramTreeBuilder:
             copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
             to_node.children.append(copied_link)
 
-            if not group_year_link.is_reference() and self._is_empty(child, relationships):
+            if not group_year_link.is_reference() and is_empty(child, relationships):
                 self._fill_node_children_from_node(
                     group_year_link.child,
                     child,
@@ -274,15 +274,7 @@ class ProgramTree(interface.RootEntity):
         return NullPrerequisites()
 
     def is_empty(self, parent_node=None):
-        parent_node = parent_node or self.root_node
-        for child_node in parent_node.children_as_nodes:
-            if not self.is_empty(parent_node=child_node):
-                return False
-            is_mandatory_children = child_node.node_type in self.authorized_relationships.\
-                get_ordered_mandatory_children_types(parent_node.node_type) if self.authorized_relationships else []
-            if not is_mandatory_children:
-                return False
-        return True
+        return is_empty(parent_node or self.root_node, self.authorized_relationships)
 
     @entity_id.default
     def _entity_id(self) -> 'ProgramTreeIdentity':
@@ -740,6 +732,16 @@ class ProgramTree(interface.RootEntity):
 
     def get_prerequisite(self, node: 'NodeLearningUnitYear') -> 'Prerequisite':
         return self.prerequisites.get_prerequisite(node)
+
+
+def is_empty(parent_node: 'Node', relationships: 'AuthorizedRelationshipList'):
+    for child_node in parent_node.children_as_nodes:
+        if not is_empty(child_node, relationships):
+            return False
+        is_mandatory_children = child_node.node_type in relationships.get_ordered_mandatory_children_types(parent_node.node_type)
+        if not is_mandatory_children:
+            return False
+    return True
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:
