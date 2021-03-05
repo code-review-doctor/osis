@@ -32,7 +32,6 @@ from typing import List, Set, Optional, Dict
 import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
-from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.utils.cache import cached_result
@@ -47,7 +46,6 @@ from program_management.ddd.domain.link import factory as link_factory, LinkBuil
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.prerequisite import Prerequisites, \
     PrerequisitesBuilder
-from program_management.ddd.domain.service import get_node_with_children
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
@@ -264,7 +262,7 @@ class ProgramTreeBuilder:
 class ProgramTree(interface.RootEntity):
 
     root_node = attr.ib(type=Node)
-    authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
+    authorized_relationships = attr.ib(type='AuthorizedRelationshipList', factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
     prerequisites = attr.ib(type='Prerequisites')
 
@@ -738,7 +736,9 @@ def is_empty(parent_node: 'Node', relationships: 'AuthorizedRelationshipList'):
     for child_node in parent_node.children_as_nodes:
         if not is_empty(child_node, relationships):
             return False
-        is_mandatory_children = child_node.node_type in relationships.get_ordered_mandatory_children_types(parent_node.node_type)
+        is_mandatory_children = child_node.node_type in relationships.get_ordered_mandatory_children_types(
+            parent_node.node_type
+        )
         if not is_mandatory_children:
             return False
     return True

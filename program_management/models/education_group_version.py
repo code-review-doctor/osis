@@ -28,6 +28,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.utils.constants import YES, NO
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -59,15 +60,16 @@ class StandardListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ("yes", _("Standard")),
-            ("no", _("Particular"))
+            (YES, _("Standard")),
+            (NO, _("Particular"))
         )
 
     def queryset(self, request, queryset):
-        if self.value() == "yes":
-            return queryset.filter(version_name='')
-        if self.value() == "no":
-            return queryset.exclude(version_name='')
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.filter(version_name=program_tree_version.STANDARD)
+        if self.value() == NO:
+            return queryset.exclude(version_name=program_tree_version.STANDARD)
         return queryset
 
 
@@ -78,15 +80,16 @@ class TransitionListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ("yes", _("Yes")),
-            ("no", _("No"))
+            (YES, _("Yes")),
+            (NO, _("No"))
         )
 
     def queryset(self, request, queryset):
-        if self.value() == "yes":
-            return queryset.exclude(transition_name='')
-        if self.value() == "no":
-            return queryset.filter(transition_name='')
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.exclude(transition_name=program_tree_version.NOT_A_TRANSITION)
+        if self.value() == NO:
+            return queryset.filter(transition_name=program_tree_version.NOT_A_TRANSITION)
         return queryset
 
 
