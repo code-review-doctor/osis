@@ -6,6 +6,7 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 <br/>
 
 - [CQRS](#cqrs)
+- [Design patterns](#design-patterns)
 - [Domain Driven Design](#ddd-domain-driven-design)
 - [Event Sourcing](#event-sourcing)
 - [Legacy](#legacy)
@@ -36,6 +37,12 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 - [Domain Driven Design : des armes pour affronter la complexité](https://blog.octo.com/domain-driven-design-des-armes-pour-affronter-la-complexite/)
 - [Domain model purity vs. domain model completeness](https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/) (Anglais)
 - [Domain model purity and lazy loading](https://enterprisecraftsmanship.com/posts/domain-model-purity-lazy-loading/) (Anglais)
+
+<br/><br/>
+
+## Design Patterns
+### Articles
+- [Refactoring.guru - catalogue des patrons de conception](https://refactoring.guru/fr/design-patterns/catalog)
 
 <br/><br/>
 
