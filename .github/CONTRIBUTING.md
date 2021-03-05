@@ -191,6 +191,7 @@ CATEGORIES = (
 - Ne pas utiliser de `ManyToManyField` et déclarer explicitement les modèles de liaison (pour faciliter les noms de tables et synchronisations)
 - Ne pas créer de **clé étrangère** vers le modèle auth.User, mais vers **base.Person**. Cela facilite la conservation des données du modèle `auth` lors des écrasements des DB de Dev, Test et Qa.
 - Ne peut pas contenir de logique métier
+- Description obligatoire pour tout `Field` créé dans un `Model` (sert de documentation DB)
 - Accès : 
   - [couche Django Model](#modle-django-model) (un modèle peut référencer un autre modèle via FK)
 
