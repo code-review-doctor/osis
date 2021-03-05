@@ -35,19 +35,9 @@ from program_management.ddd.business_types import *
 
 class CopyCms(interface.DomainService):
     def from_past_year(self, to_tree: 'ProgramTree') -> None:
-        root_node = to_tree.root_node
-        mandatory_children = [
-            node for node in root_node.children_as_nodes
-            if node.node_type in to_tree.authorized_relationships.get_ordered_mandatory_children_types(
-                root_node.node_type
-            )
-        ]
-
-        node_to_copy_cms = mandatory_children
-        for node in node_to_copy_cms:
-            if node.is_training() or node.is_mini_training():
-                _copy_training_or_minitraining_cms_from_last_year(node.code, node.year)
-            elif node.is_group():
+        nodes_to_copy_cms = to_tree.get_mandatory_children(to_tree.root_node)
+        for node in nodes_to_copy_cms:
+            if node.is_group():
                 _copy_group_cms_from_last_year(node.code, node.year)
 
 
@@ -58,19 +48,6 @@ def _copy_group_cms_from_last_year(code: str, year: int) -> None:
     cms_to_copy_from = TranslatedText.objects.filter(
         reference=copy_from.id,
         entity=entity_name.GROUP_YEAR,
-        text_label__label__in=get_general_information_labels(),
-    ).prefetch_related("text_label")
-
-    _copy_cms(cms_to_copy_from, copy_to.id)
-
-
-def _copy_training_or_minitraining_cms_from_last_year(code: str, year: int) -> None:
-    copy_to = EducationGroupYear.objects.get(partial_acronym=code, academic_year__year=year)
-    copy_from = EducationGroupYear.objects.get(academic_year__year=year-1, group=copy_to.group)
-
-    cms_to_copy_from = TranslatedText.objects.filter(
-        reference=copy_from.id,
-        entity=entity_name.OFFER_YEAR,
         text_label__label__in=get_general_information_labels(),
     ).prefetch_related("text_label")
 

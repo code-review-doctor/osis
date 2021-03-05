@@ -743,3 +743,9 @@ class FillTreeVersionContentFromPastYearCommand(interface.CommandRequest):
     to_offer_acronym = attr.ib(type=str)
     to_version_name = attr.ib(type=str)
     to_transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyTreeCmsFromPastYear(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

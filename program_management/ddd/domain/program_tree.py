@@ -346,6 +346,14 @@ class ProgramTree(interface.RootEntity):
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
+    def get_mandatory_children(self, parent_node: 'Node'):
+        return [
+            node for node in parent_node.children_as_nodes
+            if node.node_type in self.authorized_relationships.get_ordered_mandatory_children_types(
+                parent_node.node_type
+            )
+        ]
+
     def search_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in self.get_all_links() if link_obj.child == child_node]
 
