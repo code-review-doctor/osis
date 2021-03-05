@@ -41,6 +41,7 @@ class HopsValuesValidator(business_validator.BusinessValidator):
             self.ares_authorization = training.hops.ares_authorization
         else:
             self.ares_code = self.ares_graca = self.ares_authorization = None
+        self.training_type = training.type
 
         self.ares_fields_needed = 3
         self.exception = HopsFieldsAllOrNone()
@@ -51,9 +52,11 @@ class HopsValuesValidator(business_validator.BusinessValidator):
     def validate(self, *args, **kwargs):
         exceptions = []
         hops_fields_values = [value for value in [self.ares_code, self.ares_graca, self.ares_authorization] if value]
-
-        if 0 < len(hops_fields_values) < self.ares_fields_needed:
-            exceptions.append(self.exception)
+        if self.training_type in (TrainingType.PHD, TrainingType.FORMATION_PHD) and \
+                not((self.ares_code and self.ares_authorization) or len(hops_fields_values) == 0):
+            exceptions.append(HopsFields2OrNoneForPhd())
+        elif 0 < len(hops_fields_values) < 3:
+            exceptions.append(HopsFieldsAllOrNone())
         else:
             if self.ares_code and not 0 < self.ares_code <= 9999:
                 exceptions.append(AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
