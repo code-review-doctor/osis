@@ -46,12 +46,12 @@ class CopyCms(interface.DomainService):
         node_to_copy_cms = mandatory_children
         for node in node_to_copy_cms:
             if node.is_training() or node.is_mini_training():
-                copy_training_or_minitraining_cms_from_last_year(node.code, node.year)
+                _copy_training_or_minitraining_cms_from_last_year(node.code, node.year)
             elif node.is_group():
-                copy_group_cms_from_last_year(node.code, node.year)
+                _copy_group_cms_from_last_year(node.code, node.year)
 
 
-def copy_group_cms_from_last_year(code: str, year: int) -> None:
+def _copy_group_cms_from_last_year(code: str, year: int) -> None:
     copy_to = GroupYear.objects.get(partial_acronym=code, academic_year__year=year)
     copy_from = GroupYear.objects.get(academic_year__year=year-1, group=copy_to.group)
 
@@ -64,7 +64,7 @@ def copy_group_cms_from_last_year(code: str, year: int) -> None:
     _copy_cms(cms_to_copy_from, copy_to.id)
 
 
-def copy_training_or_minitraining_cms_from_last_year(code: str, year: int) -> None:
+def _copy_training_or_minitraining_cms_from_last_year(code: str, year: int) -> None:
     copy_to = EducationGroupYear.objects.get(partial_acronym=code, academic_year__year=year)
     copy_from = EducationGroupYear.objects.get(academic_year__year=year-1, group=copy_to.group)
 
