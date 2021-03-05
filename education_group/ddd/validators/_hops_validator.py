@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ class HopsValuesValidator(business_validator.BusinessValidator):
             if 0 < len(hops_fields_values) < 2 or \
                     (len(hops_fields_values) == 2 and (self.ares_code is None or self.ares_authorization is None)):
                 exceptions.append(HopsFields2OrNoneForPhd())
+
         elif 0 < len(hops_fields_values) < 3:
             exceptions.append(HopsFieldsAllOrNone())
         else:
