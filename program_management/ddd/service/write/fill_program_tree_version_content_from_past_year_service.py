@@ -25,34 +25,27 @@
 ##############################################################################
 from django.db import transaction
 
-from education_group.ddd.domain import exception
-from education_group.ddd.service.write import copy_group_service
-from education_group.ddd.service.write.create_group_service import create_orphan_group
-from program_management.ddd.command import CopyProgramTreeToNextYearCommand
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
-from program_management.ddd.repositories import program_tree as program_tree_repository
+from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand, \
+    FillProgramTreeVersionContentFromProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
+    fill_program_tree_version_content_from_program_tree_version
 
 
 @transaction.atomic()
-def copy_program_tree_content_to_next_year(copy_cmd: CopyProgramTreeToNextYearCommand) -> 'ProgramTreeIdentity':
-    # GIVEN
-    repository = program_tree_repository.ProgramTreeRepository()
-    existing_program_tree = repository.get(
-        entity_id=ProgramTreeIdentity(
-            code=copy_cmd.code,
-            year=copy_cmd.year,
+def fill_program_tree_version_content_from_past_year(
+        cmd: FillTreeVersionContentFromPastYearCommand
+) -> 'ProgramTreeVersionIdentity':
+    return fill_program_tree_version_content_from_program_tree_version(
+        FillProgramTreeVersionContentFromProgramTreeVersionCommand(
+            from_year=cmd.to_year - 1,
+            from_offer_acronym=cmd.to_offer_acronym,
+            from_version_name=cmd.to_version_name,
+            from_transition_name=cmd.to_transition_name,
+            to_year=cmd.to_year,
+            to_offer_acronym=cmd.to_offer_acronym,
+            to_version_name=cmd.to_version_name,
+            to_transition_name=cmd.to_transition_name
         )
     )
 
-    # WHEN
-    program_tree_next_year = ProgramTreeBuilder().copy_content_to_next_year(existing_program_tree, repository)
-
-    # THEN
-    # TODO :: remove this try except and add Repository.upsert() function
-    try:
-        with transaction.atomic():
-            identity = repository.create(program_tree_next_year, copy_group_service=copy_group_service.copy_group)
-    except exception.CodeAlreadyExistException:
-        identity = repository.update(program_tree_next_year)
-
-    return identity

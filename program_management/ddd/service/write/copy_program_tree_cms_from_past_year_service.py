@@ -22,22 +22,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import contextlib
-from typing import List
-
-from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CopyTreeVersionToNextYearCommand, CopyProgramTreeToNextYearCommand
-from program_management.ddd.service.write import copy_program_version_service, \
-    copy_program_tree_content_service
+from program_management.ddd.command import CopyTreeCmsFromPastYear
+from program_management.ddd.domain.service import copy_tree_cms
+from program_management.ddd.repositories import program_tree as program_tree_repository
+from program_management.ddd.domain import program_tree
 
 
-def bulk_copy_program_tree_version(cmds: List[CopyTreeVersionToNextYearCommand]) -> List['ProgramTreeVersionIdentity']:
-    result = []
-    for cmd in cmds:
-        with contextlib.suppress(BusinessException):
-            copy_program_tree_cmd = CopyProgramTreeToNextYearCommand(code=cmd.from_offer_code, year=cmd.from_year)
-            copy_program_tree_content_service.copy_program_tree_content_to_next_year(copy_program_tree_cmd)
-            result.append(copy_program_version_service.copy_tree_version_to_next_year(cmd))
+def copy_program_tree_cms_from_past_year(cmd: CopyTreeCmsFromPastYear) -> 'ProgramTreeIdentity':
+    tree_repository = program_tree_repository.ProgramTreeRepository()
 
-    return result
+    tree = tree_repository.get(
+        program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+    )
+
+    copy_tree_cms.CopyCms().from_past_year(tree)
+
+    return tree.entity_id

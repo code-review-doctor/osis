@@ -34,13 +34,15 @@ def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepositor
     class_name = 'FakeNodeRepository'
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.NodeNotFoundException
+        "not_found_exception_class": exception.NodeNotFoundException,
+        "search": _search_nodes,
     })
 
 
 def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type['FakeRepository']:
     class_name = "FakeProgramTreeRepository"
     return type(class_name, (FakeRepository,), {
+        "create": _create_program_tree,
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeNotFoundException,
         "delete": _delete_program_tree,
@@ -51,12 +53,25 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
 def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVersion']) -> Type['FakeRepository']:
     class_name = "FakeProgramTreeVersionRepository"
     return type(class_name, (FakeRepository,), {
+        "create": _create_program_tree_version,
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeVersionNotFoundException,
         "delete": _delete_program_tree_version,
         "search": _search_program_tree_version,
         "search_versions_from_trees": _search_versions_from_trees,
     })
+
+
+@classmethod
+def _create_program_tree(cls, program_tree: 'ProgramTree', **_) -> interface.EntityIdentity:
+    cls.root_entities.append(program_tree)
+    return program_tree.entity_id
+
+
+@classmethod
+def _create_program_tree_version(cls, program_tree_version: 'ProgramTreeVersion', **_) -> interface.EntityIdentity:
+    cls.root_entities.append(program_tree_version)
+    return program_tree_version.entity_id
 
 
 @classmethod
@@ -133,3 +148,8 @@ def _search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List
 def _search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['ProgramTreeVersion']:
     tree_entities = {tree.entity_id for tree in trees}
     return [tree_version for tree_version in cls.root_entities if tree_version.tree.entity_id in tree_entities]
+
+
+@classmethod
+def _search_nodes(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['Node']:
+    return [node for node in cls.root_entities if node.entity_id in node_ids]
