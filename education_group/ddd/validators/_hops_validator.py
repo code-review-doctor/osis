@@ -52,7 +52,7 @@ class HopsValuesValidator(business_validator.BusinessValidator):
         exceptions = []
         hops_fields_values = [value for value in [self.ares_code, self.ares_graca, self.ares_authorization] if value]
 
-        if 0 < len(hops_fields_values) < 3:
+        if 0 < len(hops_fields_values) < self.ares_fields_needed:
             exceptions.append(self.exception)
         else:
             if self.ares_code and not 0 < self.ares_code <= 9999:
