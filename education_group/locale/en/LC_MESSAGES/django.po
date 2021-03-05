@@ -441,8 +441,7 @@ msgid "Faculty managers"
 msgstr ""
 
 msgid ""
-"For Phd/Formation Ph at least 2 fields concerning ARES have to be filled-in "
-"or none of them"
+"For Phd/Formation Ph the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "For all students"
