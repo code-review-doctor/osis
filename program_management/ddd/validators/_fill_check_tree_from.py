@@ -40,4 +40,4 @@ class CheckValidTreeVersionToFillFrom(business_validator.BusinessValidator):
 
     def __is_last_year_tree(self) -> bool:
         return self.tree_version_from.entity_id.year + 1 == self.tree_version_to.entity_id.year and \
-               self.tree_version_from.get_tree().root_node.code == self.tree_version_to.get_tree().root_node.code
+               self.tree_version_from.program_tree_identity.code == self.tree_version_to.program_tree_identity.code
