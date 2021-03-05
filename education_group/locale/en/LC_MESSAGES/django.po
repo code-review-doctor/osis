@@ -480,7 +480,7 @@ msgstr ""
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr ""
 
-msgid "General Conditions"
+msgid "General Access Requirements"
 msgstr ""
 
 msgid "General informations"
@@ -742,13 +742,10 @@ msgstr ""
 msgid "Signatory qualification"
 msgstr ""
 
-msgid "Special Conditions"
+msgid "Special Requirements to access some programmes"
 msgstr ""
 
-msgid "Specific Conditions"
-msgstr ""
-
-msgid "Specific admission requirements"
+msgid "Specific Access Requirements"
 msgstr ""
 
 msgid "Stage"

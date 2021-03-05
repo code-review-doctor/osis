@@ -43,6 +43,12 @@ class HopsValuesValidator(business_validator.BusinessValidator):
             self.ares_code = self.ares_graca = self.ares_authorization = None
         self.training_type = training.type
 
+        self.ares_fields_needed = 3
+        self.exception = HopsFieldsAllOrNone()
+        if training.type in (TrainingType.PHD, TrainingType.FORMATION_PHD):
+            self.ares_fields_needed = 2
+            self.exception = HopsFields2OrNoneForPhd()
+
     def validate(self, *args, **kwargs):
         exceptions = []
         hops_fields_values = [value for value in [self.ares_code, self.ares_graca, self.ares_authorization] if value]

@@ -501,8 +501,8 @@ msgstr "Financement coopération internationale CCD/CUD"
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
-msgid "General Conditions"
-msgstr "Conditions Générales"
+msgid "General Access Requirements"
+msgstr "Conditions d'accès générales"
 
 msgid "General informations"
 msgstr "Infos générales"
@@ -780,14 +780,11 @@ msgstr "Session"
 msgid "Signatory qualification"
 msgstr "Qualification du signataire"
 
-msgid "Special Conditions"
-msgstr "Conditions spéciales"
+msgid "Special Requirements to access some programmes"
+msgstr "Conditions particulières d’accès à certains programmes"
 
-msgid "Specific Conditions"
-msgstr "Conditions Particulières"
-
-msgid "Specific admission requirements"
-msgstr "Conditions spécifiques d'admission"
+msgid "Specific Access Requirements"
+msgstr "Conditions d’accès spécifiques"
 
 msgid "Stage"
 msgstr "Stage"
