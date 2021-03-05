@@ -262,6 +262,10 @@ CATEGORIES = (
 - Lorsqu'une view nécessite des permissions d'accès spécifiques (en dehors des permissions fournies par Django) : 
     - créer un décorateur dans le dossier `app_django/views/perms`
     - exemple : `base/views/learning_units/perms/`
+- Accès : 
+    - [couche Django Model](#modle-django-model)
+    - [couche DDD Repository](#dddrepository)
+
 
 <br/><br/>
 
