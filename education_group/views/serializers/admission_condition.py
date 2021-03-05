@@ -78,7 +78,7 @@ def __format_admission_condition(admission_condition):
 def __default_admission_condition():
     return {
         'admission_requirements': {
-            'label_translated': _('Specific admission requirements'),
+            'label_translated': _('Specific Access Requirements'),
             'text_fr': '',
             'text_en': ''
         },
@@ -223,12 +223,12 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'general_conditions': {
-            'label_translated': _('General Conditions'),
+            'label_translated': _('General Access Requirements'),
             'text_fr': '',
             'text_en': ''
         },
         'specific_conditions': {
-            'label_translated': _('Specific Conditions'),
+            'label_translated': _('Access based on validation of professional experience'),
             'text_fr': '',
             'text_en': ''
         },
@@ -238,7 +238,7 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'special_conditions': {
-            'label_translated': _('Special Conditions'),
+            'label_translated': _('Special Requirements to access some programmes'),
             'text_fr': '',
             'text_en': ''
         },
@@ -278,7 +278,7 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'specific_condition_requirements': {
-            'label_translated': _('Specific admission requirements'),
+            'label_translated': _('Specific Access Requirements'),
             'text_fr': '',
             'text_en': ''
         }
