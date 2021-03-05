@@ -527,6 +527,9 @@ msgstr ""
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
+msgid "Comment"
+msgstr ""
+
 msgid "Common English title"
 msgstr ""
 
