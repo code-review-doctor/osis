@@ -48,9 +48,7 @@ class Hops(models.Model):
 
     ares_study = models.IntegerField(
         verbose_name=_('ARES study code'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-        blank=True,
-        null=True
+        validators=[MinValueValidator(1), MaxValueValidator(9999)]
     )
 
     ares_graca = models.IntegerField(
@@ -62,9 +60,7 @@ class Hops(models.Model):
 
     ares_ability = models.IntegerField(
         verbose_name=_('ARES ability'),
-        validators=[MinValueValidator(1), MaxValueValidator(9999)],
-        blank=True,
-        null=True
+        validators=[MinValueValidator(1), MaxValueValidator(9999)]
     )
 
     def __str__(self):
