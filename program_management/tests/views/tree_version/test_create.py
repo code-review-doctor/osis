@@ -27,6 +27,7 @@ import mock
 from django.http import HttpResponse, HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
@@ -36,7 +37,8 @@ from base.tests.factories.education_group_type import TrainingEducationGroupType
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
+    StandardTransitionEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -249,3 +251,29 @@ class TestGetCreateProgramTreeTransitionVersion(TestCase):
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
+
+    def test_case_has_other_transition_training(self):
+        self.client.force_login(self.central_manager.person.user)
+        StandardTransitionEducationGroupVersionFactory(
+            offer=self.training_version.offer,
+            root_group__acronym=self.training_version.root_group.acronym
+        )
+        response = self.client.get(self.create_training_version_url, data={}, follow=True)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
+        self.assertEqual(response.context['error'], _(
+            "Impossible to create a transition version : an other transition version exists already on this year."
+        ))
+
+    def test_case_has_other_transition_mini_training(self):
+        self.client.force_login(self.central_manager.person.user)
+        StandardTransitionEducationGroupVersionFactory(
+            offer=self.mini_training_version.offer,
+            root_group__acronym=self.mini_training_version.root_group.acronym
+        )
+        response = self.client.get(self.create_mini_training_version_url, data={}, follow=True)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "tree_version/create_transition_version_inner.html")
+        self.assertEqual(response.context['error'], _(
+            "Impossible to create a transition version : an other transition version exists already on this year."
+        ))

@@ -293,4 +293,4 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             self.current_version_value
         )
 
-        self.assertEqual(context['current_version'], self.current_version_value)
+        self.assertEqual(context['version_label'], self.current_version_value)

@@ -238,6 +238,7 @@ MAIL_SENDER_CLASSES = os.environ.get(
     'MAIL_SENDER_CLASSES',
     'osis_common.messaging.mail_sender_classes.MessageHistorySender'
 ).split()
+ACADEMIC_CALENDAR_REMINDER_EMAILS = os.environ.get('ACADEMIC_CALENDAR_REMINDER_EMAILS', '').split()
 
 # Authentication settings
 LOGIN_URL = os.environ.get('LOGIN_URL', reverse_lazy('login'))
@@ -516,3 +517,4 @@ MAPBOX = {
 LDAP_ACCOUNT_CREATION_URL = os.environ.get("LDAP_ACCOUNT_CREATION_URL", "")
 LDAP_ACCOUNT_CONFIGURATION_URL = os.environ.get("LDAP_ACCOUNT_CONFIGURATION_URL", "")
 INTERNSHIP_SCORE_ENCODING_URL = os.environ.get("INTERNSHIP_SCORE_ENCODING_URL", "")
+CONTINUING_EDUCATION_STUDENT_PORTAL_URL = os.environ.get("CONTINUING_EDUCATION_STUDENT_PORTAL_URL", "")
