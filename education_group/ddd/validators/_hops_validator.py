@@ -49,17 +49,16 @@ class HopsValuesValidator(business_validator.BusinessValidator):
         if self.training_type in (TrainingType.PHD, TrainingType.FORMATION_PHD) and \
                 not((self.ares_code and self.ares_authorization) or len(hops_fields_values) == 0):
             exceptions.append(HopsFields2OrNoneForPhd())
+        elif 0 < len(hops_fields_values) < 3:
+            exceptions.append(HopsFieldsAllOrNone())
         else:
-            if 0 < len(hops_fields_values) < 3:
-                exceptions.append(HopsFieldsAllOrNone())
-            elif len(exceptions) == 0:
-                if self.ares_code and not 0 < self.ares_code <= 9999:
-                    exceptions.append(AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
+            if self.ares_code and not 0 < self.ares_code <= 9999:
+                exceptions.append(AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
 
-                if self.ares_graca and not 0 < self.ares_graca <= 9999:
-                    exceptions.append(AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
+            if self.ares_graca and not 0 < self.ares_graca <= 9999:
+                exceptions.append(AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
 
-                if self.ares_authorization and not 0 < self.ares_authorization <= 9999:
-                    exceptions.append(AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
+            if self.ares_authorization and not 0 < self.ares_authorization <= 9999:
+                exceptions.append(AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999())
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=set(exceptions))
