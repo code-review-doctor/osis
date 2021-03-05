@@ -178,7 +178,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             ]
         except program_exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate as e:
             self.mini_training_version_form.add_error('end_year', "")
-            display_error_messages(self.request, e.message)
+            self.mini_training_version_form.add_error(None, e.message)
         return []
 
     @cached_property
