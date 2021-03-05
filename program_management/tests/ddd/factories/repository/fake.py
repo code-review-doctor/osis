@@ -34,7 +34,8 @@ def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepositor
     class_name = 'FakeNodeRepository'
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.NodeNotFoundException
+        "not_found_exception_class": exception.NodeNotFoundException,
+        "search": _search_nodes,
     })
 
 
@@ -147,3 +148,8 @@ def _search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List
 def _search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['ProgramTreeVersion']:
     tree_entities = {tree.entity_id for tree in trees}
     return [tree_version for tree_version in cls.root_entities if tree_version.tree.entity_id in tree_entities]
+
+
+@classmethod
+def _search_nodes(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['Node']:
+    return [node for node in cls.root_entities if node.entity_id in node_ids]

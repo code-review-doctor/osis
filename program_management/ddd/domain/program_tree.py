@@ -32,6 +32,7 @@ from typing import List, Set, Optional, Dict
 import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
+from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.utils.cache import cached_result
@@ -158,7 +159,7 @@ class ProgramTreeBuilder:
             self,
             from_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
-            get_node_with_children_domain_service: interface.DomainService
+            existing_nodes: Set['Node']
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
@@ -166,7 +167,7 @@ class ProgramTreeBuilder:
             from_tree.root_node,
             to_tree.root_node,
             to_tree.authorized_relationships,
-            get_node_with_children_domain_service
+            existing_nodes
         )
         to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
 
@@ -177,51 +178,47 @@ class ProgramTreeBuilder:
             from_node: 'Node',
             to_node: 'Node',
             relationships: 'AuthorizedRelationshipList',
-            get_node_with_children_domain_service: interface.DomainService
+            existing_nodes: Set['Node']
     ) -> 'Node':
         learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
         group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
 
         for learning_unit_link in learning_units_links:
-            if self._is_end_date_inferior_to(learning_unit_link.child, to_node):
-                child = learning_unit_link.child
-            else:
-                child = get_node_with_children_domain_service.for_learning_unit_node(
-                    to_node.year,
-                    learning_unit_link.child
-                )
-                child = child or node_factory.copy_to_year(
-                    learning_unit_link.child,
-                    to_node.year,
-                    learning_unit_link.child.code
-                )
+            child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_node(existing_nodes, child_node_identity) or learning_unit_link.child
+
             copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
             to_node.children.append(copied_link)
 
         for group_year_link in group_year_links:
             if not group_year_link.child.is_group() and self._is_end_date_inferior_to(group_year_link.child, to_node):
                 continue
-            child = get_node_with_children_domain_service.for_group_year_node(
-                to_node.year,
-                group_year_link.child
-            )
-            child = child or node_factory.copy_to_year(
-                group_year_link.child,
-                to_node.year,
-                group_year_link.child.code
-            )
+
+            child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_node(existing_nodes, child_node_identity)
+            child = child or node_factory.copy_to_year(group_year_link.child, to_node.year, group_year_link.child.code)
+
             copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
             to_node.children.append(copied_link)
 
-            if not group_year_link.is_reference() and is_empty(child, relationships):
+            if not group_year_link.is_reference() and (
+                    not self._get_existing_node(existing_nodes, child_node_identity)
+                    or relationships.is_mandatory_child(to_node.node_type, child.node_type)
+            ):
                 self._fill_node_children_from_node(
                     group_year_link.child,
                     child,
                     relationships,
-                    get_node_with_children_domain_service
+                    existing_nodes
                 )
 
         return to_node
+
+    def _get_existing_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
+        return next(
+            (node for node in existing_nodes if node.entity_id == node_id),
+            None
+        )
 
     def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
         return from_node.end_date and from_node.end_date < to_node.year

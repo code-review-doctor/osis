@@ -22,15 +22,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 from django.db import transaction
 
 from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
     CopyTreeCmsFromPastYear
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
-from program_management.ddd.domain.service import get_node_with_children
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
-    program_tree as program_tree_repository
+    program_tree as program_tree_repository, node as node_repository
 from program_management.ddd.service.write import copy_program_tree_cms_from_past_year_service
 
 
@@ -40,6 +40,7 @@ def fill_program_tree_version_content_from_program_tree_version(
 ) -> 'ProgramTreeVersionIdentity':
     tree_version_repository = program_tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
+    node_repo = node_repository.NodeRepository()
 
     from_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
@@ -58,11 +59,14 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    ProgramTreeVersionBuilder().fill_from_program_tree_version(
-        from_tree_version,
-        to_tree_version,
-        get_node_with_children.GetNodeWithChildrenDomainService()
+    existing_nodes = node_repo.search(
+        [
+            attr.evolve(node.entity_id, year=cmd.to_year)
+            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
+        ]
     )
+
+    ProgramTreeVersionBuilder().fill_from_program_tree_version(from_tree_version, to_tree_version, set(existing_nodes))
 
     identity = tree_version_repository.update(to_tree_version)
     tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)

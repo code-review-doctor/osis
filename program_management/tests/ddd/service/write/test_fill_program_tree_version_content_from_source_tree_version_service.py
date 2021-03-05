@@ -29,15 +29,14 @@ from program_management.ddd.command import FillProgramTreeVersionContentFromProg
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
     ProgramTreeNonEmpty
+from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
     fill_program_tree_version_content_from_program_tree_version
-from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     SpecificProgramTreeVersionFactory
-from program_management.ddd.domain.node import factory as node_factory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020
@@ -71,6 +70,8 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
     def create_node_next_years(self):
         nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
         for node in nodes:
+            if node.is_group():
+                continue
             next_year_node = node_factory.copy_to_next_year(node)
             self.add_node_to_repo(next_year_node)
 

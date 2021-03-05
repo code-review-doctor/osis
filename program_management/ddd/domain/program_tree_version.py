@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from typing import Union, Set
 
 import attr
 
@@ -80,13 +80,13 @@ class ProgramTreeVersionBuilder:
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
-            get_node_with_children_domain_service: interface.DomainService
+            existing_nodes: Set['Node']
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
         program_tree.ProgramTreeBuilder().fill_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                get_node_with_children_domain_service
+                existing_nodes
             )
         return to_tree_version
 
