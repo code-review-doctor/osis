@@ -22,6 +22,7 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 ### Livres
 - [Clean Code: A Handbook of Agile Software Craftsmanship](https://www.amazon.com/Clean-Code-Handbook-Software-Craftsmanship-ebook/dp/B001GSTOAM)
 
+<br/><br/>
 
 ## CQRS
 ### Articles
