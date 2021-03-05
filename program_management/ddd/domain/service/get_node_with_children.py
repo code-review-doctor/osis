@@ -22,9 +22,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
 
-from education_group.ddd.command import CopyGroupCommand
-from education_group.ddd.service.write import copy_group_service
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node, program_tree
@@ -32,9 +31,9 @@ from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.repositories import program_tree as program_tree_repository, node as node_repository
 
 
-class GetOrCreateNode(interface.DomainService):
+class GetNodeWithChildrenDomainService(interface.DomainService):
     @classmethod
-    def for_group_year_node(cls, to_year: int, base_node: 'NodeGroupYear') -> 'Node':
+    def for_group_year_node(cls, to_year: int, base_node: 'NodeGroupYear') -> Optional['Node']:
         repo = program_tree_repository.ProgramTreeRepository()
 
         tree_identity = program_tree.ProgramTreeIdentity(code=base_node.code, year=to_year)
@@ -42,22 +41,12 @@ class GetOrCreateNode(interface.DomainService):
         try:
             return repo.get(tree_identity).root_node
         except ProgramTreeNotFoundException:
-            cls._create_group(base_node)
-            return repo.get(tree_identity).root_node
+            return None
 
     @classmethod
-    def for_learning_unit_node(cls, to_year: int, base_node: 'NodeLearningUnitYear') -> 'Node':
+    def for_learning_unit_node(cls, to_year: int, base_node: 'NodeLearningUnitYear') -> Optional['Node']:
         repo = node_repository.NodeRepository()
 
         node_identity = node.NodeIdentity(code=base_node.code, year=to_year)
 
         return repo.get(node_identity)
-
-    @classmethod
-    def _create_group(cls, n: 'NodeGroupYear'):
-        copy_group_service.copy_group(
-            CopyGroupCommand(
-                from_year=n.year,
-                from_code=n.code
-            )
-        )

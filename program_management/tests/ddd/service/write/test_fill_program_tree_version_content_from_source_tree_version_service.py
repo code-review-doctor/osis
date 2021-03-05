@@ -100,7 +100,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
     def mock_copy_group(self):
         patcher = mock.patch(
-            "program_management.ddd.domain.service.get_or_create_node.GetOrCreateNode._create_group",
+            "education_group.ddd.service.write.copy_group_service.copy_group",
             side_effect=lambda node: self.add_node_to_repo(node_factory.copy_to_next_year(node))
         )
         patcher.start()

@@ -24,9 +24,10 @@
 ##############################################################################
 from django.db import transaction
 
+from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
-from program_management.ddd.domain.service import copy_tree_cms
+from program_management.ddd.domain.service import copy_tree_cms, get_node_with_children
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository
 
@@ -55,10 +56,14 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    ProgramTreeVersionBuilder().fill_from_program_tree_version(from_tree_version, to_tree_version, )
+    ProgramTreeVersionBuilder().fill_from_program_tree_version(
+        from_tree_version,
+        to_tree_version,
+        get_node_with_children.GetNodeWithChildrenDomainService()
+    )
     copy_tree_cms.CopyCms().from_past_year(to_tree_version.get_tree())
 
     identity = tree_version_repository.update(to_tree_version)
-    tree_repository.update(to_tree_version.get_tree())
+    tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
 
     return identity

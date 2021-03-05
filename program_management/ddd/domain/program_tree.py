@@ -47,7 +47,7 @@ from program_management.ddd.domain.link import factory as link_factory, LinkBuil
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.prerequisite import Prerequisites, \
     PrerequisitesBuilder
-from program_management.ddd.domain.service import get_or_create_node
+from program_management.ddd.domain.service import get_node_with_children
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
@@ -156,10 +156,20 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
-    def fill_from_program_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
+    def fill_from_program_tree(
+            self,
+            from_tree: 'ProgramTree',
+            to_tree: 'ProgramTree',
+            get_node_with_children_domain_service: interface.DomainService
+    ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._fill_node_children_from_node(from_tree.root_node, to_tree.root_node, to_tree.authorized_relationships)
+        self._fill_node_children_from_node(
+            from_tree.root_node,
+            to_tree.root_node,
+            to_tree.authorized_relationships,
+            get_node_with_children_domain_service
+        )
         to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
 
         return to_tree
@@ -168,7 +178,8 @@ class ProgramTreeBuilder:
             self,
             from_node: 'Node',
             to_node: 'Node',
-            relationships: 'AuthorizedRelationshipList'
+            relationships: 'AuthorizedRelationshipList',
+            get_node_with_children_domain_service: interface.DomainService
     ) -> 'Node':
         learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
         group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
@@ -177,9 +188,14 @@ class ProgramTreeBuilder:
             if self._is_end_date_inferior_to(learning_unit_link.child, to_node):
                 child = learning_unit_link.child
             else:
-                child = get_or_create_node.GetOrCreateNode().for_learning_unit_node(
+                child = get_node_with_children_domain_service.for_learning_unit_node(
                     to_node.year,
                     learning_unit_link.child
+                )
+                child = child or node_factory.copy_to_year(
+                    learning_unit_link.child,
+                    to_node.year,
+                    learning_unit_link.child.code
                 )
             copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
             to_node.children.append(copied_link)
@@ -187,12 +203,25 @@ class ProgramTreeBuilder:
         for group_year_link in group_year_links:
             if not group_year_link.child.is_group() and self._is_end_date_inferior_to(group_year_link.child, to_node):
                 continue
-            child = get_or_create_node.GetOrCreateNode().for_group_year_node(to_node.year, group_year_link.child)
+            child = get_node_with_children_domain_service.for_group_year_node(
+                to_node.year,
+                group_year_link.child
+            )
+            child = child or node_factory.copy_to_year(
+                group_year_link.child,
+                to_node.year,
+                group_year_link.child.code
+            )
             copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
             to_node.children.append(copied_link)
 
             if not group_year_link.is_reference() and self._is_empty(child, relationships):
-                self._fill_node_children_from_node(group_year_link.child, child, relationships)
+                self._fill_node_children_from_node(
+                    group_year_link.child,
+                    child,
+                    relationships,
+                    get_node_with_children_domain_service
+                )
 
         return to_node
 
