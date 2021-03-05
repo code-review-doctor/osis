@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0569_update_is_mandatory_field_when_empty_skeleton'),
+        ('base', '0570_studentspecificprofile_comment'),
     ]
 
     operations = [
