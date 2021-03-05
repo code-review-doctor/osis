@@ -223,15 +223,6 @@ class ProgramTreeBuilder:
 
         return to_node
 
-    def _is_empty(self, node_to_check: 'Node', relationships: 'AuthorizedRelationshipList') -> bool:
-        if not node_to_check.children:
-            return True
-
-        return all(
-            node.node_type in relationships.get_ordered_mandatory_children_types(node_to_check.node_type)
-            for node in node_to_check.children_as_nodes
-        )
-
     def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
         return from_node.end_date and from_node.end_date < to_node.year
 
