@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1'
+  version: '1.10'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -85,6 +85,48 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - countries
+  /study-domains:
+    get:
+      description: Return a list of study domains. By default, it will return all official main study domains.
+      operationId: study_domains_list
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: search
+          schema:
+            description: A search term which will look up at study domain name
+            type: string
+        - in: query
+          name: decree
+          schema:
+            description: Filter on a specific decree
+            type: string
+            enum:
+              - 'BEFORE_BOLOGNE'
+              - 'BOLOGNE'
+              - 'PAYSAGE'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfStudyDomain'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - study-domains
 components:
   securitySchemes:
     Token:
@@ -129,6 +171,22 @@ components:
         name:
           type: string
           description: The name of the country
+    ArrayOfStudyDomain:
+      type: array
+      items:
+        $ref: '#/components/schemas/StudyDomain'
+    StudyDomain:
+      type: object
+      properties:
+        uuid:
+          type: string
+          description: The identifier of study domain
+        code:
+          type: string
+          description: The code of study domain
+        name:
+          type: string
+          description: The name of study domain
     Error:
       type: object
       properties:

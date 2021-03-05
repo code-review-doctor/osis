@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -12,6 +12,7 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
+from base.views.common import check_formations_impacted_by_update
 from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
@@ -25,12 +26,13 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
-from program_management.ddd.domain import program_tree_version, exception as program_exception
+from program_management.ddd.domain import exception as program_exception
+from program_management.ddd.domain import program_tree_version
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
-from program_management.forms import version
-from base.views.common import check_formations_impacted_by_update
+from program_management.forms import version, transition
 
 
 class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -51,13 +53,18 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
+        version = self.get_program_tree_version_obj()
         context = {
             "mini_training_version_form": self.mini_training_version_form,
             "mini_training_obj": self.get_mini_training_obj(),
-            "mini_training_version_obj": self.get_program_tree_version_obj(),
+            "mini_training_version_obj": version,
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
-            "cancel_url": self.get_cancel_url()
+            "cancel_url": self.get_cancel_url(),
+            "version_suffix": (
+                "-{}" if version.entity_id.is_specific_transition else "{}"
+            ).format(version.transition_name),
+            "version_label": version_label(version.entity_id)
         }
         return render(request, self.template_name, context)
 
@@ -93,7 +100,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_name,
+                    "acronym": version_label(identity, only_label=True),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
@@ -110,8 +117,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                 "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
                 "offer_acronym": last_identity.offer_acronym,
-                "acronym": last_identity.version_name,
-                "academic_year": display_as_academic_year(self.mini_training_version_form.cleaned_data["end_year"] + 1)
+                "acronym": version_label(last_identity, only_label=True),
+                "academic_year": display_as_academic_year(
+                    self.mini_training_version_form.cleaned_data["end_year"] + 1
+                )
             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
@@ -173,16 +182,23 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         return []
 
     @cached_property
-    def mini_training_version_form(self) -> 'version.UpdateMiniTrainingVersionForm':
+    def mini_training_version_form(self) \
+            -> Union['version.UpdateMiniTrainingVersionForm', 'transition.UpdateMiniTrainingTransitionVersionForm']:
         mini_training_version_identity = self.get_program_tree_version_obj().entity_id
-        return version.UpdateMiniTrainingVersionForm(
-            data=self.request.POST or None,
-            user=self.request.user,
-            year=self.kwargs['year'],
-            mini_training_version_identity=mini_training_version_identity,
-            mini_training_type=self.get_mini_training_obj().type,
-            initial=self._get_mini_training_version_form_initial_values()
-        )
+        form_parameters = self._get_form_parameters(mini_training_version_identity)
+        if mini_training_version_identity.is_transition:
+            return transition.UpdateMiniTrainingTransitionVersionForm(**form_parameters)
+        return version.UpdateMiniTrainingVersionForm(**form_parameters)
+
+    def _get_form_parameters(self, mini_training_version_identity):
+        return {
+            'data': self.request.POST or None,
+            'user': self.request.user,
+            'year': self.kwargs['year'],
+            'mini_training_version_identity': mini_training_version_identity,
+            'mini_training_type': self.get_mini_training_obj().type,
+            'initial': self._get_mini_training_version_form_initial_values()
+        }
 
     @functools.lru_cache()
     def get_mini_training_obj(self) -> 'MiniTraining':
@@ -244,6 +260,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         group_obj = self.get_group_obj()
 
         form_initial_values = {
+            'transition_name': mini_training_version.transition_name,
             'version_name': mini_training_version.version_name,
             'version_title_fr': mini_training_version.title_fr,
             'version_title_en': mini_training_version.title_en,
