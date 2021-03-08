@@ -38,6 +38,8 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 - [Domain Driven Design : des armes pour affronter la complexité](https://blog.octo.com/domain-driven-design-des-armes-pour-affronter-la-complexite/)
 - [Domain model purity vs. domain model completeness](https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/) (Anglais)
 - [Domain model purity and lazy loading](https://enterprisecraftsmanship.com/posts/domain-model-purity-lazy-loading/) (Anglais)
+### Livres
+- [Architecture patterns with python - Harry J.W. Percival](https://www.amazon.fr/Architecture-Patterns-Python-Domain-Driven-Microservices-ebook/dp/B085KB31X3) (Anglais)
 
 <br/><br/>
 
