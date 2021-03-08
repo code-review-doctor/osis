@@ -23,19 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
-from django.urls import path
+import datetime
 
-from attribution.api.views.attribution import AttributionListView, MyAttributionListView
-from attribution.api.views.calendar import ApplicationCoursesCalendarListView
+from base.business.event_perms import AcademicEventCalendarHelper
+from base.models.academic_calendar import AcademicCalendar
+from base.models.academic_year import AcademicYear
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
-app_name = "attribution"
-urlpatterns = [
-    url(
-        r'^application/calendars$',
-        ApplicationCoursesCalendarListView.as_view(),
-        name=ApplicationCoursesCalendarListView.name
-    ),
-    path('<int:year>/me/', MyAttributionListView.as_view(), name=MyAttributionListView.name),
-    path('<int:year>/<str:global_id>/', AttributionListView.as_view(), name=AttributionListView.name),
-]
+
+class AccessScheduleCalendar(AcademicEventCalendarHelper):
+    event_reference = AcademicCalendarTypes.ACCESS_SCHEDULE_CALENDAR.name
+
+    @classmethod
+    def ensure_consistency_until_n_plus_6(cls):
+        current_academic_year = AcademicYear.objects.current()
+        academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)
+
+        for ac_year in academic_years:
+            AcademicCalendar.objects.get_or_create(
+                reference=cls.event_reference,
+                data_year=ac_year,
+                defaults={
+                    "title": "Accès horaire ADE",
+                    "start_date": datetime.date(ac_year.year, 7, 1),
+                    "end_date": datetime.date(ac_year.year + 1, 9, 14),
+                    "academic_year": ac_year  # To remove after refactoring
+                }
+            )
