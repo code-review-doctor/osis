@@ -29,17 +29,23 @@
     <form method="POST" action="{% url 'learning_unit_cancel_proposal' learning_unit_year_id=learning_unit_year.id %}">
         {% csrf_token %}
         <div class="modal-header">
-            <h3>{% trans 'Do you want to cancel proposal?' %}</h3>
+            <strong>{% trans 'Cancel the proposal?' %}</strong>
             <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
         </div>
-        {% if list_partims %}
-            <div class="modal-body">
-                <div>{% trans "The learning unit have partim" %} : {{ list_partims|join:", " }}</div>
-             </div>
-        {% endif %}
+        <div class="modal-body">
+            {% trans 'This action will permanently cancel the proposal' %}
+            {% if list_partims %}
+                <br>
+                <br>
+                <div>
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                    {% trans "The learning unit have partim" %} : {{ list_partims|join:", " }}
+                </div>
+            {% endif %}
+        </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-            <button type="submit" class="btn btn-primary">{% trans "Confirm" %}</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Do not cancel" %}</button>
+            <button type="submit" class="btn btn-danger">{% trans "Cancel the proposal" %}</button>
          </div>
     </form>
 {% endblock %}

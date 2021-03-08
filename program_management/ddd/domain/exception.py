@@ -136,21 +136,24 @@ class ProgramTreeVersionMismatch(BusinessException):
             *args,
             **kwargs
     ):
-        parents_version_names = {
-            self._get_version_name(version_identity) for version_identity in parents_version_mismatched_identity
+        parents_version_labels = {
+            self._get_version_label(version_identity) for version_identity in parents_version_mismatched_identity
         }
         messages = _(
             "%(node_to_add)s or its children must have the same version as %(node_to_paste_to)s "
             "and all of it's parent's [%(version_mismatched)s]"
         ) % {
-            'node_to_add': str(node_to_add),
-            'node_to_paste_to': str(node_to_paste_to),
-            'version_mismatched': ",".join(parents_version_names)
-        }
+                       'node_to_add': str(node_to_add),
+                       'node_to_paste_to': str(node_to_paste_to),
+                       'version_mismatched': ",".join(parents_version_labels)
+                   }
         super().__init__(messages, **kwargs)
 
-    def _get_version_name(self, version_identity: 'ProgramTreeVersionIdentity'):
-        return str(_('Standard')) if version_identity.is_official_standard else version_identity.version_name
+    @staticmethod
+    def _get_version_label(version_identity: 'ProgramTreeVersionIdentity'):
+        from program_management.ddd.domain.program_tree_version import version_label
+        return str(_('Standard')) \
+            if version_identity.is_official_standard else version_label(version_identity, only_label=True)
 
 
 class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessException):
@@ -160,7 +163,7 @@ class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessExc
             "{transition_year}"
         ).format(
             code=version.program_tree_identity.code,
-            year=version.entity_id.year,
+            year=version.end_year_of_existence,
             transition_year=transition_year
         )
         super().__init__(message, **kwargs)

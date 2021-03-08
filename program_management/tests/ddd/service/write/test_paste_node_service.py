@@ -430,6 +430,36 @@ class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
         result = paste_element_service.paste_element(valid_command)
         self.assertTrue(result)
 
+    def test_should_set_link_as_not_mandatory_when_parent_is_list_minor_major_list_or_option_choice(self):
+        tree_to_paste_data = {
+            "node_type": MiniTrainingType.OPEN_MINOR,
+            "year": 2020,
+            "node_id": 589
+        }
+        tree_to_paste = tree_builder(tree_to_paste_data)
+        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_tree_version_repository.root_entities.append(
+            StandardProgramTreeVersionFactory(
+                tree=tree_to_paste,
+                program_tree_repository=self.fake_program_tree_repository,
+            )
+        )
+
+        valid_command = PasteElementCommandFactory(
+            node_to_paste_code=tree_to_paste.root_node.code,
+            node_to_paste_year=tree_to_paste.root_node.year,
+            path_where_to_paste="1|22",
+            link_type=None,
+            is_mandatory=True
+        )
+        paste_element_service.paste_element(valid_command)
+
+        created_link = self.tree.get_link(
+            self.tree.get_node("1|22"),
+            self.tree.get_node("1|22|589")
+        )
+        self.assertFalse(created_link.is_mandatory)
+
     def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_surpassed(self):
         tree_to_paste_data = {
             "node_type": GroupType.FINALITY_120_LIST_CHOICE,

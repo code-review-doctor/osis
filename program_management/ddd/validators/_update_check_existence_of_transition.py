@@ -28,15 +28,19 @@ from program_management.ddd.domain.service.get_next_version_if_exists import Get
 
 
 class CheckExistenceOfTransition(business_validator.BusinessValidator):
-    def __init__(self, tree_version: 'ProgramTreeVersion'):
+    def __init__(self, tree_version: 'ProgramTreeVersion', initial_end_year: int):
         self.tree_version = tree_version
+        self.initial_end_year = initial_end_year
         super().__init__()
 
     def validate(self, *args, **kwargs):
         if not self.tree_version.is_transition:
             return
 
-        other_transition_year = GetNextVersionIfExists.get_next_transition_version_year(self.tree_version)
+        other_transition_year = GetNextVersionIfExists.get_next_transition_version_year(
+            self.tree_version,
+            self.initial_end_year
+        )
         if other_transition_year:
             raise exception.CannotExtendTransitionDueToExistenceOfOtherTransitionException(
                 self.tree_version,

@@ -181,7 +181,9 @@ class GroupFilter(FilterSet):
     @staticmethod
     def filter_by_transition(queryset, name, value):
         if not value:
-            return queryset.filter(educationgroupversion__transition_name=NOT_A_TRANSITION)
+            return queryset.filter(
+                Q(educationgroupversion__transition_name=NOT_A_TRANSITION) | Q(educationgroupversion__isnull=True)
+            )
         return queryset
 
     def get_queryset(self):
@@ -195,6 +197,11 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
+        standard_clause = (
+                Q(educationgroupversion__version_name='') | Q(educationgroupversion__version_name__isnull=True)
+        )
+        group_clause = Q(educationgroupversion__isnull=True)
+        not_transition_clause = Q(educationgroupversion__transition_name=NOT_A_TRANSITION)
         return GroupYear.objects.all().select_related('element', 'academic_year').annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
@@ -209,17 +216,15 @@ class GroupFilter(FilterSet):
                 When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
                      then=Value(PARTICULAR)),
                 default=Value(STANDARD),
-                output_field=CharField(),)
+                output_field=CharField(), )
         ).annotate(
             complete_title_fr=Case(
-                When(~Q(educationgroupversion__transition_name=NOT_A_TRANSITION) &
-                     Q(educationgroupversion__version_name=''),
-                     then=Concat('acronym', Value('[Transition]'))),
-                When(~Q(educationgroupversion__version_name='') &
-                     ~Q(educationgroupversion__transition_name=NOT_A_TRANSITION),
-                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
-                When(~Q(educationgroupversion__version_name='') &
-                     Q(educationgroupversion__transition_name=NOT_A_TRANSITION),
+                When(~group_clause & standard_clause & ~not_transition_clause,
+                     then=Concat('acronym', Value('['), 'educationgroupversion__transition_name', Value(']'))),
+                When(~group_clause & ~standard_clause & ~not_transition_clause,
+                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value('-'),
+                                 'educationgroupversion__transition_name', Value(']'))),
+                When(~group_clause & ~standard_clause & not_transition_clause,
                      then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
                 default='acronym',
                 output_field=CharField()
@@ -233,5 +238,5 @@ class GroupFilter(FilterSet):
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)
         qs = super().filter_queryset(queryset)
-        order_fields = qs.query.order_by + ('id', )
+        order_fields = qs.query.order_by + ('id',)
         return qs.order_by(*order_fields)

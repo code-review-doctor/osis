@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-18 14:25+0100\n"
+"POT-Creation-Date: 2021-03-04 13:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,6 +116,9 @@ msgstr ""
 msgid "ARES ability"
 msgstr ""
 
+msgid "ARES codes"
+msgstr ""
+
 msgid "ARES study code"
 msgstr ""
 
@@ -216,6 +219,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Activities"
+msgstr ""
+
 msgid "Activities on other campus"
 msgstr ""
 
@@ -232,6 +238,9 @@ msgid "Add. requ. ent. 1"
 msgstr ""
 
 msgid "Add. requ. ent. 2"
+msgstr ""
+
+msgid "Additional info"
 msgstr ""
 
 msgid "Additional requirement entity 1"
@@ -344,6 +353,9 @@ msgid ""
 "UE"
 msgstr ""
 
+msgid "At least one learning unit has partim:"
+msgstr ""
+
 msgid "At the end of this learning unit, the student is able to:"
 msgstr ""
 
@@ -425,7 +437,16 @@ msgstr ""
 msgid "Cancel proposal"
 msgstr ""
 
+msgid "Cancel proposal(s)"
+msgstr ""
+
+msgid "Cancel proposal(s)?"
+msgstr ""
+
 msgid "Cancel the proposal"
+msgstr ""
+
+msgid "Cancel the proposal?"
 msgstr ""
 
 msgid "Catalogue"
@@ -494,6 +515,9 @@ msgstr ""
 msgid "Co-graduation total coefficient"
 msgstr ""
 
+msgid "Co-graduation/partnership"
+msgstr ""
+
 msgid "Co-holder"
 msgstr ""
 
@@ -501,6 +525,9 @@ msgid "Code"
 msgstr ""
 
 msgid "Code co-graduation inter CfB"
+msgstr ""
+
+msgid "Comment"
 msgstr ""
 
 msgid "Common English title"
@@ -634,6 +661,11 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
+msgid ""
+"Default information (ac. yr., acronym/short title, title, category, type, "
+"credits)"
+msgstr ""
+
 msgid "Default learning unit enrollment"
 msgstr ""
 
@@ -673,6 +705,9 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
+msgid "Diploma/certificat"
+msgstr ""
+
 msgid "Direct Access"
 msgstr ""
 
@@ -697,7 +732,7 @@ msgstr ""
 msgid "Do not assign"
 msgstr ""
 
-msgid "Do you want to cancel proposal?"
+msgid "Do not cancel"
 msgstr ""
 
 msgid "Do you want to change the status of this proposals?"
@@ -731,6 +766,10 @@ msgid "Edit"
 msgstr ""
 
 msgid "Edit the proposal"
+msgstr ""
+
+msgctxt "list"
+msgid "Education fields"
 msgstr ""
 
 msgid "Education group"
@@ -815,6 +854,9 @@ msgid "Enrolled"
 msgstr ""
 
 msgid "Enrolled to learning unit"
+msgstr ""
+
+msgid "Enrollment"
 msgstr ""
 
 msgid "Enrollment campus"
@@ -1005,6 +1047,10 @@ msgstr ""
 msgid "Funding"
 msgstr ""
 
+msgctxt "list"
+msgid "Funding"
+msgstr ""
+
 msgid "Funding direction"
 msgstr ""
 
@@ -1012,6 +1058,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "Gathering"
 msgstr ""
 
 msgid "Gender"
@@ -1250,7 +1299,13 @@ msgstr ""
 msgid "Learning units proposal comparison"
 msgstr ""
 
+msgid "Learning units training list"
+msgstr ""
+
 msgid "LearningUnitsList"
+msgstr ""
+
+msgid "LearningUnitsTrainingsList"
 msgstr ""
 
 msgid "Lecturing"
@@ -1292,7 +1347,10 @@ msgstr ""
 msgid "List of learning units with educational information and specifications"
 msgstr ""
 
-msgid "List of learning units with with one line per attribution"
+msgid "List of learning units with one line per attribution"
+msgstr ""
+
+msgid "List of learning units with one line per training"
 msgstr ""
 
 msgid "List of teachers"
@@ -1678,6 +1736,9 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
+msgid "Osis code"
+msgstr ""
+
 msgid "Other academic responsible"
 msgstr ""
 
@@ -1691,6 +1752,9 @@ msgid "Other individual"
 msgstr ""
 
 msgid "Other languages activities"
+msgstr ""
+
+msgid "Other legal information"
 msgstr ""
 
 msgid "Other remark (intended for publication)"
@@ -1850,6 +1914,9 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
+msgstr ""
+
+msgid "Produce a customizable xls of learning units with one line per training"
 msgstr ""
 
 msgid ""
@@ -2086,6 +2153,9 @@ msgstr ""
 msgid "Residential"
 msgstr ""
 
+msgid "Responsibles and contacts"
+msgstr ""
+
 msgid "Result"
 msgstr ""
 
@@ -2150,6 +2220,12 @@ msgid "Select all"
 msgstr ""
 
 msgid "Select all the messages"
+msgstr ""
+
+msgid "Select/deselect all"
+msgstr ""
+
+msgid "Send calendar reminder notice"
 msgstr ""
 
 msgid "Separate"
@@ -2311,6 +2387,12 @@ msgid ""
 msgstr ""
 
 msgid "The credits value should be an integer"
+msgstr ""
+
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
 msgstr ""
 
 #, python-format
@@ -2507,6 +2589,12 @@ msgstr ""
 msgid "Thesis"
 msgstr ""
 
+msgid "This action will permanently cancel the proposal"
+msgstr ""
+
+msgid "This action will permanently cancel the selected proposal(s)"
+msgstr ""
+
 msgid "This code already exists for this learning unit"
 msgstr ""
 
@@ -2522,7 +2610,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application this year"
+msgid "This learning unit has application"
 msgstr ""
 
 msgid ""
@@ -2562,6 +2650,9 @@ msgstr ""
 msgid "Title specific complement"
 msgstr ""
 
+msgid "Titles(partial/English)"
+msgstr ""
+
 msgid "To complete"
 msgstr ""
 
@@ -2575,6 +2666,15 @@ msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+msgid "Training code"
+msgstr ""
+
+msgid "Training management entity"
+msgstr ""
+
+msgid "Training title"
 msgstr ""
 
 msgid "Trainings"
@@ -2656,6 +2756,9 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Url"
 msgstr ""
 
 msgid "User"
