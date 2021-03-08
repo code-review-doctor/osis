@@ -176,7 +176,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             self.training_version_form.add_error(
                 None, _("Impossible to put end date to %(end_year)s: %(msg)s") % {
                     "msg": e.message,
-                    "end_year": update_command.end_year
+                    "end_year": display_as_academic_year(update_command.end_year)
                 }
             )
         return []
