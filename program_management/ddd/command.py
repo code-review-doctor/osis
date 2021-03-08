@@ -749,3 +749,11 @@ class FillTreeVersionContentFromPastYearCommand(interface.CommandRequest):
 class CopyTreeCmsFromPastYear(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CopyProgramTreePrerequisitesFromProgramTreeCommand(interface.CommandRequest):
+    from_code = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    to_code = attr.ib(type=str)
+    to_year = attr.ib(type=int)
