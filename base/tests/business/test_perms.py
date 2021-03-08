@@ -33,8 +33,7 @@ from django.test import TestCase
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.perms import view_academicactors
-from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
-    MAX_ACADEMIC_YEAR_CENTRAL
+from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
@@ -634,10 +633,7 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         person = self.central_manager.person
         for luy in self.learning_unit_years:
             with self.subTest(academic_year=luy.academic_year):
-                if self.current_acy.year <= luy.academic_year.year <= self.current_acy.year + MAX_ACADEMIC_YEAR_CENTRAL:
-                    self.assertTrue(person.user.has_perm('base.can_create_partim', luy))
-                else:
-                    self.assertFalse(person.user.has_perm('base.can_create_partim', luy))
+                self.assertTrue(person.user.has_perm('base.can_create_partim', luy))
 
 
 class PermsViewAcademicActorCase(TestCase):
