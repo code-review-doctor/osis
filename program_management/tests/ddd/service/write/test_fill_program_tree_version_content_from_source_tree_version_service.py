@@ -36,7 +36,7 @@ from program_management.ddd.service.write.fill_program_tree_version_content_from
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
-    SpecificProgramTreeVersionFactory
+    SpecificProgramTreeVersionFactory, SpecificTransitionProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020
@@ -140,6 +140,58 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             InvalidTreeVersionToFillFrom,
             fill_program_tree_version_content_from_program_tree_version,
             cmd
+        )
+
+    def test_can_fill_transition_from_transition_past_year(self):
+        tree_version_to_fill_from = SpecificTransitionProgramTreeVersionFactory(
+            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
+        )
+        tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__code=tree_version_to_fill_from.program_tree_identity.code
+        )
+
+        self.add_tree_version_to_repo(tree_version_to_fill_from)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+
+        cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill)
+
+        self.assertTrue(
+            fill_program_tree_version_content_from_program_tree_version(cmd)
+        )
+
+    def test_can_fill_transition_from_its_past_year_equivalent_non_transition(self):
+        tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
+            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
+        )
+        tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+        )
+
+        self.add_tree_version_to_repo(tree_version_to_fill_from)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+
+        cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill)
+
+        self.assertTrue(
+            fill_program_tree_version_content_from_program_tree_version(cmd)
+        )
+
+    def test_can_fill_transition_from_its_same_year_equivalent_non_transition(self):
+        tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
+        )
+        tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+        )
+
+        self.add_tree_version_to_repo(tree_version_to_fill_from)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+
+        cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill)
+
+        self.assertTrue(
+            fill_program_tree_version_content_from_program_tree_version(cmd)
         )
 
     def test_cannot_fill_non_empty_tree(self):
