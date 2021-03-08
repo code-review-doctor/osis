@@ -34,7 +34,7 @@ class TransitionNameExistsValidator(BusinessValidator):
         self.working_year = working_year
         self.version_name = version_name
         self.offer_acronym = offer_acronym
-        self.transition_name = "TRANSITION " + transition_name
+        self.transition_name = transition_name
 
     def validate(self):
         from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
