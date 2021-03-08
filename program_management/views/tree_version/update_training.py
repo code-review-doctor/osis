@@ -64,7 +64,8 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             "is_finality_types": self.get_training_obj().is_finality(),
             "version_suffix": (
                 "-{}" if version.entity_id.is_specific_transition else "{}"
-            ).format(version.transition_name)
+            ).format(version.transition_name),
+            "version_label": version_label(version.entity_id)
         }
         return render(request, self.template_name, context)
 
@@ -258,6 +259,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         administration_entity_obj = entity_version.find(training_obj.administration_entity.acronym)
 
         form_initial_values = {
+            'transition_name': training_version.transition_name,
             'version_name': training_version.version_name,
             'version_title_fr': training_version.title_fr,
             'version_title_en': training_version.title_en,

@@ -51,11 +51,13 @@ class TestValidateExistenceOfTransition(TestValidatorValidateMixin, TestCase):
         self.transition.end_year_of_existence = self.year + 4
 
         self.assertValidatorRaises(
-            _update_check_existence_of_transition.CheckExistenceOfTransition(self.transition),
+            _update_check_existence_of_transition.CheckExistenceOfTransition(self.transition, self.year),
             None
         )
 
     def test_should_not_raise_exception_if_no_transition_in_future(self):
         self.transition.end_year_of_existence = self.year + 4
 
-        self.assertValidatorNotRaises(_update_check_existence_of_transition.CheckExistenceOfTransition(self.transition))
+        self.assertValidatorNotRaises(
+            _update_check_existence_of_transition.CheckExistenceOfTransition(self.transition, self.year)
+        )
