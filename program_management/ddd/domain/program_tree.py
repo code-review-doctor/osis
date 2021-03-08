@@ -155,6 +155,10 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
+    def copy_prerequisites_from_program_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
+        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
+        return to_tree
+
     def fill_from_program_tree(
             self,
             from_tree: 'ProgramTree',
@@ -169,7 +173,6 @@ class ProgramTreeBuilder:
             to_tree.authorized_relationships,
             existing_nodes
         )
-        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
 
         return to_tree
 

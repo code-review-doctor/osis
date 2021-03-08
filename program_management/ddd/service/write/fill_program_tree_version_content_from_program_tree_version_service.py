@@ -27,11 +27,12 @@ from django.db import transaction
 
 from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
-    CopyTreeCmsFromPastYear
+    CopyTreeCmsFromPastYear, CopyProgramTreePrerequisitesFromProgramTreeCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository
-from program_management.ddd.service.write import copy_program_tree_cms_from_past_year_service
+from program_management.ddd.service.write import copy_program_tree_cms_from_past_year_service, \
+    copy_program_tree_prerequisites_from_program_tree_service
 
 
 @transaction.atomic()
@@ -71,6 +72,14 @@ def fill_program_tree_version_content_from_program_tree_version(
     identity = tree_version_repository.update(to_tree_version)
     tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
 
+    copy_program_tree_prerequisites_from_program_tree_service.copy_program_tree_prerequisites_from_program_tree(
+        CopyProgramTreePrerequisitesFromProgramTreeCommand(
+            from_code=from_tree_version.program_tree_identity.code,
+            from_year=from_tree_version.program_tree_identity.year,
+            to_code=to_tree_version.program_tree_identity.code,
+            to_year=to_tree_version.program_tree_identity.year
+        )
+    )
     copy_program_tree_cms_from_past_year_service.copy_program_tree_cms_from_past_year(
         CopyTreeCmsFromPastYear(
             code=to_tree_version.program_tree_identity.code,
