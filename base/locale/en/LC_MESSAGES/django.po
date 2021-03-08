@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-03 09:19+0100\n"
+"POT-Creation-Date: 2021-03-04 13:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -528,6 +528,9 @@ msgid "Code"
 msgstr ""
 
 msgid "Code co-graduation inter CfB"
+msgstr ""
+
+msgid "Comment"
 msgstr ""
 
 msgid "Common English title"
@@ -2389,6 +2392,12 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr ""
 
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
+msgstr ""
+
 #, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
@@ -2750,6 +2759,9 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Url"
 msgstr ""
 
 msgid "User"
