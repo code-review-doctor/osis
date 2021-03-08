@@ -33,6 +33,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.decorators.ajax import ajax_required
 from program_management.ddd import command
 from program_management.ddd.domain.exception import TransitionNameExistsInPast
+from program_management.ddd.domain.program_tree_version import TRANSITION_PREFIX
 from program_management.ddd.service.read import check_transition_name_service
 
 
@@ -45,7 +46,7 @@ def check_transition_name(request, year, acronym, version_name=""):
         year=year,
         offer_acronym=acronym,
         version_name=version_name,
-        transition_name=transition_name
+        transition_name=TRANSITION_PREFIX+" "+transition_name if transition_name else TRANSITION_PREFIX
     )
 
     try:
