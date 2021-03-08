@@ -201,6 +201,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "create_specific_version_url": self.get_create_specific_version_url(),
             "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
+            "create_transition_version_permission_name": self.get_create_transition_version_permission_name(),
             "is_root_node": self.is_root_node(),
             "view_publish_btn":
                 self.request.user.has_perm('base.view_publish_btn') and
@@ -265,6 +266,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     def get_create_version_permission_name(self) -> str:
         return "base.add_minitraining_version"
+
+    def get_create_transition_version_permission_name(self) -> str:
+        return "base.add_minitraining_transition_version"
 
     def get_delete_permanently_tree_version_url(self):
         if not self.program_tree_version_identity.is_official_standard:
