@@ -180,7 +180,7 @@ CATEGORIES = (
 ## API
 - Regroupe le `schema.yml`, les views REST et serializers (Django-Rest-Framework)
 - Incrémenter la version du schema.yml (cf. `info: version: 'X.Y'`) à chaque modification de celui-ci
-- Tout champs utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champs "filtre" doit se trouver dans la donnée renvoyée)
+- Tout champ utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champ "filtre" doit se trouver dans la donnée renvoyée)
  
 <br/><br/>
 
