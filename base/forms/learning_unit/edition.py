@@ -125,13 +125,17 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
         self.luy_current_year = self.learning_unit_year.academic_year.year
 
         learning_container = self.learning_unit_year.learning_container_year.learning_container
-        academic_year_learning_container_year = self.learning_unit_year.learning_container_year.academic_year
-        applications = TutorApplication.objects.filter(
-            learning_container_year__learning_container=learning_container,
-            learning_container_year__academic_year__year__gte=academic_year_learning_container_year.year
-        ).order_by('learning_container_year__academic_year__year')
-        if not max_year and applications:
-            max_year = applications.first().learning_container_year.academic_year.year
+        if self.learning_unit_year.is_full():
+            academic_year_learning_container_year = self.learning_unit_year.learning_container_year.academic_year
+            applications = TutorApplication.objects.filter(
+                learning_container_year__learning_container=learning_container,
+                learning_container_year__academic_year__year__gte=academic_year_learning_container_year.year
+            ).order_by('learning_container_year__academic_year__year')
+            if not max_year and applications:
+                max_year = applications.first().learning_container_year.academic_year.year
+        else:
+            learning_unit_parent = self.learning_unit.parent
+            max_year = learning_unit_parent.end_year.year if learning_unit_parent.end_year else None
         academic_years = AcademicYear.objects.filter(year__gte=self.luy_current_year, year__in=target_years_opened)
         return academic_years.filter(year__lte=max_year) if max_year else academic_years
 

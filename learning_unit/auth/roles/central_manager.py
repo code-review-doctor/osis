@@ -25,7 +25,6 @@ class CentralManager(osis_role_models.EntityRoleModel):
             'base.can_create_learningunit': predicates.is_learning_unit_edition_for_central_manager_period_open,
             'base.can_create_partim':
                 predicates.is_user_attached_to_current_requirement_entity &
-                predicates.is_learning_unit_year_not_in_past &
                 predicates.is_learning_unit_edition_for_central_manager_period_open &
                 predicates.is_learning_unit_year_full &
                 predicates.is_external_learning_unit_with_cograduation,

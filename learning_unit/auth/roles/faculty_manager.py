@@ -114,6 +114,7 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                  ),
             'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
             'base.can_change_attribution':
                 predicates.is_learning_unit_type_allowed_for_attributions &
