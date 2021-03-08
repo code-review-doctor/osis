@@ -14,7 +14,7 @@ def create_access_schedule_calendar(apps, shema_editor):
     now = timezone.now()
     current_academic_year = AcademicYear.objects.filter(start_date__lte=now, end_date__gte=now).last()
     if current_academic_year:
-        qs = AcademicYear.objects.filter(year__gt=2020, year__lte=current_academic_year.year + 6)
+        qs = AcademicYear.objects.filter(year__gte=2020, year__lte=current_academic_year.year + 6)
         for ac_year in qs:
             AcademicCalendar.objects.update_or_create(
                 reference=AcademicCalendarTypes.ACCESS_SCHEDULE_CALENDAR.name,
