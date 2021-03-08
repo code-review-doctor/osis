@@ -55,8 +55,9 @@ from program_management.ddd.validators._node_have_link import NodeHaveLinkValida
 from program_management.ddd.validators._prerequisite_expression_syntax import PrerequisiteExpressionSyntaxValidator
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
-from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator, \
-    FullTransitionNamePatternValidator
+from program_management.ddd.validators._transition_name_existed import TransitionNameExistedValidator
+from program_management.ddd.validators._transition_name_exists import TransitionNameExistsValidator
+from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator
 from program_management.ddd.validators._update_check_existence_of_transition import CheckExistenceOfTransition
 from program_management.ddd.validators._validate_end_date_and_option_finality import ValidateFinalitiesEndDateAndOptions
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
@@ -281,7 +282,7 @@ class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
     def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
-            FullTransitionNamePatternValidator(transition_name=transition_name)
+            TransitionNamePatternValidator(transition_name=transition_name)
         ]
         super().__init__()
 
@@ -297,8 +298,10 @@ class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
 
 
 class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(self, transition_name: str):
+    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
-            TransitionNamePatternValidator(transition_name=transition_name)
+            TransitionNamePatternValidator(transition_name=transition_name),
+            TransitionNameExistsValidator(year, offer_acronym, version_name, transition_name),
+            TransitionNameExistedValidator(year, offer_acronym, version_name, transition_name),
         ]
         super().__init__()

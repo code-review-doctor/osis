@@ -117,7 +117,7 @@ class CreateProgramTreeSpecificVersion(AjaxPermissionRequiredMixin, AjaxTemplate
                 try:
                     identities = create_and_postpone_tree_specific_version_service. \
                         create_and_postpone_program_tree_specific_version(command=command)
-                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
+                except (program_management.ddd.domain.exception.VersionNameExistsCurrentYearAndInFuture,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             else:
@@ -239,7 +239,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
                 try:
                     identities = create_and_postpone_tree_transition_version_service. \
                         create_and_postpone_program_tree_transition_version(command=command)
-                except (program_management.ddd.domain.exception.VersionNameAlreadyExist,
+                except (program_management.ddd.domain.exception.TransitionNameExistsCurrentYearAndInFuture,
                         exception.MultipleEntitiesFoundException) as e:
                     form.add_error('version_name', e.message)
             else:
@@ -338,7 +338,7 @@ def _convert_form_to_prolong_command(
         updated_year=form.tree_version_identity.year,
         offer_acronym=form.tree_version_identity.offer_acronym,
         version_name=form.cleaned_data['version_name'],
-        transition_name=NOT_A_TRANSITION,
+        transition_name=last_program_tree_version.transition_name,
         title_en=form.cleaned_data.get("version_title_en") or last_program_tree_version.title_en,
         title_fr=form.cleaned_data.get("version_title_fr") or last_program_tree_version.title_fr,
     )

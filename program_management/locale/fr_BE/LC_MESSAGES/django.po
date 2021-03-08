@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-23 09:12+0100\n"
+"POT-Creation-Date: 2021-02-24 16:19+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -149,6 +149,10 @@ msgstr "Concours"
 msgctxt "female plural"
 msgid "All"
 msgstr "Toutes"
+
+msgctxt "male plural"
+msgid "All"
+msgstr "Tous"
 
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
@@ -881,9 +885,9 @@ msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
-"La version de formation %(offer_acronym)s %(version_name)s a été supprimée "
+"La version de formation %(offer_acronym)s%(version_name)s a été supprimée "
 "avec succès."
 
 msgid "The registration form is available at the Secretariat of"
@@ -952,6 +956,12 @@ msgstr "Transformation et modification"
 
 msgid "Transition name"
 msgstr "Sigle de la transition"
+
+msgid "Transition name {} already exists"
+msgstr "Nom de transition {} existe déjà"
+
+msgid "Transition name {} existed"
+msgstr "Nom de transition {} a déjà existé dans le passé"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
@@ -1053,6 +1063,14 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
 "qu'il existe une version particulière pour cette année et/ou dans le futur."
+
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists in {transition_year}"
+msgstr ""
+"Vous ne pouvez pas étendre la formation '{code}' en {year} parce qu'il "
+"existe une autre version de transition en {transition_year}"
 
 #, python-format
 msgid ""

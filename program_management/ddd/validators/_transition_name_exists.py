@@ -23,20 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
-
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import InvalidTransitionNameException
-
-TRANSITION_NAME_REGEX = r"^TRANSITION(\s[A-Z]+)?"
+from program_management.ddd.domain.exception import TransitionNameExistsCurrentYearAndInFuture
 
 
-class TransitionNamePatternValidator(BusinessValidator):
+class TransitionNameExistsValidator(BusinessValidator):
 
-    def __init__(self, transition_name: str):
-        super().__init__()
+    def __init__(self, working_year: int, offer_acronym: str, version_name: str, transition_name: str):
+        super(TransitionNameExistsValidator, self).__init__()
+        self.working_year = working_year
+        self.version_name = version_name
+        self.offer_acronym = offer_acronym
         self.transition_name = transition_name
 
     def validate(self):
-        if not bool(re.fullmatch(TRANSITION_NAME_REGEX, self.transition_name.upper())):
-            raise InvalidTransitionNameException()
+        from program_management.ddd.domain.service.get_last_existing_version_name import GetLastExistingVersion
+        last_version_identity = GetLastExistingVersion().get_last_existing_version_identity(
+            self.version_name,
+            self.offer_acronym,
+            self.transition_name
+        )
+        if last_version_identity and last_version_identity.year >= self.working_year:
+            raise TransitionNameExistsCurrentYearAndInFuture(last_version_identity.transition_name)
