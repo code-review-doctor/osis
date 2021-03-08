@@ -595,7 +595,7 @@ msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
 msgid "Continuing Education"
-msgstr "Formation Continue"
+msgstr "Formations Continues"
 
 msgid "Coordinator"
 msgstr "Coordinateur"
