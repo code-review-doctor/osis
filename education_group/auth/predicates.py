@@ -230,3 +230,13 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, obj: Union['Gr
         }
         return user_scopes.get(obj.management_entity_id) == Scope.ALL.value
     return None
+
+
+@predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_education_group_year_a_transition(
+        self,
+        user: User,
+        obj: Union[EducationGroupYear, GroupYear] = None
+):
+    return obj and obj.partial_acronym.upper().startswith('T')
