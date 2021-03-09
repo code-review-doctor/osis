@@ -111,6 +111,8 @@ def has_learning_unit_prerequisite_dependencies(self, user, learning_unit_year):
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_container_type_deletable(self, user, learning_unit_year):
     if learning_unit_year:
+        if learning_unit_year.is_partim():
+            return True
         container_type = learning_unit_year.learning_container_year.container_type
         is_full_course = container_type == container_types.COURSE and learning_unit_year.is_full()
         type_is_deletable = container_type not in [type.name for type in DELETABLE_CONTAINER_TYPES]
