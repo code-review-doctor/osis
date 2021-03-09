@@ -182,6 +182,9 @@ msgstr ""
 msgid "Access minor"
 msgstr ""
 
+msgid "Access schedule calendar"
+msgstr ""
+
 msgid "Access to the student's virtual office."
 msgstr ""
 

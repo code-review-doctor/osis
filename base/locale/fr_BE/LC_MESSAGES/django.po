@@ -193,6 +193,9 @@ msgstr "Accès refusé !"
 msgid "Access minor"
 msgstr "Mineure d’accès"
 
+msgid "Access schedule calendar"
+msgstr "Accès horaire ADE"
+
 msgid "Access to the student's virtual office."
 msgstr "Accès au bureau virtuel de l'étudiant."
 
