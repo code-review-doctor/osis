@@ -85,6 +85,7 @@ class AcademicCalendarTypes(ChoiceEnum):
     SCORES_EXAM_DIFFUSION = _("Scores diffusion")
     SCORES_EXAM_SUBMISSION = _("Scores exam submission")
     TEACHING_CHARGE_APPLICATION = _("Application for vacant courses")
+    ACCESS_SCHEDULE_CALENDAR = _("Access schedule calendar")
     COURSE_ENROLLMENT = _("Course enrollment")
     SUMMARY_COURSE_SUBMISSION = _("Summary course submission")
     SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE = _("Summary course submission force majeure")

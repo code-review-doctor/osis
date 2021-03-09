@@ -193,6 +193,9 @@ msgstr "Accès refusé !"
 msgid "Access minor"
 msgstr "Mineure d’accès"
 
+msgid "Access schedule calendar"
+msgstr "Accès horaire ADE"
+
 msgid "Access to the student's virtual office."
 msgstr "Accès au bureau virtuel de l'étudiant."
 
@@ -595,7 +598,7 @@ msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
 msgid "Continuing Education"
-msgstr "Formation Continue"
+msgstr "Formations Continues"
 
 msgid "Coordinator"
 msgstr "Coordinateur"
