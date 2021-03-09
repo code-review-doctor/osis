@@ -54,6 +54,12 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 - [Event Sourcing : comprendre les bases d’un système évènementiel](https://blog.engineering.publicissapient.fr/2017/01/16/event-sourcing-comprendre-les-bases-dun-systeme-evenementiel/)
 
 <br/><br/>
+
+## Event Storming
+### Articles
+- [Event Storming : modélisez votre domaine métier en équipe](https://cleandojo.com/2019/06/event-storming-modelisez-votre-domaine-metier-en-equipe/)
+
+<br/><br/>
  
 ## Legacy
 ### Articles
