@@ -23,18 +23,18 @@
 {% endcomment %}
 {% load i18n %}
 
-<div id="section_{{ section_id }}">
+<div id="section_{{ section_name }}">
     <h3 {% if not can_edit %}class="education_group_year-common italic"{% endif %}>{{ text }}
         {% if can_edit_information and can_edit %}
             <a role="button"
                class="trigger_modal"
-               data-url="{{ update_text_url }}?section={{ section_id }}&title={{ text.split|join:"%20" }}"
+               data-url="{{ update_text_url }}?section={{ section_name }}&title={{ text.split|join:"%20" }}"
                data-modal_class="modal-lg">
                 <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
             </a>
         {% endif %}
     </h3>
-    <div class="row collapse" id="collapse_{{ section_id }}" aria-expanded="false">
+    <div class="row collapse" id="collapse_{{ section_name }}" aria-expanded="false">
         <div class="col-md-6" id="text_{{ section }}_fr">
             {% if field %}
                 {% if can_edit %}
@@ -60,8 +60,8 @@
         </div>
     </div>
     {% if field or field_en %}
-        <a role="button" class="collapsed btn_collapse" data-toggle="collapse" href="#collapse_{{ section_id }}"
-           aria-expanded="false" aria-controls="collapse_{{ section_id }}" id="btn_collapse_{{ section_id }}">
+        <a role="button" class="collapsed btn_collapse" data-toggle="collapse" href="#collapse_{{ section_name }}"
+           aria-expanded="false" aria-controls="collapse_{{ section_name }}" id="btn_collapse_{{ section_name }}">
         </a>
     {% endif %}
     <hr/>

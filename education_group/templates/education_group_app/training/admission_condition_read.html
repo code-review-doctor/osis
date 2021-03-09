@@ -23,29 +23,7 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block style %}
-    <style>
-        div[id^="section_"]  div.collapse[aria-expanded="false"] {
-            display: block;
-            height: 80px !important;
-            overflow: hidden;
-        }
 
-        div[id^="section_"] .btn_collapse.collapsed:after  {
-            font-family: 'Font Awesome\ 5 Free';
-            font-weight: 900;
-            content: "\f078";
-            font-weight: bold;
-        }
-
-        div[id^="section_"] .btn_collapse:not(.collapsed):after {
-            font-family: 'Font Awesome\ 5 Free';
-            font-weight: 900;
-            content: "\f077";
-            font-weight: bold;
-        }
-    </style>
-{% endblock %}
 {% block top_action_bar %}
     {% if view_publish_btn %}
         {% include  "education_group_app/blocks/refresh_publication_button.html" %}
@@ -64,33 +42,33 @@
         <div class="col-md-12">
             {% if training.is_bachelor or training.is_master_specialized or training.is_aggregation or training.is_master_60_credits or training.is_master_120_credits or training.is_master_180_240_credits %}
                 <!-- Message d'alerte -->
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=common_admission_condition.alert_message.text_fr field_en=common_admission_condition.alert_message.text_en can_edit=False section_id=1%}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=common_admission_condition.alert_message.text_fr field_en=common_admission_condition.alert_message.text_en can_edit=False %}
             {% endif %}
 
             {% if training.is_bachelor %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False  section_id=2%}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="free" text=_("Specific admission requirements") field=common_admission_condition.specific_condition_requirements.text_fr field_en=common_admission_condition.specific_condition_requirements.text_en can_edit=False  section_id=3%}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=common_admission_condition.specific_conditions.text_fr field_en=common_admission_condition.specific_conditions.text_en can_edit=False  section_id=4 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=common_admission_condition.language_exam.text_fr field_en=common_admission_condition.language_exam.text_en can_edit=False  section_id=5 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Conditions") field=common_admission_condition.special_conditions.text_fr field_en=common_admission_condition.special_conditions.text_en can_edit=False section_id=6 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="common_free" text=_("Specific admission requirements") field=common_admission_condition.specific_condition_requirements.text_fr field_en=common_admission_condition.specific_condition_requirements.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_particulieres" text=_("Specific Conditions") field=common_admission_condition.specific_conditions.text_fr field_en=common_admission_condition.specific_conditions.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_examen_langue" text=_("Language Exam") field=common_admission_condition.language_exam.text_fr field_en=common_admission_condition.language_exam.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_speciales" text=_("Special Conditions") field=common_admission_condition.special_conditions.text_fr field_en=common_admission_condition.special_conditions.text_en can_edit=False %}
             {% endif %}
 
             <!-- Conditions spécifiques d'admission -->
-            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="free" text=_("Specific admission requirements") field=admission_condition.admission_requirements.text_fr field_en=admission_condition.admission_requirements.text_en can_edit=True  section_id=7 %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="free" text=_("Specific admission requirements") field=admission_condition.admission_requirements.text_fr field_en=admission_condition.admission_requirements.text_en can_edit=True %}
 
             {% if training.is_master_specialized %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False  section_id=8 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False %}
             {% endif %}
 
             {% if training.is_aggregation %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False section_id=9 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=common_admission_condition.french_proficiency_examination.text_fr field_en=common_admission_condition.french_proficiency_examination.text_en can_edit=False section_id=10 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=common_admission_condition.subscription_lightening.text_fr field_en=common_admission_condition.subscription_lightening.text_en can_edit=False section_id=11 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=common_admission_condition.opening_to_adults.text_fr field_en=common_admission_condition.opening_to_adults.text_en can_edit=False section_id=12 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=common_admission_condition.french_proficiency_examination.text_fr field_en=common_admission_condition.french_proficiency_examination.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=common_admission_condition.subscription_lightening.text_fr field_en=common_admission_condition.subscription_lightening.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=common_admission_condition.opening_to_adults.text_fr field_en=common_admission_condition.opening_to_adults.text_en can_edit=False %}
             {% endif %}
 
             {% if training.is_master_60_credits or training.is_master_120_credits or training.is_master_180_240_credits %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False section_id=13 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Conditions") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False %}
                 <!-- Bacheliers universitaires table -->
                 <div id="university_bachelors">
                     <h3>{% trans 'University Bachelors' %}</h3>
@@ -134,8 +112,8 @@
                 </div>
 
                 <!-- Bacheliers non universitaires -->
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=common_admission_condition.non_university_bachelors.text_fr field_en=common_admission_condition.non_university_bachelors.text_en can_edit=False section_id=14 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.non_university_bachelors.text_fr field_en=admission_condition.non_university_bachelors.text_en can_edit=True section_id=15 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="common_non_university_bachelors" text=_("Non university Bachelors") field=common_admission_condition.non_university_bachelors.text_fr field_en=common_admission_condition.non_university_bachelors.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.non_university_bachelors.text_fr field_en=admission_condition.non_university_bachelors.text_en can_edit=True %}
 
                 <!-- Diplômés du 2° cycle universitaire table-->
                 <div id="holders_second_university_degree">
@@ -177,19 +155,19 @@
                 </div>
 
                 <!-- Diplômés de 2° cycle non universitaire -->
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="holders_non_university_second_degree" text=_("Holders of a non-University 2nd cycle degree") field=admission_condition.holders_non_university_second_degree.text_fr field_en=admission_condition.holders_non_university_second_degree.text_en can_edit=True section_id=16 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="holders_non_university_second_degree" text=_("Holders of a non-University 2nd cycle degree") field=admission_condition.holders_non_university_second_degree.text_fr field_en=admission_condition.holders_non_university_second_degree.text_en can_edit=True %}
 
                 <!-- Adultes en reprise d'études -->
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Access based on validation of professional experience") field=common_admission_condition.adults_taking_up_university_training.text_fr field_en=common_admission_condition.adults_taking_up_university_training.text_en can_edit=False section_id=17 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Access based on validation of professional experience") field=admission_condition.adults_taking_up_university_training.text_fr field_en=admission_condition.adults_taking_up_university_training.text_en can_edit=True section_id=18 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="common_adults_taking_up_university_training" text=_("Access based on validation of professional experience") field=common_admission_condition.adults_taking_up_university_training.text_fr field_en=common_admission_condition.adults_taking_up_university_training.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Access based on validation of professional experience") field=admission_condition.adults_taking_up_university_training.text_fr field_en=admission_condition.adults_taking_up_university_training.text_en can_edit=True %}
 
                 <!-- Accès personnalisé -->
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Access based on application") field=common_admission_condition.personalized_access.text_fr field_en=common_admission_condition.personalized_access.text_en can_edit=False section_id=19 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Access based on application") field=admission_condition.personalized_access.text_fr field_en=admission_condition.personalized_access.text_en can_edit=True section_id=20 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="common_personalized_access" text=_("Access based on application") field=common_admission_condition.personalized_access.text_fr field_en=common_admission_condition.personalized_access.text_en can_edit=False%}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Access based on application") field=admission_condition.personalized_access.text_fr field_en=admission_condition.personalized_access.text_en can_edit=True %}
 
                 <!-- Procédures d'admission et d'inscription -->
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=common_admission_condition.admission_enrollment_procedures.text_fr field_en=common_admission_condition.admission_enrollment_procedures.text_en can_edit=False section_id=21 %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.admission_enrollment_procedures.text_fr field_en=admission_condition.admission_enrollment_procedures.text_en can_edit=True section_id=22 %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="common_admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=common_admission_condition.admission_enrollment_procedures.text_fr field_en=common_admission_condition.admission_enrollment_procedures.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.admission_enrollment_procedures.text_fr field_en=admission_condition.admission_enrollment_procedures.text_en can_edit=True %}
             {% endif %}
         </div>
     </div>
