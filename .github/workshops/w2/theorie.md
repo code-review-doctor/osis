@@ -1,0 +1,306 @@
+# Partie 1 : DDD : domaine "pure" et domaine "complet"
+
+## Domaine complet : définition
+
+- Un domaine est complet ssi il contient toute la logique métier de l'application
+
+- Cas d'utilisation : modifier l'email d'un utilisateur
+
+```python
+from osis_common.ddd import interface
+import attr
+
+# Domain
+@attr.s(slots=True)
+class Company(interface.Entity):
+    domain_name= attr.ib(type=str)
+    
+    def is_email_corporate(self, email: str) -> bool:
+        email_domain = email.split('@')[1]
+        return email_domain == self.domain_name
+
+
+@attr.s(slots=True)
+class UserIdentity(interface.Entity):
+    username = attr.ib(type=str)
+
+
+@attr.s(slots=True)
+class User(interface.Entity):
+    entity_identity = attr.ib(type=UserIdentity)
+    company = attr.ib(type=Company)
+    email = attr.ib(type=str)
+
+    def change_email(self, new_email: str):
+        if not self.company.is_email_corporate():
+            raise interface.BusinessException("Incorrect email domain")
+        self.email = new_email
+
+
+# Application Service
+def change_email_service(cmd: interface.CommandRequest) -> 'interface.EntityIdentity':
+    repository = UserRepository()
+    # Given
+    user = repository.get(UserIdentity(username=cmd.username))
+    
+    # When
+    user.change_email(new_email=cmd.email)
+
+    # Then
+    repository.update(user)
+    
+    return user.entity_identity
+```
+
+- "Domain logic fragmentation" est l'opposé d'un domaine complet : lorsque la logique métier (ici, `is_email_corporate`)
+appartient à une autre couche que le domaine métier (couche de services, couche repository...)
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Domaine pure : définition
+
+- Un domaine est "pure" ssi
+    - il n'a aucune dépendance externe ou à d'autres couches de code
+    - il dépend uniquement de types primitifs ou d'autres classes du domaines
+
+- Cas d'utilisation : règle métier : interdit de modifier si l'email existe déjà
+
+- Essai n°1 : vérifier cette règle dans l'application service
+```python
+from osis_common.ddd import interface
+import attr
+
+# Application Service
+def change_email_service(cmd: interface.CommandRequest) -> 'interface.EntityIdentity':
+    repository = UserRepository()
+    # Given
+    if repository.search(email=new_email):
+        raise interface.BusinessException("Email already exists")
+
+    user = repository.get(UserIdentity(username=cmd.username))
+    
+    # When
+    user.change_email(new_email=cmd.email)
+
+    # Then
+    repository.update(user)
+    
+    return user.entity_identity
+
+```
+
+
+- Notre implémentation rend-elle notre domaine pure ?
+- Notre implémentation rend-elle notre domaine complet ?
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+- Essai n°2 : Injection du repository dans le domain
+
+```python
+from osis_common.ddd import interface
+import attr
+
+# Domain
+@attr.s(slots=True)
+class User(interface.Entity):
+    entity_identity = attr.ib(type=UserIdentity)
+    company = attr.ib(type=Company)
+    email = attr.ib(type=str)
+
+    def change_email(self, new_email: str, repository: UserRepository):
+        if not self.company.is_email_corporate():
+            raise interface.BusinessException("Incorrect email domain")
+        if repository.search(email=new_email):
+            raise interface.BusinessException("Email already exists")
+        self.email = new_email
+
+```
+
+- Notre implémentation rend-elle notre domaine pure ?
+- Notre implémentation rend-elle notre domaine complet ?
+- Pas correct : le modèle DB peut toujours atteindre la base de données (via injection de dépendance)
+
+- Autre idée ? 
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+- Essai n°3 : passer la liste des utilisateurs existants à notre domaine
+
+```python
+from osis_common.ddd import interface
+import attr
+
+# Application Service
+def change_email_service(cmd: interface.CommandRequest) -> 'interface.EntityIdentity':
+    repository = UserRepository()
+    # Given
+    all_users = repository.search()
+    user = repository.get(UserIdentity(username=cmd.username), all_users=all_users)
+    
+    # When
+    user.change_email(new_email=cmd.email)
+
+    # Then
+    repository.update(user)
+    
+    return user.entity_identity
+
+
+# Domain
+@attr.s(slots=True)
+class User(interface.Entity):
+    entity_identity = attr.ib(type=UserIdentity)
+    company = attr.ib(type=Company)
+    email = attr.ib(type=str)
+
+    def change_email(self, new_email: str, all_users: List['User']):
+        if not self.company.is_email_corporate():
+            raise interface.BusinessException("Incorrect email domain")
+        if new_email in {u.email for u in all_users}:
+            raise interface.BusinessException("Email already exists")
+        self.email = new_email
+
+```
+
+- Quel inconvénient à cette solution ? 
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+## Trilemme
+
+https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
+
+- Il est impossible de satisfaire les 3 concepts suivants : 
+    - Domain complet
+    - Domain pure
+    - Performance
+
+- Choix possibles :
+    - Placer toutes les opérations de lecture et écritures aux limites d'une opération métier (sandwich pattern)
+        - Domaine "pure" et "complet" **au détriment des performances**
+    - Partager la logique métier entre le domaine et l'application service
+        - Domaine "pure" et performances **au détriment d'un domaine "complet"**
+    - Injecter les dépendances hors processus dans le domaine
+        - Domaine "complet" et performances **au détriment d'un domaine "pure"**
+
+- Décision : 
+    - Toujours privilégier un domaine "pure" et "complet"
+
+- Et si j'ai des problèmes de performances ? 
+    - Privilégier un domaine "pure" et une application performante
+        - Il est plus facile de maintenir un "domain logic fragmentation" plutôt que des dépendances externes (mocks, etc.)
+
+        
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+## Questions
+
+- Puis-je faire des tryexcept dans un application service ? 
+- Puis-je placer un IF dans un application service ?
+- Puis-je lancer une BusinessException dans un application service ?
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+# Partie 2 : DDD
+
+## Différence entre "domain service" et "application service"
+
+### Différence principale
+- Les "domain services" contiennent de la logique métier alors que les "application services" n'en contiennent pas
+
+#### Application service
+- Un application service représente un service qui effectue une action métier complète
+- Given - when - then facilement identifiable
+- Orchestre les appels dans les différentes couches (Repository, Domaine, DomaineService)
+
+
+
+#### Domain service
+- Un domain service est un service qui encapsule une logique métier qui ne sait pas être représenté par un Entity ou à un ValueObject,
+et qui ne représente pas un cas d'utilisation en tant que tel.
+- Quand utiliser un DomainService ? 
+    - Lorsque notre domaine ne peut pas être "pure" et "complet" à cause des performances
+    - Lorsque nous avons une logique métier dans un use case qui nécessite des dépendances externes
+- Exemple : 
+```python
+from decimal import Decimal
+from osis_common.ddd import interface
+from external.dependency.gateway import payment_gateway
+
+
+
+# Application service
+def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
+    repository = ATMRepository()    
+    atm = repository.get()  # distributeur automatique de billets
+
+    if not atm.can_dispense_money(amount):
+        return atm.entity_identity
+
+    amount_with_commission = atm.calculate_amount_with_commission(amount)
+    result = payment_gateway.charge_payment(amount_with_commission)  # dépendance externe
+
+    if result.is_failure():
+        return atm.entity_identity
+    
+    atm.dispense_money(amount)
+    
+    repository.update(atm)
+    
+    return atm.entity_identity
+    
+```
+
+- Solution : Domain service
+
+```python
+from decimal import Decimal
+from osis_common.ddd import interface
+from external.dependency.gateway import payment_gateway
+
+
+# Application service
+def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
+    repository = ATMRepository()    
+    atm = repository.get()  # distributeur automatique de billets
+    AtmWithdrawMoney.withdraw_money(atm, amount, payment_gateway)
+    repository.update(atm)
+    
+    return atm.entity_identity
+
+
+# Domain service
+class AtmWithdrawMoney(interface.DomainService):
+    def withdraw_money(self, atm: ATM, amount: Decimal, payment_gateway):
+        if not atm.can_dispense_money(amount):
+                return atm.entity_identity
+    
+        amount_with_commission = atm.calculate_amount_with_commission(amount)
+        result = payment_gateway.charge_payment(amount_with_commission)  # dépendance externe
+    
+        if result.is_failure():
+            return atm.entity_identity
+        
+        atm.dispense_money(amount)
+
+
+    
+```
+
+
+
+## Questions
+
+- Puis-je appeler un Domain service dans un application service ?
+- Puis-je appeler un application service dans un domain service ?
