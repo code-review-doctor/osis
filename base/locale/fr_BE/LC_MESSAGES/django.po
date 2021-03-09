@@ -1364,10 +1364,10 @@ msgid "Legend"
 msgstr "Légende"
 
 msgid "Limited proposal management"
-msgstr "Gestion limitée de la proposition"
+msgstr "Gestion des propositions limitée"
 
 msgid "Extended proposal management"
-msgstr "Gestion étendue de la proposition"
+msgstr "Gestion des propositions étendue"
 
 msgid "Link type"
 msgstr "Type de lien"
