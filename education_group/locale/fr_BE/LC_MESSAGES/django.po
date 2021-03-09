@@ -460,9 +460,9 @@ msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
 msgid ""
-"For Phd/Formation Ph the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation PhD the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
 msgstr ""
-"Pour les doctorats/formations doctorales les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou "
+"Pour les formations doctorales les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou "
 "tous les champs ARES doivent être vides"
 
 msgid "For all students"

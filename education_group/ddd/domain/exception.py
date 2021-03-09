@@ -315,9 +315,9 @@ class HopsFieldsAllOrNone(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class HopsFields2OrNoneForPhd(BusinessException):
+class HopsFields2OrNoneForFormationPhd(BusinessException):
     def __init__(self, *args, **kwargs):
-        message = _("For Phd/Formation Ph the fields 'ARES study code' and 'ARES ability' have to be filled-in "
+        message = _("For formation PhD the fields 'ARES study code' and 'ARES ability' have to be filled-in "
                     "or none of the ARES fields")
         super().__init__(message, **kwargs)
 
