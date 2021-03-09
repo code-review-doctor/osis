@@ -31,7 +31,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
     AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
-from education_group.ddd.validators._hops_validator import HopsValuesValidator, HopsFields2OrNoneForPhd
+from education_group.ddd.validators._hops_validator import HopsValuesValidator, HopsFields2OrNoneForFormationPhd
 from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
@@ -78,7 +78,7 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=None,
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        training = TrainingFactory(hops=hops, type=TrainingType.PHD)
+        training = TrainingFactory(hops=hops, type=TrainingType.FORMATION_PHD)
         validator = HopsValuesValidator(training=training)
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
@@ -86,7 +86,7 @@ class TestHopsValidator(SimpleTestCase):
 
         self.assertIsInstance(
             e.exception.exceptions.pop(),
-            HopsFields2OrNoneForPhd
+            HopsFields2OrNoneForFormationPhd
         )
 
     def test_validation_ares_code_not_valid(self):
