@@ -78,7 +78,7 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=None,
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        training = TrainingFactory(hops=hops, type=TrainingType.PHD)
+        training = TrainingFactory(hops=hops, type=TrainingType.FORMATION_PHD)
         validator = HopsValuesValidator(training=training)
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
