@@ -163,7 +163,8 @@ class ProgramTreeBuilder:
             self,
             from_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
-            existing_nodes: Set['Node']
+            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
+            existing_trees: Set['ProgramTree']
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
@@ -171,7 +172,8 @@ class ProgramTreeBuilder:
             from_tree.root_node,
             to_tree.root_node,
             to_tree.authorized_relationships,
-            existing_nodes
+            existing_learning_unit_nodes,
+            existing_trees
         )
 
         return to_tree
@@ -181,14 +183,16 @@ class ProgramTreeBuilder:
             from_node: 'Node',
             to_node: 'Node',
             relationships: 'AuthorizedRelationshipList',
-            existing_nodes: Set['Node']
+            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
+            existing_trees: Set['ProgramTree']
     ) -> 'Node':
         learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
         group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
 
         for learning_unit_link in learning_units_links:
             child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_node(existing_nodes, child_node_identity) or learning_unit_link.child
+            child = self._get_existing_learning_node(existing_learning_unit_nodes, child_node_identity) or \
+                learning_unit_link.child
 
             copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
             to_node.children.append(copied_link)
@@ -198,26 +202,33 @@ class ProgramTreeBuilder:
                 continue
 
             child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_node(existing_nodes, child_node_identity)
+            child = self._get_existing_group_node(existing_trees, child_node_identity)
             child = child or node_factory.copy_to_year(group_year_link.child, to_node.year, group_year_link.child.code)
 
             copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
             to_node.children.append(copied_link)
 
             if not group_year_link.is_reference() and (
-                    not self._get_existing_node(existing_nodes, child_node_identity)
+                    is_empty(child, relationships)
                     or relationships.is_mandatory_child(to_node.node_type, child.node_type)
             ):
                 self._fill_node_children_from_node(
                     group_year_link.child,
                     child,
                     relationships,
-                    existing_nodes
+                    existing_learning_unit_nodes,
+                    existing_trees
                 )
 
         return to_node
 
-    def _get_existing_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
+    def _get_existing_group_node(self, existing_trees: Set['ProgramTree'], node_id: 'NodeIdentity') -> Optional['Node']:
+        return next(
+            (tree.root_node for tree in existing_trees if tree.root_node.entity_id == node_id),
+            None
+        )
+
+    def _get_existing_learning_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
         return next(
             (node for node in existing_nodes if node.entity_id == node_id),
             None

@@ -30,10 +30,12 @@ from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
     ProgramTreeNonEmpty
 from program_management.ddd.domain.node import factory as node_factory
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
     fill_program_tree_version_content_from_program_tree_version
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     SpecificProgramTreeVersionFactory
@@ -237,6 +239,16 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             for child_node in self.tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
         }
         self.assertFalse(tree_entities_ids.intersection(entities_ids))
+
+    def test_do_not_overwrite_content_if_node_is_not_empty(self):
+        subgroup_node = self.tree_version_from.tree.get_node("1|21|31")
+        next_year_node = node_factory.copy_to_next_year(subgroup_node)
+        self.add_node_to_repo(next_year_node)
+        expected_link = LinkFactory(parent=next_year_node)
+
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+
+        self.assertIn(expected_link, self.tree_version_to_fill.tree.get_all_links())
 
     def _generate_cmd(
             self,

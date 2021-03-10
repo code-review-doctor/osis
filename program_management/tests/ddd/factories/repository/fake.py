@@ -43,6 +43,7 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
     class_name = "FakeProgramTreeRepository"
     return type(class_name, (FakeRepository,), {
         "create": _create_program_tree,
+        "search": _search_program_trees,
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeNotFoundException,
         "delete": _delete_program_tree,
@@ -111,6 +112,14 @@ def _delete_program_tree(
         cmd = command.DeleteNodeCommand(code=node.code, year=node.year, node_type=node.node_type.name,
                                         acronym=node.title)
         delete_node_service(cmd)
+
+
+@classmethod
+def _search_program_trees(cls, entity_ids: List['ProgramTreeIdentity'] = None, **kwargs) -> List['ProgramTree']:
+    result = []
+    if entity_ids:
+        return [root_entity for root_entity in cls.root_entities if root_entity.entity_id in entity_ids]
+    return result
 
 
 @classmethod
