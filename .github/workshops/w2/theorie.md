@@ -207,6 +207,7 @@ https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
 - Puis-je faire des tryexcept dans un application service ? 
 - Puis-je placer un IF dans un application service ?
 - Puis-je lancer une BusinessException dans un application service ?
+- Validator pour AcademicEvent est-il pure ?
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -303,4 +304,29 @@ class AtmWithdrawMoney(interface.DomainService):
 ## Questions
 
 - Puis-je appeler un Domain service dans un application service ?
-- Puis-je appeler un application service dans un domain service ?
+- Puis-je appeler un application service dans un domain service ? 
+
+
+## Exercices dans le code
+
+- cf. ProgramTree
+
+
+--------------------------------------------
+Note réunion architecture 10/03/2021
+
+
+
+- [w3] ajouter Dossier Factory
+    - [w3] Associer d'office un aggreagte à un factory
+    - [w3] Pareil pour les EntityIdentity
+        - Avantage : pas d'ambiguité : tout objet du domaine ne peut être instancié que via factory
+        - Avantage : pas besoin de faire de new Identity(...) -> juste appeler la factory
+        - Inconvénient : pattern "factory" pas nécessaire
+
+
+- [w6] shared kernel : équivalent "app reference" : aujourd'hui, crée-t-on cette couche (à inclure dans les formations) ou on verra + tard ? 
+Si plus tard, alors ajd on duplique les valueObjects et Entities
+    - [w6] à concilier : réflexion d'équipe pour mettre objet shared kernel + voir avantages et inconvénient d'un shared kernel
+    
+
