@@ -27,3 +27,14 @@
 ### Coding styles
 
 - [W5] Correction d'un bug = obligation d'un test unitaire.
+
+-------------------------------
+
+### Shared Kernel
+
+- Regroupe les ValueObject et Entity qui sont réutilisés à travers différents bounded contexts.
+- Pour le moment, privilégier la duplication de mêmes Entity / ValueObject dans les bounded contexts 
+- L'ajout d'un Entity / ValueObject est à discuter avec l'équipe
+- TODO :: documenter avantages et inconvénient d'un shared kernel
+   
+

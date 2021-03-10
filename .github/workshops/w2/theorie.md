@@ -311,22 +311,3 @@ class AtmWithdrawMoney(interface.DomainService):
 
 - cf. ProgramTree
 
-
---------------------------------------------
-Note réunion architecture 10/03/2021
-
-
-
-- [w3] ajouter Dossier Factory
-    - [w3] Associer d'office un aggreagte à un factory
-    - [w3] Pareil pour les EntityIdentity
-        - Avantage : pas d'ambiguité : tout objet du domaine ne peut être instancié que via factory
-        - Avantage : pas besoin de faire de new Identity(...) -> juste appeler la factory
-        - Inconvénient : pattern "factory" pas nécessaire
-
-
-- [w6] shared kernel : équivalent "app reference" : aujourd'hui, crée-t-on cette couche (à inclure dans les formations) ou on verra + tard ? 
-Si plus tard, alors ajd on duplique les valueObjects et Entities
-    - [w6] à concilier : réflexion d'équipe pour mettre objet shared kernel + voir avantages et inconvénient d'un shared kernel
-    
-
