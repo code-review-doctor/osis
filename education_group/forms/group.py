@@ -79,8 +79,9 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
+        is_transition = self.initial.get('code').upper().startswith('T')
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-        if self.user.person.is_faculty_manager:
+        if self.user.person.is_faculty_manager and not is_transition:
             target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
 
         self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
