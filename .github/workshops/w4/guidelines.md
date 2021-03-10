@@ -13,6 +13,8 @@
 ### validateurs
 
 - [W4] Un validateur ne peut pas modifier les arguments qu'elle reçoit pour sa propre validation. Exemple : self.transition_name = "TRANSITION " + transitionname (https://github.com/uclouvain/osis/pull/9680/files#)
+- Effectuer toujours les checks dans l'action métier de l'objet du domaine
+    - Exemples d'action métier : `ProgramTree.paste_node()`, `Program_tree.up_link()`, `Training.update_aims()`
 - Effectuer toujours les checks AVANT d'effectuer l'action métier sur l'objet
         - évite d'avoir un objet du domaine en état inconsistant -> garantit qu'un objet du domaine tjr consistant (plus facile en mainteance)
         - facilite les tests unitaires

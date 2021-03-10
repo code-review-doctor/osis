@@ -210,7 +210,23 @@ https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
 - Validator pour AcademicEvent est-il pure ?
 
 
-<br/><br/><br/><br/><br/><br/><br/><br/>
+## Exercices dans le code
+
+- program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree
+- program_management.ddd.service.write.paste_element_service.paste_element
+- program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version
+- education_group.ddd.service.write.delete_orphan_training_service.delete_orphan_training
+- education_group.ddd.service.write.copy_training_service.copy_training_to_next_year
+- program_management.ddd.service.write.up_link_service.up_link
+- education_group.ddd.service.write.update_group_service.update_group
+
+
+
+<br/><br/><br/><br/>
+-------------------------------
+<br/><br/><br/><br/>
+
+
 
 
 # Partie 2 : DDD
@@ -306,8 +322,4 @@ class AtmWithdrawMoney(interface.DomainService):
 - Puis-je appeler un Domain service dans un application service ?
 - Puis-je appeler un application service dans un domain service ? 
 
-
-## Exercices dans le code
-
-- cf. ProgramTree
 
