@@ -28,6 +28,7 @@ from django.db import transaction
 from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
     CopyTreeCmsFromPastYear, CopyProgramTreePrerequisitesFromProgramTreeCommand
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository
@@ -60,14 +61,25 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    existing_nodes = node_repo.search(
-        [
-            attr.evolve(node.entity_id, year=cmd.to_year)
+    existing_trees = tree_repository.search(
+        entity_ids=[
+            program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
             for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
+    existing_learning_unit_nodes = node_repo.search(
+        [
+            attr.evolve(node.entity_id, year=cmd.to_year)
+            for node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
+        ]
+    )
 
-    ProgramTreeVersionBuilder().fill_from_program_tree_version(from_tree_version, to_tree_version, set(existing_nodes))
+    ProgramTreeVersionBuilder().fill_from_program_tree_version(
+        from_tree_version,
+        to_tree_version,
+        set(existing_learning_unit_nodes),
+        set(existing_trees)
+    )
 
     identity = tree_version_repository.update(to_tree_version)
     tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
