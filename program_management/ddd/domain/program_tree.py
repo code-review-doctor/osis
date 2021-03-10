@@ -191,7 +191,8 @@ class ProgramTreeBuilder:
 
         for learning_unit_link in learning_units_links:
             child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_learning_node(existing_learning_unit_nodes, child_node_identity) or learning_unit_link.child
+            child = self._get_existing_learning_node(existing_learning_unit_nodes, child_node_identity) or \
+                learning_unit_link.child
 
             copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
             to_node.children.append(copied_link)
