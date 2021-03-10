@@ -972,6 +972,9 @@ msgstr "Sigle déjà existant"
 msgid "Export"
 msgstr "Exporter"
 
+msgid "Proposal management"
+msgstr "Gestion de la proposition"
+
 msgid "External"
 msgstr "Externe"
 
@@ -1362,6 +1365,12 @@ msgstr "Vol. PM"
 
 msgid "Legend"
 msgstr "Légende"
+
+msgid "Limited proposal management"
+msgstr "Gestion des propositions limitée"
+
+msgid "Extended proposal management"
+msgstr "Gestion des propositions étendue"
 
 msgid "Link type"
 msgstr "Type de lien"
@@ -2090,9 +2099,6 @@ msgid ""
 msgstr ""
 "Proposition d'unité d'enseignement <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> créée avec succès."
-
-msgid "Proposal management"
-msgstr "Gestion de la proposition"
 
 msgid "Proposal of creation"
 msgstr "Proposition de création"
