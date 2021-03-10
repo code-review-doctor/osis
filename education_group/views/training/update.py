@@ -234,7 +234,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             program_management_exception.ProgramTreeNonEmpty,
             exception.TrainingHaveLinkWithEPC,
             exception.TrainingHaveEnrollments,
-            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+            program_management_exception.CannotDeleteStandardDueToSpecificVersionEndDate,
+            program_management_exception.CannotDeleteStandardDueToTransitionVersionEndDate
         ) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
