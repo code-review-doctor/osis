@@ -31,7 +31,7 @@
             <!-- Message d'alerte -->
             {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True %}
             <!-- Conditions Générales -->
-            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_cond_generales field_en=admission_condition.text_ca_cond_generales_en can_edit=True %}
+            {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_cond_generales" text=_("General Access Requirements") field=admission_condition.text_ca_cond_generales field_en=admission_condition.text_ca_cond_generales_en can_edit=True %}
             <!-- Bacheliers non universitaires -->
             {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="non_university_bachelors" text=_("Non university Bachelors") field=admission_condition.text_non_university_bachelors field_en=admission_condition.text_non_university_bachelors_en can_edit=True %}
             <!-- Adultes en reprise d'études -->

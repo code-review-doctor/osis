@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-02 11:07+0100\n"
+"POT-Creation-Date: 2021-02-18 14:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -476,7 +476,7 @@ msgstr ""
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr ""
 
-msgid "General Conditions"
+msgid "General Access Requirements"
 msgstr ""
 
 msgid "General informations"
@@ -738,13 +738,10 @@ msgstr ""
 msgid "Signatory qualification"
 msgstr ""
 
-msgid "Special Conditions"
+msgid "Special Requirements to access some programmes"
 msgstr ""
 
-msgid "Specific Conditions"
-msgstr ""
-
-msgid "Specific admission requirements"
+msgid "Specific Access Requirements"
 msgstr ""
 
 msgid "Stage"
