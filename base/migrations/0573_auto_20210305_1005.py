@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0570_studentspecificprofile_comment'),
+        ('base', '0572_auto_20210309_1616'),
     ]
 
     operations = [
