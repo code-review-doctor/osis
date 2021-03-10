@@ -31,3 +31,13 @@ def set_remote_validation(field: forms.Field, url: str) -> None:
             "data-parsley-remote-validator": "async-osis"
         }
     )
+
+
+def set_remote_transition_version_validation(field: forms.Field, url: str) -> None:
+    field.widget.attrs.update(
+        {
+            "data-parsley-remote": url,
+            "data-parsley-remote-validator": "async-osis",
+            "data-parsley-validate-if-empty": "true"
+        }
+    )
