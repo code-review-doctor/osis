@@ -1,28 +1,4 @@
-coverage==4.5.1
-Django==2.2.13
-pika==0.12.0
-openpyxl==2.3.2
-Pillow==7.2.0
-psycopg2-binary==2.7.5
-reportlab==3.5.34
-django-analytical==2.4.0
-django-localflavor==1.6
-django-statici18n==1.8.3
-factory_boy==2.8.1
-django-dotenv==1.4.2
-pendulum==1.2.0
-djangorestframework==3.9.4
-gitpython==2.1.9
-requests==2.20.0
-django-bootstrap3==11.1.0
-django-ordered-model==2.1.0
-django-waffle==0.14.0
-redis==2.10.6
-django-redis==4.9.0
-beautifulsoup4==4.6.3
-pypom==2.2.0
-selenium==3.11.0
-python-magic==0.4.15
+-r base-requirements.txt
 django-ajax-selects==1.7.1
 celery==4.4.7
 django-celery-beat==1.5.0
@@ -42,8 +18,6 @@ pycodestyle==2.4.0
 pylint==2.4.4
 diff-cover==3.0.1
 numpy==1.17.4
-# setuptools 50.0 causes issues
-setuptools==49.6.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
