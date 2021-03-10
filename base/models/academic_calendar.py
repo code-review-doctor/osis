@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -78,7 +80,8 @@ class AcademicCalendarQuerySet(models.QuerySet):
         return self.filter(start_date__range=(today, today_with_range))
 
 
-class AcademicCalendar(SerializableModel):
+class AcademicCalendar(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
@@ -117,7 +120,7 @@ class AcademicCalendar(SerializableModel):
         permissions = (
             ("can_access_academic_calendar", "Can access academic calendar"),
         )
-        unique_together = ("academic_year", "title")
+        unique_together = ("data_year", "title")
 
 
 def find_highlight_academic_calendar():
@@ -128,19 +131,5 @@ def find_highlight_academic_calendar():
         .order_by('end_date')
 
 
-def get_by_reference_and_academic_year(a_reference, an_academic_year):
-    return get_object_or_none(AcademicCalendar, reference=a_reference, academic_year=an_academic_year)
-
-
 def get_by_reference_and_data_year(a_reference, data_year):
     return get_object_or_none(AcademicCalendar, reference=a_reference, data_year=data_year)
-
-
-def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, a_reference):
-    return AcademicCalendar.objects.open_calendars().filter(
-        academic_year=an_academic_year_id, reference=a_reference
-    ).exists()
-
-
-def _list_types(calendar_types):
-    return [calendar_type[0] for calendar_type in calendar_types]
