@@ -159,6 +159,24 @@ class ProgramTreeBuilder:
         to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
         return to_tree
 
+    def fill_transition_from_program_tree(
+            self,
+            from_tree: 'ProgramTree',
+            to_tree: 'ProgramTree',
+            existing_nodes: Set['Node']
+    ) -> 'ProgramTree':
+        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
+
+        self._fill_node_children_from_node_in_case_of_transition(
+            from_tree.root_node,
+            to_tree.root_node,
+            to_tree.authorized_relationships,
+            existing_nodes,
+            to_tree.root_node.transition_name
+        )
+
+        return to_tree
+
     def fill_from_program_tree(
             self,
             from_tree: 'ProgramTree',
@@ -175,6 +193,74 @@ class ProgramTreeBuilder:
         )
 
         return to_tree
+
+    def _fill_node_children_from_node_in_case_of_transition(
+            self,
+            from_node: 'Node',
+            to_node: 'Node',
+            relationships: 'AuthorizedRelationshipList',
+            existing_nodes: Set['Node'],
+            transition_name: 'str'
+    ) -> 'Node':
+        learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
+        group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
+
+        for learning_unit_link in learning_units_links:
+            child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_node(existing_nodes, child_node_identity) or learning_unit_link.child
+
+            copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
+            to_node.children.append(copied_link)
+
+        for group_year_link in group_year_links:
+            child = None
+            child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
+            if group_year_link.child.is_group():
+                new_code = self.generate_new_transition_code(group_year_link.child.code, existing_nodes)
+                child = node_factory.copy_to_year(group_year_link.child, to_node.year, new_code)
+
+            elif group_year_link.child.is_mini_training() and not self._is_end_date_inferior_to(group_year_link.child, to_node):
+                child = self._get_existing_node(existing_nodes, child_node_identity)
+
+            elif group_year_link.child.is_training():
+                child = self._get_transition_node(
+                    group_year_link.child.title,
+                    to_node.year,
+                    group_year_link.child.version_name,
+                    transition_name,
+                    existing_nodes
+                )
+
+            if not child:
+                continue
+
+            copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
+            to_node.children.append(copied_link)
+
+            if not group_year_link.is_reference() and (
+                    not self._get_existing_node(existing_nodes, child_node_identity)
+                    or relationships.is_mandatory_child(to_node.node_type, child.node_type)
+            ):
+                self._fill_node_children_from_node_in_case_of_transition(
+                    group_year_link.child,
+                    child,
+                    relationships,
+                    existing_nodes,
+                    transition_name
+                )
+
+        return to_node
+
+    def _get_transition_node(self, title, year, version_name, transition_name, existing_nodes) -> 'Node':
+        return next(
+            node for node in existing_nodes
+            if node.title == title and node.year == year and node.version_name == version_name and
+            node.transition_name == transition_name
+        )
+
+    # TODO fix this with domain service maybe
+    def generate_new_transition_code(self, base_code: str, existing_nodes: Set['Node']) -> str:
+        return "T" + base_code[1:]
 
     def _fill_node_children_from_node(
             self,

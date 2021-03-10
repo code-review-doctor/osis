@@ -22,6 +22,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import namedtuple
+
 import attr
 import mock
 
@@ -30,13 +32,15 @@ from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
     ProgramTreeNonEmpty
 from program_management.ddd.domain.node import factory as node_factory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, NOT_A_TRANSITION
 from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
     fill_program_tree_version_content_from_program_tree_version
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
-    SpecificProgramTreeVersionFactory, SpecificTransitionProgramTreeVersionFactory
+    SpecificProgramTreeVersionFactory, SpecificTransitionProgramTreeVersionFactory, \
+    StandardTransitionProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020
@@ -54,18 +58,29 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.tree_version_to_fill = SpecificProgramTreeVersionFactory(
             tree__root_node__code=self.tree_version_from.tree.root_node.code,
             tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__transition_name=NOT_A_TRANSITION,
+            transition_name=NOT_A_TRANSITION
+        )
+        self.transition_tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
+            tree__root_node__code=self.tree_version_from.tree.root_node.code,
+            tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
             tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
         )
         self.cmd = self._generate_cmd(self.tree_version_from, self.tree_version_to_fill)
+        self.transition_cmd = self._generate_cmd(self.tree_version_from, self.transition_tree_version_to_fill)
 
         self.add_tree_version_to_repo(self.tree_version_from)
         self.add_tree_version_to_repo(self.tree_version_to_fill)
+        self.add_tree_version_to_repo(self.transition_tree_version_to_fill)
 
         self.mock_generate_code()
         self.mock_get_current_academic_year()
         self.mock_copy_cms()
         self.create_node_next_years()
         self.mock_copy_group()
+        self.mock_validation_rule()
+        self.mock_current_academic_year()
 
     def create_node_next_years(self):
         nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
@@ -103,6 +118,22 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         patcher = mock.patch(
             "education_group.ddd.service.write.copy_group_service.copy_group",
             side_effect=lambda node: self.add_node_to_repo(node_factory.copy_to_next_year(node))
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def mock_validation_rule(self):
+        patcher = mock.patch(
+            "program_management.ddd.domain.service.validation_rule.FieldValidationRule.get",
+            side_effect=lambda *args, **kwargs: namedtuple("validation_rule", "initial_value")(10)
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def mock_current_academic_year(self):
+        patcher = mock.patch(
+            "base.models.academic_year.starting_academic_year",
+            side_effect=lambda *args, **kwargs: namedtuple("starting", "year")(CURRENT_ACADEMIC_YEAR_YEAR)
         )
         patcher.start()
         self.addCleanup(patcher.stop)
@@ -289,6 +320,42 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             for child_node in self.tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
         }
         self.assertFalse(tree_entities_ids.intersection(entities_ids))
+
+    def test_in_case_of_transition_generate_new_group_with_code_beginning_by_T(self):
+        fill_program_tree_version_content_from_program_tree_version(self.transition_cmd)
+
+        group_nodes = [
+            node for node in self.transition_tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
+            if node.is_group()
+        ]
+        group_codes = [node.code for node in group_nodes]
+        does_all_group_nodes_start_with_t = all(
+            [code.startswith("T") for code in group_codes]
+        )
+        self.assertTrue(does_all_group_nodes_start_with_t)
+
+    def test_should_create_training_transition_if_missing(self):
+        tree_to_fill_from = StandardProgramTreeVersionFactory(
+            tree=ProgramTree2MFactory(current_year=CURRENT_ACADEMIC_YEAR_YEAR, end_year=NEXT_ACADEMIC_YEAR_YEAR)
+        )
+        tree_version_to_fill = StandardTransitionProgramTreeVersionFactory(
+            tree__root_node__code=tree_to_fill_from.tree.root_node.code,
+            tree__root_node__title=tree_to_fill_from.entity_id.offer_acronym,
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
+        )
+        self.add_tree_version_to_repo(tree_to_fill_from)
+        self.add_tree_version_to_repo(tree_version_to_fill)
+
+        cmd = self._generate_cmd(tree_to_fill_from, tree_version_to_fill)
+        fill_program_tree_version_content_from_program_tree_version(cmd)
+
+        training_nodes = [node for node in tree_version_to_fill.tree.root_node.get_all_children_as_nodes()
+                          if node.is_training()]
+        are_all_trainings_transitions = all(
+            node.transition_name == tree_version_to_fill.transition_name and
+            node.version_name == tree_version_to_fill.version_name for node in training_nodes
+        )
+        self.assertTrue(are_all_trainings_transitions)
 
     def _generate_cmd(
             self,

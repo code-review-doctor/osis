@@ -83,11 +83,18 @@ class ProgramTreeVersionBuilder:
             existing_nodes: Set['Node']
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        program_tree.ProgramTreeBuilder().fill_from_program_tree(
+        if to_tree_version.is_transition:
+            program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
                 existing_nodes
             )
+        else:
+            program_tree.ProgramTreeBuilder().fill_from_program_tree(
+                    from_tree_version.get_tree(),
+                    to_tree_version.get_tree(),
+                    existing_nodes
+                )
         return to_tree_version
 
     def copy_to_next_year(

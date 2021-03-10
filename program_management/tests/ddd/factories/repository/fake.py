@@ -27,6 +27,7 @@ from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from testing.mocks import FakeRepository
 
 
@@ -59,6 +60,20 @@ def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVer
         "delete": _delete_program_tree_version,
         "search": _search_program_tree_version,
         "search_versions_from_trees": _search_versions_from_trees,
+    })
+
+
+def get_fake_program_tree_version_identity_search(tree_version_repo) -> 'ProgramTreeVersionIdentitySearch':
+    @classmethod
+    def get_from_node_identities(cls, node_identities: List['NodeIdentity']) -> List['ProgramTreeVersionIdentity']:
+        result = []
+        for tree_version in tree_version_repo.root_entities:
+            if tree_version.get_tree() and tree_version.tree.root_node.entity_id in node_identities:
+                result.append(tree_version.entity_id)
+        return result
+    class_name = "FakeProgramTreeVersionIdentitySearch"
+    return type(class_name, (ProgramTreeVersionIdentitySearch,), {
+        "get_from_node_identities": get_from_node_identities
     })
 
 
@@ -151,5 +166,9 @@ def _search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['Progra
 
 
 @classmethod
-def _search_nodes(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['Node']:
-    return [node for node in cls.root_entities if node.entity_id in node_ids]
+def _search_nodes(cls, node_ids: List['NodeIdentity'] = None, year: int = None, **kwargs) -> List['Node']:
+    if node_ids:
+        return [node for node in cls.root_entities if node.entity_id in node_ids]
+    if year:
+        return [node for node in cls.root_entities if node.entity_id.year == year]
+    return []

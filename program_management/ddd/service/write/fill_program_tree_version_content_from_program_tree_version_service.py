@@ -27,12 +27,13 @@ from django.db import transaction
 
 from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
-    CopyTreeCmsFromPastYear, CopyProgramTreePrerequisitesFromProgramTreeCommand
+    CopyTreeCmsFromPastYear, CopyProgramTreePrerequisitesFromProgramTreeCommand, \
+    CreateProgramTreeTransitionVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository
 from program_management.ddd.service.write import copy_program_tree_cms_from_past_year_service, \
-    copy_program_tree_prerequisites_from_program_tree_service
+    copy_program_tree_prerequisites_from_program_tree_service, create_and_postpone_tree_transition_version_service
 
 
 @transaction.atomic()
@@ -60,11 +61,25 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    existing_nodes = node_repo.search(
-        [
-            attr.evolve(node.entity_id, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
+    if cmd.to_transition_name:
+        training_nodes = [
+            node for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes() if node.is_training()
         ]
+        for training in training_nodes:
+            create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
+                CreateProgramTreeTransitionVersionCommand(
+                    end_year=to_tree_version.end_year_of_existence,
+                    offer_acronym=training.title,
+                    version_name=to_tree_version.version_name,
+                    start_year=from_tree_version.program_tree_identity.year,
+                    transition_name=to_tree_version.transition_name,
+                    title_fr="",
+                    title_en=""
+                )
+            )
+
+    existing_nodes = node_repo.search(
+        year=cmd.to_year
     )
 
     ProgramTreeVersionBuilder().fill_from_program_tree_version(from_tree_version, to_tree_version, set(existing_nodes))
