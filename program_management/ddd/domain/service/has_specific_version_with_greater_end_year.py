@@ -28,10 +28,10 @@ from program_management.ddd.business_types import *
 from program_management.models.education_group_version import EducationGroupVersion
 
 
-class HasVersionWithGreaterEndYear(interface.DomainService):
+class HasSpecificVersionWithGreaterEndYear(interface.DomainService):
 
     @classmethod
-    def greater_than_standard_year(cls, standard_version: 'ProgramTreeVersion') -> bool:
+    def specific_version_greater_than_standard_year(cls, standard_version: 'ProgramTreeVersion') -> bool:
         return EducationGroupVersion.objects.filter(
             Q(root_group__group__end_year__isnull=True) |
             Q(root_group__group__end_year__year__gte=standard_version.entity_id.year),
