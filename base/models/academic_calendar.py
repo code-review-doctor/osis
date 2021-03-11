@@ -39,9 +39,9 @@ from osis_common.utils.models import get_object_or_none
 
 
 class AcademicCalendarAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
-    list_display = ('title', 'start_date', 'end_date', 'data_year')
+    list_display = ('title', 'data_year', 'start_date', 'end_date',)
     list_display_links = ('title', 'data_year')
-    readonly_fields = ('academic_year', 'title')
+    readonly_fields = ('title', )
     list_filter = ('reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
