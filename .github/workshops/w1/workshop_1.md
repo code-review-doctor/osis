@@ -9,8 +9,6 @@
         Use case 1 : En tant qu'utilisateur facultaire, je veux créer une UE
         Use case 2 : En tant qu'utilisateur facultaire, je veux créer des parties magistrales et pratiques d'une UE et d'un partim
 
-<p style="page-break-after: always;">&nbsp;</p>
-
 
 -------------------------------
 

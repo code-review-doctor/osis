@@ -21,17 +21,48 @@
 ```python
 from typing import List
 
+
 # Non CQS
-fruit = next(["pomme", "fraise", "orange"])
+class MyFruitsList:
+    fruits : List['str'] = None
+    _curent_element_position = None
+    
+    def next(self):
+        if self._curent_element_position is None:
+            self._curent_element_position = 0
+        else: 
+            self._curent_element_position += 1
+        return self.fruits[self._curent_element_position]
 
-# CQS :
-# Commande
-def avancer(fruits: List['str']) -> None:
-    pass
+my_fruits = MyFruitsList(fruits=["pomme", "fraise", "orange"])
+pomme = my_fruits.next()
+fraise = my_fruits.next()
+orange = my_fruits.next()
 
-# requête 
-def element_courant(fruits) -> str:
-    pass
+
+# CQS
+class MyFruitsList:
+    fruits : List['str'] = None
+    _curent_element_position = 0
+    
+    # Commande
+    def move_forward(self) -> None:
+        self._curent_element_position += 1
+    
+    # requête 
+    def current_element(self) -> str:
+        return self.fruits[self._curent_element_position]
+
+
+my_fruits = MyFruitsList(fruits=["pomme", "fraise", "orange"])
+pomme = my_fruits.current_element()
+
+my_fruits.move_forward()
+fraise = my_fruits.current_element()
+
+my_fruits.move_forward()
+orange = my_fruits.current_element()
+
 ```
 
 <br/><br/><br/><br/><br/><br/><br/><br/>

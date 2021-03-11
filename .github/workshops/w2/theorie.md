@@ -13,20 +13,20 @@ import attr
 # Domain
 @attr.s(slots=True)
 class Company(interface.Entity):
-    domain_name= attr.ib(type=str)
+    domain_name = attr.ib(type=str)
     
     def is_email_corporate(self, email: str) -> bool:
         email_domain = email.split('@')[1]
         return email_domain == self.domain_name
 
 
-@attr.s(slots=True)
+@attr.s(frozen=True, slots=True)
 class UserIdentity(interface.Entity):
     username = attr.ib(type=str)
 
 
 @attr.s(slots=True)
-class User(interface.Entity):
+class User(interface.RootEntity):
     entity_identity = attr.ib(type=UserIdentity)
     company = attr.ib(type=Company)
     email = attr.ib(type=str)
@@ -35,6 +35,10 @@ class User(interface.Entity):
         if not self.company.is_email_corporate():
             raise interface.BusinessException("Incorrect email domain")
         self.email = new_email
+
+
+
+#_____________________________________________________________________________________
 
 
 # Application Service
@@ -119,13 +123,27 @@ class User(interface.Entity):
             raise interface.BusinessException("Email already exists")
         self.email = new_email
 
+
+
+# Application Service
+def change_email_service(cmd: interface.CommandRequest) -> 'interface.EntityIdentity':
+    repository = UserRepository()
+    # Given
+    user = repository.get(UserIdentity(username=cmd.username))
+    
+    # When
+    user.change_email(new_email=cmd.email, repository=repository)
+
+    # Then
+    repository.update(user)
+    
+    return user.entity_identity
+
 ```
 
 - Notre implémentation rend-elle notre domaine pure ?
 - Notre implémentation rend-elle notre domaine complet ?
-- Pas correct : le modèle DB peut toujours atteindre la base de données (via injection de dépendance)
-
-- Autre idée ? 
+ 
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -176,8 +194,6 @@ class User(interface.Entity):
 
 ## Trilemme
 
-https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
-
 - Il est impossible de satisfaire les 3 concepts suivants : 
     - Domain complet
     - Domain pure
@@ -192,7 +208,7 @@ https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
         - Domaine "complet" et performances **au détriment d'un domaine "pure"**
 
 - Décision : 
-    - Toujours privilégier un domaine "pure" et "complet"
+    - Toujours privilégier un domaine "pure" et "complet" **au détriment des performances**
 
 - Et si j'ai des problèmes de performances ? 
     - Privilégier un domaine "pure" et une application performante
@@ -223,7 +239,9 @@ https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
 
 
 <br/><br/><br/><br/>
+
 -------------------------------
+
 <br/><br/><br/><br/>
 
 
@@ -236,19 +254,19 @@ https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/
 ### Différence principale
 - Les "domain services" contiennent de la logique métier alors que les "application services" n'en contiennent pas
 
-#### Application service
+### Application service
 - Un application service représente un service qui effectue une action métier complète
 - Given - when - then facilement identifiable
 - Orchestre les appels dans les différentes couches (Repository, Domaine, DomaineService)
 
 
 
-#### Domain service
+### Domain service
 - Un domain service est un service qui encapsule une logique métier qui ne sait pas être représenté par un Entity ou à un ValueObject,
 et qui ne représente pas un cas d'utilisation en tant que tel.
 - Quand utiliser un DomainService ? 
     - Lorsque notre domaine ne peut pas être "pure" et "complet" à cause des performances
-    - Lorsque nous avons une logique métier dans un use case qui nécessite des dépendances externes
+    - Lorsque nous avons une logique/règle métier qui nécessite des dépendances externes (autres domaines, )
 - Exemple : 
 ```python
 from decimal import Decimal
@@ -257,19 +275,18 @@ from external.dependency.gateway import payment_gateway
 
 
 
-# Application service
+# Application service (use case) "retirer de l'argent sur un distributeur automatique de billets"
 def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
     repository = ATMRepository()    
     atm = repository.get()  # distributeur automatique de billets
 
-    if not atm.can_dispense_money(amount):
-        return atm.entity_identity
-
+    # Charge le montant avec une commission pour le facturer à travers un gateway
     amount_with_commission = atm.calculate_amount_with_commission(amount)
     result = payment_gateway.charge_payment(amount_with_commission)  # dépendance externe
 
     if result.is_failure():
-        return atm.entity_identity
+        # Logique métier : ce "if" décide si l'argent sera finalement retiré de l'ATM ou non. 
+        raise interface.BusinessException("Couldn't charge the payment from the gateway")
     
     atm.dispense_money(amount)
     
@@ -278,6 +295,10 @@ def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
     return atm.entity_identity
     
 ```
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 - Solution : Domain service
 
@@ -289,7 +310,7 @@ from external.dependency.gateway import payment_gateway
 
 # Application service
 def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
-    repository = ATMRepository()    
+    repository = ATMRepository()
     atm = repository.get()  # distributeur automatique de billets
     AtmWithdrawMoney.withdraw_money(atm, amount, payment_gateway)
     repository.update(atm)
@@ -299,9 +320,7 @@ def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
 
 # Domain service
 class AtmWithdrawMoney(interface.DomainService):
-    def withdraw_money(self, atm: ATM, amount: Decimal, payment_gateway):
-        if not atm.can_dispense_money(amount):
-                return atm.entity_identity
+    def withdraw_money(self, atm: ATM, amount: Decimal, payment_gateway) -> None:
     
         amount_with_commission = atm.calculate_amount_with_commission(amount)
         result = payment_gateway.charge_payment(amount_with_commission)  # dépendance externe
@@ -319,7 +338,8 @@ class AtmWithdrawMoney(interface.DomainService):
 
 ## Questions
 
+- Puis-je appeler un application service dans un domain service ?
 - Puis-je appeler un Domain service dans un application service ?
-- Puis-je appeler un application service dans un domain service ? 
+ 
 
 
