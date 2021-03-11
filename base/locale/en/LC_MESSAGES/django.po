@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-04 13:43+0100\n"
+"POT-Creation-Date: 2021-03-09 13:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -180,6 +180,9 @@ msgid "Access denied!"
 msgstr ""
 
 msgid "Access minor"
+msgstr ""
+
+msgid "Access schedule calendar"
 msgstr ""
 
 msgid "Access to the student's virtual office."
@@ -942,6 +945,9 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+msgid "Extended proposal management"
+msgstr ""
+
 msgid "External"
 msgstr ""
 
@@ -1324,6 +1330,9 @@ msgid "Lecturing vol."
 msgstr ""
 
 msgid "Legend"
+msgstr ""
+
+msgid "Limited proposal management"
 msgstr ""
 
 msgid "Link type"
@@ -2744,6 +2753,9 @@ msgid "University first cycle certificate"
 msgstr ""
 
 msgid "University second cycle certificate"
+msgstr ""
+
+msgid "Unspecified"
 msgstr ""
 
 msgid "Up"
