@@ -85,7 +85,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - countries
-  /study-domains/:
+  /study-domains:
     get:
       description: Return a list of study domains. By default, it will return all official main study domains.
       operationId: study_domains_list
