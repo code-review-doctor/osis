@@ -501,24 +501,6 @@ class ProgramTree(interface.RootEntity):
             None
         )
 
-    def get_node_smallest_ordered_path(self, node: 'Node') -> Optional[Path]:
-        """
-        Return the smallest ordered path of node inside the tree.
-        The smallest ordered path would be the result of a depth-first
-        search of the path of the node with respect to the order of the links.
-        Meaning we will recursively search for the path node by searching
-        first in the descendants of the first child and so on.
-        :param node: Node
-        :return: A Path if node is present in tree. None if not.
-        """
-        if node == self.root_node:
-            return build_path(self.root_node)
-
-        return next(
-            (path for path, node_obj in self.root_node.descendents if node_obj == node),
-            None
-        )
-
     def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
         """
         Return the corresponding node based on the code and year.

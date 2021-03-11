@@ -208,49 +208,6 @@ class TestGetNodeByIdAndTypeProgramTree(SimpleTestCase):
         )
 
 
-class TestGetNodePath(SimpleTestCase):
-    def setUp(self) -> None:
-        self.tree = ProgramTreeFactory()
-        self.link_1 = LinkFactory(parent=self.tree.root_node)
-        self.link_1_1 = LinkFactory(parent=self.link_1.child)
-        self.link_1_1_1 = LinkFactory(parent=self.link_1_1.child)
-        self.link_2 = LinkFactory(parent=self.tree.root_node)
-        self.link_2_1 = LinkFactory(parent=self.link_2.child, child=self.link_1_1_1.child)
-
-    def test_when_node_not_present_in_tree_should_return_none(self):
-        path = self.tree.get_node_smallest_ordered_path(NodeLearningUnitYearFactory())
-        self.assertIsNone(path)
-
-    def test_when_node_is_root_then_should_return_path_of_root(self):
-        path = self.tree.get_node_smallest_ordered_path(self.tree.root_node)
-        self.assertEqual(
-            path,
-            program_tree.build_path(self.tree.root_node)
-        )
-
-    def test_when_node_is_uniquely_present_in_tree_should_return_path(self):
-        path = self.tree.get_node_smallest_ordered_path(self.link_1_1.child)
-        self.assertEqual(
-            path,
-            program_tree.build_path(self.tree.root_node, self.link_1.child, self.link_1_1.child)
-        )
-
-    def test_when_node_is_present_multiple_times_in_tree_should_return_smallest_ordered_path(self):
-        path = self.tree.get_node_smallest_ordered_path(self.link_1_1_1.child)
-
-        path_expected = program_tree.build_path(
-            self.tree.root_node,
-            self.link_1.child,
-            self.link_1_1.child,
-            self.link_1_1_1.child
-        )
-
-        self.assertEqual(
-            path,
-            path_expected
-        )
-
-
 class TestGetAllLearningUnitNodes(SimpleTestCase):
     def setUp(self):
         link = LinkFactory(child=NodeGroupYearFactory())
