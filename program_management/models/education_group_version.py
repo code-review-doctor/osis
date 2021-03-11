@@ -28,29 +28,29 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models.enums.education_group_types import TrainingType
+from base.utils.constants import YES, NO
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-def copy_to_next_year(modeladmin, request, queryset):
-    from program_management.ddd.command import CopyTreeVersionToNextYearCommand
-    from program_management.ddd.service.write import bulk_copy_program_tree_version_content_service
+def fill_from_past_year(modeladmin, request, queryset):
+    from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
+    from program_management.ddd.service.write import bulk_fill_program_tree_version_content_service_from_past_year
     cmds = []
     qs = queryset.select_related("offer", "root_group")
     for obj in qs:
-        # cmd = CopyTreeVersionToNextYearCommand(
-        #     from_year=obj.offer.academic_year.year,
-        #     from_offer_acronym=obj.offer.acronym,
-        #     from_offer_code=obj.root_group.partial_acronym,
-        #     from_version_name=obj.version_name,
-        #     from_is_transition=obj.is_transition
-        # )
-        # cmds.append(cmd)
-    result = bulk_copy_program_tree_version_content_service.bulk_copy_program_tree_version(cmds)
-    modeladmin.message_user(request, "{} programs have been copied".format(len(result)))
+        cmd = FillTreeVersionContentFromPastYearCommand(
+            to_year=obj.offer.academic_year.year,
+            to_offer_acronym=obj.offer.acronym,
+            to_version_name=obj.version_name,
+            to_transition_name=obj.transition_name
+        )
+        cmds.append(cmd)
+    result = bulk_fill_program_tree_version_content_service_from_past_year.\
+        bulk_fill_program_tree_version_content_from_past_year(cmds)
+    modeladmin.message_user(request, "{} programs have been filled".format(len(result)))
 
 
-copy_to_next_year.short_description = _("Copy program tree content to next year")
+fill_from_past_year.short_description = _("Fill program tree content from last year")
 
 
 class StandardListFilter(admin.SimpleListFilter):
@@ -60,23 +60,44 @@ class StandardListFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return (
-            ("yes", _("Standard")),
-            ("no", _("Particular"))
+            (YES, _("Standard")),
+            (NO, _("Particular"))
         )
 
     def queryset(self, request, queryset):
-        if self.value() == "yes":
-            return queryset.filter(version_name='')
-        if self.value() == "no":
-            return queryset.exclude(version_name='')
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.filter(version_name=program_tree_version.STANDARD)
+        if self.value() == NO:
+            return queryset.exclude(version_name=program_tree_version.STANDARD)
+        return queryset
+
+
+class TransitionListFilter(admin.SimpleListFilter):
+    title = _('Transition')
+
+    parameter_name = 'transition'
+
+    def lookups(self, request, model_admin):
+        return (
+            (YES, _("Yes")),
+            (NO, _("No"))
+        )
+
+    def queryset(self, request, queryset):
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.exclude(transition_name=program_tree_version.NOT_A_TRANSITION)
+        if self.value() == NO:
+            return queryset.filter(transition_name=program_tree_version.NOT_A_TRANSITION)
         return queryset
 
 
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('offer', 'version_name', 'root_group', 'transition_name')
-    list_filter = ('offer__academic_year',)
+    list_filter = (StandardListFilter, TransitionListFilter, 'offer__academic_year',)
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
-    actions = [copy_to_next_year]
+    actions = [fill_from_past_year]
 
 
 class StandardEducationGroupVersionManager(models.Manager):
