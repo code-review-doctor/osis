@@ -249,7 +249,10 @@ class TestCourseEnrollmentForm(TestCase):
 
     @override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
     def test_clean_with_validation_error(self):
-        AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT, data_year=self.academic_year)
+        academic_calendar = AcademicCalendarFactory(
+            reference=academic_calendar_type.COURSE_ENROLLMENT,
+            data_year=self.academic_year
+        )
 
         exam_enrollment_start = '20/12/{}'.format(self.academic_year.year-2)
         exam_enrollment_end = '15/01/{}'.format(self.academic_year.year-1)
@@ -261,11 +264,12 @@ class TestCourseEnrollmentForm(TestCase):
         )
         form.is_valid()
 
-        self.assertEqual(form.errors["range_date"][0],
-                         "{} doit être comprise entre {} et {}"
-                         .format(exam_enrollment_start,
-                                 self.academic_year.start_date.strftime(DATE_FORMAT),
-                                 self.academic_year.end_date.strftime(DATE_FORMAT)))
+        expected_error_msg = "{} doit être comprise entre {} et {}".format(
+            exam_enrollment_start,
+            academic_calendar.start_date.strftime(DATE_FORMAT),
+            academic_calendar.end_date.strftime(DATE_FORMAT)
+        )
+        self.assertEqual(form.errors["range_date"][0], expected_error_msg)
 
     @override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
     def test_clean_with_validation_error_in_date(self):
