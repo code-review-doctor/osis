@@ -1,13 +1,14 @@
 
 ## [W1] Formation 1
 
-    Rappels théoriques :
-        DDD : définition, objectif, philosophie, value et entity objects (langage commun entre tous les partis, ...) + exemple code (couches dans le code ProgramTree)
-        CQS : définition + exemple code dans ProgramTree
-    Workshop [contenu à développer]
-        Objectif : développer ensemble les uses cases suivants dans le DDD avec nos guidelines d'aujourd'hui.
-        Use case 1 : En tant qu'utilisateur facultaire, je veux créer une UE
-        Use case 2 : En tant qu'utilisateur facultaire, je veux créer des parties magistrales et pratiques d'une UE et d'un partim
+- Rappels théoriques :
+    - DDD : définition, objectif, philosophie, couches, ValuObject <-> Entity
+    - CQS : définition, exemple, avantages
+- Workshop
+    - Objectif : développer ensemble les uses cases suivants dans le DDD avec nos guidelines d'aujourd'hui
+    - Use case 1 : En tant qu'utilisateur facultaire, je veux créer une UE
+    - Use case 2 : En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'une UE
+
 
 
 -------------------------------
@@ -56,3 +57,21 @@ En tant qu'utilisateur facultaire, je veux créer une UE
     - Partie numérique (4 chiffres - dont 1er != 0)
 
 
+## Cas d'utilisation 2
+### user story
+En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'une UE
+
+### business rules
+- Valeurs concernées
+    - année académique
+    - sigle (PP, PM)
+    - volume Q1
+    - volume Q2
+    - volume annuel
+    - quadrimestre (Q1&Q2, Q1ORQ2, etc.)
+- Volume annuel == Q1 + Q2
+- Si partie pratique alors sigle == PP
+- Si partie magistrale (théorique) alors sigle == PM
+- Les volumes Q1 et Q2 ne doivent être remplis que s'ils correspondent à la valeur indiquée dans Quadrimestre
+    - Exemple : si quadrimestre == Q1, alors Q1 est obligatoire, Q2 doit être vide
+    - Exemple : si quadrimestre == Q1AndQ2, alors Q1 et Q2 sont obligatoires

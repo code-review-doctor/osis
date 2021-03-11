@@ -1,29 +1,31 @@
 ## [W2] Formation 2
 
-    Partie 1 
-        Théorie
-            Domaine "pure" et domaine "complet"
-            Pattern "Sandwich"
-        Workshop
-            Sur base du code dans "program_management" et ensuite du code du workshop 1 :
-                Déterminer si notre domaine est "pure" et/ou "complet"
-                Refactorer notre code (UE) pour le rendre "pure" (si nécessaire)
-                Refactorer notre code (UE) pour le rendre "complet" (si nécessaire)
-            Use case 1 : En tant qu'utilisateur facultaire, je veux supprimer une UE
-    Partie 2
-        Théorie
-            Différence entre un DomainService et un ApplicationService
-            Dépendances entre aggregates dans un même domain (définition plus détaillée d'un modèle "pure")
-        Workshop [contenu à développer]
-            Use case 2 : En tant qu'utilisateur facultaire, je veux créer un Partim
-            Use case 3 : En tant qu'utilisateur facultaire, je veux visualiser le nombre d'inscrits à une UE.
+- Partie 1 
+    - Théorie
+        - Domaine "pure" et domaine "complet"
+        - Pattern "Sandwich"
+    - Workshop
+        - Sur base du code dans "program_management" :
+            - Déterminer si notre domaine est "pure" et/ou "complet"
+        - Sur base du code du workshop 1 :
+            - Refactorer notre code (UE) pour le rendre "pure" (si nécessaire)
+            - Refactorer notre code (UE) pour le rendre "complet" (si nécessaire)
+        - Use case 1 : En tant qu'utilisateur facultaire, je veux supprimer une UE
+- Partie 2
+    - Théorie
+        - Différence entre un DomainService et un ApplicationService
+        - Taille et dépendances entre agrégats
+    - Workshop
+        - Use case 2 : En tant qu'utilisateur facultaire, je veux créer un Partim
+        - Use case 3 : En tant qu'utilisateur facultaire, je veux visualiser le nombre d'inscrits à une UE.
+        - Use case 4 : En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'un partim
 
 
 -------------------------------
 
 
 ## Cas d'utilisation 1
-### as a story
+### user story
 En tant qu'utilisateur facultaire, je veux supprimer une UE
 (pour DomainService + domaine "incomplet")
 
@@ -34,7 +36,7 @@ En tant qu'utilisateur facultaire, je veux supprimer une UE
 
 
 ## Cas d'utilisation 2
-### as a story
+### user story
 En tant qu'utilisateur facultaire, je veux créer un partim
 (pour la dépendance entre aggregatesRoot)
 
@@ -55,9 +57,19 @@ En tant qu'utilisateur facultaire, je veux créer un partim
 
 
 ## Cas d'utilisation 3
-### as a story
+### user story
 En tant qu'utilisateur facultaire, je veux visualiser le nombre d'inscrits à une UE. 
 (pour DomainService)
 ### business rules
 Aucune
+
+
+
+## Cas d'utilisation 4
+### user story
+En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'un partim 
+
+### business rules
+- Même chose que pour la création des parties magistrales et pratiques d'une UE
+- Le volume de chaque composant, pour chaque quadrimestre, doit être <= volume de l'UE complète sur le partim
 

@@ -1,4 +1,10 @@
+## [W3] Formation 3
 
+- Théorie
+    - Design patterns "Factory" et "Builder"
+- Workshop
+    - Use case 1 : En tant qu'utilisateur facultaire, je veux recopier une UE vers l'année suivante
+    - Use case 2 : En tant qu'utilisateur facultaire, je veux prolonger une UE jusqu'à N+6
 
 -------------------------------
 
