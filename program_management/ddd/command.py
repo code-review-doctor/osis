@@ -757,3 +757,17 @@ class CopyProgramTreePrerequisitesFromProgramTreeCommand(interface.CommandReques
     from_year = attr.ib(type=int)
     to_code = attr.ib(type=str)
     to_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreeVersionCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgramTreeVersionOriginCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
+    offer_acronym = attr.ib(type=str)
+    version_name = attr.ib(type=str)
+    transition_name = attr.ib(type=str)

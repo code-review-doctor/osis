@@ -24,19 +24,19 @@
 {% endcomment %}
 
 <div class="modal-content" id="form-modal-content">
-    <div id="form-modal-body" class="modal-body">
-        {% include 'template_messages.html' %}
-        <form method="post" id="form_fill_content" action="{{ request.get_full_path }}">
-            {% csrf_token %}
+    <form method="post" id="form_fill_content" action="{{ request.get_full_path }}">
+        {% csrf_token %}
+        <div id="form-modal-body" class="modal-body">
+            {% include 'template_messages.html' %}
 
-            <p>TODO</p>
+            <p><b>{% blocktrans %} Fill {{ title }} in {{ year }} {% endblocktrans %}</b></p>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-                <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
-                       onclick="$('#form_fill_content').submit();"/>
-            </div>
-        </form>
 
-    </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+            <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"
+                   onclick="$('#form_fill_content').submit();"/>
+        </div>
+    </form>
 </div>

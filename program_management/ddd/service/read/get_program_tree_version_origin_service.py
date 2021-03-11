@@ -22,9 +22,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional
 
-from django.forms import forms
+from program_management.ddd.command import GetProgramTreeVersionOriginCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
+from program_management.ddd.domain.service import identity_search
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
-class FillContentForm(forms.Form):
-    pass
+def get_program_tree_version_origin(cmd: GetProgramTreeVersionOriginCommand) -> Optional['ProgramTreeVersion']:
+    tree_version_identity = ProgramTreeVersionIdentity(
+        offer_acronym=cmd.offer_acronym,
+        year=cmd.year,
+        version_name=cmd.version_name,
+        transition_name=cmd.transition_name
+    )
+    source_identity = identity_search.ProgramTreeVersionIdentitySearch(
+    ).get_source_identity_from_program_tree_version_identity(
+        tree_version_identity
+    )
+    return program_tree_version_repository.ProgramTreeVersionRepository().get(source_identity)
