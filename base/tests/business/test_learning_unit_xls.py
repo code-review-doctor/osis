@@ -29,10 +29,10 @@ from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
+from typing import List
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
-from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
@@ -397,12 +397,14 @@ class TestLearningUnitXls(TestCase):
             start_year=2017
         )
 
-        attribution_charge_new_lecturing = AttributionChargeNewFactory(learning_component_year=component_lecturing,
-                                                                       attribution=an_attribution,
-                                                                       allocation_charge=15.0)
-        attribution_charge_new_practical = AttributionChargeNewFactory(learning_component_year=component_practical,
-                                                                       attribution=an_attribution,
-                                                                       allocation_charge=5.0)
+        AttributionChargeNewFactory(
+            learning_component_year=component_lecturing,
+            attribution=an_attribution,
+        )
+        AttributionChargeNewFactory(
+            learning_component_year=component_practical,
+            attribution=an_attribution
+        )
 
         # Simulate annotate
         luy = annotate_qs(LearningUnitYear.objects.filter(pk=luy.pk)).first()
@@ -429,8 +431,7 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(get_data_part2(luy, False), expected_common)
         self.assertEqual(
             get_data_part2(luy, True),
-            expected_attribution_data(
-                attribution_charge_new_lecturing, attribution_charge_new_practical,
+            _expected_attribution_data(
                 expected_common,
                 luy
             )
@@ -520,7 +521,7 @@ class TestLearningUnitXls(TestCase):
 
         self.assertListEqual(titles,
                              _expected_titles_common_part1() + _expected_titles_for_proposals() +
-                             _expected_titles_common_part2_a() + [HEADER_TEACHERS] + _expected_titles_common_part2_b() +
+                             _expected_titles_common_part2_a() + HEADER_TEACHERS + _expected_titles_common_part2_b() +
                              [HEADER_PROGRAMS]
                              )
         # with grp/attribution
@@ -528,7 +529,7 @@ class TestLearningUnitXls(TestCase):
         titles = _prepare_titles(is_external_ue_list=True, with_grp=True, with_attributions=True)
 
         self.assertListEqual(titles,
-                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + [HEADER_TEACHERS] +
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + HEADER_TEACHERS +
                              _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
                              )
 
@@ -552,6 +553,7 @@ class TestLearningUnitXls(TestCase):
             luy.credits,
             luy.entity_allocation,
             luy.complete_title_english,
+            '',
             '',
             luy.get_periodicity_display(),
             yesno(luy.status),
@@ -655,30 +657,21 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(expected, formations)
 
 
-def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):
+def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:
     expected_attribution = None
     for k, v in luy.attribution_charge_news.items():
         expected_attribution = v
-    expected_attribution = "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
-        expected_attribution.get('person'),
-        _('Function'),
-        Functions[expected_attribution['function']].value,
-        _('Substitute'),
-        '',
-        _('Beg. of attribution'),
-        expected_attribution.get('start_year'),
-        _('Attribution duration'),
-        expected_attribution.get('duration'),
-        _('Attrib. vol1'),
-        attribution_charge_new_lecturing.allocation_charge,
-        _('Attrib. vol2'),
-        attribution_charge_new_practical.allocation_charge, )
-    ex = [expected_attribution]
+    complete_name = "{} {}".format(
+        expected_attribution.get('person').last_name.upper(),
+        expected_attribution.get('person').first_name
+    )
+
+    ex = [complete_name, expected_attribution.get('person').email]
     ex.extend(expected)
     return ex
 
 
-def _expected_titles_common_part1():
+def _expected_titles_common_part1() -> List[str]:
     return [
             str(_('Code')),
             str(_('Ac yr.')),
@@ -689,7 +682,7 @@ def _expected_titles_common_part1():
         ]
 
 
-def _expected_titles_common_part2_a():
+def _expected_titles_common_part2_a() -> List[str]:
     return [
         str(_('Credits')),
         str(_('Alloc. Ent.')),
@@ -697,7 +690,7 @@ def _expected_titles_common_part2_a():
         ]
 
 
-def _expected_titles_common_part2_b():
+def _expected_titles_common_part2_b() -> List[str]:
     return [
         str(_('Periodicity')),
         str(_('Active')),
@@ -715,14 +708,14 @@ def _expected_titles_common_part2_b():
     ]
 
 
-def _expected_titles_for_proposals():
+def _expected_titles_for_proposals() -> List[str]:
     return [
         str(_('Proposal type')),
         str(_('Proposal status')),
     ]
 
 
-def _expected_titles_for_external():
+def _expected_titles_for_external() -> List[str]:
     return [
         str(_('Country')),
         str(_('City of institution')),
