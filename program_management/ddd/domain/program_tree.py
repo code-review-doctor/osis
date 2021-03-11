@@ -68,7 +68,7 @@ class ProgramTreeBuilder:
     def create_and_fill_from_program_tree(
             self,
             duplicate_from: 'ProgramTree',
-            duplicate_to_transition: bool,
+            transition_name: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = None
     ) -> 'ProgramTree':
@@ -81,7 +81,7 @@ class ProgramTreeBuilder:
         """
         copied_root = self._create_and_fill_root_and_direct_children(
             duplicate_from,
-            duplicate_to_transition,
+            transition_name,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
         )
@@ -95,7 +95,7 @@ class ProgramTreeBuilder:
     def _create_and_fill_root_and_direct_children(
             self,
             program_tree: 'ProgramTree',
-            duplicate_to_transition: bool,
+            transition_name: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
@@ -103,13 +103,14 @@ class ProgramTreeBuilder:
         new_code = GenerateNodeCode().generate_from_parent_node(
             parent_node=root_node,
             child_node_type=root_node.node_type,
-            duplicate_to_transition=duplicate_to_transition
+            duplicate_to_transition=bool(transition_name)
         )
         new_parent = node_factory.create_and_fill_from_node(
             create_from=root_node,
             new_code=new_code,
             override_end_year_to=override_end_year_to,
-            override_start_year_to=override_start_year_to
+            override_start_year_to=override_start_year_to,
+            transition_name=transition_name
         )
         mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
         for copy_from_link in [n for n in root_node.children if n.child.node_type in mandatory_children_types]:
@@ -117,13 +118,13 @@ class ProgramTreeBuilder:
             new_code = GenerateNodeCode().generate_from_parent_node(
                 parent_node=child_node,
                 child_node_type=child_node.node_type,
-                duplicate_to_transition=duplicate_to_transition
+                duplicate_to_transition=bool(transition_name)
             )
             new_child = node_factory.create_and_fill_from_node(
                 create_from=child_node,
                 new_code=new_code,
                 override_end_year_to=override_end_year_to,
-                override_start_year_to=override_start_year_to
+                override_start_year_to=override_start_year_to,
             )
             copied_link = link_factory.create_link(new_parent, new_child)
             new_parent.children.append(copied_link)
@@ -163,7 +164,8 @@ class ProgramTreeBuilder:
             self,
             from_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
-            existing_nodes: Set['Node']
+            existing_nodes: Set['Node'],
+            existing_trees: Set['ProgramTree']
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
@@ -172,7 +174,8 @@ class ProgramTreeBuilder:
             to_tree.root_node,
             to_tree.authorized_relationships,
             existing_nodes,
-            to_tree.root_node.transition_name
+            to_tree.root_node.transition_name,
+            existing_trees,
         )
 
         return to_tree
@@ -202,14 +205,15 @@ class ProgramTreeBuilder:
             to_node: 'Node',
             relationships: 'AuthorizedRelationshipList',
             existing_nodes: Set['Node'],
-            transition_name: 'str'
+            transition_name: 'str',
+            existing_trees: Set['ProgramTree']
     ) -> 'Node':
         learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
         group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
 
         for learning_unit_link in learning_units_links:
             child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_node(existing_nodes, child_node_identity) or learning_unit_link.child
+            child = self._get_existing_learning_node(existing_nodes, child_node_identity) or learning_unit_link.child
 
             copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
             to_node.children.append(copied_link)
@@ -222,7 +226,7 @@ class ProgramTreeBuilder:
                 child = node_factory.copy_to_year(group_year_link.child, to_node.year, new_code)
 
             elif group_year_link.child.is_mini_training() and not self._is_end_date_inferior_to(group_year_link.child, to_node):
-                child = self._get_existing_node(existing_nodes, child_node_identity)
+                child = self._get_existing_group_node(existing_trees, child_node_identity)
 
             elif group_year_link.child.is_training():
                 child = self._get_transition_node(
@@ -230,7 +234,7 @@ class ProgramTreeBuilder:
                     to_node.year,
                     group_year_link.child.version_name,
                     transition_name,
-                    existing_nodes
+                    existing_trees
                 )
 
             if not child:
@@ -240,7 +244,7 @@ class ProgramTreeBuilder:
             to_node.children.append(copied_link)
 
             if not group_year_link.is_reference() and (
-                    not self._get_existing_node(existing_nodes, child_node_identity)
+                    is_empty(child, relationships)
                     or relationships.is_mandatory_child(to_node.node_type, child.node_type)
             ):
                 self._fill_node_children_from_node_in_case_of_transition(
@@ -248,16 +252,24 @@ class ProgramTreeBuilder:
                     child,
                     relationships,
                     existing_nodes,
-                    transition_name
+                    transition_name,
+                    existing_trees
                 )
 
         return to_node
 
-    def _get_transition_node(self, title, year, version_name, transition_name, existing_nodes) -> 'Node':
+    def _get_transition_node(
+            self,
+            title: str,
+            year: int,
+            version_name: str,
+            transition_name: str,
+            existing_trees: Set['ProgramTree']
+    ) -> 'Node':
         return next(
-            node for node in existing_nodes
-            if node.title == title and node.year == year and node.version_name == version_name and
-            node.transition_name == transition_name
+            tree.root_node for tree in existing_trees
+            if tree.root_node.title == title and tree.root_node.year == year and
+            tree.root_node.version_name == version_name and tree.root_node.transition_name == transition_name
         )
 
     # TODO fix this with domain service maybe

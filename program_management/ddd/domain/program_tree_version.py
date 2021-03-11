@@ -88,7 +88,8 @@ class ProgramTreeVersionBuilder:
             program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_learning_unit_nodes
+                existing_learning_unit_nodes,
+                existing_trees
             )
         else:
             program_tree.ProgramTreeBuilder().fill_from_program_tree(
@@ -125,6 +126,7 @@ class ProgramTreeVersionBuilder:
                     copy_from.program_tree_identity,
                     year=copy_from.program_tree_identity.year + 1
                 ),
+                tree=None
             )
         return tree_version_next_year
 

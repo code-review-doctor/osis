@@ -62,6 +62,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
+    transition_trees = []
     if cmd.to_transition_name:
         training_nodes = [
             node for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes() if node.is_training()
@@ -78,6 +79,12 @@ def fill_program_tree_version_content_from_program_tree_version(
                     title_en=""
                 )
             )
+        transition_tree_versions = tree_version_repository.search(
+            version_name=to_tree_version.version_name,
+            transition_name=to_tree_version.transition_name,
+            year=cmd.to_year
+        )
+        transition_trees = [tree_version.get_tree() for tree_version in transition_tree_versions]
 
     existing_trees = tree_repository.search(
         entity_ids=[
@@ -85,6 +92,7 @@ def fill_program_tree_version_content_from_program_tree_version(
             for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
+
     existing_learning_unit_nodes = node_repo.search(
         [
             attr.evolve(node.entity_id, year=cmd.to_year)
@@ -96,7 +104,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         from_tree_version,
         to_tree_version,
         set(existing_learning_unit_nodes),
-        set(existing_trees)
+        set(existing_trees).union(transition_trees)
     )
 
     identity = tree_version_repository.update(to_tree_version)

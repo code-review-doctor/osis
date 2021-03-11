@@ -143,7 +143,8 @@ def _search_program_tree_version(
         entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
         version_name: str = None,
         offer_acronym: str = None,
-        is_transition: bool = False,
+        transition_name: str = None,
+        year: int = None,
         **kwargs
 ) -> List['ProgramTreeVersion']:
     result = cls.root_entities  # type: List[ProgramTreeVersion]
@@ -151,8 +152,10 @@ def _search_program_tree_version(
         result = (tree_version for tree_version in result if tree_version.version_name == version_name)
     if offer_acronym is not None:
         result = (tree_version for tree_version in result if tree_version.entity_id.offer_acronym == offer_acronym)
-    if is_transition is not None:
-        result = (tree_version for tree_version in result if tree_version.is_transition == is_transition)
+    if transition_name is not None:
+        result = (tree_version for tree_version in result if tree_version.transition_name == transition_name)
+    if year:
+        result = (tree_version for tree_version in result if tree_version.entity_id.year == year)
     return list(result)
 
 
