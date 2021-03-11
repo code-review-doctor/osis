@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 11:37+0100\n"
+"POT-Creation-Date: 2021-03-03 15:27+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -188,6 +188,9 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
 
+msgid "Cannot copy prerequisite"
+msgstr "Impossible de copier les prérequis"
+
 #, python-format
 msgid ""
 "Cannot detach because the following learning units are prerequisite in "
@@ -203,6 +206,12 @@ msgid ""
 msgstr ""
 "Interdit de détacher car les unités d'enseignement suivantes ont des "
 "prérequis dans %(formation)s: %(learning_units)s"
+
+msgid "Cannot fill content from {}"
+msgstr "Interdit de remplir le contenur à partir de {}"
+
+msgid "Cannot fill content of {}"
+msgstr "Interdit de remplir le contenue de {}"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -297,6 +306,9 @@ msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
+
+msgid "Fill program tree content from last year"
+msgstr "Remplir le contenue de programmes à partir de l'année passée"
 
 #, python-format
 msgid ""
@@ -633,6 +645,9 @@ msgstr "Intitulé partiel en anglais"
 msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
 
+msgid "Particular"
+msgstr "Particulière"
+
 msgid "Particulière"
 msgstr "Particulière"
 
@@ -946,6 +961,9 @@ msgstr "Autres informations"
 
 msgid "Transformation and modification"
 msgstr "Transformation et modification"
+
+msgid "Transition"
+msgstr "Transition"
 
 msgid "Transition name"
 msgstr "Sigle de la transition"

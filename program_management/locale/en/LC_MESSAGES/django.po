@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 11:37+0100\n"
+"POT-Creation-Date: 2021-03-03 15:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,6 +171,9 @@ msgstr ""
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
 
+msgid "Cannot copy prerequisite"
+msgstr ""
+
 #, python-format
 msgid ""
 "Cannot detach because the following learning units are prerequisite in "
@@ -186,6 +189,12 @@ msgid ""
 msgstr ""
 "Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
+
+msgid "Cannot fill content from {}"
+msgstr ""
+
+msgid "Cannot fill content of {}"
+msgstr ""
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -276,6 +285,9 @@ msgid "Evaluation methods (force majeure)"
 msgstr ""
 
 msgid "Export"
+msgstr ""
+
+msgid "Fill program tree content from last year"
 msgstr ""
 
 #, python-format
@@ -595,6 +607,9 @@ msgstr ""
 msgid "Partial title in French"
 msgstr ""
 
+msgid "Particular"
+msgstr ""
+
 msgid "Particulière"
 msgstr ""
 
@@ -878,6 +893,9 @@ msgid "Transformation"
 msgstr ""
 
 msgid "Transformation and modification"
+msgstr ""
+
+msgid "Transition"
 msgstr ""
 
 msgid "Transition name"
