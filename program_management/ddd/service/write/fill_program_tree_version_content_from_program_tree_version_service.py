@@ -62,6 +62,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
+    # Extract that into application service
     transition_trees = []
     if cmd.to_transition_name:
         training_nodes = [

@@ -24,11 +24,14 @@
 #
 ##############################################################################
 import re
-from typing import Pattern, Tuple
+from typing import Pattern, Tuple, List, Set
+
+import attr
 
 from base.models.enums.education_group_types import EducationGroupTypesEnum
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.validation_rule import FieldValidationRule
 
@@ -43,6 +46,20 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
+@attr.s
+class BGenerateNodeCode(interface.DomainService):
+    existing_nodes = attr.ib(type=List['Node'])
+
+    def __attrs_post_init__(self):
+        self._codes_generated = set()  # type: Set[NodeCode]
+
+    def generate_transition_code(self, base_code: NodeCode) -> NodeCode:
+        new_code = "T" + base_code[1:]
+        self._codes_generated.add(new_code)
+        return new_code
+
+
+@deprecated
 class GenerateNodeCode(interface.DomainService):
 
     @classmethod

@@ -36,7 +36,7 @@ from program_management.views import quick_search, create_element, publish_gener
 from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
-    update_mini_training
+    update_mini_training, fill_content
 from program_management.views.tree_version.delete import TreeVersionDeleteView
 
 urlpatterns = [
@@ -130,6 +130,7 @@ urlpatterns = [
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),
         path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
+        path('fill/', fill_content.FillTransitionVersionContentView.as_view(), name='fill_transition_version_content'),
     ])),
 
     path('<int:year>/<acronym:acronym>/', include([
