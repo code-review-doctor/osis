@@ -23,11 +23,12 @@
 {% endcomment %}
 {% load i18n %}
 
-<div id="section_{{ section_name }}">
+<div id="{{ section }}" name="section_{{ section_name }}">
     <h3 {% if not can_edit %}class="education_group_year-common italic"{% endif %}>{{ text }}
         {% if can_edit_information and can_edit %}
             <a role="button"
-               class="trigger_modal"
+               id="a_to_update_{{ section_name }}"
+               class="trigger_modal btn_to_focus"
                data-url="{{ update_text_url }}?section={{ section_name }}&title={{ text.split|join:"%20" }}"
                data-modal_class="modal-lg">
                 <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
