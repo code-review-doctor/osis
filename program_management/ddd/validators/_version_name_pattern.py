@@ -30,7 +30,7 @@ from program_management.ddd.domain.exception import InvalidVersionNameException,
     InvalidVersionNameWithTransitionException
 
 VERSION_NAME_REGEX = "^[A-Z]{0,15}$"
-HAVE_NOT_TRANSITION = "^(?!TRANSITION).*"
+HAVE_NOT_TRANSITION = "^((?!TRANSITION).)*$"
 
 
 class VersionNamePatternValidator(BusinessValidator):

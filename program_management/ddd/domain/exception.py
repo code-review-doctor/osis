@@ -408,7 +408,7 @@ class InvalidVersionNameException(BusinessException):
 
 class InvalidVersionNameWithTransitionException(BusinessException):
     def __init__(self):
-        message = _("Name version cannot begin by TRANSITION. Please create a transition version if necessary")
+        message = _("Name version cannot contain TRANSITION. Please create a transition version if necessary")
         super().__init__(message)
 
 
