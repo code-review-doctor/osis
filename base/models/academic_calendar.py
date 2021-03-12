@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 from reversion.admin import VersionAdmin
 
 from base.models import academic_year
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.models.utils.admin_extentions import remove_delete_action
 from base.signals.publisher import compute_all_scores_encodings_deadlines
@@ -92,7 +92,7 @@ class AcademicCalendar(SerializableModel):
     highlight_title = models.CharField(max_length=50, blank=True, null=True)
     highlight_description = models.CharField(max_length=255, blank=True, null=True)
     highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(choices=academic_calendar_type.ACADEMIC_CALENDAR_TYPES, max_length=70)
+    reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70)
 
     objects = AcademicCalendarQuerySet.as_manager()
 
@@ -109,11 +109,6 @@ class AcademicCalendar(SerializableModel):
     def validation_mandatory_dates(self):
         if self.start_date is None:
             raise AttributeError(_('Start date is mandatory'))
-
-    def get_category(self):
-        if self.reference in _list_types(academic_calendar_type.ACADEMIC_CALENDAR_TYPES):
-            return academic_calendar_type.ACADEMIC_CATEGORY
-        return ''
 
     def __str__(self):
         return "{} {}".format(self.academic_year, self.title)
