@@ -6,7 +6,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0569_update_is_mandatory_field_when_empty_skeleton'),
+        ('base', '0574_auto_20210311_1130'),
     ]
 
     operations = [
