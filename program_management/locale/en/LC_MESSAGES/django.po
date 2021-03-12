@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 13:29+0100\n"
+"POT-Creation-Date: 2021-03-03 15:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,6 +83,9 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
+msgid "Academic responsible"
+msgstr ""
+
 msgid "Academic type"
 msgstr ""
 
@@ -117,6 +120,9 @@ msgstr ""
 msgid "Add potential courses"
 msgstr ""
 
+msgid "Admin. ent."
+msgstr ""
+
 msgid "Administration entity"
 msgstr ""
 
@@ -124,6 +130,10 @@ msgid "Admission exam"
 msgstr ""
 
 msgctxt "female plural"
+msgid "All"
+msgstr ""
+
+msgctxt "male plural"
 msgid "All"
 msgstr ""
 
@@ -144,6 +154,9 @@ msgstr "Are you sure you want to remove %(child)s ?"
 msgid "Attribution entity"
 msgstr ""
 
+msgid "Beginning"
+msgstr ""
+
 msgid "Block"
 msgstr ""
 
@@ -156,6 +169,9 @@ msgstr ""
 
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
+msgstr ""
+
+msgid "Cannot copy prerequisite"
 msgstr ""
 
 #, python-format
@@ -173,6 +189,12 @@ msgid ""
 msgstr ""
 "Cannot detach because the following learning units have prerequisite in "
 "%(formation)s: %(learning_units)s"
+
+msgid "Cannot fill content from {}"
+msgstr ""
+
+msgid "Cannot fill content of {}"
+msgstr ""
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -232,7 +254,13 @@ msgstr ""
 msgid "Direct gathering"
 msgstr ""
 
+msgid "Dissertation"
+msgstr ""
+
 msgid "Duration"
+msgstr ""
+
+msgid "Education_groups"
 msgstr ""
 
 msgid "English comment"
@@ -257,6 +285,9 @@ msgid "Evaluation methods (force majeure)"
 msgstr ""
 
 msgid "Export"
+msgstr ""
+
+msgid "Fill program tree content from last year"
 msgstr ""
 
 #, python-format
@@ -296,6 +327,9 @@ msgstr ""
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr ""
 
+msgid "General informations"
+msgstr ""
+
 msgid "Group"
 msgstr ""
 
@@ -303,6 +337,15 @@ msgid "ISCED domain"
 msgstr ""
 
 msgid "Identification"
+msgstr ""
+
+msgid ""
+"Impossible to create a transition version : an other transition version "
+"exists already on this year."
+msgstr ""
+
+#, python-format
+msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
 msgid "Include subordinate entities"
@@ -343,6 +386,9 @@ msgid ""
 "academic year %(parent_node)s."
 msgstr ""
 
+msgid "Jury members"
+msgstr ""
+
 msgid "Keywords"
 msgstr ""
 
@@ -359,6 +405,9 @@ msgid "Last update description fiche by"
 msgstr ""
 
 msgid "Last update description fiche on"
+msgstr ""
+
+msgid "Last year of org."
 msgstr ""
 
 msgid "Leads to diploma/certificate"
@@ -414,6 +463,9 @@ msgstr ""
 msgid "List UE"
 msgstr ""
 
+msgid "List education groups"
+msgstr ""
+
 msgid "List of teachers"
 msgstr ""
 
@@ -427,6 +479,9 @@ msgid "Made in"
 msgstr ""
 
 msgid "Main gathering"
+msgstr ""
+
+msgid "Manag. ent."
 msgstr ""
 
 msgid "Mandatory"
@@ -445,6 +500,9 @@ msgstr ""
 msgid ""
 "Mini-Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
+msgstr ""
+
+msgid "Mini-training"
 msgstr ""
 
 msgid "Mobile phone"
@@ -475,6 +533,9 @@ msgid "New specific version"
 msgstr ""
 
 msgid "New training"
+msgstr ""
+
+msgid "New transition version"
 msgstr ""
 
 msgid "No"
@@ -522,6 +583,12 @@ msgstr[1] ""
 msgid "Optional"
 msgstr ""
 
+msgid "Other academic responsibles"
+msgstr ""
+
+msgid "Other contacts"
+msgstr ""
+
 msgid "Other informations"
 msgstr ""
 
@@ -538,6 +605,9 @@ msgid "Partial title in English"
 msgstr ""
 
 msgid "Partial title in French"
+msgstr ""
+
+msgid "Particular"
 msgstr ""
 
 msgid "Particulière"
@@ -595,6 +665,9 @@ msgstr ""
 msgid "Professionnal title"
 msgstr ""
 
+msgid "Program organized with other institutes"
+msgstr ""
+
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
 msgstr ""
@@ -633,6 +706,9 @@ msgid "Relative credits must be lower or equals to 999"
 msgstr ""
 
 msgid "Remark"
+msgstr ""
+
+msgid "Remark in English"
 msgstr ""
 
 msgid "Req. Entity"
@@ -760,7 +836,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -778,6 +854,9 @@ msgid ""
 msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
+msgstr ""
+
+msgid "This value is invalid."
 msgstr ""
 
 msgid "This version exists until"
@@ -819,6 +898,9 @@ msgstr ""
 msgid "Transition"
 msgstr ""
 
+msgid "Transition name"
+msgstr ""
+
 msgid "Tutors"
 msgstr ""
 
@@ -831,11 +913,17 @@ msgstr ""
 msgid "Type of training"
 msgstr ""
 
+msgid "UCL Diploma"
+msgstr ""
+
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
 msgstr ""
 
 msgid "University certificate"
+msgstr ""
+
+msgid "Unspecified"
 msgstr ""
 
 msgid "Update Content"
@@ -901,8 +989,26 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
+"You can't delete the specific program tree '{code}' in {year} as transition "
+"versions exists during this year and/or in the future."
+msgstr ""
+
+#, python-brace-format
+msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
 "versions exists during this year and/or in the future."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't delete the standard program tree '{code}' in {year} as transition "
+"versions exists during this year and/or in the future."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists in {transition_year}"
 msgstr ""
 
 #, python-format
@@ -939,6 +1045,9 @@ msgid "certificate aims"
 msgstr ""
 
 msgid "comment (internal)"
+msgstr ""
+
+msgid "contacts"
 msgstr ""
 
 msgid "dissertation"

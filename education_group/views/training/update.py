@@ -1,11 +1,11 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 #  A copy of this license - GNU General Public License - is available
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
-# ############################################################################
+#############################################################################
 import functools
 from typing import List, Dict, Optional
 
@@ -35,7 +35,8 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages, \
+    check_formations_impacted_by_update
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -44,7 +45,8 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, ContentConstraintTypeMissing, \
-    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum
+    ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
+    HopsFields2OrNoneForFormationPhd
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -60,6 +62,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.domain.exception import Program2MEndDateLowerThanItsFinalitiesException, \
     FinalitiesEndDateGreaterThanTheirMasters2MException
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_training_with_program_tree_service
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
@@ -102,6 +105,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     updated_trainings
                 )
                 display_success_messages(request, success_messages, extra_tags='safe')
+                check_formations_impacted_by_update(self.get_training_obj().code, self.get_training_obj().year,
+                                                    request, self.get_training_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -178,7 +183,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 elif isinstance(e, exception.ContentConstraintMaximumInvalid):
                     self.training_form.add_error("max_constraint", e.message)
                 elif isinstance(e, HopsFieldsAllOrNone) or \
-                        isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
+                        isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999) or \
+                        isinstance(e, HopsFields2OrNoneForFormationPhd):
                     self.training_form.add_error('ares_code', e.message)
                 elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                     self.training_form.add_error('ares_graca', e.message)
@@ -230,7 +236,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             program_management_exception.ProgramTreeNonEmpty,
             exception.TrainingHaveLinkWithEPC,
             exception.TrainingHaveEnrollments,
-            program_management_exception.CannotDeleteStandardDueToVersionEndDate
+            program_management_exception.CannotDeleteStandardDueToSpecificVersionEndDate,
+            program_management_exception.CannotDeleteStandardDueToTransitionVersionEndDate
         ) as e:
             self.training_form.add_error("end_year", "")
             self.training_form.add_error(
@@ -513,6 +520,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             code=cleaned_data["code"],
             offer_acronym=cleaned_data["acronym"],
             version_name='',
-            is_transition=False,
+            transition_name=NOT_A_TRANSITION,
             from_year=cleaned_data["end_year"].year+1
         )

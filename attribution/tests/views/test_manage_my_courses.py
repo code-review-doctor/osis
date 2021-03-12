@@ -123,8 +123,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
-    @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
-    def test_list_my_attributions_summary_editable_after_period(self, mock_is_open):
+    def test_list_my_attributions_summary_editable_after_period(self):
         self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
         self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
         self.academic_calendar.save()
@@ -191,11 +190,11 @@ class ManageMyCoursesViewTestCase(TestCase):
         response = self.client.get(self.url)
         context = response.context
         self.assertTrue(context['event_perm_force_majeure_open'])
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_start_date'],
             self.academic_calendar_force_majeure.start_date
         )
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_end_date'],
             self.academic_calendar_force_majeure.end_date
         )
