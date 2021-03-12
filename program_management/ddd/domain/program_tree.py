@@ -43,8 +43,11 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
+from program_management.ddd.domain.prerequisite import Prerequisites, \
+    PrerequisitesBuilder
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
@@ -62,9 +65,10 @@ class ProgramTreeIdentity(interface.EntityIdentity):
 
 class ProgramTreeBuilder:
 
-    def duplicate(
+    def create_and_fill_from_program_tree(
             self,
             duplicate_from: 'ProgramTree',
+            duplicate_to_transition: bool,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = None
     ) -> 'ProgramTree':
@@ -75,8 +79,9 @@ class ProgramTreeBuilder:
         :param override_start_year_to: This param override the 'start year' of all nodes and links in the Tree.
         :return:
         """
-        copied_root = self._duplicate_root_and_direct_children(
+        copied_root = self._create_and_fill_root_and_direct_children(
             duplicate_from,
+            duplicate_to_transition,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
         )
@@ -87,23 +92,36 @@ class ProgramTreeBuilder:
         )
         return copied_tree
 
-    def _duplicate_root_and_direct_children(
+    def _create_and_fill_root_and_direct_children(
             self,
             program_tree: 'ProgramTree',
+            duplicate_to_transition: bool,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
-        copy_from_node = program_tree.root_node
-        new_parent = node_factory.duplicate(
-            copy_from_node,
+        root_node = program_tree.root_node
+        new_code = GenerateNodeCode().generate_from_parent_node(
+            parent_node=root_node,
+            child_node_type=root_node.node_type,
+            duplicate_to_transition=duplicate_to_transition
+        )
+        new_parent = node_factory.create_and_fill_from_node(
+            create_from=root_node,
+            new_code=new_code,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
         )
         mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
-        for copy_from_link in [n for n in copy_from_node.children if n.child.node_type in mandatory_children_types]:
+        for copy_from_link in [n for n in root_node.children if n.child.node_type in mandatory_children_types]:
             child_node = copy_from_link.child
-            new_child = node_factory.duplicate(
-                child_node,
+            new_code = GenerateNodeCode().generate_from_parent_node(
+                parent_node=child_node,
+                child_node_type=child_node.node_type,
+                duplicate_to_transition=duplicate_to_transition
+            )
+            new_child = node_factory.create_and_fill_from_node(
+                create_from=child_node,
+                new_code=new_code,
                 override_end_year_to=override_end_year_to,
                 override_start_year_to=override_start_year_to
             )
@@ -137,15 +155,87 @@ class ProgramTreeBuilder:
                 root_next_year.add_child(child_next_year, is_mandatory=True)
         return program_tree_next_year
 
-    # Do not delete : will be usefull to copy content of a program tree to next year
-    def _copy_node_and_children_to_next_year(self, copy_from_node: 'Node') -> 'Node':
-        parent_next_year = node_factory.copy_to_next_year(copy_from_node)
-        for copy_from_link in copy_from_node.children:
-            child_node = copy_from_link.child
-            child_next_year = self._copy_node_and_children_to_next_year(child_node)
-            link_next_year = link_factory.copy_to_next_year(copy_from_link, parent_next_year, child_next_year)
-            parent_next_year.children.append(link_next_year)
-        return parent_next_year
+    def copy_prerequisites_from_program_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
+        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
+        return to_tree
+
+    def fill_from_program_tree(
+            self,
+            from_tree: 'ProgramTree',
+            to_tree: 'ProgramTree',
+            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
+            existing_trees: Set['ProgramTree']
+    ) -> 'ProgramTree':
+        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
+
+        self._fill_node_children_from_node(
+            from_tree.root_node,
+            to_tree.root_node,
+            to_tree.authorized_relationships,
+            existing_learning_unit_nodes,
+            existing_trees
+        )
+
+        return to_tree
+
+    def _fill_node_children_from_node(
+            self,
+            from_node: 'Node',
+            to_node: 'Node',
+            relationships: 'AuthorizedRelationshipList',
+            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
+            existing_trees: Set['ProgramTree']
+    ) -> 'Node':
+        learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
+        group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
+
+        for learning_unit_link in learning_units_links:
+            child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_learning_node(existing_learning_unit_nodes, child_node_identity) or \
+                learning_unit_link.child
+
+            copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
+            to_node.children.append(copied_link)
+
+        for group_year_link in group_year_links:
+            if not group_year_link.child.is_group() and self._is_end_date_inferior_to(group_year_link.child, to_node):
+                continue
+
+            child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_group_node(existing_trees, child_node_identity)
+            child = child or node_factory.copy_to_year(group_year_link.child, to_node.year, group_year_link.child.code)
+
+            copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
+            to_node.children.append(copied_link)
+
+            if not group_year_link.is_reference() and (
+                    is_empty(child, relationships)
+                    or relationships.is_mandatory_child(to_node.node_type, child.node_type)
+            ):
+                self._fill_node_children_from_node(
+                    group_year_link.child,
+                    child,
+                    relationships,
+                    existing_learning_unit_nodes,
+                    existing_trees
+                )
+
+        return to_node
+
+    def _get_existing_group_node(self, existing_trees: Set['ProgramTree'], node_id: 'NodeIdentity') -> Optional['Node']:
+        return next(
+            (tree.root_node for tree in existing_trees if tree.root_node.entity_id == node_id),
+            None
+        )
+
+    def _get_existing_learning_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
+        return next(
+            (node for node in existing_nodes if node.entity_id == node_id),
+            None
+        )
+
+    def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
+        return from_node.end_date and from_node.end_date < to_node.year
 
     def build_from_orphan_group_as_root(
             self,
@@ -174,7 +264,7 @@ class ProgramTreeBuilder:
 class ProgramTree(interface.RootEntity):
 
     root_node = attr.ib(type=Node)
-    authorized_relationships = attr.ib(type=AuthorizedRelationshipList, factory=list)
+    authorized_relationships = attr.ib(type='AuthorizedRelationshipList', factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
     prerequisites = attr.ib(type='Prerequisites')
 
@@ -184,15 +274,7 @@ class ProgramTree(interface.RootEntity):
         return NullPrerequisites()
 
     def is_empty(self, parent_node=None):
-        parent_node = parent_node or self.root_node
-        for child_node in parent_node.children_as_nodes:
-            if not self.is_empty(parent_node=child_node):
-                return False
-            is_mandatory_children = child_node.node_type in self.authorized_relationships.\
-                get_ordered_mandatory_children_types(parent_node.node_type) if self.authorized_relationships else []
-            if not is_mandatory_children:
-                return False
-        return True
+        return is_empty(parent_node or self.root_node, self.authorized_relationships)
 
     @entity_id.default
     def _entity_id(self) -> 'ProgramTreeIdentity':
@@ -265,6 +347,14 @@ class ProgramTree(interface.RootEntity):
             result.append(self.get_node(path))
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
+
+    def get_mandatory_children(self, parent_node: 'Node'):
+        return [
+            node for node in parent_node.children_as_nodes
+            if node.node_type in self.authorized_relationships.get_ordered_mandatory_children_types(
+                parent_node.node_type
+            )
+        ]
 
     def search_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in self.get_all_links() if link_obj.child == child_node]
@@ -417,7 +507,9 @@ class ProgramTree(interface.RootEntity):
         return my_map.get(str(child.entity_id) + str(parent.entity_id))
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
-        copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
+        copied_root_node = copy.deepcopy(self.root_node)
+        if ignore_children_from:
+            copied_root_node.prune(ignore_children_from)
         return ProgramTree(
             root_node=copied_root_node,
             authorized_relationships=self.authorized_relationships,
@@ -443,6 +535,10 @@ class ProgramTree(interface.RootEntity):
         """
         path_to_paste_to = paste_command.path_where_to_paste
         node_to_paste_to = self.get_node(path_to_paste_to)
+        is_mandatory = paste_command.is_mandatory
+        if node_to_paste_to.is_minor_major_option_list_choice():
+            is_mandatory = False
+
         if node_to_paste_to.is_minor_major_list_choice() and node_to_paste.is_minor_major_deepening():
             link_type = LinkTypes.REFERENCE
         else:
@@ -461,7 +557,7 @@ class ProgramTree(interface.RootEntity):
         return node_to_paste_to.add_child(
             node_to_paste,
             access_condition=paste_command.access_condition,
-            is_mandatory=paste_command.is_mandatory,
+            is_mandatory=is_mandatory,
             block=paste_command.block,
             link_type=link_type,
             comment=paste_command.comment,
@@ -515,9 +611,16 @@ class ProgramTree(interface.RootEntity):
         return parent.detach_child(node_to_detach)
 
     def __copy__(self) -> 'ProgramTree':
+        return self.__deepcopy__(memodict={})
+
+    def __deepcopy__(self, memodict: Dict = None) -> 'ProgramTree':
+        if memodict is None:
+            memodict = {}
+
         return ProgramTree(
-            root_node=_copy(self.root_node),
-            authorized_relationships=copy.copy(self.authorized_relationships)
+            root_node=self.root_node.__deepcopy__(memodict),
+            authorized_relationships=copy.copy(self.authorized_relationships),
+            prerequisites=copy.deepcopy(self.prerequisites)
         )
 
     def get_relative_credits_values(self, child_node: 'NodeIdentity'):
@@ -639,6 +742,18 @@ class ProgramTree(interface.RootEntity):
         return self.prerequisites.get_prerequisite(node)
 
 
+def is_empty(parent_node: 'Node', relationships: 'AuthorizedRelationshipList'):
+    for child_node in parent_node.children_as_nodes:
+        if not is_empty(child_node, relationships):
+            return False
+        is_mandatory_children = child_node.node_type in relationships.get_ordered_mandatory_children_types(
+            parent_node.node_type
+        )
+        if not is_mandatory_children:
+            return False
+    return True
+
+
 def _nodes_from_root(root: 'Node') -> List['Node']:
     nodes = [root]
     for link in root.children:
@@ -657,20 +772,6 @@ def _links_from_root(root: 'Node', ignore: Set[EducationGroupTypesEnum] = None) 
 
 def build_path(*nodes):
     return '{}'.format(PATH_SEPARATOR).join((str(n.node_id) for n in nodes))
-
-
-def _copy(root: 'Node', ignore_children_from: Set[EducationGroupTypesEnum] = None):
-    new_node = node_factory.deepcopy_node_without_copy_children_recursively(root)
-    new_children = []
-    for link in root.children:
-        if ignore_children_from and link.parent.node_type in ignore_children_from:
-            continue
-        new_child = _copy(link.child, ignore_children_from=ignore_children_from)
-        new_link = link_factory.deepcopy_link_without_copy_children_recursively(link)
-        new_link.child = new_child
-        new_children.append(new_link)
-    new_node.children = new_children
-    return new_node
 
 
 def _path_contains(path: 'Path', node: 'Node') -> bool:

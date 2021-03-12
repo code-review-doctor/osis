@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List
+from typing import List, Optional
 
 import attr
 from django.core.exceptions import PermissionDenied
@@ -36,16 +36,16 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
-from base.models.learning_unit_year import LearningUnitYear
 
 
 @attr.s(frozen=True, slots=True)
 class AcademicEvent:
+    id = attr.ib(type=int)
     title = attr.ib(type=str)
     authorized_target_year = attr.ib(type=int)
     start_date = attr.ib(type=datetime.date)
     end_date = attr.ib(type=datetime.date)
+    type = attr.ib(type=str)
 
     def is_open_now(self) -> bool:
         """
@@ -140,7 +140,7 @@ class AcademicEventCalendarHelper(ABC):
     @cached_property
     def _get_academic_events(self) -> List[AcademicEvent]:
         return sorted(
-            AcademicEventFactory().get_academic_events(self.event_reference),
+            AcademicEventRepository().get_academic_events(self.event_reference),
             key=lambda academic_event: academic_event.start_date
         )
 
@@ -153,14 +153,30 @@ class AcademicEventCalendarHelper(ABC):
         raise NotImplementedError()
 
 
-class AcademicEventFactory:
-    def get_academic_events(self, event_reference: str) -> List[AcademicEvent]:
-        qs = AcademicCalendar.objects.filter(
-            reference=event_reference
-        ).annotate(
-            authorized_target_year=F('data_year__year')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year')
+class AcademicEventRepository:
+    def get_academic_events(self, event_reference: Optional[str] = None) -> List[AcademicEvent]:
+        qs = AcademicCalendar.objects.all()
+        if event_reference:
+            qs = qs.filter(reference=event_reference)
+        qs = qs.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')
         return [AcademicEvent(**obj) for obj in qs]
+
+    def get(self, academic_event_id: int) -> AcademicEvent:
+        obj = AcademicCalendar.objects.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')\
+         .get(pk=academic_event_id)
+        return AcademicEvent(**obj)
+
+    def update(self, academic_event: AcademicEvent):
+        academic_event_db = AcademicCalendar.objects.get(pk=academic_event.id)
+        academic_event_db.start_date = academic_event.start_date
+        academic_event_db.end_date = academic_event.end_date
+        academic_event_db.save()
 
 
 @attr.s(frozen=True, slots=True)
@@ -184,12 +200,12 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
         return sorted(
-            AcademicEventSessionFactory().get_academic_session_events(self.event_reference),
+            AcademicEventSessionRepository().get_academic_session_events(self.event_reference),
             key=lambda academic_session_event: academic_session_event.start_date
         )
 
 
-class AcademicEventSessionFactory:
+class AcademicEventSessionRepository:
     def get_academic_session_events(self, event_reference: str) -> List[AcademicSessionEvent]:
         qs = AcademicCalendar.objects.filter(
             reference=event_reference
@@ -197,8 +213,9 @@ class AcademicEventSessionFactory:
             sessionexamcalendar__isnull=True
         ).annotate(
             authorized_target_year=F('data_year__year'),
+            type=F('reference'),
             session=F('sessionexamcalendar__number_session')
-        ).values('title', 'start_date', 'end_date', 'authorized_target_year', 'session')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
         return [AcademicSessionEvent(**obj) for obj in qs]
 
 
@@ -274,67 +291,3 @@ class EventPermClosed(EventPerm):
     @classmethod
     def get_open_academic_calendars_queryset(cls) -> QuerySet:
         return AcademicCalendar.objects.none()
-
-
-class EventPermLearningUnitFacultyManagerEdition(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-    error_msg = _("This learning unit is not editable by faculty managers during this period.")
-
-
-class EventPermLearningUnitCentralManagerEdition(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.LEARNING_UNIT_EDITION_CENTRAL_MANAGERS
-    error_msg = _("This learning unit is not editable by central managers during this period.")
-
-
-# TODO : gather EventPerm disregarding role
-def generate_event_perm_learning_unit_edition(person, obj=None, raise_exception=True):
-    if person.is_central_manager_for_ue:
-        return EventPermLearningUnitCentralManagerEdition(obj, raise_exception)
-    elif person.is_faculty_manager_for_ue:
-        return EventPermLearningUnitFacultyManagerEdition(obj, raise_exception)
-    else:
-        return EventPermClosed(obj, raise_exception)
-
-
-class EventPermCreationOrEndDateProposalCentralManager(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
-    error_msg = _("Creation or end date modification proposal not allowed for central managers during this period.")
-
-
-class EventPermCreationOrEndDateProposalFacultyManager(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
-    error_msg = _("Creation or end date modification proposal not allowed for faculty managers during this period.")
-
-
-def generate_event_perm_creation_end_date_proposal(person, obj=None, raise_exception=True):
-    if person.is_central_manager:
-        return EventPermCreationOrEndDateProposalCentralManager(obj, raise_exception)
-    elif person.is_faculty_manager:
-        return EventPermCreationOrEndDateProposalFacultyManager(obj, raise_exception)
-    else:
-        return EventPermClosed(obj, raise_exception)
-
-
-class EventPermModificationOrTransformationProposalCentralManager(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS
-    error_msg = _("Modification or transformation proposal not allowed for central managers during this period.")
-
-
-class EventPermModificationOrTransformationProposalFacultyManager(EventPerm):
-    model = LearningUnitYear
-    event_reference = academic_calendar_type.MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS
-    error_msg = _("Modification or transformation proposal not allowed for faculty managers during this period.")
-
-
-def generate_event_perm_modification_transformation_proposal(person, obj=None, raise_exception=True):
-    if person.is_central_manager:
-        return EventPermModificationOrTransformationProposalCentralManager(obj, raise_exception)
-    elif person.is_faculty_manager:
-        return EventPermModificationOrTransformationProposalFacultyManager(obj, raise_exception)
-    else:
-        return EventPermClosed(obj, raise_exception)

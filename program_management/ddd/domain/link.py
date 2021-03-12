@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import copy
+from typing import Dict
 
 import attr
 
@@ -91,6 +92,18 @@ class Link(interface.Entity):
     def __hash__(self):
         return hash(self.entity_id)
 
+    def __deepcopy__(self, memodict: Dict = None) -> 'Link':
+        if memodict is None:
+            memodict = {}
+
+        copy_link = attr.evolve(
+            self,
+            parent=self.parent.__deepcopy__(memodict) if self.parent else None,
+            child=self.child.__deepcopy__(memodict) if self.child else None
+        )
+
+        return copy_link
+
     def is_reference(self):
         return self.link_type == LinkTypes.REFERENCE
 
@@ -136,6 +149,13 @@ class LinkWithChildBranch(Link):
         super(LinkWithChildBranch, self).__init__(*args, **kwargs)
 
 
+class LinkBuilder:
+    def from_link(self, from_link: 'Link', parent: 'Node', child: 'Node'):
+        new_link = attr.evolve(from_link, parent=parent, child=child)
+        new_link._has_changed = True
+        return new_link
+
+
 class LinkFactory:
 
     def copy_to_next_year(self, copy_from_link: 'Link', parent_next_year: 'Node', child_next_year: 'Node') -> 'Link':
@@ -157,13 +177,6 @@ class LinkFactory:
         link_created = self.get_link(*args, **kwargs)
         link_created._has_changed = True
         return link_created
-
-    def deepcopy_link_without_copy_children_recursively(self, original_link: 'Link'):
-        original_child = original_link.child
-        original_link.child = None  # To avoid recursive deep copy of all children behind
-        new_link = copy.deepcopy(original_link)
-        original_link.child = original_child
-        return new_link
 
 
 factory = LinkFactory()

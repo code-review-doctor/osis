@@ -53,4 +53,4 @@ class EntityVersionAddressTest(TestCase):
         address = EntityVersionAddressFactory(is_main=True)
         address.street_number = 17
         address.save()
-        self.assertEquals(address.street_number, 17)
+        self.assertEqual(address.street_number, 17)

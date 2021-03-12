@@ -43,6 +43,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -77,6 +78,7 @@ class LearningUnitYearDeletion(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             learning_unit=cls.learning_unit)
         cls.the_partim = _('The partim')
+        generate_learning_unit_edition_calendars([cls.academic_year])
 
     def test_check_related_partims_deletion(self):
         msg = deletion._check_related_partims_deletion(self.l_container_year)
