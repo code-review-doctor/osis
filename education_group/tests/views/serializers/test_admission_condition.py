@@ -44,14 +44,14 @@ class TestGetCommonAdmissionConditionSerializer(TestCase):
                 'text_en': cls.common_admission_training_120.text_alert_message_en
             },
             'general_conditions': {
-                'label_translated': _('General Conditions'),
+                'label_translated': _('General Access Requirements'),
                 'text_fr': cls.common_admission_training_120.text_ca_cond_generales,
                 'text_en': cls.common_admission_training_120.text_ca_cond_generales_en
             },
             'specific_conditions': {
-                'label_translated': _('Specific Conditions'),
+                'label_translated': _('Access based on validation of professional experience'),
                 'text_fr': cls.common_admission_training_120.text_ca_bacs_cond_particulieres,
-                'text_en':  cls.common_admission_training_120.text_ca_bacs_cond_particulieres_en,
+                'text_en': cls.common_admission_training_120.text_ca_bacs_cond_particulieres_en,
             },
             'language_exam': {
                 'label_translated': _('Language Exam'),
@@ -59,7 +59,7 @@ class TestGetCommonAdmissionConditionSerializer(TestCase):
                 'text_en': cls.common_admission_training_120.text_ca_bacs_examen_langue_en
             },
             'special_conditions': {
-                'label_translated': _('Special Conditions'),
+                'label_translated': _('Special Requirements to access some programmes'),
                 'text_fr': cls.common_admission_training_120.text_ca_bacs_cond_speciales,
                 'text_en': cls.common_admission_training_120.text_ca_bacs_cond_speciales_en
             },
@@ -99,7 +99,7 @@ class TestGetCommonAdmissionConditionSerializer(TestCase):
                 'text_en': cls.common_admission_training_120.text_admission_enrollment_procedures_en
             },
             'specific_condition_requirements': {
-                'label_translated': _('Specific admission requirements'),
+                'label_translated': _('Specific Access Requirements'),
                 'text_fr': cls.common_admission_training_120.text_free,
                 'text_en': cls.common_admission_training_120.text_free_en
             }

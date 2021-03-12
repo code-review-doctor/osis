@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-04 13:43+0100\n"
+"POT-Creation-Date: 2021-03-09 13:20+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -192,6 +192,9 @@ msgstr "Accès refusé !"
 
 msgid "Access minor"
 msgstr "Mineure d’accès"
+
+msgid "Access schedule calendar"
+msgstr "Accès horaire ADE"
 
 msgid "Access to the student's virtual office."
 msgstr "Accès au bureau virtuel de l'étudiant."
@@ -542,6 +545,9 @@ msgstr "Code"
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
 
+msgid "Comment"
+msgstr "Commentaire"
+
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
 
@@ -592,7 +598,7 @@ msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
 msgid "Continuing Education"
-msgstr "Formation Continue"
+msgstr "Formations Continues"
 
 msgid "Coordinator"
 msgstr "Coordinateur"
@@ -965,6 +971,9 @@ msgstr "Sigle déjà existant"
 
 msgid "Export"
 msgstr "Exporter"
+
+msgid "Proposal management"
+msgstr "Gestion de la proposition"
 
 msgid "External"
 msgstr "Externe"
@@ -1356,6 +1365,12 @@ msgstr "Vol. PM"
 
 msgid "Legend"
 msgstr "Légende"
+
+msgid "Limited proposal management"
+msgstr "Gestion des propositions limitée"
+
+msgid "Extended proposal management"
+msgstr "Gestion des propositions étendue"
 
 msgid "Link type"
 msgstr "Type de lien"
@@ -2085,9 +2100,6 @@ msgstr ""
 "Proposition d'unité d'enseignement <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> créée avec succès."
 
-msgid "Proposal management"
-msgstr "Gestion de la proposition"
-
 msgid "Proposal of creation"
 msgstr "Proposition de création"
 
@@ -2461,8 +2473,9 @@ msgid ""
 "exception in relation to the sessions calculated according to the "
 "quadrimesters."
 msgstr ""
-"Le champ session dérogation doit être complété UNIQUEMENT si l'on veut encoder une exception par rapport aux sessions "
-"calculées en fonction des quadrimestres."
+"Le champ session dérogation doit être complété UNIQUEMENT si l'on veut "
+"encoder une exception par rapport aux sessions calculées en fonction des "
+"quadrimestres."
 
 #, python-format
 msgid ""
@@ -2865,6 +2878,9 @@ msgstr "Certificat d’université 1er cycle"
 
 msgid "University second cycle certificate"
 msgstr "Certificat d’université 2ème cycle"
+
+msgid "Unspecified"
+msgstr "Indéterminé"
 
 msgid "Up"
 msgstr "Haut"
