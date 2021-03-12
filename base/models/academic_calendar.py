@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 from reversion.admin import VersionAdmin
 
 from base.models import academic_year
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.models.utils.admin_extentions import remove_delete_action
 from base.signals.publisher import compute_all_scores_encodings_deadlines
@@ -44,6 +44,7 @@ class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ('academic_year', 'reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
+    actions = ['send_calendar_reminder_notice']
 
     def has_add_permission(self, request, obj=None):
         return False
@@ -53,6 +54,11 @@ class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
 
     def get_actions(self, request):
         return remove_delete_action(super(AcademicCalendarAdmin, self).get_actions(request))
+
+    def send_calendar_reminder_notice(self, request, queryset):
+        from base.tasks import calendar_reminder_notice
+        return calendar_reminder_notice.run()
+    send_calendar_reminder_notice.short_description = _("Send calendar reminder notice")
 
 
 class AcademicCalendarQuerySet(models.QuerySet):
@@ -86,7 +92,7 @@ class AcademicCalendar(SerializableModel):
     highlight_title = models.CharField(max_length=50, blank=True, null=True)
     highlight_description = models.CharField(max_length=255, blank=True, null=True)
     highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(choices=academic_calendar_type.ACADEMIC_CALENDAR_TYPES, max_length=70)
+    reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70)
 
     objects = AcademicCalendarQuerySet.as_manager()
 
@@ -103,11 +109,6 @@ class AcademicCalendar(SerializableModel):
     def validation_mandatory_dates(self):
         if self.start_date is None:
             raise AttributeError(_('Start date is mandatory'))
-
-    def get_category(self):
-        if self.reference in _list_types(academic_calendar_type.ACADEMIC_CALENDAR_TYPES):
-            return academic_calendar_type.ACADEMIC_CATEGORY
-        return ''
 
     def __str__(self):
         return "{} {}".format(self.academic_year, self.title)
@@ -143,18 +144,3 @@ def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, 
 
 def _list_types(calendar_types):
     return [calendar_type[0] for calendar_type in calendar_types]
-
-
-def get_academic_calendar_by_date_and_reference_and_data_year(data_year, reference, date=None):
-    if date is None:
-        date = timezone.now()
-
-    try:
-        return AcademicCalendar.objects.get(
-            data_year=data_year,
-            reference=reference,
-            start_date__lte=date,
-            end_date__gte=date,
-        )
-    except AcademicCalendar.DoesNotExist:
-        return None

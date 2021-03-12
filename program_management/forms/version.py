@@ -26,7 +26,6 @@
 from typing import Dict
 
 import attr
-from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib.auth.models import User
 from django.forms import TextInput
@@ -34,14 +33,14 @@ from django.urls import reverse
 from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
-from base.forms.utils.fields import OsisRichTextFormField
-from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.fields import OsisRichTextFormField
 from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from education_group.forms import fields
 from education_group.forms.training import _get_section_choices
 from education_group.forms.widgets import CertificateAimsWidget
@@ -50,10 +49,12 @@ from program_management.ddd.command import GetVersionMaxEndYear
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
-from program_management.ddd.service.read import get_version_max_end_year
+from program_management.ddd.service.read import get_specific_version_max_end_year_service
 from rules_management.enums import MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, \
     TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
+
+TRANSITION = " - Transition"
 
 
 class SpecificVersionForm(forms.Form):
@@ -81,22 +82,23 @@ class SpecificVersionForm(forms.Form):
     def __init__(self, tree_version_identity: 'ProgramTreeVersionIdentity', *args, **kwargs):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
-
         self._init_academic_year_choices()
         self._set_remote_validation_on_version_name()
 
     def _set_remote_validation_on_version_name(self):
         set_remote_validation(
             self.fields["version_name"],
-            reverse("check_version_name", args=[self.tree_version_identity.year,
-                                                self.tree_version_identity.offer_acronym]
-                    )
+            reverse(
+                "check_version_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
+            )
         )
 
     def _init_academic_year_choices(self):
-        max_year = get_version_max_end_year.calculate_version_max_end_year(
+        max_year = get_specific_version_max_end_year_service.calculate_specific_version_max_end_year(
             GetVersionMaxEndYear(
                 offer_acronym=self.tree_version_identity.offer_acronym,
+                version_name=self.tree_version_identity.version_name,
                 year=self.tree_version_identity.year
             )
         )

@@ -52,8 +52,8 @@ from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, organization as organization_factory, \
     person as person_factory
-from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
-    generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_proposal_calendars, \
+    generate_proposal_calendars_without_start_and_end_date
 from base.tests.factories.academic_year import create_current_academic_year, \
     AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -86,10 +86,12 @@ LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AcademicYearFactory.produce(number_past=3, number_future=10)
+        academic_years = AcademicYearFactory.produce(number_past=3, number_future=10)
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
+        generate_proposal_calendars_without_start_and_end_date(academic_years)
+
         cls.entity_version = EntityVersionFactory(
             entity__organization=an_organization,
             entity_type=entity_type.FACULTY,
@@ -271,7 +273,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         cls.current_academic_year = cls.academic_years[4]
         cls.next_academic_year = cls.academic_years[5]
         cls.previous_academic_year = cls.academic_years[3]
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars(cls.academic_years)
 
         cls.entity_version = EntityVersionFactory(
             entity__organization=an_organization,
@@ -544,7 +546,8 @@ class TestGroupActionsOnProposals(TestCase):
 class TestLearningUnitProposalCancellation(TestCase):
     @classmethod
     def setUpTestData(cls):
-        create_current_academic_year()
+        academic_year = create_current_academic_year()
+        generate_proposal_calendars_without_start_and_end_date([academic_year])
         cls.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         cls.learning_unit_year = cls.learning_unit_proposal.learning_unit_year
         cls.person = FacultyManagerFactory(
@@ -762,8 +765,7 @@ class TestEditProposal(TestCase):
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.current_academic_year = cls.academic_years[0]
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
-        generate_modification_transformation_proposal_calendars(cls.academic_years)
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars(cls.academic_years)
         cls.language = FrenchLanguageFactory()
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
@@ -1101,6 +1103,7 @@ class TestCreationProposalCancel(TestCase):
         a_proposal = _create_proposal_learning_unit("LOSIS1211")
         luy = a_proposal.learning_unit_year
         url = reverse('learning_unit_cancel_proposal', args=[luy.id])
+        generate_proposal_calendars_without_start_and_end_date([luy.academic_year])
 
         self.central_manager = CentralManagerFactory(entity=luy.learning_container_year.requirement_entity)
         self.client.force_login(self.central_manager.person.user)
