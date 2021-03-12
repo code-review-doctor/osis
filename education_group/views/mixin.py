@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.utils.translation import gettext_lazy as _
+
 from base.models.enums.education_group_types import GroupType
 from base.utils.cache import ElementCache
 from education_group.ddd import command as command_education_group
@@ -28,9 +30,8 @@ from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.service.read import get_group_service
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd import command as command_program_management
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.service.read import element_selected_service
-from django.utils.translation import gettext_lazy as _
-
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 
 
@@ -62,7 +63,8 @@ class ElementSelectedClipBoardSerializer:
                 display_as_academic_year(element_selected["element_year"])
             )
 
-    def _get_group_str(self, element_selected) -> str:
+    @staticmethod
+    def _get_group_str(element_selected) -> str:
         group = get_group_service.get_group(
             command_education_group.GetGroupCommand(
                 code=element_selected["element_code"],
@@ -78,8 +80,8 @@ class ElementSelectedClipBoardSerializer:
                     year=element_selected["element_year"]
                 )
             )
-            if not version.is_standard:
-                element_selected_str += "[{}]".format(version.version_name)
+            if not version.is_official_standard:
+                element_selected_str += "{}".format(version_label(version.entity_id))
 
         element_selected_str += " - {}".format(group.academic_year)
         return element_selected_str

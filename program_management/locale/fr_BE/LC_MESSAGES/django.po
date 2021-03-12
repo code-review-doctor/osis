@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-20 13:29+0100\n"
+"POT-Creation-Date: 2021-03-03 15:27+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -100,6 +100,9 @@ msgstr "Crédits absolus"
 msgid "Ac yr."
 msgstr "Anac."
 
+msgid "Academic responsible"
+msgstr "Responsable académique"
+
 msgid "Academic type"
 msgstr "Nature"
 
@@ -134,6 +137,9 @@ msgstr "Ajouter"
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
 
+msgid "Admin. ent."
+msgstr "Ent. adm."
+
 msgid "Administration entity"
 msgstr "Entité d'administration"
 
@@ -143,6 +149,10 @@ msgstr "Concours"
 msgctxt "female plural"
 msgid "All"
 msgstr "Toutes"
+
+msgctxt "male plural"
+msgid "All"
+msgstr "Tous"
 
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
@@ -161,6 +171,9 @@ msgstr "Êtes-vous sûr·e de vouloir retirer %(child)s ?"
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
 
+msgid "Beginning"
+msgstr "Début"
+
 msgid "Block"
 msgstr "Bloc"
 
@@ -174,6 +187,9 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
+
+msgid "Cannot copy prerequisite"
+msgstr "Impossible de copier les prérequis"
 
 #, python-format
 msgid ""
@@ -190,6 +206,12 @@ msgid ""
 msgstr ""
 "Interdit de détacher car les unités d'enseignement suivantes ont des "
 "prérequis dans %(formation)s: %(learning_units)s"
+
+msgid "Cannot fill content from {}"
+msgstr "Interdit de remplir le contenur à partir de {}"
+
+msgid "Cannot fill content of {}"
+msgstr "Interdit de remplir le contenue de {}"
 
 #, python-format
 msgid "Cannot perform action on a education group before %(limit_year)s"
@@ -251,8 +273,14 @@ msgstr "Diplômes /  Certificats"
 msgid "Direct gathering"
 msgstr "Regroupement direct"
 
+msgid "Dissertation"
+msgstr "Mémoire"
+
 msgid "Duration"
 msgstr "Durée"
+
+msgid "Education_groups"
+msgstr "Formations"
 
 msgid "English comment"
 msgstr "Commentaire anglais"
@@ -278,6 +306,9 @@ msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
+
+msgid "Fill program tree content from last year"
+msgstr "Remplir le contenue de programmes à partir de l'année passée"
 
 #, python-format
 msgid ""
@@ -320,6 +351,9 @@ msgstr "Financement coopération internationale CCD/CUD"
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
+msgid "General informations"
+msgstr "Infos générales"
+
 msgid "Group"
 msgstr "Groupement"
 
@@ -328,6 +362,13 @@ msgstr "Domaine ISCED/CITE"
 
 msgid "Identification"
 msgstr "Identification"
+
+msgid ""
+"Impossible to create a transition version : an other transition version "
+"exists already on this year."
+msgstr ""
+"Impossible de créer une version de transition : une autre version de "
+"transition existe déjà sur cette année."
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -373,6 +414,9 @@ msgstr ""
 "Il est interdit d'attacher %(child_node)s à un élément d'une autre année "
 "académique %(parent_node)s."
 
+msgid "Jury members"
+msgstr "Membres du jury"
+
 msgid "Keywords"
 msgstr "Mots clés"
 
@@ -390,6 +434,9 @@ msgstr "Dernière modification fiche descriptive par"
 
 msgid "Last update description fiche on"
 msgstr "Dernière modification fiche descriptive le"
+
+msgid "Last year of org."
+msgstr "Dernière année d'org."
 
 msgid "Leads to diploma/certificate"
 msgstr "Mène à diplôme/certificat"
@@ -447,6 +494,9 @@ msgstr ""
 msgid "List UE"
 msgstr "Liste UE"
 
+msgid "List education groups"
+msgstr "Liste des formations"
+
 msgid "List of teachers"
 msgstr "Liste des enseignants"
 
@@ -461,6 +511,9 @@ msgstr "Fait à"
 
 msgid "Main gathering"
 msgstr "Regroupement principal"
+
+msgid "Manag. ent."
+msgstr "Ent. gestion"
 
 msgid "Mandatory"
 msgstr "Obligatoire"
@@ -483,6 +536,9 @@ msgid ""
 msgstr ""
 "La mini-formation <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> a été modifiée avec succés"
+
+msgid "Mini-training"
+msgstr "Mini-formation"
 
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
@@ -513,6 +569,9 @@ msgstr "Nouvelle version particulière"
 
 msgid "New training"
 msgstr "Nouvelle Formation"
+
+msgid "New transition version"
+msgstr "Nouvelle version de transition"
 
 msgid "No"
 msgstr "Non"
@@ -558,6 +617,12 @@ msgstr[1] ""
 msgid "Optional"
 msgstr "Au choix"
 
+msgid "Other academic responsibles"
+msgstr "Autres responsables académiques"
+
+msgid "Other contacts"
+msgstr "Autres contacts"
+
 msgid "Other informations"
 msgstr "Autres informations"
 
@@ -575,6 +640,9 @@ msgstr "Intitulé partiel en anglais"
 
 msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
+
+msgid "Particular"
+msgstr "Particulière"
 
 msgid "Particulière"
 msgstr "Particulière"
@@ -635,6 +703,9 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 msgid "Professionnal title"
 msgstr "Titre professionnel"
 
+msgid "Program organized with other institutes"
+msgstr "Programme co-organisés avec d'autres institutions"
+
 #, python-brace-format
 msgid "Program tree not found : {code} {year}"
 msgstr "Programme non trouvé : {code} {year}"
@@ -674,6 +745,9 @@ msgstr "Crédits relatifs doit être inférieur ou égale à 999"
 
 msgid "Remark"
 msgstr "Remarque"
+
+msgid "Remark in English"
+msgstr "Remarque en anglais"
 
 msgid "Req. Entity"
 msgstr "Entité Resp."
@@ -770,7 +844,9 @@ msgstr ""
 msgid ""
 "The learning unit %(acronym)s is used inside %(mini_trainings)s but not "
 "inside %(training)s"
-msgstr "L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais pas dans %(training)s"
+msgstr ""
+"L'unité d'enseignement %(acronym)s est utilisée dans %(mini_trainings)s mais "
+"pas dans %(training)s"
 
 msgid "The learning unit has prerequisites"
 msgstr "L'UE a des prérequis"
@@ -785,11 +861,13 @@ msgstr "L'UE est un prérequis"
 msgid "The link \"%(node)s\" has been updated."
 msgstr "Le lien \"%(node)s\" a été mis à jour."
 
+#, python-format
 msgid ""
 "The parent \"%(parent)s\" has reached the maximum number of children allowed "
 "for the type(s) : \"%(child_types)s\"."
 msgstr ""
-"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de type(s) : \"%(child_types)s\"."
+"Le parent %(parent)s a atteint le nombre maximum autorisé d'enfants de "
+"type(s) : \"%(child_types)s\"."
 
 #, python-format
 msgid ""
@@ -811,9 +889,9 @@ msgstr "La formation %(title)s - %(academic_year)s sera publiée sous peu"
 
 #, python-format
 msgid ""
-"The program tree version %(offer_acronym)s %(version_name)s has been deleted."
+"The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
-"La version de formation %(offer_acronym)s %(version_name)s a été supprimée "
+"La version de formation %(offer_acronym)s%(version_name)s a été supprimée "
 "avec succès."
 
 msgid "The registration form is available at the Secretariat of"
@@ -836,6 +914,9 @@ msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
+
+msgid "This value is invalid."
+msgstr "Cette valeur semble non valide."
 
 msgid "This version exists until"
 msgstr "Dernière année d'organisation"
@@ -880,6 +961,9 @@ msgstr "Transformation et modification"
 msgid "Transition"
 msgstr "Transition"
 
+msgid "Transition name"
+msgstr "Sigle de la transition"
+
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
@@ -892,12 +976,18 @@ msgstr "Type de contrainte"
 msgid "Type of training"
 msgstr "Type de formation"
 
+msgid "UCL Diploma"
+msgstr "Diplôme avec l'UCL"
+
 #, python-brace-format
 msgid "Unable to publish sections for {code} - {year}"
 msgstr "Impossible de publier les sections pour {code} - {year}"
 
 msgid "University certificate"
 msgstr "Certificat universitaire"
+
+msgid "Unspecified"
+msgstr "Indéterminé"
 
 msgid "Update Content"
 msgstr "Modification Contenu"
@@ -969,11 +1059,29 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
+"You can't delete the specific program tree '{code}' in {year} as transition "
+"versions exists during this year and/or in the future."
+msgstr ""
+"Vous ne pouvez pas supprimer la formation particulière '{code}' en {year} "
+"parce qu'il existe une version de transition pour cette année et/ou dans le "
+"futur."
+
+#, python-brace-format
+msgid ""
 "You can't delete the standard program tree '{code}' in {year} as specific "
 "versions exists during this year and/or in the future."
 msgstr ""
 "Vous ne pouvez pas supprimer la formation standard '{code}' en {year} parce "
 "qu'il existe une version particulière pour cette année et/ou dans le futur."
+
+
+#, python-brace-format
+msgid ""
+"You can't extend the program tree '{code}' in {year} as other transition "
+"version exists in {transition_year}"
+msgstr ""
+"Vous ne pouvez pas étendre la formation '{code}' en {year} parce qu'il "
+"existe une autre version de transition en {transition_year}"
 
 #, python-format
 msgid ""
@@ -1016,6 +1124,9 @@ msgstr "attendus du diplôme"
 
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
+
+msgid "contacts"
+msgstr "contacts"
 
 msgid "dissertation"
 msgstr "mémoire"
