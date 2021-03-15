@@ -34,3 +34,9 @@ indiquant qu'il n'est pas au bon endroit
 - [W1] Les paramètres d'une commande ne peuvent jamais être considérés comme une valeur "valide" : 
 le domaine ne peut pas s'y fier. Interdit de passer des valeurs calculées "businessement" dans une commande.
 
+
+-------------------------------
+
+### Lib Attrs
+- [W1] Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/) pour les Entity / ValueObject
+

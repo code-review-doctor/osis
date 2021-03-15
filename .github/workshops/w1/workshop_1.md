@@ -2,7 +2,7 @@
 ## [W1] Formation 1
 
 - Rappels théoriques :
-    - DDD : définition, objectif, philosophie, couches, ValuObject <-> Entity
+    - DDD : définition, objectif, philosophie, couches, ValueObject <-> Entity
     - CQS : définition, exemple, avantages
 - Workshop
     - Objectif : développer ensemble les uses cases suivants dans le DDD avec nos guidelines d'aujourd'hui
