@@ -32,6 +32,8 @@ Exemple : un calculateur de taxe
 
 - Utiliser injection de dépendances si le domain service a besoin d'un repository
 
+- Ne connaît pas la base de données (pas de querysets)!
+
 - Accès : 
     - couche Domain
     - couche Repository

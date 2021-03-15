@@ -70,6 +70,12 @@ appartient à une autre couche que le domaine métier (couche de services, couch
     - il n'a aucune dépendance externe ou à d'autres couches de code
     - il dépend uniquement de types primitifs ou d'autres classes du domaines
 
+- "Dépendance externe" signifie tout service (classes, fonction...) qui ne fait pas partie du domaine. Exemples :
+    - base de données
+    - gestion de fichiers
+    - envoi de mail
+    - envoi de messages (queues)
+
 - Cas d'utilisation : règle métier : interdit de modifier si l'email existe déjà
 
 - Essai n°1 : vérifier cette règle dans l'application service
@@ -238,11 +244,11 @@ class User(interface.Entity):
 
 
 
-<br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 -------------------------------
 
-<br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 
@@ -266,13 +272,12 @@ class User(interface.Entity):
 et qui ne représente pas un cas d'utilisation en tant que tel.
 - Quand utiliser un DomainService ? 
     - Lorsque notre domaine ne peut pas être "complet" à cause des performances
-        - Exemple : Vérifier si l'email d'un utilisateur existe
-    - Pour préserver notre domaine "pure"
-        - Exemple : Calculer la date de fin de report d'une formation (injecter le calendrier académique dans notre domaine le rendrait "impure")
+        - Exemple : Vérifier si l'email d'un utilisateur existe (charger la liste de tous les utilisateurs en mémoire serait trop couteux)
     - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
     - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
         - Exemple : Générer d'un numéro de séquence (dépendance externe : base de données)
         - Exemple : Attacher un groupement dans le contenu d'une formation n'est possible que si le cache contient un groupement et peut être vidé (dépendance externe : système de cache)
+        - Exemple : Calculer la date de fin de report d'une formation (dépendance externe : gestion des événements académiques)
 - Exemple codé : 
 ```python
 from decimal import Decimal
@@ -303,7 +308,9 @@ def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
 ```
 
 
+
 <br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 
 - Solution : Domain service
@@ -327,12 +334,13 @@ def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
 # Domain service
 class AtmWithdrawMoney(interface.DomainService):
     def withdraw_money(self, atm: ATM, amount: Decimal, payment_gateway) -> None:
-    
+        # Charge le montant avec une commission pour le facturer à travers un gateway
         amount_with_commission = atm.calculate_amount_with_commission(amount)
         result = payment_gateway.charge_payment(amount_with_commission)  # dépendance externe
     
         if result.is_failure():
-            return atm.entity_identity
+            # Logique métier : ce "if" décide si l'argent sera finalement retiré de l'ATM ou non. 
+            raise interface.BusinessException("Couldn't charge the payment from the gateway")
         
         atm.dispense_money(amount)
 
