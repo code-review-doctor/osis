@@ -265,9 +265,15 @@ class User(interface.Entity):
 - Un domain service est un service qui encapsule une logique métier qui ne sait pas être représenté par un Entity ou à un ValueObject,
 et qui ne représente pas un cas d'utilisation en tant que tel.
 - Quand utiliser un DomainService ? 
-    - Lorsque notre domaine ne peut pas être "pure" et "complet" à cause des performances
-    - Lorsque nous avons une logique/règle métier qui nécessite des dépendances externes (autres domaines, )
-- Exemple : 
+    - Lorsque notre domaine ne peut pas être "complet" à cause des performances
+        - Exemple : Vérifier si l'email d'un utilisateur existe
+    - Pour préserver notre domaine "pure"
+        - Exemple : Calculer la date de fin de report d'une formation (injecter le calendrier académique dans notre domaine le rendrait "impure")
+    - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
+    - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
+        - Exemple : Générer d'un numéro de séquence (dépendance externe : base de données)
+        - Exemple : Attacher un groupement dans le contenu d'une formation n'est possible que si le cache contient un groupement et peut être vidé (dépendance externe : système de cache)
+- Exemple codé : 
 ```python
 from decimal import Decimal
 from osis_common.ddd import interface

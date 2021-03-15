@@ -28,11 +28,14 @@ Code pas propre, à proscrire :
 - Regroupe les **objets** qui ne représentent pas un `ValueObject` ou une `Entity` du domaine. 
 Exemple : un calculateur de taxe
 
+- Contient de la logique métier
+
 - Utiliser injection de dépendances si le domain service a besoin d'un repository
 
 - Accès : 
     - couche Domain
     - couche Repository
+    - couche BusinessException
 
 
 -------------------------------

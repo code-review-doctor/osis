@@ -16,6 +16,7 @@
         - Différence entre un DomainService et un ApplicationService
         - Taille et dépendances entre agrégats
     - Workshop
+        - Refactoring UE : vérification des "DomainService" et "ApplicationService"
         - Use case 2 : En tant qu'utilisateur facultaire, je veux créer un Partim
         - Use case 3 : En tant qu'utilisateur facultaire, je veux visualiser le nombre d'inscrits à une UE.
         - Use case 4 : En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'un partim
