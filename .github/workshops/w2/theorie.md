@@ -273,12 +273,13 @@ et qui ne représente pas un cas d'utilisation en tant que tel.
 - Quand utiliser un DomainService ? 
     - Lorsque notre domaine ne peut pas être "complet" à cause des performances
         - Exemple : Vérifier si l'email d'un utilisateur existe (charger la liste de tous les utilisateurs en mémoire serait trop couteux)
-    - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
     - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
         - Exemple : Générer d'un numéro de séquence (dépendance externe : base de données)
         - Exemple : Attacher un groupement dans le contenu d'une formation n'est possible que si le cache contient un groupement et peut être vidé (dépendance externe : système de cache)
         - Exemple : Calculer la date de fin de report d'une formation (dépendance externe : gestion des événements académiques)
-- Exemple codé : 
+    - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
+        - Exemple codé : 
+
 ```python
 from decimal import Decimal
 from osis_common.ddd import interface
@@ -401,3 +402,14 @@ class AtmWithdrawMoney(interface.DomainService):
     - Note : un nombre grandissant d'agrégats dans un même domaine est signe que notre domaine 
     vise une problématique métier trop large
 
+
+
+## Exercices
+
+Les éléments suivants sont-ils réellement des DomainService ?
+- program_management.ddd.domain.service.has_version_with_greater_end_year.HasVersionWithGreaterEndYear
+- program_management.ddd.domain.service.get_last_existing_version_name.GetLastExistingVersion
+- program_management.ddd.domain.service.generate_node_code.GenerateNodeCode
+- program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement
+- program_management.ddd.domain.service.get_node_publish_url.GetNodePublishUrl
+- program_management.ddd.domain.service.validation_rule.FieldValidationRule
