@@ -29,8 +29,8 @@
         <div id="form-modal-body" class="modal-body">
             {% include 'template_messages.html' %}
 
-            <p><b>{% blocktrans %} Fill {{ title }} in {{ year }} {% endblocktrans %}</b></p>
-
+            <p><b>{% blocktrans with title=tree_version.official_name year=tree_version.year %} Fill {{ title }} in {{ year }} {% endblocktrans %}</b></p>
+            {% bootstrap_field form.source_choices show_label=False %}
 
         </div>
         <div class="modal-footer">

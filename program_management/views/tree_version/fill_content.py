@@ -23,12 +23,13 @@
 #
 ##############################################################################
 import functools
-from typing import Optional
+from typing import Optional, Dict
 
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.views.generic import FormView
 
+from base.forms.exceptions import InvalidFormException
 from base.models.enums import education_group_categories
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
@@ -37,12 +38,36 @@ from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.read import get_program_tree_version_service, \
     get_program_tree_version_origin_service
-from program_management.forms.fill_content import FillContentForm
+from program_management.forms.fill_content import FillTransitionContentForm
 
 
 class FillTransitionVersionContentView(PermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree_version/fill_content_inner.html"
-    form_class = FillContentForm
+    form_class = FillTransitionContentForm
+
+    def get_context_data(self, **kwargs) -> Dict:
+        context_data = super().get_context_data(**kwargs)
+
+        context_data["tree_version"] = self.transition_tree
+
+        return context_data
+
+    def form_valid(self, form: 'FillTransitionContentForm'):
+        try:
+            form.save()
+            return super().form_valid(form)
+        except InvalidFormException:
+            return self.form_invalid(form)
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+
+        form_kwargs["transition_tree"] = self.transition_tree
+        form_kwargs["last_year_transition_tree"] = self.last_year_transition_tree
+        form_kwargs["source_tree"] = self.version_tree
+        form_kwargs["last_year_source_tree"] = self.last_year_version_tree
+
+        return form_kwargs
 
     @functools.lru_cache()
     def get_permission_object(self) -> GroupYear:

@@ -243,6 +243,10 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.is_standard
 
     @property
+    def year(self) -> 'academic_year.AcademicYear':
+        return academic_year.AcademicYear(year=self.entity_id.year)
+
+    @property
     def end_year(self):
         return academic_year.AcademicYear(year=self.end_year_of_existence)
 
@@ -273,6 +277,13 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def is_standard_transition(self) -> bool:
         return self.entity_id.is_standard_transition
+
+    @property
+    def official_name(self) -> str:
+        return "{acronym}{version_label}".format(
+            acronym=self.entity_id.offer_acronym,
+            version_label=version_label(self.entity_id)
+        )
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)
