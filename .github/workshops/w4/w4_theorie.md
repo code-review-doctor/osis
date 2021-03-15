@@ -9,11 +9,20 @@
 - Question : qqn voit-il un avantage à faire le check après validation ? 
 
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
 ## Quid des validateurs dans les forms par rapport aux validateurs du domaine ?
 
 - Validateurs des Django forms == validateurs métier. Exemples :
     - MyForm.credits doit être > 0
     - MyForm.sigle doit respecter le format `^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}`
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
 
 ## Comment afficher les BusinessExceptions dans les champs des forms ? Et comment génération un rapport avec toutes les erreurs ? Comment éviter de s'arrêter à la 1ère exception ?
 
@@ -109,6 +118,10 @@ class CreateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         check_update_training_service.check_update_training(command)
 
 ``` 
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 
 ## Validateurs génériques
