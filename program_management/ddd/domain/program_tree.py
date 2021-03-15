@@ -169,6 +169,8 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
+        self._delete_mandatory_children(to_tree)
+
         self._fill_node_children_from_node_in_case_of_transition(
             from_tree.root_node,
             to_tree.root_node,
@@ -179,6 +181,11 @@ class ProgramTreeBuilder:
         )
 
         return to_tree
+
+    def _delete_mandatory_children(self, tree: 'ProgramTree'):
+        children = tree.root_node.children_as_nodes
+        for child in children:
+            tree.root_node.detach_child(child)
 
     def fill_from_program_tree(
             self,

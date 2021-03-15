@@ -25,6 +25,7 @@
 import functools
 from typing import Optional, Dict
 
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.views.generic import FormView
@@ -39,9 +40,10 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.service.read import get_program_tree_version_service, \
     get_program_tree_version_origin_service
 from program_management.forms.fill_content import FillTransitionContentForm
+from django.utils.translation import gettext_lazy as _
 
 
-class FillTransitionVersionContentView(PermissionRequiredMixin, AjaxTemplateMixin, FormView):
+class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree_version/fill_content_inner.html"
     form_class = FillTransitionContentForm
 
@@ -58,6 +60,15 @@ class FillTransitionVersionContentView(PermissionRequiredMixin, AjaxTemplateMixi
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
+
+    def get_success_url(self) -> str:
+        return ""
+
+    def get_success_message(self, cleaned_data) -> str:
+        return _("%(title)s in %(year)s has been filled") % {
+            "title": self.transition_tree.official_name,
+            "year": self.transition_tree.year
+        }
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
@@ -104,7 +115,7 @@ class FillTransitionVersionContentView(PermissionRequiredMixin, AjaxTemplateMixi
     def last_year_version_tree(self) -> 'ProgramTreeVersion':
         return get_program_tree_version_service.get_program_tree_version(
             command.GetProgramTreeVersionCommand(
-                year=self.kwargs['year'],
+                year=self.kwargs['year'] - 1,
                 code=self.version_tree.program_tree_identity.code
             )
         )
