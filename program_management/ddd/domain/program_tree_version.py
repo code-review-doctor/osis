@@ -76,7 +76,7 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
-    def fill_from_program_tree_version(
+    def fill_transition_from_program_tree_version(
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
@@ -84,22 +84,30 @@ class ProgramTreeVersionBuilder:
             existing_trees: Set['ProgramTree'],
             node_code_generator
     ) -> 'ProgramTreeVersion':
+        validators_by_business_action.FillProgramTreeTransitionValidatorList(from_tree_version, to_tree_version).validate()
+        program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
+            from_tree_version.get_tree(),
+            to_tree_version.get_tree(),
+            existing_learning_unit_nodes,
+            existing_trees,
+            node_code_generator
+        )
+        return to_tree_version
+
+    def fill_from_program_tree_version(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            to_tree_version: 'ProgramTreeVersion',
+            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
+            existing_trees: Set['ProgramTree'],
+    ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        if to_tree_version.is_transition:
-            program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
-                from_tree_version.get_tree(),
-                to_tree_version.get_tree(),
-                existing_learning_unit_nodes,
-                existing_trees,
-                node_code_generator
-            )
-        else:
-            program_tree.ProgramTreeBuilder().fill_from_program_tree(
-                    from_tree_version.get_tree(),
-                    to_tree_version.get_tree(),
-                    existing_learning_unit_nodes,
-                    existing_trees
-                )
+        program_tree.ProgramTreeBuilder().fill_from_program_tree(
+            from_tree_version.get_tree(),
+            to_tree_version.get_tree(),
+            existing_learning_unit_nodes,
+            existing_trees
+        )
         return to_tree_version
 
     def copy_to_next_year(

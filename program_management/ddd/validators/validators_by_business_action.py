@@ -259,6 +259,16 @@ class FillProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator
         super().__init__()
 
 
+class FillProgramTreeTransitionValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, tree_to_fill_from: 'ProgramTreeVersion', tree_to_fill_to: 'ProgramTreeVersion'):
+        self.validators = [
+            CheckValidTreeVersionToFillTo(tree_to_fill_to),
+            CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to),
+
+        ]
+        super().__init__()
+
+
 class CopyProgramTreeValidatorList(business_validator.BusinessListValidator):
     def __init__(self, copy_from: 'ProgramTree'):
         self.validators = [

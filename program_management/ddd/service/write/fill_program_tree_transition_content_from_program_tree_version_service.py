@@ -106,7 +106,7 @@ def fill_program_tree_transition_content_from_program_tree_version(
 
     node_code_generator = generate_node_code.BGenerateNodeCode(existing_nodes=all_nodes)
 
-    ProgramTreeVersionBuilder().fill_from_program_tree_version(
+    ProgramTreeVersionBuilder().fill_transition_from_program_tree_version(
         from_tree_version,
         to_tree_version,
         set(existing_learning_unit_nodes),

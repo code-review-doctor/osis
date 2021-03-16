@@ -63,31 +63,6 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    # Extract that into application service
-    transition_trees = []
-    if cmd.to_transition_name:
-        training_nodes = [
-            node for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes() if node.is_training()
-        ]
-        for training in training_nodes:
-            create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
-                CreateProgramTreeTransitionVersionCommand(
-                    end_year=to_tree_version.end_year_of_existence,
-                    offer_acronym=training.title,
-                    version_name=to_tree_version.version_name,
-                    start_year=from_tree_version.program_tree_identity.year,
-                    transition_name=to_tree_version.transition_name,
-                    title_fr="",
-                    title_en=""
-                )
-            )
-        transition_tree_versions = tree_version_repository.search(
-            version_name=to_tree_version.version_name,
-            transition_name=to_tree_version.transition_name,
-            year=cmd.to_year
-        )
-        transition_trees = [tree_version.get_tree() for tree_version in transition_tree_versions]
-
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
@@ -102,18 +77,11 @@ def fill_program_tree_version_content_from_program_tree_version(
         ]
     )
 
-    all_nodes = to_tree_version.get_tree().root_node.get_all_children_as_nodes()
-    for tree in existing_trees:
-        all_nodes.update(tree.root_node.get_all_children_as_nodes())
-
-    node_code_generator = generate_node_code.BGenerateNodeCode(existing_nodes=all_nodes)
-
     ProgramTreeVersionBuilder().fill_from_program_tree_version(
         from_tree_version,
         to_tree_version,
         set(existing_learning_unit_nodes),
-        set(existing_trees).union(transition_trees),
-        node_code_generator
+        set(existing_trees),
     )
 
     identity = tree_version_repository.update(to_tree_version)
