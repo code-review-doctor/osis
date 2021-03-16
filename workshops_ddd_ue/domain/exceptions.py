@@ -20,3 +20,11 @@ class InvalidResponsibleEntityTypeOrCodeException(BusinessException):
             )
         )
         super().__init__(message, **kwargs)
+
+
+class CreditsShouldBeGreatherThanZeroException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Credits should be greather than 0"
+        )
+        super().__init__(message, **kwargs)
