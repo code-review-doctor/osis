@@ -1,22 +1,63 @@
 # Partie 1
 
-## Appliquer les validateurs avant ou après modification de l'objet du domaine ?
+## Appliquer les validateurs avant ou après exécution d'une action métier de l'objet du domaine ?
 
 - Effectuer toujours les checks AVANT d'effectuer l'action métier sur l'objet
     - évite d'avoir un objet du domaine en état inconsistant (garantit qu'un objet du domaine tjr consistant)
     - facilite les tests unitaires
+    - exemple : je ne peux modifier une UE que si son année académique est >= 2019
+        - si validation après : modification effectuée sur l'objet du domaine alors que ce n'était pas autorisé
 
-- Question : qqn voit-il un avantage à faire le check après validation ? 
+- Note : un validateur ne peut jamais modifier les arguments qu'il reçoit pour sa propre validation
+    - Exemple (à éviter) : self.transition_name = "TRANSITION " + transitionname (https://github.com/uclouvain/osis/pull/9680/files#)
+    - Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/) pour les validateurs
+
+```python
+import attr
+from base.ddd.utils.business_validator import BusinessValidator
+
+
+@attr.s(frozen=True, slots=True)
+class MyBusinessValidator(BusinessValidator):
+    object_used_for_validation = attr.ib(type=object)
+    other_object_used_for_validation = attr.ib(type=object)
+
+    def validate(self):
+        if self.object_used_for_validation != self.other_object_used_for_validation:
+            raise MyOwnValidatorBusinessException()
+
+```
+
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
 
+
 ## Quid des validateurs dans les forms par rapport aux validateurs du domaine ?
 
-- Validateurs des Django forms == validateurs métier. Exemples :
+### Input Validation VS Contract Precondition
+
+- "Input Validation"
+    - Mécanisme protégeant notre système contre les infiltrations de données invalides
+    - Données autorisées en état invalides
+    - "Bouclier de protection contre le monde extérieur"
+
+- "Contract Precondition"
+    - Suppose que les données à l'intérieur du système sont dans un état valide
+    - "Bouclier" de prévention pour s'asurer
+
+- Validateurs des Django forms == validateurs métier
+     - Exception : pas de validateur sur les types de données
+        - Assuré par les couches supérieures 
+- Exemples de validateurs (domaine):
     - MyForm.credits doit être > 0
     - MyForm.sigle doit respecter le format `^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}`
+        - Tout validateur dans un Form **doit** se trouver dans les validateurs du domaine
+
+   
+- Tous valdateur forms ==> validateurs dans le domaine
+- Plus de validaiton dans les fomrs > pas dupliquer l'info
 
 
 
@@ -57,13 +98,12 @@ class DisplayExceptionsByFieldNameMixin:
         if self.field_name_by_exception is None:
             self.field_name_by_exception = {}
 
-    def is_valid(self):
+    def save(self):
         try:
             self.call_application_service()
         except MultipleBusinessExceptions as multiple_exceptions:
             self.display_exceptions(multiple_exceptions)
-
-        return super().is_valid()
+            raise BusinessFormInvalidException()
     
     def call_application_service(self):
         raise NotImplementedError()
@@ -89,12 +129,15 @@ class DisplayExceptionsByFieldNameMixin:
 #-------------------------------------------------------------------------------------------------------------------
 # ddd/service/read 
 def check_update_training_service(check_command: CheckUpdateTrainingCommand) -> None:
+    """Uniquement dans le cas d'un rapport"""
     identity = TrainingIdentity(acronym=check_command.acronym, year=check_command.year)
     
     training = TrainingRepository().get(identity)
-    
-    training.update(check_command)
-
+    # TODO :: le .update DOIT faire appel à is_updatable
+    # TODO :: prendre autre exemple : check paste-node ==> être précis sur le besoin du "vérifier" (rapport)
+    # TODO :: Ne pas créer d'office un check...
+    training.is_updatable(check_command)
+    # TODO ::      
 
 
 
@@ -115,7 +158,19 @@ class CreateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     def call_application_service(self):
         command = ...
-        check_update_training_service.check_update_training(command)
+        check_update_training_service(command)
+
+
+#-------------------------------------------------------------------------------------------------------------------
+# Django Form
+class View(...):
+
+    def post(self, *args, **kwargs):
+        form = CreateTrainingForm(request.POST)
+        # if form.is_valid():
+        form.save()
+        if form.errors:
+            redirect()
 
 ``` 
 

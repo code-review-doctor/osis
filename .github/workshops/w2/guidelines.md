@@ -8,7 +8,7 @@
 - [w2] Un domaine ne peut faire aucune référence à un élément extérieur (même par inversion de dépendance)
 => Objectif : pas de mock. S'il est nécessaire de mock notre domaine, il n'est pas pure.
 
-- [W2] Classe BusinessException : faire une section dessus (application service ne lance que ces types d'exceptions là et pas d'autres)
+- Encapsule l'ensemble des règles métier (cf. lien vers doc technique "domaine pure et complet")
 
 - [W2] Toute exception lancée par le domaine doit être une BusinessException
 
