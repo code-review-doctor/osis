@@ -346,7 +346,7 @@ msgstr ""
 "in %(year)s"
 
 msgid "Fill program tree content from last year"
-msgstr "Remplir le contenue de programmes à partir de l'année passée"
+msgstr "Remplir le contenu de programmes à partir de l'année passée"
 
 #, python-format
 msgid ""
