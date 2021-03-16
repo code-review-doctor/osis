@@ -32,13 +32,11 @@ from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, ProgramTreeNonEmpty, \
     IsNotTransitionException
 from program_management.ddd.domain.node import factory as node_factory
-from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.fill_program_tree_transition_content_from_program_tree_version_service import \
     fill_program_tree_transition_content_from_program_tree_version
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
-from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     SpecificProgramTreeVersionFactory, SpecificTransitionProgramTreeVersionFactory, \

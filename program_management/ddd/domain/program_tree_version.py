@@ -88,16 +88,24 @@ class ProgramTreeVersionBuilder:
             from_tree_version,
             to_tree_version
         ).validate()
-        program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
-            from_tree_version.get_tree(),
-            to_tree_version.get_tree(),
-            existing_learning_unit_nodes,
-            existing_trees,
-            node_code_generator
-        )
+        if from_tree_version.is_transition:
+            program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
+                from_tree_version.get_tree(),
+                to_tree_version.get_tree(),
+                existing_learning_unit_nodes,
+                existing_trees,
+            )
+        else:
+            program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
+                from_tree_version.get_tree(),
+                to_tree_version.get_tree(),
+                existing_learning_unit_nodes,
+                existing_trees,
+                node_code_generator
+            )
         return to_tree_version
 
-    def fill_from_program_tree_version(
+    def fill_from_last_year_program_tree_version(
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
@@ -105,7 +113,7 @@ class ProgramTreeVersionBuilder:
             existing_trees: Set['ProgramTree'],
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        program_tree.ProgramTreeBuilder().fill_from_program_tree(
+        program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
             from_tree_version.get_tree(),
             to_tree_version.get_tree(),
             existing_learning_unit_nodes,

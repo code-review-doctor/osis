@@ -23,26 +23,25 @@
 #
 ##############################################################################
 from collections import namedtuple
+from unittest import skip
 
 import attr
 import mock
 
-from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
+from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
     ProgramTreeNonEmpty
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
-    fill_program_tree_version_content_from_program_tree_version
+from program_management.ddd.service.write.fill_program_tree_version_content_from_last_year_service import \
+    fill_program_tree_version_content_from_last_year
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
-    SpecificProgramTreeVersionFactory, SpecificTransitionProgramTreeVersionFactory, \
-    StandardTransitionProgramTreeVersionFactory
+    SpecificProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020
@@ -64,7 +63,8 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
             tree__root_node__transition_name=NOT_A_TRANSITION,
             transition_name=NOT_A_TRANSITION
         )
-        self.cmd = self._generate_cmd(self.tree_version_from, self.tree_version_to_fill)
+
+        self.cmd = self._generate_cmd(self.tree_version_to_fill)
 
         self.add_tree_version_to_repo(self.tree_version_from)
         self.add_tree_version_to_repo(self.tree_version_to_fill)
@@ -115,41 +115,6 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def test_can_only_fill_content_of_next_academic_year(self):
-        tree_version_to_fill = StandardProgramTreeVersionFactory(
-            tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
-            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
-        )
-        self.add_tree_version_to_repo(tree_version_to_fill)
-
-        cmd = self._generate_cmd(self.tree_version_from, tree_version_to_fill)
-
-        self.assertRaisesBusinessException(
-            InvalidTreeVersionToFillTo,
-            fill_program_tree_version_content_from_program_tree_version,
-            cmd
-        )
-
-    def test_if_specific_official_can_only_copy_from_its_previous_year(self):
-        tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
-            tree__root_node__year=PAST_ACADEMIC_YEAR_YEAR
-        )
-        tree_version_to_fill = SpecificProgramTreeVersionFactory(
-            tree__root_node__title=tree_version_to_fill_from.entity_id.offer_acronym,
-            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
-        )
-
-        self.add_tree_version_to_repo(tree_version_to_fill_from)
-        self.add_tree_version_to_repo(tree_version_to_fill)
-
-        cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill)
-
-        self.assertRaisesBusinessException(
-            InvalidTreeVersionToFillFrom,
-            fill_program_tree_version_content_from_program_tree_version,
-            cmd
-        )
-
     def test_cannot_fill_non_empty_tree(self):
         tree_version_to_fill_to = SpecificProgramTreeVersionFactory(
             tree=ProgramTreeBachelorFactory(
@@ -159,22 +124,23 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
             tree__root_node__code=tree_version_to_fill_to.tree.root_node.code,
-            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
+            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__title=tree_version_to_fill_to.entity_id.offer_acronym,
         )
 
         self.add_tree_version_to_repo(tree_version_to_fill_to)
         self.add_tree_version_to_repo(tree_version_to_fill_from)
 
-        cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill_to)
+        cmd = self._generate_cmd(tree_version_to_fill_to)
 
         self.assertRaisesBusinessException(
             ProgramTreeNonEmpty,
-            fill_program_tree_version_content_from_program_tree_version,
+            fill_program_tree_version_content_from_last_year,
             cmd
         )
 
     def test_should_return_program_tree_version_identity_of_tree_filled(self):
-        result = fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        result = fill_program_tree_version_content_from_last_year(self.cmd)
 
         self.assertEqual(self.tree_version_to_fill.entity_id, result)
 
@@ -182,7 +148,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.tree_version_from.tree.get_node("1|22").detach_child(
             self.tree_version_from.tree.get_node("1|22|32")
         )
-        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        fill_program_tree_version_content_from_last_year(self.cmd)
 
         expected = [
             attr.evolve(child_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
@@ -198,7 +164,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         ue_node = NodeLearningUnitYearFactory(year=CURRENT_ACADEMIC_YEAR_YEAR, end_date=CURRENT_ACADEMIC_YEAR_YEAR)
         self.tree_version_from.tree.get_node("1|21|31").add_child(ue_node)
 
-        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        fill_program_tree_version_content_from_last_year(self.cmd)
 
         self.assertIn(ue_node, self.tree_version_to_fill.tree.get_all_nodes())
 
@@ -210,7 +176,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         self.tree_version_from.tree.get_node("1|22").add_child(mini_training_node)
 
-        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        fill_program_tree_version_content_from_last_year(self.cmd)
 
         self.assertNotIn(mini_training_node, self.tree_version_to_fill.tree.get_all_nodes())
 
@@ -222,7 +188,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         self.tree_version_from.tree.get_node("1|21").add_child(group_node)
 
-        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        fill_program_tree_version_content_from_last_year(self.cmd)
 
         member = attr.evolve(group_node.entity_id, year=NEXT_ACADEMIC_YEAR_YEAR)
         containers = [
@@ -232,7 +198,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.assertIn(member, containers)
 
     def test_do_not_copy_content_of_reference_child(self):
-        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        fill_program_tree_version_content_from_last_year(self.cmd)
 
         children_of_reference_link = self.tree_version_from.tree.get_node("1|22|32").get_all_children_as_nodes()
         entities_ids = {
@@ -252,20 +218,12 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.add_node_to_repo(next_year_node)
         expected_link = LinkFactory(parent=next_year_node)
 
-        fill_program_tree_version_content_from_program_tree_version(self.cmd)
+        fill_program_tree_version_content_from_last_year(self.cmd)
 
         self.assertIn(expected_link, self.tree_version_to_fill.tree.get_all_links())
 
-    def _generate_cmd(
-            self,
-            tree_from: 'ProgramTreeVersion',
-            tree_to: 'ProgramTreeVersion',
-    ) -> 'FillProgramTreeVersionContentFromProgramTreeVersionCommand':
-        return FillProgramTreeVersionContentFromProgramTreeVersionCommand(
-            from_year=tree_from.entity_id.year,
-            from_offer_acronym=tree_from.entity_id.offer_acronym,
-            from_version_name=tree_from.entity_id.version_name,
-            from_transition_name=tree_from.entity_id.transition_name,
+    def _generate_cmd(self, tree_to: 'ProgramTreeVersion') -> 'FillTreeVersionContentFromPastYearCommand':
+        return FillTreeVersionContentFromPastYearCommand(
             to_year=tree_to.entity_id.year,
             to_offer_acronym=tree_to.entity_id.offer_acronym,
             to_version_name=tree_to.entity_id.version_name,

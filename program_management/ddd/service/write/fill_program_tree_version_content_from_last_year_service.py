@@ -26,8 +26,8 @@ import attr
 from django.db import transaction
 
 from education_group.ddd.service.write import copy_group_service
-from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
-    CopyProgramTreePrerequisitesFromProgramTreeCommand, CopyTreeCmsFromPastYear
+from program_management.ddd.command import CopyProgramTreePrerequisitesFromProgramTreeCommand, CopyTreeCmsFromPastYear, \
+    FillTreeVersionContentFromPastYearCommand
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
@@ -37,8 +37,8 @@ from program_management.ddd.service.write import copy_program_tree_prerequisites
 
 
 @transaction.atomic()
-def fill_program_tree_version_content_from_program_tree_version(
-        cmd: 'FillProgramTreeVersionContentFromProgramTreeVersionCommand'
+def fill_program_tree_version_content_from_last_year(
+        cmd: 'FillTreeVersionContentFromPastYearCommand'
 ) -> 'ProgramTreeVersionIdentity':
     tree_version_repository = program_tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
@@ -46,12 +46,13 @@ def fill_program_tree_version_content_from_program_tree_version(
 
     from_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
-            offer_acronym=cmd.from_offer_acronym,
-            year=cmd.from_year,
-            version_name=cmd.from_version_name,
-            transition_name=cmd.from_transition_name
+            offer_acronym=cmd.to_offer_acronym,
+            year=cmd.to_year - 1,
+            version_name=cmd.to_version_name,
+            transition_name=cmd.to_transition_name
         )
     )
+
     to_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
             offer_acronym=cmd.to_offer_acronym,
@@ -75,7 +76,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         ]
     )
 
-    ProgramTreeVersionBuilder().fill_from_program_tree_version(
+    ProgramTreeVersionBuilder().fill_from_last_year_program_tree_version(
         from_tree_version,
         to_tree_version,
         set(existing_learning_unit_nodes),

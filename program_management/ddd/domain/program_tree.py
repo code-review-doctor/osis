@@ -189,7 +189,7 @@ class ProgramTreeBuilder:
         for child in children:
             parent_node.detach_child(child)
 
-    def fill_from_program_tree(
+    def fill_from_last_year_program_tree(
             self,
             from_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
@@ -233,7 +233,6 @@ class ProgramTreeBuilder:
             child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
             if group_year_link.child.is_group():
                 new_code = node_code_generator.generate_transition_code(group_year_link.child.code)
-                # new_code = self.generate_new_transition_code(group_year_link.child.code, existing_nodes)
                 child = node_factory.copy_to_year(group_year_link.child, to_node.year, new_code)
 
             elif group_year_link.child.is_mini_training() and \

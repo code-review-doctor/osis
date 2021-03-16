@@ -33,7 +33,7 @@ from base.forms.exceptions import InvalidFormException
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
     FillProgramTreeTransitionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.service.write import fill_program_tree_version_content_from_program_tree_version_service, \
+from program_management.ddd.service.write import fill_program_tree_version_content_from_last_year_service, \
     fill_program_tree_transition_content_from_program_tree_version_service
 
 

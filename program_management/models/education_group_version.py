@@ -46,7 +46,7 @@ def fill_from_past_year(modeladmin, request, queryset):
         )
         cmds.append(cmd)
     result = bulk_fill_program_tree_version_content_service_from_past_year.\
-        bulk_fill_program_tree_version_content_from_past_year(cmds)
+        bulk_fill_program_tree_version_content_from_last_year(cmds)
     modeladmin.message_user(request, "{} programs have been filled".format(len(result)))
 
 
