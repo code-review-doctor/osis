@@ -170,7 +170,7 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._delete_mandatory_children(to_tree)
+        self._delete_mandatory_children(to_tree.root_node)
 
         self._fill_node_children_from_node_in_case_of_transition(
             from_tree.root_node,
@@ -184,10 +184,10 @@ class ProgramTreeBuilder:
 
         return to_tree
 
-    def _delete_mandatory_children(self, tree: 'ProgramTree'):
-        children = tree.root_node.children_as_nodes
+    def _delete_mandatory_children(self, parent_node: 'Node'):
+        children = parent_node.children_as_nodes
         for child in children:
-            tree.root_node.detach_child(child)
+            parent_node.detach_child(child)
 
     def fill_from_program_tree(
             self,
@@ -236,7 +236,8 @@ class ProgramTreeBuilder:
                 # new_code = self.generate_new_transition_code(group_year_link.child.code, existing_nodes)
                 child = node_factory.copy_to_year(group_year_link.child, to_node.year, new_code)
 
-            elif group_year_link.child.is_mini_training() and not self._is_end_date_inferior_to(group_year_link.child, to_node):
+            elif group_year_link.child.is_mini_training() and \
+                    not self._is_end_date_inferior_to(group_year_link.child, to_node):
                 child = self._get_existing_group_node(existing_trees, child_node_identity)
 
             elif group_year_link.child.is_training():
@@ -258,6 +259,7 @@ class ProgramTreeBuilder:
                     is_empty(child, relationships)
                     or relationships.is_mandatory_child(to_node.node_type, child.node_type)
             ):
+                self._delete_mandatory_children(child)
                 self._fill_node_children_from_node_in_case_of_transition(
                     group_year_link.child,
                     child,
