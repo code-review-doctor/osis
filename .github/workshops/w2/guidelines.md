@@ -50,6 +50,7 @@ Code pas propre, à proscrire :
     - ==> NON
     - Les exceptions "infra" (IntergityError, etc...) on laisse péter pour garder la stacktrace précise
 
+- [W2] Pas de get_or_create / update_or_create pour les Entities mis uniquement pour les values objetcs 
 
 -------------------------------
 
@@ -58,4 +59,7 @@ Code pas propre, à proscrire :
 Code pas propre, à proscrire : 
 - [W2] des try-except dans un service
 - [W2] des conditions et du code algorithmic dans un service
+
+
+- [W2] Ne peut pas être modifié ! (Sauf en cas de bug). Un application service étant un use case, son contenu ne devrait jamais être modifié - sauf si le use case métier a changé.
 

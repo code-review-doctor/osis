@@ -35,3 +35,5 @@
     - métier ==> Couche "domaine" obligatoirement
     - Duplication ?
  
+ - [W4] Les paramètres d'une commande ne peuvent jamais être considérés comme une valeur "valide" : 
+ le domaine ne peut pas s'y fier. Interdit de passer des valeurs calculées "businessement" dans une commande.

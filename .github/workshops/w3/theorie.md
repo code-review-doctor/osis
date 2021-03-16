@@ -6,7 +6,7 @@
 
 https://refactoring.guru/fr/design-patterns/factory-method
 
-- Le pattern **Fatory** est un patron de conception de création qui définit une interface 
+- Le pattern **Factory** est un patron de conception de création qui définit une interface 
 pour créer des objets dans une classe mère, mais délègue le choix des types d’objets à créer aux sous-classes.
 
 ### Problème
@@ -22,7 +22,7 @@ pour créer des objets dans une classe mère, mais délègue le choix des types 
 
 ### Solution
 
-- Utiliser une **factory**, capable de créer un groupement en fonction des attributs
+- Utiliser une **Factory**, capable de créer un groupement en fonction des attributs
 ```python
 from osis_common.ddd import interface
 

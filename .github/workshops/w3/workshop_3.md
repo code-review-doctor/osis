@@ -7,6 +7,9 @@
     - Use case 2 : En tant qu'utilisateur facultaire, je veux prolonger une UE jusqu'à N+6
 
 -------------------------------
+## Demande métier supplémentaire
+- Création d'une UE : sous-type stage obligatoire si type=stage, sinon vide obligatoire
+
 
 ## Cas d'utilisation 1
 ### user story
