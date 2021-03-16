@@ -7,6 +7,7 @@ from workshops_ddd_ue.domain.learning_unit_year import ResponsibleEntity
 class ResponsibleEntityAuthorizedTypeOrCode(BusinessValidator):
 
     def __init__(self, responsible_entity: 'ResponsibleEntity'):
+        super().__init__()
         self.responsible_entity = responsible_entity
 
     def validate(self, *args, **kwargs):
