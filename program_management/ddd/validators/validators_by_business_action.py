@@ -64,6 +64,7 @@ from program_management.ddd.validators._validate_end_date_and_option_finality im
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators._version_name_pattern import VersionNamePatternValidator
+from program_management.ddd.validators.is_transition import IsTransitionValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
@@ -264,7 +265,7 @@ class FillProgramTreeTransitionValidatorList(MultipleExceptionBusinessListValida
         self.validators = [
             CheckValidTreeVersionToFillTo(tree_to_fill_to),
             CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to),
-
+            IsTransitionValidator(tree_to_fill_to)
         ]
         super().__init__()
 

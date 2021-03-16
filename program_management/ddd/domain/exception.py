@@ -440,3 +440,11 @@ class CannotCopyPrerequisiteException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Cannot copy prerequisite")
         super().__init__(message, **kwargs)
+
+
+class IsNotTransitionException(BusinessException):
+    def __init__(self, tree_version: 'ProgramTreeVersion', **kwargs):
+        message = _("Tree %(title)s is not a transition") % {
+            "title": tree_version.official_name
+        }
+        super().__init__(message, **kwargs)
