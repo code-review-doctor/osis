@@ -7,6 +7,7 @@ from osis_common.ddd import interface
 class CreateLearningUnitCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     academic_year = attr.ib(type=int)
+    type = attr.ib(type=str)
     common_title_fr = attr.ib(type=str)
     specific_title_fr = attr.ib(type=str)
     common_title_en = attr.ib(type=str)
