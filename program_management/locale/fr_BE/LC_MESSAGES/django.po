@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-03 15:27+0100\n"
+"POT-Creation-Date: 2021-03-16 10:37+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
+
+#, python-format
+msgid " Fill %(title)s in %(year)s "
+msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
@@ -50,6 +54,10 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+
+#, python-format
+msgid "%(title)s in %(year)s has been filled"
+msgstr "%(title)s en %(year)s a été remplie"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -306,6 +314,36 @@ msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
+
+#, python-format
+msgid "Fill from specific official of last year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version particulière de l'année passée: %(title)s in "
+"%(year)s"
+
+#, python-format
+msgid "Fill from specific official of this year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version particulière de cette année: %(title)s in "
+"%(year)s"
+
+#, python-format
+msgid "Fill from standard version of last year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version standard de l'année passée: %(title)s in "
+"%(year)s"
+
+#, python-format
+msgid "Fill from standard version of this year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version standard de cette année: %(title)s in "
+"%(year)s"
+
+#, python-format
+msgid "Fill from transition version of last year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version de transition de l'année passée: %(title)s "
+"in %(year)s"
 
 msgid "Fill program tree content from last year"
 msgstr "Remplir le contenue de programmes à partir de l'année passée"
@@ -706,6 +744,14 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 
 msgid "Professionnal title"
 msgstr "Titre professionnel"
+
+#, python-format
+msgid "Program %(title)s is not a specific official"
+msgstr "Programme %(title)s n'est pas une version particulière"
+
+#, python-format
+msgid "Program %(title)s is not a transition"
+msgstr "Programme %(title)s n'est pas une transition"
 
 msgid "Program organized with other institutes"
 msgstr "Programme co-organisés avec d'autres institutions"

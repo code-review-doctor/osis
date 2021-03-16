@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-09 13:20+0100\n"
+"POT-Creation-Date: 2021-03-16 10:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -612,22 +612,6 @@ msgstr ""
 msgid "Creation"
 msgstr ""
 
-msgid ""
-"Creation or end date modification proposal not allowed for central managers "
-"during this period."
-msgstr ""
-
-msgid ""
-"Creation or end date modification proposal not allowed for faculty managers "
-"during this period."
-msgstr ""
-
-msgid "Creation or end date proposal by central managers"
-msgstr ""
-
-msgid "Creation or end date proposal by faculty managers"
-msgstr ""
-
 msgid "Credits"
 msgstr ""
 
@@ -984,6 +968,9 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
+msgid "Fill this transition version"
+msgstr ""
+
 msgid "Finality 120 list choice"
 msgstr ""
 
@@ -1275,12 +1262,6 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr ""
 
-msgid "Learning unit edition by central managers"
-msgstr ""
-
-msgid "Learning unit edition by faculty managers"
-msgstr ""
-
 msgid "Learning unit search"
 msgstr ""
 
@@ -1554,22 +1535,6 @@ msgid "Mobility partnership list choice"
 msgstr ""
 
 msgid "Modification"
-msgstr ""
-
-msgid "Modification or transformation proposal by central managers"
-msgstr ""
-
-msgid "Modification or transformation proposal by faculty managers"
-msgstr ""
-
-msgid ""
-"Modification or transformation proposal not allowed for central managers "
-"during this period."
-msgstr ""
-
-msgid ""
-"Modification or transformation proposal not allowed for faculty managers "
-"during this period."
 msgstr ""
 
 #, python-format
@@ -2620,14 +2585,6 @@ msgid "This field is required."
 msgstr ""
 
 msgid "This learning unit has application"
-msgstr ""
-
-msgid ""
-"This learning unit is not editable by central managers during this period."
-msgstr ""
-
-msgid ""
-"This learning unit is not editable by faculty managers during this period."
 msgstr ""
 
 #, python-format
