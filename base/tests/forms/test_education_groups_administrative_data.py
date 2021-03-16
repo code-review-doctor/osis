@@ -209,7 +209,7 @@ class TestAdministrativeDataForm(TestCase):
 
     def _search_offer_year_calendar(self, education_group_yr, a_reference):
         academic_calendar = AcademicCalendar.objects.get(sessionexamcalendar__number_session=1,
-                                                         academic_year=education_group_yr.academic_year,
+                                                         data_year=education_group_yr.academic_year,
                                                          reference=a_reference)
         return OfferYearCalendar.objects.filter(education_group_year=education_group_yr,
                                                 academic_calendar=academic_calendar)
