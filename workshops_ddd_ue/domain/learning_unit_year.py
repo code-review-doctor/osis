@@ -46,8 +46,9 @@ class LearningUnit(interface.RootEntity):
     def code(self) -> int:
         return self.entity_id.code
 
-    def create(self, command: 'CreateLearningUnitCommand', repository: LearningUnitRepository) -> 'LearningUnit':
-        responsible_entity = ResponsibleEntity(
+    @staticmethod
+    def create(command: 'CreateLearningUnitCommand', repository: LearningUnitRepository) -> 'LearningUnit':
+        responsible_entity = ResponsibleEntity(  # FIXME
             entity_id=ResponsibleEntityIdentity(code=command.responsible_entity_code),
             title=None,
             address=Address(
@@ -76,7 +77,7 @@ class LearningUnit(interface.RootEntity):
             internship_subtype=utils.get_enum_from_str(command.internship_subtype, InternshipSubtype),
             responsible_entity=responsible_entity,
             periodicity=utils.get_enum_from_str(command.periodicity, PeriodicityEnum),
-            language=Language(
+            language=Language(  # FIXME
                 ietf_code=None,
                 name=None,
                 iso_code=command.iso_code,
