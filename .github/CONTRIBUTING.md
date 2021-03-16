@@ -318,29 +318,9 @@ def send_an_email(receiver: Person):
 ## Domain driven design
 
 #### Conventions générales
+- Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/)
 - Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
 Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
-- Tous les paramètres d'entrée et de sortie doivent être typés
-- Les fonctions qui renvoient une objet, int, str doivent être nommés "get_<sth>"
-- Les fonctions qui renvoient un booléen doivent être nommés de sorte à poser une question fermée 
-(où la réponse ne peut être que "Oui" ou "Non"). Exemples : `is_<sth>`, `has_<sth>`, `contains_<sth>`...
-- Les fonctions qui renvoient une list, set, dict :
-    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
-    
-    Exemple: ```def get_nodes() -> List['Node']```
-
-    - Pour les fonctions de recherche : search_<nom_pluriel>()
-    
-    Exemple: ```def search_nodes(*typed_filters) -> List['Node']```
-
-- Nommage des fonctions, fichiers **privés** (uniquement scope de la classe ou du fichier) : __function
-
-    Exemple: ```def __my_private_function(param: str) -> None```
-
-- Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
-
-    Exemple: ```def _my_protected_function(param: str) -> None```
- - Implémentation des Value Objects en utilisant la librairie **attrs** en définissant la classe comme étant frozen (immutable) et faisant usage de slots.
 
 
 
@@ -418,7 +398,6 @@ class UpdateTrainingCommand(interface.CommandRequest):
     - EntityIdentity
     - BusinessException
 - Contient uniquement des termes métier non techniques -> doit être compréhensible par le métier
-- Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/)
 - 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
 - Nommage des objets : ObjetMetier.
 
@@ -488,11 +467,11 @@ class Training(interface.RootEntity):
 - Ne possède pas d'identité
     - L'ensemble de ses attributs composent son identité
 - Deux ValueObjects sont les mêmes ssi l'ensemble des valeurs de leurs attributs sont les mêmes
-- Immuable
+- Immuable (librairie `attrs` => `frozen=True`)
     - Toute modification de l'objet signifie que c'est un nouvel objet
     - Ne possède pas d'historique
 - Appartient d'office à une Entity
-- Exemples : 
+- Exemples :
     - Une date
     - Une adresse
 
@@ -503,7 +482,7 @@ import attr
 from osis_common.ddd import interface
 
 
-@attr.s(slots=True)
+@attr.s(frozen=True, slots=True)
 class Address(interface.ValueObject):
     country_name = attr.ib(type=str)
     street_name = attr.ib(type=str)
