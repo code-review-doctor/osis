@@ -1,6 +1,6 @@
 from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
-from workshops_ddd_ue.domain.learning_unit_year import ResponsibleEntity
+from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
 from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator

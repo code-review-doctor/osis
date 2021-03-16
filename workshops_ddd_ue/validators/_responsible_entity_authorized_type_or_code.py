@@ -1,7 +1,7 @@
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.entity_type import EntityType
 from workshops_ddd_ue.domain.exceptions import InvalidResponsibleEntityTypeOrCodeException
-from workshops_ddd_ue.domain.learning_unit_year import ResponsibleEntity
+from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
 
 
 class ResponsibleEntityAuthorizedTypeOrCode(BusinessValidator):
