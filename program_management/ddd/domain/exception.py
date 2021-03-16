@@ -448,3 +448,11 @@ class IsNotTransitionException(BusinessException):
             "title": tree_version.official_name
         }
         super().__init__(message, **kwargs)
+
+
+class IsNotSpecificOfficialException(BusinessException):
+    def __init__(self, tree_version: 'ProgramTreeVersion', **kwargs):
+        message = _("Tree %(title)s is not a specific official") % {
+            "title": tree_version.official_name
+        }
+        super().__init__(message, **kwargs)
