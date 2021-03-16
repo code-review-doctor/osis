@@ -48,16 +48,13 @@ WIDTH_CNUM = 3
 
 @attr.s
 class BGenerateNodeCode(interface.DomainService):
-    existing_nodes = attr.ib(type=Iterable['Node'])
-
-    def __attrs_post_init__(self):
-        self._codes_generated = {node.code for node in self.existing_nodes}  # type: Set[NodeCode]
+    existing_codes = attr.ib(type=Set[NodeCode], converter=set)
 
     def generate_transition_code(self, base_code: NodeCode) -> NodeCode:
         transition_base_code = "T" + base_code[1:]
         new_code = self.__generate_node_code(transition_base_code)
 
-        self._codes_generated.add(new_code)
+        self.existing_codes.add(new_code)
         return new_code
 
     def __generate_node_code(self, base_code: str) -> str:
@@ -70,7 +67,7 @@ class BGenerateNodeCode(interface.DomainService):
         cnum, subdivision = reg_child_initial_value.search(base_code.replace(sigle_ele, "")).group("cnum", "subdivision")
 
         code_generated = "{}{}{}".format(sigle_ele, cnum, subdivision)
-        while code_generated in self._codes_generated:
+        while code_generated in self.existing_codes:
             cnum = str(int(cnum) + 1)
             code_generated = "{}{}{}".format(sigle_ele, cnum, subdivision)
 

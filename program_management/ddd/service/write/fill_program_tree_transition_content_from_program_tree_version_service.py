@@ -100,11 +100,8 @@ def fill_program_tree_transition_content_from_program_tree_version(
         ]
     )
 
-    all_nodes = to_tree_version.get_tree().root_node.get_all_children_as_nodes()
-    for tree in existing_trees:
-        all_nodes.update(tree.root_node.get_all_children_as_nodes())
-
-    node_code_generator = generate_node_code.BGenerateNodeCode(existing_nodes=all_nodes)
+    existing_codes = tree_repository.get_all_codes_for_year(year=cmd.to_year)
+    node_code_generator = generate_node_code.BGenerateNodeCode(existing_codes=existing_codes)
 
     ProgramTreeVersionBuilder().fill_transition_from_program_tree_version(
         from_tree_version,

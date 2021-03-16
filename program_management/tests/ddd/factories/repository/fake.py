@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List, Type, Optional
+from typing import List, Type, Optional, Set
 
 from osis_common.ddd import interface
 from program_management.ddd import command
@@ -48,7 +48,8 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeNotFoundException,
         "delete": _delete_program_tree,
-        "search_from_children": _search_from_children
+        "search_from_children": _search_from_children,
+        "get_all_codes_for_year": _get_all_codes_for_year,
     })
 
 
@@ -184,3 +185,13 @@ def _search_nodes(cls, node_ids: List['NodeIdentity'] = None, year: int = None, 
     if year:
         return [node for node in cls.root_entities if node.entity_id.year == year]
     return []
+
+
+@classmethod
+def _get_all_codes_for_year(cls, year: int) -> Set[str]:
+    result = set()
+    for tree in cls.root_entities:
+        if tree.entity_id.year != year:
+            tree_codes = {node.code for node in tree.get_all_nodes()}
+            result.union(tree_codes)
+    return result

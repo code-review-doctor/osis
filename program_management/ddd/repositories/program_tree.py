@@ -23,12 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Set
 
 from django.db.models import Q
 
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
+from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import Entity
 from program_management.ddd import command
@@ -131,6 +132,11 @@ class ProgramTreeRepository(interface.AbstractRepository):
             return load_tree.load(tree_root_id)
         except Element.DoesNotExist:
             raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
+
+    @classmethod
+    def get_all_codes_for_year(cls, year: int) -> Set[str]:
+        codes_qs = GroupYear.objects.all(academic_year__year=year).values_list('partial_acronym', flat=True)
+        return set(codes_qs)
 
 
 def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:
