@@ -47,6 +47,5 @@ class EducationGroupLimitedDailyManagementCalendar(AcademicEventCalendarHelper):
                     "title": "Gestion journalière limitée - catalogue",
                     "start_date": datetime.date(ac_year.year - 2, 9, 15),
                     "end_date": None,
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

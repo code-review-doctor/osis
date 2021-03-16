@@ -36,7 +36,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class SessionExamCalendarAdmin(OsisModelAdmin):
     list_display = ('academic_calendar', 'number_session', 'changed')
-    list_filter = ('academic_calendar__academic_year', 'number_session', 'academic_calendar__reference')
+    list_filter = ('academic_calendar__data_year', 'number_session', 'academic_calendar__reference')
     raw_id_fields = ('academic_calendar',)
     search_fields = ['academic_calendar__title']
 

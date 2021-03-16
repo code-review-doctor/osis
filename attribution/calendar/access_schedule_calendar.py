@@ -47,6 +47,5 @@ class AccessScheduleCalendar(AcademicEventCalendarHelper):
                     "title": "Accès horaire ADE",
                     "start_date": datetime.date(ac_year.year, 7, 1),
                     "end_date": datetime.date(ac_year.year + 1, 9, 14),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

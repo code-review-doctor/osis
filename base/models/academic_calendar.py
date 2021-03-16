@@ -62,27 +62,15 @@ class AcademicCalendarAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     send_calendar_reminder_notice.short_description = _("Send calendar reminder notice")
 
 
-class AcademicCalendarQuerySet(models.QuerySet):
-    def open_calendars(self, date=None):
-        """ return only open calendars """
-        if not date:
-            date = timezone.now()
-
-        return self.filter(start_date__lte=date, end_date__gt=date)
-
-
 class AcademicCalendar(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
     data_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT, related_name="+")
     title = models.CharField(max_length=50, blank=True)
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
     reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70, db_index=True)
-
-    objects = AcademicCalendarQuerySet.as_manager()
 
     def save(self, *args, **kwargs):
         self.validation_mandatory_dates()
@@ -99,7 +87,7 @@ class AcademicCalendar(models.Model):
             raise AttributeError(_('Start date is mandatory'))
 
     def __str__(self):
-        return "{} {}".format(self.academic_year, self.title)
+        return "{} {}".format(self.data_year, self.title)
 
     class Meta:
         permissions = (
