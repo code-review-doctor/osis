@@ -442,6 +442,7 @@ class UpdateTrainingCommand(interface.CommandRequest):
 - 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
 - Nommage des objets : ObjetMetier.
 
+<br/><br/>
 
 ##### Entity
 
@@ -476,6 +477,9 @@ class StudyDomain(interface.Entity):
 ```
 
 
+<br/><br/>
+
+
 ##### RootEntity
 
 - Même définition qu'une Entity, sauf : 
@@ -498,6 +502,10 @@ class Training(interface.RootEntity):
     # Other fields ...
 
 ```
+
+
+<br/><br/>
+
 
 ##### ValueObject
 
@@ -544,6 +552,10 @@ class Address(interface.ValueObject):
 
 ```
 
+
+<br/><br/>
+
+
 ##### EntityIdentity
 
 - Protected : utilisé uniquement par une [Entity](#entity) ou par un [RootEntity](#rootentity)
@@ -578,6 +590,8 @@ class Training(interface.RootEntity):
 
 ```
 
+<br/><br/>
+
 ##### BusinessException
 - Protected : utilisé uniquement par les validateurs et objets notre domaine
 - Regroupe les exceptions qui représentent des règles métier non respectée
@@ -600,7 +614,7 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 ```
 
 
-
+<br/><br/><br/><br/>
 
 #### ddd/repository
 
@@ -621,6 +635,10 @@ class TrainingRepository(interface.AbstractRepository):
     pass
  
 ```
+
+
+<br/><br/><br/><br/>
+
 
 #### ddd/service (application service)
 
@@ -650,6 +668,10 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
     pass
  
 ```
+
+
+<br/><br/><br/><br/>
+
 
 #### ddd/validator
 

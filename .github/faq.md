@@ -28,12 +28,12 @@ Nous modifierons notre manière de travailler et adapterons nos guidelines en co
 L'objectif du DDD est, entre autres, de construire un langage commun à travers tous les intervenants d'un projet.
 
 Le vocabulaire métier utilisé dans les analyses est notre référence : 
-les termes métier **en français** doivent donc être clairs et non ambigus pour le développeur : 
+les termes métier **en français** doivent donc être clairs et non ambigus pour le développeur.
 
 Toute ambiguïté sur un terme métier nécessite clarification auprès de l'analyste / du métier.
 
-Les développeurs doivent être d'accord sur un terme en anglais qui identifie clairement l'élément métier, l'objet, la variable... 
-Si lors de la review, le développeur comprend le code (assez explicite) et identifie clairement la correspondance en français : c'est un accord.
+**Pour la partie en anglais**, Les développeurs doivent être d'accord sur un terme qui identifie clairement l'élément métier, l'objet, la variable... 
+Si lors de la review, le reviewer comprend le code (assez explicite) et identifie clairement la correspondance en français : c'est un accord.
  > :information_source: [WordReference - Dictionnaire en ligne fournissant toutes les traductions possibles d'un mot en fonction de son contexte](https://www.wordreference.com/fr/)
 
 <br/><br/>
