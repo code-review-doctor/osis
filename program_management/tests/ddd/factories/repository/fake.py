@@ -49,7 +49,7 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
         "not_found_exception_class": exception.ProgramTreeNotFoundException,
         "delete": _delete_program_tree,
         "search_from_children": _search_from_children,
-        "get_all_codes_for_year": _get_all_codes_for_year,
+        "get_all_codes": _get_all_codes,
     })
 
 
@@ -188,10 +188,9 @@ def _search_nodes(cls, node_ids: List['NodeIdentity'] = None, year: int = None, 
 
 
 @classmethod
-def _get_all_codes_for_year(cls, year: int) -> Set[str]:
+def _get_all_codes(cls) -> Set[str]:
     result = set()
     for tree in cls.root_entities:
-        if tree.entity_id.year != year:
-            tree_codes = {node.code for node in tree.get_all_nodes()}
-            result.union(tree_codes)
+        tree_codes = {node.code for node in tree.get_all_nodes()}
+        result.union(tree_codes)
     return result

@@ -134,8 +134,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
             raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
 
     @classmethod
-    def get_all_codes_for_year(cls, year: int) -> Set[str]:
-        codes_qs = GroupYear.objects.all(academic_year__year=year).values_list('partial_acronym', flat=True)
+    def get_all_codes(cls) -> Set[str]:
+        codes_qs = GroupYear.objects.all().values_list('partial_acronym', flat=True)
         return set(codes_qs)
 
 

@@ -100,7 +100,7 @@ def fill_program_tree_transition_content_from_program_tree_version(
         ]
     )
 
-    existing_codes = tree_repository.get_all_codes_for_year(year=cmd.to_year)
+    existing_codes = tree_repository.get_all_codes()
     node_code_generator = generate_node_code.BGenerateNodeCode(existing_codes=existing_codes)
 
     ProgramTreeVersionBuilder().fill_transition_from_program_tree_version(
