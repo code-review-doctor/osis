@@ -3,13 +3,58 @@
 Regroupe les questions dont les réponses ne peuvent pas être formalisée sous forme de guideline/règle stricte, 
 mais plutôt sous forme de "philosophie de développement".
 
+
 <br/><br/>
+
+
+#### :question: Quand doit-on appliquer le DDD ? Quid du CRUD ? Quid des views de recherche, fichiers excels, pdfs ?
+
+Le DDD n'est pas une réponse à tout. Comme le décrit très bien l'article [Domain Driven Design : des armes pour affronter la complexité](https://blog.octo.com/domain-driven-design-des-armes-pour-affronter-la-complexite/),
+il y a des avantanges et inconvénients.
+
+Dans le cadre du projet Osis, nous privilégions - pour le moment - l'utilisation du DDD pour les services `Read` et `Write` pour 2 raisons :
+- Détacher notre base de code au maximum de la DB et limiter les coût de refactoring : Osis étant la réécriture d'un projet Legacy, sa base de code et son modèle DB est en constante évolution
+- Éviter d'intégrer trop de nouveaux concepts en même temps dans l'équipe et dans le projet
+
+Si des problèmes de performances sont constatés, diverses solutions pourront être mises en place (lazy load, ORM/SQL pour les services `Read`...). 
+Nous modifierons notre manière de travailler et adapterons nos guidelines en conséquence.
+
+
+<br/><br/>
+
 
 #### :question: L'analyse est en français, le code en anglais : comment traduire correctement le métier ?
 
- Les développeurs doivent être d'accord sur un terme en anglais qui identifie clairement l'élément métier, l'objet, la variable... 
- Si lors de la review, le développeur comprend le code (assez explicite) et identifie clairement la correspondance en français : c'est un accord.
+L'objectif du DDD est, entre autres, de construire un langage commun à travers tous les intervenants d'un projet.
+
+Le vocabulaire métier utilisé dans les analyses est notre référence : 
+les termes métier **en français** doivent donc être clairs et non ambigus pour le développeur : 
+
+Toute ambiguïté sur un terme métier nécessite clarification auprès de l'analyste / du métier.
+
+Les développeurs doivent être d'accord sur un terme en anglais qui identifie clairement l'élément métier, l'objet, la variable... 
+Si lors de la review, le développeur comprend le code (assez explicite) et identifie clairement la correspondance en français : c'est un accord.
  > :information_source: [WordReference - Dictionnaire en ligne fournissant toutes les traductions possibles d'un mot en fonction de son contexte](https://www.wordreference.com/fr/)
+
+<br/><br/>
+
+
+#### :question: Par où commencer pour implémenter une fonctionnalité ? Comment savoir quel code va dans quelle couche ?
+
+Certains développerons dans un fichier vide pour ensuite déplacer le code dans les couches adéquates, 
+d'autres implémenterons directement le code dans les couches pertinentes...
+Il n'existe pas de règle stricte qui définit par où démarrer le développement d'une fonctionnalité.
+Commencez par ce qui vous semble le plus évident à faire.
+
+- J'ai une règle / contrainte / invariant métier ? 
+    - --> Couche du domaine
+- J'ai besoin de sauvegarder / extraire des données en base de données ? (Querysets, ...)
+    - --> Couche repository
+- J'ai besoin de soumettre un formulaire ? 
+    - --> Couche Form (pour le formulaire html)
+    - --> Couche Command + application service
+    - --> Couche Views (pour l'utilisation du form et l'appel au service) 
+
 
 <br/><br/>
 
@@ -18,7 +63,8 @@ mais plutôt sous forme de "philosophie de développement".
 
 Cf. [Boyscout rule](https://www.matheus.ro/2017/12/11/clean-code-boy-scout-rule/)
 
-Attention à ne pas tomber dans l'excès, qui mènerait à une PR complexe et longue à reviewer, ou trop détachée de l'objectif original du ticket.
+Attention à ne pas tomber dans l'excès, qui mènerait à une PR complexe et longue à reviewer, 
+ou trop détachée de l'objectif original du ticket.
 
 <br/><br/>
 
@@ -37,14 +83,3 @@ Si vous ne le faites pas, c'est votre collègue qui perdra du temps.
 
 <br/><br/>
 
-#### :question: Quand doit-on appliquer le DDD ? Quid du CRUD ? Quid des views de recherche, fichiers excels, pdfs ?
-
-Le DDD n'est pas une réponse à tout. Comme le décrit très bien l'article [Domain Driven Design : des armes pour affronter la complexité](https://blog.octo.com/domain-driven-design-des-armes-pour-affronter-la-complexite/),
-il y a des avantanges et inconvénients.
-
-Dans le cadre du projet Osis, nous privilégions - pour le moment - l'utilisation du DDD pour les services `Read` et `Write` pour 2 raisons :
-- Détacher notre base de code au maximum de la DB et limiter les coût de refactoring : Osis étant la réécriture d'un projet Legacy, sa base de code et son modèle DB est en constante évolution
-- Éviter d'intégrer trop de nouveaux concepts en même temps dans l'équipe et dans le projet
-
-Si des problèmes de performances sont constatés, diverses solutions pourront être mises en place (lazy load, ORM/SQL pour les services `Read`...). 
-Nous modifierons notre manière de travailler et adapterons nos guidelines en conséquence.

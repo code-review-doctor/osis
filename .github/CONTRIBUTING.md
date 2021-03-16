@@ -35,7 +35,7 @@
     - [Repository](#dddrepository)
     - [Application service](#dddservice-application-service)
     - [Validator](#dddvalidator)
-- [FAQ](faq.md)
+- [FAQ : questions - réponses](faq.md)
 - [Références](references.md)
 
 
@@ -54,12 +54,8 @@
 #### Conventions de nommage
 
 - Dans le code qui implémente le DDD, **seuls des termes métier doivent apparaître** (pas de termes techniques).
-Se référer aux termes utilisés dans la description des analyses.
-# TODO :: lien to FAQ
-the "semantic"
-"meaningful names"
-speaking same language as end users
-Separate the view and the logic
+Se référer aux termes utilisés dans la description des analyses. Cf. [L'analyse est en français, le code en anglais : comment traduire correctement le métier ??](faq.md#question-lanalyse-est-en-franais-le-code-en-anglais--comment-traduire-correctement-le-mtier-)
+
 
 - Toute fonction qui renvoie un seul résultat : get_<sth>
     
