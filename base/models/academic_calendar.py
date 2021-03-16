@@ -76,17 +76,11 @@ class AcademicCalendar(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
-    data_year = models.ForeignKey(
-        'AcademicYear', on_delete=models.PROTECT, related_name='related_academic_calendar_data', blank=True, null=True
-    )
-    title = models.CharField(max_length=50, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    end_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
-    highlight_title = models.CharField(max_length=50, blank=True, null=True)
-    highlight_description = models.CharField(max_length=255, blank=True, null=True)
-    highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
-    reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70)
+    data_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT, related_name="+")
+    title = models.CharField(max_length=50, blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField(blank=True, null=True)
+    reference = models.CharField(choices=AcademicCalendarTypes.choices(), max_length=70, db_index=True)
 
     objects = AcademicCalendarQuerySet.as_manager()
 
@@ -112,14 +106,6 @@ class AcademicCalendar(models.Model):
             ("can_access_academic_calendar", "Can access academic calendar"),
         )
         unique_together = ("data_year", "title")
-
-
-def find_highlight_academic_calendar():
-    return AcademicCalendar.objects.open_calendars() \
-        .exclude(highlight_title__isnull=True).exclude(highlight_title__exact='') \
-        .exclude(highlight_description__isnull=True).exclude(highlight_description__exact='') \
-        .exclude(highlight_shortcut__isnull=True).exclude(highlight_shortcut__exact='') \
-        .order_by('end_date')
 
 
 def get_by_reference_and_data_year(a_reference, data_year):

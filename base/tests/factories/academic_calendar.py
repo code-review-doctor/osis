@@ -46,9 +46,6 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
     start_date = factory.SelfAttribute("academic_year.start_date")
     end_date = factory.SelfAttribute("academic_year.end_date")
-    highlight_title = factory.Sequence(lambda n: 'Highlight - %d' % n)
-    highlight_description = factory.Sequence(lambda n: 'Description - %d' % n)
-    highlight_shortcut = factory.Sequence(lambda n: 'Shortcut Highlight - %d' % n)
     reference = factory.Iterator(academic_calendar_type.ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
 
 

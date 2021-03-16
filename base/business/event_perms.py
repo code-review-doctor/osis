@@ -28,14 +28,10 @@ from abc import ABC
 from typing import List, Optional
 
 import attr
-from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import AcademicYear
 
 
 @attr.s(frozen=True, slots=True)
