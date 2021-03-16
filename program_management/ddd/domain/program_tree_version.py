@@ -84,7 +84,10 @@ class ProgramTreeVersionBuilder:
             existing_trees: Set['ProgramTree'],
             node_code_generator
     ) -> 'ProgramTreeVersion':
-        validators_by_business_action.FillProgramTreeTransitionValidatorList(from_tree_version, to_tree_version).validate()
+        validators_by_business_action.FillProgramTreeTransitionValidatorList(
+            from_tree_version,
+            to_tree_version
+        ).validate()
         program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
             from_tree_version.get_tree(),
             to_tree_version.get_tree(),

@@ -66,12 +66,12 @@ def fill_program_tree_version_content_from_program_tree_version(
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes().union()
+            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
 
     existing_learning_unit_nodes = node_repo.search(
-        [
+        entity_ids=[
             attr.evolve(node.entity_id, year=cmd.to_year)
             for node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
         ]
@@ -85,10 +85,7 @@ def fill_program_tree_version_content_from_program_tree_version(
     )
 
     identity = tree_version_repository.update(to_tree_version)
-    if to_tree_version.is_transition:
-        tree_repository.create(to_tree_version.get_tree(), create_orphan_group_service=create_group_service.create_orphan_group)
-    else:
-        tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
+    tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
 
     copy_program_tree_prerequisites_from_program_tree_service.copy_program_tree_prerequisites_from_program_tree(
         CopyProgramTreePrerequisitesFromProgramTreeCommand(
