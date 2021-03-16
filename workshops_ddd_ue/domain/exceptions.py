@@ -42,3 +42,9 @@ class LearningUnitCodeStructureInvalidException(BusinessException):
     def __init__(self, code: str, *args, **kwargs):
         message = _("The code {} is not a valid code").format(code)
         super().__init__(message, **kwargs)
+
+
+class EmptyRequiredFieldsException(BusinessException):
+    def __init__(self, empty_required_fields: List[str], *args, **kwargs):
+        message = _("Following fields are required : {}").format(empty_required_fields)
+        super().__init__(message, **kwargs)
