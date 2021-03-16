@@ -29,7 +29,8 @@ import mock
 
 from program_management.ddd.command import FillProgramTreeTransitionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.academic_year import AcademicYear
-from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, ProgramTreeNonEmpty
+from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, ProgramTreeNonEmpty, \
+    IsNotTransitionException
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
@@ -189,7 +190,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
 
     def test_cannot_fill_non_empty_tree(self):
-        tree_version_to_fill_to = SpecificProgramTreeVersionFactory(
+        tree_version_to_fill_to = SpecificTransitionProgramTreeVersionFactory(
             tree=ProgramTreeBachelorFactory(
                 current_year=NEXT_ACADEMIC_YEAR_YEAR,
                 end_year=NEXT_ACADEMIC_YEAR_YEAR
@@ -207,6 +208,26 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
         self.assertRaisesBusinessException(
             ProgramTreeNonEmpty,
+            fill_program_tree_transition_content_from_program_tree_version,
+            cmd
+        )
+
+    def test_tree_version_to_fill_to_should_be_transition(self):
+        tree_version_to_fill_to = SpecificProgramTreeVersionFactory(
+            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
+        )
+        tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
+            tree__root_node__code=tree_version_to_fill_to.tree.root_node.code,
+            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
+        )
+
+        self.add_tree_version_to_repo(tree_version_to_fill_to)
+        self.add_tree_version_to_repo(tree_version_to_fill_from)
+
+        cmd = self._generate_cmd(tree_version_to_fill_from, tree_version_to_fill_to)
+
+        self.assertRaisesBusinessException(
+            IsNotTransitionException,
             fill_program_tree_transition_content_from_program_tree_version,
             cmd
         )
