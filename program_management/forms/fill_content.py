@@ -30,9 +30,11 @@ from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.forms.exceptions import InvalidFormException
-from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
+from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
+    FillProgramTreeTransitionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.service.write import fill_program_tree_version_content_from_program_tree_version_service
+from program_management.ddd.service.write import fill_program_tree_version_content_from_program_tree_version_service, \
+    fill_program_tree_transition_content_from_program_tree_version_service
 
 
 class ValidChoice(Enum):
@@ -66,16 +68,16 @@ class FillTransitionContentForm(forms.Form):
     def save(self) -> None:
         if self.is_valid():
             try:
-                fill_program_tree_version_content_from_program_tree_version_service.\
-                    fill_program_tree_version_content_from_program_tree_version(self.generate_cmd())
+                fill_program_tree_transition_content_from_program_tree_version_service. \
+                    fill_program_tree_transition_content_from_program_tree_version(self.generate_cmd())
             except MultipleBusinessExceptions as multiple_exceptions:
                 for exception in multiple_exceptions.exceptions:
                     self.add_error(None, exception.message)
                 raise InvalidFormException()
 
-    def generate_cmd(self) -> 'FillProgramTreeVersionContentFromProgramTreeVersionCommand':
+    def generate_cmd(self) -> 'FillProgramTreeTransitionContentFromProgramTreeVersionCommand':
         tree_to_fill_from = self._get_tree_to_fill_from()
-        return FillProgramTreeVersionContentFromProgramTreeVersionCommand(
+        return FillProgramTreeTransitionContentFromProgramTreeVersionCommand(
             from_year=tree_to_fill_from.entity_id.year,
             from_offer_acronym=tree_to_fill_from.entity_id.offer_acronym,
             from_version_name=tree_to_fill_from.version_name,

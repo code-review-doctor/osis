@@ -165,7 +165,8 @@ class ProgramTreeBuilder:
             from_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
             existing_nodes: Set['Node'],
-            existing_trees: Set['ProgramTree']
+            existing_trees: Set['ProgramTree'],
+            node_code_generator
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
@@ -178,6 +179,7 @@ class ProgramTreeBuilder:
             existing_nodes,
             to_tree.root_node.transition_name,
             existing_trees,
+            node_code_generator
         )
 
         return to_tree
@@ -213,7 +215,8 @@ class ProgramTreeBuilder:
             relationships: 'AuthorizedRelationshipList',
             existing_nodes: Set['Node'],
             transition_name: 'str',
-            existing_trees: Set['ProgramTree']
+            existing_trees: Set['ProgramTree'],
+            node_code_generator
     ) -> 'Node':
         learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
         group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
@@ -229,7 +232,8 @@ class ProgramTreeBuilder:
             child = None
             child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
             if group_year_link.child.is_group():
-                new_code = self.generate_new_transition_code(group_year_link.child.code, existing_nodes)
+                new_code = node_code_generator.generate_transition_code(group_year_link.child.code)
+                # new_code = self.generate_new_transition_code(group_year_link.child.code, existing_nodes)
                 child = node_factory.copy_to_year(group_year_link.child, to_node.year, new_code)
 
             elif group_year_link.child.is_mini_training() and not self._is_end_date_inferior_to(group_year_link.child, to_node):
@@ -260,7 +264,8 @@ class ProgramTreeBuilder:
                     relationships,
                     existing_nodes,
                     transition_name,
-                    existing_trees
+                    existing_trees,
+                    node_code_generator
                 )
 
         return to_node
