@@ -36,3 +36,9 @@ class LearningUnitCodeAlreadyExistsException(BusinessException):
             "The code {} already exists"
         ).format(code)
         super().__init__(message, **kwargs)
+
+
+class LearningUnitCodeStructureInvalidException(BusinessException):
+    def __init__(self, code: str, *args, **kwargs):
+        message = _("The code {} is not a valid code").format(code)
+        super().__init__(message, **kwargs)
