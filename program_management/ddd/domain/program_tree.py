@@ -284,10 +284,6 @@ class ProgramTreeBuilder:
             tree.root_node.version_name == version_name and tree.root_node.transition_name == transition_name
         )
 
-    # TODO fix this with domain service maybe
-    def generate_new_transition_code(self, base_code: str, existing_nodes: Set['Node']) -> str:
-        return "T" + base_code[1:]
-
     def _fill_node_children_from_node(
             self,
             from_node: 'Node',
