@@ -28,3 +28,11 @@ class CreditsShouldBeGreatherThanZeroException(BusinessException):
             "Credits should be greather than 0"
         )
         super().__init__(message, **kwargs)
+
+
+class LearningUnitCodeAlreadyExistsException(BusinessException):
+    def __init__(self, code: str, *args, **kwargs):
+        message = _(
+            "The code {} already exists"
+        ).format(code)
+        super().__init__(message, **kwargs)
