@@ -390,22 +390,36 @@ class TestLearningUnitXls(TestCase):
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        a_tutor = TutorFactory()
+        a_tutor = TutorFactory(person__last_name="Dupuis", person__first_name="Tom", person__email="dupuis@gmail.com")
 
-        an_attribution = AttributionNewFactory(
+        an_attribution_1 = AttributionNewFactory(
             tutor=a_tutor,
             start_year=2017
         )
 
         AttributionChargeNewFactory(
             learning_component_year=component_lecturing,
-            attribution=an_attribution,
+            attribution=an_attribution_1,
         )
         AttributionChargeNewFactory(
             learning_component_year=component_practical,
-            attribution=an_attribution
+            attribution=an_attribution_1
         )
 
+        a_tutor2 = TutorFactory(person__last_name="Tosson", person__first_name="Ivan", person__email="tosson@gmail.com")
+        an_attribution_2 = AttributionNewFactory(
+            tutor=a_tutor2,
+            start_year=2017
+        )
+
+        AttributionChargeNewFactory(
+            learning_component_year=component_lecturing,
+            attribution=an_attribution_2,
+        )
+        AttributionChargeNewFactory(
+            learning_component_year=component_practical,
+            attribution=an_attribution_2
+        )
         # Simulate annotate
         luy = annotate_qs(LearningUnitYear.objects.filter(pk=luy.pk)).first()
         luy.entity_requirement = EntityVersionFactory()
@@ -658,15 +672,17 @@ class TestLearningUnitXls(TestCase):
 
 
 def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:
-    expected_attribution = None
+    expected_attributions = []
     for k, v in luy.attribution_charge_news.items():
-        expected_attribution = v
-    complete_name = "{} {}".format(
-        expected_attribution.get('person').last_name.upper(),
-        expected_attribution.get('person').first_name
-    )
+        expected_attributions.append(v)
 
-    ex = [complete_name, expected_attribution.get('person').email]
+    complete_name = ';'.join("{} {}".format(
+            expected_attribution.get('person').last_name.upper(),
+            expected_attribution.get('person').first_name
+        ) for expected_attribution in expected_attributions)
+
+    emails = ";".join(expected_attribution.get('person').email for expected_attribution in expected_attributions)
+    ex = [complete_name, emails]
     ex.extend(expected)
     return ex
 

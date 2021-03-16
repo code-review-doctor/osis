@@ -302,8 +302,8 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) 
     lu_data_part2 = []
     if with_attributions:
         teachers = _get_teachers(learning_unit_yr)
-        lu_data_part2.append('; '.join(_build_complete_name(person) for person in teachers))
-        lu_data_part2.append("; ".join(person.email if person.email else '-' for person in teachers))
+        lu_data_part2.append(';'.join(_build_complete_name(person) for person in teachers))
+        lu_data_part2.append(';'.join(person.email if person.email else '-' for person in teachers))
 
     lu_data_part2.append(learning_unit_yr.get_periodicity_display())
     lu_data_part2.append(yesno(learning_unit_yr.status))
@@ -558,8 +558,7 @@ def _prepare_titles(is_external_ue_list: bool, with_attributions: bool, with_grp
 def _build_complete_name(person: Person) -> str:
     return " ".join([
         ("{}".format(person.last_name) if person.last_name else "").upper(),
-        person.first_name or "",
-        person.middle_name or ""
+        person.first_name or ""
     ]).strip()
 
 
