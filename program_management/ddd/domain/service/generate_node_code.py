@@ -64,7 +64,9 @@ class BGenerateNodeCode(interface.DomainService):
 
         match_result = reg_parent_code.search(base_code) or reg_common_partial_acronym.search(base_code)
         sigle_ele = match_result.group("sigle_ele")
-        cnum, subdivision = reg_child_initial_value.search(base_code.replace(sigle_ele, "")).group("cnum", "subdivision")
+        cnum, subdivision = reg_child_initial_value.search(
+            base_code.replace(sigle_ele, "")
+        ).group("cnum", "subdivision")
 
         code_generated = "{}{}{}".format(sigle_ele, cnum, subdivision)
         while code_generated in self.existing_codes:

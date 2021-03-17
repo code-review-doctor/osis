@@ -106,7 +106,10 @@ class FillTransitionContentForm(forms.Form):
 
         if self.last_year_transition_tree:
             choices.append(
-                (ValidChoice.LAST_YEAR_TRANSITION_TREE.value, self.__get_last_year_transition_tree_option_human_readable())
+                (
+                    ValidChoice.LAST_YEAR_TRANSITION_TREE.value,
+                    self.__get_last_year_transition_tree_option_human_readable()
+                )
             )
         if self.last_year_source_tree:
             choices.append(
@@ -143,4 +146,3 @@ class FillTransitionContentForm(forms.Form):
             "title": self.last_year_source_tree.official_name,
             "year": self.last_year_source_tree.year
         }
-
