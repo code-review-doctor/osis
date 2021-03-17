@@ -318,32 +318,32 @@ msgstr "Exporter"
 #, python-format
 msgid "Fill from specific official of last year: %(title)s in %(year)s"
 msgstr ""
-"Recopier à partir de la version particulière de l'année passée: %(title)s in "
+"Recopier à partir de la version particulière de l'année passée: %(title)s en "
 "%(year)s"
 
 #, python-format
 msgid "Fill from specific official of this year: %(title)s in %(year)s"
 msgstr ""
-"Recopier à partir de la version particulière de cette année: %(title)s in "
+"Recopier à partir de la version particulière de cette année: %(title)s en "
 "%(year)s"
 
 #, python-format
 msgid "Fill from standard version of last year: %(title)s in %(year)s"
 msgstr ""
-"Recopier à partir de la version standard de l'année passée: %(title)s in "
+"Recopier à partir de la version standard de l'année passée: %(title)s en "
 "%(year)s"
 
 #, python-format
 msgid "Fill from standard version of this year: %(title)s in %(year)s"
 msgstr ""
-"Recopier à partir de la version standard de cette année: %(title)s in "
+"Recopier à partir de la version standard de cette année: %(title)s en "
 "%(year)s"
 
 #, python-format
 msgid "Fill from transition version of last year: %(title)s in %(year)s"
 msgstr ""
 "Recopier à partir de la version de transition de l'année passée: %(title)s "
-"in %(year)s"
+"en %(year)s"
 
 msgid "Fill program tree content from last year"
 msgstr "Remplir le contenu de programmes à partir de l'année passée"
