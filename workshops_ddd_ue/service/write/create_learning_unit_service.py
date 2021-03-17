@@ -8,7 +8,7 @@ from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 
 
 @transaction.atomic()
-def create_and_postpone_orphan_training(cmd: CreateLearningUnitCommand) -> List['LearningUnitIdentity']:
+def create_learning_unit(cmd: CreateLearningUnitCommand) -> List['LearningUnitIdentity']:
     # GIVEN
     repository = LearningUnitRepository()
 
