@@ -8,4 +8,8 @@ Exemples :
 - "translate" dans les prérequis : And, et, or, ou... : affichage ? domaine ?
 
 
-- [???] Ou gérer les traductions ? 
+- [???] Ou gérer les traductions ?
+
+- Single respojsibility principle
+def __gt__(self, other):
+    return other.year > self.year

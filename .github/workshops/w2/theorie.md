@@ -226,8 +226,8 @@ class User(interface.Entity):
 
 ## Questions
 
-- Puis-je faire des tryexcept dans un application service ? 
-- Puis-je placer un IF dans un application service ?
+- Puis-je faire des `try-except` dans un application service ? 
+- Puis-je placer un `if` dans un application service ?
 - Puis-je lancer une BusinessException dans un application service ?
 - Validator pour AcademicEvent est-il pure ?
 
@@ -281,15 +281,30 @@ et qui ne représente pas un cas d'utilisation en tant que tel.
         - Exemple codé : 
 
 ```python
+import attr
 from decimal import Decimal
 from osis_common.ddd import interface
 from external.dependency.gateway import payment_gateway
 
+# Domain
+@attr.s(slots=True)
+class ATM(interface.RootEntity):
+    """Distributeur automatique de billets"""
+    commission = attr.ib(type=Decimal)
+
+    def calculate_amount_with_commission(self, amount: Decimal) -> Decimal:
+        """Calcule le montant additionné de la commission propre à l'ATM"""
+        return amount + self.commission
 
 
-# Application service (use case) "retirer de l'argent sur un distributeur automatique de billets"
+#-----------------------------------------------------------------------
+# Application Service
+
+
+# Application service (use case)
 def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
-    repository = ATMRepository()    
+    """Retirer de l'argent sur un distributeur automatique de billets"""
+    repository = ATMRepository()
     atm = repository.get()  # distributeur automatique de billets
 
     # Charge le montant avec une commission pour le facturer à travers un gateway
@@ -350,11 +365,37 @@ class AtmWithdrawMoney(interface.DomainService):
 ```
 
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 ## Questions
 
 - Puis-je appeler un application service dans un domain service ?
 - Puis-je appeler un Domain service dans un application service ?
+- Le code suivant est-il pure ?
+
+```python
+from ddd.domain.formation_enrollment import STATE1, STATE4, STATE8
+from osis_common.ddd import interface
+
+# Repository
+class FormationEnrollmentRepository(interface.AbstractRepository):
+    def search_enrollments_by_student(self, student_identity: StudentIdentity) -> List[FormationEnrollmentEntity]:
+        data_from_db = EnrollmentDatabaseDjangoModel.objects.filter(
+            student__registration_id=student_identity.registration_id,
+            enrollment_state__in=[STATE1, STATE4, STATE8],
+        )
+        return [FormationEnrollmentEntity(...obj) for obj in data_from_db]
+
+
+
+
+# ApplicationService
+def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[EnrollmentDatabaseDjangoModel]:
+    student_identity = StudentIdentity(cmd.registration_id)
+    return FormationEnrollmentRepository().search_enrollments_by_student(student_identity)
+
+```
 
 
 

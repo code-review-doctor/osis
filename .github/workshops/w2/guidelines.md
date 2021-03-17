@@ -1,5 +1,7 @@
 ## Guidelines
 
+- FAQ : Question : Comment savoir si on doit filtrer en mémoire (domaine) ou via Repository.search/filter via queryset ?
+    - Tendre vers des queries génériques, et n'aller dans le spécifique QUE s'il y a des problèmes de perf
 
 
 ### Domain
@@ -33,6 +35,10 @@ Exemple : un calculateur de taxe
 - Utiliser injection de dépendances si le domain service a besoin d'un repository
 
 - Ne connaît pas la base de données (pas de querysets)!
+
+- Renvoie uniquement des types primitifs, des Entity ou ValueObjects
+
+- Peut recevoir une Entity, ValueObject, type_primitif ou repositories 
 
 - Accès : 
     - couche Domain
