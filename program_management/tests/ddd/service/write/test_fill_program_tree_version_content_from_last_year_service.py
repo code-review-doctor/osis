@@ -26,6 +26,7 @@ from collections import namedtuple
 
 import attr
 import mock
+from django.test import override_settings
 
 from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
 from program_management.ddd.domain.academic_year import AcademicYear
@@ -46,6 +47,7 @@ CURRENT_ACADEMIC_YEAR_YEAR = 2021
 NEXT_ACADEMIC_YEAR_YEAR = 2022
 
 
+@override_settings(YEAR_LIMIT_EDG_MODIFICATION=PAST_ACADEMIC_YEAR_YEAR)
 class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
     def setUp(self) -> None:
         self._init_fake_repos()
@@ -66,11 +68,9 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         self.add_tree_version_to_repo(self.tree_version_from)
         self.add_tree_version_to_repo(self.tree_version_to_fill)
 
-        self.mock_get_current_academic_year()
         self.mock_copy_cms()
         self.create_node_next_years()
         self.mock_copy_group()
-        self.mock_current_academic_year()
 
     def create_node_next_years(self):
         nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
@@ -79,14 +79,6 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
                 continue
             next_year_node = node_factory.copy_to_next_year(node)
             self.add_node_to_repo(next_year_node)
-
-    def mock_get_current_academic_year(self):
-        patcher = mock.patch(
-            "program_management.ddd.domain.service.get_academic_year.GetAcademicYear.get_next_academic_year",
-            side_effect=lambda *args, **kwargs: AcademicYear(NEXT_ACADEMIC_YEAR_YEAR)
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
 
     def mock_copy_cms(self):
         patcher = mock.patch(
@@ -100,14 +92,6 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         patcher = mock.patch(
             "education_group.ddd.service.write.copy_group_service.copy_group",
             side_effect=lambda node: self.add_node_to_repo(node_factory.copy_to_next_year(node))
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
-    def mock_current_academic_year(self):
-        patcher = mock.patch(
-            "base.models.academic_year.starting_academic_year",
-            side_effect=lambda *args, **kwargs: namedtuple("starting", "year")(CURRENT_ACADEMIC_YEAR_YEAR)
         )
         patcher.start()
         self.addCleanup(patcher.stop)

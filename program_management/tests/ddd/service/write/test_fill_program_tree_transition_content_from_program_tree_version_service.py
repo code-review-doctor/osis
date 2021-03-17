@@ -26,6 +26,7 @@ from collections import namedtuple
 
 import attr
 import mock
+from django.test import override_settings
 
 from program_management.ddd.command import FillProgramTreeTransitionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.academic_year import AcademicYear
@@ -48,6 +49,7 @@ CURRENT_ACADEMIC_YEAR_YEAR = 2021
 NEXT_ACADEMIC_YEAR_YEAR = 2022
 
 
+@override_settings(YEAR_LIMIT_EDG_MODIFICATION=PAST_ACADEMIC_YEAR_YEAR)
 class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
     def setUp(self) -> None:
         self._init_fake_repos()
@@ -65,7 +67,6 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.add_tree_version_to_repo(self.tree_version_from)
         self.add_tree_version_to_repo(self.tree_version_to_fill)
 
-        self.mock_get_current_academic_year()
         self.create_node_next_years()
         self.mock_create_group()
         self.mock_current_academic_year()
@@ -96,14 +97,6 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def mock_get_current_academic_year(self):
-        patcher = mock.patch(
-            "program_management.ddd.domain.service.get_academic_year.GetAcademicYear.get_next_academic_year",
-            side_effect=lambda *args, **kwargs: AcademicYear(NEXT_ACADEMIC_YEAR_YEAR)
-        )
-        patcher.start()
-        self.addCleanup(patcher.stop)
-
     def mock_create_group(self):
         patcher = mock.patch(
             "education_group.ddd.service.write.create_group_service.create_orphan_group",
@@ -120,7 +113,8 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    def test_can_only_fill_content_of_next_academic_year(self):
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=CURRENT_ACADEMIC_YEAR_YEAR)
+    def test_can_only_fill_content_of_tree_before_year_limit(self):
         tree_version_to_fill = StandardProgramTreeVersionFactory(
             tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
             tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
