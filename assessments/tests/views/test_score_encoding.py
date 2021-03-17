@@ -383,6 +383,8 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
 
     def test_message_score_encoding_not_open(self):
         self.session_exam_calendar.delete()
+        self.academic_calendar.delete()
+
         url = reverse('outside_scores_encodings_period')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
