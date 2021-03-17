@@ -287,7 +287,7 @@ class User(interface.Entity):
 ### Domain service
 - Un domain service est un service qui encapsule une logique métier qui ne sait pas être représenté par un Entity ou à un ValueObject,
 et qui ne représente pas un cas d'utilisation en tant que tel
-- Quand utiliser un DomainService ? 
+- Quand utiliser un DomainService ?
     - Lorsque notre domaine ne peut pas être "complet" à cause des performances
         - Exemple : Vérifier si l'email d'un utilisateur existe (charger la liste de tous les utilisateurs en mémoire serait trop couteux)
     - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
@@ -340,6 +340,9 @@ def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
     
 ```
 
+<br/><br/>
+
+- NB : plus la logique métier est isolée et donc PURE (encapsulée dans le domaine), moins il y aura de domain service
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
