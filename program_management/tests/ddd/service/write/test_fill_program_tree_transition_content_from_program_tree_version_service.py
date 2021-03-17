@@ -29,12 +29,12 @@ import mock
 from django.test import override_settings
 
 from program_management.ddd.command import FillProgramTreeTransitionContentFromProgramTreeVersionCommand
-from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, ProgramTreeNonEmpty, \
     IsNotTransitionException
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.service.write.fill_program_tree_transition_content_from_program_tree_version_service import \
+from program_management.ddd.service.write.\
+    fill_program_tree_transition_content_from_program_tree_version_service import \
     fill_program_tree_transition_content_from_program_tree_version
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
