@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-16 10:40+0100\n"
+"POT-Creation-Date: 2021-03-16 13:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -530,9 +530,6 @@ msgstr ""
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
-msgid "Comment"
-msgstr ""
-
 msgid "Common English title"
 msgstr ""
 
@@ -687,6 +684,9 @@ msgid "Detailed program"
 msgstr ""
 
 msgid "Details"
+msgstr ""
+
+msgid "Details other educational facilities"
 msgstr ""
 
 msgid "Diploma title"
@@ -1344,6 +1344,9 @@ msgid "List of learning units with one line per training"
 msgstr ""
 
 msgid "List of teachers"
+msgstr ""
+
+msgid "List of teachers (email)"
 msgstr ""
 
 msgid "List of trainings with administrative data"

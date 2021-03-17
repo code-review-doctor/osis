@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-16 10:40+0100\n"
+"POT-Creation-Date: 2021-03-16 13:18+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -545,9 +545,6 @@ msgstr "Code"
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
 
-msgid "Comment"
-msgstr "Commentaire"
-
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
 
@@ -705,6 +702,9 @@ msgstr "Programme détaillé"
 
 msgid "Details"
 msgstr "Détails"
+
+msgid "Details other educational facilities"
+msgstr "Détails autre aménagement"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
@@ -1374,6 +1374,9 @@ msgstr "Liste des UE avec une formation par ligne"
 
 msgid "List of teachers"
 msgstr "Liste des enseignants"
+
+msgid "List of teachers (email)"
+msgstr "Liste des enseignants (email)"
 
 msgid "List of trainings with administrative data"
 msgstr "Liste des formations avec données administratives"
