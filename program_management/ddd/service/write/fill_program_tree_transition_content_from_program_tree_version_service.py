@@ -68,18 +68,21 @@ def fill_program_tree_transition_content_from_program_tree_version(
         node for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes() if node.is_training()
     ]
     for training in training_nodes:
-        create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
-            CreateProgramTreeTransitionVersionCommand(
-                end_year=to_tree_version.end_year_of_existence,
-                offer_acronym=training.title,
-                version_name=to_tree_version.version_name,
-                start_year=to_tree_version.program_tree_identity.year,
-                transition_name=to_tree_version.transition_name,
-                title_fr="",
-                title_en="",
-                from_year=from_tree_version.program_tree_identity.year
+        try:
+            create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
+                CreateProgramTreeTransitionVersionCommand(
+                    end_year=to_tree_version.end_year_of_existence,
+                    offer_acronym=training.title,
+                    version_name=to_tree_version.version_name,
+                    start_year=to_tree_version.program_tree_identity.year,
+                    transition_name=to_tree_version.transition_name,
+                    title_fr="",
+                    title_en="",
+                    from_year=from_tree_version.program_tree_identity.year
+                )
             )
-        )
+        except Exception:
+            pass
 
     transition_tree_versions = tree_version_repository.search(
         version_name=to_tree_version.version_name,
