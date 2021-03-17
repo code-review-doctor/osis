@@ -13,6 +13,7 @@
 - Utiliser un IReadRepository pour les DTO (afin de séparer les repo READ / WRITE == CQS)
 - DTO : les Django serializers aident facilement à la conversion en DTO : est-ce qu'on ne les réutiliserait pas ?
 - données initiales de Forms filtrées : DTO ou domain service ? (exemple : filtrer les etds en états X ou Y)
+- Nos Interface.CommandRequest sont des DTO
 
 Ok donc on va partir sur des DTO + repository qui renvoient des DTO + querysets UNIQUEMENT dans les repos. 
 Les Serializers, forms, views utilisent alors un applicaiton service qui renvoie DTO à parir d'un repo 

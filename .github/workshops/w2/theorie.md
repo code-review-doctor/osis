@@ -70,7 +70,8 @@ appartient à une autre couche que le domaine métier (couche de services, couch
     - il n'a aucune dépendance externe ou à d'autres couches de code
     - il dépend uniquement de types primitifs ou d'autres classes du domaines
 
-- "Dépendance externe" signifie tout service (classes, fonction...) qui ne fait pas partie du domaine. Exemples :
+
+- "Dépendance externe" signifie tout service (classe, fonction...) à connotation technique qui ne fait pas partie intégrante du domaine. Exemples :
     - base de données
     - gestion de fichiers
     - envoi de mail
@@ -193,6 +194,10 @@ class User(interface.Entity):
 
 ```
 
+<br/><br/>
+
+- Notre implémentation rend-elle notre domaine pure ?
+- Notre implémentation rend-elle notre domaine complet ?
 - Quel inconvénient à cette solution ? 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -201,23 +206,33 @@ class User(interface.Entity):
 ## Trilemme
 
 - Il est impossible de satisfaire les 3 concepts suivants : 
-    - Domain complet
-    - Domain pure
+    - Domaine complet
+    - Domaine pure
     - Performance
 
 - Choix possibles :
-    - Placer toutes les opérations de lecture et écritures aux limites d'une opération métier (sandwich pattern)
-        - Domaine "pure" et "complet" **au détriment des performances**
-    - Partager la logique métier entre le domaine et l'application service
-        - Domaine "pure" et performances **au détriment d'un domaine "complet"**
-    - Injecter les dépendances hors processus dans le domaine
-        - Domaine "complet" et performances **au détriment d'un domaine "pure"**
+
+**1.** Placer toutes les opérations de lecture et écritures aux limites d'une opération métier (sandwich pattern)
+    
+- Domaine "pure" et "complet" **au détriment des performances**
+
+**2.** Partager la logique métier entre le domaine et l'application service
+
+- Domaine "pure" et performances **au détriment d'un domaine "complet"**
+
+**3.** Injecter les dépendances hors processus dans le domaine
+
+- Domaine "complet" et performances **au détriment d'un domaine "pure"**
+
+<br/><br/>
 
 - Décision : 
-    - Toujours privilégier un domaine "pure" et "complet" **au détriment des performances**
+    - Toujours privilégier un domaine "pure" et "complet" **au détriment des performances** (**1.**)
 
-- Et si j'ai des problèmes de performances ? 
-    - Privilégier un domaine "pure" et une application performante
+<br/><br/>
+
+- Et si j'ai des problèmes de performances ?
+    - Privilégier un domaine "pure" et une application performante (**2.**)
         - Il est plus facile de maintenir un "domain logic fragmentation" plutôt que des dépendances externes (mocks, etc.)
 
         
@@ -226,13 +241,15 @@ class User(interface.Entity):
 
 ## Questions
 
-- Puis-je faire des `try-except` dans un application service ? 
+- Puis-je faire des `try-except` dans un application service ?
 - Puis-je placer un `if` dans un application service ?
 - Puis-je lancer une BusinessException dans un application service ?
-- Validator pour AcademicEvent est-il pure ?
 
 
-## Exercices dans le code
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+## Exercices dans le code : domaines pure et/ou complets ?
 
 - program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree
 - program_management.ddd.service.write.paste_element_service.paste_element
@@ -269,12 +286,12 @@ class User(interface.Entity):
 
 ### Domain service
 - Un domain service est un service qui encapsule une logique métier qui ne sait pas être représenté par un Entity ou à un ValueObject,
-et qui ne représente pas un cas d'utilisation en tant que tel.
+et qui ne représente pas un cas d'utilisation en tant que tel
 - Quand utiliser un DomainService ? 
     - Lorsque notre domaine ne peut pas être "complet" à cause des performances
         - Exemple : Vérifier si l'email d'un utilisateur existe (charger la liste de tous les utilisateurs en mémoire serait trop couteux)
     - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
-        - Exemple : Générer d'un numéro de séquence (dépendance externe : base de données)
+        - Exemple : Générer un numéro de séquence pour une entité du domaine (dépendance externe : base de données)
         - Exemple : Attacher un groupement dans le contenu d'une formation n'est possible que si le cache contient un groupement et peut être vidé (dépendance externe : système de cache)
         - Exemple : Calculer la date de fin de report d'une formation (dépendance externe : gestion des événements académiques)
     - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
@@ -380,6 +397,7 @@ from osis_common.ddd import interface
 
 # Repository
 class FormationEnrollmentRepository(interface.AbstractRepository):
+
     def search_enrollments_by_student(self, student_identity: StudentIdentity) -> List[FormationEnrollmentEntity]:
         data_from_db = EnrollmentDatabaseDjangoModel.objects.filter(
             student__registration_id=student_identity.registration_id,
@@ -389,9 +407,10 @@ class FormationEnrollmentRepository(interface.AbstractRepository):
 
 
 
+#-----------------------------------------------------------------------
 
 # ApplicationService
-def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[EnrollmentDatabaseDjangoModel]:
+def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[FormationEnrollmentEntity]:
     student_identity = StudentIdentity(cmd.registration_id)
     return FormationEnrollmentRepository().search_enrollments_by_student(student_identity)
 
@@ -413,12 +432,16 @@ def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[Enrollm
     - Toute modification d'un agrégat **doit** être consistant en tout temps
     - Pas possible de persister un agrégat en plusieurs fois (transactions)
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 - Un grand agrégat 
     - amène la simplicité
         - plus facile d'assurer la consistance des invariants métier car par de dépendances externes
     - au détriment des performances
         - nécessaire de charger plus de données pour assurer la consistance des invariants
     - Domaine "complet" **au détriment des performances**
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 - Un petit agrégat 
     - amène la performance
@@ -429,12 +452,15 @@ def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[Enrollm
         - dépendances externes dans les services (plus compliqué)
     - Application performante **au détriment d'un domaine "complet"**
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 - Taille d'un agrégat peut être influencée par le métier : 
     - Exemple : Un groupement peut-il exister sans ProgramTree ?
         - Oui -> transactions différentes : groupement peut être séparé de l'agrégat
     - Exemple : Les liens entre groupements peuvent-ils exister sans ProgramTree ?
         - Non -> transaction commune : les liens font partie intégrante du ProgramTree
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 ## Conclusion (pour Osis)
@@ -444,11 +470,13 @@ def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[Enrollm
     vise une problématique métier trop large
 
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 ## Exercices
 
-Les éléments suivants sont-ils réellement des DomainService ?
-- program_management.ddd.domain.service.has_version_with_greater_end_year.HasVersionWithGreaterEndYear
+Les éléments suivants sont-ils réellement des DomainService ? Pourrait-on s'en passer ? Notre domaine est-il pure et/ou complet ?
+- program_management.ddd.domain.service.has_specific_version_with_greater_end_year.HasSpecificVersionWithGreaterEndYear
 - program_management.ddd.domain.service.get_last_existing_version_name.GetLastExistingVersion
 - program_management.ddd.domain.service.generate_node_code.GenerateNodeCode
 - program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement
