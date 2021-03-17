@@ -27,7 +27,7 @@ import datetime
 
 from django.db import models
 
-from base.business.event_perms import AcademicSessionEvent
+from base.business.academic_calendar import AcademicSessionEvent
 from base.models import offer_year_calendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import number_session, academic_calendar_type
