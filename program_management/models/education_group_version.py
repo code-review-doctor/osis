@@ -45,6 +45,8 @@ def fill_from_past_year(modeladmin, request, queryset):
             to_transition_name=obj.transition_name
         )
         cmds.append(cmd)
+    # TODO restrict year maybe
+    # TODO add bulk fill transition
     result = bulk_fill_program_tree_version_content_service_from_past_year.\
         bulk_fill_program_tree_version_content_from_last_year(cmds)
     modeladmin.message_user(request, "{} programs have been filled".format(len(result)))

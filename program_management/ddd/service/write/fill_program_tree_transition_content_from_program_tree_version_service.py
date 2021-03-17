@@ -67,6 +67,7 @@ def fill_program_tree_transition_content_from_program_tree_version(
         node for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes() if node.is_training()
     ]
     for training in training_nodes:
+        # TODO Should create from to_tree_year
         create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
             CreateProgramTreeTransitionVersionCommand(
                 end_year=to_tree_version.end_year_of_existence,
@@ -126,5 +127,6 @@ def fill_program_tree_transition_content_from_program_tree_version(
             to_year=to_tree_version.program_tree_identity.year
         )
     )
+    # TODO Should copy cms
 
     return identity
