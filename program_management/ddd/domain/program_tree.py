@@ -212,8 +212,6 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._delete_mandatory_children(to_tree.root_node)
-
         self._fill_node_from_node_in_case_of_transition(
             from_tree.root_node,
             to_tree.root_node,
@@ -238,7 +236,13 @@ class ProgramTreeBuilder:
 
         for source_link in links_to_copy:
             child_node_identity = attr.evolve(source_link.child.entity_id, year=to_node.year)
+
             child = self._get_existing_node(existing_nodes, child_node_identity)
+            if relationships.is_mandatory_child(source_link.parent.node_type, source_link.child.node_type):
+                child = self._get_equivalent_mandatory_child(
+                    to_node.children_as_nodes,
+                    source_link.child.node_type
+                ) or child
 
             if source_link.child.is_learning_unit():
                 child = child or source_link.child
@@ -260,7 +264,6 @@ class ProgramTreeBuilder:
             to_node.children.append(copied_link)
 
             if self._can_link_child_be_filled(copied_link, relationships):
-                self._delete_mandatory_children(child)
                 self._fill_node_from_node_in_case_of_transition(
                     source_link.child,
                     child,
@@ -272,10 +275,15 @@ class ProgramTreeBuilder:
 
         return to_node
 
-    def _delete_mandatory_children(self, parent_node: 'Node'):
-        children = parent_node.children_as_nodes
-        for child in children:
-            parent_node.detach_child(child)
+    def _get_equivalent_mandatory_child(
+            self,
+            children: List['Node'],
+            child_type: 'EducationGroupTypesEnum'
+    ) -> Optional['Node']:
+        return next(
+            (child for child in children if child.node_type == child_type),
+            None
+        )
 
     def _can_link_be_copied(self, link: 'Link', year_to_be_copied_to: int) -> bool:
         is_child_end_date_superior_or_equal_to_year_to_be_copied_to = \
