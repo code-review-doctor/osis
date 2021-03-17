@@ -70,6 +70,7 @@ class CreateProgramTreeTransitionVersionCommand(interface.CommandRequest):
     transition_name = attr.ib(type=str)
     title_en = attr.ib(type=str)
     title_fr = attr.ib(type=str)
+    from_year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
