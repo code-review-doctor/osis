@@ -35,11 +35,11 @@ class LearningUnitRepository(interface.AbstractRepository):
 
             requirement_entity_id = EntityVersionDatabase.objects.filter(
                 acronym=entity.responsible_entity.code
-            ).values_list('entity_id', flat=True).first()
+            ).values_list('entity_id', flat=True).get()
 
             academic_year_id = AcademicYearDatabase.objects.filter(
                 year=entity.academic_year.year
-            ).values_list('pk', flat=True).first()
+            ).values_list('pk', flat=True).get()
 
             learning_container_year = LearningContainerYearDatabase.objects.create(
                 acronym=entity.code,
@@ -52,7 +52,7 @@ class LearningUnitRepository(interface.AbstractRepository):
 
             language_id = LanguageDatabase.objects.filter(
                 code=entity.language.iso_code
-            ).values_list('pk', flat=True).first()
+            ).values_list('pk', flat=True).get()
 
             learn_unit_year = LearningUnitYearDatabase.objects.create(
                 learning_unit=learning_unit,
