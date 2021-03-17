@@ -184,34 +184,47 @@ class ProgramTreeBuilder:
             relationships: 'AuthorizedRelationshipList',
             existing_nodes: Set['Node']
     ) -> 'Node':
-        learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
-        group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
+        links_to_copy = (link for link in from_node.children if self._can_link_be_copied(link, to_node.year))
 
-        for learning_unit_link in learning_units_links:
-            child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_node(existing_nodes, child_node_identity) or learning_unit_link.child
-
-            copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
-            to_node.children.append(copied_link)
-
-        for group_year_link in group_year_links:
-            if not group_year_link.child.is_group() and self._is_end_date_inferior_to(group_year_link.child, to_node):
-                continue
-
-            child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
+        for link in links_to_copy:
+            child_node_identity = attr.evolve(link.child.entity_id, year=to_node.year)
             child = self._get_existing_node(existing_nodes, child_node_identity)
-            child = child or node_factory.copy_to_year(group_year_link.child, to_node.year, group_year_link.child.code)
 
-            copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
+            if link.child.is_learning_unit():
+                child = child or link.child
+            else:
+                child = child or node_factory.copy_to_year(link.child, to_node.year, link.child.code)
+
+            copied_link = LinkBuilder().from_link(link, to_node, child)
             to_node.children.append(copied_link)
 
-            if not group_year_link.is_reference() and (
-                    is_empty(child, relationships)
-                    or relationships.is_mandatory_child(to_node.node_type, child.node_type)
-            ):
-                self._fill_node_children_from_node(group_year_link.child, child, relationships, existing_nodes)
+            if self._can_link_child_be_filled(copied_link, relationships):
+                self._fill_node_children_from_node(link.child, child, relationships, existing_nodes)
 
         return to_node
+
+    def _can_link_child_be_filled(self, link: 'Link', relationships: 'AuthorizedRelationshipList') -> bool:
+        if link.child.is_learning_unit():
+            return False
+        elif link.is_reference():
+            return False
+        elif is_empty(link.child, relationships):
+            return True
+        elif relationships.is_mandatory_child(link.parent.node_type, link.child.node_type):
+            return True
+        return False
+
+    def _can_link_be_copied(self, link: 'Link', year_to_be_copied_to: int) -> bool:
+        is_child_end_date_superior_or_equal_to_year_to_be_copied_to = \
+            not link.child.end_date or link.child.end_date >= year_to_be_copied_to
+
+        if is_child_end_date_superior_or_equal_to_year_to_be_copied_to:
+            return True
+        elif link.child.is_group():
+            return True
+        elif link.child.is_learning_unit():
+            return True
+        return False
 
     def fill_transition_from_program_tree(
             self,
@@ -323,6 +336,9 @@ class ProgramTreeBuilder:
 
     def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
         return from_node.end_date and from_node.end_date < to_node.year
+
+    def _is_end_date_superior_equal_to(self, from_node: 'Node', year: int):
+        return from_node.end_date and from_node.end_date >= year
 
     def build_from_orphan_group_as_root(
             self,
