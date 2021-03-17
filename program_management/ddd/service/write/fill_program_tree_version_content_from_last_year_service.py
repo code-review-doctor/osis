@@ -44,7 +44,7 @@ def fill_program_tree_version_content_from_last_year(
     tree_repository = program_tree_repository.ProgramTreeRepository()
     node_repo = node_repository.NodeRepository()
 
-    from_tree_version = tree_version_repository.get(
+    last_year_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
             offer_acronym=cmd.to_offer_acronym,
             year=cmd.to_year - 1,
@@ -65,21 +65,21 @@ def fill_program_tree_version_content_from_last_year(
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
+            for node in last_year_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
 
     existing_learning_unit_nodes = node_repo.search(
         [
             attr.evolve(node.entity_id, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
+            for node in last_year_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
         ]
     )
 
     existing_nodes = [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
 
     ProgramTreeVersionBuilder().fill_from_last_year_program_tree_version(
-        from_tree_version,
+        last_year_tree_version,
         to_tree_version,
         set(existing_nodes),
     )
@@ -89,8 +89,8 @@ def fill_program_tree_version_content_from_last_year(
 
     copy_program_tree_prerequisites_from_program_tree_service.copy_program_tree_prerequisites_from_program_tree(
         CopyProgramTreePrerequisitesFromProgramTreeCommand(
-            from_code=from_tree_version.program_tree_identity.code,
-            from_year=from_tree_version.program_tree_identity.year,
+            from_code=last_year_tree_version.program_tree_identity.code,
+            from_year=last_year_tree_version.program_tree_identity.year,
             to_code=to_tree_version.program_tree_identity.code,
             to_year=to_tree_version.program_tree_identity.year
         )

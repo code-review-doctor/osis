@@ -162,14 +162,14 @@ class ProgramTreeBuilder:
 
     def fill_from_last_year_program_tree(
             self,
-            from_tree: 'ProgramTree',
+            last_year_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
             existing_nodes: Set['Node'],
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._fill_node_children_from_node(
-            from_tree.root_node,
+        self._fill_node_children_based_on_last_year(
+            last_year_tree.root_node,
             to_tree.root_node,
             to_tree.authorized_relationships,
             existing_nodes
@@ -177,29 +177,29 @@ class ProgramTreeBuilder:
 
         return to_tree
 
-    def _fill_node_children_from_node(
+    def _fill_node_children_based_on_last_year(
             self,
-            from_node: 'Node',
+            last_year_node: 'Node',
             to_node: 'Node',
             relationships: 'AuthorizedRelationshipList',
             existing_nodes: Set['Node']
     ) -> 'Node':
-        links_to_copy = (link for link in from_node.children if self._can_link_be_copied(link, to_node.year))
+        links_to_copy = (link for link in last_year_node.children if self._can_link_be_copied(link, to_node.year))
 
-        for link in links_to_copy:
-            child_node_identity = attr.evolve(link.child.entity_id, year=to_node.year)
+        for last_year_link in links_to_copy:
+            child_node_identity = attr.evolve(last_year_link.child.entity_id, year=to_node.year)
             child = self._get_existing_node(existing_nodes, child_node_identity)
 
-            if link.child.is_learning_unit():
-                child = child or link.child
+            if last_year_link.child.is_learning_unit():
+                child = child or last_year_link.child
             else:
-                child = child or node_factory.copy_to_year(link.child, to_node.year, link.child.code)
+                child = child or node_factory.copy_to_next_year(last_year_link.child)
 
-            copied_link = LinkBuilder().from_link(link, to_node, child)
+            copied_link = LinkBuilder().from_link(last_year_link, to_node, child)
             to_node.children.append(copied_link)
 
             if self._can_link_child_be_filled(copied_link, relationships):
-                self._fill_node_children_from_node(link.child, child, relationships, existing_nodes)
+                self._fill_node_children_based_on_last_year(last_year_link.child, child, relationships, existing_nodes)
 
         return to_node
 

@@ -78,13 +78,16 @@ class ProgramTreeVersionBuilder:
 
     def fill_from_last_year_program_tree_version(
             self,
-            from_tree_version: 'ProgramTreeVersion',
+            last_year_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
             existing_nodes: Set['Node'],
     ) -> 'ProgramTreeVersion':
-        validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
+        validators_by_business_action.FillProgramTreeVersionValidatorList(
+            last_year_tree_version,
+            to_tree_version
+        ).validate()
         program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
-            from_tree_version.get_tree(),
+            last_year_tree_version.get_tree(),
             to_tree_version.get_tree(),
             existing_nodes,
         )
