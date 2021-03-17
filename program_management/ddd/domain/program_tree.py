@@ -246,12 +246,12 @@ class ProgramTreeBuilder:
                 new_code = node_code_generator.generate_transition_code(source_link.child.code)
                 child = node_factory.copy_to_year(source_link.child, to_node.year, new_code)
             elif source_link.child.is_training():
-                child = self._get_transition_node(
+                child = self._get_existing_transition_node(
+                    existing_nodes,
                     source_link.child.title,
                     to_node.year,
                     source_link.child.version_name,
-                    transition_name,
-                    existing_nodes
+                    transition_name
                 )
             elif not child:
                 continue
@@ -306,13 +306,13 @@ class ProgramTreeBuilder:
             None
         )
 
-    def _get_transition_node(
+    def _get_existing_transition_node(
             self,
+            existing_nodes: Set['Node'],
             title: str,
             year: int,
             version_name: str,
-            transition_name: str,
-            existing_nodes: Set['Node']
+            transition_name: str
     ) -> 'Node':
         return next(
             node for node in existing_nodes
