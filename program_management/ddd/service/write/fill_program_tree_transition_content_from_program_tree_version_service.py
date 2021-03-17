@@ -28,14 +28,15 @@ from django.db import transaction
 
 from education_group.ddd.service.write import create_group_service
 from program_management.ddd.command import CreateProgramTreeTransitionVersionCommand, \
-    CopyProgramTreePrerequisitesFromProgramTreeCommand, FillProgramTreeTransitionContentFromProgramTreeVersionCommand
+    CopyProgramTreePrerequisitesFromProgramTreeCommand, FillProgramTreeTransitionContentFromProgramTreeVersionCommand, \
+    CopyTreeCmsFromTree
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.domain.service import generate_node_code
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository
 from program_management.ddd.service.write import copy_program_tree_prerequisites_from_program_tree_service, \
-    create_and_postpone_tree_transition_version_service
+    create_and_postpone_tree_transition_version_service, copy_program_tree_cms_from_program_tree_service
 
 
 @transaction.atomic()
@@ -127,6 +128,14 @@ def fill_program_tree_transition_content_from_program_tree_version(
             to_year=to_tree_version.program_tree_identity.year
         )
     )
-    # TODO Should copy cms
+
+    copy_program_tree_cms_from_program_tree_service.copy_program_tree_cms_from_program_tree(
+        CopyTreeCmsFromTree(
+            from_code=from_tree_version.program_tree_identity.code,
+            from_year=from_tree_version.program_tree_identity.year,
+            to_code=to_tree_version.program_tree_identity.code,
+            to_year=to_tree_version.program_tree_identity.year
+        )
+    )
 
     return identity

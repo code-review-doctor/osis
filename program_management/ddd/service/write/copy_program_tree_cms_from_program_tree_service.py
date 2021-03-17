@@ -23,19 +23,18 @@
 #
 ##############################################################################
 from program_management.ddd.business_types import *
-from program_management.ddd.command import CopyTreeCmsFromPastYear
+from program_management.ddd.command import CopyTreeCmsFromTree
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.service import copy_tree_cms
 from program_management.ddd.repositories import program_tree as program_tree_repository
-from program_management.ddd.domain import program_tree
 
 
-def copy_program_tree_cms_from_past_year(cmd: CopyTreeCmsFromPastYear) -> 'ProgramTreeIdentity':
+def copy_program_tree_cms_from_program_tree(cmd: CopyTreeCmsFromTree) -> 'ProgramTreeIdentity':
     tree_repository = program_tree_repository.ProgramTreeRepository()
 
-    tree = tree_repository.get(
-        program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.year)
-    )
+    from_tree = tree_repository.get(program_tree.ProgramTreeIdentity(code=cmd.from_code, year=cmd.from_year))
+    to_tree = tree_repository.get(program_tree.ProgramTreeIdentity(code=cmd.to_code, year=cmd.to_year))
 
-    copy_tree_cms.CopyCms().from_past_year(tree)
+    copy_tree_cms.CopyCms().from_tree(from_tree, to_tree)
 
-    return tree.entity_id
+    return to_tree.entity_id

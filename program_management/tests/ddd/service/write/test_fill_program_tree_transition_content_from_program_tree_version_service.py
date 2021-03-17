@@ -72,6 +72,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         self.mock_current_academic_year()
         self.mock_generate_code()
         self.mock_validation_rule()
+        self.mock_copy_cms()
 
     def create_node_next_years(self):
         nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
@@ -80,6 +81,14 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
                 continue
             next_year_node = node_factory.copy_to_next_year(node)
             self.add_node_to_repo(next_year_node)
+
+    def mock_copy_cms(self):
+        patcher = mock.patch(
+            "program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_tree",
+            side_effect=lambda *args, **kwargs: None
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def mock_generate_code(self):
         patcher = mock.patch(

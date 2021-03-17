@@ -82,7 +82,7 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
 
     def mock_copy_cms(self):
         patcher = mock.patch(
-            "program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_past_year",
+            "program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_tree",
             side_effect=lambda *args, **kwargs: None
         )
         patcher.start()
