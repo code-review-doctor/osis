@@ -203,16 +203,79 @@ class ProgramTreeBuilder:
 
         return to_node
 
-    def _can_link_child_be_filled(self, link: 'Link', relationships: 'AuthorizedRelationshipList') -> bool:
-        if link.child.is_learning_unit():
-            return False
-        elif link.is_reference():
-            return False
-        elif is_empty(link.child, relationships):
-            return True
-        elif relationships.is_mandatory_child(link.parent.node_type, link.child.node_type):
-            return True
-        return False
+    def fill_transition_from_program_tree(
+            self,
+            from_tree: 'ProgramTree',
+            to_tree: 'ProgramTree',
+            existing_nodes: Set['Node'],
+            node_code_generator: 'BGenerateNodeCode'
+    ) -> 'ProgramTree':
+        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
+
+        self._delete_mandatory_children(to_tree.root_node)
+
+        self._fill_node_from_node_in_case_of_transition(
+            from_tree.root_node,
+            to_tree.root_node,
+            to_tree.authorized_relationships,
+            existing_nodes,
+            to_tree.root_node.transition_name,
+            node_code_generator
+        )
+
+        return to_tree
+
+    def _fill_node_from_node_in_case_of_transition(
+            self,
+            from_node: 'Node',
+            to_node: 'Node',
+            relationships: 'AuthorizedRelationshipList',
+            existing_nodes: Set['Node'],
+            transition_name: 'str',
+            node_code_generator: 'BGenerateNodeCode'
+    ) -> 'Node':
+        links_to_copy = (link for link in from_node.children if self._can_link_be_copied(link, to_node.year))
+
+        for source_link in links_to_copy:
+            child_node_identity = attr.evolve(source_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_node(existing_nodes, child_node_identity)
+
+            if source_link.child.is_learning_unit():
+                child = child or source_link.child
+            elif source_link.child.is_group():
+                new_code = node_code_generator.generate_transition_code(source_link.child.code)
+                child = node_factory.copy_to_year(source_link.child, to_node.year, new_code)
+            elif source_link.child.is_training():
+                child = self._get_transition_node(
+                    source_link.child.title,
+                    to_node.year,
+                    source_link.child.version_name,
+                    transition_name,
+                    existing_nodes
+                )
+            elif not child:
+                continue
+
+            copied_link = LinkBuilder().from_link(source_link, to_node, child)
+            to_node.children.append(copied_link)
+
+            if self._can_link_child_be_filled(copied_link, relationships):
+                self._delete_mandatory_children(child)
+                self._fill_node_from_node_in_case_of_transition(
+                    source_link.child,
+                    child,
+                    relationships,
+                    existing_nodes,
+                    transition_name,
+                    node_code_generator
+                )
+
+        return to_node
+
+    def _delete_mandatory_children(self, parent_node: 'Node'):
+        children = parent_node.children_as_nodes
+        for child in children:
+            parent_node.detach_child(child)
 
     def _can_link_be_copied(self, link: 'Link', year_to_be_copied_to: int) -> bool:
         is_child_end_date_superior_or_equal_to_year_to_be_copied_to = \
@@ -226,93 +289,16 @@ class ProgramTreeBuilder:
             return True
         return False
 
-    def fill_transition_from_program_tree(
-            self,
-            from_tree: 'ProgramTree',
-            to_tree: 'ProgramTree',
-            existing_nodes: Set['Node'],
-            node_code_generator: 'BGenerateNodeCode'
-    ) -> 'ProgramTree':
-        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
-
-        self._delete_mandatory_children(to_tree.root_node)
-
-        self._fill_node_children_from_node_in_case_of_transition(
-            from_tree.root_node,
-            to_tree.root_node,
-            to_tree.authorized_relationships,
-            existing_nodes,
-            to_tree.root_node.transition_name,
-            node_code_generator
-        )
-
-        return to_tree
-
-    def _delete_mandatory_children(self, parent_node: 'Node'):
-        children = parent_node.children_as_nodes
-        for child in children:
-            parent_node.detach_child(child)
-
-    def _fill_node_children_from_node_in_case_of_transition(
-            self,
-            from_node: 'Node',
-            to_node: 'Node',
-            relationships: 'AuthorizedRelationshipList',
-            existing_nodes: Set['Node'],
-            transition_name: 'str',
-            node_code_generator: 'BGenerateNodeCode'
-    ) -> 'Node':
-        learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
-        group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
-
-        for learning_unit_link in learning_units_links:
-            child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_node(existing_nodes, child_node_identity) or learning_unit_link.child
-
-            copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
-            to_node.children.append(copied_link)
-
-        for group_year_link in group_year_links:
-            child = None
-            child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
-            if group_year_link.child.is_group():
-                new_code = node_code_generator.generate_transition_code(group_year_link.child.code)
-                child = node_factory.copy_to_year(group_year_link.child, to_node.year, new_code)
-
-            elif group_year_link.child.is_mini_training() and \
-                    not self._is_end_date_inferior_to(group_year_link.child, to_node):
-                child = self._get_existing_node(existing_nodes, child_node_identity)
-
-            elif group_year_link.child.is_training():
-                child = self._get_transition_node(
-                    group_year_link.child.title,
-                    to_node.year,
-                    group_year_link.child.version_name,
-                    transition_name,
-                    existing_nodes
-                )
-
-            if not child:
-                continue
-
-            copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
-            to_node.children.append(copied_link)
-
-            if not group_year_link.is_reference() and (
-                    is_empty(child, relationships)
-                    or relationships.is_mandatory_child(to_node.node_type, child.node_type)
-            ):
-                self._delete_mandatory_children(child)
-                self._fill_node_children_from_node_in_case_of_transition(
-                    group_year_link.child,
-                    child,
-                    relationships,
-                    existing_nodes,
-                    transition_name,
-                    node_code_generator
-                )
-
-        return to_node
+    def _can_link_child_be_filled(self, link: 'Link', relationships: 'AuthorizedRelationshipList') -> bool:
+        if link.child.is_learning_unit():
+            return False
+        elif link.is_reference():
+            return False
+        elif is_empty(link.child, relationships):
+            return True
+        elif relationships.is_mandatory_child(link.parent.node_type, link.child.node_type):
+            return True
+        return False
 
     def _get_existing_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
         return next(
@@ -333,9 +319,6 @@ class ProgramTreeBuilder:
             if not node.is_learning_unit() and node.title == title and node.year == year and
             node.version_name == version_name and node.transition_name == transition_name
         )
-
-    def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
-        return from_node.end_date and from_node.end_date < to_node.year
 
     def _is_end_date_superior_equal_to(self, from_node: 'Node', year: int):
         return from_node.end_date and from_node.end_date >= year
