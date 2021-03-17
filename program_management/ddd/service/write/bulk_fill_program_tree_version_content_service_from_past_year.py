@@ -28,9 +28,12 @@ from typing import List
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
-from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
+from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand, \
+    FillProgramTreeTransitionContentFromProgramTreeVersionCommand
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
-from program_management.ddd.service.write import fill_program_tree_version_content_from_last_year_service
+from program_management.ddd.service.write import fill_program_tree_version_content_from_last_year_service, \
+    fill_program_tree_transition_content_from_program_tree_version_service
 
 
 def bulk_fill_program_tree_version_content_from_last_year(
@@ -39,9 +42,26 @@ def bulk_fill_program_tree_version_content_from_last_year(
     result = []
     for cmd in cmds:
         with contextlib.suppress(BusinessException, MultipleBusinessExceptions, ProgramTreeVersionNotFoundException):
-            result.append(
-                fill_program_tree_version_content_from_last_year_service.
-                fill_program_tree_version_content_from_last_year(cmd)
-            )
+            if cmd.to_transition_name != program_tree_version.NOT_A_TRANSITION:
+                result.append(
+                    fill_program_tree_transition_content_from_program_tree_version_service.
+                    fill_program_tree_transition_content_from_program_tree_version(
+                        FillProgramTreeTransitionContentFromProgramTreeVersionCommand(
+                            from_year=cmd.to_year - 1,
+                            from_version_name=cmd.to_version_name,
+                            from_offer_acronym=cmd.to_offer_acronym,
+                            from_transition_name=cmd.to_transition_name,
+                            to_year=cmd.to_year,
+                            to_version_name=cmd.to_version_name,
+                            to_offer_acronym=cmd.to_offer_acronym,
+                            to_transition_name=cmd.to_transition_name
+                        )
+                    )
+                )
+            else:
+                result.append(
+                    fill_program_tree_version_content_from_last_year_service.
+                    fill_program_tree_version_content_from_last_year(cmd)
+                )
 
     return result
