@@ -2360,10 +2360,10 @@ msgid "Success"
 msgstr "Succès"
 
 msgid "Summary course submission"
-msgstr "Edition fiches descriptives"
+msgstr "Modification fiches descriptives"
 
 msgid "Summary course submission force majeure"
-msgstr "Edition fiches descriptives (cas de force majeure)"
+msgstr "Modification fiches descriptives (cas de force majeure)"
 
 msgid "Suppression"
 msgstr "Suppression"
