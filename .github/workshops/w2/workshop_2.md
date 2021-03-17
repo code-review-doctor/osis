@@ -28,7 +28,6 @@
 ## Cas d'utilisation 1
 ### user story
 En tant qu'utilisateur facultaire, je veux supprimer une UE
-(pour DomainService + domaine "incomplet")
 
 ### business rules
 - Je ne peux pas supprimer l'UE si 
@@ -39,7 +38,6 @@ En tant qu'utilisateur facultaire, je veux supprimer une UE
 ## Cas d'utilisation 2
 ### user story
 En tant qu'utilisateur facultaire, je veux créer un partim
-(pour la dépendance entre aggregatesRoot)
 
 ### business rules
 - Un partim possède les mêmes champs qu'une UE, mais les champs suivants sont hérités de l'UE
@@ -60,7 +58,6 @@ En tant qu'utilisateur facultaire, je veux créer un partim
 ## Cas d'utilisation 3
 ### user story
 En tant qu'utilisateur facultaire, je veux visualiser le nombre d'inscrits à une UE. 
-(pour DomainService)
 ### business rules
 Aucune
 
