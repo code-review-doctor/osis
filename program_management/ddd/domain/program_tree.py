@@ -238,14 +238,14 @@ class ProgramTreeBuilder:
             child_node_identity = attr.evolve(source_link.child.entity_id, year=to_node.year)
 
             child = self._get_existing_node(existing_nodes, child_node_identity)
-            if relationships.is_mandatory_child(source_link.parent.node_type, source_link.child.node_type):
-                child = self._get_equivalent_mandatory_child(
-                    to_node.children_as_nodes,
-                    source_link.child.node_type
-                ) or child
 
             if source_link.child.is_learning_unit():
                 child = child or source_link.child
+            elif relationships.is_mandatory_child(source_link.parent.node_type, source_link.child.node_type):
+                child = self._get_equivalent_mandatory_child(
+                    to_node.children_as_nodes,
+                    source_link.child.node_type
+                )
             elif source_link.child.is_group():
                 new_code = node_code_generator.generate_transition_code(source_link.child.code)
                 child = node_factory.copy_to_year(source_link.child, to_node.year, new_code)

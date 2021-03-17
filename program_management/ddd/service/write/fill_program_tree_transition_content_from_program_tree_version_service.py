@@ -26,7 +26,7 @@
 import attr
 from django.db import transaction
 
-from education_group.ddd.service.write import create_group_service
+from education_group.ddd.service.write import create_group_service, copy_group_service
 from program_management.ddd.command import CreateProgramTreeTransitionVersionCommand, \
     CopyProgramTreePrerequisitesFromProgramTreeCommand, FillProgramTreeTransitionContentFromProgramTreeVersionCommand, \
     CopyTreeCmsFromTree
@@ -91,7 +91,7 @@ def fill_program_tree_transition_content_from_program_tree_version(
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes().union()
+            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
 
@@ -116,10 +116,16 @@ def fill_program_tree_transition_content_from_program_tree_version(
     )
 
     identity = tree_version_repository.update(to_tree_version)
-    tree_repository.create(
-        to_tree_version.get_tree(),
-        create_orphan_group_service=create_group_service.create_orphan_group
-    )
+    if from_tree_version.is_transition:
+        tree_repository.create(
+            to_tree_version.get_tree(),
+            copy_group_service=copy_group_service.copy_group
+        )
+    else:
+        tree_repository.create(
+            to_tree_version.get_tree(),
+            create_orphan_group_service=create_group_service.create_orphan_group
+        )
 
     copy_program_tree_prerequisites_from_program_tree_service.copy_program_tree_prerequisites_from_program_tree(
         CopyProgramTreePrerequisitesFromProgramTreeCommand(
