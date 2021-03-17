@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from dal import autocomplete
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
-from django.db.models import Q
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
@@ -39,19 +35,15 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitDailyManagementEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
-from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
-from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
-    show_error_message_for_form_invalid
+    show_error_message_for_form_invalid, check_formations_impacted_by_update
 from base.views.learning_unit import learning_unit_components
-from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
 from learning_unit.views.utils import learning_unit_year_getter
@@ -196,6 +188,9 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
             display_success_messages(request, _('The learning unit has been updated (with report).'))
         else:
             display_success_messages(request, _('The learning unit has been updated (without report).'))
+        check_formations_impacted_by_update(learning_unit_year.acronym,
+                                            learning_unit_year.academic_year.year,
+                                            request, None)
 
     except ConsistencyError as e:
         error_list = e.error_list

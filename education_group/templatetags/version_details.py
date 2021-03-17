@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from typing import List, Dict
+
 from django import template
 
-from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import version_label
+from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 
 register = template.Library()
 
@@ -37,6 +39,6 @@ def version_details(entity_id: 'NodeIdentity', tree_versions: List['ProgramTreeV
     program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(entity_id)
     for program_tree_version in tree_versions:
         if program_tree_version.program_tree_identity == program_tree_identity:
-            return {"title": " [{}]".format(program_tree_version.title_fr)if program_tree_version.title_fr else None,
-                    "version_label": program_tree_version.version_label}
+            return {"title": " [{}]".format(program_tree_version.title_fr) if program_tree_version.title_fr else None,
+                    "version_label": version_label(program_tree_version.entity_id)}
     return None

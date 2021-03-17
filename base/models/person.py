@@ -139,14 +139,13 @@ class Person(SerializableModel):
         return " ".join([self.last_name or "", self.first_name or ""]).strip()
 
     def __str__(self):
-        return self.get_str(self.first_name, self.middle_name, self.last_name)
+        return self.get_str(self.first_name, self.last_name)
 
     @staticmethod
-    def get_str(first_name, middle_name, last_name):
+    def get_str(first_name, last_name):
         return " ".join([
             ("{},".format(last_name) if last_name else "").upper(),
-            first_name or "",
-            middle_name or ""
+            first_name or ""
         ]).strip()
 
     @cached_property
@@ -163,9 +162,6 @@ class Person(SerializableModel):
         for person_entity in self.personentity_set.all().select_related('entity'):
             entities.append(person_entity.entity)
         return entities
-
-    def get_managed_programs(self):
-        return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
 
     class Meta:
         permissions = (

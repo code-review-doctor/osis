@@ -1,5 +1,5 @@
 import functools
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
@@ -13,6 +13,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version
 from base.utils import operator
 from base.utils.urls import reverse_with_get
+from base.views.common import check_formations_impacted_by_update
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.common import display_success_messages
 from education_group.ddd import command as command_education_group
@@ -27,10 +28,11 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateTrainingVersionCommand
 from program_management.ddd.domain import program_tree_version, exception as program_exception
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_training_version_service
-from program_management.forms import version
+from program_management.forms import version, transition
 
 
 class TrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -40,10 +42,10 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     template_name = "tree_version/training/update.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if self.get_program_tree_version_obj().is_standard_version:
+        if self.get_program_tree_version_obj().is_official_standard:
             redirect_url = reverse('training_update', kwargs={
                 'year': self.get_group_obj().year,
-                'code':  self.get_group_obj().code,
+                'code': self.get_group_obj().code,
                 'title': self.get_training_obj().acronym
             })
             return HttpResponseRedirect(redirect_url)
@@ -51,14 +53,19 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     @transaction.non_atomic_requests
     def get(self, request, *args, **kwargs):
+        version = self.get_program_tree_version_obj()
         context = {
             "training_version_form": self.training_version_form,
             "training_obj": self.get_training_obj(),
-            "training_version_obj": self.get_program_tree_version_obj(),
+            "training_version_obj": version,
             "group_obj": self.get_group_obj(),
             "tabs": self.get_tabs(),
             "cancel_url": self.get_cancel_url(),
-            "is_finality_types": self.get_training_obj().is_finality()
+            "is_finality_types": self.get_training_obj().is_finality(),
+            "version_suffix": (
+                "-{}" if version.entity_id.is_specific_transition else "{}"
+            ).format(version.transition_name),
+            "version_label": version_label(version.entity_id)
         }
         return render(request, self.template_name, context)
 
@@ -69,6 +76,9 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             if not self.training_version_form.errors:
                 self.display_success_messages(version_identities)
                 self.display_delete_messages(version_identities)
+                check_formations_impacted_by_update(self.get_group_obj().code,
+                                                    self.get_group_obj().year,
+                                                    request, self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
@@ -91,7 +101,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 ) % {
                     "link": self.get_url_program_version(identity),
                     "offer_acronym": identity.offer_acronym,
-                    "acronym": identity.version_name,
+                    "acronym": version_label(identity, only_label=True),
                     "academic_year": display_as_academic_year(identity.year)
                 }
             )
@@ -109,7 +119,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
                 "offer_acronym": last_identity.offer_acronym,
-                "acronym": last_identity.version_name,
+                "acronym": version_label(last_identity, only_label=True),
                 "academic_year": display_as_academic_year(self.training_version_form.cleaned_data["end_year"] + 1)
             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
@@ -158,22 +168,37 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
                     offer_acronym=update_command.offer_acronym,
                     year=year,
                     version_name=update_command.version_name,
-                    is_transition=update_command.is_transition
+                    transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
+        except program_exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate as e:
+            self.training_version_form.add_error('end_year', "")
+            self.training_version_form.add_error(
+                None, _("Impossible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": display_as_academic_year(update_command.end_year)
+                }
+            )
         return []
 
     @cached_property
-    def training_version_form(self) -> 'version.UpdateTrainingVersionForm':
+    def training_version_form(self) \
+            -> Union['version.UpdateTrainingVersionForm', 'transition.UpdateTrainingTransitionVersionForm']:
         training_version_identity = self.get_program_tree_version_obj().entity_id
-        return version.UpdateTrainingVersionForm(
-            data=self.request.POST or None,
-            user=self.request.user,
-            year=self.kwargs['year'],
-            training_version_identity=training_version_identity,
-            training_type=self.get_training_obj().type,
-            initial=self._get_training_version_form_initial_values()
-        )
+        form_parameters = self._get_form_parameters(training_version_identity)
+        if training_version_identity.is_transition:
+            return transition.UpdateTrainingTransitionVersionForm(**form_parameters)
+        return version.UpdateTrainingVersionForm(**form_parameters)
+
+    def _get_form_parameters(self, training_version_identity):
+        return {
+            'data': self.request.POST or None,
+            'user': self.request.user,
+            'year': self.kwargs['year'],
+            'training_version_identity': training_version_identity,
+            'training_type': self.get_training_obj().type,
+            'initial': self._get_training_version_form_initial_values()
+        }
 
     @functools.lru_cache()
     def get_training_obj(self) -> 'Training':
@@ -242,6 +267,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         administration_entity_obj = entity_version.find(training_obj.administration_entity.acronym)
 
         form_initial_values = {
+            'transition_name': training_version.transition_name,
             'version_name': training_version.version_name,
             'version_title_fr': training_version.title_fr,
             'version_title_en': training_version.title_en,
@@ -329,7 +355,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             offer_acronym=self.get_program_tree_version_obj().entity_id.offer_acronym,
             version_name=self.get_program_tree_version_obj().entity_id.version_name,
             year=self.get_program_tree_version_obj().entity_id.year,
-            is_transition=self.get_program_tree_version_obj().entity_id.is_transition,
+            transition_name=self.get_program_tree_version_obj().entity_id.transition_name,
 
             title_en=form.cleaned_data["version_title_en"],
             title_fr=form.cleaned_data["version_title_fr"],

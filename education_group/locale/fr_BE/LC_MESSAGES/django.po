@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-06 08:24+0100\n"
+"POT-Creation-Date: 2021-03-04 15:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,6 +15,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#, python-format
+msgid " Are you sure you want to delete %(obj_repr)s ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer  %(obj_repr)s?"
+
+#, python-format
+msgid " Postpone will be apply on all section block \"%(section)s\" ! "
+msgstr ""
+"Le report va être appliqué sur l'entièreté de la section \"%(section)s\" !"
 
 #, python-format
 msgid ""
@@ -53,6 +62,14 @@ msgid "%(start_index)s to %(end_index)s of %(total_counts)s common topics"
 msgstr ""
 "%(start_index)s à %(end_index)s sur %(total_counts)s rubriques communes"
 
+#, python-format
+msgid "%(title)s has been updated (with postpone)"
+msgstr "%(title)s a été mis à jour (avec report)"
+
+#, python-format
+msgid "%(title)s has been updated (without postpone)"
+msgstr "%(title)s a été mis à jour (sans report)"
+
 msgid "ARES ability"
 msgstr "Habilitation ARES"
 
@@ -77,8 +94,38 @@ msgstr "Année académique"
 msgid "Access"
 msgstr "Accès"
 
+msgid "Access based on application"
+msgstr "Accès sur dossier"
+
+msgid "Access based on validation of professional experience"
+msgstr "Accès par valorisation des acquis de l'expérience"
+
 msgid "Access condition"
 msgstr "Condition d'accès"
+
+msgid "Achievement has been created (with postpone)"
+msgstr "Un acquis a été créé (avec report)"
+
+msgid "Achievement has been created (without postpone)"
+msgstr "Un acquis a été créé (sans report)"
+
+msgid "Achievement has been deleted (with postpone)"
+msgstr "Un acquis a été supprimé (avec report)"
+
+msgid "Achievement has been deleted (without postpone)"
+msgstr "Un acquis a été supprimé (sans report)"
+
+msgid "Achievement has been reordered (with postpone)"
+msgstr "Un acquis a été réordonné (avec report)"
+
+msgid "Achievement has been reordered (without postpone)"
+msgstr "Un acquis a été réordonné (sans report)"
+
+msgid "Achievement has been updated (with postpone)"
+msgstr "Un acquis a été mis à jour (avec report)"
+
+msgid "Achievement has been updated (without postpone)"
+msgstr "Un acquis a été mis à jour (sans report)"
 
 msgid "Acronym already exists"
 msgstr "Le sigle existe déjà"
@@ -108,6 +155,15 @@ msgstr "Ajouter le contenu Anglais de ce paragraphe"
 msgid "Add the French content of this paragraph"
 msgstr "Ajouter le contenu Français de ce paragraphe"
 
+msgid "Add/Edit achievement"
+msgstr "Ajouter/Modifier un acquis"
+
+msgid "Add/Modify a line"
+msgstr "Ajouter/Modifier une ligne"
+
+msgid "Add/Update contact"
+msgstr "Ajouter/Modifier un contact"
+
 msgid "Additional info"
 msgstr "Infos complémentaires"
 
@@ -123,9 +179,6 @@ msgstr "Procédures d'admission et d'inscription"
 msgid "Admission exam"
 msgstr "Concours"
 
-msgid "Adults taking up their university training"
-msgstr "Adultes en reprise d'études"
-
 msgid "Alert Message"
 msgstr "Message d'alerte"
 
@@ -140,6 +193,18 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer %(code)s - %(title)s ?"
 #, python-format
 msgid "Are you sure you want to delete %(object)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(object)s ?"
+
+msgid "Are you sure you want to delete a condition ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer une condition ?"
+
+msgid "Are you sure you want to delete an achievement ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer un acquis ?"
+
+msgid "Are you sure you want to modify the order ?"
+msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre ?"
+
+msgid "Are you sure you want to modify the order of a condition?"
+msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre d'une condition ?"
 
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr "Bachelier de la Communauté flamande de Belgique"
@@ -202,9 +267,6 @@ msgstr ""
 "Les conditions d'admission communes peuvent seulement être modifiées par un "
 "gestionnaire en central"
 
-msgid "Common admission conditions have been updated"
-msgstr "Les conditions d'admission communes ont été mises à jour"
-
 msgid "Common admission conditions will be published soon"
 msgstr "Les conditions d'admission communes seront publiées sous peu"
 
@@ -215,6 +277,30 @@ msgid "Common pedagogy informations can only be edited by central manager"
 msgstr ""
 "Les informations pédagogiques communes peuvent seulement être modifiées par "
 "un gestionnaire en central"
+
+msgid "Condition has been created (with postpone)"
+msgstr "Une condition a été créée (avec report)"
+
+msgid "Condition has been created (without postpone)"
+msgstr "Une condition a été créée (sans report)"
+
+msgid "Condition has been removed (with postpone)"
+msgstr "Une condition a été supprimée (avec report)"
+
+msgid "Condition has been removed (without postpone)"
+msgstr "Une condition a été supprimée (sans report)"
+
+msgid "Condition has been reordered (with postpone)"
+msgstr "Une condition a été réordonnée (avec report)"
+
+msgid "Condition has been reordered (without postpone)"
+msgstr "Une condition a été réordonnée (sans report)"
+
+msgid "Condition has been updated (with postpone)"
+msgstr "Une condition a été mise à jour (avec report)"
+
+msgid "Condition has been updated (without postpone)"
+msgstr "Une condition a été mise à jour (sans report)"
 
 msgid "Conditions"
 msgstr "Conditions"
@@ -227,6 +313,24 @@ msgid ""
 "Consistency error in %(academic_year)s: %(fields)s has already been modified"
 msgstr ""
 "Erreur de consistance en %(academic_year)s: %(fields)s a déjà été modifié"
+
+msgid "Contact has been created (with postpone)"
+msgstr "Un contact a été créé (avec report)"
+
+msgid "Contact has been created (without postpone)"
+msgstr "Un contact a été créé (sans report)"
+
+msgid "Contact has been removed (with postpone)"
+msgstr "Un contact a été supprimé (avec report)"
+
+msgid "Contact has been removed (without postpone)"
+msgstr "Un contact a été supprimé (sans report)"
+
+msgid "Contact has been updated (with postpone)"
+msgstr "Un contact a été mis à jour (avec report)"
+
+msgid "Contact has been updated (without postpone)"
+msgstr "Un contact a été mis à jour (sans report)"
 
 msgid "Contacts"
 msgstr "Contacts"
@@ -270,6 +374,21 @@ msgstr "Inscription par défaut aux cours"
 msgid "Delete"
 msgstr "Supprimer"
 
+msgid "Delete a condition"
+msgstr "Supprimer une condition"
+
+msgid "Delete achievement"
+msgstr "Supprimer un acquis"
+
+msgid "Delete and postpone"
+msgstr "Supprimer et reporter"
+
+msgid "Delete and postpone changes on next years"
+msgstr "Supprimer et reporter les changements sur les années futures"
+
+msgid "Delete contact"
+msgstr "Supprimer un contact"
+
 msgid "Deliberation"
 msgstr "Délibération"
 
@@ -288,6 +407,9 @@ msgstr "Mémoire"
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
+msgid "Down"
+msgstr "Bas"
+
 msgid "Duration"
 msgstr "Durée"
 
@@ -299,6 +421,9 @@ msgstr "Année académique de fin"
 
 msgid "End year must be greater than or equal to the start year"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
+
+msgid "English"
+msgstr "Anglais"
 
 msgid "English comment"
 msgstr "Commentaire en anglais"
@@ -315,6 +440,12 @@ msgstr "Entrez le texte à rechercher"
 msgid "Entity"
 msgstr "Entité"
 
+msgid "Entity has been updated (with postpone)"
+msgstr "Entité a été modifiée (avec report)"
+
+msgid "Entity has been updated (without postpone)"
+msgstr "Entité a été modifiée (sans report)"
+
 msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 "Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
@@ -328,6 +459,12 @@ msgstr "Gestionnaire facultaire"
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
+msgid ""
+"For formation PhD the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+msgstr ""
+"Pour les formations doctorales les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou "
+"tous les champs ARES doivent être vides"
+
 msgid "For all students"
 msgstr "Pour tous les étudiants"
 
@@ -336,6 +473,9 @@ msgstr "Bacheliers étrangers"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
+
+msgid "French"
+msgstr "Français"
 
 msgid "French language proficiency examination"
 msgstr "Maîtrise de la langue française"
@@ -361,14 +501,11 @@ msgstr "Financement coopération internationale CCD/CUD"
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
-msgid "General Conditions"
-msgstr "Conditions Générales"
+msgid "General Access Requirements"
+msgstr "Conditions d'accès générales"
 
 msgid "General informations"
 msgstr "Infos générales"
-
-msgid "General informations have been updated"
-msgstr "Les informations générales ont été mises à jour"
 
 msgid "Graduates"
 msgstr "Diplômés"
@@ -515,6 +652,12 @@ msgstr ""
 msgid "Modification"
 msgstr "Modification"
 
+msgid "Modify order achievement"
+msgstr "Modifier l'ordre des acquis"
+
+msgid "Modify order of condition"
+msgstr "Modifier l'ordre d'une condition"
+
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr "Plusieurs entités '{entity_acronym}' trouvées pour l'année {year}"
@@ -564,12 +707,15 @@ msgstr "Intitulé partiel en anglais"
 msgid "Partial title in French"
 msgstr "Intitulé partiel en français"
 
-msgid "Personalized access"
-msgstr "Accès personnalisé"
-
 msgid "Please enter an academic year greater or equal to group start year."
 msgstr ""
 "Veuillez choisir une année académique plus grande ou équale à celle de début"
+
+msgid "Postpone will be apply on all achievement block !"
+msgstr "Le report va être appliqué sur l'entièreté des acquis !"
+
+msgid "Postpone will be apply on all block contact !"
+msgstr "Le report va être appliqué sur l'entièreté des contacts !"
 
 msgid "Primary language"
 msgstr "Langue principale"
@@ -607,6 +753,15 @@ msgstr "Remarque"
 msgid "Remarks"
 msgstr "Remarques"
 
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Save and postpone"
+msgstr "Enregistrer et reporter"
+
+msgid "Save and postpone changes on next years"
+msgstr "Enregistrer et reporter les changements sur les années futures"
+
 msgid "Schedule type"
 msgstr "Type horaire"
 
@@ -625,14 +780,11 @@ msgstr "Session"
 msgid "Signatory qualification"
 msgstr "Qualification du signataire"
 
-msgid "Special Conditions"
-msgstr "Conditions spéciales"
+msgid "Special Requirements to access some programmes"
+msgstr "Conditions particulières d’accès à certains programmes"
 
-msgid "Specific Conditions"
-msgstr "Conditions Particulières"
-
-msgid "Specific admission requirements"
-msgstr "Conditions spécifiques d'admission"
+msgid "Specific Access Requirements"
+msgstr "Conditions d’accès spécifiques"
 
 msgid "Stage"
 msgstr "Stage"
@@ -648,6 +800,16 @@ msgstr "Année académique de début"
 
 msgid "Status"
 msgstr "Statut"
+
+msgid "The additional informations has been updated (with postpone)"
+msgstr ""
+"Les informations supplémentaires ont été sauvegardées avec succès (avec "
+"report)"
+
+msgid "The additional informations has been updated (without postpone)"
+msgstr ""
+"Les informations supplémentaires ont été sauvegardées avec succès (sans "
+"report)"
 
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir qu'une seule valeur."
@@ -693,6 +855,12 @@ msgid ""
 msgstr ""
 "La mini-formation {abbreviated_title} ({academic_year}) contient des "
 "liaisons dans l'application EPC"
+
+msgid "The program aim has been updated (with postpone)"
+msgstr "L’objectif du programme a été mis à jour avec succès (avec report)"
+
+msgid "The program aim has been updated (without postpone)"
+msgstr "L’objectif du programme a été mis à jour avec succès (sans report)"
 
 msgid ""
 "The scope of the user is limited and prevents this action to be performed"
@@ -825,8 +993,17 @@ msgstr "Bacheliers universitaires"
 msgid "University certificate"
 msgstr "Certificat universitaire"
 
+msgid "Up"
+msgstr "Haut"
+
+msgid "Update"
+msgstr "Modifier"
+
 msgid "Update Training"
 msgstr "Modifier Formation"
+
+msgid "Update entity"
+msgstr "Modifier l'entité"
 
 msgid "User"
 msgstr "Utilisateur"
@@ -919,6 +1096,9 @@ msgstr "commentaire (interne)"
 
 msgid "credits"
 msgstr "crédits"
+
+msgid "delete"
+msgstr "supprimer"
 
 msgid "dissertation"
 msgstr "mémoire"

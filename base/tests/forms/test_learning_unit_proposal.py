@@ -31,7 +31,8 @@ from django.test import TestCase
 from base.forms.learning_unit import learning_unit_create_2
 from base.forms.learning_unit_proposal import ProposalBaseForm
 from base.forms.proposal import learning_unit_proposal
-from base.models import proposal_learning_unit, academic_year as academic_year_mdl
+from base.models import proposal_learning_unit
+from base.models.academic_year import AcademicYear
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
@@ -39,7 +40,7 @@ from base.models.enums.entity_type import SCHOOL
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -48,8 +49,12 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, FacultyManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
@@ -67,7 +72,7 @@ class TestSave(TestCase):
             AcademicYearFactory(year=cls.current_academic_year.year - 10),
             AcademicYearFactory(year=cls.current_academic_year.year + 10)
         )
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars(cls.academic_years)
         today = datetime.date.today()
         cls.an_entity = EntityFactory(organization=cls.an_organization)
         cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.FACULTY,
@@ -298,36 +303,32 @@ class TestSave(TestCase):
 
     def test_academic_year_range_creation_proposal_central_manager(self):
         FrenchLanguageFactory()
-        central_manager = CentralManagerForUEFactory()
+        central_manager = CentralManagerFactory(entity=self.an_entity).person
         form = learning_unit_create_2.FullForm(
             central_manager,
             self.learning_unit_year.academic_year,
             start_year=self.learning_unit_year.academic_year,
             proposal_type=ProposalType.CREATION.name
         )
+        target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
         self.assertCountEqual(
             list(form.fields['academic_year'].queryset),
-            list(academic_year_mdl.find_academic_years(
-                start_year=self.current_academic_year.year,
-                end_year=self.current_academic_year.year + 6
-            ))
+            list(AcademicYear.objects.filter(year__in=target_years_opened))
         )
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
         FrenchLanguageFactory()
-        faculty_manager = FacultyManagerForUEFactory()
+        faculty_manager = FacultyManagerFactory(entity=self.an_entity).person
         form = learning_unit_create_2.FullForm(
             faculty_manager,
             self.learning_unit_year.academic_year,
             start_year=self.learning_unit_year.academic_year,
             proposal_type=ProposalType.CREATION.name
         )
+        target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
         self.assertCountEqual(
             list(form.fields['academic_year'].queryset),
-            list(academic_year_mdl.find_academic_years(
-                start_year=self.current_academic_year.year + 1,
-                end_year=self.current_academic_year.year + 6
-            ))
+            list(AcademicYear.objects.filter(year__in=target_years_opened))
         )
 
 
@@ -340,8 +341,6 @@ def build_initial_data(learning_unit_year, entity):
             "container_type": learning_unit_year.learning_container_year.container_type,
             "team": learning_unit_year.learning_container_year.team,
             "common_title_english": learning_unit_year.learning_container_year.common_title_english,
-            "is_vacant": learning_unit_year.learning_container_year.is_vacant,
-            "type_declaration_vacant": learning_unit_year.learning_container_year.type_declaration_vacant,
             "requirement_entity": entity.id,
             "allocation_entity": entity.id,
             "additional_entity_1": None,
@@ -361,8 +360,8 @@ def build_initial_data(learning_unit_year, entity):
             "quadrimester": learning_unit_year.quadrimester,
             "specific_title_english": learning_unit_year.specific_title_english,
             "professional_integration": learning_unit_year.professional_integration,
-            "attribution_procedure": learning_unit_year.attribution_procedure,
             "other_remark": learning_unit_year.other_remark,
+            'other_remark_english': learning_unit_year.other_remark_english,
             "faculty_remark": learning_unit_year.faculty_remark,
         },
         "learning_unit": {
@@ -378,10 +377,22 @@ def build_initial_data(learning_unit_year, entity):
 class TestProposalLearningUnitFilter(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = AcademicYearFactory.produce(None, 2, 5)
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        cls.academic_years = AcademicYearFactory.produce(create_current_academic_year().year, 2, 5)
+        generate_proposal_calendars(cls.academic_years)
+        cls.central_manager = CentralManagerFactory().person
+        cls.faculty_manager = FacultyManagerFactory().person
 
-    def test_initial_value_with_entity_subordinated(self):
+    def test_initial_value_with_entity_subordinated_central_manager(self):
+        self.client.force_login(self.central_manager.user)
+        proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
+        self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
+        self.assertEqual(
+            proposal_filter.form.fields['academic_year'].initial,
+            self.academic_years[3]  # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
+        )
+
+    def test_initial_value_with_entity_subordinated_faculty_manager(self):
+        self.client.force_login(self.faculty_manager.user)
         proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
         self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
         self.assertEqual(

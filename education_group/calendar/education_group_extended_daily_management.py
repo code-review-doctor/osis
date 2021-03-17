@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventCalendarHelper
+from base.business.academic_calendar import AcademicEventCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
@@ -40,13 +40,12 @@ class EducationGroupExtendedDailyManagementCalendar(AcademicEventCalendarHelper)
         academic_years = AcademicYear.objects.min_max_years(current_academic_year.year, current_academic_year.year + 6)
 
         for ac_year in academic_years:
-            AcademicCalendar.objects.update_or_create(
+            AcademicCalendar.objects.get_or_create(
                 reference=cls.event_reference,
                 data_year=ac_year,
                 defaults={
                     "title": "Gestion journalière étendue - catalogue",
                     "start_date": datetime.date(ac_year.year - 6, 9, 15),
                     "end_date": None,
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

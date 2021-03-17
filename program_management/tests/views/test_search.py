@@ -45,9 +45,11 @@ from base.tests.factories.user import UserFactory
 from base.utils.cache import RequestCache
 from education_group.tests.factories.group import GroupFactory as EducationGroupGroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.forms.education_groups import GroupFilter, STANDARD, PARTICULAR
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, create_with_version
+    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, \
+    create_with_version
 
 URL_EDUCATION_GROUPS = "version_program"
 SEARCH_TEMPLATE = "search.html"
@@ -239,13 +241,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertEqual(context["object_list_count"], 0)
-
-    def test_initial_form_data(self):
-        response = self.client.get(self.url)
-
-        form = response.context["form"]
-        self.assertEqual(form.fields["academic_year"].initial, self.current_academic_year)
-        self.assertEqual(form.fields["category"].initial, education_group_categories.TRAINING)
 
     def test_with_empty_search_result(self):
         response = self.client.get(self.url, data={"category": education_group_categories.MINI_TRAINING})
@@ -493,13 +488,13 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
         cls.particular_egv_1 = EducationGroupVersionFactory(root_group=cls.particular_group_yr_1,
                                                             offer=cls.egy,
                                                             version_name='CMES-1',
-                                                            is_transition=False)
+                                                            transition_name=NOT_A_TRANSITION)
 
         cls.particular_group_yr_2 = GroupYearFactory(group=group_transition,
                                                      academic_year=cls.current_academic_year)
         cls.particular_egv_2 = EducationGroupVersionFactory(root_group=cls.particular_group_yr_2,
                                                             offer=cls.egy, version_name='CMES-2',
-                                                            is_transition=False)
+                                                            transition_name=NOT_A_TRANSITION)
 
         # Transition of particular
         group_transition_particular_group_yr_2 = EducationGroupGroupFactory(start_year=cls.current_academic_year)

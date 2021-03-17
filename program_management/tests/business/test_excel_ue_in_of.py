@@ -65,6 +65,7 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -740,5 +741,5 @@ class TestXlsContent(TestCase):
 def _assert_format_title(tree: 'ProgramTree', tree_version: 'ProgramTreeVersion') -> str:
     return "{}{}".format(
         tree.root_node.title,
-        tree_version.version_label
+        version_label(tree_version.entity_id)
     ) if tree_version else tree.root_node.title

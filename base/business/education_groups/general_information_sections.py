@@ -24,13 +24,16 @@
 #
 ##############################################################################
 from collections import namedtuple
+from typing import Union, List
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from education_group.models.group_year import GroupYear
 
 SKILLS_AND_ACHIEVEMENTS = 'comp_acquis'
 PEDAGOGY = 'pedagogie'
@@ -125,12 +128,12 @@ SECTION_LIST = [
 COMMON_TYPE_ADMISSION_CONDITIONS = {
     TrainingType.BACHELOR.name:
         ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
-         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales',),
+         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', 'free',),
     TrainingType.AGGREGATION.name:
         ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr',
          'ca_allegement', 'ca_ouv_adultes',),
     TrainingType.PGRM_MASTER_120.name:
-        ('alert_message', 'non_university_bachelors', 'adults_taking_up_university_training',
+        ('alert_message', 'ca_cond_generales', 'non_university_bachelors', 'adults_taking_up_university_training',
          'personalized_access', 'admission_enrollment_procedures',),
     TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales',)
 }
@@ -610,3 +613,15 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [AGREGATION, CAAP, PREREQUISITE, COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION, ]
     }
 }
+
+
+def can_postpone_general_information(obj: Union['EducationGroupYear', 'GroupYear']) -> bool:
+    return not obj.academic_year.is_past
+
+
+def get_general_information_labels() -> List[str]:
+    result = []
+    for section in SECTION_LIST:
+        result.extend(section.labels)
+
+    return result

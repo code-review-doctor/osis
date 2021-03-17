@@ -68,12 +68,10 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_ac_year.year)
 
         cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.current_ac_year,
             data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
         cls.academic_calendar_force_majeure = OpenAcademicCalendarFactory(
-            academic_year=cls.current_ac_year,
             data_year=cls.current_ac_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
         )
@@ -123,8 +121,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
-    @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
-    def test_list_my_attributions_summary_editable_after_period(self, mock_is_open):
+    def test_list_my_attributions_summary_editable_after_period(self):
         self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
         self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
         self.academic_calendar.save()
@@ -132,7 +129,6 @@ class ManageMyCoursesViewTestCase(TestCase):
         next_calendar = AcademicCalendarFactory(
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
-            academic_year=self.ac_year_in_future[1],
             data_year=self.ac_year_in_future[1],
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
@@ -152,8 +148,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             msg[0].get('message'),
             _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
                 "data_year": self.academic_calendar.data_year,
-                "end_date": (self.academic_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                "end_date": self.academic_calendar.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
@@ -174,7 +169,6 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.academic_calendar.save()
 
         AcademicCalendarFactory(
-            academic_year=self.ac_year_in_future[1],
             data_year=self.ac_year_in_future[1],
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
         )
@@ -192,11 +186,11 @@ class ManageMyCoursesViewTestCase(TestCase):
         response = self.client.get(self.url)
         context = response.context
         self.assertTrue(context['event_perm_force_majeure_open'])
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_start_date'],
             self.academic_calendar_force_majeure.start_date
         )
-        self.assertEquals(
+        self.assertEqual(
             context['event_perm_force_majeure_end_date'],
             self.academic_calendar_force_majeure.end_date
         )
@@ -208,8 +202,7 @@ class ManageMyCoursesViewTestCase(TestCase):
                 "start_date":
                     self.academic_calendar_force_majeure.start_date.strftime('%d/%m/%Y'),
                 "end_date":
-                    (self.academic_calendar_force_majeure.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                    self.academic_calendar_force_majeure.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.WARNING)
@@ -357,13 +350,11 @@ class ManageMyCoursesMixin(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
             data_year=cls.current_academic_year,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         )
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.academic_year_in_future,
             data_year=cls.academic_year_in_future,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         )

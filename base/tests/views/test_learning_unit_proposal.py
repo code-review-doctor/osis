@@ -52,8 +52,8 @@ from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, organization as organization_factory, \
     person as person_factory
-from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
-    generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_proposal_calendars, \
+    generate_proposal_calendars_without_start_and_end_date
 from base.tests.factories.academic_year import create_current_academic_year, \
     AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -86,10 +86,12 @@ LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 class TestLearningUnitModificationProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AcademicYearFactory.produce(number_past=3, number_future=10)
+        academic_years = AcademicYearFactory.produce(number_past=3, number_future=10)
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
+        generate_proposal_calendars_without_start_and_end_date(academic_years)
+
         cls.entity_version = EntityVersionFactory(
             entity__organization=an_organization,
             entity_type=entity_type.FACULTY,
@@ -162,9 +164,6 @@ class TestLearningUnitModificationProposal(TestCase):
             year=cls.learning_unit_year.academic_year.year - 1)
 
     def setUp(self):
-        self.open_event_patcher = mock.patch("base.business.event_perms.EventPerm.is_open", return_value=True)
-        self.mocked_open_event = self.open_event_patcher.start()
-        self.addCleanup(self.open_event_patcher.stop)
         self.client.force_login(self.person.user)
 
     def test_user_not_logged(self):
@@ -235,7 +234,6 @@ class TestLearningUnitModificationProposal(TestCase):
         expected_initial_data_fields = {
             'learning_container_year': [
                 "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
-                "is_vacant", "type_declaration_vacant",
                 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
             ],
             'learning_unit': [
@@ -244,7 +242,7 @@ class TestLearningUnitModificationProposal(TestCase):
             'learning_unit_year': [
                 "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
                 "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester",
-                "session", "attribution_procedure", "faculty_remark", "other_remark",
+                "session", "faculty_remark", "other_remark", "other_remark_english"
             ],
             'learning_component_year': [
                 "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
@@ -272,7 +270,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         cls.current_academic_year = cls.academic_years[4]
         cls.next_academic_year = cls.academic_years[5]
         cls.previous_academic_year = cls.academic_years[3]
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars(cls.academic_years)
 
         cls.entity_version = EntityVersionFactory(
             entity__organization=an_organization,
@@ -333,13 +331,9 @@ class TestLearningUnitSuppressionProposal(TestCase):
         }
 
     def setUp(self):
-        self.open_event_patcher = mock.patch("base.business.event_perms.EventPerm.is_open", return_value=True)
-        self.mocked_open_event = self.open_event_patcher.start()
-        self.addCleanup(self.open_event_patcher.stop)
         self.client.force_login(self.person.user)
 
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_get_request(self, mock_is_open):
+    def test_get_request(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -362,8 +356,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         self.assertEqual(form_proposal.fields['folder_id'].initial, None)
         self.assertEqual(form_proposal.fields['entity'].initial, None)
 
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_get_request_first_year_of_UE(self, mock_is_open):
+    def test_get_request_first_year_of_UE(self):
         url = reverse(learning_unit_suppression_proposal, args=[self.previous_learning_unit_year.id])
         response = self.client.get(url)
         redirected_url = reverse("learning_unit", args=[self.previous_learning_unit_year.id])
@@ -374,15 +367,13 @@ class TestLearningUnitSuppressionProposal(TestCase):
             _("You cannot put in proposal for ending date on the first year of the learning unit.")
         )
 
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_get_request_on_UE_with_end_date(self, mock_is_open):
+    def test_get_request_on_UE_with_end_date(self):
         self.learning_unit.end_year = self.next_academic_year
         self.learning_unit.save()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_get_request_academic_year_list_in_form_for_central_manager(self, mock_is_open):
+    def test_get_request_academic_year_list_in_form_for_central_manager(self):
         person_factory.add_person_to_groups(self.person, [groups.CENTRAL_MANAGER_GROUP])
         response = self.client.get(self.url)
         self.assertCountEqual(
@@ -390,8 +381,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
             list(self.academic_year_for_suppression_proposal)
         )
 
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_post_request(self, mock_is_open):
+    def test_post_request(self):
         response = self.client.post(self.url, data=self.form_data)
 
         redirected_url = reverse("learning_unit", args=[self.learning_unit_year.id])
@@ -545,7 +535,8 @@ class TestGroupActionsOnProposals(TestCase):
 class TestLearningUnitProposalCancellation(TestCase):
     @classmethod
     def setUpTestData(cls):
-        create_current_academic_year()
+        academic_year = create_current_academic_year()
+        generate_proposal_calendars_without_start_and_end_date([academic_year])
         cls.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         cls.learning_unit_year = cls.learning_unit_proposal.learning_unit_year
         cls.person = FacultyManagerFactory(
@@ -763,8 +754,7 @@ class TestEditProposal(TestCase):
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.current_academic_year = cls.academic_years[0]
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
-        generate_modification_transformation_proposal_calendars(cls.academic_years)
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars(cls.academic_years)
         cls.language = FrenchLanguageFactory()
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
@@ -1102,6 +1092,7 @@ class TestCreationProposalCancel(TestCase):
         a_proposal = _create_proposal_learning_unit("LOSIS1211")
         luy = a_proposal.learning_unit_year
         url = reverse('learning_unit_cancel_proposal', args=[luy.id])
+        generate_proposal_calendars_without_start_and_end_date([luy.academic_year])
 
         self.central_manager = CentralManagerFactory(entity=luy.learning_container_year.requirement_entity)
         self.client.force_login(self.central_manager.person.user)

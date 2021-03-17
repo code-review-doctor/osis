@@ -36,6 +36,8 @@ from django.utils.translation import gettext_lazy as _
 from openpyxl import load_workbook
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_units.xls_generator import generate_xls_teaching_material
+from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.models.enums import academic_calendar_type, entity_type
 from base.models.enums import organization_type
 from base.models.enums.learning_unit_year_subtypes import FULL
@@ -56,8 +58,6 @@ from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, LearningUnitYearTranslatedTextFactory
-from base.business.learning_units.xls_generator import generate_xls_teaching_material
-from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
@@ -74,7 +74,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             cls.old_academic_year
         ).academic_years[0]
         AcademicCalendarFactory(
-            academic_year=cls.previous_academic_year,
+            data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
@@ -188,7 +188,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         cls.next_academic_year = cls.academic_years[5]
         cls.previous_academic_year = cls.academic_years[4]
         AcademicCalendarFactory(
-            academic_year=cls.previous_academic_year,
+            data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
@@ -329,7 +329,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         AcademicCalendarFactory(
-            academic_year=cls.previous_academic_year,
+            data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION

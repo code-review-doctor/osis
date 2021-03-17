@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.common import remove_from_session
+from base.business.list.ue_utilizations import create_xls_ue_utilizations_with_one_training_per_line
 
 
 class SearchTypes(Enum):
@@ -134,14 +135,7 @@ def _create_xls_comparison(view_obj, context, **response_kwargs):
 
 
 def _create_xls_with_parameters(view_obj, context, **response_kwargs):
-    user = view_obj.request.user
-    luys = context["filter"].qs
-    filters = _get_filter(context["form"], view_obj.search_type)
-    other_params = {
-        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
-        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
-    }
-    return create_xls_with_parameters(user, luys, filters, other_params)
+    return _create_ue_list_with_parameters(context, view_obj)
 
 
 def _create_xls_attributions(view_obj, context, **response_kwargs):
@@ -156,6 +150,29 @@ def _create_xls_proposal_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["filter"].qs
     for luy in luys:
-        learning_unit_year_with_context.append_latest_entities(luy, service_course_search=False)
+        learning_unit_year_with_context.append_latest_entities(luy)
     filters = _get_filter(context["form"], view_obj.search_type)
     return create_xls_proposal_comparison(user, luys, filters)
+
+
+def _create_xls_ue_utilizations_with_one_training_per_line(view_obj, context, **response_kwargs):
+    filters = _get_filter(context["form"], view_obj.search_type)
+    return create_xls_ue_utilizations_with_one_training_per_line(view_obj.request.user,
+                                                                 context["filter"].qs,
+                                                                 filters
+                                                                 )
+
+
+def _create_ue_list_with_parameters(context, view_obj, is_external_ue_list=False):
+    user = view_obj.request.user
+    luys = context["filter"].qs
+    filters = _get_filter(context["form"], view_obj.search_type)
+    other_params = {
+        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
+        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
+    }
+    return create_xls_with_parameters(user, luys, filters, other_params, is_external_ue_list)
+
+
+def _create_xls_external_ue_with_parameters(view_obj, context, **response_kwargs):
+    return _create_ue_list_with_parameters(context, view_obj, is_external_ue_list=True)

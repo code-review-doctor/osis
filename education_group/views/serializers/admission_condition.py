@@ -78,7 +78,7 @@ def __format_admission_condition(admission_condition):
 def __default_admission_condition():
     return {
         'admission_requirements': {
-            'label_translated': _('Specific admission requirements'),
+            'label_translated': _('Specific Access Requirements'),
             'text_fr': '',
             'text_en': ''
         },
@@ -93,12 +93,12 @@ def __default_admission_condition():
             'text_en': ''
         },
         'adults_taking_up_university_training': {
-            'label_translated': _('Adults taking up their university training'),
+            'label_translated': _('Access based on validation of professional experience'),
             'text_fr': '',
             'text_en': ''
         },
         'personalized_access': {
-            'label_translated': _('Personalized access'),
+            'label_translated': _('Access based on application'),
             'text_fr': '',
             'text_en': ''
         },
@@ -180,6 +180,8 @@ def get_common_admission_condition(offer_type: str, year: int):
             personalized_access_en=F('text_personalized_access_en'),
             admission_enrollment_procedures_fr=F('text_admission_enrollment_procedures'),
             admission_enrollment_procedures_en=F('text_admission_enrollment_procedures_en'),
+            specific_condition_requirements_fr=F('text_free'),
+            specific_condition_requirements_en=F('text_free_en')
         ).values(
             'alert_message_fr',
             'alert_message_en',
@@ -205,6 +207,8 @@ def get_common_admission_condition(offer_type: str, year: int):
             'personalized_access_en',
             'admission_enrollment_procedures_fr',
             'admission_enrollment_procedures_en',
+            'specific_condition_requirements_fr',
+            'specific_condition_requirements_en'
         ).get()
     except AdmissionCondition.DoesNotExist:
         return __default_common_admission_condition()
@@ -219,12 +223,12 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'general_conditions': {
-            'label_translated': _('General Conditions'),
+            'label_translated': _('General Access Requirements'),
             'text_fr': '',
             'text_en': ''
         },
         'specific_conditions': {
-            'label_translated': _('Specific Conditions'),
+            'label_translated': _('Access based on validation of professional experience'),
             'text_fr': '',
             'text_en': ''
         },
@@ -234,7 +238,7 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'special_conditions': {
-            'label_translated': _('Special Conditions'),
+            'label_translated': _('Special Requirements to access some programmes'),
             'text_fr': '',
             'text_en': ''
         },
@@ -259,17 +263,22 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'adults_taking_up_university_training': {
-            'label_translated': _('Adults taking up their university training'),
+            'label_translated': _('Access based on validation of professional experience'),
             'text_fr': '',
             'text_en': ''
         },
         'personalized_access': {
-            'label_translated': _('Personalized access'),
+            'label_translated': _('Access based on application'),
             'text_fr': '',
             'text_en': ''
         },
         'admission_enrollment_procedures': {
             'label_translated': _('Admission and Enrolment Procedures for general registration'),
+            'text_fr': '',
+            'text_en': ''
+        },
+        'specific_condition_requirements': {
+            'label_translated': _('Specific Access Requirements'),
             'text_fr': '',
             'text_en': ''
         }

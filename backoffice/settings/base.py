@@ -238,6 +238,7 @@ MAIL_SENDER_CLASSES = os.environ.get(
     'MAIL_SENDER_CLASSES',
     'osis_common.messaging.mail_sender_classes.MessageHistorySender'
 ).split()
+ACADEMIC_CALENDAR_REMINDER_EMAILS = os.environ.get('ACADEMIC_CALENDAR_REMINDER_EMAILS', '').split()
 
 # Authentication settings
 LOGIN_URL = os.environ.get('LOGIN_URL', reverse_lazy('login'))
@@ -319,6 +320,19 @@ CKEDITOR_CONFIGS = {
             {'name': 'about', 'items': ['About']},
         ],
         'autoParagraph': False
+    },
+    'link_only': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Link', 'Unlink'],
+        ],
+    },
+    'comment_link_only': {
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Link', 'Unlink'],
+        ],
+        'height': 75
     },
 }
 
@@ -410,6 +424,14 @@ ESB_GEOCODING_ENDPOINT = os.environ.get('ESB_GEOCODING_ENDPOINT')
 ESB_ENTITIES_HISTORY_ENDPOINT = os.environ.get('ESB_ENTITIES_HISTORY_ENDPOINT')
 ESB_ENTITY_ADDRESS_ENDPOINT = os.environ.get('ESB_ENTITY_ADDRESS_ENDPOINT')
 
+# EPC Configuration
+EPC_API_URL = os.environ.get('EPC_API_URL')
+EPC_API_USER = os.environ.get('EPC_API_USER')
+EPC_API_PASSWORD = os.environ.get('EPC_API_PASSWORD')
+EPC_ATTRIBUTIONS_TUTOR_ENDPOINT = os.environ.get(
+    'EPC_ATTRIBUTIONS_TUTOR_ENDPOINT', "resources/AllocationCharges/tutors/{global_id}/{year}"
+)
+
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
 # Selenium Testing
@@ -499,3 +521,10 @@ MAPBOX = {
         'https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js',
     ).split(' '),
 }
+
+LDAP_ACCOUNT_CREATION_URL = os.environ.get("LDAP_ACCOUNT_CREATION_URL", "")
+LDAP_ACCOUNT_CONFIGURATION_URL = os.environ.get("LDAP_ACCOUNT_CONFIGURATION_URL", "")
+INTERNSHIP_SCORE_ENCODING_URL = os.environ.get("INTERNSHIP_SCORE_ENCODING_URL", "")
+CONTINUING_EDUCATION_STUDENT_PORTAL_URL = os.environ.get("CONTINUING_EDUCATION_STUDENT_PORTAL_URL", "")
+
+SCHEDULE_APP_URL = os.environ.get("SCHEDULE_APP_URL", "")

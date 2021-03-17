@@ -47,7 +47,7 @@
 
 {% block header_content %}
     <div class="page-header">
-        <h2>{{ group_obj.abbreviated_title }} {% if version.version_label %} {{ version.version_label }} {% endif %}- {{ group_obj.academic_year }}</h2>
+        <h2>{{ group_obj.abbreviated_title }} {{ version_label }} - {{ group_obj.academic_year }}</h2>
         <h3>
             {% if training_obj %}
                 {{ training_obj.titles.title_fr }}
@@ -70,7 +70,7 @@
             {% include "blocks/tabs.html" %}
 
             <div class="panel-footer text-right">
-                {% include "education_group/blocks/form/create_cancel_buttons.html" %}
+                {% include "blocks/forms/create_cancel_buttons.html" %}
             </div>
         </div>
         {% include "blocks/modal/confirmation_modal.html" %}

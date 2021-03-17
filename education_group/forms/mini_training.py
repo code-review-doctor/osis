@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from ckeditor.widgets import CKEditorWidget
 from typing import Dict, Optional
 
 from django import forms
@@ -28,6 +29,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
+from base.forms.utils.fields import OsisRichTextFormField
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
@@ -98,8 +100,8 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
         label=_("Learning location"),
         to_field_name="name"
     )
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_en = OsisRichTextFormField(config_name='link_only', label=_("remark in english"), required=False)
 
     def __init__(self, *args, user: User, mini_training_type: str, attach_path: Optional[str], **kwargs):
         self.user = user
@@ -117,15 +119,19 @@ class MiniTrainingForm(ValidationRuleMixin, forms.Form):
         if self.attach_path:
             self.fields['academic_year'].disabled = True
 
-        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
-            target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
-        else:
-            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         working_academic_years = AcademicYear.objects.filter(year__in=target_years_opened)
-        self.fields['academic_year'].queryset = working_academic_years
-        self.fields['end_year'].queryset = AcademicYear.objects.filter(
-            year__gte=getattr(working_academic_years.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].queryset = self.fields['end_year'].queryset = working_academic_years
+
+        if not self.fields['academic_year'].disabled and self.user.person.is_faculty_manager:
+            self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
+                year__in=EducationGroupPreparationCalendar().get_target_years_opened()
+            )
+
+        self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
+            year__gte=getattr(
+                self.fields['academic_year'].queryset.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION
+            )
         )
 
     def __init_management_entity_field(self):
@@ -195,7 +201,10 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
-            self.fields["end_year"].queryset = AcademicYear.objects.filter(year__gte=initial_academic_year_value)
+            self.fields["end_year"].queryset = AcademicYear.objects.filter(
+                year__gte=initial_academic_year_value,
+                year__in=EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+            )
 
     # PermissionFieldMixin
     def get_context(self) -> str:

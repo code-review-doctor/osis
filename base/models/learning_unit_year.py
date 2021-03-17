@@ -72,8 +72,8 @@ MAXIMUM_CREDITS = 500
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
     SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    0 AS level, parent_element_id, child_element_id, version.is_transition, version.version_name,
-    version.title_fr AS version_title_fr
+    0 AS level, parent_element_id, child_element_id, version.transition_name, version.version_name,
+    version.title_fr AS version_title_fr, gy.management_entity_id as management_entity
     FROM base_groupelementyear AS gs
     INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON gs.child_element_id = element_child.id
@@ -85,8 +85,8 @@ WITH RECURSIVE group_element_year_parent AS (
     UNION ALL
     SELECT parent.id, gs_origin,
     gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
-    child.level + 1, parent.parent_element_id, parent.child_element_id, version.is_transition, version.version_name,
-    version.title_fr AS version_title_fr
+    child.level + 1, parent.parent_element_id, parent.child_element_id, version.transition_name, version.version_name,
+    version.title_fr AS version_title_fr, gy.management_entity_id as management_entity
     FROM base_groupelementyear AS parent
     INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
     INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id
@@ -115,10 +115,23 @@ def academic_year_validator(value):
 
 
 class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
-                    'status')
+    list_display = (
+        'external_id',
+        'acronym',
+        'specific_title',
+        'academic_year',
+        'credits',
+        'requirement_entity',
+        'status',
+        'changed',
+    )
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
+    search_fields = [
+        'acronym',
+        'learning_container_year__requirement_entity__entityversion__acronym',
+        'external_id',
+        'id'
+    ]
     actions = [
         'resend_messages_to_queue',
     ]
@@ -222,7 +235,6 @@ class LearningUnitYear(SerializableModel):
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
-    structure = models.ForeignKey('Structure', blank=True, null=True, on_delete=models.CASCADE)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -253,6 +265,11 @@ class LearningUnitYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_('Other remark (intended for publication)')
+    )
+    other_remark_english = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark in english (intended for publication)')
     )
     faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark (unpublished)'))
 
@@ -690,15 +707,6 @@ def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
                                            proposallearningunit__isnull=True) \
         .order_by('academic_year') \
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
-
-
-def find_learning_unit_years_by_academic_year_tutor_attributions(academic_year, tutor):
-    """ In this function, only learning unit year with containers is visible! [no classes] """
-    qs = LearningUnitYear.objects_with_container.filter(
-        academic_year=academic_year,
-        attribution__tutor=tutor,
-    ).distinct().order_by('academic_year__year', 'acronym')
-    return qs
 
 
 def toggle_summary_locked(learning_unit_year_id):

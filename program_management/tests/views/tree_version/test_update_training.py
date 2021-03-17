@@ -22,7 +22,6 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
-from django.conf import settings
 from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -37,9 +36,12 @@ from education_group.tests.ddd.factories.diploma import DiplomaAimFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
+from program_management.forms.transition import UpdateMiniTrainingTransitionVersionForm, \
+    UpdateTrainingTransitionVersionForm
 from program_management.forms.version import UpdateTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
-    StandardProgramTreeVersionFactory
+    StandardProgramTreeVersionFactory, StandardTransitionProgramTreeVersionFactory, \
+    SpecificTransitionProgramTreeVersionFactory
 from program_management.views.tree_version.update_training import TrainingVersionUpdateView
 
 
@@ -134,8 +136,8 @@ class TestTrainingVersionUpdateGetView(TestCase):
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
 
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
-    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
-                'calculate_version_max_end_year', return_value=2025)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
     def test_assert_get_context(self, mock_max_postponement, mock_program_tree_version_repo):
         mock_program_tree_version_repo.return_value = self.training_version_obj
         response = self.client.get(self.url)
@@ -162,6 +164,34 @@ class TestTrainingVersionUpdateGetView(TestCase):
             },
         ]
         self.assertEqual(response.context['tabs'], expected_tabs)
+
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
+    def test_assert_get_context_when_transition(self, mock_max_postponement, mock_program_tree_version_repo):
+        transition_version = StandardTransitionProgramTreeVersionFactory()
+        mock_program_tree_version_repo.return_value = transition_version
+        self.mocked_get_training_version.return_value = transition_version
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(response.context['training_version_form'], UpdateTrainingTransitionVersionForm)
+        self.assertEqual(response.context['training_version_obj'], transition_version)
+        self.assertEqual(response.context['version_suffix'], transition_version.transition_name)
+
+    @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
+    def test_assert_get_context_when_specific_transition(self, mock_max_postponement, mock_program_tree_version_repo):
+        transition_version = SpecificTransitionProgramTreeVersionFactory()
+        mock_program_tree_version_repo.return_value = transition_version
+        self.mocked_get_training_version.return_value = transition_version
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(response.context['training_version_form'], UpdateTrainingTransitionVersionForm)
+        self.assertEqual(response.context['training_version_obj'], transition_version)
+        self.assertEqual(response.context['version_suffix'], "-{}".format(transition_version.transition_name))
 
 
 @override_settings(YEAR_LIMIT_EDG_MODIFICATION=0)
@@ -234,8 +264,8 @@ class TestTrainingVersionUpdatePostView(TestCase):
                 '._convert_form_to_update_training_version_command', return_value=None)
     @mock.patch('program_management.views.tree_version.update_training.version'
                 '.UpdateTrainingVersionForm.is_valid', return_value=True)
-    @mock.patch('program_management.ddd.service.read.get_version_max_end_year.'
-                'calculate_version_max_end_year', return_value=2025)
+    @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
+                'calculate_specific_version_max_end_year', return_value=2025)
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
     @mock.patch('program_management.views.tree_version.update_training.update_and_postpone_training_version_service'
                 '.update_and_postpone_training_version', return_value=[])
