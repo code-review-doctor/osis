@@ -57,7 +57,15 @@ class GroupBuilder:
         except exception.GroupNotFoundException:
             group_next_year = copy.deepcopy(group_from)
             group_next_year.entity_id = identity_next_year
+        cls._update_end_year(group_next_year)
         return group_next_year
+
+    @classmethod
+    def _update_end_year(cls, group: 'Group') -> None:
+        if not group.end_year:
+            return
+        if group.year > group.end_year:
+            group.end_year = group.year
 
     @classmethod
     def build_from_create_cmd(cls, cmd: command.CreateOrphanGroupCommand):
