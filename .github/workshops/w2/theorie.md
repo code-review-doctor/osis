@@ -342,7 +342,7 @@ def withdraw_money(amount: Decimal) -> interface.EntityIdentity:
 
 <br/><br/>
 
-- NB : plus la logique métier est isolée et donc PURE (encapsulée dans le domaine), moins il y aura de domain service
+- NB : plus la logique métier est isolée (encapsulée dans le domaine = domaine COMPLET), moins il y aura de domain services
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
