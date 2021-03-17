@@ -47,6 +47,5 @@ class EducationGroupSwitchCalendar(AcademicEventCalendarHelper):
                     "title": "Basculement des formations",
                     "start_date": datetime.date(ac_year.year, 7, 1),
                     "end_date": datetime.date(ac_year.year + 1, 6, 30),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

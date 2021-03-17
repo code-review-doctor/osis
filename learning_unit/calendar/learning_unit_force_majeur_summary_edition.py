@@ -47,6 +47,5 @@ class LearningUnitForceMajeurSummaryEditionCalendar(AcademicEventCalendarHelper)
                     "title": "Edition fiches descriptives (cas de force majeure)",
                     "start_date": datetime.date(ac_year.year + 1, 6, 15),
                     "end_date": datetime.date(ac_year.year + 1, 6, 20),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

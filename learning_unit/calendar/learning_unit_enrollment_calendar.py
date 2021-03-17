@@ -47,6 +47,5 @@ class LearningUnitEnrollmentCalendar(AcademicEventCalendarHelper):
                     "title": "Inscription aux cours",
                     "start_date": datetime.date(ac_year.year, 9, 1),
                     "end_date": datetime.date(ac_year.year, 10, 31),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )

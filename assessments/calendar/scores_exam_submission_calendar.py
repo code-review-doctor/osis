@@ -60,7 +60,6 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Encodage de notes - Session 1",
                 start_date=datetime.date(academic_year.year, 12, 15),
                 end_date=datetime.date(academic_year.year + 1, 2, 28),
-                academic_year=academic_year  # To remove after refactoring
             )
             SessionExamCalendar.objects.create(number_session=1, academic_calendar=academic_calendar)
 
@@ -79,7 +78,6 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Encodage de notes - Session 2",
                 start_date=datetime.date(academic_year.year + 1, 5, 20),
                 end_date=datetime.date(academic_year.year + 1, 7, 10),
-                academic_year=academic_year  # To remove after refactoring
             )
             SessionExamCalendar.objects.create(number_session=2, academic_calendar=academic_calendar)
 
@@ -97,7 +95,5 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Encodage de notes - Session 3",
                 start_date=datetime.date(academic_year.year + 1, 8, 10),
                 end_date=datetime.date(academic_year.year + 1, 9, 15),
-                academic_year=academic_year  # To remove after refactoring
-
             )
             SessionExamCalendar.objects.create(number_session=3, academic_calendar=academic_calendar)
