@@ -168,7 +168,7 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._fill_node_children_based_on_last_year(
+        self._fill_node_from_last_year_node(
             last_year_tree.root_node,
             to_tree.root_node,
             to_tree.authorized_relationships,
@@ -177,7 +177,7 @@ class ProgramTreeBuilder:
 
         return to_tree
 
-    def _fill_node_children_based_on_last_year(
+    def _fill_node_from_last_year_node(
             self,
             last_year_node: 'Node',
             to_node: 'Node',
@@ -199,7 +199,7 @@ class ProgramTreeBuilder:
             to_node.children.append(copied_link)
 
             if self._can_link_child_be_filled(copied_link, relationships):
-                self._fill_node_children_based_on_last_year(last_year_link.child, child, relationships, existing_nodes)
+                self._fill_node_from_last_year_node(last_year_link.child, child, relationships, existing_nodes)
 
         return to_node
 
