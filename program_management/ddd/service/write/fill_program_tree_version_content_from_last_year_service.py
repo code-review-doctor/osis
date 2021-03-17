@@ -76,11 +76,12 @@ def fill_program_tree_version_content_from_last_year(
         ]
     )
 
+    existing_nodes = [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
+
     ProgramTreeVersionBuilder().fill_from_last_year_program_tree_version(
         from_tree_version,
         to_tree_version,
-        set(existing_learning_unit_nodes),
-        set(existing_trees),
+        set(existing_nodes),
     )
 
     identity = tree_version_repository.update(to_tree_version)

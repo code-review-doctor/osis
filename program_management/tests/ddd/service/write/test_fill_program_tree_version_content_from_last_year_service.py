@@ -23,15 +23,13 @@
 #
 ##############################################################################
 from collections import namedtuple
-from unittest import skip
 
 import attr
 import mock
 
 from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
 from program_management.ddd.domain.academic_year import AcademicYear
-from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo, InvalidTreeVersionToFillFrom, \
-    ProgramTreeNonEmpty
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
@@ -40,8 +38,7 @@ from program_management.ddd.service.write.fill_program_tree_version_content_from
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
-    SpecificProgramTreeVersionFactory
+from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020
@@ -49,7 +46,7 @@ CURRENT_ACADEMIC_YEAR_YEAR = 2021
 NEXT_ACADEMIC_YEAR_YEAR = 2022
 
 
-class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
+class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
     def setUp(self) -> None:
         self._init_fake_repos()
 

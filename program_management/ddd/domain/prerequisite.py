@@ -233,24 +233,21 @@ class PrerequisiteFactory:
         return AND
 
     @classmethod
-    def copy_to_next_year(cls, to_copy: 'Prerequisite', next_year_tree: 'ProgramTree') -> 'Prerequisite':
-        next_year_identity = attr.evolve(
-            to_copy.node_having_prerequisites,
-            year=to_copy.node_having_prerequisites.year+1
-        )
+    def copy_to_tree(cls, to_copy: 'Prerequisite', to_tree: 'ProgramTree') -> 'Prerequisite':
+        node_having_prerequisite_identity = attr.evolve(to_copy.node_having_prerequisites, year=to_tree.entity_id.year)
 
-        code_presents = {node.code for node in next_year_tree.get_all_nodes()}
-        if next_year_identity.code not in code_presents:
+        codes_inside_tree = {node.code for node in to_tree.get_all_nodes()}
+        if node_having_prerequisite_identity.code not in codes_inside_tree:
             raise CannotCopyPrerequisiteException()
 
-        items_code = {item.code for item in to_copy.get_all_prerequisite_items()}
-        if items_code.difference(code_presents):
+        prerequisite_items_code = {item.code for item in to_copy.get_all_prerequisite_items()}
+        if prerequisite_items_code.difference(codes_inside_tree):
             raise CannotCopyPrerequisiteException()
 
         return cls().from_expression(
             cls._normalize_expression(to_copy.get_prerequisite_expression(translate=False)),
-            next_year_identity,
-            next_year_tree.entity_id
+            node_having_prerequisite_identity,
+            to_tree.entity_id
         )
 
     # FIX: Because the expression varies with translation
@@ -263,14 +260,14 @@ factory = PrerequisiteFactory()
 
 
 class PrerequisitesBuilder:
-    def copy_to_next_year(self, from_prerequisites: 'Prerequisites', to_tree: 'ProgramTree') -> 'Prerequisites':
-        next_year_prerequisites = list()
+    def copy_to_tree(self, from_prerequisites: 'Prerequisites', to_tree: 'ProgramTree') -> 'Prerequisites':
+        copy_prerequisites = list()
         for prerequisite in from_prerequisites.prerequisites:
             with contextlib.suppress(CannotCopyPrerequisiteException):
-                next_year_prerequisites.append(
-                    factory.copy_to_next_year(prerequisite, to_tree)
+                copy_prerequisites.append(
+                    factory.copy_to_tree(prerequisite, to_tree)
                 )
-        return Prerequisites(to_tree.entity_id, next_year_prerequisites)
+        return Prerequisites(to_tree.entity_id, copy_prerequisites)
 
 
 @attr.s(slots=True)

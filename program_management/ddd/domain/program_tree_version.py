@@ -76,13 +76,26 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
+    def fill_from_last_year_program_tree_version(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            to_tree_version: 'ProgramTreeVersion',
+            existing_nodes: Set['Node'],
+    ) -> 'ProgramTreeVersion':
+        validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
+        program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
+            from_tree_version.get_tree(),
+            to_tree_version.get_tree(),
+            existing_nodes,
+        )
+        return to_tree_version
+
     def fill_transition_from_program_tree_version(
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
-            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
-            existing_trees: Set['ProgramTree'],
-            node_code_generator
+            existing_nodes: Set['Node'],
+            node_code_generator: 'BGenerateNodeCode'
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeTransitionValidatorList(
             from_tree_version,
@@ -92,33 +105,15 @@ class ProgramTreeVersionBuilder:
             program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_learning_unit_nodes,
-                existing_trees,
+                existing_nodes,
             )
         else:
             program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_learning_unit_nodes,
-                existing_trees,
+                existing_nodes,
                 node_code_generator
             )
-        return to_tree_version
-
-    def fill_from_last_year_program_tree_version(
-            self,
-            from_tree_version: 'ProgramTreeVersion',
-            to_tree_version: 'ProgramTreeVersion',
-            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
-            existing_trees: Set['ProgramTree'],
-    ) -> 'ProgramTreeVersion':
-        validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
-            from_tree_version.get_tree(),
-            to_tree_version.get_tree(),
-            existing_learning_unit_nodes,
-            existing_trees
-        )
         return to_tree_version
 
     def copy_to_next_year(

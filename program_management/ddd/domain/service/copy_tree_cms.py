@@ -25,7 +25,6 @@
 from typing import Iterable
 
 from base.business.education_groups.general_information_sections import get_general_information_labels
-from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from education_group.models.group_year import GroupYear
