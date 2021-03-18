@@ -87,13 +87,9 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
         return generate_prerequisites_workbook(self.tree)
 
     def to_excel(self):
-        version_label = self.tree.root_node.version_label()
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': "{acronym}{version_label}".format(
-                acronym=self.tree.root_node.title,
-                version_label="[{}]".format(version_label) if version_label else ""
-            )
+            'acronym': self.tree.root_node.title + formatter.format_version_label(self.tree.root_node)
         }
 
 
@@ -112,13 +108,9 @@ def generate_prerequisites_workbook(tree: 'ProgramTree') -> Workbook:
 
 def _build_excel_lines(tree: 'ProgramTree') -> List:
     language = translation.get_language()
-    version_label = tree.root_node.version_label()
     content = _first_line_content(
         HeaderLine(
-            egy_acronym="{acronym}{version_label}".format(
-                acronym=tree.root_node.title,
-                version_label="[{}]".format(version_label) if version_label else ""
-            ),
+            egy_acronym=tree.root_node.title + formatter.format_version_label(tree.root_node),
             egy_title="{title}{version_title}".format(
                 title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
@@ -271,13 +263,9 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
         return generate_ue_is_prerequisite_for_workbook(self.tree)
 
     def to_excel(self):
-        version_label = self.tree.root_node.version_label()
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': "{acronym}{version_label}".format(
-                acronym=self.tree.root_node.title,
-                version_label="[{}]".format(version_label) if version_label else ""
-            )
+            'acronym': self.tree.root_node.title + formatter.format_version_label(self.tree.root_node)
         }
 
 
@@ -316,13 +304,9 @@ def _get_workbook(tree: 'ProgramTree',
 
 def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
     language = translation.get_language()
-    version_label = tree.root_node.version_label()
     content = _first_line_content(
         HeaderLinePrerequisiteOf(
-            node_title="{acronym}{version_label}".format(
-                acronym=tree.root_node.title,
-                version_label="[{}]".format(version_label) if version_label else ""
-            ),
+            node_title=tree.root_node.title + formatter.format_version_label(tree.root_node),
             tree_title="{title}{version_title}".format(
                 title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
