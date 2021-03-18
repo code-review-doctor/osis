@@ -7,6 +7,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.utils import utils
 from osis_common.ddd import interface
+from program_management.ddd.domain.program_tree import ProgramTree
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain._address import Address
@@ -14,7 +15,6 @@ from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntityIdentity, ResponsibleEntity
 from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 from workshops_ddd_ue.validators.validators_by_business_action import CreateLearningUnitValidatorList
 
 
@@ -45,8 +45,11 @@ class LearningUnit(interface.RootEntity):
         return self.entity_id.academic_year
 
     @property
-    def code(self) -> int:
+    def code(self) -> str:
         return self.entity_id.code
+
+    def can_be_deleted(self, all_programs: List['ProgramTree']):
+        pass
 
     @staticmethod
     def create(

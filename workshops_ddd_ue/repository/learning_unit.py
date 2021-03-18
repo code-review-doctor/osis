@@ -83,7 +83,7 @@ class LearningUnitRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: LearningUnitIdentity) -> Entity:
+    def get(cls, entity_id: LearningUnitIdentity) -> LearningUnit:
         qs = _get_common_queryset().filter(acronym=entity_id.code, academic_year__year=entity_id.year)
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)

@@ -20,3 +20,9 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     remark_faculty = attr.ib(type=str)
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteLearningUnitCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    academic_year = attr.ib(type=int)
