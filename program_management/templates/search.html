@@ -238,7 +238,7 @@
                         if (row['active_entity_management_version'] === true)
                             return data;
                         else {
-                            let my_msg = "This entity is not active during this academic year";
+                            let my_msg = gettext("This entity is not active during this academic year");
                             return '<del>' + data + '</del>' +
                                 ' <span class="glyphicon glyphicon-question-sign" ' +
                                 'data-toggle="tooltip" ' +
