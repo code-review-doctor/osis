@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from typing import List
 
 from education_group.ddd import command
@@ -42,7 +43,15 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
         acronym=postpone_cmd.postpone_from_acronym,
         year=postpone_cmd.postpone_from_year
     )
-    conflicted_fields = ConflictedFields().get_training_conflicted_fields(from_training_id)
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
+        identity=from_training_id,
+        repository=TrainingRepository()
+    )
+    if not postpone_cmd.is_creation and postpone_cmd.postpone_from_year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
+        conflicted_fields = {}
+        end_postponement_year = postpone_cmd.postpone_from_year
+    else:
+        conflicted_fields = ConflictedFields().get_training_conflicted_fields(from_training_id)
 
     # WHEN
     identities_created = [
@@ -107,10 +116,10 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
             )
         )
     ]
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
-        identity=from_training_id,
-        repository=TrainingRepository()
-    )
+    # end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
+    #     identity=from_training_id,
+    #     repository=TrainingRepository()
+    # )
     for year in range(from_training_id.year, end_postponement_year):
         if year + 1 in conflicted_fields:
             continue  # Do not copy info from year to N+1 because conflict detected

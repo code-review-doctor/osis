@@ -5,7 +5,7 @@
 #  The core business involves the administration of students, teachers,
 #  courses, programs and so on.
 #
-#  Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#  Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -34,7 +34,8 @@ from education_group.tests.ddd.factories.command.postpone_training_and_group_mod
 class TestPostponeTrainingAndGroupModificationService(SimpleTestCase):
     def setUp(self) -> None:
         self.cmd = PostponeTrainingAndGroupModificationCommandFactory(
-            postpone_from_year=2020
+            postpone_from_year=2020,
+            is_creation=False
         )
 
     @mock.patch('education_group.ddd.service.write.postpone_training_and_group_modification_service.'

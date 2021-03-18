@@ -284,6 +284,7 @@ class UpdateMiniTrainingAndGroupCommand(interface.CommandRequest):
 class PostponeMiniTrainingAndGroupModificationCommand(interface.CommandRequest):
     postpone_from_abbreviated_title = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+    is_creation = attr.ib(type=bool)
 
     code = attr.ib(type=str)
     status = attr.ib(type=str)
@@ -395,6 +396,7 @@ class UpdateGroupCommand(interface.CommandRequest):
 class PostponeTrainingAndGroupModificationCommand(interface.CommandRequest):
     postpone_from_acronym = attr.ib(type=str)
     postpone_from_year = attr.ib(type=int)
+    is_creation = attr.ib(type=bool)
 
     code = attr.ib(type=str)
     status = attr.ib(type=str)

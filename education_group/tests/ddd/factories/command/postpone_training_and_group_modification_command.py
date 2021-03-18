@@ -40,6 +40,7 @@ class PostponeTrainingAndGroupModificationCommandFactory(factory.Factory):
 
     postpone_from_acronym = factory.Sequence(lambda n: 'TRAININGTITLE%d' % n)
     postpone_from_year = 2019
+    is_creation = False
 
     status = factory.Iterator(ActiveStatusEnum.choices(), getter=operator.itemgetter(0))
     code = factory.Sequence(lambda n: 'CODE%d' % n)

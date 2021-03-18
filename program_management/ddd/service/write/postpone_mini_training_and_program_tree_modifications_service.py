@@ -79,6 +79,7 @@ def __convert_to_postpone_mini_training_and_group_modification_command(
         code=mini_training_cmd.code,
         postpone_from_year=mini_training_cmd.year,
         postpone_from_abbreviated_title=mini_training_cmd.abbreviated_title,
+        is_creation=False,
         title_fr=mini_training_cmd.title_fr,
         title_en=mini_training_cmd.title_en,
         credits=mini_training_cmd.credits,

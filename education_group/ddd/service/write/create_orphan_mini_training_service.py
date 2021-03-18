@@ -57,7 +57,7 @@ def create_and_postpone_orphan_mini_training(
             command.PostponeMiniTrainingAndGroupModificationCommand(
                 postpone_from_abbreviated_title=cmd.abbreviated_title,
                 postpone_from_year=cmd.year,
-
+                is_creation=True,
                 code=cmd.code,
                 status=cmd.status,
                 credits=cmd.credits,

@@ -79,6 +79,7 @@ def __convert_to_postpone_training_and_group_modification_command(
     return command.PostponeTrainingAndGroupModificationCommand(
         postpone_from_acronym=cmd.postpone_from_acronym,
         postpone_from_year=cmd.postpone_from_year,
+        is_creation=False,
         code=cmd.code,
         status=cmd.status,
         credits=cmd.credits,
