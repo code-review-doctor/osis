@@ -45,7 +45,7 @@ class LearningUnitForceMajeurSummaryEditionCalendar(AcademicEventCalendarHelper)
                 data_year=ac_year,
                 defaults={
                     "title": "Modification fiches descriptives (cas de force majeure)",
-                    "start_date": datetime.date(ac_year.year + 1, 6, 15),
-                    "end_date": datetime.date(ac_year.year + 1, 6, 20),
+                    "start_date": datetime.date(2020, 1, 1),
+                    "end_date": datetime.date(2020, 1, 1),
                 }
             )
