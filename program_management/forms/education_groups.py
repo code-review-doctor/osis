@@ -199,19 +199,19 @@ class GroupFilter(FilterSet):
         )
 
         current_clause = (
-                Q(entity_management_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
-                Q(entity_management_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(entity_management_start_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            Q(entity_management_end_date__range=[F('academic_year__start_date'), F('academic_year__end_date')]) |
+            (
+                Q(entity_management_start_date__lte=F('academic_year__start_date')) &
                 (
-                    Q(entity_management_start_date__lte=F('academic_year__start_date')) &
-                    (
-                        Q(entity_management_end_date__isnull=True) |
-                        Q(entity_management_end_date__gte=F('academic_year__end_date'))
-                    )
+                    Q(entity_management_end_date__isnull=True) |
+                    Q(entity_management_end_date__gte=F('academic_year__end_date'))
                 )
+            )
         )
 
         standard_clause = (
-                Q(educationgroupversion__version_name='') | Q(educationgroupversion__version_name__isnull=True)
+            Q(educationgroupversion__version_name='') | Q(educationgroupversion__version_name__isnull=True)
         )
         group_clause = Q(educationgroupversion__isnull=True)
         not_transition_clause = Q(educationgroupversion__transition_name=NOT_A_TRANSITION)
