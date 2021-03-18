@@ -23,8 +23,7 @@ def update_application_courses_calendar(apps, shema_editor):
                 defaults={
                     "title": "Candidature aux cours vacants",
                     "start_date": datetime.date(ac_year.year, 2, 1),
-                    "end_date": datetime.date(ac_year.year, 2, 14),
-                    "academic_year": ac_year
+                    "end_date": datetime.date(ac_year.year, 2, 14)
                 }
             )
 
