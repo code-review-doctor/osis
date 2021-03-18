@@ -1,6 +1,9 @@
+from typing import List
+
 from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
+from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
 from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
 from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator
@@ -14,13 +17,13 @@ from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code imp
 class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(
             self,
-            repository: LearningUnitRepository,
             responsible_entity: 'ResponsibleEntity',
             command: CreateLearningUnitCommand,
+            all_existing_identities: List['LearningUnitIdentity']
     ):
         self.validators = [
             AcademicYearGreaterThan2019(command.academic_year),
-            CodeAlreadyExistsValidator(command.code, repository),
+            CodeAlreadyExistsValidator(command.code, all_existing_identities),
             CreditsMinimumValueValidator(command.credits),
             CodeStructureValidator(command.code),
             RequiredFieldsValidator(command),

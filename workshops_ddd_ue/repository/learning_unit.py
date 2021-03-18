@@ -132,6 +132,20 @@ class LearningUnitRepository(interface.AbstractRepository):
     def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
         raise NotImplementedError
 
+    def get_identities(self) -> List['LearningUnitIdentity']:
+        all_learn_unit_years = LearningUnitYearDatabase.objects.all().values(
+            "acronym",
+            "academic_year__year",
+        )
+
+        return [
+            LearningUnitIdentity(
+                code=learning_unit['acronym'],
+                academic_year=AcademicYear(year=learning_unit['academic_year__year'])
+            )
+            for learning_unit in all_learn_unit_years
+        ]
+
 
 def _annotate_queryset(queryset):
     queryset = queryset.annotate(

@@ -1,3 +1,5 @@
+from typing import List
+
 import attr
 
 from base.models.enums.internship_subtypes import InternshipSubtype
@@ -47,7 +49,10 @@ class LearningUnit(interface.RootEntity):
         return self.entity_id.code
 
     @staticmethod
-    def create(command: 'CreateLearningUnitCommand', repository: LearningUnitRepository) -> 'LearningUnit':
+    def create(
+            command: 'CreateLearningUnitCommand',
+            all_existing_identities: List['LearningUnitIdentity']
+    ) -> 'LearningUnit':
         responsible_entity = ResponsibleEntity(  # FIXME
             entity_id=ResponsibleEntityIdentity(code=command.responsible_entity_code),
             title=None,
@@ -61,7 +66,7 @@ class LearningUnit(interface.RootEntity):
             type=None,
         )
 
-        CreateLearningUnitValidatorList(repository, responsible_entity, command).validate()
+        CreateLearningUnitValidatorList(responsible_entity, command, all_existing_identities).validate()
 
         academic_year = AcademicYear(year=command.academic_year)
         return LearningUnit(

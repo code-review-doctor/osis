@@ -11,9 +11,10 @@ from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 def create_learning_unit(cmd: CreateLearningUnitCommand) -> List['LearningUnitIdentity']:
     # GIVEN
     repository = LearningUnitRepository()
+    all_existing_identities = repository.get_identities()
 
     # WHEN
-    learning_unit = LearningUnit.create(cmd, repository)
+    learning_unit = LearningUnit.create(cmd, all_existing_identities)
 
     # THEN
     repository.create(learning_unit)
