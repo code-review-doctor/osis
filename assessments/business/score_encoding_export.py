@@ -23,30 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 from openpyxl import Workbook
 from openpyxl.styles import Color, PatternFill, Font, colors
+from openpyxl.styles.borders import Border, Side, BORDER_MEDIUM
 from openpyxl.writer.excel import save_virtual_workbook
-from typing import List
 
 from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
+from assessments.models import score_sheet_address
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
-from openpyxl.styles.borders import Border, Side, BORDER_MEDIUM
 from base.models.enums import peps_type
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.student_specific_profile import StudentSpecificProfile
 from osis_common.decorators.download import set_download_cookie
-from assessments.models import score_sheet_address
 
 HEADER = [_('Academic year'), _('Session'), _('Learning unit'), pgettext_lazy('encoding', 'Program'),
           _('Registration number'), _('Lastname'), _('Firstname'), _('Email'), _('Numbered scores'),
           _('Justification (A,T)'), _('End date Prof'), _('Type of specific profile'), _('Extra time (33% generally)'),
           _('Large print'), _('Specific room of examination'), _('Other educational facilities'),
-          _('Educational tutor'),
+          _('Details other educational facilities'), _('Educational tutor'),
           ]
 
 JUSTIFICATION_ALIASES = {
@@ -60,7 +61,7 @@ FIRST_ROW_LEGEND_ENROLLMENT_STATUS = 7
 
 FIRST_COL_PEPS = 'L'
 FIRST_ROW_PEPS = 12
-LAST_COLUMN_NUMBER = 18
+LAST_COLUMN_NUMBER = len(HEADER) + 1
 
 BORDER_LEFT = Border(
         left=Side(border_style=BORDER_MEDIUM,
@@ -114,10 +115,12 @@ def export_xls(exam_enrollments: List[ExamEnrollment], is_program_manager: bool)
                 str(_('Yes')) if student_specific_profile.arrangement_appropriate_copy else '-',
                 str(_('Yes')) if student_specific_profile.arrangement_specific_locale else '-',
                 str(_('Yes')) if student_specific_profile.arrangement_other else '-',
+                str(student_specific_profile.arrangement_comment)
+                if student_specific_profile.arrangement_comment else '-',
                 str(student_specific_profile.guide) if student_specific_profile.guide else '-',
-                ])
+            ])
         else:
-            line_content.extend(["-", "-", "-", "-", "-", "-"])
+            line_content.extend(["-", "-", "-", "-", "-", "-", "-"])
         worksheet.append(line_content)
         row_number += 1
         __coloring_non_editable(worksheet, row_number, score, exam_enroll.justification_final)
@@ -195,6 +198,8 @@ def __columns_resizing(ws):
     col_note = ws.column_dimensions['P']
     col_note.width = 25
     col_note = ws.column_dimensions['Q']
+    col_note.width = 30
+    col_note = ws.column_dimensions['R']
     col_note.width = 30
 
 

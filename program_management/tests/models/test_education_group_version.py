@@ -32,6 +32,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.program_tree_version import TRANSITION_PREFIX
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
@@ -48,11 +49,33 @@ class TestEducationGroupVersion(SimpleTestCase):
 
     def test_str_education_group_version(self):
         version = EducationGroupVersion(version_name='version', offer=self.offer, root_group=self.root_group)
-        self.assertEqual(str(version), '{} ({})'.format(version.offer, version.version_name))
+        self.assertEqual(str(version), '{}[{}] - {}'.format(
+            version.offer.acronym, version.version_name, version.offer.academic_year
+        ))
+
+    def test_str_education_group_version_transition(self):
+        version = EducationGroupVersion(transition_name='version', offer=self.offer, root_group=self.root_group)
+        self.assertEqual(str(version), '{}[{}] - {}'.format(
+            version.offer.acronym, version.transition_name, version.offer.academic_year
+        ))
+
+    def test_str_education_group_version_transition_specific(self):
+        version = EducationGroupVersion(
+            transition_name='transition',
+            version_name='version',
+            offer=self.offer,
+            root_group=self.root_group
+        )
+        self.assertEqual(
+            str(version),
+            '{}[{}-{}] - {}'.format(
+                version.offer.acronym, version.version_name, version.transition_name, version.offer.academic_year
+            )
+        )
 
     def test_str_standard_education_group_version(self):
         version = EducationGroupVersion(offer=self.offer, root_group=self.root_group)
-        self.assertEqual(str(version), str(version.offer))
+        self.assertEqual(str(version), '{} - {}'.format(self.offer.acronym, self.offer.academic_year))
 
 
 class TestStandardEducationGroupManager(TestCase):
@@ -75,6 +98,8 @@ class TestEducationGroupVersionModel(TestCase):
     def test_unique(self):
         particular_version = ParticularTransitionEducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1)
         with self.assertRaises(IntegrityError):
-            ParticularTransitionEducationGroupVersionFactory\
-                ._get_manager(EducationGroupVersion)\
-                .create(version_name=particular_version.version_name, is_transition=True, offer=self.offer_1)
+            ParticularTransitionEducationGroupVersionFactory._get_manager(EducationGroupVersion).create(
+                version_name=particular_version.version_name,
+                transition_name=TRANSITION_PREFIX,
+                offer=self.offer_1
+            )

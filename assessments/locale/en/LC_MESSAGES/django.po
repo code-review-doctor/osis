@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-11 14:07+0100\n"
+"POT-Creation-Date: 2021-03-16 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -147,6 +147,9 @@ msgid "Decimals authorized for this learning unit"
 msgstr ""
 
 msgid "Definitive submission (Submit to faculty)"
+msgstr ""
+
+msgid "Details other educational facilities"
 msgstr ""
 
 msgid "Display all deadlines for this learning unit"
@@ -449,13 +452,13 @@ msgstr ""
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
-msgid "Score(s) saved"
-msgstr ""
-
 msgid "Score sheet address was successfully saved."
 msgstr ""
 
 msgid "Score submitted"
+msgstr ""
+
+msgid "Score(s) saved"
 msgstr ""
 
 msgid "Scores encoding"

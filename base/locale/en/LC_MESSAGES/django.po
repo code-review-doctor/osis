@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-11 08:40+0100\n"
+"POT-Creation-Date: 2021-03-16 13:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,6 +79,10 @@ msgid ""
 "%(year)s"
 msgstr ""
 
+#, python-format
+msgid "%(title)s has been updated"
+msgstr ""
+
 msgid "1st quadri"
 msgstr ""
 
@@ -110,6 +114,9 @@ msgid "AND"
 msgstr ""
 
 msgid "ARES ability"
+msgstr ""
+
+msgid "ARES codes"
 msgstr ""
 
 msgid "ARES study code"
@@ -175,6 +182,9 @@ msgstr ""
 msgid "Access minor"
 msgstr ""
 
+msgid "Access schedule calendar"
+msgstr ""
+
 msgid "Access to the student's virtual office."
 msgstr ""
 
@@ -212,6 +222,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Activities"
+msgstr ""
+
 msgid "Activities on other campus"
 msgstr ""
 
@@ -228,6 +241,9 @@ msgid "Add. requ. ent. 1"
 msgstr ""
 
 msgid "Add. requ. ent. 2"
+msgstr ""
+
+msgid "Additional info"
 msgstr ""
 
 msgid "Additional requirement entity 1"
@@ -311,9 +327,6 @@ msgstr ""
 msgid "Are you sure you want to delete the achievement?"
 msgstr ""
 
-msgid "Are you sure you want to delete the event"
-msgstr ""
-
 msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
@@ -335,15 +348,15 @@ msgstr ""
 msgid "Artist"
 msgstr ""
 
-msgid "As displayed on the home page"
-msgstr ""
-
 msgid "Assistants"
 msgstr ""
 
 msgid ""
 "At least a partim volume value is greater than corresponding volume of full "
 "UE"
+msgstr ""
+
+msgid "At least one learning unit has partim:"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
@@ -427,7 +440,16 @@ msgstr ""
 msgid "Cancel proposal"
 msgstr ""
 
+msgid "Cancel proposal(s)"
+msgstr ""
+
+msgid "Cancel proposal(s)?"
+msgstr ""
+
 msgid "Cancel the proposal"
+msgstr ""
+
+msgid "Cancel the proposal?"
 msgstr ""
 
 msgid "Catalogue"
@@ -494,6 +516,9 @@ msgid "Co-graduation"
 msgstr ""
 
 msgid "Co-graduation total coefficient"
+msgstr ""
+
+msgid "Co-graduation/partnership"
 msgstr ""
 
 msgid "Co-holder"
@@ -578,23 +603,10 @@ msgstr ""
 msgid "Create specific version"
 msgstr ""
 
+msgid "Create transition version"
+msgstr ""
+
 msgid "Creation"
-msgstr ""
-
-msgid ""
-"Creation or end date modification proposal not allowed for central managers "
-"during this period."
-msgstr ""
-
-msgid ""
-"Creation or end date modification proposal not allowed for faculty managers "
-"during this period."
-msgstr ""
-
-msgid "Creation or end date proposal by central managers"
-msgstr ""
-
-msgid "Creation or end date proposal by faculty managers"
 msgstr ""
 
 msgid "Credits"
@@ -633,6 +645,11 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
+msgid ""
+"Default information (ac. yr., acronym/short title, title, category, type, "
+"credits)"
+msgstr ""
+
 msgid "Default learning unit enrollment"
 msgstr ""
 
@@ -669,7 +686,13 @@ msgstr ""
 msgid "Details"
 msgstr ""
 
+msgid "Details other educational facilities"
+msgstr ""
+
 msgid "Diploma title"
+msgstr ""
+
+msgid "Diploma/certificat"
 msgstr ""
 
 msgid "Direct Access"
@@ -696,7 +719,7 @@ msgstr ""
 msgid "Do not assign"
 msgstr ""
 
-msgid "Do you want to cancel proposal?"
+msgid "Do not cancel"
 msgstr ""
 
 msgid "Do you want to change the status of this proposals?"
@@ -730,6 +753,10 @@ msgid "Edit"
 msgstr ""
 
 msgid "Edit the proposal"
+msgstr ""
+
+msgctxt "list"
+msgid "Education fields"
 msgstr ""
 
 msgid "Education group"
@@ -816,6 +843,9 @@ msgstr ""
 msgid "Enrolled to learning unit"
 msgstr ""
 
+msgid "Enrollment"
+msgstr ""
+
 msgid "Enrollment campus"
 msgstr ""
 
@@ -872,9 +902,6 @@ msgstr ""
 msgid "Evaluations"
 msgstr ""
 
-msgid "Event"
-msgstr ""
-
 msgid "Exam board secretary"
 msgstr ""
 
@@ -900,6 +927,9 @@ msgid "Existing acronym"
 msgstr ""
 
 msgid "Export"
+msgstr ""
+
+msgid "Extended proposal management"
 msgstr ""
 
 msgid "External"
@@ -1007,6 +1037,10 @@ msgstr ""
 msgid "Funding"
 msgstr ""
 
+msgctxt "list"
+msgid "Funding"
+msgstr ""
+
 msgid "Funding direction"
 msgstr ""
 
@@ -1014,6 +1048,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "Gathering"
 msgstr ""
 
 msgid "Gender"
@@ -1043,9 +1080,6 @@ msgstr ""
 msgid "Global ID"
 msgstr ""
 
-msgid "Go"
-msgstr ""
-
 msgctxt "carousel"
 msgid "Go"
 msgstr ""
@@ -1066,15 +1100,6 @@ msgid "Help"
 msgstr ""
 
 msgid "High Level Promising athlete"
-msgstr ""
-
-msgid "Highlight description"
-msgstr ""
-
-msgid "Highlight shortcut"
-msgstr ""
-
-msgid "Highlight title"
 msgstr ""
 
 msgid "Home"
@@ -1234,12 +1259,6 @@ msgstr ""
 msgid "Learning unit %(acronym)s successfully updated."
 msgstr ""
 
-msgid "Learning unit edition by central managers"
-msgstr ""
-
-msgid "Learning unit edition by faculty managers"
-msgstr ""
-
 msgid "Learning unit search"
 msgstr ""
 
@@ -1264,7 +1283,13 @@ msgstr ""
 msgid "Learning units proposal comparison"
 msgstr ""
 
+msgid "Learning units training list"
+msgstr ""
+
 msgid "LearningUnitsList"
+msgstr ""
+
+msgid "LearningUnitsTrainingsList"
 msgstr ""
 
 msgid "Lecturing"
@@ -1283,6 +1308,9 @@ msgid "Lecturing vol."
 msgstr ""
 
 msgid "Legend"
+msgstr ""
+
+msgid "Limited proposal management"
 msgstr ""
 
 msgid "Link type"
@@ -1306,7 +1334,10 @@ msgstr ""
 msgid "List of learning units with educational information and specifications"
 msgstr ""
 
-msgid "List of learning units with with one line per attribution"
+msgid "List of learning units with one line per attribution"
+msgstr ""
+
+msgid "List of learning units with one line per training"
 msgstr ""
 
 msgid "List of teachers"
@@ -1503,22 +1534,6 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
-msgid "Modification or transformation proposal by central managers"
-msgstr ""
-
-msgid "Modification or transformation proposal by faculty managers"
-msgstr ""
-
-msgid ""
-"Modification or transformation proposal not allowed for central managers "
-"during this period."
-msgstr ""
-
-msgid ""
-"Modification or transformation proposal not allowed for faculty managers "
-"during this period."
-msgstr ""
-
 #, python-format
 msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
@@ -1692,6 +1707,9 @@ msgstr ""
 msgid "Organizations"
 msgstr ""
 
+msgid "Osis code"
+msgstr ""
+
 msgid "Other academic responsible"
 msgstr ""
 
@@ -1705,6 +1723,9 @@ msgid "Other individual"
 msgstr ""
 
 msgid "Other languages activities"
+msgstr ""
+
+msgid "Other legal information"
 msgstr ""
 
 msgid "Other remark (intended for publication)"
@@ -1769,6 +1790,9 @@ msgid "Partnerships"
 msgstr ""
 
 msgid "Password"
+msgstr ""
+
+msgid "Pay attention"
 msgstr ""
 
 msgid "Pay attention! This learning unit is used in more than one formation"
@@ -1861,6 +1885,9 @@ msgid "Produce Xls"
 msgstr ""
 
 msgid "Produce a customizable xls of learning units"
+msgstr ""
+
+msgid "Produce a customizable xls of learning units with one line per training"
 msgstr ""
 
 msgid ""
@@ -2097,6 +2124,9 @@ msgstr ""
 msgid "Residential"
 msgstr ""
 
+msgid "Responsibles and contacts"
+msgstr ""
+
 msgid "Result"
 msgstr ""
 
@@ -2163,6 +2193,12 @@ msgstr ""
 msgid "Select all the messages"
 msgstr ""
 
+msgid "Select/deselect all"
+msgstr ""
+
+msgid "Send calendar reminder notice"
+msgstr ""
+
 msgid "Separate"
 msgstr ""
 
@@ -2215,13 +2251,7 @@ msgstr ""
 msgid "Start date"
 msgstr ""
 
-msgid "Start date and end date are mandatory"
-msgstr ""
-
 msgid "Start date is mandatory"
-msgstr ""
-
-msgid "Start date must be lower than end date"
 msgstr ""
 
 msgid "State"
@@ -2318,12 +2348,6 @@ msgstr ""
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr ""
 
-#, python-format
-msgid ""
-"The closure's date of '%s' of the academic calendar can't be lower than %s "
-"(end date of '%s' of the program '%s')"
-msgstr ""
-
 msgid "The configuration of you user profile"
 msgstr ""
 
@@ -2336,6 +2360,12 @@ msgstr ""
 msgid "The credits value should be an integer"
 msgstr ""
 
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
+msgstr ""
+
 #, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
@@ -2344,10 +2374,6 @@ msgstr ""
 
 #, python-format
 msgid "The entity '%(acronym)s' doesn't exist anymore in %(year)s"
-msgstr ""
-
-#, python-format
-msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
 msgid "The field can contain only one value."
@@ -2534,6 +2560,12 @@ msgstr ""
 msgid "Thesis"
 msgstr ""
 
+msgid "This action will permanently cancel the proposal"
+msgstr ""
+
+msgid "This action will permanently cancel the selected proposal(s)"
+msgstr ""
+
 msgid "This code already exists for this learning unit"
 msgstr ""
 
@@ -2550,14 +2582,6 @@ msgid "This field is required."
 msgstr ""
 
 msgid "This learning unit has application"
-msgstr ""
-
-msgid ""
-"This learning unit is not editable by central managers during this period."
-msgstr ""
-
-msgid ""
-"This learning unit is not editable by faculty managers during this period."
 msgstr ""
 
 #, python-format
@@ -2589,7 +2613,13 @@ msgstr ""
 msgid "Title specific complement"
 msgstr ""
 
+msgid "Titles(partial/English)"
+msgstr ""
+
 msgid "To complete"
+msgstr ""
+
+msgid "Today"
 msgstr ""
 
 msgid "Total"
@@ -2599,6 +2629,15 @@ msgid "Total enrollments to training"
 msgstr ""
 
 msgid "Training"
+msgstr ""
+
+msgid "Training code"
+msgstr ""
+
+msgid "Training management entity"
+msgstr ""
+
+msgid "Training title"
 msgstr ""
 
 msgid "Trainings"
@@ -2629,9 +2668,6 @@ msgid "Tutors"
 msgstr ""
 
 msgid "Type"
-msgstr ""
-
-msgid "Type of event"
 msgstr ""
 
 msgid "Type of training"
@@ -2673,16 +2709,22 @@ msgstr ""
 msgid "University second cycle certificate"
 msgstr ""
 
-msgid "Unscheduled events"
+msgid "Unspecified"
 msgstr ""
 
 msgid "Up"
+msgstr ""
+
+msgid "Update"
 msgstr ""
 
 msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Url"
 msgstr ""
 
 msgid "User"
@@ -2770,9 +2812,6 @@ msgctxt "section title"
 msgid "Welcome"
 msgstr ""
 
-msgid "Year of concerned data"
-msgstr ""
-
 msgid "Yes"
 msgstr ""
 
@@ -2841,9 +2880,6 @@ msgstr ""
 msgid "a partim volume value is greater than corresponding volume of parent"
 msgstr ""
 
-msgid "academic events"
-msgstr ""
-
 # TODO
 msgid "acronym rules"
 msgstr ""
@@ -2901,17 +2937,8 @@ msgstr ""
 msgid "credits"
 msgstr ""
 
-msgid "date_format"
-msgstr "%m/%d/%Y"
-
 msgid "date_format_string"
 msgstr "m/d/Y"
-
-msgid "day"
-msgstr ""
-
-msgid "days"
-msgstr ""
 
 msgid "delete"
 msgstr ""
@@ -2948,9 +2975,6 @@ msgstr ""
 msgid "field reference"
 msgstr ""
 
-msgid "format_date"
-msgstr "mm/dd/yyyy"
-
 msgid "french help text"
 msgstr ""
 
@@ -2964,6 +2988,9 @@ msgid "hourly volume total annual"
 msgstr ""
 
 msgid "initial value"
+msgstr ""
+
+msgid "is part of several trainings"
 msgstr ""
 
 msgid "items per page"
@@ -3083,6 +3110,15 @@ msgid ""
 msgstr ""
 
 msgid "the sum of repartition volumes must be equal to the global volume"
+msgstr ""
+
+msgid "this group"
+msgstr ""
+
+msgid "this mini-training"
+msgstr ""
+
+msgid "this training"
 msgstr ""
 
 msgid "to"

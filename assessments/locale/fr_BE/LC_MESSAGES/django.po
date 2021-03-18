@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-11 14:07+0100\n"
+"POT-Creation-Date: 2021-03-16 13:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -163,6 +163,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
+
+msgid "Details other educational facilities"
+msgstr "Détails autre aménagement"
 
 msgid "Display all deadlines for this learning unit"
 msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
@@ -479,14 +482,14 @@ msgstr "Note contenant plus de 2 décimales"
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
 
-msgid "Score(s) saved"
-msgstr "Note(s) sauvée(s)"
-
 msgid "Score sheet address was successfully saved."
 msgstr "L'adresse de la feuille de notes a été sauvée avec succès."
 
 msgid "Score submitted"
 msgstr "note soumise"
+
+msgid "Score(s) saved"
+msgstr "Note(s) sauvée(s)"
 
 msgid "Scores encoding"
 msgstr "Encodage de notes"

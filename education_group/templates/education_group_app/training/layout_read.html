@@ -1,5 +1,5 @@
 {% extends "education_group_app/blocks/layout_detail.html" %}
-{% load i18n navigation %}
+{% load i18n navigation static %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% block header_content %}
-    {% navigation_group request.user education_group_version.root_group request.resolver_match.url_name current_version %}
+    {% navigation_group request.user education_group_version.root_group request.resolver_match.url_name version_label %}
 {% endblock %}
 
 {% block tabs %}
@@ -57,4 +57,5 @@
             });
         {% endif %}
     </script>
+    <script type="text/javascript" src="{% static "js/education_group/element-focus.js" %}"></script>
 {% endblock script %}

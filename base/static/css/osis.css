@@ -259,9 +259,14 @@ div:target {
     content: "\f077";
 }
 
+/* Override select2 css */
 .select2-container {
     width: 100% !important;
     padding: 0;
+}
+.select2-selection--multiple{
+    overflow: hidden !important;
+    height: auto !important;
 }
 
 #loader {
@@ -697,3 +702,32 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .btn-publish {
     margin-right: 20px;
 }
+
+div[name^="section_"]  div.collapse[aria-expanded="false"] {
+    display: block;
+    height: 80px !important;
+    overflow: hidden;
+}
+
+div[name^="section_"] .btn_collapse {
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+    font-weight: bold;
+}
+
+div[name^="section_"] .btn_collapse.collapsed:after  {
+    content: "\f078";
+}
+
+div[name^="section_"] .btn_collapse:not(.collapsed):after {
+    content: "\f077";
+}
+
+/*
+Override default z-index of datepicker component in order to fix issue with datepicker in modal
+https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-behind-popover/51344669
+*/
+.bootstrap-datetimepicker-widget {
+    z-index: 1600;
+}
+
