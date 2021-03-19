@@ -157,11 +157,11 @@ def search_enrollments_of_student(cmd: interface.CommandRequest) -> List[Formati
 
 
 - Réponses :
-    - Non. Mais un ApplicationService peut utiliser un autre ApplicationService
+    - Non. Dans l'architecture en oignon, la couche ApplicationService connaît la couche DomainService, et non l'inverse 
     - Oui. Un DomainService encapsule une logique métier qui interragit avec des dépendances extérieures, nécessaire
     dans le cadre d'une Use case (ApplicationService)
     - Non. Le filtre `enrollment_state__in=[STATE1, STATE4, STATE8]` représente de la logique métier. À encapsuler 
-    dans le domaine (ou dans un DomainService).
+    dans le domaine (ou dans un DomainService)
 
 
 ## Exercices
