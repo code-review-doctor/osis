@@ -24,18 +24,16 @@
 ##############################################################################
 import uuid
 from enum import Enum
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.forms.exceptions import InvalidFormException
-from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
-    FillProgramTreeTransitionContentFromProgramTreeVersionCommand
+from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.service.write import fill_program_tree_version_content_from_last_year_service, \
-    fill_program_tree_transition_content_from_program_tree_version_service
+from program_management.ddd.service.write import fill_program_tree_version_content_from_program_tree_version_service
 
 
 class ValidChoice(Enum):
@@ -70,17 +68,17 @@ class FillTransitionContentForm(forms.Form):
         if self.is_valid():
             try:
                 cmd = self.generate_cmd()
-                fill_program_tree_transition_content_from_program_tree_version_service. \
-                    fill_program_tree_transition_content_from_program_tree_version(cmd)
+                fill_program_tree_version_content_from_program_tree_version_service. \
+                    fill_program_tree_version_content_from_program_tree_version(cmd)
                 return cmd.transaction_id
             except MultipleBusinessExceptions as multiple_exceptions:
                 for exception in multiple_exceptions.exceptions:
                     self.add_error(None, exception.message)
                 raise InvalidFormException()
 
-    def generate_cmd(self) -> 'FillProgramTreeTransitionContentFromProgramTreeVersionCommand':
+    def generate_cmd(self) -> 'FillProgramTreeVersionContentFromProgramTreeVersionCommand':
         tree_to_fill_from = self._get_tree_to_fill_from()
-        return FillProgramTreeTransitionContentFromProgramTreeVersionCommand(
+        return FillProgramTreeVersionContentFromProgramTreeVersionCommand(
             from_year=tree_to_fill_from.entity_id.year,
             from_offer_acronym=tree_to_fill_from.entity_id.offer_acronym,
             from_version_name=tree_to_fill_from.version_name,

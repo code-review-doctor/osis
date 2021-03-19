@@ -33,12 +33,16 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 def fill_from_past_year(modeladmin, request, queryset):
-    from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
+    from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
     from program_management.ddd.service.write import bulk_fill_program_tree_version_content_service_from_past_year
     cmds = []
     qs = queryset.select_related("offer", "root_group")
     for obj in qs:
-        cmd = FillTreeVersionContentFromPastYearCommand(
+        cmd = FillProgramTreeVersionContentFromProgramTreeVersionCommand(
+            from_year=obj.offer.academic_year.year - 1,
+            from_offer_acronym=obj.offer.acronym,
+            from_version_name=obj.version_name,
+            from_transition_name=obj.transition_name,
             to_year=obj.offer.academic_year.year,
             to_offer_acronym=obj.offer.acronym,
             to_version_name=obj.version_name,

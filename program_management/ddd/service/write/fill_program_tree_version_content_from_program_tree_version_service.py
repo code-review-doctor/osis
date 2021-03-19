@@ -22,14 +22,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import attr
 from django.db import transaction
 
-from education_group.ddd.service.write import copy_group_service
+from education_group.ddd.service.write import create_group_service, copy_group_service
 from program_management.ddd.command import CopyProgramTreePrerequisitesFromProgramTreeCommand, \
-    FillTreeVersionContentFromPastYearCommand, CopyTreeCmsFromTree
+    FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
+    CopyTreeCmsFromTree
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
+from program_management.ddd.domain.service import generate_node_code
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository, report
 from program_management.ddd.service.write import copy_program_tree_prerequisites_from_program_tree_service, \
@@ -37,23 +40,22 @@ from program_management.ddd.service.write import copy_program_tree_prerequisites
 
 
 @transaction.atomic()
-def fill_program_tree_version_content_from_last_year(
-        cmd: 'FillTreeVersionContentFromPastYearCommand'
+def fill_program_tree_version_content_from_program_tree_version(
+        cmd: 'FillProgramTreeVersionContentFromProgramTreeVersionCommand'
 ) -> 'ProgramTreeVersionIdentity':
     tree_version_repository = program_tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
     node_repo = node_repository.NodeRepository()
     report_repo = report.ReportRepository()
 
-    last_year_tree_version = tree_version_repository.get(
+    from_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
-            offer_acronym=cmd.to_offer_acronym,
-            year=cmd.to_year - 1,
-            version_name=cmd.to_version_name,
-            transition_name=cmd.to_transition_name
+            offer_acronym=cmd.from_offer_acronym,
+            year=cmd.from_year,
+            version_name=cmd.from_version_name,
+            transition_name=cmd.from_transition_name
         )
     )
-
     to_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
             offer_acronym=cmd.to_offer_acronym,
@@ -63,43 +65,66 @@ def fill_program_tree_version_content_from_last_year(
         )
     )
 
+    transition_tree_versions = tree_version_repository.search(
+        version_name=to_tree_version.version_name,
+        transition_name=to_tree_version.transition_name,
+        year=cmd.to_year
+    )
+    transition_trees = [tree_version.get_tree() for tree_version in transition_tree_versions]
+
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
-            for node in last_year_tree_version.get_tree().root_node.get_all_children_as_nodes()
+            for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
 
     existing_learning_unit_nodes = node_repo.search(
         [
             attr.evolve(node.entity_id, year=cmd.to_year)
-            for node in last_year_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
+            for node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
         ]
     )
 
-    existing_nodes = [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
+    existing_nodes = [tree.root_node for tree in existing_trees] + \
+        existing_learning_unit_nodes +\
+        [tree.root_node for tree in transition_trees]
 
-    ProgramTreeVersionBuilder().fill_from_last_year_program_tree_version(
-        last_year_tree_version,
+    existing_codes = [identity.code for identity in tree_repository.get_all_identities()]
+    node_code_generator = generate_node_code.BGenerateNodeCode(existing_codes=existing_codes)
+
+    ProgramTreeVersionBuilder().fill_from_program_tree_version(
+        from_tree_version,
         to_tree_version,
         set(existing_nodes),
+        node_code_generator
     )
 
     identity = tree_version_repository.update(to_tree_version)
-    tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
+    if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
+        tree_repository.create(
+            to_tree_version.get_tree(),
+            copy_group_service=copy_group_service.copy_group
+        )
+    else:
+        tree_repository.create(
+            to_tree_version.get_tree(),
+            create_orphan_group_service=create_group_service.create_orphan_group
+        )
 
     copy_program_tree_prerequisites_from_program_tree_service.copy_program_tree_prerequisites_from_program_tree(
         CopyProgramTreePrerequisitesFromProgramTreeCommand(
-            from_code=last_year_tree_version.program_tree_identity.code,
-            from_year=last_year_tree_version.program_tree_identity.year,
+            from_code=from_tree_version.program_tree_identity.code,
+            from_year=from_tree_version.program_tree_identity.year,
             to_code=to_tree_version.program_tree_identity.code,
             to_year=to_tree_version.program_tree_identity.year
         )
     )
+
     copy_program_tree_cms_from_program_tree_service.copy_program_tree_cms_from_program_tree(
         CopyTreeCmsFromTree(
-            from_code=last_year_tree_version.program_tree_identity.code,
-            from_year=last_year_tree_version.program_tree_identity.year,
+            from_code=from_tree_version.program_tree_identity.code,
+            from_year=from_tree_version.program_tree_identity.year,
             to_code=to_tree_version.program_tree_identity.code,
             to_year=to_tree_version.program_tree_identity.year
         )

@@ -257,17 +257,6 @@ class FillProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator
         self.validators = [
             CheckValidTreeVersionToFillTo(tree_to_fill_to),
             CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to),
-            IsSpecificOfficialValidator(tree_to_fill_to)
-        ]
-        super().__init__()
-
-
-class FillProgramTreeTransitionValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(self, tree_to_fill_from: 'ProgramTreeVersion', tree_to_fill_to: 'ProgramTreeVersion'):
-        self.validators = [
-            CheckValidTreeVersionToFillTo(tree_to_fill_to),
-            CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to),
-            IsTransitionValidator(tree_to_fill_to)
         ]
         super().__init__()
 

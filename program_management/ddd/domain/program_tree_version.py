@@ -93,18 +93,15 @@ class ProgramTreeVersionBuilder:
         )
         return to_tree_version
 
-    def fill_transition_from_program_tree_version(
+    def fill_from_program_tree_version(
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
             existing_nodes: Set['Node'],
             node_code_generator: 'BGenerateNodeCode'
     ) -> 'ProgramTreeVersion':
-        validators_by_business_action.FillProgramTreeTransitionValidatorList(
-            from_tree_version,
-            to_tree_version
-        ).validate()
-        if from_tree_version.is_transition:
+        validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
+        if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
             program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
