@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from decimal import Decimal
 from typing import Optional, List, Tuple
 
@@ -736,6 +737,7 @@ class FillProgramTreeVersionContentFromProgramTreeVersionCommand(interface.Comma
     to_offer_acronym = attr.ib(type=str)
     to_version_name = attr.ib(type=str)
     to_transition_name = attr.ib(type=str)
+    transaction_id = attr.ib(type=uuid.UUID, default=attr.Factory(uuid.uuid4))
 
 
 @attr.s(frozen=True, slots=True)
@@ -748,6 +750,7 @@ class FillProgramTreeTransitionContentFromProgramTreeVersionCommand(interface.Co
     to_offer_acronym = attr.ib(type=str)
     to_version_name = attr.ib(type=str)
     to_transition_name = attr.ib(type=str)
+    transaction_id = attr.ib(type=uuid.UUID, default=attr.Factory(uuid.uuid4))
 
 
 @attr.s(frozen=True, slots=True)
@@ -756,6 +759,7 @@ class FillTreeVersionContentFromPastYearCommand(interface.CommandRequest):
     to_offer_acronym = attr.ib(type=str)
     to_version_name = attr.ib(type=str)
     to_transition_name = attr.ib(type=str)
+    transaction_id = attr.ib(type=uuid.UUID, default=attr.Factory(uuid.uuid4))
 
 
 @attr.s(frozen=True, slots=True)
@@ -792,3 +796,8 @@ class GetProgramTreeVersionOriginCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetReportCommand(interface.CommandRequest):
+    transaction_id = attr.ib(type=uuid.UUID)

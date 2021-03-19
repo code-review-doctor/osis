@@ -22,6 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from enum import Enum
 from typing import Optional, Tuple, List
 
@@ -65,11 +66,13 @@ class FillTransitionContentForm(forms.Form):
 
         self.set_source_choices()
 
-    def save(self) -> None:
+    def save(self) -> uuid.UUID:
         if self.is_valid():
             try:
+                cmd = self.generate_cmd()
                 fill_program_tree_transition_content_from_program_tree_version_service. \
-                    fill_program_tree_transition_content_from_program_tree_version(self.generate_cmd())
+                    fill_program_tree_transition_content_from_program_tree_version(cmd)
+                return cmd.transaction_id
             except MultipleBusinessExceptions as multiple_exceptions:
                 for exception in multiple_exceptions.exceptions:
                     self.add_error(None, exception.message)

@@ -22,3 +22,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import abc
+from typing import List
+
+
+class ReportEvent(abc.ABC):
+    def __str__(self):
+        raise NotImplementedError
+
+
+class AggregateReport:
+    def __init__(self):
+        self._changes = []  # type:List[ReportEvent]
+        self._warnings = []  # type:List[ReportEvent]
+
+    def add_change(self, event: ReportEvent) -> None:
+        self._changes.append(event)
+
+    def add_warning(self, event: ReportEvent) -> None:
+        self._warnings.append(event)
+
+    def get_changes(self) -> List[ReportEvent]:
+        return self._changes
+
+    def get_warnings(self) -> List[ReportEvent]:
+        return self._warnings

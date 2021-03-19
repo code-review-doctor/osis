@@ -34,7 +34,7 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.domain.service import generate_node_code
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
-    program_tree as program_tree_repository, node as node_repository
+    program_tree as program_tree_repository, node as node_repository, report
 from program_management.ddd.service.write import copy_program_tree_prerequisites_from_program_tree_service, \
     create_and_postpone_tree_transition_version_service, copy_program_tree_cms_from_program_tree_service
 
@@ -46,6 +46,7 @@ def fill_program_tree_transition_content_from_program_tree_version(
     tree_version_repository = program_tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
     node_repo = node_repository.NodeRepository()
+    report_repo = report.ReportRepository()
 
     from_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
@@ -147,5 +148,7 @@ def fill_program_tree_transition_content_from_program_tree_version(
             to_year=to_tree_version.program_tree_identity.year
         )
     )
+
+    report_repo.create(to_tree_version.get_tree().report, cmd.transaction_id)
 
     return identity

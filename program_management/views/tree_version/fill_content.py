@@ -28,19 +28,22 @@ from typing import Optional, Dict
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
 from base.forms.exceptions import InvalidFormException
 from base.models.enums import education_group_categories
+from base.views.common import display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
+from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.domain.report import AggregateReport
 from program_management.ddd.service.read import get_program_tree_version_service, \
-    get_program_tree_version_origin_service
+    get_program_tree_version_origin_service, get_report_service
 from program_management.forms.fill_content import FillTransitionContentForm
-from django.utils.translation import gettext_lazy as _
 
 
 class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
@@ -56,13 +59,21 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
 
     def form_valid(self, form: 'FillTransitionContentForm'):
         try:
-            form.save()
+            transaction_id = form.save()
+            report = get_report_service.get_report(GetReportCommand(transaction_id=transaction_id))
+            self.display_report_warning(report)
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
 
     def get_success_url(self) -> str:
         return ""
+
+    def display_report_warning(self, report: 'AggregateReport'):
+        display_warning_messages(
+            self.request,
+            [str(warning) for warning in report.get_warnings()]
+        )
 
     def get_success_message(self, cleaned_data) -> str:
         return _("%(title)s in %(year)s has been filled") % {

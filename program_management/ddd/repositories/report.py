@@ -22,3 +22,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+from typing import Optional
+
+from django.core.cache import cache
+
+from program_management.ddd.domain.report import AggregateReport
+
+DEFAULT_TIMEOUT = 60  # seconds
+
+
+class ReportRepository:
+    @classmethod
+    def create(cls, report: 'AggregateReport', transaction_id: uuid.UUID):
+        cache.set(str(transaction_id), report, timeout=DEFAULT_TIMEOUT)
+
+    @classmethod
+    def get(cls, transaction_id: uuid.UUID) -> Optional['AggregateReport']:
+        return cache.get(str(transaction_id))
