@@ -2,7 +2,9 @@
 
 - FAQ : Question : Comment savoir si on doit filtrer en mémoire (domaine) ou via Repository.search/filter via queryset ?
     - Tendre vers des queries génériques, et n'aller dans le spécifique QUE s'il y a des problèmes de perf
-
+    Ajouter guideline : GENERIGQUE au maximum dans repository
+    plus il y a de filtres, plus on se demande "est-ce que c'est du métier" 
+    et "est-ce que notre nom de fonction est explicicte et respecte le single responsibility principle"?
 
 ### Domain
 

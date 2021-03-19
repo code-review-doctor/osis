@@ -20,3 +20,8 @@ Les Serializers, forms, views utilisent alors un applicaiton service qui renvoie
 
 - W5 : mettre à jour la partie "abroerscence des packages" dans le CONTRIBUTING (suite à workshop)
 - W5 : ou placer les exceptions.py ? (exceptions business)
+
+- W5? Bounded contexts
+    - [ALES] ApplicationService peutil appeler plusieurs repositories de plusieurs domaines différents ?
+
+- W5 Shared Kernel ?

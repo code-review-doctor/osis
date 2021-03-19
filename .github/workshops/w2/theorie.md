@@ -11,8 +11,8 @@ from osis_common.ddd import interface
 import attr
 
 # Domain
-@attr.s(slots=True)
-class Company(interface.Entity):
+@attr.s(frozen=True, slots=True)
+class Company(interface.ValueObject):
     domain_name = attr.ib(type=str)
     
     def is_email_corporate(self, email: str) -> bool:
@@ -170,7 +170,7 @@ def change_email_service(cmd: interface.CommandRequest) -> 'interface.EntityIden
     user = repository.get(UserIdentity(username=cmd.username), all_users=all_users)
     
     # When
-    user.change_email(new_email=cmd.email)
+    user.change_email(new_email=cmd.email, all_users=all_users)
 
     # Then
     repository.update(user)

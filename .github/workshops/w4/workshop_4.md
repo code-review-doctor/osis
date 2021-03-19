@@ -14,3 +14,9 @@
         - Pattern "Mediator"
     - Pratique [contenu à développer] :
         - Use case : En tant qu'utilisateur, je veux obtenir un rapport (à l'écran) de toutes les erreurs lorsque je soumets mon formulaire de création d'une UE
+
+
+
+Pratique : 
+- Corriger les FIXME dans le code (workshop 1)
+- Revoir le ResponsibleEntityAuthorizedTypeOrCode (injeter Entity ?)
