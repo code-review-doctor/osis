@@ -3,6 +3,11 @@
 - Théorie
     - Design patterns "Factory" et "Builder"
 - Workshop
+    - Question : notre LearningUnitRepository.get() respecte-t-il nos guidelines ?
+    - Refactoring UE : éviter la duplication de code qui instancie notre LearningUnit 
+        - instancié dans repository
+        - instancié dans le domaine
+    - Demande métier supplémentaire
     - Use case 1 : En tant qu'utilisateur facultaire, je veux recopier une UE vers l'année suivante
     - Use case 2 : En tant qu'utilisateur facultaire, je veux prolonger une UE jusqu'à N+6
 
