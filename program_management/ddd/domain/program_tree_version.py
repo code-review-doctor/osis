@@ -76,23 +76,6 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
-    def fill_from_last_year_program_tree_version(
-            self,
-            last_year_tree_version: 'ProgramTreeVersion',
-            to_tree_version: 'ProgramTreeVersion',
-            existing_nodes: Set['Node'],
-    ) -> 'ProgramTreeVersion':
-        validators_by_business_action.FillProgramTreeVersionValidatorList(
-            last_year_tree_version,
-            to_tree_version
-        ).validate()
-        program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
-            last_year_tree_version.get_tree(),
-            to_tree_version.get_tree(),
-            existing_nodes,
-        )
-        return to_tree_version
-
     def fill_from_program_tree_version(
             self,
             from_tree_version: 'ProgramTreeVersion',
@@ -114,6 +97,17 @@ class ProgramTreeVersionBuilder:
                 existing_nodes,
                 node_code_generator
             )
+        return to_tree_version
+
+    def copy_prerequisites_from_tree_version(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            to_tree_version: 'ProgramTreeVersion'
+    ) -> 'ProgramTreeVersion':
+        program_tree.ProgramTreeBuilder().copy_prerequisites_from_program_tree(
+            from_tree_version.get_tree(),
+            to_tree_version.get_tree()
+        )
         return to_tree_version
 
     def copy_to_next_year(
