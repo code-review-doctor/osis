@@ -43,15 +43,16 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
         acronym=postpone_cmd.postpone_from_acronym,
         year=postpone_cmd.postpone_from_year
     )
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
-        identity=from_training_id,
-        repository=TrainingRepository()
-    )
+
     if not postpone_cmd.is_creation and postpone_cmd.postpone_from_year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
         conflicted_fields = {}
         end_postponement_year = postpone_cmd.postpone_from_year
     else:
         conflicted_fields = ConflictedFields().get_training_conflicted_fields(from_training_id)
+        end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
+            identity=from_training_id,
+            repository=TrainingRepository()
+        )
 
     # WHEN
     identities_created = [

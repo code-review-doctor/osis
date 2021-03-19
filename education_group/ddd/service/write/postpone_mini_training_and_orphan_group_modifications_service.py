@@ -44,16 +44,15 @@ def postpone_mini_training_and_orphan_group_modifications(
     from_year = postpone_cmd.postpone_from_year
     from_mini_training_id = MiniTrainingIdentity(acronym=postpone_cmd.postpone_from_abbreviated_title, year=from_year)
 
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_mini_training(
-        identity=from_mini_training_id,
-        repository=MiniTrainingRepository()
-    )
-
     if not postpone_cmd.is_creation and postpone_cmd.postpone_from_year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
         conflicted_fields = {}
         end_postponement_year = postpone_cmd.postpone_from_year
     else:
         conflicted_fields = ConflictedFields().get_mini_training_conflicted_fields(from_mini_training_id)
+        end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_mini_training(
+            identity=from_mini_training_id,
+            repository=MiniTrainingRepository()
+        )
 
     # WHEN
     identities_created = [
