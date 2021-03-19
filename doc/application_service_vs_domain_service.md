@@ -18,14 +18,17 @@
 - Un domain service est un service qui encapsule une logique métier qui ne sait pas être représenté par un Entity ou à un ValueObject,
 et qui ne représente pas un cas d'utilisation en tant que tel
 - Quand utiliser un DomainService ?
-    - Lorsque notre domaine ne peut pas être "complet" à cause des performances
-        - Exemple : Vérifier si l'email d'un utilisateur existe (charger la liste de tous les utilisateurs en mémoire serait trop couteux)
-    - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
-        - Exemple : Générer un numéro de séquence pour une entité du domaine (dépendance externe : base de données)
-        - Exemple : Attacher un groupement dans le contenu d'une formation n'est possible que si le cache contient un groupement et peut être vidé (dépendance externe : système de cache)
-        - Exemple : Calculer la date de fin de report d'une formation (dépendance externe : gestion des événements académiques)
-    - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
-        - Exemple codé : 
+    - Le plus rarement possible ! (Plus le domaine est [pure et complet](#application_service_vs_domain_service.md),
+     moins les DomainServices sont utiles)
+        - Lorsque le use case nécessite une logique métier à travers plusieurs RootEntity (aggrégats)
+        - Lorsque notre domaine ne peut pas être "complet" à cause des performances
+            - Exemple : Vérifier si l'email d'un utilisateur existe (charger la liste de tous les utilisateurs en mémoire serait trop couteux)
+        - Lorsque notre use case est dépendant d'un service technique / extérieur au domaine
+            - Exemple : Générer un numéro de séquence pour une entité du domaine (dépendance externe : base de données)
+            - Exemple : Attacher un groupement dans le contenu d'une formation n'est possible que si le cache contient un groupement et peut être vidé (dépendance externe : système de cache)
+            - Exemple : Calculer la date de fin de report d'une formation (dépendance externe : gestion des événements académiques)
+        - Lorsque notre use case se comporte différemment en fonction du résultat d'un service extérieur
+            - Exemple codé : 
 
 ```python
 import attr

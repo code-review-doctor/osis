@@ -658,8 +658,10 @@ class TrainingRepository(interface.AbstractRepository):
 
 - Regroupe les **objets** qui ne représentent pas un `ValueObject` ou une `Entity` du domaine. 
 Exemple : un calculateur de taxe
-- Encapsule de la logique métier, qui ne sait pas être contenue directement dans le domaine.
-Cf. [domaine pure et domain complet](application_service_vs_domain_service.md) et [application service VS domain service](application_service_vs_domain_service.md)
+- Encapsule de la logique métier, qui ne sait pas être contenue directement dans le domaine
+    - Le plus rarement possible ! 
+    - Cf. [domaine pure et domain complet](application_service_vs_domain_service.md)
+    - Cf. [application service VS domain service](application_service_vs_domain_service.md)
 - Renvoie uniquement des types primitifs, des Entity ou ValueObjects
 - Peut recevoir une Entity, ValueObject, type_primitif ou repository
 - Accès :
