@@ -293,3 +293,20 @@ n’existe qu’en un seul exemplaire, tout en fournissant un point d’accès g
     - Avantage : facilité e distinction privé - publique : ce qui est publique possède une factory
     - Avantage : pas besoin de faire de new Identity(...) -> juste appeler la factory
     - Inconvénient : pattern "factory" complexe pour des objets simples ("overengineering")
+    
+- Pas de différence entre Builder et Factory :
+    - Uniquement "Builder"
+
+- Nouvelle interface :
+
+```python
+
+class Builder(abc.ABC):
+
+    def build_from_command(self, cmd: CommandRequest):
+        raise NotImplementedError()
+
+    def build_from_database_model(self, django_model_object: django.db.models.Model):
+        raise NotImplementedError()
+
+```

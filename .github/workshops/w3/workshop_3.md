@@ -1,6 +1,8 @@
 ## [W3] Formation 3
 
+- Finalisation des uses cases 1 + 2 + 3 (workshop 2)
 - Théorie
+    - Update or create ?
     - Design patterns "Factory" et "Builder"
 - Workshop
     - Question : notre LearningUnitRepository.get() respecte-t-il nos guidelines ?

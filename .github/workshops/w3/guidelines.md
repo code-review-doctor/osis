@@ -16,6 +16,9 @@ Et seulement lui !! Il est interdit de créer uen nstante d'un objet du domaine 
         - Avantage : pas d'ambiguité : tout objet du domaine ne peut être instancié que via factory
         - Avantage : pas besoin de faire de new Identity(...) -> juste appeler la factory
         - Inconvénient : pattern "factory" pas nécessaire
+        
+
+- Factory.build_from_command et Factory.build_from
 
 -------------------------------
 
