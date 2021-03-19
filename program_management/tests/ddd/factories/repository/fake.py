@@ -26,7 +26,7 @@ from typing import List, Type, Optional, Set
 from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import exception
+from program_management.ddd.domain import exception, program_tree
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from testing.mocks import FakeRepository
 
@@ -191,7 +191,7 @@ def _search_nodes(cls, node_ids: List['NodeIdentity'] = None, year: int = None, 
 def _get_all_identities(cls) -> Set['ProgramTreeIdentity']:
     result = set()
     for tree in cls.root_entities:
-        identities = {ProgramTreeIdentity(node.code, node.year) for node in tree.get_all_nodes()
+        identities = {program_tree.ProgramTreeIdentity(node.code, node.year) for node in tree.get_all_nodes()
                       if not node.is_learning_unit()}
         result.union(identities)
     return result
