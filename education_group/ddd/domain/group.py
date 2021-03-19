@@ -141,6 +141,16 @@ class Group(interface.RootEntity):
     def is_mini_training(self):
         return self.type in MiniTrainingType
 
+    def is_backbone_group(self):
+        return self.type in (
+            GroupType.COMMON_CORE,
+            GroupType.FINALITY_120_LIST_CHOICE,
+            GroupType.FINALITY_180_LIST_CHOICE,
+            GroupType.OPTION_LIST_CHOICE,
+            GroupType.MAJOR_LIST_CHOICE,
+            GroupType.MINOR_LIST_CHOICE
+        )
+
     def update(
             self,
             abbreviated_title: str,
@@ -185,3 +195,21 @@ class Group(interface.RootEntity):
                 continue
             value = getattr(other_group, field)
             setattr(self, field, value)
+
+
+    def build_success_messages(self, updated_aims_trainings, updated_trainings):
+        success_messages = []
+
+        # get success msg on deleted trainings before splitting results
+        if updated_trainings:
+            success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
+
+        updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
+        updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
+        updated_aims_trainings = list(set(updated_aims_trainings).difference(updated_trainings_with_aims))
+
+        success_messages += self.get_success_msg_updated_trainings(updated_trainings)
+        success_messages += self.get_success_msg_updated_trainings_with_aims(updated_trainings_with_aims)
+        success_messages += self.get_success_msg_updated_aims_only(updated_aims_trainings)
+
+        return success_messages

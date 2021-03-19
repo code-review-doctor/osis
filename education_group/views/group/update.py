@@ -34,7 +34,8 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version, academic_year, campus
-from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update, \
+    display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
@@ -48,6 +49,11 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import PermissionRequiredMixin
+from education_group.ddd.service.write.postpone_backbone_group_modification_service import \
+    postpone_backbone_group_modification_service
+from education_group.ddd.domain.exception import GroupCopyConsistencyException
+from education_group.ddd.domain.group import GroupIdentity
+from base.utils.urls import reverse_with_get
 
 
 class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -80,12 +86,18 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
 
         if group_form.is_valid():
-            group_id = self.__send_update_group_cmd(group_form)
+            print('is valid')
+            updated_groups = self.__send_update_group_cmd(group_form)
             if group_form.is_valid():
-                display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+                success_messages = self.build_success_messages(
+                    updated_groups
+                )
+                display_success_messages(request, success_messages, extra_tags='safe')
+                # display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 check_formations_impacted_by_update(self.get_group_obj().code,
                                                     self.get_group_obj().year, request, self.get_group_obj().type)
-                return HttpResponseRedirect(self.get_success_url(group_id))
+                return HttpResponseRedirect(self.get_success_url())
+                # return HttpResponseRedirect(self.get_success_url(group_id))
         else:
             msg = _("Error(s) in form: The modifications are not saved")
             display_error_messages(request, msg)
@@ -98,44 +110,50 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "cancel_url": self.get_cancel_url()
         })
 
-    def __send_update_group_cmd(self, group_form: GroupUpdateForm) -> 'GroupIdentity':
-        cmd_update = command.UpdateGroupCommand(
-            code=self.kwargs['code'],
-            year=self.kwargs['year'],
-            abbreviated_title=group_form.cleaned_data['abbreviated_title'],
-            title_fr=group_form.cleaned_data['title_fr'],
-            title_en=group_form.cleaned_data['title_en'],
-            credits=group_form.cleaned_data['credits'],
-            constraint_type=group_form.cleaned_data['constraint_type'],
-            min_constraint=group_form.cleaned_data['min_constraint'],
-            max_constraint=group_form.cleaned_data['max_constraint'],
-            management_entity_acronym=group_form.cleaned_data['management_entity'],
-            teaching_campus_name=group_form.cleaned_data['teaching_campus']['name'] if
+    def _convert_form_to_postpone_modification_cmd(
+            self,
+            group_form: GroupUpdateForm
+    ) -> command.UpdateGroupCommand:
+        return command.UpdateGroupCommand(
+            code = self.kwargs['code'],
+            year = self.kwargs['year'],
+            abbreviated_title = group_form.cleaned_data['abbreviated_title'],
+            title_fr = group_form.cleaned_data['title_fr'],
+            title_en = group_form.cleaned_data['title_en'],
+            credits = group_form.cleaned_data['credits'],
+            constraint_type = group_form.cleaned_data['constraint_type'],
+            min_constraint = group_form.cleaned_data['min_constraint'],
+            max_constraint = group_form.cleaned_data['max_constraint'],
+            management_entity_acronym = group_form.cleaned_data['management_entity'],
+            teaching_campus_name = group_form.cleaned_data['teaching_campus']['name'] if
             group_form.cleaned_data['teaching_campus'] else None,
-            organization_name=group_form.cleaned_data['teaching_campus']['organization_name'] if
+            organization_name = group_form.cleaned_data['teaching_campus']['organization_name'] if
             group_form.cleaned_data['teaching_campus'] else None,
-            remark_fr=group_form.cleaned_data['remark_fr'],
-            remark_en=group_form.cleaned_data['remark_en'],
-            end_year=self.get_group_obj().end_year,
+            remark_fr = group_form.cleaned_data['remark_fr'],
+            remark_en = group_form.cleaned_data['remark_en'],
+            end_year = self.get_group_obj().end_year,
+
         )
+
+    def __send_update_group_cmd(self, group_form: GroupUpdateForm) -> 'GroupIdentity':
+        updated_training_identities = []
         try:
-            return update_group_service.update_group(cmd_update)
+            postpone_modification_command = self._convert_form_to_postpone_modification_cmd(group_form)
+            updated_training_identities = postpone_backbone_group_modification_service(
+                postpone_modification_command
+            )
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
-                if isinstance(e, CreditShouldBeGreaterOrEqualsThanZero):
-                    group_form.add_error('credits', e.message)
-                elif isinstance(e, ContentConstraintTypeMissing):
-                    group_form.add_error('constraint_type', e.message)
-                elif isinstance(e, ContentConstraintMinimumMaximumMissing) or \
-                        isinstance(e, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum):
-                    group_form.add_error('min_constraint', e.message)
-                    group_form.add_error('max_constraint', '')
-                elif isinstance(e, ContentConstraintMinimumInvalid):
-                    group_form.add_error('min_constraint', e.message)
-                elif isinstance(e, ContentConstraintMaximumInvalid):
-                    group_form.add_error('max_constraint', e.message)
-                else:
-                    group_form.add_error(None, e.message)
+                group_form.add_error(None, e.message)
+        except GroupCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
+            updated_group_identities = [
+                GroupIdentity(code=self.get_group_obj().code, year=year)
+                for year in range(self.get_group_obj().year, e.conflicted_fields_year)
+            ]
+        except Exception as e:
+            group_form.add_error(None, e.message)
+        return updated_group_identities
 
     @functools.lru_cache()
     def get_group_obj(self) -> 'Group':
@@ -157,12 +175,20 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": group_id.code,
             "academic_year": display_as_academic_year(group_id.year),
         }
+    #
+    # def get_success_url(self, group_id: 'GroupIdentity') -> str:
+    #     url = reverse('element_identification', kwargs={'code': group_id.code, 'year': group_id.year})
+    #     if self.request.GET.get('path'):
+    #         url += "?path={}".format(self.request.GET.get('path'))
+    #     return url
 
-    def get_success_url(self, group_id: 'GroupIdentity') -> str:
-        url = reverse('element_identification', kwargs={'code': group_id.code, 'year': group_id.year})
-        if self.request.GET.get('path'):
-            url += "?path={}".format(self.request.GET.get('path'))
-        return url
+    def get_success_url(self) -> str:
+        get_data = {'path': self.request.GET['path_to']} if self.request.GET.get('path_to') else {}
+        return reverse_with_get(
+            'element_identification',
+            kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year']},
+            get=get_data
+        )
 
     def _get_initial_group_form(self) -> Dict:
         group_obj = self.get_group_obj()
@@ -202,3 +228,27 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             academic_year__year=self.kwargs['year'],
             partial_acronym=self.kwargs['code']
         )
+
+    def build_success_messages(self, updated_trainings):
+        success_messages = []
+
+        # get success msg on deleted trainings before splitting results
+        # if updated_trainings:
+        #     success_messages += self.get_success_msg_deleted_trainings(updated_trainings)
+
+        # updated_trainings_with_aims = list(set(updated_trainings).intersection(updated_aims_trainings))
+        # updated_trainings = list(set(updated_trainings).difference(updated_trainings_with_aims))
+        # updated_aims_trainings = list(set(updated_aims_trainings).difference(updated_trainings_with_aims))
+
+        success_messages += self.get_success_msg_updated_groups(updated_trainings)
+        # success_messages += self.get_success_msg_updated_trainings_with_aims(updated_trainings_with_aims)
+        # success_messages += self.get_success_msg_updated_aims_only(updated_aims_trainings)
+
+        return success_messages
+
+    def get_success_msg_updated_groups(self, training_identities: List["GroupIdentity"]) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self.get_success_msg(identity) for identity in training_identities]
+
+    def _sort_by_year(self, training_identites: List[GroupIdentity]):
+        return sorted(training_identites, key=lambda x: x.year)
