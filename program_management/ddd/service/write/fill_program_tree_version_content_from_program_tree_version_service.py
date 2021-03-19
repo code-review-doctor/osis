@@ -99,10 +99,7 @@ def fill_program_tree_version_content_from_program_tree_version(
 
     identity = tree_version_repository.update(to_tree_version)
     if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
-        tree_repository.create(
-            to_tree_version.get_tree(),
-            copy_group_service=copy_group_service.copy_group
-        )
+        tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
     else:
         tree_repository.create(
             to_tree_version.get_tree(),

@@ -37,6 +37,7 @@ from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import CannotCopyPrerequisiteException
+from program_management.ddd.domain.report_events import CannotCopyPrerequisiteAsLearningUnitNotPresent
 from program_management.ddd.validators import validators_by_business_action
 
 AND_OPERATOR = "ET"
@@ -238,10 +239,27 @@ class PrerequisiteFactory:
 
         codes_inside_tree = {node.code for node in to_tree.get_all_nodes()}
         if node_having_prerequisite_identity.code not in codes_inside_tree:
+            to_tree.report.add_warning(
+                CannotCopyPrerequisiteAsLearningUnitNotPresent(
+                    prerequisite_code=node_having_prerequisite_identity.code,
+                    learning_unit_code=node_having_prerequisite_identity.code,
+                    training_acronym=to_tree.root_node.title,
+                    copy_year=to_tree.root_node.year
+                )
+            )
             raise CannotCopyPrerequisiteException()
 
         prerequisite_items_code = {item.code for item in to_copy.get_all_prerequisite_items()}
         if prerequisite_items_code.difference(codes_inside_tree):
+            for code in prerequisite_items_code.difference(codes_inside_tree):
+                to_tree.report.add_warning(
+                    CannotCopyPrerequisiteAsLearningUnitNotPresent(
+                        prerequisite_code=node_having_prerequisite_identity.code,
+                        learning_unit_code=code,
+                        training_acronym=to_tree.root_node.title,
+                        copy_year=to_tree.root_node.year
+                    )
+                )
             raise CannotCopyPrerequisiteException()
 
         return cls().from_expression(
