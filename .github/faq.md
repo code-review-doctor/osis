@@ -83,3 +83,68 @@ Si vous ne le faites pas, c'est votre collègue qui perdra du temps.
 
 <br/><br/>
 
+
+#### :question: Comment savoir si je dois filtrer une liste d'objets en mémoire via le Domain/DomainService ou via Repository.search/filter (querysets) ?
+
+Réponse courte : tendre vers des queries génériques, et n'aller dans les filtres spécifiques QUE s'il y a des problèmes de performances.
+
+Raisons : 
+- Plus une query est générique, plus elle sera réutilisée par nos services, plus le mécanisme de cache pourra jouer son rôle
+- Moins il y a de filtres côté repository, plus il y a de filtres côté Domain/DomainService
+
+
+Se poser les questions suivantes peut nous aider : 
+    
+- Est-ce que mon filtre correspond à du métier ?
+- Est-ce que le nom de ma fonction est explicite ?
+- Est-ce que ma fonction respecte le "single responsibility principle" ?
+
+Plus il y a de paramètres pour filtrer des querysets dans un Repository, 
+plus on se rapproche d'une fonction qui possède du métier.
+
+Exemple : 
+
+```python
+
+class EnrollmentRepository(interface.AbstractRepository):
+    
+    # MAUVAIS car : 
+    # 1. le filtre 'enrollment_state' correspond à du code "métier" 
+    # (le repository ne peut pas déterminer lui-même quels sont les 'enrollment_state' pertinents à un use case) 
+    # 2. le nom de la fonction 'search_enrollments_by_student' ne fait pas explicitement référence à 'enrollment_state'  
+    def search_enrollments_by_student(self, student_identity: StudentIdentity) -> List[FormationEnrollmentEntity]:
+        data_from_db = EnrollmentDatabaseDjangoModel.objects.filter(
+            student__registration_id=student_identity.registration_id,
+            enrollment_state__in=[STATE1, STATE4, STATE8],
+        )
+        return [FormationEnrollmentEntity(...obj) for obj in data_from_db]    
+    
+    # À éviter car : 
+    # 1. le filtre 'enrollment_states' amène une query très spécifique et variable 
+    def search_enrollments_by_student_and_enrollment_states(
+            self,
+            student_identity: StudentIdentity,
+            enrollment_states: List[EnrollmentState]
+    ) -> List[FormationEnrollmentEntity]:
+        data_from_db = EnrollmentDatabaseDjangoModel.objects.filter(
+            student__registration_id=student_identity.registration_id,
+            enrollment_state__in={state.name for state in states},
+        )
+        return [FormationEnrollmentEntity(...obj) for obj in data_from_db]    
+    
+    # CORRECT car :
+    # 1. Le filtre reste générique (mécanisme de cache plus aisé)
+    # 2. Respecte le single responsibility principle (on ne filtre que par Student, on ne fait rien d'autre)
+    def search_enrollments_by_student(
+            self,
+            student_identity: StudentIdentity
+    ) -> List[FormationEnrollmentEntity]:
+        data_from_db = EnrollmentDatabaseDjangoModel.objects.filter(
+            student__registration_id=student_identity.registration_id,
+            enrollment_state__in={state.name for state in states},
+        )
+        return [FormationEnrollmentEntity(...obj) for obj in data_from_db]
+
+```
+    
+<br/><br/>
