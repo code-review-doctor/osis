@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Union, Set
+from typing import Optional, List, Set
 
 from django.db.models import Q
 
@@ -31,10 +31,9 @@ from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from osis_common.ddd.interface import Entity
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import exception
+from program_management.ddd.domain import exception, program_tree
 from program_management.ddd.repositories import persist_tree, load_tree, node
 from program_management.models.element import Element
 
@@ -134,9 +133,9 @@ class ProgramTreeRepository(interface.AbstractRepository):
             raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
 
     @classmethod
-    def get_all_codes(cls) -> Set[str]:
-        codes_qs = GroupYear.objects.all().values_list('partial_acronym', flat=True)
-        return set(codes_qs)
+    def get_all_identities(cls) -> List['ProgramTreeIdentity']:
+        qs = GroupYear.objects.all().values_list("partial_acronym", "academic_year__year")
+        return [program_tree.ProgramTreeIdentity(code=row[0], year=row[1]) for row in qs]
 
 
 def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:
