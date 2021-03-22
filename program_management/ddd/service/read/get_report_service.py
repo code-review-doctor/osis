@@ -32,4 +32,4 @@ from program_management.ddd.repositories import report
 def get_report(cmd: 'GetReportCommand') -> Optional['AggregateReport']:
     report_repo = report.ReportRepository()
 
-    return report_repo.get(transaction_id=cmd.transaction_id)
+    return report_repo.get(transaction_id=cmd.from_transaction_id)

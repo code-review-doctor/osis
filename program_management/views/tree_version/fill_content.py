@@ -65,7 +65,7 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
     def form_valid(self, form: 'FillTransitionContentForm'):
         try:
             transaction_id = form.save()
-            report = get_report_service.get_report(command.GetReportCommand(transaction_id=transaction_id))
+            report = get_report_service.get_report(command.GetReportCommand(from_transaction_id=transaction_id))
             self.display_report_warning(report)
             return super().form_valid(form)
         except InvalidFormException:
