@@ -26,6 +26,7 @@
 import attr
 from django.utils.translation import gettext_lazy as _
 
+from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.report import ReportEvent
 
 
@@ -45,14 +46,15 @@ class CopyLearningUnitNotExistForYearEvent(ReportEvent):
 
 @attr.s(frozen=True, slots=True)
 class NotCopyTrainingMiniTrainingNotExistForYearEvent(ReportEvent):
-    title = attr.ib(type=str)
-    end_year = attr.ib(type=int)
-    copy_year = attr.ib(type=int)
+    code = attr.ib(type=str)
+    acronym = attr.ib(type=str)
+    end_year = attr.ib(type=AcademicYear)
+    copy_year = attr.ib(type=AcademicYear)
 
     def __str__(self):
         return _("Training/Mini-Training %(title)s is closed in %(end_year)s. "
                  "This training/mini-training is not copied in %(copy_year)s.") % {
-            "title": self.title,
+            "title": "{} - {}".format(self.code, self.acronym),
             "copy_year": self.copy_year,
             "end_year": self.end_year
         }

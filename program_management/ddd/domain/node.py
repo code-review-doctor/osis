@@ -224,6 +224,10 @@ class Node(interface.Entity):
         return self._academic_year
 
     @property
+    def end_academic_year(self) -> Optional['AcademicYear']:
+        return AcademicYear(self.end_date) if self.end_date else None
+
+    @property
     def children(self) -> List['Link']:
         self._children.sort(key=lambda link_obj: link_obj.order or 0)
         return self._children
