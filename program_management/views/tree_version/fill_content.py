@@ -39,7 +39,7 @@ from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.domain.report import AggregateReport
+from program_management.ddd.domain.report import Report
 from program_management.ddd.service.read import get_program_tree_version_service, \
     get_program_tree_version_origin_service, get_report_service
 from program_management.forms.fill_content import FillTransitionContentForm
@@ -74,13 +74,13 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
     def get_success_url(self) -> str:
         return ""
 
-    def display_report_warning(self, report: 'AggregateReport') -> None:
+    def display_report_warning(self, report: 'Report') -> None:
         display_warning_messages(self.request, [str(warning) for warning in report.get_warnings()])
 
     def get_success_message(self, cleaned_data) -> str:
         return _("%(title)s in %(year)s has been filled") % {
             "title": self.transition_tree.official_name,
-            "year": self.transition_tree.year
+            "year": self.transition_tree.academic_year
         }
 
     def get_permission_required(self):
