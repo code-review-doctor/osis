@@ -19,13 +19,3 @@ Et seulement lui !! Il est interdit de créer uen nstante d'un objet du domaine 
         
 
 - Factory.build_from_command et Factory.build_from
-
--------------------------------
-
-### Application services
-
-- [W3] Note importante : un service DOIT être réutilisable et ne doit faire qu'une seule chose à la fois.
-Par exemple, un service de mise à jour ne doit faire qu'une mise à jour et rien de plus (pas de report !).
-En d'autres termes, si une action (bouton) utilisateur nécessite de créer un training, reporter ce training, créer le programme type, le reporter, créer le gorupement et le reporter, etc... cela doit être 1 service qui fait appel à tous ces services implémentés dans des domaines différents.
-
-

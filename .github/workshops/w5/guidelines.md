@@ -38,3 +38,11 @@
 - TODO :: documenter avantages et inconvénient d'un shared kernel
    
 
+-------------------------------
+
+### Application services
+
+- [W5] Note importante : un service NE PEUT PAS être réutilisable et ne doit faire qu'une seule chose à la fois.
+Par exemple, un service de mise à jour ne doit faire qu'une mise à jour et rien de plus (pas de report !).
+En d'autres termes, si une action (bouton) utilisateur nécessite de créer un training, reporter ce training, créer le programme type, le reporter, créer le gorupement et le reporter, etc... cela doit être 1 service qui fait appel à tous les RootEntity/DomainServices implémentés dans des domaines différents.
+

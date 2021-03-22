@@ -6,7 +6,7 @@
 - Si ma formation existe déjà ou qu'une partie de son contenu existe déjà, il faut l'écraser.
 
 
-## Implémentation
+## Implémentation existante
 
 ```python
 
@@ -296,6 +296,9 @@ n’existe qu’en un seul exemplaire, tout en fournissant un point d’accès g
     
 - Pas de différence entre Builder et Factory :
     - Uniquement "Builder"
+
+- Accès : 
+    - Couche Domaine
 
 - Nouvelle interface :
 
