@@ -50,7 +50,6 @@ from program_management.ddd.validators._fill_check_tree_from import CheckValidTr
 from program_management.ddd.validators._fill_check_tree_to import CheckValidTreeVersionToFillTo
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
-from program_management.ddd.validators._is_specific_version import IsSpecificOfficialValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -65,7 +64,6 @@ from program_management.ddd.validators._validate_end_date_and_option_finality im
 from program_management.ddd.validators._version_name_existed import VersionNameExistedValidator
 from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
 from program_management.ddd.validators._version_name_pattern import VersionNamePatternValidator
-from program_management.ddd.validators._is_transition import IsTransitionValidator
 from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
