@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-04 15:00+0100\n"
+"POT-Creation-Date: 2021-03-22 08:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -440,11 +440,12 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
-msgid ""
-"For formation PhD the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+msgid "For all students"
 msgstr ""
 
-msgid "For all students"
+msgid ""
+"For formation PhD the fields 'ARES study code' and 'ARES ability' have to be "
+"filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -972,6 +973,12 @@ msgstr ""
 msgid ""
 "You can't copy the training '{acronym}' from {from_year} to {to_year} "
 "because it ends in {end_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"You can't copy the training '{acronym}' from {from_year} to {to_year} "
+"because it's less or equal than {year_limit_edg_modification}"
 msgstr ""
 
 #, python-format

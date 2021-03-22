@@ -40,7 +40,7 @@ def copy_training_to_next_year(
                 postpone_from_year=year
             )
         )
-        print('---')
+
         copy_group_service.copy_group(
             cmd=command.CopyGroupCommand(
                 from_code=postpone_cmd.code,
