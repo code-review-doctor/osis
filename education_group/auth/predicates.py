@@ -234,9 +234,17 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, obj: Union['Gr
 
 @predicate(bind=True)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_education_group_year_a_transition(
+def is_group_year_an_eligible_transition(
         self,
         user: User,
-        obj: Union[EducationGroupYear, GroupYear] = None
+        obj: GroupYear = None
 ):
-    return obj and obj.partial_acronym.upper().startswith('T')
+    if obj:
+        is_transition = obj and obj.partial_acronym.upper().startswith('T')
+        links_to_parent = obj.element.children_elements.all()
+        if links_to_parent:
+            parent = links_to_parent.get().parent_element.group_year
+            is_parent_transition = parent.partial_acronym.upper().startswith('T')
+            return is_transition and is_parent_transition
+        return is_transition
+    return None

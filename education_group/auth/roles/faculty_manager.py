@@ -59,23 +59,23 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                (predicates.is_education_group_year_a_transition | predicates.is_program_edition_period_open),
+                (predicates.is_group_year_an_eligible_transition | predicates.is_program_edition_period_open),
             'base.change_prerequisite':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_program_edition_period_open,
             'base.delete_all_training':
-                (predicates.is_education_group_year_a_transition | predicates.have_one_program_edition_calendar_open) &
+                (predicates.is_group_year_an_eligible_transition | predicates.have_one_program_edition_calendar_open) &
                 predicates.are_all_trainings_removable,
             'base.delete_all_minitraining':
-                (predicates.is_education_group_year_a_transition | predicates.have_one_program_edition_calendar_open) &
+                (predicates.is_group_year_an_eligible_transition | predicates.have_one_program_edition_calendar_open) &
                 predicates.are_all_minitrainings_removable,
             'base.delete_all_group':
-                (predicates.is_education_group_year_a_transition | predicates.have_one_program_edition_calendar_open) &
+                (predicates.is_group_year_an_eligible_transition | predicates.have_one_program_edition_calendar_open) &
                 predicates.are_all_groups_removable,
             'base.delete_training':
-                predicates.is_education_group_year_a_transition | osis_role_predicates.always_deny(
+                predicates.is_group_year_an_eligible_transition | osis_role_predicates.always_deny(
                     message=pgettext("female", "The user does not have permission to delete a %(category)s.") % {
                         "category": Categories.TRAINING.value
                     }
@@ -92,12 +92,12 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                (predicates.is_education_group_year_a_transition | predicates.is_program_edition_period_open),
+                (predicates.is_group_year_an_eligible_transition | predicates.is_program_edition_period_open),
             'base.can_detach_node':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                (predicates.is_education_group_year_a_transition | predicates.is_program_edition_period_open),
+                (predicates.is_group_year_an_eligible_transition | predicates.is_program_edition_period_open),
             'base.change_educationgroupcertificateaim':
                 osis_role_predicates.always_deny(
                     message=_('Certificate aim can only be edited by program manager')
@@ -140,7 +140,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
-                (predicates.is_education_group_year_a_transition | predicates.is_program_edition_period_open),
+                (predicates.is_group_year_an_eligible_transition | predicates.is_program_edition_period_open),
             'base.add_training_version':
                 osis_role_predicates.always_deny(
                     message=_('Training version can only be created by central manager')
@@ -154,9 +154,9 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                (predicates.is_education_group_year_a_transition | predicates.is_program_edition_period_open),
+                (predicates.is_group_year_an_eligible_transition | predicates.is_program_edition_period_open),
             'program_management.delete_permanently_training_version':
-                (predicates.is_user_attached_to_management_entity & predicates.is_education_group_year_a_transition)
+                (predicates.is_user_attached_to_management_entity & predicates.is_group_year_an_eligible_transition)
                 | osis_role_predicates.always_deny(
                     message=_('Training version can only be deleted by central manager')
                 ),
@@ -174,7 +174,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope &
-                (predicates.is_education_group_year_a_transition | predicates.is_program_edition_period_open),
+                (predicates.is_group_year_an_eligible_transition | predicates.is_program_edition_period_open),
             'program_management.delete_permanently_minitraining_version':
                 predicates.have_one_program_edition_calendar_open &
                 predicates.are_all_mini_training_versions_removable,
