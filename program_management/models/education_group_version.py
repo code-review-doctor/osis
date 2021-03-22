@@ -36,10 +36,10 @@ def fill_from_past_year(modeladmin, request, queryset):
     from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
     from program_management.ddd.service.write import bulk_fill_program_tree_version_content_service_from_past_year
     cmds = []
-    qs = queryset.select_related("offer", "root_group")
+    qs = queryset.select_related("offer", "root_group", "offer__academic_year")
     for obj in qs:
         cmd = FillProgramTreeVersionContentFromProgramTreeVersionCommand(
-            from_year=obj.offer.academic_year.year - 1,
+            from_year=obj.offer.academic_year.past_year,
             from_offer_acronym=obj.offer.acronym,
             from_version_name=obj.version_name,
             from_transition_name=obj.transition_name,

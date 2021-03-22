@@ -780,7 +780,7 @@ class ProgramTree(interface.RootEntity):
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
         :param tree_repository: a tree repository
-        :return: the suppressed link
+        :return: the suppressed link<
         """
         PathValidator(path_to_node_to_detach).validate()
 
