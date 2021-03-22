@@ -46,18 +46,18 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-@attr.s
-class BGenerateNodeCode(interface.DomainService):
-    existing_codes = attr.ib(type=Set[NodeCode], converter=set)
+@attr.s()
+class GenerateNodeCode(interface.DomainService):
+    existing_codes = attr.ib(type=Set[NodeCode], converter=set, default=attr.Factory(Set))
 
     def generate_transition_code(self, base_code: NodeCode) -> NodeCode:
         transition_base_code = "T" + base_code[1:]
-        new_code = self.__generate_node_code(transition_base_code)
+        new_code = self.__generate_node_code_from_code(transition_base_code)
 
         self.existing_codes.add(new_code)
         return new_code
 
-    def __generate_node_code(self, base_code: str) -> str:
+    def __generate_node_code_from_code(self, base_code: str) -> str:
         reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)
         reg_common_partial_acronym = re.compile(REGEX_COMMON_PARTIAL_ACRONYM)
         reg_child_initial_value = re.compile(REGEX_GROUP_PARTIAL_ACRONYM_INITIAL_VALUE)
@@ -75,10 +75,6 @@ class BGenerateNodeCode(interface.DomainService):
 
         return code_generated
 
-
-#  FIXME:: Deprecated in favour of the above node generator
-class GenerateNodeCode(interface.DomainService):
-
     @classmethod
     def generate_from_parent_node(
             cls,
@@ -89,6 +85,7 @@ class GenerateNodeCode(interface.DomainService):
         code = TRANSITION_FIRST_LETTER + parent_node.code[1:] if duplicate_to_transition else parent_node.code
         return cls.__generate_node_code(code=code, child_node_type=child_node_type)
 
+    # FIXME reuse generate_node_code_from_code which doesn't call db
     @classmethod
     def __generate_node_code(cls, code: str, child_node_type: EducationGroupTypesEnum) -> NodeCode:
         reg_parent_code = re.compile(REGEX_TRAINING_PARTIAL_ACRONYM)

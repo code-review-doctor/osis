@@ -34,6 +34,7 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
     CreateProgramTreeTransitionVersionCommand, CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
@@ -81,7 +82,7 @@ class ProgramTreeVersionBuilder:
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
             existing_nodes: Set['Node'],
-            node_code_generator: 'BGenerateNodeCode'
+            node_code_generator: 'GenerateNodeCode'
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
         if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:

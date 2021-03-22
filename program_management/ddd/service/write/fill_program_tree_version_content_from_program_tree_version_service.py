@@ -61,20 +61,17 @@ def fill_program_tree_version_content_from_program_tree_version(
         )
     )
 
-    transition_tree_versions = tree_version_repository.search(
+    exising_transition_tree_versions = tree_version_repository.search(
         version_name=to_tree_version.version_name,
         transition_name=to_tree_version.transition_name,
         year=cmd.to_year
     )
-    transition_trees = [tree_version.get_tree() for tree_version in transition_tree_versions]
-
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
             for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
-
     existing_learning_unit_nodes = node_repo.search(
         [
             attr.evolve(node.entity_id, year=cmd.to_year)
@@ -82,12 +79,11 @@ def fill_program_tree_version_content_from_program_tree_version(
         ]
     )
 
-    existing_nodes = [tree.root_node for tree in existing_trees] + \
-        existing_learning_unit_nodes +\
-        [tree.root_node for tree in transition_trees]
+    existing_nodes = [tree_version.get_tree().root_node for tree_version in exising_transition_tree_versions] +\
+        [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
 
     existing_codes = [identity.code for identity in tree_repository.get_all_identities()]
-    node_code_generator = generate_node_code.BGenerateNodeCode(existing_codes=existing_codes)
+    node_code_generator = generate_node_code.GenerateNodeCode(existing_codes=existing_codes)
 
     ProgramTreeVersionBuilder().fill_from_program_tree_version(
         from_tree_version,

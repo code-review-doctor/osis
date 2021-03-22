@@ -229,7 +229,7 @@ class ProgramTreeBuilder:
             from_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
             existing_nodes: Set['Node'],
-            node_code_generator: 'BGenerateNodeCode'
+            node_code_generator: 'GenerateNodeCode'
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
@@ -252,7 +252,7 @@ class ProgramTreeBuilder:
             relationships: 'AuthorizedRelationshipList',
             existing_nodes: Set['Node'],
             transition_name: 'str',
-            node_code_generator: 'BGenerateNodeCode',
+            node_code_generator: 'GenerateNodeCode',
             to_tree: 'ProgramTree'
     ) -> 'Node':
         links_to_copy = (link for link in from_node.children if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year))
