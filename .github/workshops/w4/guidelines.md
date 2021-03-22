@@ -29,6 +29,7 @@
 - https://enterprisecraftsmanship.com/posts/validation-and-ddd/
 - https://enterprisecraftsmanship.com/posts/code-contracts-vs-input-validation/
 - https://enterprisecraftsmanship.com/posts/fail-fast-principle/
+https://stackoverflow.com/questions/60535089/ddd-validation-for-existence-of-entity-in-other-bounded-contexts
 
 
 
