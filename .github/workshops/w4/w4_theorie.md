@@ -39,27 +39,23 @@ class MyBusinessValidator(BusinessValidator):
 
 ### "Two steps validation" : Input Validation VS Contract Precondition
 
-- "Input Validation"
+- "Input Validation" (precondition)
     - Mécanisme protégeant notre système contre les infiltrations de données invalides
     - Données autorisées en état invalides
     - "Bouclier de protection contre le monde extérieur"
 
-- "Contract Precondition"
+- "Invariant validation" (code contract)
     - Suppose que les données à l'intérieur du système sont dans un état valide
     - Validation des invariants
-    - "Bouclier" de prévention pour s'asurer de la consistance de nos objets par rapport au métier
+    - "Bouclier" de prévention pour s'asurer de la consistance de nos objets
 
 - Validateurs des Django forms == validateurs métier
      - Exception : pas de validateur sur les types de données
-        - Assuré par les couches supérieures 
+        - Assuré par les couches supérieures (ici, Django forms)
+
 - Exemples de validateurs (domaine):
     - MyForm.credits doit être > 0
     - MyForm.sigle doit respecter le format `^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}`
-        - Tout validateur dans un Form **doit** se trouver dans les validateurs du domaine
-
-
-- Tous valdateur forms ==> validateurs dans le domaine
-- Plus de validation dans les forms --> pas dupliquer l'info
 
 
 
@@ -78,14 +74,20 @@ class MyBusinessValidator(BusinessValidator):
     - Empêche de stocker des données en état inconsistant
     - Principe opposé : fail-silently (try-except)
 - Exemple dans Osis : les validateurs
- 
 
-### ValidatorList + MultipleExceptionBusinessListValidator + DisplayExceptionsByFieldNameMixin
 
-- Faire hériter `ValidatorList` de [MultipleExceptionBusinessListValidator](https://github.com/uclouvain/osis/blob/dev/base/ddd/utils/business_validator.py#L122)
-    - Toute action métier raise une MultipleBusinessExceptions, qui peuvent être catchées côté client
-- Créer un service (read) qui effectue l'action métier à checker (DomainObject.business_action())
-    - Nomenclature : check_<application_service_name>
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+### ValidatorList + TwoStepsMultipleBusinessExceptionListValidator + DisplayExceptionsByFieldNameMixin
+
+- Faire hériter `ValidatorList` de TwoStepsMultipleBusinessExceptionListValidator (implémentation ci-dessous)
+    - Toute règle métier raise une BusinessException
+    - Toute action métier raise une MultipleBusinessExceptions
+    - toute MultipleBusinessExceptions gérable par le client (view, API...)
+
 - Utiliser `DisplayExceptionsByFieldNameMixin` dans nos Django forms
 
 ```python
@@ -99,23 +101,24 @@ class DisplayExceptionsByFieldNameMixin:
     # Example : {CodeAlreadyExistException: ('code',), AcronymAlreadyExist: ('acronym',)}
     field_name_by_exception = None
 
-    # If True, exceptions that are not configured in `field_name_by_exception` will be displayed as "default errors".
+    # If True, exceptions that are not configured in `field_name_by_exception` will be displayed.
     # If False, exceptions that are not configured in `field_name_by_exception` will be ignored.
     display_exceptions_by_default = True
 
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if self.field_name_by_exception is None:
             self.field_name_by_exception = {}
 
+    def call_application_service(self):
+        raise NotImplementedError
+
     def save(self):
         try:
-            self.call_application_service()
+            if self.is_valid():  # to clean data
+                return self.call_application_service()
         except MultipleBusinessExceptions as multiple_exceptions:
             self.display_exceptions(multiple_exceptions)
-            raise BusinessFormInvalidException()
-    
-    def call_application_service(self):
-        raise NotImplementedError()
 
     def display_exceptions(self, exceptions_to_display: MultipleBusinessExceptions):
         """
@@ -126,7 +129,7 @@ class DisplayExceptionsByFieldNameMixin:
         """
         copied_list = list(exceptions_to_display.exceptions)
         for exception in copied_list:
-            field_names = self.field_name_by_exception.get(exception, [])
+            field_names = self.field_name_by_exception.get(type(exception), [])
             if self.display_exceptions_by_default and not field_names:
                 self.add_error('', exception.message)
             else:
@@ -136,15 +139,50 @@ class DisplayExceptionsByFieldNameMixin:
 
 
 #-------------------------------------------------------------------------------------------------------------------
+
+@attr.s(slots=True)
+class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
+
+    def get_input_validators(self) -> List[BusinessValidator]:
+        raise NotImplementedError()
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        raise NotImplementedError()
+
+    def __validate_inputs(self):
+        self.__validate(self.get_input_validators())
+
+    def __validate_invariants(self):
+        self.__validate(self.get_invariants_validators())
+
+    @staticmethod
+    def __validate(business_validators):
+        exceptions = set()
+        for validator in business_validators:
+            try:
+                validator.validate()
+            except MultipleBusinessExceptions as e:
+                exceptions |= e.exceptions
+            except BusinessException as e:
+                exceptions.add(e)
+
+        if exceptions:
+            raise MultipleBusinessExceptions(exceptions=exceptions)
+
+    def validate(self):
+        self.__validate_inputs()
+        self.__validate_invariants()
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------
 # ddd/service/write 
 def update_training_service(command: UpdateTrainingCommand) -> 'TrainingIdentity':
     """Uniquement dans le cas d'un rapport"""
     identity = TrainingIdentity(acronym=command.acronym, year=command.year)
     
     training = TrainingRepository().get(identity)
-    # TODO :: le .update DOIT faire appel à is_updatable
-    # TODO :: prendre autre exemple : check paste-node ==> être précis sur le besoin du "vérifier" (rapport)
-    # TODO :: Ne pas créer d'office un check...
     training.update(command)
     
     TrainingRepository().update(training)
@@ -170,7 +208,7 @@ class CreateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     def call_application_service(self):
         command = ...
-        update_training_service(command)
+        return update_training_service(command)
 
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -183,9 +221,27 @@ class View(...):
         form.save()
         if form.errors:
             redirect()
+        else:
+            pass
 
 ``` 
 
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Avantages
+
+- Domaine complet : pas de duplication : logique métier encapsulée à un seul endroit
+- Plus besoin de solutions compliquées côté "client" (Parsley)
+- Pas d'ambiguïté sur quelle règle placer où : tout va dans le domaine
+- Facilité de testing (toute la logique est au même endroit)
+
+## Inconvénients
+
+- Demande un mapping de nos types de BusinessException avec les clients des ApplicationService (django Forms, API...)
+- Nécessite de mettre tous les champs required=False dans les forms
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
