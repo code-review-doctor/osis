@@ -169,12 +169,7 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._fill_node_from_last_year_node(
-            last_year_tree.root_node,
-            to_tree.root_node,
-            existing_nodes,
-            to_tree
-        )
+        self._fill_node_from_last_year_node(last_year_tree.root_node, to_tree.root_node, existing_nodes, to_tree)
 
         return to_tree
 
@@ -185,10 +180,14 @@ class ProgramTreeBuilder:
             existing_nodes: Set['Node'],
             to_tree: 'ProgramTree'
     ) -> 'Node':
-        links_to_copy = (link for link in last_year_node.children
-                         if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year))
-        links_that_cannot_be_copied = (link for link in last_year_node.children
-                                       if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year))
+        links_to_copy = (
+            link for link in last_year_node.children
+            if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
+        links_that_cannot_be_copied = (
+            link for link in last_year_node.children
+            if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
         for link in links_that_cannot_be_copied:
             to_tree.report.add_change(
                 report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
@@ -255,7 +254,10 @@ class ProgramTreeBuilder:
             node_code_generator: 'GenerateNodeCode',
             to_tree: 'ProgramTree'
     ) -> 'Node':
-        links_to_copy = (link for link in from_node.children if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year))
+        links_to_copy = (
+            link for link in from_node.children
+            if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
         links_that_cannot_be_copied = (
             link for link in from_node.children
             if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
@@ -320,13 +322,29 @@ class ProgramTreeBuilder:
 
         return to_node
 
+    def _get_existing_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
+        return next((node for node in existing_nodes if node.entity_id == node_id), None)
+
     def _get_equivalent_mandatory_child(
             self,
             children: List['Node'],
             child_type: 'EducationGroupTypesEnum'
     ) -> Optional['Node']:
-        return next(
-            (child for child in children if child.node_type == child_type),
+        return next((child for child in children if child.node_type == child_type), None)
+
+    def _get_existing_transition_node(
+            self,
+            existing_nodes: Set['Node'],
+            title: str,
+            year: int,
+            version_name: str,
+            transition_name: str
+    ) -> Optional['Node']:
+        return next((
+                node for node in existing_nodes
+                if not node.is_learning_unit() and node.title == title and node.year == year and
+                node.version_name == version_name and node.transition_name == transition_name
+            ),
             None
         )
 
@@ -352,29 +370,6 @@ class ProgramTreeBuilder:
         elif relationships.is_mandatory_child(link.parent.node_type, link.child.node_type):
             return True
         return False
-
-    def _get_existing_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
-        return next(
-            (node for node in existing_nodes if node.entity_id == node_id),
-            None
-        )
-
-    def _get_existing_transition_node(
-            self,
-            existing_nodes: Set['Node'],
-            title: str,
-            year: int,
-            version_name: str,
-            transition_name: str
-    ) -> 'Node':
-        return next(
-            node for node in existing_nodes
-            if not node.is_learning_unit() and node.title == title and node.year == year and
-            node.version_name == version_name and node.transition_name == transition_name
-        )
-
-    def _is_end_date_superior_equal_to(self, from_node: 'Node', year: int):
-        return from_node.end_date and from_node.end_date >= year
 
     def build_from_orphan_group_as_root(
             self,
