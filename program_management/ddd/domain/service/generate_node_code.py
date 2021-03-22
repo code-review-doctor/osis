@@ -48,7 +48,7 @@ WIDTH_CNUM = 3
 
 @attr.s()
 class GenerateNodeCode(interface.DomainService):
-    existing_codes = attr.ib(type=Set[NodeCode], converter=set, default=attr.Factory(Set))
+    existing_codes = attr.ib(type=Set[NodeCode], converter=set, default=attr.Factory(set))
 
     def generate_transition_code(self, base_code: NodeCode) -> NodeCode:
         transition_base_code = "T" + base_code[1:]
