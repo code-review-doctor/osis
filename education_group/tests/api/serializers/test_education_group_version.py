@@ -55,6 +55,7 @@ class TrainingVersionListSerializerTestCase(TestCase):
             'url',
             'version_name',
             'code',
-            'transition_name'
+            'transition_name',
+            'is_transition'
         ]
         self.assertListEqual(list(self.serializer.data), expected_fields)
