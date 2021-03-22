@@ -1,4 +1,7 @@
 
+- W5 : mettre à jour la partie "abroerscence des packages" dans le CONTRIBUTING (suite à workshop)
+
+
 
 -------------------------------
 

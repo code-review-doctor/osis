@@ -13,3 +13,7 @@ Exemples :
 - Single respojsibility principle
 def __gt__(self, other):
     return other.year > self.year
+
+
+- W5? Bounded contexts
+    - [ALES] ApplicationService peutil appeler plusieurs repositories de plusieurs domaines différents ?
