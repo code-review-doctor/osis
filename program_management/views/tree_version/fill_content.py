@@ -38,7 +38,6 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
-from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.report import AggregateReport
 from program_management.ddd.service.read import get_program_tree_version_service, \
@@ -49,31 +48,32 @@ from program_management.forms.fill_content import FillTransitionContentForm
 class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree_version/fill_content_inner.html"
     form_class = FillTransitionContentForm
+    success_url = ""
 
     def get_context_data(self, **kwargs) -> Dict:
         context_data = super().get_context_data(**kwargs)
-
         context_data["tree_version"] = self.transition_tree
-
         return context_data
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["transition_tree"] = self.transition_tree
+        form_kwargs["last_year_transition_tree"] = self.last_year_transition_tree
+        form_kwargs["source_tree"] = self.same_version_tree
+        form_kwargs["last_year_source_tree"] = self.last_year_same_version_tree
+        return form_kwargs
 
     def form_valid(self, form: 'FillTransitionContentForm'):
         try:
             transaction_id = form.save()
-            report = get_report_service.get_report(GetReportCommand(transaction_id=transaction_id))
+            report = get_report_service.get_report(command.GetReportCommand(transaction_id=transaction_id))
             self.display_report_warning(report)
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
 
-    def get_success_url(self) -> str:
-        return ""
-
-    def display_report_warning(self, report: 'AggregateReport'):
-        display_warning_messages(
-            self.request,
-            [str(warning) for warning in report.get_warnings()]
-        )
+    def display_report_warning(self, report: 'AggregateReport') -> None:
+        display_warning_messages(self.request, [str(warning) for warning in report.get_warnings()])
 
     def get_success_message(self, cleaned_data) -> str:
         return _("%(title)s in %(year)s has been filled") % {
@@ -81,22 +81,17 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
             "year": self.transition_tree.year
         }
 
-    def get_form_kwargs(self):
-        form_kwargs = super().get_form_kwargs()
-
-        form_kwargs["transition_tree"] = self.transition_tree
-        form_kwargs["last_year_transition_tree"] = self.last_year_transition_tree
-        form_kwargs["source_tree"] = self.version_tree
-        form_kwargs["last_year_source_tree"] = self.last_year_version_tree
-
-        return form_kwargs
+    def get_permission_required(self):
+        if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
+            return ("base.fill_training_version",)
+        return ("base.fill_minitraining_version",)
 
     @functools.lru_cache()
     def get_permission_object(self) -> GroupYear:
         return get_object_or_404(
             GroupYear,
             academic_year__year=self.kwargs['year'],
-            partial_acronym=self.kwargs['code'],
+            partial_acronym=self.kwargs['code']
         )
 
     @cached_property
@@ -112,7 +107,7 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         )
 
     @cached_property
-    def version_tree(self) -> 'ProgramTreeVersion':
+    def same_version_tree(self) -> 'ProgramTreeVersion':
         return get_program_tree_version_origin_service.get_program_tree_version_origin(
             command.GetProgramTreeVersionOriginCommand(
                 year=self.kwargs['year'],
@@ -123,15 +118,10 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         )
 
     @cached_property
-    def last_year_version_tree(self) -> 'ProgramTreeVersion':
+    def last_year_same_version_tree(self) -> 'ProgramTreeVersion':
         return get_program_tree_version_service.get_program_tree_version(
             command.GetProgramTreeVersionCommand(
                 year=self.kwargs['year'] - 1,
-                code=self.version_tree.program_tree_identity.code
+                code=self.same_version_tree.program_tree_identity.code
             )
         )
-
-    def get_permission_required(self):
-        if self.get_permission_object().education_group_type.category == education_group_categories.TRAINING:
-            return ("base.fill_training_version",)
-        return ("base.fill_minitraining_version",)
