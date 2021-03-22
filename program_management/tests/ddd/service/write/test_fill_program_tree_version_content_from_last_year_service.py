@@ -28,6 +28,7 @@ import attr
 import mock
 from django.test import override_settings
 
+from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty, InvalidTreeVersionToFillTo
 from program_management.ddd.domain.node import factory as node_factory
@@ -60,6 +61,7 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
             tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
             tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
             tree__root_node__transition_name=NOT_A_TRANSITION,
+            tree__root_node__node_type=TrainingType.BACHELOR,
             transition_name=NOT_A_TRANSITION
         )
 
@@ -230,7 +232,8 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
         )
         self.tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
             tree__root_node__title=self.tree_version_from.entity_id.offer_acronym,
-            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__node_type=TrainingType.BACHELOR
         )
         self.cmd = self._generate_cmd(self.tree_version_from, self.tree_version_to_fill)
 
@@ -292,11 +295,13 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
     def test_can_fill_transition_from_transition_past_year(self):
         tree_version_to_fill_from = SpecificTransitionProgramTreeVersionFactory(
-            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR
+            tree__root_node__year=CURRENT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__node_type=TrainingType.BACHELOR
         )
         tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
             tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
-            tree__root_node__code=tree_version_to_fill_from.program_tree_identity.code
+            tree__root_node__code=tree_version_to_fill_from.program_tree_identity.code,
+            tree__root_node__node_type=TrainingType.BACHELOR
         )
 
         self.add_tree_version_to_repo(tree_version_to_fill_from)
