@@ -962,11 +962,14 @@ components:
           type: string
         transition_name:
           type: string
+        is_transition:
+          type: boolean
       required:
         - url
         - version_name
         - code
         - transition_name
+        - is_transition
     PaginatedTraining:
       allOf:
         - $ref: '#/components/schemas/Pagination'
