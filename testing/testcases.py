@@ -26,12 +26,11 @@ from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
-    get_fake_program_tree_repository, get_fake_node_repository, get_fake_program_tree_version_identity_search
+    get_fake_program_tree_repository, get_fake_node_repository
 from testing.mocks import MockPatcherMixin
-from program_management.ddd.business_types import *
 
 
 class DDDTestCase(MockPatcherMixin, TestCase):
@@ -58,14 +57,6 @@ class DDDTestCase(MockPatcherMixin, TestCase):
         self.mock_repo(
             "education_group.ddd.repository.group.GroupRepository",
             self.fake_group_repository
-        )
-
-        self.fake_program_tree_version_identity_search = get_fake_program_tree_version_identity_search(
-            self.fake_program_tree_version_repository
-        )
-        self.mock_repo(
-            "program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch",
-            self.fake_program_tree_version_identity_search
         )
 
     def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):

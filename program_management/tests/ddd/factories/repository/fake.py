@@ -65,20 +65,6 @@ def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVer
     })
 
 
-def get_fake_program_tree_version_identity_search(tree_version_repo) -> 'ProgramTreeVersionIdentitySearch':
-    @classmethod
-    def get_from_node_identities(cls, node_identities: List['NodeIdentity']) -> List['ProgramTreeVersionIdentity']:
-        result = []
-        for tree_version in tree_version_repo.root_entities:
-            if tree_version.get_tree() and tree_version.tree.root_node.entity_id in node_identities:
-                result.append(tree_version.entity_id)
-        return result
-    class_name = "FakeProgramTreeVersionIdentitySearch"
-    return type(class_name, (ProgramTreeVersionIdentitySearch,), {
-        "get_from_node_identities": get_from_node_identities
-    })
-
-
 @classmethod
 def _create_program_tree(cls, program_tree: 'ProgramTree', **_) -> interface.EntityIdentity:
     cls.root_entities.append(program_tree)
