@@ -24,14 +24,14 @@
 ##############################################################################
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import IsFinalityException
+from program_management.ddd.domain.exception import CannotFillContentOfProgramTreeOfTypeFinalityException
 
 
-class IsNotFinalityValidator(business_validator.BusinessValidator):
+class CannotFillContentOfProgramTreeOfTypeFinalityValidator(business_validator.BusinessValidator):
     def __init__(self, tree: 'ProgramTree'):
         self.tree = tree
         super().__init__()
 
     def validate(self, *args, **kwargs):
         if self.tree.root_node.is_finality():
-            raise IsFinalityException()
+            raise CannotFillContentOfProgramTreeOfTypeFinalityException()
