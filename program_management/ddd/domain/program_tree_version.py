@@ -254,7 +254,7 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.is_standard
 
     @property
-    def year(self) -> 'academic_year.AcademicYear':
+    def academic_year(self) -> 'academic_year.AcademicYear':
         return academic_year.AcademicYear(year=self.entity_id.year)
 
     @property
