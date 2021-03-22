@@ -60,8 +60,8 @@ class GroupBuilder:
         cls._update_end_year(group_next_year)
         return group_next_year
 
-    @classmethod
-    def _update_end_year(cls, group: 'Group') -> None:
+    @staticmethod
+    def _update_end_year(group: 'Group') -> None:
         if not group.end_year:
             return
         if group.year > group.end_year:
