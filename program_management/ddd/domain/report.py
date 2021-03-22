@@ -23,7 +23,12 @@
 #
 ##############################################################################
 import abc
+import uuid
 from typing import List
+
+import attr
+
+from osis_common.ddd import interface
 
 
 class ReportEvent(abc.ABC):
@@ -31,19 +36,25 @@ class ReportEvent(abc.ABC):
         raise NotImplementedError
 
 
-class AggregateReport:
-    def __init__(self):
-        self._changes = []  # type:List[ReportEvent]
-        self._warnings = []  # type:List[ReportEvent]
+@attr.s(frozen=True, slots=True)
+class ReportIdentity(interface.EntityIdentity):
+    transaction_id = attr.ib(type=uuid.UUID)
+
+
+@attr.s()
+class Report(interface.Entity):
+    entity_id = attr.ib(type=ReportIdentity)
+    changes = attr.ib(init=False, type=List[ReportEvent], factory=list)
+    warnings = attr.ib(init=False, type=List[ReportEvent], factory=list)
 
     def add_change(self, event: ReportEvent) -> None:
-        self._changes.append(event)
+        self.changes.append(event)
 
     def add_warning(self, event: ReportEvent) -> None:
-        self._warnings.append(event)
+        self.warnings.append(event)
 
     def get_changes(self) -> List[ReportEvent]:
-        return self._changes
+        return self.changes
 
     def get_warnings(self) -> List[ReportEvent]:
-        return self._warnings
+        return self.warnings

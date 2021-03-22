@@ -22,21 +22,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
-from typing import Optional
+from typing import Optional, List
 
 from django.core.cache import cache
 
-from program_management.ddd.domain.report import AggregateReport
+from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
+from program_management.ddd.domain.report import Report, ReportIdentity
 
 DEFAULT_TIMEOUT = 60  # seconds
 
 
-class ReportRepository:
+class ReportRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, report: 'AggregateReport', transaction_id: uuid.UUID):
-        cache.set(str(transaction_id), report, timeout=DEFAULT_TIMEOUT)
+    def create(cls, report: Report, **kwargs) -> ReportIdentity:
+        cache.set(str(report.entity_id.transaction_id), report, timeout=DEFAULT_TIMEOUT)
+        return report.entity_id
 
     @classmethod
-    def get(cls, transaction_id: uuid.UUID) -> Optional['AggregateReport']:
-        return cache.get(str(transaction_id))
+    def get(cls, report_identity: ReportIdentity) -> Optional['Report']:
+        return cache.get(str(report_identity))
+
+    @classmethod
+    def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
+        pass
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
+        pass
+
+    @classmethod
+    def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
+        pass

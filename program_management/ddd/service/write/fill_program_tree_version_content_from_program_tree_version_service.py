@@ -30,6 +30,7 @@ from education_group.ddd.service.write import create_group_service, copy_group_s
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
+from program_management.ddd.domain.report import Report, ReportIdentity
 from program_management.ddd.domain.service import generate_node_code, copy_tree_cms
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository, report
@@ -60,6 +61,7 @@ def fill_program_tree_version_content_from_program_tree_version(
             transition_name=cmd.to_transition_name
         )
     )
+    to_tree_version.get_tree().report = Report(entity_id=ReportIdentity(transaction_id=cmd.transaction_id))
 
     exising_transition_tree_versions = tree_version_repository.search(
         version_name=to_tree_version.version_name,
@@ -104,6 +106,6 @@ def fill_program_tree_version_content_from_program_tree_version(
 
     copy_tree_cms.CopyCms().from_tree(from_tree_version.get_tree(), to_tree_version.get_tree())
 
-    report_repo.create(to_tree_version.get_tree().report, cmd.transaction_id)
+    report_repo.create(to_tree_version.get_tree().report)
 
     return identity
