@@ -119,7 +119,7 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
         versions = version.offer.educationgroupversion_set.filter(transition_name=NOT_A_TRANSITION).annotate(
             is_transition=Case(
                 When(transition_name='', then=Value(False)),
-                default=True,
+                default=Value(True),
                 output_field=BooleanField()
             )
         )
