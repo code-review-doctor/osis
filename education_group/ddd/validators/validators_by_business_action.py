@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ from education_group.ddd.validators._start_year_end_year import StartYearEndYear
 from education_group.ddd.validators._unique_code import UniqueCodeValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
+from education_group.ddd.validators._is_copy_possible import CheckCopyPossibleValidator
 
 
 class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
@@ -117,6 +118,7 @@ class CopyTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, training_from: 'Training'):
         self.validators = [
             CheckTrainingEndDateValidator(training_from),
+            CheckCopyPossibleValidator(training_from),
         ]
         super().__init__()
 

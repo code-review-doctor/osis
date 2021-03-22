@@ -6,6 +6,7 @@ from django.utils.translation import gettext_lazy as _, ngettext_lazy
 from education_group.ddd.business_types import *
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_common.ddd.interface import BusinessException
+from django.conf import settings
 
 
 class TrainingNotFoundException(Exception):
@@ -345,4 +346,18 @@ class AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessEx
 class AresDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("The fields concerning ARES must be greater than or equal to 1 and less than or equal to 9999")
+        super().__init__(message, **kwargs)
+
+
+class CannotCopyTrainingDueToLimitYearOfModification(BusinessException):
+    def __init__(self, training: 'Training', *args, **kwargs):
+        message = _(
+            "You can't copy the training '{acronym}' from {from_year} to {to_year} because it's "
+            "less or equal than {year_limit_edg_modification}"
+        ).format(
+            acronym=training.acronym,
+            from_year=training.year,
+            to_year=training.year + 1,
+            year_limit_edg_modification=settings.YEAR_LIMIT_EDG_MODIFICATION,
+        )
         super().__init__(message, **kwargs)

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,10 +28,10 @@ from typing import List
 from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
+from education_group.ddd.domain.service.training_and_group_copy import copy_training_to_next_year
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.ddd.service.write import copy_training_service, update_training_and_group_service, \
-    copy_group_service
+from education_group.ddd.service.write import update_training_and_group_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
 
 
@@ -115,20 +115,12 @@ def postpone_training_and_group_modification(postpone_cmd: command.PostponeTrain
         if year + 1 in conflicted_fields:
             continue  # Do not copy info from year to N+1 because conflict detected
 
-        identity_next_year = copy_training_service.copy_training_to_next_year(
-            copy_cmd=command.CopyTrainingToNextYearCommand(
-                acronym=postpone_cmd.postpone_from_acronym,
-                postpone_from_year=year
-            )
-        )
-        copy_group_service.copy_group(
-            cmd=command.CopyGroupCommand(
-                from_code=postpone_cmd.code,
-                from_year=year
-            )
-        )
+        identity_next_year = copy_training_to_next_year(postpone_cmd, year)
         # THEN
-        identities_created.append(identity_next_year)
+        if identity_next_year:
+            identities_created.append(identity_next_year)
+        else:
+            break
     if conflicted_fields:
         first_conflict_year = min(conflicted_fields.keys())
         raise exception.TrainingCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
