@@ -50,6 +50,7 @@ from program_management.ddd.validators._fill_check_tree_from import CheckValidTr
 from program_management.ddd.validators._fill_check_tree_to import CheckValidTreeVersionToFillTo
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
+from program_management.ddd.validators._is_not_finality_type import IsNotFinalityValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -283,6 +284,7 @@ class FillProgramTreeValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, to_tree: 'ProgramTree'):
         self.validators = [
             EmptyProgramTreeValidator(to_tree),
+            IsNotFinalityValidator(to_tree),
         ]
         super().__init__()
 
