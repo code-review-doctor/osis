@@ -59,8 +59,8 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         form_kwargs = super().get_form_kwargs()
         form_kwargs["transition_tree"] = self.transition_tree
         form_kwargs["last_year_transition_tree"] = self.last_year_transition_tree
-        form_kwargs["source_tree"] = self.same_version_tree
-        form_kwargs["last_year_source_tree"] = self.last_year_same_version_tree
+        form_kwargs["same_version_tree"] = self.same_version_tree
+        form_kwargs["last_year_same_version_tree"] = self.last_year_same_version_tree
         return form_kwargs
 
     def form_valid(self, form: 'FillTransitionContentForm'):

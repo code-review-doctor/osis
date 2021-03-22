@@ -36,10 +36,10 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.service.write import fill_program_tree_version_content_from_program_tree_version_service
 
 
-class ValidChoice(Enum):
+class ValidSourceChoices(Enum):
     LAST_YEAR_TRANSITION_TREE = "last_year"
-    SOURCE_TREE = "source"
-    LAST_YEAR_SOURCE_TREE = "last_year_source"
+    SAME_VERSION = "same_version"
+    LAST_YEAR_SAME_VERSION_TREE = "last_year_same_version"
 
 
 class FillTransitionContentForm(forms.Form):
@@ -50,15 +50,15 @@ class FillTransitionContentForm(forms.Form):
             self,
             transition_tree: 'ProgramTreeVersion',
             last_year_transition_tree: Optional['ProgramTreeVersion'],
-            source_tree: 'ProgramTreeVersion',
-            last_year_source_tree: Optional['ProgramTreeVersion'],
+            same_version_tree: 'ProgramTreeVersion',
+            last_year_same_version_tree: Optional['ProgramTreeVersion'],
             *args,
             **kwargs
     ):
         self.transition_tree = transition_tree
         self.last_year_transition_tree = last_year_transition_tree
-        self.source_tree = source_tree
-        self.last_year_source_tree = last_year_source_tree
+        self.same_version_tree = same_version_tree
+        self.last_year_same_version_tree = last_year_same_version_tree
 
         super().__init__(*args, **kwargs)
 
@@ -74,7 +74,7 @@ class FillTransitionContentForm(forms.Form):
             except MultipleBusinessExceptions as multiple_exceptions:
                 for exception in multiple_exceptions.exceptions:
                     self.add_error(None, exception.message)
-                raise InvalidFormException()
+        raise InvalidFormException()
 
     def generate_cmd(self) -> 'FillProgramTreeVersionContentFromProgramTreeVersionCommand':
         tree_to_fill_from = self._get_tree_to_fill_from()
@@ -91,9 +91,9 @@ class FillTransitionContentForm(forms.Form):
 
     def _get_tree_to_fill_from(self) -> 'ProgramTreeVersion':
         map_choice_tree_version = {
-            ValidChoice.LAST_YEAR_TRANSITION_TREE.value: self.last_year_transition_tree,
-            ValidChoice.SOURCE_TREE.value: self.source_tree,
-            ValidChoice.LAST_YEAR_SOURCE_TREE.value: self.last_year_source_tree
+            ValidSourceChoices.LAST_YEAR_TRANSITION_TREE.value: self.last_year_transition_tree,
+            ValidSourceChoices.SAME_VERSION.value: self.same_version_tree,
+            ValidSourceChoices.LAST_YEAR_SAME_VERSION_TREE.value: self.last_year_same_version_tree
         }
         source_choice = self.cleaned_data["source_choices"]
 
@@ -108,18 +108,21 @@ class FillTransitionContentForm(forms.Form):
         if self.last_year_transition_tree:
             choices.append(
                 (
-                    ValidChoice.LAST_YEAR_TRANSITION_TREE.value,
+                    ValidSourceChoices.LAST_YEAR_TRANSITION_TREE.value,
                     self.__get_last_year_transition_tree_option_human_readable()
                 )
             )
-        if self.last_year_source_tree:
+        if self.last_year_same_version_tree:
             choices.append(
-                (ValidChoice.LAST_YEAR_SOURCE_TREE.value, self.__get_last_year_source_tree_option_human_readable())
+                (
+                    ValidSourceChoices.LAST_YEAR_SAME_VERSION_TREE.value,
+                    self.__get_last_year_same_version_tree_option_human_readable()
+                )
             )
 
-        if self.source_tree:
+        if self.same_version_tree:
             choices.append(
-                (ValidChoice.SOURCE_TREE.value, self.__get_source_tree_option_human_readable())
+                (ValidSourceChoices.SAME_VERSION.value, self.__get_same_version_tree_option_human_readable())
             )
 
         return tuple(choices)
@@ -130,20 +133,20 @@ class FillTransitionContentForm(forms.Form):
             "year": self.last_year_transition_tree.year
         }
 
-    def __get_source_tree_option_human_readable(self) -> str:
+    def __get_same_version_tree_option_human_readable(self) -> str:
         text = _("Fill from standard version of this year: %(title)s in %(year)s")
-        if self.source_tree.is_specific_official:
+        if self.same_version_tree.is_specific_official:
             text = _("Fill from specific official of this year: %(title)s in %(year)s")
         return text % {
-            "title": self.source_tree.official_name,
-            "year": self.source_tree.year
+            "title": self.same_version_tree.official_name,
+            "year": self.same_version_tree.year
         }
 
-    def __get_last_year_source_tree_option_human_readable(self) -> str:
+    def __get_last_year_same_version_tree_option_human_readable(self) -> str:
         text = _("Fill from standard version of last year: %(title)s in %(year)s")
-        if self.last_year_source_tree.is_specific_official:
+        if self.last_year_same_version_tree.is_specific_official:
             text = _("Fill from specific official of last year: %(title)s in %(year)s")
         return text % {
-            "title": self.last_year_source_tree.official_name,
-            "year": self.last_year_source_tree.year
+            "title": self.last_year_same_version_tree.official_name,
+            "year": self.last_year_same_version_tree.year
         }
