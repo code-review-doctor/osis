@@ -189,7 +189,7 @@ class ProgramTreeBuilder:
             if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
         )
         for link in links_that_cannot_be_copied:
-            to_tree.report.add_change(
+            to_tree.report.add_warning(
                 report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
                     title=link.child.title,
                     end_year=link.child.end_date,
@@ -203,7 +203,7 @@ class ProgramTreeBuilder:
 
             if last_year_link.child.is_learning_unit() and not child:
                 child = last_year_link.child
-                to_tree.report.add_change(
+                to_tree.report.add_warning(
                     report_events.CopyLearningUnitNotExistForYearEvent(
                         code=child.code,
                         copy_year=to_node.year,
@@ -218,8 +218,10 @@ class ProgramTreeBuilder:
 
             if self._can_link_child_be_filled(copied_link, to_tree.authorized_relationships):
                 self._fill_node_from_last_year_node(last_year_link.child, child, existing_nodes, to_tree)
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(report_events.CopyReferenceEmptyEvent(title=copied_link.child.title))
             elif copied_link.is_reference():
-                to_tree.report.add_change(report_events.CopyReferenceGroupEvent(title=copied_link.child.title))
+                to_tree.report.add_warning(report_events.CopyReferenceGroupEvent(title=copied_link.child.title))
 
         return to_node
 
@@ -263,7 +265,7 @@ class ProgramTreeBuilder:
             if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
         )
         for link in links_that_cannot_be_copied:
-            to_tree.report.add_change(
+            to_tree.report.add_warning(
                 report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
                     title=link.child.title,
                     end_year=link.child.end_date,
@@ -278,7 +280,7 @@ class ProgramTreeBuilder:
 
             if source_link.child.is_learning_unit() and not child:
                 child = source_link.child
-                to_tree.report.add_change(
+                to_tree.report.add_warning(
                     report_events.CopyLearningUnitNotExistForYearEvent(
                         code=child.code,
                         copy_year=to_node.year,
@@ -318,7 +320,7 @@ class ProgramTreeBuilder:
                     to_tree
                 )
             elif copied_link.is_reference():
-                to_tree.report.add_change(report_events.CopyReferenceGroupEvent(title=copied_link.child.title))
+                to_tree.report.add_warning(report_events.CopyReferenceGroupEvent(title=copied_link.child.title))
 
         return to_node
 

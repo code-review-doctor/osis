@@ -69,6 +69,16 @@ class CopyReferenceGroupEvent(ReportEvent):
 
 
 @attr.s(frozen=True, slots=True)
+class CopyReferenceEmptyEvent(ReportEvent):
+    title = attr.ib(type=str)
+
+    def __str__(self):
+        return _("The reference element %(title)s is still empty.") % {
+            "title": self.title,
+        }
+
+
+@attr.s(frozen=True, slots=True)
 class TrainingAlreadyCopiedEvent(ReportEvent):
     title = attr.ib(type=str)
     copy_year = attr.ib(type=int)
