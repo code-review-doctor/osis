@@ -79,13 +79,13 @@ class CopyReferenceEmptyEvent(ReportEvent):
 
 
 @attr.s(frozen=True, slots=True)
-class TrainingAlreadyCopiedEvent(ReportEvent):
+class NodeAlreadyCopiedEvent(ReportEvent):
     title = attr.ib(type=str)
     copy_year = attr.ib(type=int)
 
     def __str__(self):
         return _(
-            "The training %(title)s has already been copied in %(copy_year)s in the context of an other training."
+            "The element %(title)s has already been copied in %(copy_year)s in the context of an other training."
             "Its content may have changed."
         ) % {
             "title": self.title,

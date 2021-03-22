@@ -222,6 +222,10 @@ class ProgramTreeBuilder:
                 to_tree.report.add_warning(report_events.CopyReferenceEmptyEvent(title=copied_link.child.title))
             elif copied_link.is_reference():
                 to_tree.report.add_warning(report_events.CopyReferenceGroupEvent(title=copied_link.child.title))
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(
+                    report_events.NodeAlreadyCopiedEvent(title=copied_link.child.title, copy_year=to_node.year)
+                )
 
         return to_node
 
@@ -319,8 +323,14 @@ class ProgramTreeBuilder:
                     node_code_generator,
                     to_tree
                 )
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(report_events.CopyReferenceEmptyEvent(title=copied_link.child.title))
             elif copied_link.is_reference():
                 to_tree.report.add_warning(report_events.CopyReferenceGroupEvent(title=copied_link.child.title))
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(
+                    report_events.NodeAlreadyCopiedEvent(title=copied_link.child.title, copy_year=to_node.year)
+                )
 
         return to_node
 
