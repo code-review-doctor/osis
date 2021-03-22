@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-17 14:04+0100\n"
+"POT-Creation-Date: 2021-03-22 09:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -420,6 +420,12 @@ msgstr ""
 msgid "Keywords"
 msgstr ""
 
+#, python-format
+msgid ""
+"LU %(code)s does not exist in %(copy_year)s. LU is copied with %(year)s as "
+"year of reference."
+msgstr ""
+
 msgid "Language"
 msgstr ""
 
@@ -693,14 +699,6 @@ msgstr ""
 msgid "Professionnal title"
 msgstr ""
 
-#, python-format
-msgid "Program %(title)s is not a specific official"
-msgstr ""
-
-#, python-format
-msgid "Program %(title)s is not a transition"
-msgstr ""
-
 msgid "Program organized with other institutes"
 msgstr ""
 
@@ -823,6 +821,12 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid ""
+"The element %(title)s has already been copied in %(copy_year)s in the "
+"context of an other training.Its content may have changed."
+msgstr ""
+
+#, python-format
 msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
 
@@ -862,6 +866,13 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: "
+"%(learning_unit_code)s does not exist anymore in %(training_acronym) in "
+"%(copy_year)s."
+msgstr ""
+
+#, python-format
+msgid ""
 "The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
 "are not inside the selected training %(root)s"
 msgstr ""
@@ -873,6 +884,16 @@ msgstr ""
 #, python-format
 msgid ""
 "The program tree version %(offer_acronym)s%(version_name)s has been deleted."
+msgstr ""
+
+#, python-format
+msgid "The reference element %(title)s is still empty."
+msgstr ""
+
+#, python-format
+msgid ""
+"The reference group %(title)s has not yet been copied. Its content is still "
+"empty."
 msgstr ""
 
 msgid "The registration form is available at the Secretariat of"
@@ -920,6 +941,18 @@ msgstr ""
 msgid ""
 "Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is closed in %(end_year)s. This training/"
+"mini-training is not copied in %(copy_year)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
+"is not copied in %(copy_year)s."
 msgstr ""
 
 msgid "Trainings"

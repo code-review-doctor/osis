@@ -48,7 +48,6 @@ from program_management.forms.fill_content import FillTransitionContentForm
 class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMixin, AjaxTemplateMixin, FormView):
     template_name = "tree_version/fill_content_inner.html"
     form_class = FillTransitionContentForm
-    success_url = ""
 
     def get_context_data(self, **kwargs) -> Dict:
         context_data = super().get_context_data(**kwargs)
@@ -71,6 +70,9 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
+
+    def get_success_url(self) -> str:
+        return ""
 
     def display_report_warning(self, report: 'AggregateReport') -> None:
         display_warning_messages(self.request, [str(warning) for warning in report.get_warnings()])

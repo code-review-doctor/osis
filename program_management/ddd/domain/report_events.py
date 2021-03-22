@@ -59,6 +59,19 @@ class NotCopyTrainingMiniTrainingNotExistForYearEvent(ReportEvent):
 
 
 @attr.s(frozen=True, slots=True)
+class NotCopyTrainingMiniTrainingNotExistingEvent(ReportEvent):
+    title = attr.ib(type=str)
+    copy_year = attr.ib(type=int)
+
+    def __str__(self):
+        return _("Training/Mini-Training %(title)s is inconsistent."
+                 "This training/mini-training is not copied in %(copy_year)s.") % {
+                   "title": self.title,
+                   "copy_year": self.copy_year,
+               }
+
+
+@attr.s(frozen=True, slots=True)
 class CopyReferenceGroupEvent(ReportEvent):
     title = attr.ib(type=str)
 
@@ -102,7 +115,7 @@ class CannotCopyPrerequisiteAsLearningUnitNotPresent(ReportEvent):
 
     def __str__(self):
         return _(
-            "The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: %(learning_unit_code)s"
+            "The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: %(learning_unit_code)s "
             "does not exist anymore in %(training_acronym) in %(copy_year)s."
         ) % {
             "prerequisite_code": self.prerequisite_code,

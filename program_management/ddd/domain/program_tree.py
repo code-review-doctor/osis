@@ -308,6 +308,12 @@ class ProgramTreeBuilder:
                     transition_name
                 )
             elif not child:
+                to_tree.report.add_warning(
+                    report_events.NotCopyTrainingMiniTrainingNotExistingEvent(
+                        title=source_link.child.title,
+                        copy_year=to_node.year
+                    )
+                )
                 continue
 
             copied_link = LinkBuilder().from_link(source_link, to_node, child)

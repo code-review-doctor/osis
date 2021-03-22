@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-17 14:04+0100\n"
+"POT-Creation-Date: 2021-03-22 09:41+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -464,6 +464,14 @@ msgstr "Membres du jury"
 msgid "Keywords"
 msgstr "Mots clés"
 
+#, python-format
+msgid ""
+"LU %(code)s does not exist in %(copy_year)s. LU is copied with %(year)s as "
+"year of reference."
+msgstr ""
+"L'UE %(code)s n'existe pas en %(copy_year)s. L'UE est recopiée avec %(year)s "
+"comme année de référence."
+
 msgid "Language"
 msgstr "Langue"
 
@@ -747,14 +755,6 @@ msgstr "Produire un fichier Excel avec la liste des formations"
 msgid "Professionnal title"
 msgstr "Titre professionnel"
 
-#, python-format
-msgid "Program %(title)s is not a specific official"
-msgstr "Programme %(title)s n'est pas une version particulière"
-
-#, python-format
-msgid "Program %(title)s is not a transition"
-msgstr "Programme %(title)s n'est pas une transition"
-
 msgid "Program organized with other institutes"
 msgstr "Programme co-organisés avec d'autres institutions"
 
@@ -882,6 +882,14 @@ msgstr ""
 "auquel vous voulez rattacher."
 
 #, python-format
+msgid ""
+"The element %(title)s has already been copied in %(copy_year)s in the "
+"context of an other training.Its content may have changed."
+msgstr ""
+"L'élément %(title)s a déjà été recopié en %(copy_year)s dans le cadre d'une "
+"autre formation. Il pourrait donc déjà avoir été modifié."
+
+#, python-format
 msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
 "La date de fin de la formation %(acronym)s doit être plus grande ou égale à "
@@ -927,6 +935,15 @@ msgid ""
 msgstr ""
 "Le parent %(parent)s doit au moins avoir un enfant de type(s) \"%(types)s\"."
 
+
+msgid ""
+"The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: "
+"%(learning_unit_code)s does not exist anymore in %(training_acronym) in "
+"%(copy_year)s."
+msgstr ""
+"Le prérequis de %(prerequisites_code)s n'est pas copié en %(copy_year)s: "
+"%(learning_unit_code)s n'est plus dans %(training_acronym) en %(copy_year)s."
+
 #, python-format
 msgid ""
 "The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
@@ -945,6 +962,18 @@ msgid ""
 msgstr ""
 "La version de formation %(offer_acronym)s%(version_name)s a été supprimée "
 "avec succès."
+
+#, python-format
+msgid "The reference element %(title)s is still empty."
+msgstr "L'élément de référence %(title)s est encore vide."
+
+#, python-format
+msgid ""
+"The reference group %(title)s has not yet been copied. Its content is still "
+"empty."
+msgstr ""
+"Le groupement de référence %(title)s n'a pas encore été recopié. Son contenu "
+"est encore vide."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -1000,6 +1029,22 @@ msgid ""
 msgstr ""
 "La formation <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> a été modifiée avec succés"
+
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is closed in %(end_year)s. This training/"
+"mini-training is not copied in %(copy_year)s."
+msgstr ""
+"La formation/mini-formation %(title)s est clôturée en %(end_year)s. Cet "
+"élément n'est pas recopié en %(copy_year)s."
+
+
+msgid ""
+"Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
+"is not copied in %(copy_year)s."
+msgstr ""
+"La formation/mini-formation %(title)s est inconsistente. Cet "
+"élément n'est pas recopié en %(copy_year)s."
 
 msgid "Trainings"
 msgstr "Formations"
