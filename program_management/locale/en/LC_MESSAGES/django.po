@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 11:11+0100\n"
+"POT-Creation-Date: 2021-03-22 11:23+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -374,6 +374,14 @@ msgstr ""
 
 #, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
+msgstr ""
+
+msgid ""
+"In the context of a Master, this action fill the content of the transition "
+"version of the Master but also of its finalities if the corresponding "
+"transition versions exist. Therefore, it is necessary to create the "
+"transition version of the finalities that are wished before executing this "
+"action."
 msgstr ""
 
 msgid "Include subordinate entities"

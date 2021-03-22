@@ -214,7 +214,7 @@ class ProgramTreeBuilder:
             elif last_year_link.child.is_group() and not child:
                 child = child or node_factory.copy_to_next_year(last_year_link.child)
 
-            else:
+            elif not child:
                 to_tree.report.add_warning(
                     report_events.NotCopyTrainingMiniTrainingNotExistingEvent(
                         acronym=last_year_link.child.title,
@@ -222,6 +222,7 @@ class ProgramTreeBuilder:
                         copy_year=to_node.academic_year
                     )
                 )
+                continue
 
             copied_link = LinkBuilder().from_link(last_year_link, to_node, child)
             to_node.children.append(copied_link)
