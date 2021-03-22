@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 09:41+0100\n"
+"POT-Creation-Date: 2021-03-22 11:11+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -867,7 +867,7 @@ msgstr ""
 #, python-format
 msgid ""
 "The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: "
-"%(learning_unit_code)s does not exist anymore in %(training_acronym) in "
+"%(learning_unit_code)s does not exist anymore in %(training_title)s in "
 "%(copy_year)s."
 msgstr ""
 
@@ -953,6 +953,10 @@ msgstr ""
 msgid ""
 "Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
 "is not copied in %(copy_year)s."
+msgstr ""
+
+#, python-format
+msgid "Training/Mini-Training %(title)s transition version is non existent."
 msgstr ""
 
 msgid "Trainings"

@@ -244,7 +244,8 @@ class PrerequisiteFactory:
                     prerequisite_code=node_having_prerequisite_identity.code,
                     learning_unit_code=node_having_prerequisite_identity.code,
                     training_acronym=to_tree.root_node.title,
-                    copy_year=to_tree.root_node.year
+                    training_code=to_tree.root_node.code,
+                    copy_year=to_tree.root_node.academic_year
                 )
             )
             raise CannotCopyPrerequisiteException()
@@ -257,7 +258,8 @@ class PrerequisiteFactory:
                         prerequisite_code=node_having_prerequisite_identity.code,
                         learning_unit_code=code,
                         training_acronym=to_tree.root_node.title,
-                        copy_year=to_tree.root_node.year
+                        training_code=to_tree.root_node.code,
+                        copy_year=to_tree.root_node.academic_year
                     )
                 )
             raise CannotCopyPrerequisiteException()
