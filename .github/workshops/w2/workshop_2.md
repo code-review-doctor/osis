@@ -62,7 +62,7 @@ En tant qu'utilisateur facultaire, je veux créer un partim
 
 ## Cas d'utilisation 3
 ### user story
-En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'un partim 
+En tant qu'utilisateur facultaire, je veux créer les parties magistrales et pratiques d'un partim (en même temps que le partim)
 
 ### business rules
 - Même chose que pour la création des parties magistrales et pratiques d'une UE

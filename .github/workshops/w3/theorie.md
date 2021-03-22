@@ -53,7 +53,7 @@ def copy_training_to_next_year(cmd: CommandRequest) -> EntityIdentity:
     - Repository.update()
 - Avantages :
     - Encapsulation de la logique de persistence dans la couche Repository
-    - Facilité d'utilisation du Repository par no Application services
+    - Facilité d'utilisation du Repository par nos Application services
         - Pas d'ambiguïté : dois-je create ou dois-je update mon aggregate ?
 
 
@@ -102,6 +102,11 @@ https://refactoring.guru/fr/design-patterns/factory-method
 - Le pattern **Factory** est un patron de conception de création qui définit une interface 
 pour créer des objets dans une classe mère, mais délègue le choix des types d’objets à créer aux sous-classes.
 
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ### Problème
 
 - Gestion d'un programme de formation (ProgramTree) qui contient des enfants appelés "groupements" (Node)
@@ -110,6 +115,9 @@ pour créer des objets dans une classe mère, mais délègue le choix des types 
     - une classe
     - un groupement
 - Ces groupements ont des logiques à la fois communes et spécifiques à leurs natures
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 
@@ -124,15 +132,15 @@ class Node(interface.Entity):
     """Classe comportant les logiques communes"""
     pass
 
-class NodeGroupYear(interface.Entity):
+class NodeGroupYear(Node):
     """Classe comportant les logiques spécifiques aux groupements"""
     pass
 
-class NodeLearningUnitYear(interface.Entity):
+class NodeLearningUnitYear(Node):
     """Classe comportant les logiques spécifiques aux Unités d'Enseignement"""
     pass
 
-class NodeLearningClassYear(interface.Entity):
+class NodeLearningClassYear(Node):
     """Classe comportant les logiques spécifiques aux classes"""
     pass
 
@@ -147,6 +155,7 @@ class NodeFactory:
             return NodeLearningClassYear(**node_attrs)
         raise Exception("Unknown type")
 
+
 # Utilisation
 learning_unit_node = NodeFactory().get_node(
     type=LEARNING_UNIT,
@@ -156,11 +165,13 @@ learning_unit_node = NodeFactory().get_node(
 )
 
 
-
-node_factory = NodeFactory()
-
 ``` 
-    
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ### Avantages et inconvénients
 
 - (+) Complexité de création (constructeurs complexes) masquée et encapsulée dans une classe dédiée
@@ -185,6 +196,11 @@ https://refactoring.guru/fr/design-patterns/builder
 étape par étape. Il permet de produire différentes variations ou représentations d’un objet 
 en utilisant le même code de construction.
 
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ### Problème
 
 - Gestion d'un programme de formation (ProgramTree) qui contient des enfants appelés "groupements" (Node)
@@ -192,12 +208,16 @@ en utilisant le même code de construction.
 - En fonction du type groupement racine du programme de formation, la création de son contenu change
 - Je peux créer un programme de formation sur une année 2021 sur base de ce même programme en 2020
 
-Constat : la création d'un programme de formation est complexe, avec beaucoup de champs et objets imbriqués
+Constat : la création d'un programme de formations est complexe, avec beaucoup de champs et objets imbriqués
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 
 ### Solution
 
-- Utiliser un **builder**, capable de créer un groupement en fonction des attributs
+- Utiliser un **builder**, capable de créer un programme de formations en fonction des attributs
 
 ```python
 from osis_common.ddd import interface
@@ -240,6 +260,10 @@ class ProgramTreeBuilder:
             authorized_relationships=new_authorized_relationships
         )
 ```
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 
 ### Avantages et inconvénients
@@ -293,9 +317,6 @@ n’existe qu’en un seul exemplaire, tout en fournissant un point d’accès g
     - Avantage : facilité e distinction privé - publique : ce qui est publique possède une factory
     - Avantage : pas besoin de faire de new Identity(...) -> juste appeler la factory
     - Inconvénient : pattern "factory" complexe pour des objets simples ("overengineering")
-    
-- Pas de différence entre Builder et Factory :
-    - Uniquement "Builder"
 
 - Accès : 
     - Couche Domaine
