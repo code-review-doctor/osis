@@ -1,18 +1,14 @@
-from typing import List
-
 import attr
 
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from osis_common.ddd import interface
-from program_management.ddd.domain.program_tree import ProgramTree
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.validators.validators_by_business_action import DeleteLearningUnitValidatorList
 
 
 @attr.s(frozen=True, slots=True)
@@ -50,6 +46,3 @@ class LearningUnit(interface.RootEntity):
     @property
     def code(self) -> str:
         return self.entity_id.code
-
-    def can_be_deleted(self, all_programs: List['ProgramTree']):
-        DeleteLearningUnitValidatorList(self.entity_id, all_programs).validate()

@@ -8,7 +8,6 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from osis_common.ddd.interface import CommandRequest, RootEntity
 from workshops_ddd_ue.command import CreateLearningUnitCommand
-from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain._address import Address
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
