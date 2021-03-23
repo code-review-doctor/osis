@@ -25,10 +25,20 @@
 from typing import Optional
 
 from program_management.ddd.command import GetProgramTreeVersionCommand
+from program_management.ddd.domain import program_tree_version, exception
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
 def get_program_tree_version(cmd: GetProgramTreeVersionCommand) -> Optional['ProgramTreeVersion']:
-    results = program_tree_version_repository.ProgramTreeVersionRepository().search(code=cmd.code, year=cmd.year)
-    return next(iter(results), None)
+    identity = program_tree_version.ProgramTreeVersionIdentity(
+        offer_acronym=cmd.acronym,
+        year=cmd.year,
+        version_name=cmd.version_name,
+        transition_name=cmd.transition_name
+    )
+
+    try:
+        return program_tree_version_repository.ProgramTreeVersionRepository().get(entity_id=identity)
+    except exception.ProgramTreeVersionNotFoundException:
+        return None

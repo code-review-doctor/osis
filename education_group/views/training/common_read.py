@@ -276,7 +276,12 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         if self.is_root_node and self.program_tree_version_identity.is_transition:
             return reverse(
                 "fill_transition_version_content",
-                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+                kwargs={
+                    'year': self.current_version.entity_id.year,
+                    'acronym': self.current_version.entity_id.offer_acronym,
+                    'transition_name': self.current_version.entity_id.transition_name,
+                    'version_name': self.current_version.entity_id.version_name,
+                }
             )
 
     def get_create_specific_version_url(self):

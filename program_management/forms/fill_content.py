@@ -130,7 +130,7 @@ class FillTransitionContentForm(forms.Form):
     def __get_last_year_transition_tree_option_human_readable(self) -> str:
         return _("Fill from transition version of last year: %(title)s in %(year)s") % {
             "title": self.last_year_transition_tree.official_name,
-            "year": self.last_year_transition_tree.year
+            "year": self.last_year_transition_tree.academic_year
         }
 
     def __get_same_version_tree_option_human_readable(self) -> str:
@@ -139,7 +139,7 @@ class FillTransitionContentForm(forms.Form):
             text = _("Fill from specific official of this year: %(title)s in %(year)s")
         return text % {
             "title": self.same_version_tree.official_name,
-            "year": self.same_version_tree.year
+            "year": self.same_version_tree.academic_year
         }
 
     def __get_last_year_same_version_tree_option_human_readable(self) -> str:
@@ -148,5 +148,5 @@ class FillTransitionContentForm(forms.Form):
             text = _("Fill from specific official of last year: %(title)s in %(year)s")
         return text % {
             "title": self.last_year_same_version_tree.official_name,
-            "year": self.last_year_same_version_tree.year
+            "year": self.last_year_same_version_tree.academic_year
         }

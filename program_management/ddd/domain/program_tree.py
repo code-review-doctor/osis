@@ -42,12 +42,12 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
-from program_management.ddd.domain import exception, report, report_events
+from program_management.ddd.domain import exception, report_events
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
-from program_management.ddd.domain.report import AggregateReport, Report
 from program_management.ddd.domain.prerequisite import Prerequisites, \
     PrerequisitesBuilder
+from program_management.ddd.domain.report import Report
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action

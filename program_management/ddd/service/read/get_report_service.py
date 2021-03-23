@@ -25,11 +25,13 @@
 from typing import Optional
 
 from program_management.ddd.command import GetReportCommand
-from program_management.ddd.domain.report import AggregateReport
+from program_management.ddd.domain.report import Report, ReportIdentity
 from program_management.ddd.repositories import report
 
 
-def get_report(cmd: 'GetReportCommand') -> Optional['AggregateReport']:
+def get_report(cmd: 'GetReportCommand') -> Optional['Report']:
     report_repo = report.ReportRepository()
 
-    return report_repo.get(transaction_id=cmd.from_transaction_id)
+    report_identity = ReportIdentity(transaction_id=cmd.from_transaction_id)
+
+    return report_repo.get(report_identity=report_identity)

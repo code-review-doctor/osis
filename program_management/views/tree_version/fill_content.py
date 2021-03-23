@@ -38,10 +38,11 @@ from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
+from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.report import Report
 from program_management.ddd.service.read import get_program_tree_version_service, \
-    get_program_tree_version_origin_service, get_report_service
+    get_report_service
 from program_management.forms.fill_content import FillTransitionContentForm
 
 
@@ -93,29 +94,41 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         return get_object_or_404(
             GroupYear,
             academic_year__year=self.kwargs['year'],
-            partial_acronym=self.kwargs['code']
+            acronym=self.kwargs['acronym'],
+            educationgroupversion__version_name=self.kwargs['version_name'],
+            educationgroupversion__transition_name=self.kwargs['transition_name'],
         )
 
     @cached_property
     def transition_tree(self) -> 'ProgramTreeVersion':
         return get_program_tree_version_service.get_program_tree_version(
-            command.GetProgramTreeVersionCommand(code=self.kwargs['code'], year=self.kwargs['year'])
+            command.GetProgramTreeVersionCommand(
+                year=self.kwargs['year'],
+                acronym=self.kwargs['acronym'],
+                version_name=self.kwargs['version_name'],
+                transition_name=self.kwargs['transition_name']
+            )
         )
 
     @cached_property
     def last_year_transition_tree(self) -> Optional['ProgramTreeVersion']:
         return get_program_tree_version_service.get_program_tree_version(
-            command.GetProgramTreeVersionCommand(code=self.kwargs['code'], year=int(self.kwargs['year']) - 1)
+            command.GetProgramTreeVersionCommand(
+                year=self.kwargs['year'] - 1,
+                acronym=self.kwargs['acronym'],
+                version_name=self.kwargs['version_name'],
+                transition_name=self.kwargs['transition_name']
+            )
         )
 
     @cached_property
     def same_version_tree(self) -> 'ProgramTreeVersion':
-        return get_program_tree_version_origin_service.get_program_tree_version_origin(
-            command.GetProgramTreeVersionOriginCommand(
+        return get_program_tree_version_service.get_program_tree_version(
+            command.GetProgramTreeVersionCommand(
                 year=self.kwargs['year'],
-                offer_acronym=self.transition_tree.entity_id.offer_acronym,
-                transition_name=self.transition_tree.entity_id.transition_name,
-                version_name=self.transition_tree.entity_id.version_name
+                acronym=self.kwargs['acronym'],
+                version_name=self.kwargs['version_name'],
+                transition_name=program_tree_version.NOT_A_TRANSITION
             )
         )
 
@@ -124,6 +137,8 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         return get_program_tree_version_service.get_program_tree_version(
             command.GetProgramTreeVersionCommand(
                 year=self.kwargs['year'] - 1,
-                code=self.same_version_tree.program_tree_identity.code
+                acronym=self.kwargs['acronym'],
+                version_name=self.kwargs['version_name'],
+                transition_name=program_tree_version.NOT_A_TRANSITION
             )
         )
