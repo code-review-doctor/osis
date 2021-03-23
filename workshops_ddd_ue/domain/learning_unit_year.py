@@ -16,7 +16,7 @@ from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntityIdentity, ResponsibleEntity
 from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.validators.validators_by_business_action import CreateLearningUnitValidatorList, \
-    DeleteLearningUnitValidatorList
+    DeleteLearningUnitValidatorList, CopyLearningUnitToNextYearValidatorList
 
 
 @attr.s(frozen=True, slots=True)
@@ -30,6 +30,9 @@ class LearningUnitIdentity(interface.EntityIdentity):
     @property
     def year(self) -> int:
         return self.academic_year.year
+
+    def get_next_year(self):
+        return self.year + 1
 
 
 @attr.s(slots=True, hash=False, eq=False)

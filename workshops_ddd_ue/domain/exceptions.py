@@ -66,3 +66,9 @@ class InternshipSubtypeMandatoryException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Internship subtype is a mandatory field")
         super().__init__(message, **kwargs)
+
+
+class LearningUnitAlreadyExistsException(BusinessException):
+    def __init__(self, learning_unit_identity: 'LearningUnitIdentity', *args, **kwargs):
+        message = _("Learning unit {} already exists next year").format(learning_unit_identity)
+        super().__init__(message, **kwargs)

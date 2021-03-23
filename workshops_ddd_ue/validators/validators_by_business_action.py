@@ -9,6 +9,7 @@ from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsVa
 from workshops_ddd_ue.validators._credits_minimum_value import CreditsMinimumValueValidator
 from workshops_ddd_ue.validators._internship_subtype_mandatory import InternshipSubtypeMandatoryValidator
 from workshops_ddd_ue.validators._learning_unit_code_structure import CodeStructureValidator
+from workshops_ddd_ue.validators._learning_unit_exists_in_next_year import LearningUnitYearExistsNextYearValidator
 from workshops_ddd_ue.validators._required_fields import RequiredFieldsValidator
 from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code import \
     ResponsibleEntityAuthorizedTypeOrCode
@@ -29,5 +30,17 @@ class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
             RequiredFieldsValidator(command),
             ResponsibleEntityAuthorizedTypeOrCode(responsible_entity),
             InternshipSubtypeMandatoryValidator(command.type, command.internship_subtype),
+        ]
+        super().__init__()
+
+
+class CopyLearningUnitToNextYearValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(
+            self,
+            learning_unit_identity: 'LearningUnitIdentity',
+            all_existing_learning_units: List['LearningUnit'],
+    ):
+        self.validators = [
+            LearningUnitYearExistsNextYearValidator(learning_unit_identity, all_existing_learning_units),
         ]
         super().__init__()
