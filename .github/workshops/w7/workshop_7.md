@@ -17,3 +17,5 @@ def __gt__(self, other):
 
 - W5? Bounded contexts
     - [ALES] ApplicationService peutil appeler plusieurs repositories de plusieurs domaines différents ?
+    
+- Rapports (warnings, changes...) et events
