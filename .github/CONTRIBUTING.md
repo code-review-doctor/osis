@@ -1,5 +1,8 @@
 ## Table of Contents
 - [Coding styles](#coding-styles)
+    - [PEP8](#pep8)
+    - [Style de code Django](#style-de-code-django)
+    - [Conventions de nommage](#conventions-de-nommage)
     - [Indentation](#indentation)
     - [Signature des fonctions](#signature-des-fonctions)
     - [Constantes](#constantes)
@@ -24,9 +27,16 @@
     - [Arborescence des packages](#arborescence-des-packages)
     - [Commande](#dddcommandpy)
     - [Domaine](#ddddomain)
+        - [Entity](#entity)
+        - [RootEntity (aggregate)](#rootentity)
+        - [ValueObject](#valueobject)
+        - [EntityIdentity](#entityidentity)
+        - [BusinessException](#businessexception)
     - [Repository](#dddrepository)
     - [Application service](#dddservice-application-service)
     - [Validator](#dddvalidator)
+- [FAQ : questions - réponses](faq.md)
+- [Références](references.md)
 
 
 <br/><br/>
@@ -39,6 +49,44 @@
 
 #### Style de code Django
 - [Coding Style de Django](https://docs.djangoproject.com/en/2.2/internals/contributing/writing-code/coding-style/).
+
+
+#### Conventions de nommage
+
+- Dans le code qui implémente le DDD, **seuls des termes métier doivent apparaître** (pas de termes techniques).
+Se référer aux termes utilisés dans la description des analyses. Cf. [L'analyse est en français, le code en anglais : comment traduire correctement le métier ??](faq.md#question-lanalyse-est-en-franais-le-code-en-anglais--comment-traduire-correctement-le-mtier-)
+
+
+- Toute fonction qui renvoie un seul résultat : get_<sth>
+    
+    Exemple : ```def get_something() -> object```
+    
+- Toute fonction qui renvoie un booléen doit être nommé sous forme de question fermée (dont la réponse ne peut être que "Oui" ou "Non")
+
+    Exemples : ```def has_something() -> bool```, ```def is_something() -> bool```, ```def containes_something() -> bool```
+
+- Toute fonction qui renvoie une `list`, `set`, `dict` :
+    - Types de retour de fonctions non autorisés (pas assez explicites) :
+        - `dict` ==> utiliser `Dict[KeyType, ValueType]`
+        - `list` ==> utiliser `List[TypeOfElement]`
+        - `set` ==> utiliser `Set[TypeOfElement]`
+
+    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
+    
+    Exemple: ```def get_nodes() -> List['Node']```
+
+    - Pour les fonctions de recherche : search_<nom_pluriel>()
+    
+    Exemple: ```def search_nodes(*typed_filters) -> List['Node']```
+
+- Nommage des fonctions, fichiers **privés** (uniquement scope de la classe ou du fichier) : __function
+
+    Exemple: ```def __my_private_function(param: str) -> None```
+
+- Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
+
+    Exemple: ```def _my_protected_function(param: str) -> None```
+
 
 
 #### Indentation
@@ -93,9 +141,6 @@ def my_function(arg1: str,
 
 #### Signature des fonctions
 - Doit être typée ([python typing](https://docs.python.org/fr/3.6/library/typing.html))
-- Types de retour de fonctions non autorisés (pas assez explicites) :
-  - `dict` ==> utiliser `Dict[KeyType, ValueType]`
-  - `list` ==> utiliser `List[TypeOfElement]`
 - Éviter l'utilisation de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
 
 
@@ -205,7 +250,7 @@ CATEGORIES = (
   - [couche Application Service](#dddservice-application-service)
   - [couche Templates](#template-html)
   - [couche Template Tags](#template-django-template-tags)
-  - Uniquement vues "list" et "excel" : [couche Django Models](#modle-django-model) (à analyser au cas par cas ; le DDD risquerait de complexifier ces vues)
+  - Uniquement vues "list" et "excel" : [couche Django Models](#modle-django-model) (à analyser au cas par cas ; le DDD risquerait de complexifier ces vues - cf. [Quand doit-on appliquer le DDD ? Quid du CRUD ?](faq.md#question-quand-doit-on-appliquer-le-ddd--quid-du-crud--quid-des-views-de-recherche-fichiers-excels-pdfs-))
 
 <br/><br/>
 
@@ -313,33 +358,14 @@ def send_an_email(receiver: Person):
 ## Domain driven design
 
 #### Conventions générales
+- Cf. [Quand doit-on appliquer le DDD ? Quid du CRUD ?](faq.md#question-quand-doit-on-appliquer-le-ddd--quid-du-crud--quid-des-views-de-recherche-fichiers-excels-pdfs-)
+- Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/)
 - Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
 Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
-- Tous les paramètres d'entrée et de sortie doivent être typés
-- Les fonctions qui renvoient une objet, int, str doivent être nommés "get_<sth>"
-- Les fonctions qui renvoient un booléen doivent être nommés de sorte à poser une question fermée 
-(où la réponse ne peut être que "Oui" ou "Non"). Exemples : `is_<sth>`, `has_<sth>`, `contains_<sth>`...
-- Les fonctions qui renvoient une list, set, dict :
-    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
-    
-    Exemple: ```def get_nodes() -> List['Node']```
-
-    - Pour les fonctions de recherche : search_<nom_pluriel>()
-    
-    Exemple: ```def search_nodes(*typed_filters) -> List['Node']```
-
-- Nommage des fonctions, fichiers **privés** (uniquement scope de la classe ou du fichier) : __function
-
-    Exemple: ```def __my_private_function(param: str) -> None```
-
-- Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
-
-    Exemple: ```def _my_protected_function(param: str) -> None```
- - Implémentation des Value Objects en utilisant la librairie **attrs** en définissant la classe comme étant frozen (immutable) et faisant usage de slots.
 
 
 
-> :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour le DDD
+> :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour l'implémentation du DDD
 > (ValueObject, EntityObject...) sont définies [dans osis_common](https://github.com/uclouvain/osis-common/tree/master/ddd)**
 
 
@@ -352,8 +378,10 @@ django_app
  |   ├─ command.py
  |   |
  |   ├─ domain
+ |   |   ├─ exceptions.py  (exceptions business)
  |   |   ├─ <objet_métier>.py  (Aggregate root)
  |   |   ├─ _entity.py (protected)
+ |   |   ├─ _value_object.py (protected)
  |   |
  |   ├─ repository
  |   |   ├─ <objet_métier>.py
@@ -381,7 +409,8 @@ django_app
 #### ddd/command.py
 - Regroupe les **objets** qui sont transmis en paramètre d'un service (ddd/service)
 - Représente une simple "dataclass" possédant des attributs primitifs
-- Ces classes sont publiques : elles sont utilisées par les views
+- Public : utilisables en dehors de la couche du domaine ([service](#dddservice-application-service), [views](#vue-django-view)...)
+- Séparé en read/write ([CQS](#CQS_command_query_separation.md))
 - Doit obligatoirement hériter de l'objet CommandRequest
 - Nommage des classes de commande : <ActionMetier>Command
 
@@ -389,56 +418,203 @@ Exemple :
 ```python
 # command.py
 import attr
-
 from osis_common.ddd import interface
-from program_management.ddd.business_types import Path
 
 
 @attr.s(frozen=True, slots=True)
-class DetachNodeCommand(interface.CommandRequest):
-    path_to_detach = attr.ib(type=Path)
+class UpdateTrainingCommand(interface.CommandRequest):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=str)
+    title = attr.ib(type=str)
+    # ... other fields
 
-
-@attr.s(frozen=True, slots=True)
-class AttachNodeCommand(interface.CommandRequest):
-    path_to_node_to_attach = attr.ib(type=Path)
- 
 ```
 
+
 #### ddd/domain
-- Regroupe les **objets** du domaine métier qui doivent obligatoirement hériter de ValueObject, Entity ou RootEntity
-- Déclare les EntityIdentity (dans le même fichier que la classe du domaine qui utilise cet EntityIdentity)
-- Les ValueObject doivent obligatoirement redéfinir les méthodes `__hash__()` et `__eq__()`
-- Seuls les AggregateRoot (interface.RootEntity) sont publiques ; les `Entity` utilisées par l'aggregat root sont `protected`
+- Regroupe les **objets** du domaine métier :
+    - Entity
+    - RootEntity
+    - ValueObject
+    - EntityIdentity
+    - BusinessException
+- Contient uniquement des termes métier non techniques -> doit être compréhensible par le métier
 - 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
 - Nommage des objets : ObjetMetier.
 
-Exemple :
+<br/><br/>
+
+##### Entity
+
+- Protected : utilisé uniquement par d'autres `Entity` ou par un [RootEntity](#rootentity)
+- Ne possède pas de repository associé
+- Cf. [interface.Entity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L32)
+- Possède une identité [EntityIdentity](#entityidentity)
+- Deux entités sont identiques ssi leurs identités sont les mêmes
+- Mutable
+    - Toute modification de l'objet change l'état de l'objet
+    - Possède un historique (à travers le temps)
+- Exemple :
+
 ```python
-# ddd/domain/program_tree.py  -> Aggregate root du domaine "program_management"
+# .../domain/_study_domain.py
+import attr
+
+from osis_common.ddd import interface
+
+ 
+@attr.s(frozen=True, slots=True)
+class StudyDomainIdentity(interface.EntityIdentity):
+    decree_name = attr.ib(type=str)
+    code = attr.ib(type=str)
+
+
+@attr.s(slots=True)
+class StudyDomain(interface.Entity):
+    entity_id = attr.ib(type=StudyDomainIdentity)
+    name = attr.ib(type=str)
+
+```
+
+
+<br/><br/>
+
+
+##### RootEntity
+
+- Même définition qu'une Entity, sauf : 
+    - **Public** : utilisable par les couches en dehors du domaine ([service](#dddservice-application-service), [repository](#dddrepository)...)
+    - Possède un [repository](#dddrepository) associé
+        - persistence : 1 transaction par aggrégat (tout l'aggrégat est persisté, ou rien du tout - mais pas à moitié)
+- Exemple : 
+```python
+# .../domain/training.py
+import attr
+
+from osis_common.ddd import interface
+
+
+@attr.s(slots=True)
+class Training(interface.RootEntity):
+    entity_id = attr.ib(type=TrainingIdentity)
+    title = attr.ib(type=str)
+    study_domains = attr.ib(type=List[StudyDomain])
+    # Other fields ...
+
+```
+
+
+<br/><br/>
+
+
+##### ValueObject
+
+- Protected : utilisé uniquement par d'autres [ValueObject](#valueobject), [Entity](#entity) ou par un [RootEntity](#rootentity)
+- Ne possède pas de repository associé
+- Cf. [interface.ValueObject](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L20)
+- Doit redéfinir les méthodes `__hash__()` et `__eq__()`
+- Ne possède pas d'identité
+    - L'ensemble de ses attributs composent son identité
+- Deux ValueObjects sont les mêmes ssi l'ensemble des valeurs de leurs attributs sont les mêmes
+- Immuable (librairie `attrs` => `frozen=True`)
+    - Toute modification de l'objet signifie que c'est un nouvel objet
+    - Ne possède pas d'historique
+- Appartient d'office à une Entity
+- Exemples :
+    - Une date
+    - Une adresse
+
+```python
+# .../domain/_address.py
 import attr
 
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class ProgramTreeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
+class Address(interface.ValueObject):
+    country_name = attr.ib(type=str)
+    street_name = attr.ib(type=str)
+    street_number = attr.ib(type=str)
+    city = attr.ib(type=str)
+    postal_code = attr.ib(type=str)
 
-class ProgramTree(interface.RootEntity):
-    pass
- 
+    
+    def __eq__(self, other):
+        return self.country_name == other.country_name  \
+            and self.city == other.city \
+            and self.street_name == other.street_name \
+            and self.street_number == other.street_number \
+            and self.postal_code == other.postal_code
+
+    def __hash__(self):
+        return hash(self.country_name + self.street_name + self.street_number + self.city + self.postal_code)
+
 ```
+
+
+<br/><br/>
+
+
+##### EntityIdentity
+
+- Protected : utilisé uniquement par une [Entity](#entity) ou par un [RootEntity](#rootentity)
+- Cf. [interface.EntityIdentity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L28)
+- Représente l'identité d'une entité de notre domaine
+- Si elle change, c'est qu'on ne parle plus du même "objet"
+    - C'est donc un ValueObject
+- Déclaré dans le même fichier que l'Entity qui l'utilise
+- Cas d'exception (rare) : si l'identité logique est complexe à construire 
+(exemple : identité d'une personne - nom, prénom, age, lieu de naissance...),
+l'EntityIdentity sera composé d'un `UUID`
+
+- Exemple : 
 ```python
-# ddd/domain/_node.py  -> Une Entity "protected" du domaine "program_management"
+# .../domain/training.py
+import attr
 from osis_common.ddd import interface
 
-class Node(interface.Entity):
-    pass
+
+# Identité d'un Training
+@attr.s(frozen=True, slots=True)
+class TrainingIdentity(interface.EntityIdentity):
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+# Aggregate (RootEntity)
+@attr.s(slots=True)
+class Training(interface.RootEntity):
+    entity_id = attr.ib(type=TrainingIdentity)
+    # Other fields ...
 
 ```
 
+<br/><br/>
+
+##### BusinessException
+- Protected : utilisé uniquement par les validateurs et objets notre domaine
+- Regroupe les exceptions qui représentent des règles métier non respectée
+- Déclare les messages d'erreur destinés aux utilisateurs si cette exception métier est rencontrée
+    - Unique endroit qui "casse" l'isolation du domaine (utilisation externe au domaine) : module de traduction Django
+- Hérite de `BusinessException`
+- Exemple :
+
+```python
+### .../domain/exceptions.py
+from osis_common.ddd.interface import BusinessException
+from django.utils.translation import gettext_lazy as _
+
+
+class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
+    def __init__(self, training_identity: 'TrainingIdentity', *args, **kwargs):
+        message = _('Cannot delete because there are students enrolled to {}'.format(training_identity))
+        super().__init__(message, **kwargs)
+
+```
+
+
+<br/><br/><br/><br/>
 
 #### ddd/repository
 
@@ -451,14 +627,18 @@ class Node(interface.Entity):
 
 Exemple :
 ```python
-# ddd/repository/program_tree.py
+# ddd/repository/training.py
 from osis_common.ddd import interface
 
-class ProgramTreeRepository(interface.AbstractRepository):
+class TrainingRepository(interface.AbstractRepository):
     """Chargé d'implémenter les fonctions fournies par AbstractRepository."""
     pass
  
 ```
+
+
+<br/><br/><br/><br/>
+
 
 #### ddd/service (application service)
 
@@ -489,6 +669,10 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
  
 ```
 
+
+<br/><br/><br/><br/>
+
+
 #### ddd/validator
 
 - Regroupe les invariants métier (règles business)
@@ -502,21 +686,19 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 
 Exemple : 
 ```python
-# ddd/validator/_detach_root.py  # protected
-from osis_common.ddd import interface
-from django.utils.translation import gettext as _
+# ddd/validator/_existing_enrollments.py  # protected
 from base.ddd.utils import business_validator
 
-class DetachRootValidator(business_validator.BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', path_to_detach: 'Path'):
-        super(DetachRootValidator, self).__init__()
-        self.path_to_detach = path_to_detach
-        self.tree = tree
+class TrainingExistingEnrollmentsValidator(business_validator.BusinessValidator):
+    def __init__(self, training_id: 'TrainingIdentity'):
+        super().__init__()
+        self.training_id = training_id
 
-    def validate(self):
-        if self.tree.is_root(self.tree.get_node(self.path_to_detach)):
-            raise interface.BusinessException(_("Cannot perform detach action on root."))
+    def validate(self, *args, **kwargs):
+        enrollments_count = EnrollmentCounter().get_training_enrollments_count(self.training_id)
+        if enrollments_count > 0:
+            raise TrainingHaveEnrollments(self.training_id.acronym, self.training_id.year, enrollments_count)
 
 ```
 
