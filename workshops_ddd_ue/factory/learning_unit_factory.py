@@ -1,5 +1,5 @@
 import abc
-from typing import List
+from typing import List, Type
 
 import attr
 
@@ -13,7 +13,9 @@ from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
+from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
+    InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
+    MasterThesisLearningUnit, ExternalLearningUnit
 from workshops_ddd_ue.dto.learning_unit_dto import DTO, LearningUnitFromRepositoryDTO
 from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList, \
@@ -43,9 +45,8 @@ class LearningUnitBuilder(RootEntityBuilder):
         responsible_entity = _build_responsible_entity(cmd.responsible_entity_code)  # FIXME
         CreateLearningUnitValidatorList(responsible_entity, cmd, all_existing_identities).validate()
         dto = cmd
-        return LearningUnit(
+        return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.academic_year),
-            type=LearningContainerYearType[dto.type],
             titles=_build_titles(
                 dto.common_title_fr,
                 dto.specific_title_fr,
@@ -62,7 +63,7 @@ class LearningUnitBuilder(RootEntityBuilder):
 
     @classmethod
     def build_from_repository_dto(cls, dto: 'LearningUnitFromRepositoryDTO') -> 'LearningUnit':
-        return LearningUnit(
+        return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
             type=LearningContainerYearType[dto.type],
             titles=_build_titles(
@@ -91,6 +92,23 @@ class LearningUnitBuilder(RootEntityBuilder):
             entity_id=LearningUnitIdentityBuilder.build_for_next_year(learning_unit.entity_id)
         )
         return learning_unit_next_year
+
+
+def _get_learning_unit_class(type: str) -> Type[LearningUnit]:
+    if type == LearningContainerYearType.COURSE.name:
+        return CourseLearningUnit
+    if type == LearningContainerYearType.INTERNSHIP.name:
+        return InternshipLearningUnit
+    if type == LearningContainerYearType.DISSERTATION.name:
+        return DissertationLearningUnit
+    if type == LearningContainerYearType.OTHER_COLLECTIVE.name:
+        return OtherCollectiveLearningUnit
+    if type == LearningContainerYearType.OTHER_INDIVIDUAL.name:
+        return OtherIndividualLearningUnit
+    if type == LearningContainerYearType.MASTER_THESIS.name:
+        return MasterThesisLearningUnit
+    if type == LearningContainerYearType.EXTERNAL.name:
+        return ExternalLearningUnit
 
 
 def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publication_en: str):

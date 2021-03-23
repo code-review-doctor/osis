@@ -32,7 +32,6 @@ class LearningUnit(interface.RootEntity):
     entity_id = attr.ib(type=LearningUnitIdentity)
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
-    type = attr.ib(type=LearningContainerYearType)
     internship_subtype = attr.ib(type=InternshipSubtype)
     responsible_entity = attr.ib(type=ResponsibleEntity)
     periodicity = attr.ib(type=PeriodicityEnum)
@@ -46,3 +45,31 @@ class LearningUnit(interface.RootEntity):
     @property
     def code(self) -> str:
         return self.entity_id.code
+
+
+class CourseLearningUnit(LearningUnit):
+    type = LearningContainerYearType.COURSE
+
+
+class InternshipLearningUnit(LearningUnit):
+    type = LearningContainerYearType.INTERNSHIP
+
+
+class DissertationLearningUnit(LearningUnit):
+    type = LearningContainerYearType.DISSERTATION
+
+
+class OtherCollectiveLearningUnit(LearningUnit):
+    type = LearningContainerYearType.OTHER_COLLECTIVE
+
+
+class OtherIndividualLearningUnit(LearningUnit):
+    type = LearningContainerYearType.OTHER_INDIVIDUAL
+
+
+class MasterThesisLearningUnit(LearningUnit):
+    type = LearningContainerYearType.MASTER_THESIS
+
+
+class ExternalLearningUnit(LearningUnit):
+    type = LearningContainerYearType.EXTERNAL
