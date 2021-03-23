@@ -243,8 +243,8 @@ def is_group_year_an_eligible_transition(
         is_transition = obj and obj.partial_acronym.upper().startswith('T')
         links_to_parent = obj.element.children_elements.all()
         if links_to_parent:
-            parent = links_to_parent.get().parent_element.group_year
-            is_parent_transition = parent.partial_acronym.upper().startswith('T')
-            return is_transition and is_parent_transition
+            parents = [link.parent_element.group_year for link in links_to_parent]
+            all_parents_transition = all(parent.partial_acronym.upper().startswith('T') for parent in parents)
+            return is_transition and all_parents_transition
         return is_transition
     return None
