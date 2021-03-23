@@ -27,12 +27,13 @@
     - [Arborescence des packages](#arborescence-des-packages)
     - [Commande](#dddcommandpy)
     - [Domaine](#ddddomain)
-        - [Entity](#entity)
-        - [RootEntity (aggregate)](#rootentity)
-        - [ValueObject](#valueobject)
-        - [EntityIdentity](#entityidentity)
-        - [BusinessException](#businessexception)
+        - [Entity](#ddddomainentity)
+        - [RootEntity (aggregate)](#ddddomainrootentity)
+        - [ValueObject](#ddddomainvalueobject)
+        - [EntityIdentity](#ddddomainentityidentity)
+        - [BusinessException](#ddddomainbusinessexception)
     - [Repository](#dddrepository)
+    - [Domain service](#domain-services)
     - [Application service](#dddservice-application-service)
     - [Validator](#dddvalidator)
 - [FAQ : questions - réponses](faq.md)
@@ -367,6 +368,7 @@ Dans de rares cas plus complexes (exemple: identification d'une personne : UUID)
 
 > :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour l'implémentation du DDD
 > (ValueObject, EntityObject...) sont définies [dans osis_common](https://github.com/uclouvain/osis-common/tree/master/ddd)**
+> et [dans base.ddd.utils.business_validator](https://github.com/uclouvain/osis/blob/dev/base/ddd/utils/business_validator.py)**
 
 
 
@@ -408,9 +410,9 @@ django_app
 
 #### ddd/command.py
 - Regroupe les **objets** qui sont transmis en paramètre d'un service (ddd/service)
-- Représente une simple "dataclass" possédant des attributs primitifs
+- Représente une simple "dataclass" possédant des attributs primitifs (qui sont des données entrées par l'utilisateur)
 - Public : utilisables en dehors de la couche du domaine ([service](#dddservice-application-service), [views](#vue-django-view)...)
-- Séparé en read/write ([CQS](#CQS_command_query_separation.md))
+- Séparé en read/write ([CQS](CQS_command_query_separation.md))
 - Doit obligatoirement hériter de l'objet CommandRequest
 - Nommage des classes de commande : <ActionMetier>Command
 
@@ -432,19 +434,24 @@ class UpdateTrainingCommand(interface.CommandRequest):
 
 
 #### ddd/domain
-- Regroupe les **objets** du domaine métier :
+- Encapsule la logique métier, capturée dans les **objets** suivants:
     - Entity
     - RootEntity
     - ValueObject
     - EntityIdentity
     - BusinessException
+- Cf. [domaine pure et domain complet](application_service_vs_domain_service.md)
+- Ne possède aucune dépendance externe
 - Contient uniquement des termes métier non techniques -> doit être compréhensible par le métier
+- Un même domaine peut posséder plusieurs RootEntity
 - 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
 - Nommage des objets : ObjetMetier.
+- Accès :
+    - Aucun (tout ce qui se trouve dans le domaine ne doit avoir aucune dépendance externe à lui-même)
 
 <br/><br/>
 
-##### Entity
+#### ddd/domain/Entity
 
 - Protected : utilisé uniquement par d'autres `Entity` ou par un [RootEntity](#rootentity)
 - Ne possède pas de repository associé
@@ -480,7 +487,7 @@ class StudyDomain(interface.Entity):
 <br/><br/>
 
 
-##### RootEntity
+#### ddd/domain/RootEntity
 
 - Même définition qu'une Entity, sauf : 
     - **Public** : utilisable par les couches en dehors du domaine ([service](#dddservice-application-service), [repository](#dddrepository)...)
@@ -507,7 +514,7 @@ class Training(interface.RootEntity):
 <br/><br/>
 
 
-##### ValueObject
+#### ddd/domain/ValueObject
 
 - Protected : utilisé uniquement par d'autres [ValueObject](#valueobject), [Entity](#entity) ou par un [RootEntity](#rootentity)
 - Ne possède pas de repository associé
@@ -556,17 +563,17 @@ class Address(interface.ValueObject):
 <br/><br/>
 
 
-##### EntityIdentity
+#### ddd/domain/EntityIdentity
 
-- Protected : utilisé uniquement par une [Entity](#entity) ou par un [RootEntity](#rootentity)
-- Cf. [interface.EntityIdentity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L28)
 - Représente l'identité d'une entité de notre domaine
-- Si elle change, c'est qu'on ne parle plus du même "objet"
-    - C'est donc un ValueObject
+- Représente un ValueObject (si n'importe quelle valeur change, ce n'est plus la même "identité")
+- Visibilité :
+    - `protected` (si c'est l'identité d'une Entity)
+    - `publique` (si c'est l'identité d'une RootEntity)
 - Déclaré dans le même fichier que l'Entity qui l'utilise
 - Cas d'exception (rare) : si l'identité logique est complexe à construire 
-(exemple : identité d'une personne - nom, prénom, age, lieu de naissance...),
-l'EntityIdentity sera composé d'un `UUID`
+(exemple : identité d'une personne - nom, prénom, age, lieu de naissance...), l'EntityIdentity sera composé d'un `UUID`
+- Cf. [interface.EntityIdentity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L28)
 
 - Exemple : 
 ```python
@@ -592,12 +599,15 @@ class Training(interface.RootEntity):
 
 <br/><br/>
 
-##### BusinessException
-- Protected : utilisé uniquement par les validateurs et objets notre domaine
+#### ddd/domain/BusinessException
 - Regroupe les exceptions qui représentent des règles métier non respectée
-- Déclare les messages d'erreur destinés aux utilisateurs si cette exception métier est rencontrée
+- Déclare les messages d'erreur **traduits** destinés aux utilisateurs
     - Unique endroit qui "casse" l'isolation du domaine (utilisation externe au domaine) : module de traduction Django
+- Visibilité : `protected` (utilisé uniquement par les validateurs et objets notre domaine)
 - Hérite de `BusinessException`
+- Accès :
+    - Aucun (une Exception ne doit avoir aucune dépendance externe à elle-même)
+
 - Exemple :
 
 ```python
@@ -620,10 +630,15 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 
 - Regroupe les **objets** qui permettent de faire le lien entre le stockage des données et nos objets du domaine.
 - Chargée de persist / load les données (pour Osis, le stockage est fait une DB PostGres)
-- Utilisation d'une interface commune AbstractRepository
-- Les objets du repository doivent obligatoirement implémenter AbstractRepository
+- Hérite de `AbstractRepository`
+- Renvoie / persiste uniquement des RootEntity qui sont complets (ne peut pas renvoyer de types primitifs ou ValueObjects)
+    - Évite les risque d'inconsistance dans les vérifications des invariants métier
 - Nommage des fichiers : <objet_métier>.py
-- Nommage des objets : <ObjetMetier>Repository. 
+- Nommage des objets : <ObjetMetier>Repository.
+- Cf. [interface.AbstractRepository](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L53)
+- Accès :
+    - [couche Django Model](#modle-django-model)
+    - [couche Domain](#ddddomain)
 
 Exemple :
 ```python
@@ -636,6 +651,37 @@ class TrainingRepository(interface.AbstractRepository):
  
 ```
 
+<br/><br/><br/><br/>
+
+
+#### Domain services
+
+- Regroupe les **objets** qui ne représentent pas un `ValueObject` ou une `Entity` du domaine. 
+Exemple : un calculateur de taxe
+- Encapsule de la logique métier, qui ne sait pas être contenue directement dans le domaine
+    - Le plus rarement possible ! 
+    - Cf. [domaine pure et domain complet](application_service_vs_domain_service.md)
+    - Cf. [application service VS domain service](application_service_vs_domain_service.md)
+- Renvoie uniquement des types primitifs, des Entity ou ValueObjects
+- Peut recevoir une Entity, ValueObject, type_primitif ou repository
+- Accès :
+    - [couche Domain](#ddddomain) (via injection de dépendance)
+    - [couche Repository](#dddrepository) (via injection de dépendance)
+    - [couche BusinessException](#ddddomainbusinessexception)
+
+Exemple :
+```python
+# ddd/domain/service/sequence_generator.py
+from osis_common.ddd import interface
+
+class GenerateSequenceId(interface.DomainService):
+    
+    def generate(self, entity: RootEntity) -> int:
+        """Chargé de générer un nouveau numéro de séquence (unique) dans un système externe (database, etc.)"""
+        pass
+
+```
+
 
 <br/><br/><br/><br/>
 
@@ -643,14 +689,16 @@ class TrainingRepository(interface.AbstractRepository):
 #### ddd/service (application service)
 
 - Regroupe les **fonctions** qui implémentent les uses cases des utilisateurs (Given when then)
-- Chargée d'orchestrer les appels vers les couches du DDD (repository, domain...) et de déclencher les événements (exemple : envoi de mail)
-- Les fonctions de service reçoivent en paramètres uniquement des objets CommandRequest ([ddd/command.py](#ddd/command.py))
-- Les services renvoient toujours un EntityIdentity ; c'est la responsabilité des views de gérer les messages de succès ;
-- Séparer les services write et read dans des dossiers séparés
+- Chargé d'orchestrer les appels vers les couches du DDD (repository, domain...) et de déclencher les événements (exemple : envoi de mail)
+- Reçoit en paramètre uniquement des objets CommandRequest ([ddd/command.py](#ddd/command.py))
+- Renvoit toujours un EntityIdentity ; c'est la responsabilité des views de gérer les messages de succès ;
+- Séparé en 2 catégories : `write` et `read`
 - Doit être documentée (car couche publique réutilisable)
-- Les fonctions de service sont toujours publiques
+- Visibilité : `publique`
 - Nommage des fichiers : <action_metier>_service.py
 - Nommage des fonctions : <action_metier>
+- Cf. [application service VS domain service](application_service_vs_domain_service.md)
+
 
 Exemple:
 ```python
@@ -676,10 +724,9 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 #### ddd/validator
 
 - Regroupe les invariants métier (règles business)
-- Se charge de raise des BusinessException en cas d'invariant métier non respecté
-- Les messages doivent être traduits (si BusinessException s'en charge, le makemessages ne reprendra pas messages à traduire car ils seront stockés dans des variables...)
+- Chargé de raise des BusinessException en cas d'invariant métier non respecté
 - Doit hériter de BusinessValidator
-- Sont toujours `protected` (accessibles uniquement par le Domain)
+- Visibilité : `protected` (accessibles uniquement par le Domain)
 - 1 fichier par invariant métier
 - Nommage des fichiers : <invariant_metier>.py
 - Nommage des objets : <InvariantMetier>Validator
