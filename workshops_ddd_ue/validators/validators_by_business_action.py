@@ -38,9 +38,9 @@ class CopyLearningUnitToNextYearValidatorList(MultipleExceptionBusinessListValid
     def __init__(
             self,
             learning_unit_identity: 'LearningUnitIdentity',
-            all_existing_learning_units: List['LearningUnit'],
+            all_existing_lear_unit_identities: List['LearningUnitIdentity'],
     ):
         self.validators = [
-            LearningUnitYearExistsNextYearValidator(learning_unit_identity, all_existing_learning_units),
+            LearningUnitYearExistsNextYearValidator(learning_unit_identity, all_existing_lear_unit_identities),
         ]
         super().__init__()

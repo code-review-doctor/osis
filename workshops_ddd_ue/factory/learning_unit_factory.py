@@ -4,7 +4,7 @@ from typing import List
 import attr
 
 from osis_common.ddd.interface import CommandRequest, RootEntity
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnit
+from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList
 
@@ -25,9 +25,9 @@ class LearningUnitBuilder(RootEntityBuilder):
     def copy_to_next_year(
             cls,
             learning_unit: 'LearningUnit',
-            all_existing_learning_units: List['LearningUnit']
+            all_existing_lear_unit_identities: List['LearningUnitIdentity']
     ) -> 'LearningUnit':
-        CopyLearningUnitToNextYearValidatorList(learning_unit.entity_id, all_existing_learning_units).validate()
+        CopyLearningUnitToNextYearValidatorList(learning_unit.entity_id, all_existing_lear_unit_identities).validate()
         learning_unit_next_year = attr.evolve(
             learning_unit,
             entity_id=LearningUnitIdentityBuilder.build_for_next_year(learning_unit.entity_id)

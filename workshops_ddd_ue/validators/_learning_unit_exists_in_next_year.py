@@ -11,15 +11,15 @@ class LearningUnitYearExistsNextYearValidator(BusinessValidator):
     def __init__(
             self,
             learning_unit_identity: 'LearningUnitIdentity',
-            all_existing_learning_units: List['LearningUnit'],
+            all_existing_lear_unit_identities: List['LearningUnitIdentity'],
     ):
         super().__init__()
         self.learning_unit_identity = learning_unit_identity
-        self.all_existing_learning_units = all_existing_learning_units
+        self.all_existing_learning_units = all_existing_lear_unit_identities
         self.identity_next_year = LearningUnitIdentityBuilder.build_for_next_year(
             learning_unit_identity
         )
 
     def validate(self, *args, **kwargs):
-        if self.identity_next_year in {learn_unit.entity_id for learn_unit in self.all_existing_learning_units}:
+        if self.identity_next_year in set(self.all_existing_learning_units):
             raise LearningUnitAlreadyExistsException(self.identity_next_year)
