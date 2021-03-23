@@ -1,6 +1,7 @@
 from typing import List
 
 from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
+from program_management.ddd.domain.program_tree import ProgramTree
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
@@ -12,6 +13,7 @@ from workshops_ddd_ue.validators._learning_unit_code_structure import CodeStruct
 from workshops_ddd_ue.validators._required_fields import RequiredFieldsValidator
 from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code import \
     ResponsibleEntityAuthorizedTypeOrCode
+from workshops_ddd_ue.validators._used_in_program_tree import UsedInProgramValidator
 
 
 class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):

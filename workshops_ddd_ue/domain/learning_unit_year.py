@@ -15,13 +15,17 @@ from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntityIdentity, ResponsibleEntity
 from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.validators.validators_by_business_action import CreateLearningUnitValidatorList
+from workshops_ddd_ue.validators.validators_by_business_action import CreateLearningUnitValidatorList, \
+    DeleteLearningUnitValidatorList
 
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitIdentity(interface.EntityIdentity):
     academic_year = attr.ib(type=AcademicYear)
     code = attr.ib(type=str)
+
+    def __str__(self):
+        return "{} - ({})".format(self.code, self.academic_year)
 
     @property
     def year(self) -> int:
@@ -49,7 +53,7 @@ class LearningUnit(interface.RootEntity):
         return self.entity_id.code
 
     def can_be_deleted(self, all_programs: List['ProgramTree']):
-        pass
+        DeleteLearningUnitValidatorList(self.entity_id, all_programs).validate()
 
     @staticmethod
     def create(

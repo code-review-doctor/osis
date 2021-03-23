@@ -129,8 +129,12 @@ class LearningUnitRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+    def delete(cls, entity_id: LearningUnitIdentity, **kwargs: ApplicationService) -> None:
+        obj = LearningUnitYearDatabase.objects.get(
+            acronym=entity_id.code,
+            academic_year__year=entity_id.year,
+        )
+        obj.delete()
 
     def get_identities(self) -> List['LearningUnitIdentity']:
         all_learn_unit_years = LearningUnitYearDatabase.objects.all().values(
