@@ -21,6 +21,8 @@ from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
+from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
+from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
 
 
 class LearningUnitRepository(interface.AbstractRepository):
@@ -88,41 +90,8 @@ class LearningUnitRepository(interface.AbstractRepository):
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
         obj_as_dict = qs.get()
-        return LearningUnit(
-            entity_id=LearningUnitIdentity(code=obj_as_dict['code'], academic_year=AcademicYear(year=obj_as_dict['year'])),
-            type=obj_as_dict['type'],
-            titles=Titles(
-                common_fr=obj_as_dict['common_title_fr'],
-                specific_fr=obj_as_dict['specific_title_fr'],
-                common_en=obj_as_dict['common_title_en'],
-                specific_en=obj_as_dict['specific_title_en'],
-            ),
-            credits=obj_as_dict['credits'],
-            internship_subtype=InternshipSubtype[obj_as_dict['internship_subtype']],
-            responsible_entity=ResponsibleEntity(  # FIXME
-                entity_id=ResponsibleEntityIdentity(code=obj_as_dict['responsible_entity_code']),
-                title=None,
-                address=Address(
-                    country=None,
-                    street_name=None,
-                    street_number=None,
-                    city=None,
-                    postal_code=None,
-                ),
-                type=None,
-            ),
-            periodicity=PeriodicityEnum[obj_as_dict['periodicity']],
-            language=Language(  # FIXME
-                ietf_code=None,
-                name=None,
-                iso_code=obj_as_dict['iso_code'],
-            ),
-            remarks=Remarks(
-                faculty=obj_as_dict['remark_faculty'],
-                publication_fr=obj_as_dict['remark_publication_fr'],
-                publication_en=obj_as_dict['remark_publication_en'],
-            ),
-        )
+        dto_from_database = LearningUnitFromRepositoryDTO(**obj_as_dict)
+        return LearningUnitBuilder.build_from_repository_dto(dto_from_database)
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
