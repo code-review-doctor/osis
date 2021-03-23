@@ -29,7 +29,7 @@ from unittest import mock
 from django.test import TestCase
 
 from assessments.business import scores_encodings_deadline
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_deadline import SessionExamDeadline
 from base.tests.factories.academic_calendar import AcademicCalendarFactory

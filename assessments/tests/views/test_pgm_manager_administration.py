@@ -32,8 +32,6 @@ from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
 from base.auth.roles.program_manager import ProgramManager
-from base.models.enums import academic_calendar_type
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
