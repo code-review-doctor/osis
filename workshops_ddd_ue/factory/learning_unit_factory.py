@@ -1,26 +1,25 @@
 import abc
 from typing import List
 
-from osis_common.ddd.interface import CommandRequest
+import attr
+
+from osis_common.ddd.interface import CommandRequest, RootEntity
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit
+from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList
 
 
-class Builder(abc.ABC):
+# TODO :: to move into osis_common.ddd.interface
+class RootEntityBuilder(abc.ABC):
 
-    def build_from_command(self, cmd: CommandRequest):
+    def build_from_command(self, cmd: CommandRequest) -> RootEntity:
         raise NotImplementedError()
 
-    def build_from_database_model(self, django_model_object: django.db.models.Model):
+    def build_from_database_model(self, django_model_object: 'django.db.models.Model') -> RootEntity:
         raise NotImplementedError()
 
 
-class LearningUnitBuilder(Builder):
-    def build_from_command(self, cmd: CommandRequest):
-        pass
-
-    def build_from_database_model(self, django_model_object: django.db.models.Model):
-        pass
+class LearningUnitBuilder(RootEntityBuilder):
 
     @classmethod
     def copy_to_next_year(
@@ -29,4 +28,8 @@ class LearningUnitBuilder(Builder):
             all_existing_learning_units: List['LearningUnit']
     ) -> 'LearningUnit':
         CopyLearningUnitToNextYearValidatorList(learning_unit.entity_id, all_existing_learning_units).validate()
-        return ???
+        learning_unit_next_year = attr.evolve(
+            learning_unit,
+            entity_id=LearningUnitIdentityBuilder.build_for_next_year(learning_unit.entity_id)
+        )
+        return learning_unit_next_year

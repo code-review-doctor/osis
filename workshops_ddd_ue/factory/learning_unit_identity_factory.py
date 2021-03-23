@@ -1,12 +1,23 @@
+import abc
 from typing import Union
 
+from osis_common.ddd.interface import CommandRequest, EntityIdentity
 from workshops_ddd_ue.command import CopyLearningUnitToNextYearCommand
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
-from workshops_ddd_ue.factory.learning_unit_factory import Builder
 
 
-class LearningUnitIdentityBuilder(Builder):
+# TODO :: to move into osis_common.ddd.interface
+class EntityIdentityBuilder(abc.ABC):
+
+    def build_from_command(self, cmd: CommandRequest) -> 'EntityIdentity':
+        raise NotImplementedError()
+
+    def build_from_database_model(self, django_model_object: django.db.models.Model) -> 'EntityIdentity':
+        raise NotImplementedError()
+
+
+class LearningUnitIdentityBuilder(EntityIdentityBuilder):
 
     @classmethod
     def build_from_command(cls, cmd: Union[CopyLearningUnitToNextYearCommand]) -> 'LearningUnitIdentity':
