@@ -639,10 +639,27 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
     - Avantage : pas d'ambiguité : tout objet du domaine ne peut être instancié que via factory
     - Avantage : facilité de distinction `privé` - `publique` : ce qui est `publique` possède une factory
     - Inconvénient : pattern "factory" complexe pour des objets simples ("overengineering")
+- Nommage des fichiers : <objet_métier>_builder.py
+- Nommage des objets : <ObjetMetier>Builder
 - Accès : 
     - [couche Domain](#ddddomain)
 - Cf. [interface.EntityIdentity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L28)
 
+Exemple :
+```python
+from osis_common.ddd import interface
+
+
+class TrainingBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CreateTrainingCommand') -> 'Training':
+        raise NotImplementedError()
+
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'Training':
+        raise NotImplementedError()
+
+```
 
 <br/><br/><br/><br/>
 
@@ -654,7 +671,7 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 - Renvoie / persiste uniquement des RootEntity qui sont complets (ne peut pas renvoyer de types primitifs ou ValueObjects)
     - Évite les risque d'inconsistance dans les vérifications des invariants métier
 - Nommage des fichiers : <objet_métier>.py
-- Nommage des objets : <ObjetMetier>Repository.
+- Nommage des objets : <ObjetMetier>Repository
 - Cf. [interface.AbstractRepository](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L53)
 - Accès :
     - [couche Django Model](#modle-django-model)
