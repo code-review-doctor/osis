@@ -49,17 +49,6 @@ from program_management.models.education_group_version import EducationGroupVers
 class ProgramTreeVersionIdentitySearch(interface.DomainService):
 
     @classmethod
-    def get_source_identity_from_program_tree_version_identity(
-            cls,
-            tree_version_identity: 'ProgramTreeVersionIdentity'
-    ) -> 'ProgramTreeVersionIdentity':
-        if tree_version_identity.transition_name:
-            return attr.evolve(tree_version_identity, transition_name=NOT_A_TRANSITION)
-        elif tree_version_identity.version_name:
-            return attr.evolve(tree_version_identity, version_name=STANDARD)
-        return tree_version_identity
-
-    @classmethod
     def get_from_node_identity(cls, node_identity: 'NodeIdentity') -> 'ProgramTreeVersionIdentity':
         return cls.get_from_node_identities([node_identity])[0]
 
