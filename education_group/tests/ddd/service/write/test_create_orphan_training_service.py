@@ -22,13 +22,11 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
-from django.test import TestCase
 
 from education_group.ddd.domain import training
 from education_group.ddd.service.write import create_orphan_training_service
 from education_group.tests.ddd.factories.command.create_training_command import CreateTrainingCommandFactory
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
 @mock.patch("education_group.ddd.service.write.create_orphan_training_service."
@@ -36,11 +34,7 @@ from testing.mocks import MockPatcherMixin
 @mock.patch("education_group.ddd.service.write.create_orphan_training_service."
             "postpone_training_and_group_modification_service.postpone_training_and_group_modification",
             return_value=[])
-class TestCreateAndPostponeOrphanTraining(TestCase, MockPatcherMixin):
-    def setUp(self) -> None:
-        self.fake_training_repository = get_fake_training_repository([])
-        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repository)
-
+class TestCreateAndPostponeOrphanTraining(DDDTestCase):
     def test_should_return_identities(self, mock_postpone_training, mock_create_orphan_group):
         cmd = CreateTrainingCommandFactory(year=2018)
 

@@ -26,17 +26,15 @@ import mock
 from django.test import TestCase
 
 from base.models.enums import academic_calendar_type
-from base.models.enums.entity_type import INSTITUTE
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityWithVersionFactory
-from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
+from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.organization import MainOrganizationFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
-from education_group.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory, MiniTrainingIdentityFactory
 from reference.tests.factories.language import FrenchLanguageFactory
@@ -50,7 +48,7 @@ class TestMiniTrainingUpdateView(TestCase):
         cls.mini_training_identity = MiniTrainingIdentityFactory(year=get_current_year())
         cls.mini_training = MiniTrainingFactory(
             entity_identity=cls.mini_training_identity,
-            start_year=get_current_year()-1
+            start_year=get_current_year()-1,
         )
         cls.organization = MainOrganizationFactory()
         cls.teaching_campus = CampusFactory(organization=cls.organization)

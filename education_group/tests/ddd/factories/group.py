@@ -23,11 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 import factory.fuzzy
 
 from base.models.enums.education_group_types import GroupType
+from education_group.ddd import command
 from education_group.ddd.domain.group import GroupIdentity, Group
-from education_group.tests.ddd.factories.campus import CampusIdentityFactory
+from education_group.ddd.repository import group as group_repository
+from education_group.ddd.service.write import copy_group_service
+from education_group.tests.ddd.factories.campus import CampusFactory
 from education_group.tests.ddd.factories.content_constraint import ContentConstraintFactory
 from education_group.tests.ddd.factories.entity import EntityFactory
 from education_group.tests.ddd.factories.remark import RemarkFactory
@@ -57,10 +62,28 @@ class GroupFactory(factory.Factory):
     type = factory.fuzzy.FuzzyChoice(GroupType)
     abbreviated_title = factory.Sequence(lambda n: "Acronym%02d" % n)
     titles = factory.SubFactory(TitlesFactory)
-    credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
+    credits = factory.fuzzy.FuzzyInteger(0, 10)
     content_constraint = factory.SubFactory(ContentConstraintFactory)
     management_entity = factory.SubFactory(EntityFactory)
-    teaching_campus = factory.SubFactory(CampusIdentityFactory)
+    teaching_campus = factory.SubFactory(CampusFactory)
     remark = factory.SubFactory(RemarkFactory)
     start_year = factory.fuzzy.FuzzyInteger(1999, 2099)
     end_year = factory.LazyAttribute(generate_end_date)
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            group_repository.GroupRepository.create(obj)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['Group']:
+        first_group = cls(*args, **kwargs)  # type: Group
+
+        result = [first_group]
+        for year in range(first_group.year, first_group.year + n - 1):
+            identity = copy_group_service.copy_group(
+                command.CopyGroupCommand(from_code=first_group.code, from_year=year)
+            )
+            result.append(group_repository.GroupRepository.get(identity))
+
+        return result

@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
+import attr
 import factory.fuzzy
 
 from base.models.enums.academic_type import AcademicTypes
@@ -33,8 +36,12 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
-from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
-from education_group.tests.ddd.factories.campus import CampusIdentityFactory
+from education_group.ddd import command
+from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears, \
+    TrainingBuilder
+from education_group.ddd.repository import training as training_repository
+from education_group.ddd.service.write import copy_training_service
+from education_group.tests.ddd.factories.campus import CampusFactory
 from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
 from education_group.tests.ddd.factories.diploma import DiplomaFactory
 from education_group.tests.ddd.factories.entity import EntityFactory
@@ -102,7 +109,7 @@ class TrainingFactory(factory.Factory):
     management_entity = factory.SubFactory(EntityFactory)
     administration_entity = factory.SubFactory(EntityFactory)
     end_year = factory.LazyAttribute(generate_end_date)
-    enrollment_campus = factory.SubFactory(CampusIdentityFactory)
+    enrollment_campus = factory.SubFactory(CampusFactory)
     other_campus_activities = factory.fuzzy.FuzzyChoice(ActivityPresence)
     funding = factory.SubFactory(FundingFactory)
     hops = factory.SubFactory(HOPSFactory)
@@ -111,3 +118,21 @@ class TrainingFactory(factory.Factory):
     academic_type = factory.fuzzy.FuzzyChoice(AcademicTypes)
     duration_unit = factory.fuzzy.FuzzyChoice(DurationUnitsEnum)
     diploma = factory.SubFactory(DiplomaFactory)
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            training_repository.TrainingRepository.create(obj)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['Training']:
+        first_training = cls(*args, **kwargs)  # type: Training
+
+        result = [first_training]
+        for year in range(first_training.year, first_training.year + n - 1):
+            identity = copy_training_service.copy_training_to_next_year(
+                command.CopyTrainingToNextYearCommand(acronym=first_training.acronym, postpone_from_year=year)
+            )
+            result.append(training_repository.TrainingRepository.get(identity))
+
+        return result

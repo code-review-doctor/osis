@@ -44,6 +44,7 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
 from reference.tests.factories.language import LanguageFactory
 
 
+# FIXME slow test
 class TestCreateProgramTreeVersion(TestCase):
     def setUp(self) -> None:
         self.offer_acronym = 'DROI2M'

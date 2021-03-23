@@ -30,7 +30,7 @@ import factory.fuzzy
 from base.models.enums import active_status, schedule_type as schedule_type_enum
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
-from education_group.tests.ddd.factories.campus import CampusIdentityFactory
+from education_group.ddd.repository import mini_training as mini_training_repository
 from education_group.tests.ddd.factories.entity import EntityFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
 
@@ -61,3 +61,8 @@ class MiniTrainingFactory(factory.Factory):
     management_entity = factory.SubFactory(EntityFactory)
     start_year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_year = None
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            mini_training_repository.MiniTrainingRepository.create(obj)

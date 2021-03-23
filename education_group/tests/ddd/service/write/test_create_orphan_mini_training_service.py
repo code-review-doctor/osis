@@ -22,13 +22,11 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
-from django.test import TestCase
 
 from education_group.ddd.domain import mini_training
 from education_group.ddd.service.write import create_orphan_mini_training_service
 from education_group.tests.ddd.factories.command.create_mini_training_command import CreateMiniTrainingCommandFactory
-from education_group.tests.ddd.factories.repository.fake import get_fake_mini_training_repository
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
 
 @mock.patch("education_group.ddd.service.write.create_orphan_mini_training_service."
@@ -37,14 +35,7 @@ from testing.mocks import MockPatcherMixin
             "postpone_mini_training_and_orphan_group_modifications_service."
             "postpone_mini_training_and_orphan_group_modifications",
             return_value=[])
-class TestCreateAndPostponeOrphanMiniTraining(TestCase, MockPatcherMixin):
-    def setUp(self) -> None:
-        self.fake_mini_training_repository = get_fake_mini_training_repository([])
-        self.mock_repo(
-            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
-            self.fake_mini_training_repository
-        )
-
+class TestCreateAndPostponeOrphanMiniTraining(DDDTestCase):
     def test_should_return_mini_training_identities(self, mock_postpone_mini_training, mock_create_orphan_group):
         mock_postpone_mini_training.return_value = [
             mini_training.MiniTrainingIdentity(acronym="ACRON", year=year) for year in range(2020, 2023)

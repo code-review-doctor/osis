@@ -54,8 +54,9 @@ from testing.mocks import MockPatcherMixin
 from testing.testcases import DDDTestCase
 
 
-class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
+class TestPasteLearningUnitNodeService(DDDTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.tree = ProgramTreeBachelorFactory(2020, 2025)
         self.tree_version = StandardProgramTreeVersionFactory(tree=self.tree)
 
@@ -174,8 +175,9 @@ class TestPasteLearningUnitNodeService(DDDTestCase, MockPatcherMixin):
         )
 
 
-class TestPasteGroupNodeService(DDDTestCase, MockPatcherMixin):
+class TestPasteGroupNodeService(DDDTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.tree = ProgramTreeBachelorFactory(2020, 2025)
 
         tree_to_paste_data = {

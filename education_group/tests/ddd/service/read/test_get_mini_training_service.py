@@ -24,22 +24,22 @@
 
 from education_group.ddd import command
 from education_group.ddd.domain import exception
-from education_group.ddd.service.read import get_group_service
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.ddd.service.read import get_mini_training_service
+from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.testcases import DDDTestCase
 
 
-class TestGetGroup(DDDTestCase):
+class TestGetMiniTraining(DDDTestCase):
     def setUp(self):
         super().setUp()
-        self.group = GroupFactory(persist=True)
-        self.cmd = command.GetGroupCommand(year=self.group.year, code=self.group.code)
+        self.mini_training = MiniTrainingFactory(persist=True)
+        self.cmd = command.GetMiniTrainingCommand(year=self.mini_training.year, acronym=self.mini_training.acronym)
 
-    def test_throw_exception_when_no_matching_group(self):
-        cmd = command.GetGroupCommand(year=self.group.year + 1, code=self.group.code)
-        with self.assertRaises(exception.GroupNotFoundException):
-            get_group_service.get_group(cmd)
+    def test_throw_exception_when_no_matching_mini_training(self):
+        cmd = command.GetMiniTrainingCommand(year=self.mini_training.year + 1, acronym=self.mini_training.acronym)
+        with self.assertRaises(exception.MiniTrainingNotFoundException):
+            get_mini_training_service.get_mini_training(cmd)
 
-    def test_return_matching_group(self):
-        result = get_group_service.get_group(self.cmd)
-        self.assertEqual(self.group, result)
+    def test_return_matching_mini_training(self):
+        result = get_mini_training_service.get_mini_training(self.cmd)
+        self.assertEqual(self.mini_training, result)

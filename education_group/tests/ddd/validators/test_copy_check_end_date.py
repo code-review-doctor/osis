@@ -26,13 +26,15 @@ from django.test import SimpleTestCase
 from education_group.ddd.domain import exception, mini_training
 from education_group.ddd.validators import _copy_check_mini_training_end_date
 from education_group.tests.factories.mini_training import MiniTrainingFactory
+from testing.testcases import DDDTestCase
 
 
-class TestCheckMiniTrainingEndValidator(SimpleTestCase):
+class TestCheckMiniTrainingEndValidator(DDDTestCase):
     def test_should_raise_exception_when_year_greater_than_end_year(self):
         mini_training_with_year_greater_than_end_date = MiniTrainingFactory(
             entity_identity=mini_training.MiniTrainingIdentity(acronym="ACRO", year=2018),
-            end_year=2017
+            end_year=2017,
+            persist=True
         )
         with self.assertRaises(exception.CannotCopyMiniTrainingDueToEndDate):
             _copy_check_mini_training_end_date.CheckMiniTrainingEndDateValidator(
@@ -42,7 +44,8 @@ class TestCheckMiniTrainingEndValidator(SimpleTestCase):
     def test_should_pass_when_year_inferior_than_end_year(self):
         mini_training_with_year_greater_than_end_date = MiniTrainingFactory(
             entity_identity=mini_training.MiniTrainingIdentity(acronym="ACRO", year=2018),
-            end_year=2019
+            end_year=2019,
+            persist=True
         )
 
         _copy_check_mini_training_end_date.CheckMiniTrainingEndDateValidator(
@@ -51,7 +54,8 @@ class TestCheckMiniTrainingEndValidator(SimpleTestCase):
 
     def test_should_pass_when_end_year_is_none(self):
         mini_training_with_year_greater_than_end_date = MiniTrainingFactory(
-            end_year=None
+            end_year=None,
+            persist=True
         )
 
         _copy_check_mini_training_end_date.CheckMiniTrainingEndDateValidator(

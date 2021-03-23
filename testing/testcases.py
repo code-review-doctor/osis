@@ -21,20 +21,61 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
+import mock
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
+    get_fake_mini_training_repository, get_fake_training_repository
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository, get_fake_node_repository
-from testing.mocks import MockPatcherMixin
 
 
-class DDDTestCase(MockPatcherMixin, TestCase):
+class DDDTestCase(TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.fake_training_repository = get_fake_training_repository([])
+        self.fake_mini_training_repository = get_fake_mini_training_repository([])
+        self.fake_group_repository = get_fake_group_repository([])
+
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repository)
+        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repository)
+        self.mock_repo(
+            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
+            self.fake_mini_training_repository
+        )
+
+    def tearDown(self) -> None:
+        self.fake_group_repository._groups = list()
+        self.fake_mini_training_repository._mini_trainings = list()
+        self.fake_training_repository._trainings = list()
+
+    def mock_repo(self, repository_path: 'str', fake_repo: 'Any') -> mock.Mock:
+        repository_patcher = mock.patch(repository_path, new=fake_repo)
+        self.addCleanup(repository_patcher.stop)
+
+        return repository_patcher.start()
+
+    def mock_service(self, service_path: str, return_value: 'Any' = None) -> mock.Mock:
+        service_patcher = mock.patch(service_path, return_value=return_value)
+        self.addCleanup(service_patcher.stop)
+
+        return service_patcher.start()
+
     def _init_fake_repos(self):
+        self.fake_training_repository = get_fake_training_repository([])
+        self.fake_mini_training_repository = get_fake_mini_training_repository([])
+        self.fake_group_repository = get_fake_group_repository([])
+
+        self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repository)
+        self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repository)
+        self.mock_repo(
+            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
+            self.fake_mini_training_repository
+        )
+
         self.fake_program_tree_version_repository = get_fake_program_tree_version_repository([])
         self.mock_repo(
             "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
@@ -51,12 +92,6 @@ class DDDTestCase(MockPatcherMixin, TestCase):
         self.mock_repo(
             "program_management.ddd.repositories.node.NodeRepository",
             self.fake_node_repository
-        )
-
-        self.fake_group_repository = get_fake_group_repository([])
-        self.mock_repo(
-            "education_group.ddd.repository.group.GroupRepository",
-            self.fake_group_repository
         )
 
     def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):

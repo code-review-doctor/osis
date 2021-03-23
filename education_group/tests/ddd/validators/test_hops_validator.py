@@ -36,15 +36,16 @@ from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from base.models.enums.education_group_types import TrainingType
+from testing.testcases import DDDTestCase
 
 MAX_VALUE_FOR_HOPS_FIELD = 9999
 MIN_VALUE_FOR_HOPS_FIELD = 1
 
 
-class TestHopsValidator(SimpleTestCase):
+class TestHopsValidator(DDDTestCase):
 
     def test_validation_ok_on_hops_fields_when_not_training(self):
-        mini_training = MiniTrainingFactory()
+        mini_training = MiniTrainingFactory(persist=True)
         validator = HopsValuesValidator(training=mini_training)
         self.assertTrue(validator.is_valid())
 
@@ -53,7 +54,7 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        training = TrainingFactory(hops=hops)
+        training = TrainingFactory(hops=hops, persist=True)
         validator = HopsValuesValidator(training=training)
         self.assertTrue(validator.is_valid())
 
@@ -62,7 +63,7 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD),
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        training = TrainingFactory(hops=hops, type=TrainingType.BACHELOR)
+        training = TrainingFactory(hops=hops, type=TrainingType.BACHELOR, persist=True)
         validator = HopsValuesValidator(training=training)
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
@@ -78,7 +79,7 @@ class TestHopsValidator(SimpleTestCase):
                            ares_graca=None,
                            ares_authorization=random.randint(MIN_VALUE_FOR_HOPS_FIELD, MAX_VALUE_FOR_HOPS_FIELD))
 
-        training = TrainingFactory(hops=hops, type=TrainingType.FORMATION_PHD)
+        training = TrainingFactory(hops=hops, type=TrainingType.FORMATION_PHD, persist=True)
         validator = HopsValuesValidator(training=training)
 
         with self.assertRaises(MultipleBusinessExceptions) as e:
@@ -111,7 +112,7 @@ class TestHopsValidator(SimpleTestCase):
         self.assert_hops_field_valid_value(hops, AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999)
 
     def assert_hops_field_valid_value(self, hops, exception_raised):
-        training = TrainingFactory(hops=hops)
+        training = TrainingFactory(hops=hops, type=TrainingType.BACHELOR, persist=True)
         validator = HopsValuesValidator(training=training)
         with self.assertRaises(MultipleBusinessExceptions) as e:
             validator.is_valid()
