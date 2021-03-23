@@ -32,6 +32,7 @@
         - [ValueObject](#ddddomainvalueobject)
         - [EntityIdentity](#ddddomainentityidentity)
         - [BusinessException](#ddddomainbusinessexception)
+    - [Factory](#dddfactory)
     - [Repository](#dddrepository)
     - [Domain service](#domain-services)
     - [Application service](#dddservice-application-service)
@@ -381,9 +382,13 @@ django_app
  |   |
  |   ├─ domain
  |   |   ├─ exceptions.py  (exceptions business)
- |   |   ├─ <objet_métier>.py  (Aggregate root)
+ |   |   ├─ <objet_métier>.py  (RootEntity)
  |   |   ├─ _entity.py (protected)
  |   |   ├─ _value_object.py (protected)
+ |   |
+ |   ├─ factory
+ |   |   ├─ <objet_métier>_builder.py  (Builder pour RootEntity)
+ |   |   ├─ <identité_objet_métier>_builder.py  (Builder pour EntityIdentity)
  |   |
  |   ├─ repository
  |   |   ├─ <objet_métier>.py
@@ -626,6 +631,21 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 
 <br/><br/><br/><br/>
 
+#### ddd/factory
+
+- Regroupe l'ensemble des factories et builders pour nos objets du domaine
+    - Cf. [Pattners Factory et Builder](#../doc/patterns_factory_builder_singleton.md)
+- Obligatoire pour tous nos objets `RootEntity` et `EntityIdentity`
+    - Avantage : pas d'ambiguité : tout objet du domaine ne peut être instancié que via factory
+    - Avantage : facilité de distinction `privé` - `publique` : ce qui est `publique` possède une factory
+    - Inconvénient : pattern "factory" complexe pour des objets simples ("overengineering")
+- Accès : 
+    - [couche Domain](#ddddomain)
+- Cf. [interface.EntityIdentity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L28)
+
+
+<br/><br/><br/><br/>
+
 #### ddd/repository
 
 - Regroupe les **objets** qui permettent de faire le lien entre le stockage des données et nos objets du domaine.
@@ -639,6 +659,7 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 - Accès :
     - [couche Django Model](#modle-django-model)
     - [couche Domain](#ddddomain)
+    - [couche Factory](#dddfactory)
 
 Exemple :
 ```python
@@ -698,6 +719,11 @@ class GenerateSequenceId(interface.DomainService):
 - Nommage des fichiers : <action_metier>_service.py
 - Nommage des fonctions : <action_metier>
 - Cf. [application service VS domain service](application_service_vs_domain_service.md)
+- Accès:
+    - [couche Factory](#dddfactory)
+    - [couche Domaine](#ddddomain)
+    - [couche DomainService](#domain-services)
+    - [couche Repository](#dddrepository)
 
 
 Exemple:
@@ -730,6 +756,9 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 - 1 fichier par invariant métier
 - Nommage des fichiers : <invariant_metier>.py
 - Nommage des objets : <InvariantMetier>Validator
+- Accès : 
+    - [couche Domain](#ddddomain) (Les validateurs font partie du domaine)
+
 
 Exemple : 
 ```python
