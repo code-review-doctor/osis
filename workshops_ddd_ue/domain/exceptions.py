@@ -60,3 +60,9 @@ class LearningUnitUsedInProgramTreeException(BusinessException):
             ",".join([identity.code for identity in program_identities])
         )
         super().__init__(message, **kwargs)
+
+
+class InternshipSubtypeMandatoryException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Internship subtype is a mandatory field")
+        super().__init__(message, **kwargs)

@@ -1,19 +1,17 @@
 from typing import List
 
 from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
-from program_management.ddd.domain.program_tree import ProgramTree
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
-from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
 from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator
 from workshops_ddd_ue.validators._credits_minimum_value import CreditsMinimumValueValidator
+from workshops_ddd_ue.validators._internship_subtype_mandatory import InternshipSubtypeMandatoryValidator
 from workshops_ddd_ue.validators._learning_unit_code_structure import CodeStructureValidator
 from workshops_ddd_ue.validators._required_fields import RequiredFieldsValidator
 from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code import \
     ResponsibleEntityAuthorizedTypeOrCode
-from workshops_ddd_ue.validators._used_in_program_tree import UsedInProgramValidator
 
 
 class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
@@ -30,5 +28,6 @@ class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
             CodeStructureValidator(command.code),
             RequiredFieldsValidator(command),
             ResponsibleEntityAuthorizedTypeOrCode(responsible_entity),
+            InternshipSubtypeMandatoryValidator(command.type, command.internship_subtype),
         ]
         super().__init__()
