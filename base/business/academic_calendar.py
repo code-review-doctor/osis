@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,17 +25,14 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List, Optional
+from typing import List, Union
 
 import attr
-from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.db.models.query import QuerySet
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 
 from base.models.academic_calendar import AcademicCalendar
-from base.models.academic_year import AcademicYear
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 @attr.s(frozen=True, slots=True)
@@ -62,6 +59,25 @@ class AcademicEvent:
 
     def is_target_year_authorized(self, target_year: int) -> bool:
         return self.authorized_target_year == target_year
+
+
+@attr.s(frozen=True, slots=True)
+class AcademicSessionEvent(AcademicEvent):
+    session = attr.ib(type=int)
+
+
+class AcademicEventFactory:
+    @classmethod
+    def get_event(cls, id, title, start_date, end_date, authorized_target_year, type, session):
+        kwargs = {
+            'id': id, 'title': title, 'start_date': start_date, 'end_date': end_date,
+            'authorized_target_year': authorized_target_year, 'type': type
+        }
+        if type in (AcademicCalendarTypes.SCORES_EXAM_DIFFUSION.name, AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+                    AcademicCalendarTypes.DISSERTATION_SUBMISSION.name, AcademicCalendarTypes.EXAM_ENROLLMENTS.name,
+                    AcademicCalendarTypes.DELIBERATION.name,):
+            return AcademicSessionEvent(**kwargs, session=session)
+        return AcademicEvent(**kwargs)
 
 
 class AcademicEventCalendarHelper(ABC):
@@ -153,37 +169,6 @@ class AcademicEventCalendarHelper(ABC):
         raise NotImplementedError()
 
 
-class AcademicEventRepository:
-    def get_academic_events(self, event_reference: Optional[str] = None) -> List[AcademicEvent]:
-        qs = AcademicCalendar.objects.all()
-        if event_reference:
-            qs = qs.filter(reference=event_reference)
-        qs = qs.annotate(
-            authorized_target_year=F('data_year__year'),
-            type=F('reference')
-        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')
-        return [AcademicEvent(**obj) for obj in qs]
-
-    def get(self, academic_event_id: int) -> AcademicEvent:
-        obj = AcademicCalendar.objects.annotate(
-            authorized_target_year=F('data_year__year'),
-            type=F('reference')
-        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type')\
-         .get(pk=academic_event_id)
-        return AcademicEvent(**obj)
-
-    def update(self, academic_event: AcademicEvent):
-        academic_event_db = AcademicCalendar.objects.get(pk=academic_event.id)
-        academic_event_db.start_date = academic_event.start_date
-        academic_event_db.end_date = academic_event.end_date
-        academic_event_db.save()
-
-
-@attr.s(frozen=True, slots=True)
-class AcademicSessionEvent(AcademicEvent):
-    session = attr.ib(type=int)
-
-
 class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
     def get_academic_session_event(self, target_year: int, session: int) -> AcademicSessionEvent:
         """
@@ -197,97 +182,46 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
             None
         )
 
+    def get_opened_academic_events(self, date=None) -> List[AcademicSessionEvent]:
+        return super().get_opened_academic_events(date=date)
+
+    def get_previous_academic_event(self, date=None) -> AcademicSessionEvent:
+        return super().get_previous_academic_event(date=date)
+
+    def get_next_academic_event(self, date=None) -> AcademicSessionEvent:
+        return super().get_next_academic_event(date=date)
+
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
         return sorted(
-            AcademicEventSessionRepository().get_academic_session_events(self.event_reference),
+            AcademicEventRepository().get_academic_events(self.event_reference),
             key=lambda academic_session_event: academic_session_event.start_date
         )
 
 
-class AcademicEventSessionRepository:
-    def get_academic_session_events(self, event_reference: str) -> List[AcademicSessionEvent]:
-        qs = AcademicCalendar.objects.filter(
-            reference=event_reference
-        ).exclude(
-            sessionexamcalendar__isnull=True
-        ).annotate(
+class AcademicEventRepository:
+    def get_academic_events(self, event_reference: str = None) -> List[Union[AcademicEvent, AcademicSessionEvent]]:
+        qs = AcademicCalendar.objects.all()
+        if event_reference:
+            qs = qs.filter(reference=event_reference)
+        qs = qs.annotate(
             authorized_target_year=F('data_year__year'),
             type=F('reference'),
             session=F('sessionexamcalendar__number_session')
         ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')
-        return [AcademicSessionEvent(**obj) for obj in qs]
+        return [AcademicEventFactory.get_event(**obj) for obj in qs]
 
+    def get(self, academic_event_id: int) -> Union[AcademicEvent, AcademicSessionEvent]:
+        obj = AcademicCalendar.objects.annotate(
+            authorized_target_year=F('data_year__year'),
+            type=F('reference'),
+            session=F('sessionexamcalendar__number_session')
+        ).values('id', 'title', 'start_date', 'end_date', 'authorized_target_year', 'type', 'session')\
+         .get(pk=academic_event_id)
+        return AcademicEventFactory.get_event(**obj)
 
-class EventPerm(ABC):
-    academic_year_field = 'academic_year'
-    model = None  # To instantiate == ex : EducationGroupYear
-    event_reference = None  # To instantiate == ex : academic_calendar_type.EDUCATION_GROUP_EDITION
-    obj = None  # To instantiate
-    raise_exception = True
-    error_msg = ""  # To instantiate == ex : _("This education group is not editable during this period.")
-
-    def __init__(self, obj=None, raise_exception=True):
-        if self.model and obj and not isinstance(obj, self.model):
-            raise AttributeError("The provided obj must be a {}".format(self.model.__name__))
-        self.obj = obj
-        self.raise_exception = raise_exception
-
-    def is_open(self):
-        if self.obj:
-            return self._is_open_for_specific_object()
-        return self._is_calendar_opened()
-
-    @classmethod
-    def get_open_academic_calendars_queryset(cls) -> QuerySet:
-        qs = AcademicCalendar.objects.open_calendars()
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-        return qs
-
-    @classmethod
-    def get_academic_calendars_queryset(cls, data_year) -> QuerySet:
-        qs = AcademicCalendar.objects.filter(data_year=data_year)
-        if cls.event_reference:
-            qs = qs.filter(reference=cls.event_reference)
-        return qs
-
-    @cached_property
-    def open_academic_calendars_for_specific_object(self) -> list:
-        obj_ac_year = getattr(self.obj, self.academic_year_field)
-        return list(self.get_open_academic_calendars_queryset().filter(data_year=obj_ac_year))
-
-    def _is_open_for_specific_object(self) -> bool:
-        if not self.open_academic_calendars_for_specific_object:
-            if self.raise_exception:
-                raise PermissionDenied(_(self.error_msg).capitalize())
-            return False
-        return True
-
-    @classmethod
-    def _is_calendar_opened(cls) -> bool:
-        return cls.get_open_academic_calendars_queryset().exists()
-
-    @classmethod
-    def get_academic_years(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
-        return AcademicYear.objects.filter(
-            pk__in=cls.get_academic_years_ids(min_academic_y=min_academic_y, max_academic_y=max_academic_y)
-        )
-
-    @classmethod
-    def get_academic_years_ids(cls, min_academic_y=None, max_academic_y=None) -> QuerySet:
-        qs = cls.get_open_academic_calendars_queryset()
-        if min_academic_y:
-            qs = qs.filter(data_year__year__gte=min_academic_y)
-        if max_academic_y:
-            qs = qs.filter(data_year__year__lte=max_academic_y)
-        return qs.values_list('data_year', flat=True)
-
-
-class EventPermClosed(EventPerm):
-    def is_open(self):
-        return False
-
-    @classmethod
-    def get_open_academic_calendars_queryset(cls) -> QuerySet:
-        return AcademicCalendar.objects.none()
+    def update(self, academic_event: Union[AcademicEvent, AcademicSessionEvent]):
+        academic_event_db = AcademicCalendar.objects.get(pk=academic_event.id)
+        academic_event_db.start_date = academic_event.start_date
+        academic_event_db.end_date = academic_event.end_date
+        academic_event_db.save()
