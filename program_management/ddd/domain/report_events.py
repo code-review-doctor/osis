@@ -81,7 +81,7 @@ class CopyTransitionTrainingNotExistingEvent(ReportEvent):
     copy_year = attr.ib(type=AcademicYear)
 
     def __str__(self):
-        return _("Training/Mini-Training %(title)s transition version is non existent.") % {
+        return _("Training %(title)s transition version is non existent.") % {
                    "title": "{} - {}".format(self.code, self.acronym),
                    "copy_year": self.copy_year,
                }

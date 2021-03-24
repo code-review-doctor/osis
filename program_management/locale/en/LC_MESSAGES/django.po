@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 11:46+0100\n"
+"POT-Creation-Date: 2021-03-24 08:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,10 +15,6 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-
-#, python-format
-msgid " Fill %(title)s in %(year)s "
-msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
@@ -293,6 +289,10 @@ msgid "Evaluation methods (force majeure)"
 msgstr ""
 
 msgid "Export"
+msgstr ""
+
+#, python-format
+msgid "Fill %(title)s in %(year)s"
 msgstr ""
 
 #, python-format
@@ -946,6 +946,10 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid "Training %(title)s transition version is non existent."
+msgstr ""
+
+#, python-format
 msgid ""
 "Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
@@ -961,10 +965,6 @@ msgstr ""
 msgid ""
 "Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
 "is not copied in %(copy_year)s."
-msgstr ""
-
-#, python-format
-msgid "Training/Mini-Training %(title)s transition version is non existent."
 msgstr ""
 
 msgid "Trainings"
