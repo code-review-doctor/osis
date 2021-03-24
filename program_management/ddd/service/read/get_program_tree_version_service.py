@@ -22,20 +22,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.business_types import *
-from program_management.ddd.command import CopyTreeCmsFromPastYear
-from program_management.ddd.domain.service import copy_tree_cms
-from program_management.ddd.repositories import program_tree as program_tree_repository
-from program_management.ddd.domain import program_tree
+from typing import Optional
+
+from program_management.ddd.command import GetProgramTreeVersionCommand
+from program_management.ddd.domain import program_tree_version, exception
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
-def copy_program_tree_cms_from_past_year(cmd: CopyTreeCmsFromPastYear) -> 'ProgramTreeIdentity':
-    tree_repository = program_tree_repository.ProgramTreeRepository()
-
-    tree = tree_repository.get(
-        program_tree.ProgramTreeIdentity(code=cmd.code, year=cmd.year)
+def get_program_tree_version(cmd: GetProgramTreeVersionCommand) -> Optional['ProgramTreeVersion']:
+    identity = program_tree_version.ProgramTreeVersionIdentity(
+        offer_acronym=cmd.acronym,
+        year=cmd.year,
+        version_name=cmd.version_name,
+        transition_name=cmd.transition_name
     )
 
-    copy_tree_cms.CopyCms().from_past_year(tree)
-
-    return tree.entity_id
+    try:
+        return program_tree_version_repository.ProgramTreeVersionRepository().get(entity_id=identity)
+    except exception.ProgramTreeVersionNotFoundException:
+        return None

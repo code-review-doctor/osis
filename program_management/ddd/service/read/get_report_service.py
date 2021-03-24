@@ -22,22 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.business_types import *
-from program_management.ddd.command import CopyProgramTreePrerequisitesFromProgramTreeCommand
-from program_management.ddd.repositories import program_tree as program_tree_repository
-from program_management.ddd.domain import program_tree
+from typing import Optional
+
+from program_management.ddd.command import GetReportCommand
+from program_management.ddd.domain.report import Report, ReportIdentity
+from program_management.ddd.repositories import report
 
 
-def copy_program_tree_prerequisites_from_program_tree(
-        cmd: 'CopyProgramTreePrerequisitesFromProgramTreeCommand'
-) -> 'ProgramTreeIdentity':
-    repo = program_tree_repository.ProgramTreeRepository()
+def get_report(cmd: 'GetReportCommand') -> Optional['Report']:
+    report_repo = report.ReportRepository()
 
-    from_tree = repo.get(program_tree.ProgramTreeIdentity(code=cmd.from_code, year=cmd.from_year))
-    to_tree = repo.get(program_tree.ProgramTreeIdentity(code=cmd.to_code, year=cmd.to_year))
+    report_identity = ReportIdentity(transaction_id=cmd.from_transaction_id)
 
-    program_tree.ProgramTreeBuilder().copy_prerequisites_from_program_tree(from_tree, to_tree)
-
-    repo.update(to_tree)
-
-    return to_tree.entity_id
+    return report_repo.get(report_identity=report_identity)

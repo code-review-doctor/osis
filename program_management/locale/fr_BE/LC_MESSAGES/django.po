@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-12 15:28+0100\n"
+"POT-Creation-Date: 2021-03-22 11:46+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,6 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
+
+#, python-format
+msgid " Fill %(title)s in %(year)s "
+msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
@@ -50,6 +54,10 @@ msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+
+#, python-format
+msgid "%(title)s in %(year)s has been filled"
+msgstr "%(title)s en %(year)s a été remplie"
 
 msgid "1st quadri"
 msgstr "1er quadri"
@@ -307,8 +315,38 @@ msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 msgid "Export"
 msgstr "Exporter"
 
+#, python-format
+msgid "Fill from specific official of last year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version particulière de l'année passée: %(title)s en "
+"%(year)s"
+
+#, python-format
+msgid "Fill from specific official of this year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version particulière de cette année: %(title)s en "
+"%(year)s"
+
+#, python-format
+msgid "Fill from standard version of last year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version standard de l'année passée: %(title)s en "
+"%(year)s"
+
+#, python-format
+msgid "Fill from standard version of this year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version standard de cette année: %(title)s en "
+"%(year)s"
+
+#, python-format
+msgid "Fill from transition version of last year: %(title)s in %(year)s"
+msgstr ""
+"Recopier à partir de la version de transition de l'année passée: %(title)s "
+"en %(year)s"
+
 msgid "Fill program tree content from last year"
-msgstr "Remplir le contenue de programmes à partir de l'année passée"
+msgstr "Remplir le contenu de programmes à partir de l'année passée"
 
 #, python-format
 msgid ""
@@ -372,7 +410,22 @@ msgstr ""
 
 #, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
-msgstr "Impossible de mettre la dernière année d'organisation à %(end_year)s : %(msg)s"
+msgstr ""
+"Impossible de mettre la dernière année d'organisation à %(end_year)s : "
+"%(msg)s"
+
+msgid ""
+"In the context of a Master, this action fill the content of the transition "
+"version of the Master but also of its finalities if the corresponding "
+"transition versions exist. Therefore, it is necessary to create the "
+"transition version of the finalities that are wished before executing this "
+"action."
+msgstr ""
+"Dans le cadre d'un Master, cette action alimente le contenu de la version de "
+"transition du Master, mais également le contenu de ses finalités si les "
+"versions de transitions correspondantes existent. Par conséquent, il est "
+"nécessaire de créer les versions de transition des finalités souhaitées "
+"avant de lancer cette action."
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -423,6 +476,14 @@ msgstr "Membres du jury"
 
 msgid "Keywords"
 msgstr "Mots clés"
+
+#, python-format
+msgid ""
+"LU %(code)s does not exist in %(copy_year)s. LU is copied with %(year)s as "
+"year of reference."
+msgstr ""
+"L'UE %(code)s n'existe pas en %(copy_year)s. L'UE est recopiée avec %(year)s "
+"comme année de référence."
 
 msgid "Language"
 msgstr "Langue"
@@ -834,6 +895,14 @@ msgstr ""
 "auquel vous voulez rattacher."
 
 #, python-format
+msgid ""
+"The element %(title)s has already been copied in %(copy_year)s in the "
+"context of an other training.Its content may have changed."
+msgstr ""
+"L'élément %(title)s a déjà été recopié en %(copy_year)s dans le cadre d'une "
+"autre formation. Il pourrait donc déjà avoir été modifié."
+
+#, python-format
 msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
 "La date de fin de la formation %(acronym)s doit être plus grande ou égale à "
@@ -881,6 +950,15 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: "
+"%(learning_unit_code)s does not exist anymore in %(training_title)s in "
+"%(copy_year)s."
+msgstr ""
+"Le prérequis de %(prerequisite_code)s n'est pas copié en %(copy_year)s: "
+"%(learning_unit_code)s n'est plus dans %(training_title)s en %(copy_year)s."
+
+#, python-format
+msgid ""
 "The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
 "are not inside the selected training %(root)s"
 msgstr ""
@@ -897,6 +975,18 @@ msgid ""
 msgstr ""
 "La version de formation %(offer_acronym)s%(version_name)s a été supprimée "
 "avec succès."
+
+#, python-format
+msgid "The reference element %(title)s is still empty."
+msgstr "L'élément de référence %(title)s est encore vide."
+
+#, python-format
+msgid ""
+"The reference group %(title)s has not yet been copied. Its content is still "
+"empty."
+msgstr ""
+"Le groupement de référence %(title)s n'a pas encore été recopié. Son contenu "
+"est encore vide."
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
@@ -953,6 +1043,28 @@ msgstr ""
 "La formation <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> a été modifiée avec succés"
 
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is closed in %(end_year)s. This training/"
+"mini-training is not copied in %(copy_year)s."
+msgstr ""
+"La formation/mini-formation %(title)s est clôturée en %(end_year)s. Cet "
+"élément n'est pas recopié en %(copy_year)s."
+
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
+"is not copied in %(copy_year)s."
+msgstr ""
+"La formation/mini-formation %(title)s est inconsistente. Cet élément n'est "
+"pas recopié en %(copy_year)s."
+
+#, python-format
+msgid "Training/Mini-Training %(title)s transition version is non existent."
+msgstr ""
+"La version de transition de la formation/mini-formation %(title)s est non "
+"existante."
+
 msgid "Trainings"
 msgstr "Formations"
 
@@ -967,6 +1079,9 @@ msgstr "Transition"
 
 msgid "Transition name"
 msgstr "Sigle de la transition"
+
+msgid "Tree is finality"
+msgstr "L'arbre est une finalité"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"

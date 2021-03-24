@@ -42,11 +42,12 @@ from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
-from program_management.ddd.domain import exception
+from program_management.ddd.domain import exception, report_events
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.prerequisite import Prerequisites, \
     PrerequisitesBuilder
+from program_management.ddd.domain.report import Report
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
@@ -68,7 +69,7 @@ class ProgramTreeBuilder:
     def create_and_fill_from_program_tree(
             self,
             duplicate_from: 'ProgramTree',
-            duplicate_to_transition: bool,
+            transition_name: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = None
     ) -> 'ProgramTree':
@@ -81,7 +82,7 @@ class ProgramTreeBuilder:
         """
         copied_root = self._create_and_fill_root_and_direct_children(
             duplicate_from,
-            duplicate_to_transition,
+            transition_name,
             override_end_year_to=override_end_year_to,
             override_start_year_to=override_start_year_to
         )
@@ -95,7 +96,7 @@ class ProgramTreeBuilder:
     def _create_and_fill_root_and_direct_children(
             self,
             program_tree: 'ProgramTree',
-            duplicate_to_transition: bool,
+            transition_name: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
             override_start_year_to: int = DO_NOT_OVERRIDE
     ) -> 'Node':
@@ -103,13 +104,14 @@ class ProgramTreeBuilder:
         new_code = GenerateNodeCode().generate_from_parent_node(
             parent_node=root_node,
             child_node_type=root_node.node_type,
-            duplicate_to_transition=duplicate_to_transition
+            duplicate_to_transition=bool(transition_name)
         )
         new_parent = node_factory.create_and_fill_from_node(
             create_from=root_node,
             new_code=new_code,
             override_end_year_to=override_end_year_to,
-            override_start_year_to=override_start_year_to
+            override_start_year_to=override_start_year_to,
+            transition_name=transition_name
         )
         mandatory_children_types = program_tree.get_ordered_mandatory_children_types(program_tree.root_node)
         for copy_from_link in [n for n in root_node.children if n.child.node_type in mandatory_children_types]:
@@ -117,13 +119,13 @@ class ProgramTreeBuilder:
             new_code = GenerateNodeCode().generate_from_parent_node(
                 parent_node=child_node,
                 child_node_type=child_node.node_type,
-                duplicate_to_transition=duplicate_to_transition
+                duplicate_to_transition=bool(transition_name)
             )
             new_child = node_factory.create_and_fill_from_node(
                 create_from=child_node,
                 new_code=new_code,
                 override_end_year_to=override_end_year_to,
-                override_start_year_to=override_start_year_to
+                override_start_year_to=override_start_year_to,
             )
             copied_link = link_factory.create_link(new_parent, new_child)
             new_parent.children.append(copied_link)
@@ -156,86 +158,287 @@ class ProgramTreeBuilder:
         return program_tree_next_year
 
     def copy_prerequisites_from_program_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> 'ProgramTree':
-        to_tree.prerequisites = PrerequisitesBuilder().copy_to_next_year(from_tree.prerequisites, to_tree)
+        to_tree.prerequisites = PrerequisitesBuilder().copy_to_tree(from_tree.prerequisites, to_tree)
         return to_tree
 
-    def fill_from_program_tree(
+    def fill_from_last_year_program_tree(
             self,
-            from_tree: 'ProgramTree',
+            last_year_tree: 'ProgramTree',
             to_tree: 'ProgramTree',
-            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
-            existing_trees: Set['ProgramTree']
+            existing_nodes: Set['Node'],
     ) -> 'ProgramTree':
         validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
 
-        self._fill_node_children_from_node(
-            from_tree.root_node,
-            to_tree.root_node,
-            to_tree.authorized_relationships,
-            existing_learning_unit_nodes,
-            existing_trees
-        )
+        self._fill_node_from_last_year_node(last_year_tree.root_node, to_tree.root_node, existing_nodes, to_tree)
 
         return to_tree
 
-    def _fill_node_children_from_node(
+    def _fill_node_from_last_year_node(
             self,
-            from_node: 'Node',
+            last_year_node: 'Node',
             to_node: 'Node',
-            relationships: 'AuthorizedRelationshipList',
-            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
-            existing_trees: Set['ProgramTree']
+            existing_nodes: Set['Node'],
+            to_tree: 'ProgramTree'
     ) -> 'Node':
-        learning_units_links = (link for link in from_node.children if link.child.is_learning_unit())
-        group_year_links = (link for link in from_node.children if not link.child.is_learning_unit())
+        links_to_copy = (
+            link for link in last_year_node.children
+            if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
+        links_that_cannot_be_copied = (
+            link for link in last_year_node.children
+            if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
+        for link in links_that_cannot_be_copied:
+            to_tree.report.add_warning(
+                report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
+                    acronym=link.child.title,
+                    code=link.child.code,
+                    end_year=link.child.end_academic_year,
+                    copy_year=to_node.academic_year
+                )
+            )
 
-        for learning_unit_link in learning_units_links:
-            child_node_identity = attr.evolve(learning_unit_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_learning_node(existing_learning_unit_nodes, child_node_identity) or \
-                learning_unit_link.child
+        for last_year_link in links_to_copy:
+            child_node_identity = attr.evolve(last_year_link.child.entity_id, year=to_node.year)
+            child = self._get_existing_node(existing_nodes, child_node_identity)
 
-            copied_link = LinkBuilder().from_link(learning_unit_link, to_node, child)
-            to_node.children.append(copied_link)
+            if last_year_link.child.is_learning_unit() and not child:
+                child = last_year_link.child
+                to_tree.report.add_warning(
+                    report_events.CopyLearningUnitNotExistForYearEvent(
+                        code=child.code,
+                        copy_year=to_node.year,
+                        year=child.year
+                    )
+                )
+            elif last_year_link.child.is_group() and not child:
+                child = child or node_factory.copy_to_next_year(last_year_link.child)
 
-        for group_year_link in group_year_links:
-            if not group_year_link.child.is_group() and self._is_end_date_inferior_to(group_year_link.child, to_node):
+            elif not child:
+                to_tree.report.add_warning(
+                    report_events.NotCopyTrainingMiniTrainingNotExistingEvent(
+                        acronym=last_year_link.child.title,
+                        code=last_year_link.child.code,
+                        copy_year=to_node.academic_year
+                    )
+                )
                 continue
 
-            child_node_identity = attr.evolve(group_year_link.child.entity_id, year=to_node.year)
-            child = self._get_existing_group_node(existing_trees, child_node_identity)
-            child = child or node_factory.copy_to_year(group_year_link.child, to_node.year, group_year_link.child.code)
-
-            copied_link = LinkBuilder().from_link(group_year_link, to_node, child)
+            copied_link = LinkBuilder().from_link(last_year_link, to_node, child)
             to_node.children.append(copied_link)
 
-            if not group_year_link.is_reference() and (
-                    is_empty(child, relationships)
-                    or relationships.is_mandatory_child(to_node.node_type, child.node_type)
-            ):
-                self._fill_node_children_from_node(
-                    group_year_link.child,
-                    child,
-                    relationships,
-                    existing_learning_unit_nodes,
-                    existing_trees
+            if self._can_link_child_be_filled(copied_link, to_tree.authorized_relationships):
+                self._fill_node_from_last_year_node(last_year_link.child, child, existing_nodes, to_tree)
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(
+                    report_events.CopyReferenceEmptyEvent(
+                        acronym=last_year_link.child.title,
+                        code=last_year_link.child.code
+                    )
+                )
+            elif copied_link.is_reference():
+                to_tree.report.add_warning(
+                    report_events.CopyReferenceGroupEvent(
+                        acronym=last_year_link.child.title,
+                        code=last_year_link.child.code
+                    )
+                )
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(
+                    report_events.NodeAlreadyCopiedEvent(
+                        acronym=last_year_link.child.title,
+                        code=last_year_link.child.code,
+                        copy_year=to_node.academic_year
+                    )
                 )
 
         return to_node
 
-    def _get_existing_group_node(self, existing_trees: Set['ProgramTree'], node_id: 'NodeIdentity') -> Optional['Node']:
-        return next(
-            (tree.root_node for tree in existing_trees if tree.root_node.entity_id == node_id),
+    def fill_transition_from_program_tree(
+            self,
+            from_tree: 'ProgramTree',
+            to_tree: 'ProgramTree',
+            existing_nodes: Set['Node'],
+            node_code_generator: 'GenerateNodeCode'
+    ) -> 'ProgramTree':
+        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
+
+        self._fill_node_from_node_in_case_of_transition(
+            from_tree.root_node,
+            to_tree.root_node,
+            to_tree.authorized_relationships,
+            existing_nodes,
+            to_tree.root_node.transition_name,
+            node_code_generator,
+            to_tree
+        )
+
+        return to_tree
+
+    def _fill_node_from_node_in_case_of_transition(
+            self,
+            from_node: 'Node',
+            to_node: 'Node',
+            relationships: 'AuthorizedRelationshipList',
+            existing_nodes: Set['Node'],
+            transition_name: 'str',
+            node_code_generator: 'GenerateNodeCode',
+            to_tree: 'ProgramTree'
+    ) -> 'Node':
+        links_to_copy = (
+            link for link in from_node.children
+            if self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
+        links_that_cannot_be_copied = (
+            link for link in from_node.children
+            if not self._can_link_be_copied_with_respect_to_child_end_date(link, to_node.year)
+        )
+        for link in links_that_cannot_be_copied:
+            to_tree.report.add_warning(
+                report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
+                    acronym=link.child.title,
+                    code=link.child.code,
+                    end_year=link.child.end_academic_year,
+                    copy_year=to_node.academic_year
+                )
+            )
+
+        for source_link in links_to_copy:
+            child_node_identity = attr.evolve(source_link.child.entity_id, year=to_node.year)
+
+            child = self._get_existing_node(existing_nodes, child_node_identity)
+
+            if source_link.child.is_learning_unit() and not child:
+                child = source_link.child
+                to_tree.report.add_warning(
+                    report_events.CopyLearningUnitNotExistForYearEvent(
+                        code=child.code,
+                        copy_year=to_node.year,
+                        year=child.year
+                    )
+                )
+            elif relationships.is_mandatory_child(source_link.parent.node_type, source_link.child.node_type):
+                child = self._get_equivalent_mandatory_child(
+                    to_node.children_as_nodes,
+                    source_link.child.node_type
+                )
+            elif source_link.child.is_group():
+                new_code = node_code_generator.generate_transition_code(source_link.child.code)
+                child = node_factory.copy_to_year(source_link.child, to_node.year, new_code)
+            elif source_link.child.is_training():
+                child = self._get_existing_transition_node(
+                    existing_nodes,
+                    source_link.child.title,
+                    to_node.year,
+                    source_link.child.version_name,
+                    transition_name
+                )
+            if not child and source_link.child.is_training():
+                to_tree.report.add_warning(
+                    report_events.CopyTransitionTrainingNotExistingEvent(
+                        acronym=source_link.child.title,
+                        code=source_link.child.code,
+                        copy_year=to_node.academic_year
+                    )
+                )
+                continue
+            elif not child:
+                to_tree.report.add_warning(
+                    report_events.NotCopyTrainingMiniTrainingNotExistingEvent(
+                        acronym=source_link.child.title,
+                        code=source_link.child.code,
+                        copy_year=to_node.academic_year
+                    )
+                )
+                continue
+
+            copied_link = LinkBuilder().from_link(source_link, to_node, child)
+            to_node.children.append(copied_link)
+
+            if self._can_link_child_be_filled(copied_link, relationships):
+                self._fill_node_from_node_in_case_of_transition(
+                    source_link.child,
+                    child,
+                    relationships,
+                    existing_nodes,
+                    transition_name,
+                    node_code_generator,
+                    to_tree
+                )
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) \
+                    and copied_link.child.is_group():
+                to_tree.report.add_warning(
+                    report_events.CopyReferenceGroupEvent(
+                        acronym=copied_link.child.title,
+                        code=copied_link.child.code
+                    )
+                )
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(
+                    report_events.CopyReferenceEmptyEvent(
+                        acronym=copied_link.child.title,
+                        code=copied_link.child.code
+                    )
+                )
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+                to_tree.report.add_warning(
+                    report_events.NodeAlreadyCopiedEvent(
+                        acronym=copied_link.child.title,
+                        code=copied_link.child.code,
+                        copy_year=to_node.academic_year
+                    )
+                )
+
+        return to_node
+
+    def _get_existing_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
+        return next((node for node in existing_nodes if node.entity_id == node_id), None)
+
+    def _get_equivalent_mandatory_child(
+            self,
+            children: List['Node'],
+            child_type: 'EducationGroupTypesEnum'
+    ) -> Optional['Node']:
+        return next((child for child in children if child.node_type == child_type), None)
+
+    def _get_existing_transition_node(
+            self,
+            existing_nodes: Set['Node'],
+            title: str,
+            year: int,
+            version_name: str,
+            transition_name: str
+    ) -> Optional['Node']:
+        return next((
+                node for node in existing_nodes
+                if not node.is_learning_unit() and node.title == title and node.year == year and
+                node.version_name == version_name and node.transition_name == transition_name
+            ),
             None
         )
 
-    def _get_existing_learning_node(self, existing_nodes: Set['Node'], node_id: 'NodeIdentity') -> Optional['Node']:
-        return next(
-            (node for node in existing_nodes if node.entity_id == node_id),
-            None
-        )
+    def _can_link_be_copied_with_respect_to_child_end_date(self, link: 'Link', year_to_be_copied_to: int) -> bool:
+        is_child_end_date_superior_or_equal_to_year_to_be_copied_to = \
+            not link.child.end_date or link.child.end_date >= year_to_be_copied_to
 
-    def _is_end_date_inferior_to(self, from_node: 'Node', to_node: 'Node'):
-        return from_node.end_date and from_node.end_date < to_node.year
+        if is_child_end_date_superior_or_equal_to_year_to_be_copied_to:
+            return True
+        elif link.child.is_group():
+            return True
+        elif link.child.is_learning_unit():
+            return True
+        return False
+
+    def _can_link_child_be_filled(self, link: 'Link', relationships: 'AuthorizedRelationshipList') -> bool:
+        if link.child.is_learning_unit():
+            return False
+        elif link.is_reference():
+            return False
+        elif is_empty(link.child, relationships):
+            return True
+        elif relationships.is_mandatory_child(link.parent.node_type, link.child.node_type):
+            return True
+        return False
 
     def build_from_orphan_group_as_root(
             self,
@@ -267,6 +470,7 @@ class ProgramTree(interface.RootEntity):
     authorized_relationships = attr.ib(type='AuthorizedRelationshipList', factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
     prerequisites = attr.ib(type='Prerequisites')
+    report = attr.ib(type=Optional[Report], default=None)
 
     @prerequisites.default
     def _default_prerequisite(self) -> 'Prerequisites':
@@ -403,24 +607,6 @@ class ProgramTree(interface.RootEntity):
             None
         )
 
-    def get_node_smallest_ordered_path(self, node: 'Node') -> Optional[Path]:
-        """
-        Return the smallest ordered path of node inside the tree.
-        The smallest ordered path would be the result of a depth-first
-        search of the path of the node with respect to the order of the links.
-        Meaning we will recursively search for the path node by searching
-        first in the descendants of the first child and so on.
-        :param node: Node
-        :return: A Path if node is present in tree. None if not.
-        """
-        if node == self.root_node:
-            return build_path(self.root_node)
-
-        return next(
-            (path for path, node_obj in self.root_node.descendents if node_obj == node),
-            None
-        )
-
     def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
         """
         Return the corresponding node based on the code and year.
@@ -513,7 +699,8 @@ class ProgramTree(interface.RootEntity):
         return ProgramTree(
             root_node=copied_root_node,
             authorized_relationships=self.authorized_relationships,
-            prerequisites=self.prerequisites
+            prerequisites=self.prerequisites,
+            report=self.report
         )
 
     def get_ordered_mandatory_children_types(self, parent_node: 'Node') -> List[EducationGroupTypesEnum]:
@@ -593,7 +780,7 @@ class ProgramTree(interface.RootEntity):
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
         :param tree_repository: a tree repository
-        :return: the suppressed link
+        :return: the suppressed link<
         """
         PathValidator(path_to_node_to_detach).validate()
 

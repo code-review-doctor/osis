@@ -117,7 +117,8 @@ class NodeFactory:
             create_from: 'Node',
             new_code: str,
             override_end_year_to: int = DO_NOT_OVERRIDE,
-            override_start_year_to: int = DO_NOT_OVERRIDE
+            override_start_year_to: int = DO_NOT_OVERRIDE,
+            transition_name: str = None
     ) -> 'Node':
         start_year = create_from.start_year if override_start_year_to == DO_NOT_OVERRIDE else override_start_year_to
         copied_node = attr.evolve(
@@ -131,6 +132,9 @@ class NodeFactory:
             children=[],
             node_id=None,
         )
+        if transition_name:
+            copied_node.transition_name = transition_name
+
         if copied_node.type == NodeType.GROUP:
             copied_node.constraint_type = None
             copied_node.min_constraint = None
@@ -218,6 +222,10 @@ class Node(interface.Entity):
         if self._academic_year is None:
             self._academic_year = AcademicYear(self.year)
         return self._academic_year
+
+    @property
+    def end_academic_year(self) -> Optional['AcademicYear']:
+        return AcademicYear(self.end_date) if self.end_date else None
 
     @property
     def children(self) -> List['Link']:

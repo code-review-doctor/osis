@@ -440,3 +440,9 @@ class CannotCopyPrerequisiteException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Cannot copy prerequisite")
         super().__init__(message, **kwargs)
+
+
+class CannotFillContentOfProgramTreeOfTypeFinalityException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Tree is finality")
+        super().__init__(message, **kwargs)

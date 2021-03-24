@@ -987,6 +987,9 @@ msgstr "Echec"
 msgid "Female"
 msgstr "Féminin"
 
+msgid "Fill this transition version"
+msgstr "Remplir cette version de transition"
+
 msgid "Finality 120 list choice"
 msgstr "Liste au choix de Finalités (120)"
 

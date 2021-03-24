@@ -320,14 +320,14 @@ class TestCheckPasteView(TestCase):
             [
                 mock.call(command.CheckPasteNodeCommand(
                     12,
-                    node_to_past_code="LSINF1254",
+                    node_to_paste_code="LSINF1254",
                     node_to_paste_year=2021,
                     path_to_paste=self.path,
                     path_to_detach=None
                 )),
                 mock.call(command.CheckPasteNodeCommand(
                     12,
-                    node_to_past_code="LECGE2589",
+                    node_to_paste_code="LECGE2589",
                     node_to_paste_year=2021,
                     path_to_paste=self.path,
                     path_to_detach=None
