@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 11:46+0100\n"
+"POT-Creation-Date: 2021-03-24 08:16+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,10 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
-
-#, python-format
-msgid " Fill %(title)s in %(year)s "
-msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
@@ -314,6 +310,10 @@ msgstr "Mode d'évaluation des acquis des étudiants (force majeure)"
 
 msgid "Export"
 msgstr "Exporter"
+
+#, python-format
+msgid "Fill %(title)s in %(year)s"
+msgstr "Remplir %(title)s en %(year)s "
 
 #, python-format
 msgid "Fill from specific official of last year: %(title)s in %(year)s"
@@ -1036,6 +1036,10 @@ msgstr ""
 "partir de %(academic_year)s."
 
 #, python-format
+msgid "Training %(title)s transition version is non existent."
+msgstr "La version de transition de la formation %(title)s est non existante."
+
+#, python-format
 msgid ""
 "Training <a href='%(link)s'> %(offer_acronym)s[%(acronym)s] "
 "(%(academic_year)s) </a> successfully updated."
@@ -1058,12 +1062,6 @@ msgid ""
 msgstr ""
 "La formation/mini-formation %(title)s est inconsistente. Cet élément n'est "
 "pas recopié en %(copy_year)s."
-
-#, python-format
-msgid "Training/Mini-Training %(title)s transition version is non existent."
-msgstr ""
-"La version de transition de la formation/mini-formation %(title)s est non "
-"existante."
 
 msgid "Trainings"
 msgstr "Formations"

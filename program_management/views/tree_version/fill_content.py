@@ -67,7 +67,8 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         try:
             transaction_id = form.save()
             report = get_report_service.get_report(command.GetReportCommand(from_transaction_id=transaction_id))
-            self.display_report_warning(report)
+            if report:
+                self.display_report_warning(report)
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
@@ -76,7 +77,7 @@ class FillTransitionVersionContentView(SuccessMessageMixin, PermissionRequiredMi
         return ""
 
     def display_report_warning(self, report: 'Report') -> None:
-        display_warning_messages(self.request, [str(warning) for warning in report.get_warnings()])
+        display_warning_messages(self.request, list({str(warning) for warning in report.get_warnings()}))
 
     def get_success_message(self, cleaned_data) -> str:
         return _("%(title)s in %(year)s has been filled") % {

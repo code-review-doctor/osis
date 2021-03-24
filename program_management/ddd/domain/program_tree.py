@@ -229,6 +229,14 @@ class ProgramTreeBuilder:
 
             if self._can_link_child_be_filled(copied_link, to_tree.authorized_relationships):
                 self._fill_node_from_last_year_node(last_year_link.child, child, existing_nodes, to_tree)
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) and\
+                    copied_link.child.is_group():
+                to_tree.report.add_warning(
+                    report_events.CopyReferenceGroupEvent(
+                        acronym=last_year_link.child.title,
+                        code=last_year_link.child.code
+                    )
+                )
             elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
                 to_tree.report.add_warning(
                     report_events.CopyReferenceEmptyEvent(
@@ -236,14 +244,7 @@ class ProgramTreeBuilder:
                         code=last_year_link.child.code
                     )
                 )
-            elif copied_link.is_reference():
-                to_tree.report.add_warning(
-                    report_events.CopyReferenceGroupEvent(
-                        acronym=last_year_link.child.title,
-                        code=last_year_link.child.code
-                    )
-                )
-            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and not copied_link.is_reference():
                 to_tree.report.add_warning(
                     report_events.NodeAlreadyCopiedEvent(
                         acronym=last_year_link.child.title,
@@ -380,7 +381,7 @@ class ProgramTreeBuilder:
                         code=copied_link.child.code
                     )
                 )
-            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and not copied_link.is_reference():
                 to_tree.report.add_warning(
                     report_events.NodeAlreadyCopiedEvent(
                         acronym=copied_link.child.title,
