@@ -3,15 +3,17 @@
 ## Appliquer les validateurs avant ou après exécution d'une action métier de l'objet du domaine ?
 
 - Effectuer toujours les checks AVANT d'effectuer l'action métier sur l'objet
-    - évite d'avoir un objet du domaine en état inconsistant (garantit qu'un objet du domaine tjr consistant)
+    - évite d'avoir un objet du domaine en état inconsistant (garantit qu'un objet du domaine est toujours consistant)
     - facilite les tests unitaires
     - exemple : je ne peux modifier une UE que si son année académique est >= 2019
         - si validation après : 
             - UE modifiée --> état inconsistant --> difficulté de maintenance
 
 - Note : un validateur ne peut jamais modifier les arguments qu'il reçoit pour sa propre validation
-    - Exemple (à éviter) : self.transition_name = "TRANSITION " + transitionname (https://github.com/uclouvain/osis/pull/9680/files#)
-    - Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/) pour les validateurs
+    - Exemple (à éviter) : `self.transition_name = "TRANSITION " + transition_name` (https://github.com/uclouvain/osis/pull/9680/files#)
+    - Exemple (à éviter) : `self.field_to_validate = str(field_to_validate)`
+    - Solution : Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/) pour les validateurs
+
 
 ```python
 import attr
@@ -37,25 +39,45 @@ class MyBusinessValidator(BusinessValidator):
 
 ## Quid des validateurs dans les forms par rapport aux validateurs du domaine ?
 
-### "Two steps validation" : Input Validation VS Contract Precondition
+### "Two steps validation" : Input Validation VS Invariant Validation
 
 - "Input Validation" (precondition)
+    - Validation des entrées utilisateur ou tout processus externe
     - Mécanisme protégeant notre système contre les infiltrations de données invalides
     - Données autorisées en état invalides
     - "Bouclier de protection contre le monde extérieur"
 
 - "Invariant validation" (code contract)
-    - Suppose que les données à l'intérieur du système sont dans un état valide
     - Validation des invariants
+    - Suppose que les données à l'intérieur du système sont dans un état valide
     - "Bouclier" de prévention pour s'asurer de la consistance de nos objets
 
 - Validateurs des Django forms == validateurs métier
      - Exception : pas de validateur sur les types de données
-        - Assuré par les couches supérieures (ici, Django forms)
+        - Assuré par les couches supérieures - internes à notre application (ici, Django forms)
+        - Pourquoi ? 
+            - Notre interface graphique empêche d'envoyer des données mal formatées
+            - Si données mal formatées, c'est l'utilisateur qui corromp délibérément le système client
+            - Notre système est protégé de toute façon : si les données entrées sont corrompues, une exception sera levée
+                - exemple : champs crédits de type `str`, remarque de type "int"...
+            - Pas nécessaire d'afficher une erreur bien formatée
 
-- Exemples de validateurs (domaine):
-    - MyForm.credits doit être > 0
-    - MyForm.sigle doit respecter le format `^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}`
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+### Exercices
+
+Input validator ou invariant validator ? 
+- Les crédits doivent être > 0
+- Le sigle doit respecter le format `^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}`
+- L'entité de charge doit être la même que l'entité d'attribution pour les types X, Y, Z
+- Les champs A, B, C sont des champs obligatoires
+- Le champ E doit être un entier, le champ F un décimal, le champ G une chaine de caractères
+- Je ne peux pas modifier une UE < 2019-20
+- Le campus sélectionné doit faire partie d'un campus appartenant à l'organisation "UCLouvain"
+- Je ne peux pas attacher un groupement de type "liste au choix mineures" dans un groupement de type "tronc commun" 
+- L'intitulé ne peut pas dépasser 255 caractères
 
 
 
@@ -63,7 +85,7 @@ class MyBusinessValidator(BusinessValidator):
 
 
 
-## Comment afficher les BusinessExceptions dans les champs des forms ? Et comment génération un rapport avec toutes les erreurs ? Comment éviter de s'arrêter à la 1ère exception ?
+## Comment afficher les BusinessExceptions dans les champs des forms ? Comment éviter de s'arrêter à la 1ère exception ? Et comment afficher toutes les erreurs au client ?
 
 ### Principe du "Fail fast"
 
@@ -81,12 +103,12 @@ class MyBusinessValidator(BusinessValidator):
 
 
 
-### ValidatorList + TwoStepsMultipleBusinessExceptionListValidator + DisplayExceptionsByFieldNameMixin
+### Solution : ValidatorList + TwoStepsMultipleBusinessExceptionListValidator + DisplayExceptionsByFieldNameMixin
 
-- Faire hériter `ValidatorList` de TwoStepsMultipleBusinessExceptionListValidator (implémentation ci-dessous)
+- Faire hériter nos ValidatorLists de `TwoStepsMultipleBusinessExceptionListValidator` (implémentation ci-dessous)
     - Toute règle métier raise une BusinessException
-    - Toute action métier raise une MultipleBusinessExceptions
-    - toute MultipleBusinessExceptions gérable par le client (view, API...)
+    - Toute action métier (application service) raise une MultipleBusinessExceptions
+    - Toute MultipleBusinessExceptions gérable par le client (view, API...)
 
 - Utiliser `DisplayExceptionsByFieldNameMixin` dans nos Django forms
 
@@ -179,24 +201,47 @@ class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
 #-------------------------------------------------------------------------------------------------------------------
 # ddd/service/write 
 def update_training_service(command: UpdateTrainingCommand) -> 'TrainingIdentity':
-    """Uniquement dans le cas d'un rapport"""
     identity = TrainingIdentity(acronym=command.acronym, year=command.year)
     
     training = TrainingRepository().get(identity)
     training.update(command)
     
-    TrainingRepository().update(training)
+    TrainingRepository().save(training)
     
     return identity
+
+
+#-------------------------------------------------------------------------------------------------------------------
+# ddd/validators/validators_by_business_action.py
+@attr.s(frozen=True, slots=True)
+class UpdateTrainingValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    command = attr.ib(type=CommandRequest)
+    existing_training = attr.ib(type=Training)
+    existing_training_identities = attr.ib(type=List[TrainingIdentity])
+
+    def get_input_validators(self) -> List[BusinessValidator]:
+        return [
+            AcronymRequiredValidator(self.command),
+            TitleRequiredValidator(self.command),
+            # ...
+        ]
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            HopsValuesValidator(self.existing_training),
+            StartYearEndYearValidator(self.existing_training),
+            UniqueAcronymValidator(self.command.acronym, self.existing_training_identities),
+            # ...
+        ]
 
 
 
 #-------------------------------------------------------------------------------------------------------------------
 # Django Form
-class CreateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
-    code = UpperCaseCharField(label=_("Code"))
-    min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize())
-    max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize())
+class UpdateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
+    code = UpperCaseCharField(label=_("Code"), required=False)
+    min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize(), required=False)
+    max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize(), required=False)
 
     field_name_by_exception = {
         CodeAlreadyExistException: ('code',),
@@ -242,6 +287,49 @@ class View(...):
 
 - Demande un mapping de nos types de BusinessException avec les clients des ApplicationService (django Forms, API...)
 - Nécessite de mettre tous les champs required=False dans les forms
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+## Et si mon domaine ne peut pas être complet à cause des performances ?
+
+- Utiliser un DomainService
+
+
+```python
+
+class UpdateTraining(interface.DomainService):
+    def update(
+            self,
+            training: Training,
+            command: UpdateTrainingCommand,
+            repository: TrainingRepository
+    ) -> None:
+        business_exceptions = []
+        if repository.acronym_exists(command.acronym):
+            business_exceptions.append(AcronymAlreadyExistsException())
+
+        try:
+            training.update(command)
+        except MultipleBusinessExceptions as e:
+            business_exceptions += e.exceptions
+        if business_exceptions:
+            raise MultipleBusinessExceptions(exceptions=business_exceptions)
+
+
+```
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+## Et les validation rules ? Et field reference ? Dans quelle(s) couche(s) devraient-ils se trouver ?
+
+- Rappel : Validation rules = validation de certains champs selon le type de données
+
+- Rappel : Field reference = accès ou non à certains champs selon le rôle de l'utilisateur
+
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
