@@ -28,6 +28,7 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
+from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.person import Person
@@ -96,10 +97,10 @@ class RoleModel(models.Model, metaclass=RoleModelMeta):
 
 
 class EntityRoleModelQueryset(models.QuerySet):
-    def get_entities_ids(self):
+    def get_entities_ids(self, academic_year: AcademicYear = None):  # list de toutes les entités actives et inactives
         person_entities = self.values('entity_id', 'with_child')
         entities_with_child = {entity['entity_id'] for entity in person_entities if entity['with_child']}
-        entity_version_tree = EntityVersion.objects.get_tree(entities_with_child)
+        entity_version_tree = EntityVersion.objects.get_tree(entities_with_child, academic_year=academic_year)
         entities_without_child = {entity['entity_id'] for entity in person_entities if not entity['with_child']}
         return entities_without_child | {node['entity_id'] for node in entity_version_tree}
 

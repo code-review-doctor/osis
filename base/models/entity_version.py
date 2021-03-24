@@ -40,6 +40,7 @@ from django.utils.translation import gettext_lazy as _
 from django_cte import CTEManager, CTEQuerySet, With
 from reversion.admin import VersionAdmin
 
+from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
@@ -174,12 +175,13 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(children_entities)
 
-    def with_parents(self, *extra_fields, date=None, **filter_kwargs):
+    def with_parents(self, *extra_fields, date=None, academic_year: AcademicYear = None, **filter_kwargs):
         """
         Use a Common Table Expression to construct the hierarchy of parent entities
         The Union is made recursively on LEFT.parent_id = CTE.children_id
 
         :param date: Date to filter the entity versions on (default: now)
+        :param academic_year: Academic year to filter the entity versions on
         :param extra_fields: Any field to add on the cte query
         :param filter_kwargs: Any filter to add on the original query
         :return: a CTE queryset
@@ -187,6 +189,21 @@ class EntityVersionQuerySet(CTEQuerySet):
         """
         if date is None:
             date = now()
+
+        if academic_year:
+            current_clause = (
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                    Q(start_date__lte=academic_year.start_date) &
+                    (
+                        Q(end_date__isnull=True) |
+                        Q(end_date__gte=academic_year.end_date)
+                    )
+                )
+            )
+        else:
+            current_clause = ((Q(end_date__gte=date) | Q(end_date__isnull=True)) & Q(start_date__lte=date))
 
         def parent_entities(cte):
             """ This function is used for the recursive SQL query """
@@ -206,8 +223,7 @@ class EntityVersionQuerySet(CTEQuerySet):
             ).union(
                 # recursive union: get parents with entity_id = parent_id
                 cte.join(EntityVersion, parent_id=cte.col.entity_id).filter(
-                    Q(end_date__gte=date) | Q(end_date__isnull=True),
-                    start_date__lte=date,
+                    current_clause
                 ).values(
                     'id',
                     'parent_id',
@@ -224,7 +240,7 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(parent_entities)
 
-    def get_tree(self, entity_ids, date=None):
+    def get_tree(self, entity_ids, date=None, academic_year: AcademicYear = None):
         """
         :return: a list of dictionaries returning
             - entityversion_id,
@@ -252,7 +268,7 @@ class EntityVersionQuerySet(CTEQuerySet):
                 if isinstance(entity, Entity):
                     entity_ids[i] = entity.pk
 
-        cte = self.with_parents('acronym', date=date, entity_id__in=entity_ids)
+        cte = self.with_parents('acronym', date=date, academic_year=academic_year, entity_id__in=entity_ids)
         qs = cte.queryset().with_cte(cte).annotate(
             level=Func('parents', function='cardinality'),
             date=Value(date, models.DateField()),
