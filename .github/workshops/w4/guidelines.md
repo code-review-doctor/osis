@@ -20,7 +20,11 @@
         - facilite les tests unitaires
         - si après : oblige à dunder method "add_node" sans validation métier -> porte ouverte
         - Question : qqn voit-il un avantage à faire le check après validation ?
-        
+- Pas nécessaire de valider si une Entity existe déjà ou non. Exemple où la validation est "overkill" :
+    - LearningUnit.Language
+    - LearningUnit.Campus
+    - LearningUnit.Entity
+
         
 ## Validators - references à ajouter
 

@@ -109,6 +109,70 @@ Les Serializers, forms, views utilisent alors un application service qui renvoie
 ### Interface : définition
 
 
+### Bounded Context
+
+- cf. Language et Entity dans notre domaine UE
+
+En partant de l'idée qu'on aura 1 seule factory pour 1 Repository et 1 application service :
+
+Essai n°1 : 
+- Injecter ResponsibleEntity dans LearningUnitBuilder
+- Inconvénients :
+    - LearningUnitRepository.get() a besoin de ResponsibleEntityRepository
+        - dépendance d'un repo avec un autre repo
+            - contradictoire avec l'idée 1 aggrégat == 1 transaction
+            - si ResponsibleEntity est à l'intérieur de LearningUnit, cela autorise LearningUnit à modifier ResponsibleEntity
+            - On devrait donc avoir uniquement ResponsibleEntityIdentity dans LearningUnit
+                - Mais cela fait qu'on ne sait plus valider correctement LearningUnit car on a pas son type
+        
+Essai n°2 :
+- DomainService(LearningUnit, EntityRepository)
+- Inconvénients :
+    - Factory -> DomainService -> Repository
+    - Équivalent à solution ci-dessus : LearningUnitRepository.get()
+    
+Essai n°3 :
+- ResponsibleEntityRepository.filter_by_learning_unit_code()
+- Inconvénients :
+    - Logique métier encapsulée dans le repository
+    
+```python
+class ResponsibleEntityRepository(interface.AbstractRepository):
+
+    def filter_by_learning_unit_code(self, code: str):
+        qs = EntityQueryset.objects.all()
+        if code not in ("ILV", "IUFC", "CCR", "LLL",):
+            qs = qs.filter(type__in=[SECTOR, FACULTY...])
+        # ...
+
+```
+
+
+Essai N°4 :
+- ResponsibleEntityIdentity dans le builder
+- Inconvénients :
+    - on a pas le type d'entité
+        - nécessite ResponsibleEntityRepository dans la factory
+            - même chose que essai n°1
+
+
+
+ValueObject VS Entity
+- Du point de vue du domaine UE, qu'est-ce qu'une ResponsibleEntity ? 
+    - ValueObject avec un code et un type
+
+
+Essai n°5 :
+- Modifier la commande pour passer responsible_entity_type
+- Inconvénients :
+    - ?
+- Avantages : 
+    - ResponsibleEntity est un ValueObject dans le contexte des UEs
+        - Plus de repositories différents
+    
+
+Et pour les DTO : on utiliserais 1 DTO par AggregateRoot ? Pour fusionner le Builder.cuild_from_command et buildfromrepositry? 
+
 ### Shared Kernel
 
 - Quid des value objects réutilisables ?

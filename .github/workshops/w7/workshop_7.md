@@ -19,3 +19,5 @@ def __gt__(self, other):
     - [ALES] ApplicationService peutil appeler plusieurs repositories de plusieurs domaines différents ?
     
 - Rapports (warnings, changes...) et events
+
+- Ajouter une classe RequiredBoostrapField pour les "*" - si required=False à tous les forms
