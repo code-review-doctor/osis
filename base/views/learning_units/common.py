@@ -153,15 +153,11 @@ def get_text_label_translated(text_lb, user_language):
 
 
 def get_common_context_to_publish(person, learning_unit_year: LearningUnitYear):
-    luy_in_current_or_future_anac = not learning_unit_year.academic_year.is_past
     can_edit_pedagogy = person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year)
     can_edit_pedagogy_force_majeur = person.user.has_perm(
         'base.can_edit_learningunit_pedagogy_force_majeur', learning_unit_year
     )
-
     return {
-        'enable_publish_button':  can_edit_pedagogy or can_edit_pedagogy_force_majeur,
-        'luy_in_current_or_future_anac': luy_in_current_or_future_anac,
         'can_edit_information': can_edit_pedagogy,
         'can_edit_force_majeur_section': can_edit_pedagogy_force_majeur
     }

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -66,16 +66,16 @@ class Tutor(RoleModel, serializable_model.SerializableModel):
             'base.can_access_catalog': rules.always_allow,
             'base.can_access_evaluation': rules.always_allow,
             'base.can_access_student_path': rules.always_allow,
-            'base.can_access_learningunit_pedagogy': attribution_predicates.have_attribution,
+            'base.can_access_learningunit_pedagogy': attribution_predicates.have_attribution_on_learning_unit_year,
             'base.can_edit_learningunit_pedagogy':
                 learning_unit_predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 learning_unit_predicates.is_learning_unit_year_summary_editable &
-                attribution_predicates.have_attribution &
+                attribution_predicates.have_attribution_on_learning_unit_year &
                 learning_unit_predicates.is_learning_unit_summary_edition_calendar_open,
             'base.can_edit_learningunit_pedagogy_force_majeur':
                 learning_unit_predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 learning_unit_predicates.is_learning_unit_year_summary_editable &
-                attribution_predicates.have_attribution &
+                attribution_predicates.have_attribution_on_learning_unit_year &
                 learning_unit_predicates.is_learning_unit_force_majeur_summary_edition_calendar_open,
         })
 

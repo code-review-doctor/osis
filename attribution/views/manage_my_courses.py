@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,9 +32,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
-from base.models import entity_calendar
 from base.models.academic_year import AcademicYear
-from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.auth.roles.tutor import Tutor
 from base.views import teaching_material
@@ -102,33 +100,19 @@ def list_my_attributions_summary_editable(request):
         year_displayed = force_majeure_academic_event.authorized_target_year
     else:
         year_displayed = main_summary_edition_academic_event.authorized_target_year
+
     academic_year = AcademicYear.objects.get(year=year_displayed)
     learning_unit_years_qs = LearningUnitYear.objects_with_container.filter(
         academic_year=academic_year,
-        learning_container_year__attributionnew__tutor=tutor,
+        learningcomponentyear__attributionchargenew__attribution__tutor=tutor
+    ).select_related(
+        'academic_year', 'learning_container_year__requirement_entity'
     ).distinct().order_by('academic_year__year', 'acronym')
 
-    entity_calendars = entity_calendar.build_calendar_by_entities(
-        ac_year=academic_year,
-        reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
-    )
-    # FIX display error why we cannot modify UE
-    errors = ()
-    errors_force_majeure = ()
-    # errors = (CanUserEditEducationalInformation(
-    #     user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years_qs)
-    # errors_force_majeure = (CanUserEditEducationalInformationForceMajeure(
-    #     user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years_qs)
-
     context = {
-        'learning_unit_years_with_errors': list(zip(learning_unit_years_qs, errors, errors_force_majeure)),
-        'entity_calendars': entity_calendars,
-        'event_perm_desc_fiche_open': bool(summary_edition_calendar.get_target_years_opened()),
-        'event_perm_force_majeure_open': bool(force_majeur_summary_edition_calendar.get_target_years_opened()),
-        'event_perm_force_majeure_start_date': force_majeure_academic_event.start_date if force_majeure_academic_event
-        else None,
-        'event_perm_force_majeure_end_date': force_majeure_academic_event.end_date if force_majeure_academic_event
-        else None
+        'learning_unit_years': learning_unit_years_qs,
+        'summary_edition_academic_event': main_summary_edition_academic_event,
+        'force_majeure_academic_event': force_majeure_academic_event,
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
