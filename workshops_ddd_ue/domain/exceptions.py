@@ -72,3 +72,18 @@ class LearningUnitAlreadyExistsException(BusinessException):
     def __init__(self, learning_unit_identity: 'LearningUnitIdentity', *args, **kwargs):
         message = _("Learning unit {} already exists next year").format(learning_unit_identity)
         super().__init__(message, **kwargs)
+
+
+class SubdivisionShouldHaveOneLetterException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("The subdivision must contain only one letter")
+        super().__init__(message, **kwargs)
+
+
+class SubdivisionAlreadyExistException(BusinessException):
+    def __init__(self, learning_unit_identity: 'LearningUnitIdentity', subdivision: str, *args, **kwargs):
+        message = _("The subdivision {subd} already exists for {ue}").format(
+            subd=subdivision,
+            ue=learning_unit_identity,
+        )
+        super().__init__(message, **kwargs)

@@ -3,7 +3,7 @@ from typing import List
 from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
+from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity, LearningUnit
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
 from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator
 from workshops_ddd_ue.validators._credits_minimum_value import CreditsMinimumValueValidator
@@ -13,6 +13,9 @@ from workshops_ddd_ue.validators._learning_unit_exists_in_next_year import Learn
 from workshops_ddd_ue.validators._required_fields import RequiredFieldsValidator
 from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code import \
     ResponsibleEntityAuthorizedTypeOrCode
+from workshops_ddd_ue.validators._subdivision_should_contain_only_one_letter import \
+    SubdivisionShouldContainOnlyOneLetterValidator
+from workshops_ddd_ue.validators._subdivision_should_not_exist import SubdivisionShouldNotExistValidator
 
 
 class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
@@ -42,5 +45,18 @@ class CopyLearningUnitToNextYearValidatorList(MultipleExceptionBusinessListValid
     ):
         self.validators = [
             LearningUnitYearExistsNextYearValidator(learning_unit_identity, all_existing_lear_unit_identities),
+        ]
+        super().__init__()
+
+
+class CreatePartimValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(
+            self,
+            learning_unit: 'LearningUnit',
+            subdivision: str,
+    ):
+        self.validators = [
+            SubdivisionShouldContainOnlyOneLetterValidator(subdivision),
+            SubdivisionShouldNotExistValidator(subdivision, learning_unit),
         ]
         super().__init__()

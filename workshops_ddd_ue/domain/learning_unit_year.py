@@ -1,14 +1,19 @@
+from typing import List
+
 import attr
 
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from osis_common.ddd import interface
+from workshops_ddd_ue.command import CreatePartimCommand
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.domain._titles import Titles
+from workshops_ddd_ue.domain._partim import Partim, PartimBuilder
+from workshops_ddd_ue.validators.validators_by_business_action import CreatePartimValidatorList
 
 
 @attr.s(frozen=True, slots=True)
@@ -37,6 +42,7 @@ class LearningUnit(interface.RootEntity):
     periodicity = attr.ib(type=PeriodicityEnum)
     language = attr.ib(type=Language)
     remarks = attr.ib(type=Remarks)
+    partims = attr.ib(type=List[Partim])
 
     @property
     def academic_year(self) -> 'AcademicYear':
@@ -45,6 +51,16 @@ class LearningUnit(interface.RootEntity):
     @property
     def code(self) -> str:
         return self.entity_id.code
+
+    def contains_partim_subdivision(self, subdivision: str) -> bool:
+        return subdivision in {p.subdivision for p in self.partims}
+
+    def create_partim(self, create_partim_cmd: 'CreatePartimCommand') -> None:
+        partim = PartimBuilder.build_from_command(
+            cmd=create_partim_cmd,
+            learning_unit=self,
+        )
+        self.partims.append(partim)
 
 
 class CourseLearningUnit(LearningUnit):
