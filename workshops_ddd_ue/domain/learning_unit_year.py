@@ -10,7 +10,7 @@ from workshops_ddd_ue.command import CreatePartimCommand
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity
+from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain._partim import Partim, PartimBuilder
 from workshops_ddd_ue.validators.validators_by_business_action import CreatePartimValidatorList
@@ -38,7 +38,7 @@ class LearningUnit(interface.RootEntity):
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=InternshipSubtype)
-    responsible_entity = attr.ib(type=ResponsibleEntity)
+    responsible_entity_identity = attr.ib(type=ResponsibleEntityIdentity)
     periodicity = attr.ib(type=PeriodicityEnum)
     language = attr.ib(type=Language)
     remarks = attr.ib(type=Remarks)

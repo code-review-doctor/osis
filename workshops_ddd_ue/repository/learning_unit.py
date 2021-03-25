@@ -4,22 +4,14 @@ from django.db.models import F, OuterRef, Subquery
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from base.models.entity_version import EntityVersion as EntityVersionDatabase
-from base.models.enums.internship_subtypes import InternshipSubtype
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-
-from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
-from base.models.learning_unit import LearningUnit as LearningUnitDatabase
 from base.models.learning_container import LearningContainer as LearningContainerDatabase
 from base.models.learning_container_year import LearningContainerYear as LearningContainerYearDatabase
+from base.models.learning_unit import LearningUnit as LearningUnitDatabase
+from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
 from osis_common.ddd import interface
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, BusinessException
 from reference.models.language import Language as LanguageDatabase
 from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.domain._address import Address
-from workshops_ddd_ue.domain._language import Language
-from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
-from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
 from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
@@ -36,7 +28,7 @@ class LearningUnitRepository(interface.AbstractRepository):
             )
 
             requirement_entity_id = EntityVersionDatabase.objects.filter(
-                acronym=entity.responsible_entity.code
+                acronym=entity.responsible_entity_identity.code
             ).values_list('entity_id', flat=True).get()
 
             academic_year_id = AcademicYearDatabase.objects.filter(
