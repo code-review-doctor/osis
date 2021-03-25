@@ -417,11 +417,13 @@ Notes:
             - si pas raises MultipleBusinessException, autre solution : 
                 - dupliquer UNIQUEMENT ces validations dans Forms et dans CommandRequest (le .isvalid( renvoie juste True/false dans ce cas)
 - FieldReference :
+    - Contenu : basé sur les champs du DomainObjectDTO
     - Réutilisé dans DomainService
         - DomainService car nécessite dépendance extérieure : les rôles et le calendrier académique
         - TODO : implémenter
     - Réutilisé dans Django Form (c'est gratuit c 'est deja implémenté) 
-- ValidationRules : 
+- ValidationRules :
+    - Contenu : basé sur les champs du DomainObjectDTO (c'est au form d'y adhérer correctement)
     - Réutilisé dans CommandRequest
         - Pour Required
     - Réutilisé dans Validator
