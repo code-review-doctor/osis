@@ -34,7 +34,6 @@ from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION, \
     EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT, EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
 from base.models.learning_unit import LearningUnit
-from base.models.person_entity import PersonEntity
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.person import FacultyManagerForUEFactory, CentralManagerForUEFactory
 from base.tests.factories.person import PersonFactory
@@ -118,7 +117,7 @@ def step_impl(context: Context, group):
 
 @step("La période de modification des programmes est en cours")
 def step_impl(context: Context):
-    calendar = AcademicCalendarFactory(academic_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
+    calendar = AcademicCalendarFactory(data_year=current_academic_year(), reference=EDUCATION_GROUP_EDITION)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
     calendar.save()
 
@@ -126,14 +125,12 @@ def step_impl(context: Context):
 @step("La période de modification des unités d'enseignement est en cours")
 def step_impl(context: Context):
     calendar = AcademicCalendarFactory(
-        academic_year=current_academic_year(),
         data_year=current_academic_year(),
         reference=EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
 
     calendar.save()
     calendar = AcademicCalendarFactory(
-        academic_year=current_academic_year(),
         data_year=current_academic_year(),
         reference=EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT)
     calendar.end_date = (datetime.now() + timedelta(days=1)).date()
@@ -165,12 +162,6 @@ def step_impl(context: Context, group):
     page.login("usual_suspect", 'Roger_Verbal_Kint')
 
     context.test.assertEqual(context.browser.current_url, context.get_url('/'))
-
-
-@step("L’utilisateur est attaché à l’entité {value}")
-def step_impl(context: Context, value: str):
-    entity = Entity.objects.filter(entityversion__acronym=value).first()
-    PersonEntity.objects.get_or_create(person=context.user.person, entity=entity, defaults={'with_child': True})
 
 
 @given("S’assurer que la date de fin de {acronym} est {year}.")

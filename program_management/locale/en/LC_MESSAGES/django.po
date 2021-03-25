@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-03 15:27+0100\n"
+"POT-Creation-Date: 2021-03-12 15:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,10 +171,8 @@ msgstr ""
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
 
-#, fuzzy
-#| msgid "Prerequisite"
 msgid "Cannot copy prerequisite"
-msgstr "Prerequisite"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -344,6 +342,10 @@ msgstr ""
 msgid ""
 "Impossible to create a transition version : an other transition version "
 "exists already on this year."
+msgstr ""
+
+#, python-format
+msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
 msgid "Include subordinate entities"
