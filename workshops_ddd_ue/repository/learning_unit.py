@@ -27,7 +27,7 @@ class LearningUnitRepository(interface.AbstractRepository):
         )
 
         requirement_entity_id = EntityVersionDatabase.objects.filter(
-            acronym=entity.responsible_entity.code
+            acronym=entity.responsible_entity_identity.code
         ).values_list('entity_id', flat=True).get()
 
         academic_year_id = AcademicYearDatabase.objects.filter(

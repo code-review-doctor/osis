@@ -8,10 +8,9 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from osis_common.ddd.interface import CommandRequest, RootEntity
 from workshops_ddd_ue.command import CreateLearningUnitCommand
-from workshops_ddd_ue.domain._address import Address
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
+from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
@@ -40,9 +39,9 @@ class LearningUnitBuilder(RootEntityBuilder):
     def build_from_command(
             cls,
             cmd: 'CreateLearningUnitCommand',
-            all_existing_identities: List['LearningUnitIdentity']
+            all_existing_identities: List['LearningUnitIdentity'],
+            responsible_entity: ResponsibleEntity
     ) -> 'LearningUnit':
-        responsible_entity = _build_responsible_entity(cmd.responsible_entity_code)  # FIXME
         CreateLearningUnitValidatorList(responsible_entity, cmd, all_existing_identities).validate()
         dto = cmd
         return _get_learning_unit_class(dto.type)(
@@ -62,7 +61,11 @@ class LearningUnitBuilder(RootEntityBuilder):
         )
 
     @classmethod
-    def build_from_repository_dto(cls, dto: 'LearningUnitFromRepositoryDTO') -> 'LearningUnit':
+    def build_from_repository_dto(
+            cls,
+            dto: 'LearningUnitFromRepositoryDTO',
+            responsible_entity: 'ResponsibleEntity'
+    ) -> 'LearningUnit':
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
             type=LearningContainerYearType[dto.type],
@@ -127,19 +130,11 @@ def _build_language(iso_code: str):
     )
 
 
-def _build_responsible_entity(responsible_entity_code: str):
-    return ResponsibleEntity(  # FIXME
-        entity_id=ResponsibleEntityIdentity(code=responsible_entity_code),
-        title=None,
-        address=Address(
-            country=None,
-            street_name=None,
-            street_number=None,
-            city=None,
-            postal_code=None,
-        ),
-        type=None,
-    )
+# def _build_responsible_entity(responsible_entity_code: str):
+#     return ResponsibleEntity(  # FIXME
+#         entity_id=ResponsibleEntityIdentity(code=responsible_entity_code),
+#         type=None,
+#     )
 
 
 def _build_titles(common_title_fr: str, specific_title_fr: str, common_title_en: str, specific_title_en: str):
