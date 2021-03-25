@@ -12,8 +12,8 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import display_error_messages, display_warning_messages, display_success_messages, \
-    check_formations_impacted_by_update
+from base.views.common import check_formations_impacted_by_update
+from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
@@ -26,12 +26,13 @@ from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
+from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
-from program_management.forms import transition, version
+from program_management.forms import version, transition
 
 
 class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
@@ -175,6 +176,14 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
                     transition_name=update_command.transition_name
                 ) for year in range(update_command.year, e.conflicted_fields_year)
             ]
+        except program_exception.CannotDeleteSpecificVersionDueToTransitionVersionEndDate as e:
+            self.mini_training_version_form.add_error('end_year', "")
+            self.mini_training_version_form.add_error(
+                None, _("Impossible to put end date to %(end_year)s: %(msg)s") % {
+                    "msg": e.message,
+                    "end_year": display_as_academic_year(update_command.end_year)
+                }
+            )
         return []
 
     @cached_property
