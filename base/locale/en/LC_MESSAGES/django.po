@@ -137,7 +137,7 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
-msgid "Academic"
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
 msgstr ""
 
 msgid "Academic actors"
@@ -640,11 +640,6 @@ msgid "Decree category"
 msgstr ""
 
 msgid "Deepening"
-msgstr ""
-
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
 msgstr ""
 
 msgid "Default learning unit enrollment"

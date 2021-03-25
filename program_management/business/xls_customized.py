@@ -57,7 +57,6 @@ XLS_FILENAME = _('Education_groups')
 XLS_DESCRIPTION = _("List education groups")
 
 WITH_VALIDITY = "with_validity"
-WITH_OSIS_CODE = "with_osis_code"
 WITH_PARTIAL_ENGLISH_TITLES = "with_partial_english_titles"
 WITH_EDUCATION_FIELDS = "with_education_fields"
 WITH_ORGANIZATION = "with_organization"
@@ -74,7 +73,6 @@ WITH_KEYWORDS = "with_keywords"
 
 TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_VALIDITY,
-    WITH_OSIS_CODE,
     WITH_PARTIAL_ENGLISH_TITLES,
     WITH_EDUCATION_FIELDS,
     WITH_ORGANIZATION,
@@ -90,13 +88,12 @@ TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_KEYWORDS
 ]
 DEFAULT_EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
-                                  str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits'))]
+                                  str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits')), str(_('Code'))]
 
 COMMON_ARES_TITlES = [str(_('Code co-graduation inter CfB')), str(_('Co-graduation total coefficient'))]
 
 PARAMETER_HEADERS = {
     WITH_VALIDITY: [str(_('Status')), str(_('Beginning')), str(_('Last year of org.'))],
-    WITH_OSIS_CODE: [str(_('Code'))],
     WITH_PARTIAL_ENGLISH_TITLES: [str(_('Title in English')), str(_('Partial title in French')),
                                   str(_('Partial title in English'))],
     WITH_EDUCATION_FIELDS: [str(_('main domain')).capitalize(), str(_('secondary domains')).capitalize(),
@@ -171,13 +168,11 @@ def extract_xls_data_from_education_group_with_parameters(group_year: GroupYear,
         _build_title_fr(offer, group, current_version),
         get_category(offer, group),
         group.type.value,
-        group.credits if group.credits else ""
+        group.credits if group.credits else "",
+        group.code,
     ]
     if WITH_VALIDITY in other_params:
         data.extend(_build_validity_data(offer, group, current_version))
-
-    if WITH_OSIS_CODE in other_params:
-        data.append(group.code)
 
     if WITH_PARTIAL_ENGLISH_TITLES in other_params:
         data.extend(_get_titles_en(current_version, offer, group))

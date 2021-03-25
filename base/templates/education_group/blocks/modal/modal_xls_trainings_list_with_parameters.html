@@ -35,10 +35,9 @@
         <div class="modal-body" id="parameters_selections">
             {% csrf_token %}
             <label>{% trans 'Do you want to export the following informations' %}?</label><br>
-            <input type="checkbox" disabled id="unmutable_chb" checked> {% trans 'Default information (ac. yr., acronym/short title, title, category, type, credits)' %}<br>
+            <input type="checkbox" disabled id="unmutable_chb" checked> {% trans 'Ac. yr., acronym/short title, title, category, type, credits, code' %}<br>
             <input type="checkbox" id="chb_all_param" title="{% trans 'Select/deselect all' %}"> <strong>{% trans 'Select all' %}</strong><br>
             <input type="checkbox" id="chb_with_validity" value="chb_with_validity" class="chb_parameters"> {% trans 'Validity' %}<br>
-            <input type="checkbox" id="chb_with_osis_code" value="chb_with_osis_code" class="chb_parameters"> {% trans 'Osis code' %}<br>
             <input type="checkbox" id="chb_with_partial_english_titles" value="chb_with_partial_english_titles" class="chb_parameters"> {% trans 'Titles(partial/English)' %}<br>
             <input type="checkbox" id="chb_with_education_fields" value="chb_with_education_fields" class="chb_parameters"> {% trans 'Education fields' context 'list' %}<br>
             <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"> {% trans 'Organization' %}<br>
@@ -69,7 +68,6 @@
     <script type="application/javascript">
         function get_parameters(){
             $('#hdn_with_validity').val(false);
-            $('#hdn_with_osis_code').val(false);
             $('#hdn_with_partial_english_titles').val(false);
             $('#hdn_with_education_fields').val(false);
             $('#hdn_with_organization').val(false);
@@ -87,9 +85,6 @@
 
             if($('#chb_with_validity').prop('checked')){
                 $('#hdn_with_validity').val(true);
-            }
-            if($('#chb_with_osis_code').prop('checked')){
-                $('#hdn_with_osis_code').val(true);
             }
             if($('#chb_with_partial_english_titles').prop('checked')){
                 $('#hdn_with_partial_english_titles').val(true);

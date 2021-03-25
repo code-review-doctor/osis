@@ -148,6 +148,9 @@ msgstr "Absent"
 msgid "Ac yr."
 msgstr "Anac."
 
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
+msgstr "Anac, sigle/int abr, intitulé complet en français, catégorie, type de formation, nombre de crédits, code"
+
 msgid "Academic"
 msgstr "Académique"
 
@@ -656,13 +659,6 @@ msgstr "Catégorie décret"
 
 msgid "Deepening"
 msgstr "Approfondissement"
-
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
-msgstr ""
-"Informations par défaut (anac, sigle/int abr, intitulé complet en français, "
-"catégorie, type de formation, nombre de crédits)"
 
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
