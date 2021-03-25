@@ -25,7 +25,7 @@ import random
 
 from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.tutor import Tutor
+from base.auth.roles.tutor import Tutor
 from features.pages.learning_unit import pages
 
 

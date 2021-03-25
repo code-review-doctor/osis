@@ -26,7 +26,7 @@ from django.utils.translation import gettext_lazy as _
 
 from assessments.views import upload_xls_utils
 from base.forms.utils import choice_field
-from base.models import tutor
+from base.auth.roles import tutor
 from base.models.enums import exam_enrollment_justification_type
 from base.models.learning_unit_year import LearningUnitYear
 from features.pages import learning_unit
