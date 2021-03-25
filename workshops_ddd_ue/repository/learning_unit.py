@@ -4,22 +4,14 @@ from django.db.models import F, OuterRef, Subquery
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from base.models.entity_version import EntityVersion as EntityVersionDatabase
-from base.models.enums.internship_subtypes import InternshipSubtype
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-
-from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
-from base.models.learning_unit import LearningUnit as LearningUnitDatabase
 from base.models.learning_container import LearningContainer as LearningContainerDatabase
 from base.models.learning_container_year import LearningContainerYear as LearningContainerYearDatabase
+from base.models.learning_unit import LearningUnit as LearningUnitDatabase
+from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, BusinessException
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
 from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.domain._address import Address
-from workshops_ddd_ue.domain._language import Language
-from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain._responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
-from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
 from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
@@ -28,55 +20,48 @@ from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
 class LearningUnitRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, entity: LearningUnit, **kwargs) -> LearningUnitIdentity:
-        try:
-            learning_container = LearningContainerDatabase.objects.create()
+        learning_container = LearningContainerDatabase.objects.create()
 
-            learning_unit = LearningUnitDatabase.objects.create(
-                learning_container=learning_container,
-            )
+        learning_unit = LearningUnitDatabase.objects.create(
+            learning_container=learning_container,
+        )
 
-            requirement_entity_id = EntityVersionDatabase.objects.filter(
-                acronym=entity.responsible_entity.code
-            ).values_list('entity_id', flat=True).get()
+        requirement_entity_id = EntityVersionDatabase.objects.filter(
+            acronym=entity.responsible_entity.code
+        ).values_list('entity_id', flat=True).get()
 
-            academic_year_id = AcademicYearDatabase.objects.filter(
-                year=entity.academic_year.year
-            ).values_list('pk', flat=True).get()
+        academic_year_id = AcademicYearDatabase.objects.filter(
+            year=entity.academic_year.year
+        ).values_list('pk', flat=True).get()
 
-            learning_container_year = LearningContainerYearDatabase.objects.create(
-                acronym=entity.code,
-                academic_year_id=academic_year_id,
-                container_type=entity.type.name,
-                common_title=entity.titles.common_fr,
-                common_title_english=entity.titles.common_en,
-                requirement_entity_id=requirement_entity_id
-            )
+        learning_container_year = LearningContainerYearDatabase.objects.create(
+            acronym=entity.code,
+            academic_year_id=academic_year_id,
+            container_type=entity.type.name,
+            common_title=entity.titles.common_fr,
+            common_title_english=entity.titles.common_en,
+            requirement_entity_id=requirement_entity_id
+        )
 
-            language_id = LanguageDatabase.objects.filter(
-                code=entity.language.iso_code
-            ).values_list('pk', flat=True).get()
+        language_id = LanguageDatabase.objects.filter(
+            code=entity.language.iso_code
+        ).values_list('pk', flat=True).get()
 
-            learn_unit_year = LearningUnitYearDatabase.objects.create(
-                learning_unit=learning_unit,
-                academic_year_id=academic_year_id,
-                learning_container_year=learning_container_year,
-                acronym=entity.code,  # FIXME :: Is this correct ? Duplicated with container.acronym ?
-                specific_title=entity.titles.specific_fr,
-                specific_title_english=entity.titles.specific_en,
-                credits=entity.titles.credits,
-                internship_subtype=entity.internship_subtype.name,
-                periodicity=entity.periodicity.name,
-                language_id=language_id,
-                faculty_remark=entity.remarks.faculty,
-                other_remark=entity.remarks.publication_fr,
-                other_remark_english=entity.remarks.publication_en,
-            )
-        except (  # FIXME
-                AcademicYearDatabase.DoesNotExist,
-                LanguageDatabase.DoesNotExist,
-                EntityVersionDatabase.DoesNotExist
-        ) as exception:
-            raise BusinessException('academic year or language or entityversion does not exists')
+        learn_unit_year = LearningUnitYearDatabase.objects.create(
+            learning_unit=learning_unit,
+            academic_year_id=academic_year_id,
+            learning_container_year=learning_container_year,
+            acronym=entity.code,  # FIXME :: Is this correct ? Duplicated with container.acronym ?
+            specific_title=entity.titles.specific_fr,
+            specific_title_english=entity.titles.specific_en,
+            credits=entity.titles.credits,
+            internship_subtype=entity.internship_subtype.name,
+            periodicity=entity.periodicity.name,
+            language_id=language_id,
+            faculty_remark=entity.remarks.faculty,
+            other_remark=entity.remarks.publication_fr,
+            other_remark_english=entity.remarks.publication_en,
+        )
 
         return entity.entity_id
 
