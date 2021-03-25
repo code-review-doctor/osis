@@ -822,10 +822,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
-    @mock.patch(
-        "base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
-    @mock.patch("base.views.learning_units.common.is_eligible_to_update_learning_unit_pedagogy")
-    def test_learning_unit_specification(self, mock_perm_pedagogy, mock_perm_force_majeure):
+    def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
         fr = FrenchLanguageFactory()
         en = EnglishLanguageFactory()

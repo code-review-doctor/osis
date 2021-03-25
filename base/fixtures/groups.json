@@ -1870,44 +1870,6 @@
     {
         "model": "auth.group",
         "fields": {
-            "name": "tutors",
-            "permissions": [
-                [
-                    "add_admissionexamtype",
-                    "admission",
-                    "admissionexamtype"
-                ],
-                [
-                    "can_access_scoreencoding",
-                    "assessments",
-                    "scoresencoding"
-                ],
-                [
-                    "can_access_academicyear",
-                    "base",
-                    "academicyear"
-                ],
-                [
-                    "can_access_catalog",
-                    "base",
-                    "offer"
-                ],
-                [
-                    "can_access_evaluation",
-                    "base",
-                    "offerenrollment"
-                ],
-                [
-                    "can_access_student_path",
-                    "base",
-                    "offerenrollment"
-                ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
             "name": "institution_administration",
             "permissions": [
                 [

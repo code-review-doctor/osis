@@ -171,10 +171,10 @@ class ListMyAttributionsSummaryEditableTestCase(TestCase):
 class TestTutorViewEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
-        AcademicYearFactory.produce()
+        cls.current_academic_year = AcademicYearFactory(current=True)
 
         cls.tutor = TutorFactory()
-        cls.learning_unit_year = LearningUnitYearFactory(summary_locked=False)
+        cls.learning_unit_year = LearningUnitYearFactory(summary_locked=False, academic_year=cls.current_academic_year)
         cls.attribution = AttributionChargeNewFactory(
             attribution__tutor=cls.tutor,
             attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
@@ -203,16 +203,19 @@ class TestTutorViewEducationalInformation(TestCase):
 
     def test_template_used(self):
         response = self.client.get(self.url)
-
         self.assertTemplateUsed(response, "manage_my_courses/educational_information.html")
+
+    def test_assert_keys_in_context(self):
+        response = self.client.get(self.url)
 
         context = response.context
         self.assertEqual(context["learning_unit_year"], self.learning_unit_year)
         self.assertTrue("teaching_materials" in context)
         self.assertFalse(context["cms_labels_translated"])
-        self.assertFalse(context["can_edit_information"])
+        self.assertTrue(context["can_edit_information"])
         self.assertFalse(context["can_edit_summary_locked_field"])
         self.assertIsInstance(context["submission_dates"], AcademicEvent)
+
         # Verify URL for tutor [==> Specific redirection]
         self.assertEqual(context['create_teaching_material_urlname'], 'tutor_teaching_material_create')
         self.assertEqual(context['update_teaching_material_urlname'], 'tutor_teaching_material_edit')
