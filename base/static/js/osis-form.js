@@ -75,7 +75,7 @@ function displayWarning(inputField){
 }
 
 function hideWarning(inputField){
-    if(inputField._ui !== undefined){
+    if(inputField._ui !== undefined && inputField._ui.$errorClassHandler.hasClass("has-warning")){
         inputField._ui.$errorClassHandler.removeClass("has-warning");
         inputField._ui.$errorsWrapper.text("");
     }
@@ -85,6 +85,7 @@ function remoteFieldValidation(xhr) {
     const inputField = this;
     return xhr.then(function(jsonResponse) {
         if (!jsonResponse["valid"]) {
+            console.log("on response");
             hideWarning(inputField);
             return $.Deferred().reject(jsonResponse["msg"]);
         }
