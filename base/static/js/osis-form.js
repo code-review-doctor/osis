@@ -75,8 +75,10 @@ function displayWarning(inputField){
 }
 
 function hideWarning(inputField){
-    inputField._ui.$errorClassHandler.removeClass("has-warning");
-    inputField._ui.$errorsWrapper.text("");
+    if(inputField._ui !== undefined){
+        inputField._ui.$errorClassHandler.removeClass("has-warning");
+        inputField._ui.$errorsWrapper.text("");
+    }
 }
 
 function remoteFieldValidation(xhr) {
