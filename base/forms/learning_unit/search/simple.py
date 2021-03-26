@@ -130,7 +130,7 @@ class LearningUnitFilter(FilterSet):
 
     with_only_proposals = filters.BooleanFilter(
         method="filter_only_proposals",
-        label=_('Include only proposals'),
+        label=_('Only proposals'),
         widget=forms.CheckboxInput,
         initial='False'
     )
