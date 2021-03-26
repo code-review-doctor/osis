@@ -47,9 +47,7 @@ def postpone_backbone_group_modification_service(
     group = get_group_service.get_group(cmd_get)
 
     conflicted_fields = ConflictedFields().get_group_conflicted_fields(group.entity_id)
-    # conflicted_fields = {}
-    print('conflicted_fields')
-    print(conflicted_fields)
+
     identities_created = [
         update_group_service.update_group(
             command.UpdateGroupCommand(
@@ -71,7 +69,7 @@ def postpone_backbone_group_modification_service(
             )
         )
     ]
-    if group.is_backbone_group():
+    if not group.is_backbone_group():
         end_postponement_year = from_year
     else:
         end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_group(
@@ -81,6 +79,8 @@ def postpone_backbone_group_modification_service(
     print("{} {}".format(from_year, end_postponement_year))
 
     for year in range(from_year, end_postponement_year):
+        print('for')
+        print(conflicted_fields)
         if year + 1 in conflicted_fields:
             continue  # Do not copy info from year to N+1 because conflict detected
 

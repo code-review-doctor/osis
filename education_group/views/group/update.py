@@ -54,6 +54,7 @@ from education_group.ddd.service.write.postpone_backbone_group_modification_serv
 from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.domain.group import GroupIdentity
 from base.utils.urls import reverse_with_get
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 
 
 class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -136,10 +137,10 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
 
     def __send_update_group_cmd(self, group_form: GroupUpdateForm) -> 'GroupIdentity':
-        updated_training_identities = []
+        updated_group_identities = []
         try:
             postpone_modification_command = self._convert_form_to_postpone_modification_cmd(group_form)
-            updated_training_identities = postpone_backbone_group_modification_service(
+            updated_group_identities = postpone_backbone_group_modification_service(
                 postpone_modification_command
             )
         except MultipleBusinessExceptions as multiple_exceptions:
@@ -171,7 +172,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
     def get_success_msg(self, group_id: 'GroupIdentity') -> str:
         return _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully updated.") % {
-            "link": self.get_success_url(group_id),
+            "link": self.get_success_url(),
             "code": group_id.code,
             "academic_year": display_as_academic_year(group_id.year),
         }

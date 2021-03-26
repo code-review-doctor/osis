@@ -35,6 +35,7 @@ from program_management.ddd.domain.service.identity_search import TrainingOrMini
     ProgramTreeVersionIdentitySearch, ProgramTreeIdentitySearch
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 
 DEFAULT_YEARS_TO_POSTPONE = 6
 
@@ -65,6 +66,7 @@ class CalculateEndPostponement(interface.DomainService):
     ):
         # Postponement for orphan groups only works if it is the root group of a program tree
         tree_identity = ProgramTreeVersionIdentitySearch.get_from_group_identity(identity)
+        print('tree_identity {}'.format(tree_identity))
         return _calculate_end_postponement(tree_identity, repository)
 
     @classmethod
@@ -93,11 +95,16 @@ class CalculateEndPostponement(interface.DomainService):
 
 def _calculate_end_postponement(identity, repository) -> int:
     max_year = CalculateEndPostponement.calculate_end_postponement_limit()
-    obj = repository.get(identity)
-    if hasattr(obj, 'end_year_of_existence'):
-        end_year = obj.end_year_of_existence
-    else:
-        end_year = obj.end_year
+    print('avt ajb')
+    try:
+        obj = repository.get(identity)
+        print(obj)
+        if hasattr(obj, 'end_year_of_existence'):
+            end_year = obj.end_year_of_existence
+        else:
+            end_year = obj.end_year
+    except ProgramTreeVersionNotFoundException:
+        pass
     if end_year is None:
         return max_year
     return min(max_year, end_year)
