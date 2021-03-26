@@ -4,6 +4,7 @@ from base.ddd.utils.business_validator import MultipleExceptionBusinessListValid
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity, LearningUnit
+from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitDataDTO
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
 from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator
 from workshops_ddd_ue.validators._credits_minimum_value import CreditsMinimumValueValidator
@@ -21,18 +22,17 @@ from workshops_ddd_ue.validators._subdivision_should_not_exist import Subdivisio
 class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(
             self,
-            responsible_entity: 'ResponsibleEntity',
-            command: CreateLearningUnitCommand,
+            dto: 'LearningUnitDataDTO',
             all_existing_identities: List['LearningUnitIdentity']
     ):
         self.validators = [
-            AcademicYearGreaterThan2019(command.academic_year),
-            CodeAlreadyExistsValidator(command.code, all_existing_identities),
-            CreditsMinimumValueValidator(command.credits),
-            CodeStructureValidator(command.code),
-            RequiredFieldsValidator(command),
-            ResponsibleEntityAuthorizedTypeOrCode(responsible_entity),
-            InternshipSubtypeMandatoryValidator(command.type, command.internship_subtype),
+            AcademicYearGreaterThan2019(dto.year),
+            CodeAlreadyExistsValidator(dto.code, all_existing_identities),
+            CreditsMinimumValueValidator(dto.credits),
+            CodeStructureValidator(dto.code),
+            RequiredFieldsValidator(dto),
+            ResponsibleEntityAuthorizedTypeOrCode(dto.responsible_entity_code, dto.responsible_entity_type),
+            InternshipSubtypeMandatoryValidator(dto.type, dto.internship_subtype),
         ]
         super().__init__()
 

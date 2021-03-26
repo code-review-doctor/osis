@@ -13,7 +13,7 @@ from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
-from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
+from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitDataDTO
 from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
 
 
@@ -75,8 +75,8 @@ class LearningUnitRepository(interface.AbstractRepository):
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
         obj_as_dict = qs.get()
-        dto_from_database = LearningUnitFromRepositoryDTO(**obj_as_dict)
-        return LearningUnitBuilder.build_from_repository_dto(dto_from_database)
+        dto_from_database = LearningUnitDataDTO(**obj_as_dict)
+        return LearningUnitBuilder.build(dto_from_database, [])  # FIXME
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:

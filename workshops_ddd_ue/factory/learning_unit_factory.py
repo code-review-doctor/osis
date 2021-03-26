@@ -15,7 +15,7 @@ from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
-from workshops_ddd_ue.dto.learning_unit_dto import DTO, LearningUnitFromRepositoryDTO
+from workshops_ddd_ue.dto.learning_unit_dto import DTO, LearningUnitDataDTO
 from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
@@ -36,36 +36,9 @@ class RootEntityBuilder(abc.ABC):
 class LearningUnitBuilder(RootEntityBuilder):
 
     @classmethod
-    def build_from_command(
-            cls,
-            cmd: 'CreateLearningUnitCommand',
-            all_existing_identities: List['LearningUnitIdentity'],
-            responsible_entity: ResponsibleEntity
-    ) -> 'LearningUnit':
-        CreateLearningUnitValidatorList(responsible_entity, cmd, all_existing_identities).validate()
-        dto = cmd
-        return _get_learning_unit_class(dto.type)(
-            entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.academic_year),
-            titles=_build_titles(
-                dto.common_title_fr,
-                dto.specific_title_fr,
-                dto.common_title_en,
-                dto.specific_title_en
-            ),
-            credits=dto.credits,
-            internship_subtype=InternshipSubtype[dto.internship_subtype],
-            responsible_entity=responsible_entity,
-            periodicity=PeriodicityEnum[dto.periodicity],
-            language=_build_language(dto.iso_code),
-            remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
-        )
+    def build(cls, dto: 'LearningUnitDataDTO', all_existing_identities: List['LearningUnitIdentity']) -> 'LearningUnit':
+        CreateLearningUnitValidatorList(dto, all_existing_identities).validate()
 
-    @classmethod
-    def build_from_repository_dto(
-            cls,
-            dto: 'LearningUnitFromRepositoryDTO',
-            responsible_entity: 'ResponsibleEntity'
-    ) -> 'LearningUnit':
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
             type=LearningContainerYearType[dto.type],
@@ -77,7 +50,10 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype],
-            responsible_entity=_build_responsible_entity(dto.responsible_entity_code),
+            responsible_entity=ResponsibleEntity(
+                entity_id=ResponsibleEntityIdentity(dto.responsible_entity_code),
+                type=dto.responsible_entity_type
+            ),
             periodicity=PeriodicityEnum[dto.periodicity],
             language=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),

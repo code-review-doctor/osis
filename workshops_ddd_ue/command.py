@@ -21,6 +21,18 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
 
+    @code.validator
+    def _code(self):
+
+    def should_be_valid(self):
+        errors = []
+        if not isinstance(self.code, str):
+            errors += InvalidValueException("MessageText")
+        if not self.code:
+            errors += FieldRequiredException('Message Text')
+        if errors:
+            raise MultipleBusinessException(exceptions=errors)
+
 
 @attr.s(frozen=True, slots=True)
 class CreatePartimCommand(interface.CommandRequest):

@@ -11,7 +11,7 @@ class DTO:
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
+class LearningUnitDataDTO(DTO):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     type = attr.ib(type=str)
@@ -22,6 +22,7 @@ class LearningUnitFromRepositoryDTO(DTO):
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
+    responsible_entity_type = attr.ib(type=str)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
     remark_faculty = attr.ib(type=str)
