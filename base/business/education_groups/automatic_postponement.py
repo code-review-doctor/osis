@@ -117,4 +117,4 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
         new_admission = update_related_object(old_egy.admissioncondition, "education_group_year", new_egy)
 
         for line in old_egy.admissioncondition.admissionconditionline_set.all():
-            update_related_object(line, "access_requirements", new_admission)
+            update_related_object(line, "admission_condition", new_admission)
