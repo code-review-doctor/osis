@@ -3,14 +3,14 @@
 
 ### Définition
 
+- "Objet de transfert de données"
 - Patron de conception d'architecture
 - Objectif : simplifier le transfert des données entre les couches d'une application logicielle 
-- "Objet de transfert de données"
 - Possède uniquement des déclarations d'attributs
 - Aucune logique technique, métier, fonction...
+- "Contrat de données" qui nous aide à atteindre la compatibilité entre les différentes couche d'une application
  
 - Question : avons-nous déjà des DTO dans notre code actuel ?
-
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -96,12 +96,46 @@ def search_formations_by_learning_unit_service(cmd: interface.CommandRequest) ->
 - FAQ : Quand utiliser les DTO pour la consultation quand utiliser nos objets du domaine ?
 - Un DTO peut il être utilisé dans le Domaine ??
 - Utiliser un IReadRepository pour les DTO (afin de séparer les repo READ / WRITE == CQS)
-- DTO : les Django serializers aident facilement à la conversion en DTO : est-ce qu'on ne les réutiliserait pas ?
 - données initiales de Forms filtrées : DTO ou domain service ? (exemple : filtrer les etds en états X ou Y)
 - Nos Interface.CommandRequest sont des DTO
 
 Ok donc on va partir sur des DTO + repository qui renvoient des DTO + querysets UNIQUEMENT dans les repos. 
 Les Serializers, forms, views utilisent alors un application service qui renvoie DTO à parir d'un repo 
+
+
+
+## Commands : rappel
+- Fait partie entièrement du domaine
+- Représente les actions qu'un utilisateur peut effectuer
+- Déclenche une modification dans notre domaine
+- "Appels de méthode sérialisables"
+- Exemple :
+```python
+
+@attr.s(frozen=True, slots=True)
+class CreateOrphanGroupCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
+```
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
 
 
 ## Architecture en oignon
