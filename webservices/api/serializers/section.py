@@ -27,11 +27,11 @@ from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
 from base.models.enums.education_group_types import TrainingType
-from webservices.api.serializers.achievement import AchievementsSerializer
-from webservices.api.serializers.admission_condition import AccessRequirementsSerializer, \
+from webservices.api.serializers.access_requirements import AccessRequirementsSerializer, \
     BachelorAccessRequirementsSerializer, SpecializedMasterAccessRequirementsSerializer, \
     AggregationAccessRequirementsSerializer, MasterAccessRequirementsSerializer, \
     ContinuingEducationTrainingAccessRequirementsSerializer
+from webservices.api.serializers.achievement import AchievementsSerializer
 from webservices.api.serializers.contacts import ContactsSerializer
 
 
@@ -58,7 +58,7 @@ class AccessRequirementsSectionSerializer(serializers.Serializer):
 
     def get_content(self, obj):
         # FIXME: Bachelor has no admissioncondition
-        admission_condition_serializers = {
+        access_requirements_serializers = {
             TrainingType.BACHELOR.name: BachelorAccessRequirementsSerializer,
             TrainingType.MASTER_MC.name: SpecializedMasterAccessRequirementsSerializer,
             TrainingType.AGGREGATION.name: AggregationAccessRequirementsSerializer,
@@ -74,7 +74,7 @@ class AccessRequirementsSectionSerializer(serializers.Serializer):
                 ContinuingEducationTrainingAccessRequirementsSerializer,
         }
         root_node = self.context.get('root_node')
-        serializer = admission_condition_serializers.get(
+        serializer = access_requirements_serializers.get(
             root_node.node_type.name,
             AccessRequirementsSerializer,
         )

@@ -30,7 +30,7 @@ from django.conf import settings
 from django.conf.urls import url, include
 
 from webservices.api.views.auth_token import AuthToken
-from webservices.api.views.common_admission_condition import CommonAccessRequirements
+from webservices.api.views.common_access_requirements import CommonAccessRequirements
 from webservices.api.views.common_text import CommonText
 from webservices.api.views.general_information import GeneralInformation
 from webservices.api.views.user import CurrentUser

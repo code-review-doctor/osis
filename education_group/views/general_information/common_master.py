@@ -37,7 +37,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class Tab(Enum):
-    ADMISSION_CONDITION = 0
+    ACCESS_REQUIREMENTS = 0
 
 
 class CommonMasterAccessRequirements(PermissionRequiredMixin, TemplateView):
@@ -51,7 +51,7 @@ class CommonMasterAccessRequirements(PermissionRequiredMixin, TemplateView):
         return {
             **super().get_context_data(**kwargs),
             "object": obj,
-            "admission_condition": self.get_admission_condition(),
+            "access_requirements": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
@@ -63,11 +63,11 @@ class CommonMasterAccessRequirements(PermissionRequiredMixin, TemplateView):
 
     def get_tab_urls(self):
         return {
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
                 'active': True,
                 'display': True,
-                'url': reverse('common_master_admission_condition', kwargs={'year': self.kwargs['year']})
+                'url': reverse('common_master_access_requirements', kwargs={'year': self.kwargs['year']})
             }
         }
 
@@ -81,11 +81,11 @@ class CommonMasterAccessRequirements(PermissionRequiredMixin, TemplateView):
             raise Http404
 
     def get_publish_url(self):
-        return reverse('publish_common_master_admission_condition', kwargs={'year': self.kwargs['year']})
+        return reverse('publish_common_master_access_requirements', kwargs={'year': self.kwargs['year']})
 
     def get_update_text_url(self) -> str:
         return reverse(
-            'education_group_year_admission_condition_update_text',
+            'education_group_year_access_requirements_update_text',
             kwargs={
                 'year': self.get_object().academic_year.year,
                 'code': self.get_object().partial_acronym
