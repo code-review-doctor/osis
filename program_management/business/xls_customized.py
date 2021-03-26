@@ -87,8 +87,15 @@ TRAINING_LIST_CUSTOMIZABLE_PARAMETERS = [
     WITH_ADDITIONAL_INFO,
     WITH_KEYWORDS
 ]
-DEFAULT_EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
-                                  str(_('Title')), str(_('Category')), str(_('Type')), str(_('Credits')), str(_('Code'))]
+DEFAULT_EDUCATION_GROUP_TITLES = [
+    str(_('Ac yr.')),
+    str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
+    str(_('Title')),
+    str(_('Category')),
+    str(_('Type')),
+    str(_('Credits')),
+    str(_('Code'))
+]
 
 COMMON_ARES_TITlES = [str(_('Code co-graduation inter CfB')), str(_('Co-graduation total coefficient'))]
 
