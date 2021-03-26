@@ -85,7 +85,6 @@ function remoteFieldValidation(xhr) {
     const inputField = this;
     return xhr.then(function(jsonResponse) {
         if (!jsonResponse["valid"]) {
-            console.log("on response");
             hideWarning(inputField);
             return $.Deferred().reject(jsonResponse["msg"]);
         }
