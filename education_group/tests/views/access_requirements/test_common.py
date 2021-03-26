@@ -39,11 +39,11 @@ class TestPermissionRequiredMockClass(AccessRequirementsMixin):
 
 
 class TestPermissionRequired(TestCase):
-    def test_should_return_commonadmissioncondition_permission_when_education_group_year_is_common(self):
+    def test_should_return_commonaccessrequirements_permission_when_education_group_year_is_common(self):
         mock_instance = TestPermissionRequiredMockClass(EducationGroupYearCommonBachelorFactory())
 
         self.assertEqual(
-            ('base.change_commonadmissioncondition', ),
+            ('base.change_commonaccessrequirements',),
             mock_instance.get_permission_required()
         )
 
@@ -51,6 +51,6 @@ class TestPermissionRequired(TestCase):
         mock_instance = TestPermissionRequiredMockClass(EducationGroupYearBachelorFactory())
 
         self.assertEqual(
-            ('base.change_admissioncondition', ),
+            ('base.change_accessrequirements',),
             mock_instance.get_permission_required()
         )

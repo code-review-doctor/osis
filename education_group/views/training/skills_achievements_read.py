@@ -45,7 +45,7 @@ class TrainingReadSkillsAchievements(TrainingRead):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        edition_perm_name = "base.change_admissioncondition"
+        edition_perm_name = "base.change_accessrequirements"
         return {
             **super().get_context_data(**kwargs),
             "year": kwargs['year'],

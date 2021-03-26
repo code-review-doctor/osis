@@ -18,6 +18,6 @@ class CentralAdmissionManager(osis_role_models.RoleModel):
         return rules.RuleSet({
             'base.view_educationgroup': rules.always_allow,
             'base.can_access_catalog_configuration': rules.always_allow,
-            'base.change_commonadmissioncondition': rules.always_allow,
+            'base.change_commonaccessrequirements': rules.always_allow,
             'base.can_access_catalog': rules.always_allow,  # Perms Backward compibility
         })
