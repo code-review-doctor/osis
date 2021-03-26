@@ -27,10 +27,10 @@ from django.urls import reverse
 
 from base.models.admission_condition import AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.tests.factories.person import SuperUserPersonFactory
-from education_group.tests.views.admission_condition.common import TestAdmissionConditionMixin
+from education_group.tests.views.admission_condition.common import TestAccessRequirementsMixin
 
 
-class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
+class TestCreateAccessRequirementsLine(TestCase, TestAccessRequirementsMixin):
     @classmethod
     def setUpTestData(cls):
         cls.person = SuperUserPersonFactory()
@@ -53,8 +53,8 @@ class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
             admission_condition=self.admission_condition
         ).count()
 
-        response = self.client.post(self.fr_url, data=self.generate_fr_post_data())
-        response = self.client.post(self.en_url, data=self.generate_en_post_data())
+        self.client.post(self.fr_url, data=self.generate_fr_post_data())
+        self.client.post(self.en_url, data=self.generate_en_post_data())
 
         self.assertEqual(
             AdmissionConditionLine.objects.filter(admission_condition=self.admission_condition).count(),
@@ -91,4 +91,3 @@ class TestCreateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
         if to_postpone:
             post_data["to_postpone"] = "1"
         return post_data
-

@@ -27,7 +27,7 @@
 from rest_framework import serializers
 
 
-class CommonAdmissionConditionSerializer(serializers.Serializer):
+class CommonAccessRequirementsSerializer(serializers.Serializer):
     class Meta:
         fields = (
             'common-1ba',

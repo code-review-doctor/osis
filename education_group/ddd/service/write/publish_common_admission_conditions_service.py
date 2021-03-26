@@ -28,12 +28,12 @@ from django.conf import settings
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from education_group.ddd.command import PublishCommonAdmissionCommand
+from education_group.ddd.command import PublishCommonAccessRequirementsCommand
 from education_group.ddd.domain.service.get_common_publish_url import GetCommonPublishUrl
 
 
 @transaction.atomic()
-def publish_common_admission_conditions(cmd: PublishCommonAdmissionCommand) -> None:
+def publish_common_admission_conditions(cmd: PublishCommonAccessRequirementsCommand) -> None:
     publish_url = GetCommonPublishUrl.get_url_admission_conditions(cmd.year)
     try:
         requests.get(
@@ -42,10 +42,10 @@ def publish_common_admission_conditions(cmd: PublishCommonAdmissionCommand) -> N
             timeout=settings.REQUESTS_TIMEOUT or 20
         )
     except Exception:
-        raise PublishCommonAdmissionConditionException(year=cmd.year)
+        raise PublishCommonAccessRequirementsException(year=cmd.year)
 
 
-class PublishCommonAdmissionConditionException(Exception):
+class PublishCommonAccessRequirementsException(Exception):
     def __init__(self, year: int, **kwargs):
-        self.message = _("Unable to publish common admission conditions for {year}").format(year=year)
+        self.message = _("Unable to publish common access requirements for {year}").format(year=year)
         super().__init__(**kwargs)

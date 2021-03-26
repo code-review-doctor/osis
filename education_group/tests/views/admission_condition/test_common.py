@@ -26,10 +26,10 @@ from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearBachelorFactory
-from education_group.views.admission_condition.common import AdmissionConditionMixin
+from education_group.views.admission_condition.common import AccessRequirementsMixin
 
 
-class TestPermissionRequiredMockClass(AdmissionConditionMixin):
+class TestPermissionRequiredMockClass(AccessRequirementsMixin):
 
     def __init__(self, education_group_year_obj):
         self.egy = education_group_year_obj

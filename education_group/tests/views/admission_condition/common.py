@@ -33,7 +33,7 @@ from base.tests.factories.admission_condition import AdmissionConditionLineFacto
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
-class TestAdmissionConditionMixin:
+class TestAccessRequirementsMixin:
     SECTION = "ca_maitrise_fr"
     LINE_SECTION = ConditionSectionsTypes.ucl_bachelors.name
 
@@ -89,4 +89,3 @@ class TestAdmissionConditionMixin:
             fields_to_compare = [field.attname for field in model_fields if field.attname not in fields_not_compare]
         for field in fields_to_compare:
             self.assertEqual(getattr(obj, field), getattr(other_obj, field), field)
-

@@ -31,11 +31,11 @@ from base.business.education_groups.admission_condition import postpone_admissio
 from base.models.admission_condition import AdmissionConditionLine
 from base.views.common import display_success_messages
 from base.views.mixins import AjaxTemplateMixin
-from education_group.views.admission_condition.common import AdmissionConditionMixin
+from education_group.views.admission_condition.common import AccessRequirementsMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class DeleteAdmissionConditionLine(AdmissionConditionMixin, PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
+class DeleteAccessRequirementsLine(AccessRequirementsMixin, PermissionRequiredMixin, AjaxTemplateMixin, DeleteView):
     template_name = "education_group_app/admission_condition/line_delete.html"
     raise_exception = True
     force_reload = True

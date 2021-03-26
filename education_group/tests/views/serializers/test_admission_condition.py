@@ -32,7 +32,7 @@ from base.tests.factories.education_group_year import EducationGroupYearCommonMa
 from education_group.views.serializers import admission_condition
 
 
-class TestGetCommonAdmissionConditionSerializer(TestCase):
+class TestGetCommonAccessRequirementsSerializer(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.common_training_120 = EducationGroupYearCommonMasterFactory(academic_year__year=2018)

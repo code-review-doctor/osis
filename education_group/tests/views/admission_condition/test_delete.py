@@ -27,10 +27,10 @@ from django.urls import reverse
 
 from base.models.admission_condition import AdmissionConditionLine
 from base.tests.factories.person import SuperUserPersonFactory
-from education_group.tests.views.admission_condition.common import TestAdmissionConditionMixin
+from education_group.tests.views.admission_condition.common import TestAccessRequirementsMixin
 
 
-class TestDeleteAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
+class TestDeleteAccessRequirementsLine(TestCase, TestAccessRequirementsMixin):
     @classmethod
     def setUpTestData(cls):
         cls.person = SuperUserPersonFactory()
@@ -61,4 +61,3 @@ class TestDeleteAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
         if to_postpone:
             post_data["to_postpone"] = "1"
         return post_data
-

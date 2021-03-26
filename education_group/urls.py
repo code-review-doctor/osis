@@ -178,7 +178,7 @@ urlpatterns = [
         path('common-bachelor/', include([
             path(
                 '',
-                general_information.CommonBachelorAdmissionCondition.as_view(),
+                general_information.CommonBachelorAccessRequirements.as_view(),
                 name="common_bachelor_admission_condition"
             ),
             path(
@@ -191,7 +191,7 @@ urlpatterns = [
         path('common-aggregate/', include([
             path(
                 '',
-                general_information.CommonAggregateAdmissionCondition.as_view(),
+                general_information.CommonAggregateAccessRequirements.as_view(),
                 name="common_aggregate_admission_condition"
             ),
             path(
@@ -204,7 +204,7 @@ urlpatterns = [
         path('common-master/', include([
             path(
                 '',
-                general_information.CommonMasterAdmissionCondition.as_view(),
+                general_information.CommonMasterAccessRequirements.as_view(),
                 name="common_master_admission_condition"
             ),
             path(
@@ -217,7 +217,7 @@ urlpatterns = [
         path('common-master-specialized/', include([
             path(
                 '',
-                general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
+                general_information.CommonMasterSpecializedAccessRequirements.as_view(),
                 name="common_master_specialized_admission_condition"
             ),
             path(
@@ -233,27 +233,27 @@ urlpatterns = [
         path('', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
         path(
             'admission_conditions/remove_line',
-            admission_condition.DeleteAdmissionConditionLine.as_view(),
+            admission_condition.DeleteAccessRequirementsLine.as_view(),
             name='education_group_year_admission_condition_remove_line'),
 
         path(
             'admission_conditions/update_line',
-            admission_condition.UpdateAdmissionConditionLine.as_view(),
+            admission_condition.UpdateAccessRequirementsLine.as_view(),
             name='education_group_year_admission_condition_update_line'),
 
         path(
             'admission_conditions/create_line',
-            admission_condition.CreateAdmissionConditionLine.as_view(),
+            admission_condition.CreateAccessRequirementsLine.as_view(),
             name='education_group_year_admission_condition_create_line'),
 
         path(
             'admission_conditions/update_text',
-            admission_condition.UpdateAdmissionCondition.as_view(),
+            admission_condition.UpdateAccessRequirements.as_view(),
             name='education_group_year_admission_condition_update_text'),
 
         path(
             'admission_conditions/line/order',
-            admission_condition.OrderAdmissionConditionLine.as_view(),
+            admission_condition.OrderAccessRequirementsLine.as_view(),
             name='education_group_year_admission_condition_line_order'),
         path(
             'admission_conditions/lang/edit/<str:language>/',

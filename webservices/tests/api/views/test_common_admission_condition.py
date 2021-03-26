@@ -35,11 +35,11 @@ from base.tests.factories.education_group_year import EducationGroupYearCommonBa
     EducationGroupYearCommonMasterFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonAgregationFactory
 from base.tests.factories.person import PersonFactory
-from webservices.api.serializers.common_admission_condition import CommonAdmissionConditionSerializer
-from webservices.api.views.common_admission_condition import CommonAdmissionCondition
+from webservices.api.serializers.common_admission_condition import CommonAccessRequirementsSerializer
+from webservices.api.views.common_admission_condition import CommonAccessRequirements
 
 
-class CommonAdmissionConditionTestCase(APITestCase):
+class CommonAccessRequirementsTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
@@ -60,7 +60,7 @@ class CommonAdmissionConditionTestCase(APITestCase):
                 field: getattr(ac, 'text_{}{}'.format(field, '_en')) or None
                 for field in relevant_attr
             }
-        cls.url = reverse(CommonAdmissionCondition.name, kwargs={
+        cls.url = reverse(CommonAccessRequirements.name, kwargs={
             'year': cls.anac.year,
             'language': cls.language
         })
@@ -93,5 +93,5 @@ class CommonAdmissionConditionTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = CommonAdmissionConditionSerializer(self.data, context={'language': self.language})
+        serializer = CommonAccessRequirementsSerializer(self.data, context={'language': self.language})
         self.assertEqual(response.data, serializer.data)

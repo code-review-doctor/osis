@@ -27,10 +27,10 @@ from django.urls import reverse
 
 from base.models.admission_condition import AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES, AdmissionCondition
 from base.tests.factories.person import SuperUserPersonFactory
-from education_group.tests.views.admission_condition.common import TestAdmissionConditionMixin
+from education_group.tests.views.admission_condition.common import TestAccessRequirementsMixin
 
 
-class TestUpdateAdmissionCondition(TestCase, TestAdmissionConditionMixin):
+class TestUpdateAccessRequirements(TestCase, TestAccessRequirementsMixin):
     @classmethod
     def setUpTestData(cls):
         cls.person = SuperUserPersonFactory()
@@ -72,7 +72,7 @@ class TestUpdateAdmissionCondition(TestCase, TestAdmissionConditionMixin):
         return post_data
 
 
-class TestUpdateAdmissionConditionLine(TestCase, TestAdmissionConditionMixin):
+class TestUpdateAccessRequirementsLine(TestCase, TestAccessRequirementsMixin):
     @classmethod
     def setUpTestData(cls):
         cls.person = SuperUserPersonFactory()

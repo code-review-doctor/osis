@@ -34,11 +34,11 @@ from base.business.education_groups.admission_condition import postpone_admissio
 from base.models.admission_condition import AdmissionConditionLine
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.achievement import ActionForm
-from education_group.views.admission_condition.common import AdmissionConditionMixin
+from education_group.views.admission_condition.common import AccessRequirementsMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class OrderAdmissionConditionLine(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin,
+class OrderAccessRequirementsLine(SuccessMessageMixin, AccessRequirementsMixin, PermissionRequiredMixin,
                                   AjaxTemplateMixin, SingleObjectMixin, FormView):
     template_name = "education_group_app/admission_condition/line_order.html"
     raise_exception = True

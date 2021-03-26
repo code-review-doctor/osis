@@ -24,21 +24,20 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
-from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
 
 from base.business.education_groups.admission_condition import can_postpone_admission_condition
-from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
+from base.models.admission_condition import AdmissionConditionLine
 from base.models.enums.admission_condition_sections import ConditionSectionsTypes
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.admission_condition import CreateLineEnglishForm, \
     CreateLineFrenchForm
-from education_group.views.admission_condition.common import AdmissionConditionMixin
+from education_group.views.admission_condition.common import AccessRequirementsMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class CreateAdmissionConditionLine(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin,
+class CreateAccessRequirementsLine(SuccessMessageMixin, AccessRequirementsMixin, PermissionRequiredMixin,
                                    AjaxTemplateMixin, CreateView):
     template_name = "education_group_app/admission_condition/line_edit.html"
     raise_exception = True

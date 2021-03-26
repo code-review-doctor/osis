@@ -36,11 +36,11 @@ from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import AjaxTemplateMixin
 from education_group.forms.admission_condition import UpdateTextForm, UpdateLineFrenchForm, \
     UpdateLineEnglishForm
-from education_group.views.admission_condition.common import AdmissionConditionMixin
+from education_group.views.admission_condition.common import AccessRequirementsMixin
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class UpdateAdmissionCondition(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin, AjaxTemplateMixin,
+class UpdateAccessRequirements(SuccessMessageMixin, AccessRequirementsMixin, PermissionRequiredMixin, AjaxTemplateMixin,
                                FormView):
     template_name = "education_group_app/admission_condition/edit.html"
     form_class = UpdateTextForm
@@ -97,7 +97,7 @@ class UpdateAdmissionCondition(SuccessMessageMixin, AdmissionConditionMixin, Per
         return 'text_' + self.get_section() + '_en'
 
 
-class UpdateAdmissionConditionLine(SuccessMessageMixin, AdmissionConditionMixin, PermissionRequiredMixin,
+class UpdateAccessRequirementsLine(SuccessMessageMixin, AccessRequirementsMixin, PermissionRequiredMixin,
                                    AjaxTemplateMixin, UpdateView):
     template_name = "education_group_app/admission_condition/line_edit.html"
     raise_exception = True

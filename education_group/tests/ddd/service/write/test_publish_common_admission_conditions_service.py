@@ -26,7 +26,7 @@ from unittest import mock
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
 
-from education_group.ddd.command import PublishCommonAdmissionCommand
+from education_group.ddd.command import PublishCommonAccessRequirementsCommand
 from education_group.ddd.service.write import publish_common_admission_conditions_service
 
 
@@ -37,7 +37,7 @@ from education_group.ddd.service.write import publish_common_admission_condition
 class TestPublishCommonAdmissionService(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.cmd = PublishCommonAdmissionCommand(year=2018)
+        cls.cmd = PublishCommonAccessRequirementsCommand(year=2018)
 
     def setUp(self):
         self.requests_get_patcher = mock.patch('requests.get', return_value=HttpResponse)
@@ -60,4 +60,3 @@ class TestPublishCommonAdmissionService(TestCase):
             headers={"Authorization": "Basic dummy:1234"},
             timeout=40
         )
-

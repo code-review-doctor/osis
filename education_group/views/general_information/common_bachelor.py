@@ -40,17 +40,17 @@ class Tab(Enum):
     ADMISSION_CONDITION = 0
 
 
-class CommonBachelorAdmissionCondition(PermissionRequiredMixin, TemplateView):
+class CommonBachelorAccessRequirements(PermissionRequiredMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
     template_name = "education_group_app/general_information/common_bachelor.html"
 
     def get_context_data(self, **kwargs):
-        object = self.get_object()
+        obj = self.get_object()
         return {
             **super().get_context_data(**kwargs),
-            "object": object,
+            "object": obj,
             "admission_condition": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(

@@ -33,10 +33,10 @@ from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import EducationGroupYearCommonBachelorFactory, \
     EducationGroupYearCommonMasterFactory, \
     EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonAgregationFactory
-from webservices.api.serializers.common_admission_condition import CommonAdmissionConditionSerializer
+from webservices.api.serializers.common_admission_condition import CommonAccessRequirementsSerializer
 
 
-class CommonAdmissionConditionSerializerTestCase(TestCase):
+class CommonAccessRequirementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.language = settings.LANGUAGE_CODE_EN
@@ -57,7 +57,7 @@ class CommonAdmissionConditionSerializerTestCase(TestCase):
                 for field in relevant_attr
             }
 
-        cls.serializer = CommonAdmissionConditionSerializer(cls.data, context={'language': cls.language})
+        cls.serializer = CommonAccessRequirementsSerializer(cls.data, context={'language': cls.language})
 
     def test_contains_expected_fields(self):
         expected_fields = [

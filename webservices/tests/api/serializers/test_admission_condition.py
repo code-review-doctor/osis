@@ -33,18 +33,18 @@ from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, EducationGroupYearCommonSpecializedMasterFactory, \
     EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonMasterFactory, TrainingFactory
-from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
-    BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
-    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer, \
-    ContinuingEducationTrainingAdmissionConditionsSerializer
+from webservices.api.serializers.admission_condition import AccessRequirementsSerializer, \
+    BachelorAccessRequirementsSerializer, SpecializedMasterAccessRequirementsSerializer, \
+    AggregationAccessRequirementsSerializer, MasterAccessRequirementsSerializer, \
+    ContinuingEducationTrainingAccessRequirementsSerializer
 
 
-class AdmissionConditionsSerializerTestCase(TestCase):
+class AccessRequirementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.CERTIFICATE.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
-        cls.serializer = AdmissionConditionsSerializer(cls.ac, context={
+        cls.serializer = AccessRequirementsSerializer(cls.ac, context={
             'language': settings.LANGUAGE_CODE_EN,
         })
 
@@ -55,14 +55,14 @@ class AdmissionConditionsSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 
-class BachelorAdmissionConditionsSerializerTestCase(TestCase):
+class BachelorAccessRequirementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.BACHELOR.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonBachelorFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = BachelorAdmissionConditionsSerializer(cls.ac, context={
+        cls.serializer = BachelorAccessRequirementsSerializer(cls.ac, context={
             'language': settings.LANGUAGE_CODE_EN,
         })
 
@@ -77,14 +77,14 @@ class BachelorAdmissionConditionsSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 
-class SpecializedMasterAdmissionConditionsSerializerTestCase(TestCase):
+class SpecializedMasterAccessRequirementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.MASTER_MC.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonSpecializedMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = SpecializedMasterAdmissionConditionsSerializer(cls.ac, context={
+        cls.serializer = SpecializedMasterAccessRequirementsSerializer(cls.ac, context={
             'language': settings.LANGUAGE_CODE_EN,
         })
 
@@ -97,14 +97,14 @@ class SpecializedMasterAdmissionConditionsSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 
-class AggregationAdmissionConditionsSerializerTestCase(TestCase):
+class AggregationAccessRequirementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.AGGREGATION.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonAgregationFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = AggregationAdmissionConditionsSerializer(cls.ac, context={
+        cls.serializer = AggregationAccessRequirementsSerializer(cls.ac, context={
             'language': settings.LANGUAGE_CODE_EN,
         })
 
@@ -120,14 +120,14 @@ class AggregationAdmissionConditionsSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 
-class MasterAdmissionConditionsSerializerTestCase(TestCase):
+class MasterAccessRequirementsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = MasterAdmissionConditionsSerializer(cls.ac, context={
+        cls.serializer = MasterAccessRequirementsSerializer(cls.ac, context={
             'language': settings.LANGUAGE_CODE_EN,
         })
 
@@ -154,7 +154,7 @@ class MasterAdmissionConditionsSerializerTestCase(TestCase):
         self.assertCountEqual(list(self.serializer.data['sections'].keys()), expected_fields)
 
 
-class ContinuingEducationTrainingAdmissionConditionsSerializerTestCase(TestCase):
+class ContinuingEducationTrainingAccessRequirementsSerializerTestCase(TestCase):
     def test_contains_expected_fields_in_certificate(self):
         egy_type = random.choice([
             TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE,
@@ -165,7 +165,7 @@ class ContinuingEducationTrainingAdmissionConditionsSerializerTestCase(TestCase)
         ])
         egy = EducationGroupYearFactory(education_group_type__name=egy_type.name)
         ac = AdmissionConditionFactory(education_group_year=egy)
-        serializer = ContinuingEducationTrainingAdmissionConditionsSerializer(ac, context={
+        serializer = ContinuingEducationTrainingAccessRequirementsSerializer(ac, context={
             'language': settings.LANGUAGE_CODE_EN,
             'egy': egy
         })

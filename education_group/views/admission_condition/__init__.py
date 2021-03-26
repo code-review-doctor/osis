@@ -22,8 +22,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from .update import UpdateAdmissionCondition, UpdateAdmissionConditionLine
-from .create import CreateAdmissionConditionLine
-from .delete import DeleteAdmissionConditionLine
-from .order import OrderAdmissionConditionLine
 from .configuration import change_language
+from .create import CreateAccessRequirementsLine
+from .delete import DeleteAccessRequirementsLine
+from .order import OrderAccessRequirementsLine
+from .update import UpdateAccessRequirements, UpdateAccessRequirementsLine

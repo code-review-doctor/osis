@@ -30,15 +30,15 @@ from rest_framework.response import Response
 
 from base.business.education_groups import general_information_sections
 from base.models.education_group_year import EducationGroupYear
-from webservices.api.serializers.common_admission_condition import CommonAdmissionConditionSerializer
+from webservices.api.serializers.common_admission_condition import CommonAccessRequirementsSerializer
 
 
-class CommonAdmissionCondition(generics.RetrieveAPIView):
+class CommonAccessRequirements(generics.RetrieveAPIView):
     """
-        Return the common admission conditions for Education Group Years
+        Return the common access requirements for Education Group Years
     """
     name = 'commonadmissionconditions_read'
-    serializer_class = CommonAdmissionConditionSerializer
+    serializer_class = CommonAccessRequirementsSerializer
 
     def get(self, request, *args, **kwargs):
         commons_qs = EducationGroupYear.objects.look_for_common(

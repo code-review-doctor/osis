@@ -33,12 +33,12 @@ from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializ
 from webservices.business import ADMISSION_CONDITION_FIELDS, ADMISSION_CONDITION_LINE_FIELDS
 
 
-class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
+class AccessRequirementsSerializer(DynamicLanguageFieldsModelSerializer):
     free_text = serializers.CharField(read_only=True, required=False)
     alert_message = serializers.CharField(read_only=True)
 
     def __init__(self, *args, **kwargs):
-        super(AdmissionConditionsSerializer, self).__init__(*args, **kwargs)
+        super(AccessRequirementsSerializer, self).__init__(*args, **kwargs)
         if not self.instance.common_admission_condition:
             self.fields.pop('alert_message')
 
@@ -51,7 +51,7 @@ class AdmissionConditionsSerializer(DynamicLanguageFieldsModelSerializer):
         )
 
 
-class BachelorAdmissionConditionsSerializer(AdmissionConditionsSerializer):
+class BachelorAccessRequirementsSerializer(AccessRequirementsSerializer):
     ca_bacs_cond_generales = serializers.CharField(read_only=True)
     ca_bacs_cond_particulieres = serializers.CharField(read_only=True)
     ca_bacs_examen_langue = serializers.CharField(read_only=True)
@@ -69,7 +69,7 @@ class BachelorAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         )
 
 
-class SpecializedMasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
+class SpecializedMasterAccessRequirementsSerializer(AccessRequirementsSerializer):
     ca_cond_generales = serializers.CharField(read_only=True)
 
     class Meta:
@@ -82,7 +82,7 @@ class SpecializedMasterAdmissionConditionsSerializer(AdmissionConditionsSerializ
         )
 
 
-class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditionsSerializer):
+class AggregationAccessRequirementsSerializer(SpecializedMasterAccessRequirementsSerializer):
     ca_maitrise_fr = serializers.CharField(read_only=True)
     ca_allegement = serializers.CharField(read_only=True)
     ca_ouv_adultes = serializers.CharField(read_only=True)
@@ -100,7 +100,7 @@ class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditi
         )
 
 
-class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
+class MasterAccessRequirementsSerializer(AccessRequirementsSerializer):
     sections = serializers.SerializerMethodField()
 
     class Meta:
@@ -143,8 +143,7 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         return text if text else None
 
 
-class ContinuingEducationTrainingAdmissionConditionsSerializer(AdmissionConditionsSerializer):
-
+class ContinuingEducationTrainingAccessRequirementsSerializer(AccessRequirementsSerializer):
     class Meta:
         model = AdmissionCondition
 

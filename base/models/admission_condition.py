@@ -72,11 +72,11 @@ class AdmissionCondition(models.Model):
     text_ca_ouv_adultes_en = models.TextField(default='')
 
     def __str__(self):
-        return "Admission condition - {}".format(self.education_group_year)
+        return "Access requirements - {}".format(self.education_group_year)
 
     class Meta:
         permissions = (
-            ("change_commonadmissioncondition", "Can change common admission condition"),
+            ("change_commonadmissioncondition", "Can change common access requirements"),
         )
 
     @cached_property

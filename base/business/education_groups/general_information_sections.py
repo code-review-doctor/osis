@@ -124,7 +124,7 @@ SECTION_LIST = [
             ]),
 ]
 
-# Common type which have admission conditions sections + relevant sections
+# Common type which have access requirements sections + relevant sections
 COMMON_TYPE_ADMISSION_CONDITIONS = {
     TrainingType.BACHELOR.name:
         ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
