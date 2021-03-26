@@ -75,7 +75,7 @@ function displayWarning(inputField){
 }
 
 function hideWarning(inputField){
-    if(inputField._ui !== undefined){
+    if(inputField._ui !== undefined && inputField._ui.$errorClassHandler.hasClass("has-warning")){
         inputField._ui.$errorClassHandler.removeClass("has-warning");
         inputField._ui.$errorsWrapper.text("");
     }
