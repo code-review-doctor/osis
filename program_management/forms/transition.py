@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.forms.utils.fields import OsisRichTextFormField
-from base.forms.utils.validations import set_remote_transition_version_validation
+from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
@@ -106,28 +106,27 @@ class TransitionVersionForm(forms.Form):
 
     def _set_remote_validation_on_transition_name(self):
         if self.tree_version_identity.version_name:
-            set_remote_transition_version_validation(
-                self.fields["transition_name"],
-                reverse(
-                    "check_transition_name",
-                    args=[
-                        self.tree_version_identity.year,
-                        self.tree_version_identity.offer_acronym,
-                        self.tree_version_identity.version_name
-                    ]
-                )
+            check_url = reverse(
+                "check_transition_name",
+                args=[
+                    self.tree_version_identity.year,
+                    self.tree_version_identity.offer_acronym,
+                    self.tree_version_identity.version_name
+                ]
             )
+
         else:
-            set_remote_transition_version_validation(
-                self.fields["transition_name"],
-                reverse(
-                    "check_transition_name",
-                    args=[
-                        self.tree_version_identity.year,
-                        self.tree_version_identity.offer_acronym,
-                    ]
-                )
+            check_url = reverse(
+                "check_transition_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
             )
+
+        set_remote_validation(
+            self.fields["transition_name"],
+            check_url,
+            validate_if_empty=True,
+            validate_on_load=True
+        )
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
