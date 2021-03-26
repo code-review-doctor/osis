@@ -128,6 +128,13 @@ class LearningUnitFilter(FilterSet):
         initial=SearchTypes.SIMPLE_SEARCH.value
     )
 
+    with_only_proposals = filters.BooleanFilter(
+        method="filter_only_proposals",
+        label=_('Include only proposals'),
+        widget=forms.CheckboxInput,
+        initial='False'
+    )
+
     order_by_field = 'ordering'
     ordering = OrderingFilter(
         fields=(
@@ -217,6 +224,11 @@ class LearningUnitFilter(FilterSet):
 
     def filter_learning_unit_year_field(self, queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
+
+    def filter_only_proposals(self, queryset, name, value):
+        if value:
+            return queryset.filter(has_proposal=True)
+        return queryset
 
 
 def filter_by_entities(name, queryset, value, with_subordinated):
