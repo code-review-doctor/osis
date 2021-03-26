@@ -1131,6 +1131,9 @@ msgstr ""
 msgid "Inactive"
 msgstr ""
 
+msgid "Include only proposals"
+msgstr ""
+
 msgid "Include subordinate entities"
 msgstr ""
 
