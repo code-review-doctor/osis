@@ -433,6 +433,7 @@ class TransitionNameExistsCurrentYearAndInFuture(BusinessException):
 class TransitionNameExistsInPast(BusinessException):
     def __init__(self, transition_name: str, *args, **kwargs):
         message = _("Transition name {} existed").format(transition_name)
+        super().__init__(message, **kwargs)
 
 class InvalidTreeVersionToFillFrom(BusinessException):
     def __init__(self, tree_version_to_fill_from: 'ProgramTreeVersion', **kwargs):

@@ -106,28 +106,27 @@ class TransitionVersionForm(forms.Form):
 
     def _set_remote_validation_on_transition_name(self):
         if self.tree_version_identity.version_name:
-            set_remote_validation(
-                self.fields["transition_name"],
-                reverse(
-                    "check_transition_name",
-                    args=[
-                        self.tree_version_identity.year,
-                        self.tree_version_identity.offer_acronym,
-                        self.tree_version_identity.version_name
-                    ]
-                )
+            check_url = reverse(
+                "check_transition_name",
+                args=[
+                    self.tree_version_identity.year,
+                    self.tree_version_identity.offer_acronym,
+                    self.tree_version_identity.version_name
+                ]
             )
+
         else:
-            set_remote_validation(
-                self.fields["transition_name"],
-                reverse(
-                    "check_transition_name",
-                    args=[
-                        self.tree_version_identity.year,
-                        self.tree_version_identity.offer_acronym,
-                    ]
-                )
+            check_url = reverse(
+                "check_transition_name",
+                args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
             )
+
+        set_remote_validation(
+            self.fields["transition_name"],
+            check_url,
+            validate_if_empty=True,
+            validate_on_load=True
+        )
 
     def clean_end_year(self):
         end_year = self.cleaned_data["end_year"]
