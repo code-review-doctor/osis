@@ -1131,9 +1131,6 @@ msgstr ""
 msgid "Inactive"
 msgstr ""
 
-msgid "Include only proposals"
-msgstr ""
-
 msgid "Include subordinate entities"
 msgstr ""
 
@@ -1669,6 +1666,9 @@ msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
 
 msgid "One of the partial volumes must have a value to 0."
+msgstr ""
+
+msgid "Only proposals"
 msgstr ""
 
 msgid "Only the volume Q1 must have a value"
