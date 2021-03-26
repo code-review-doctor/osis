@@ -32,29 +32,6 @@ from program_management.ddd import command
 from program_management.ddd.service.read import get_program_tree_service
 
 
-def get_random_learning_unit_outside_of_person_entities(
-        person_obj: person.Person
-) -> learning_unit_year.LearningUnitYear:
-    entities_version = EntityVersion.objects.get(entity__personentity__person=person_obj).descendants
-    entities = [ev.entity for ev in entities_version]
-    return LearningUnitYear.objects.filter(
-        academic_year__year=current_academic_year().year
-    ).exclude(
-        learning_container_year__requirement_entity__in=entities,
-    ).order_by("?")[0]
-
-
-def get_random_learning_unit_inside_of_person_entities(
-        person_obj: person.Person
-) -> learning_unit_year.LearningUnitYear:
-    entities_version = EntityVersion.objects.get(entity__personentity__person=person_obj).descendants
-    entities = [ev.entity for ev in entities_version]
-    return LearningUnitYear.objects.filter(
-        learning_container_year__requirement_entity__in=entities,
-        academic_year__year=current_academic_year().year
-    ).order_by("?")[0]
-
-
 def get_random_learning_unit() -> learning_unit_year.LearningUnitYear:
     return LearningUnitYear.objects.filter(
         academic_year__year=current_academic_year().year
