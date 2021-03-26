@@ -29,7 +29,7 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializer
 
 
-class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
+class AccessRequirementsTextsSerializer(DynamicLanguageFieldsModelSerializer):
     text = serializers.CharField(read_only=True)
     text_common = serializers.CharField(read_only=True)
 
@@ -42,8 +42,7 @@ class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
         )
 
 
-class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
-
+class AccessRequirementsLineSerializer(DynamicLanguageFieldsModelSerializer):
     class Meta:
         model = AdmissionConditionLine
 

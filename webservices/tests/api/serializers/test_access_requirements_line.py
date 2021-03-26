@@ -29,18 +29,18 @@ from django.test import TestCase
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory, AdmissionConditionLineFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
-from webservices.api.serializers.access_requirements_line import AdmissionConditionTextsSerializer, \
-    AdmissionConditionLineSerializer
+from webservices.api.serializers.access_requirements_line import AccessRequirementsTextsSerializer, \
+    AccessRequirementsLineSerializer
 
 
-class AdmissionConditionTextsSerializerTestCase(TestCase):
+class AccessRequirementsTextsSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         egy = EducationGroupYearFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
         cls.ac = AdmissionConditionFactory(education_group_year=egy)
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
-        cls.serializer = AdmissionConditionTextsSerializer(cls.ac, context={
+        cls.serializer = AccessRequirementsTextsSerializer(cls.ac, context={
             'language': settings.LANGUAGE_CODE_EN,
             'section': 'personalized_access'
         })
@@ -53,11 +53,11 @@ class AdmissionConditionTextsSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 
-class AdmissionConditionlineSerializerTestCase(TestCase):
+class AccessRequirementsLineSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.acl = AdmissionConditionLineFactory()
-        cls.serializer = AdmissionConditionLineSerializer(cls.acl, context={
+        cls.serializer = AccessRequirementsLineSerializer(cls.acl, context={
             'language': settings.LANGUAGE_CODE_EN,
         })
 

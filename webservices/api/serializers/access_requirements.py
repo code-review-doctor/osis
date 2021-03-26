@@ -27,8 +27,8 @@ from django.conf import settings
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
-from webservices.api.serializers.access_requirements_line import AdmissionConditionTextsSerializer, \
-    AdmissionConditionLineSerializer
+from webservices.api.serializers.access_requirements_line import AccessRequirementsTextsSerializer, \
+    AccessRequirementsLineSerializer
 from webservices.api.serializers.utils import DynamicLanguageFieldsModelSerializer
 from webservices.business import ACCESS_REQUIREMENTS_FIELDS, ACCESS_REQUIREMENTS_LINE_FIELDS
 
@@ -114,7 +114,7 @@ class MasterAccessRequirementsSerializer(AccessRequirementsSerializer):
 
     def get_sections(self, obj):
         sections = {
-            field: AdmissionConditionTextsSerializer(
+            field: AccessRequirementsTextsSerializer(
                 obj,
                 context={**self.context, 'section': field}
             ).data
@@ -124,7 +124,7 @@ class MasterAccessRequirementsSerializer(AccessRequirementsSerializer):
             field: {
                 'text': self._get_appropriate_text(field, obj),
                 'records': {
-                    diploma_type: AdmissionConditionLineSerializer(
+                    diploma_type: AccessRequirementsLineSerializer(
                         obj.admissionconditionline_set.filter(section=diploma_type),
                         many=True,
                         context=self.context
