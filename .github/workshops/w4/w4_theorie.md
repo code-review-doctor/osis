@@ -48,7 +48,7 @@ class MyBusinessValidator(BusinessValidator):
 
 ### Proposition 1 : valider ces champs en dehors de nos ApplicationService
 
-Avantages : 
+Avantages :
 - Réutilisation aisée des Django forms et leurs validations
 
 Inconvénients :
@@ -58,6 +58,7 @@ Inconvénients :
     - API
     - Scripts
 - Rend notre domaine **incomplet** : la logique métier est séparée de notre domaine
+- Difficulté de testing : métier à tester dans 2 couches différentes
 
 
 ### Proposition 2 : valider ces champs dans notre commande
@@ -69,6 +70,8 @@ Inconvénients :
 - Duplication : toute action métier (Command) plus large qui englobe cette action devra dupliquer ces mêmes validations
     - Exemple : CreateOrphanGroupCommand, CreateTrainingWithOrphanGroupCommand, CreateMiniTrainingWithOrphanGroupCommand
 - Rend notre domaine **incomplet** : la logique métier est séparée de notre domaine
+- Nécessite l'implémentation d'un mapping Command.errors <-> Form.errors
+- Difficulté de testing : métier à tester dans 2 couches différentes
 
 
 ### Proposition 3 : valider ces champs dans notre domaine (ValidatorList)
@@ -76,63 +79,103 @@ Inconvénients :
 Avantages : 
 - Aucune duplication
 - Domaine complet
+- Facilité de testing (toute la logique est au même endroit)
 
 Inconvénients :
 - Pas possible de valider l'ensemble des invariants en même temps ("rapport")
     - Exemple : Je ne peux pas valider que mes crédits > 0 si le champ crédits = "Mauvaise donnée" ou crédits = None
+- Demande un mapping de nos types de BusinessException avec les clients des ApplicationService (django Forms, API...)
 
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 
 ### "Two steps validation" : Data contracts VS Invariant Validation
 
-- "Input Validation" (precondition)
-    - Validation des entrées utilisateur ou tout processus externe
+- "Data contract" (Input Validation)
+    - Validation des données entrées par le client (tout processus externe)
     - Mécanisme protégeant notre système contre les infiltrations de données invalides
     - Données autorisées en état invalides
     - "Bouclier de protection contre le monde extérieur"
+    - Inclus **uniquement** les validations suivantes : 
+        - Type de champ (Integer, Dcimal, String...)
+        - Required
+        - ChoiceField
 
-- "Invariant validation" (code contract)
+- "Invariant validation"
     - Validation des invariants
     - Suppose que les données à l'intérieur du système sont dans un état valide
     - "Bouclier" de prévention pour s'asurer de la consistance de nos objets
-
-- Validateurs des Django forms == validateurs métier
-     - On va les retrouver dans notre domaine
-     - Exception : pas de validateur sur les types de données
-        - Assuré par les couches supérieures - internes à notre application (ici, Django forms)
-        - Pourquoi ? 
-            - Notre interface graphique empêche d'envoyer des données mal formatées
-            - Si données mal formatées, c'est l'utilisateur qui corromp délibérément le système client
-            - Notre système est protégé de toute façon : si les données entrées sont corrompues, une exception sera levée
-                - exemple : champs crédits de type `str`, remarque de type "int"...
-            - Pas nécessaire d'afficher une erreur bien formatée
-            - Si à l'avenir, ça a du sens, rien n'emêche d'ajouter des input validations dans notre domaine
+    - Inclus toutes les validations qui ne sont pas des "data contract"
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
 
-### Exercices
+### Quid de Parsley ? Si on "mappe" toutes nos erreurs à partir de nos validateurs ?
 
-Input validator ou invariant validator ? 
-- Les crédits doivent être > 0
-- Le sigle doit respecter le format `^[BEGLMTWX][A-Z]{2,4}[1-9]\d{3}`
-- L'entité de charge doit être la même que l'entité d'attribution pour les types X, Y, Z
-- Les champs A, B, C sont des champs obligatoires
-- Le champ E doit être un entier, le champ F un décimal, le champ G une chaine de caractères
-- Je ne peux pas modifier une UE < 2019-20
-- Le campus sélectionné doit faire partie d'un campus appartenant à l'organisation "UCLouvain"
-- Je ne peux pas attacher un groupement de type "liste au choix mineures" dans un groupement de type "tronc commun" 
-- L'intitulé ne peut pas dépasser 255 caractères
-
+- On duplique UNIQUEMENT les "data contract validations", càd :
+    - Type de champ dans les Form (CharField, IntegerField...)
+    - Required
+    - ChoiceField
+    - ValidationRulesMixin
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 
-## Comment afficher les BusinessExceptions dans les champs des forms ? Comment éviter de s'arrêter à la 1ère exception ? Et comment afficher toutes les erreurs au client ?
+## Quid de ValidationRules et FieldReference ? Dans quelle(s) couche(s) devraient-ils se trouver ?
+### Rappel : ValidationRules
+- Django Model qui sauvegarde des règles de validations (métier et affichage) de champs de formulaires en DB
+- Validation et affichage varient en fonction du l'état d'une donnée (par exemple, le type d'une UE)
+- Variations possibles :
+    - (métier) champ requis ou non
+    - (métier) champ à valeur fixée (valeur par défaut bloquée et non éditable)
+    - (métier) champ avec validation "regex"
+    - (affichage) champs avec valeur par défaut
+    - (affichage) champs avec help text (exemple)
+    - (affichage) champs avec place holder (espace réservé)
+- Initialisé à partir de `validation_rules.csv`
+
+
+### Rappel : FieldReference
+- Django Model qui sauvegarde des règles de validations (métier et affichage) de champs de formulaires en DB
+- Permet l'édition ou non des champs d'un formulaire en fonction :
+    - du rôle de l'utilisateur (central, facultaire... - nécessite l'accès aux groupes / permissions)
+    - du contexte (événement académique, type d'UE) :
+- Initialisé à partir de `field_reference.json`
+
+
+### Intégration dans le DDD et dans les forms
+
+#### ValidationRules
+
+- À implémenter
+    - dans les BusinessValidator dans notre domaine (domaine complet)
+    - dans les Django Forms (existe déjà)
+- Différence avec l'utilisation d'aujourd'hui :
+    - le nommage des champs stockés dans `validation_rules.csv` seront des **termes métier**
+    
+#### FieldReference
+
+- À implémenter
+    - dans les DomainService (domaine complet)
+    - dans les Django Forms (existe déjà)
+- Différence avec l'utilisation d'aujourd'hui :
+    - le nommage des champs stockés dans `field_reference.json` seront des **termes métier**
+
+- Question : pourquoi ne pas réutiliser FieldReference dans nos validateurs (domaine) plutôt que dans un DomainService ?
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Comment afficher les BusinessExceptions (invariants) par champ dans un form ? Comment éviter de s'arrêter à la 1ère exception ? Et comment afficher toutes les erreurs au client ?
 
 ### Principe du "Fail fast"
 
@@ -143,6 +186,7 @@ Input validator ou invariant validator ?
     - Empêche de stocker des données en état inconsistant
     - Principe opposé : fail-silently (try-except)
 - Exemple dans Osis : les validateurs
+    - Tout invariant métier non respecté lève immédiatement une exception
 
 
 
@@ -311,39 +355,34 @@ class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin,
 
 #-------------------------------------------------------------------------------------------------------------------
 # Django View
-class View(...):
+class CreateTrainingView(generics.View):
 
     def post(self, *args, **kwargs):
         form = CreateTrainingForm(request.POST)
-        # if form.is_valid():
-        form.save()
-        if form.errors:
-            redirect()
-        else:
-            pass
+        if form.is_valid():
+            form.save()
+            if not form.errors:
+                return success_redirect()
+        return error_redirect()
 
-``` 
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-## Avantages
-
-- Domaine complet : pas de duplication : logique métier encapsulée à un seul endroit
-- Plus besoin de solutions compliquées côté "client" (Parsley)
-- Pas d'ambiguïté sur quelle règle placer où : tout va dans le domaine
-- Facilité de testing (toute la logique est au même endroit)
-
-## Inconvénients
-
-- Demande un mapping de nos types de BusinessException avec les clients des ApplicationService (django Forms, API...)
-- Nécessite de mettre tous les champs required=False dans les forms
-- Les "*" dans le form doivent être ajoutés manuellement dans les templates
+```
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Validateurs génériques
+
+- (à implémenter et à intégrer dans la lib DDD)
+    - RequiredFieldsValidator
+    - MaximumValueValidator
+    - MinimumValueValidator
+    - MaximumLengthValidator
+    - MinimumLengthValidator
+    - StringFormatValidator (regex)
+    - ... à compléter ? 
+
 
 
 ## Et si mon domaine ne peut pas être complet à cause des performances ?
@@ -381,77 +420,6 @@ class UpdateTraining(interface.DomainService):
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
 
-
-### Quid de Parsley ? Si on "mappe" toutes nos erreurs à partir de nos validateurs ?
-
-- On duplique UNIQUEMENT les "data contract validations", càd :
-    - Type de champ dans les Form (CharField, IntegerField...)
-    - Required
-    - ChoiceField
-    - ValidationRulesMixin
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-## Quid de ValidationRules et FieldReference ? Dans quelle(s) couche(s) devraient-ils se trouver ?
-### Rappel : ValidationRules
-- Django Model qui sauvegarde des règles de validations (métier et affichage) de champs de formulaires en DB
-- Validation et affichage varient en fonction du l'état d'une donnée (par exemple, le type d'une UE)
-- Variations possibles :
-    - (métier) champ requis ou non
-    - (métier) champ à valeur fixée (valeur par défaut bloquée et non éditable)
-    - (métier) champ avec validation "regex"
-    - (affichage) champs avec valeur par défaut
-    - (affichage) champs avec help text (exemple)
-    - (affichage) champs avec place holder (espace réservé)
-- Initialisé à partir de `validation_rules.csv`
-
-
-### Rappel : FieldReference
-- Django Model qui sauvegarde des règles de validations (métier et affichage) de champs de formulaires en DB
-- Permet l'édition ou non des champs d'un formulaire en fonction :
-    - du rôle de l'utilisateur (central, facultaire... - nécessite l'accès aux groupes / permissions)
-    - du contexte (événement académique, type d'UE) :
-- Initialisé à partir de `field_reference.json`
-
-### Intégration dans le DDD et dans les forms
-
-#### ValidationRules
-
-- À implémenter
-    - dans les BusinessValidator dans notre domaine (domaine complet)
-    - dans les Django Forms (existe déjà)
-- Différence avec l'utilisation d'aujourd'hui :
-    - le nommage des champs stockés dans `validation_rules.csv` seront des **termes métier**
-    
-#### FieldReference
-
-- À implémenter
-    - dans les DomainService (domaine complet)
-    - dans les Django Forms (existe déjà)
-- Différence avec l'utilisation d'aujourd'hui :
-    - Aucune
-
-- Question : pourquoi ne pas réutiliser FieldReference dans nos validateurs (domaine) plutôt que dans un DomainService ?
-
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-## Validateurs génériques
-
-- (à implémenter et à intégrer dans la lib DDD)
-    - RequiredFieldsValidator
-    - MaximumValueValidator
-    - MinimumValueValidator
-    - MaximumLengthValidator
-    - MinimumLengthValidator
-    - StringFormatValidator (regex)
-    - ... à compléter ? 
 
 
 Idée vers laquelle tendre : 
