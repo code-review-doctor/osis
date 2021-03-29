@@ -54,7 +54,7 @@ class CommonMasterSpecializedAccessRequirements(PermissionRequiredMixin, Templat
             "access_requirements": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
-                "base.change_commonaccessrequirements", self.get_object()
+                "base.change_commonadmissioncondition", self.get_object()
             ),
             "update_text_url": self.get_update_text_url(),
             "publish_url": self.get_publish_url(),

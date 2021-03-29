@@ -43,7 +43,7 @@ class MiniTrainingReadSkillsAchievements(MiniTrainingRead):
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        edition_perm_name = "base.change_accessrequirements"
+        edition_perm_name = "base.change_admissioncondition"
         return {
             "year": kwargs['year'],
             "code": kwargs['code'],

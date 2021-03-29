@@ -46,7 +46,7 @@ class MiniTrainingReadAccessRequirements(MiniTrainingRead):
             **super().get_context_data(**kwargs),
             "admission_requirements_label": self.get_admission_requirements_label(),
             "can_edit_information":
-                self.request.user.has_perm("base.change_accessrequirements", self.get_permission_object()),
+                self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
             "update_text_url": self.get_update_text_url(),
             "mini_training": self.get_mini_training(),
         }

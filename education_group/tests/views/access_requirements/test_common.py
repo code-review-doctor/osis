@@ -43,7 +43,7 @@ class TestPermissionRequired(TestCase):
         mock_instance = TestPermissionRequiredMockClass(EducationGroupYearCommonBachelorFactory())
 
         self.assertEqual(
-            ('base.change_commonaccessrequirements',),
+            ('base.change_commonadmissioncondition',),
             mock_instance.get_permission_required()
         )
 
@@ -51,6 +51,6 @@ class TestPermissionRequired(TestCase):
         mock_instance = TestPermissionRequiredMockClass(EducationGroupYearBachelorFactory())
 
         self.assertEqual(
-            ('base.change_accessrequirements',),
+            ('base.change_admissioncondition',),
             mock_instance.get_permission_required()
         )

@@ -47,7 +47,7 @@ class TrainingReadAccessRequirements(TrainingRead):
         context = {
             **super().get_context_data(**kwargs),
             "can_edit_information":
-                self.request.user.has_perm("base.change_accessrequirements", self.get_permission_object()),
+                self.request.user.has_perm("base.change_admissioncondition", self.get_permission_object()),
             "update_text_url": self.get_update_text_url(),
             "common_access_requirements": self.get_common_access_requirements(),
             "access_requirements": self.get_access_requirements()
