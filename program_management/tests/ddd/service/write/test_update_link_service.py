@@ -22,8 +22,6 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 
-from django.test import TestCase
-
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
@@ -33,19 +31,15 @@ from program_management.ddd.service.write import update_link_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.program_tree import tree_builder, ProgramTreeFactory
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
-from testing.mocks import MockPatcherMixin
+from program_management.tests.ddd.factories.program_tree import tree_builder
+from testing.testcases import DDDTestCase
 
 
-class TestUpdateLink(TestCase, MockPatcherMixin):
+class TestUpdateLink(DDDTestCase):
     def setUp(self) -> None:
+        super().setUp()
         self.tree = ProgramTreeBachelorFactory(2016, 2018)
-        self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
-        self.mock_repo(
-            "program_management.ddd.service.write.update_link_service.ProgramTreeRepository",
-            self.fake_program_tree_repository
-        )
+        self.fake_program_tree_repository._trees.append(self.tree)
 
     def test_failure_when_block_value_is_not_a_increasing_sequence_of_digits_between_1_and_6(self):
         block_inputs = ["158", "265", "49"]

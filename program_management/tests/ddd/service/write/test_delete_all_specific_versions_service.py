@@ -117,16 +117,26 @@ class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
         )
 
         self.fake_training_repo._trainings.append(
-            TrainingFactory(entity_identity__acronym="ROOT", entity_identity__year=year, type=TrainingType.BACHELOR, persist=True)
+            TrainingFactory(
+                entity_identity__acronym="ROOT",
+                entity_identity__year=year,
+                type=TrainingType.BACHELOR,
+                persist=True
+            )
         )
         self.fake_group_repo._groups.append(
-            GroupFactory(entity_identity__code="LGRP", entity_identity__year=year, type=GroupType.OPTION_LIST_CHOICE, persist=True)
+            GroupFactory(
+                entity_identity__code="LGRP",
+                entity_identity__year=year,
+                type=GroupType.OPTION_LIST_CHOICE,
+                persist=True
+            )
         )
         self.fake_mini_training_repo._mini_trainings.append(
             MiniTrainingFactory(entity_identity__acronym="MINI", entity_identity__year=year,
                                 type=MiniTrainingType.OPTION, persist=True)
         )
-        self.fake_program_tree_repo.root_entities.append(tree)
+        self.fake_program_tree_repo._trees.append(tree)
 
         tree_version = ProgramTreeVersionFactory(
             tree=tree,
@@ -134,7 +144,7 @@ class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
             program_tree_repository=self.fake_program_tree_repo
         )
 
-        self.fake_program_tree_version_repo.root_entities.append(tree_version)
+        self.fake_program_tree_version_repo._trees_version.append(tree_version)
         return tree_version
 
     def test_should_return_program_tree_version_identity(self):
@@ -156,8 +166,8 @@ class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
     def test_should_delete_tree_version(self):
         delete_all_specific_versions_service.delete_permanently_tree_version(self.cmd)
 
-        self.assertListEqual(self.fake_program_tree_version_repo.root_entities, [])
-        self.assertListEqual(self.fake_program_tree_repo.root_entities, [])
+        self.assertListEqual(self.fake_program_tree_version_repo._trees_version, [])
+        self.assertListEqual(self.fake_program_tree_repo._trees, [])
 
     @skip("Will be rewritten")
     def test_should_delete_group_objects(self):

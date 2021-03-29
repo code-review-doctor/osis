@@ -79,8 +79,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             "end_year": 2019,
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -105,8 +105,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -130,8 +130,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -156,8 +156,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -179,8 +179,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             "year": 2018
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -211,8 +211,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -243,8 +243,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -262,8 +262,8 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
         tree_to_attach_data = {"node_type": MiniTrainingType.OPTION, "code": "OPTC", "year": 2018}
 
         tree_to_attach = tree_builder(tree_to_attach_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -312,7 +312,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree = tree_builder(tree_data)
-        self.fake_program_tree_repository.root_entities.append(tree)
+        self.fake_program_tree_repository._trees.append(tree)
 
         self.assertValidatorNotRaises(
             CheckEndDateBetweenFinalitiesAndMasters2M(tree, self.fake_program_tree_repository)
@@ -353,7 +353,7 @@ class TestValidateFinalitiesEndDateAndOptions(TestValidatorValidateMixin, Simple
             ]
         }
         tree_2m = tree_builder(tree_2m_data)
-        self.fake_program_tree_repository.root_entities.append(tree_2m)
+        self.fake_program_tree_repository._trees.append(tree_2m)
         finality_tree = ProgramTreeFactory(root_node=tree_2m.root_node.children_as_nodes[0].children_as_nodes[0])
 
         self.assertValidatorRaises(

@@ -22,7 +22,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import namedtuple
 
 import attr
 import mock

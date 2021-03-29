@@ -50,7 +50,6 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository, \
     get_fake_node_repository, get_fake_program_tree_version_repository
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
-from testing.mocks import MockPatcherMixin
 from testing.testcases import DDDTestCase
 
 
@@ -159,7 +158,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
             ]
         }
         tree_to_paste = tree_builder(tree_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
 
         invalid_command = PasteElementCommandFactory(
             node_to_paste_code=tree_to_paste.root_node.code,
@@ -228,9 +227,9 @@ class TestPasteGroupNodeService(DDDTestCase):
     def test_can_not_attach_the_same_node_to_same_parent(self):
         node_attached_to_root = self.tree.get_node("1|22")
         tree_to_attach = ProgramTreeFactory(root_node=node_attached_to_root)
-        self.fake_node_repository.root_entities.append(node_attached_to_root)
-        self.fake_program_tree_repository.root_entities.append(tree_to_attach)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_node_repository._nodes.append(node_attached_to_root)
+        self.fake_program_tree_repository._trees.append(tree_to_attach)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_attach,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -280,8 +279,8 @@ class TestPasteGroupNodeService(DDDTestCase):
         self.node_to_paste.year = 2021
         self.node_to_paste.entity_id = attr.evolve(self.node_to_paste.entity_id, year=2021)
         tree_to_paste = ProgramTreeFactory(root_node=self.node_to_paste)
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -311,9 +310,9 @@ class TestPasteGroupNodeService(DDDTestCase):
                 ]
             }
         )
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_node_repository.root_entities.append(tree_to_paste.root_node)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
+        self.fake_node_repository._nodes.append(tree_to_paste.root_node)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -344,9 +343,9 @@ class TestPasteGroupNodeService(DDDTestCase):
                 ]
             }
         )
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_node_repository.root_entities.append(tree_to_paste.root_node)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
+        self.fake_node_repository._nodes.append(tree_to_paste.root_node)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -374,8 +373,7 @@ class TestPasteGroupNodeService(DDDTestCase):
         tree_to_paste = tree_builder(tree_to_paste_data)
         node_to_paste = tree_to_paste.root_node
 
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -414,8 +412,8 @@ class TestPasteGroupNodeService(DDDTestCase):
             ]
         }
         tree_to_paste = tree_builder(tree_to_paste_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -439,8 +437,8 @@ class TestPasteGroupNodeService(DDDTestCase):
             "node_id": 589
         }
         tree_to_paste = tree_builder(tree_to_paste_data)
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
@@ -478,15 +476,15 @@ class TestPasteGroupNodeService(DDDTestCase):
         tree = ProgramTree2MFactory(2020, 2025)
         tree_to_paste = tree_builder(tree_to_paste_data)
 
-        self.fake_program_tree_repository.root_entities.append(tree_to_paste)
-        self.fake_program_tree_repository.root_entities.append(tree)
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_program_tree_repository._trees.append(tree_to_paste)
+        self.fake_program_tree_repository._trees.append(tree)
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree_to_paste,
                 program_tree_repository=self.fake_program_tree_repository,
             )
         )
-        self.fake_tree_version_repository.root_entities.append(
+        self.fake_tree_version_repository._trees_version.append(
             StandardProgramTreeVersionFactory(
                 tree=tree,
                 program_tree_repository=self.fake_program_tree_repository,
