@@ -35,7 +35,8 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import WRAP_TEXT_ALIGNMENT, annotate_qs, PROPOSAL_LINE_STYLES, \
     get_significant_volume
 from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_BORDER_TOP, \
-    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles, CELLS_TO_COLOR, XLS_DESCRIPTION, _check_cell_to_color
+    WHITE_FONT, BOLD_FONT, _prepare_xls_content, _prepare_titles, CELLS_TO_COLOR, XLS_DESCRIPTION, \
+    _check_cell_to_color, _get_management_entity_faculty
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type
@@ -324,6 +325,35 @@ class TestUeUtilization(TestCase):
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
+
+    def test_get_management_entity_faculty_no_management_entity(self):
+        self.assertEqual(_get_management_entity_faculty(None, self.academic_year), "-")
+
+    def test_get_management_entity_faculty_under_faculty(self):
+        self.assertEqual(
+            _get_management_entity_faculty(self.entity_school_version, self.academic_year),
+            self.entity_faculty_version.acronym
+        )
+
+    def test_get_management_entity_faculty_faculty_orphan(self):
+        entity_parent = EntityFactory(country=self.country, organization=self.organization)
+        EntityVersionFactory(
+            entity=entity_parent,
+            entity_type=entity_type.SCHOOL,
+            parent=None,
+            start_date=self.academic_year.start_date
+        )
+        entity_child1 = EntityFactory(country=self.country, organization=self.organization)
+        entity_child1_version = EntityVersionFactory(
+            entity=entity_child1,
+            entity_type=entity_type.SCHOOL,
+            parent=entity_parent,
+            start_date=self.academic_year.start_date
+        )
+        self.assertEqual(
+            _get_management_entity_faculty(entity_child1_version, self.academic_year),
+            entity_child1_version.acronym
+        )
 
     def _get_luy_expected_data(self, luy, a_tutor):
         return [
