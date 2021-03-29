@@ -76,7 +76,7 @@ class AdmissionCondition(models.Model):
 
     class Meta:
         permissions = (
-            ("change_commonadmissioncondition", "Can change common access requirements"),
+            ("change_commonadmissioncondition", "Can change common admission condition"),
         )
 
     @cached_property
