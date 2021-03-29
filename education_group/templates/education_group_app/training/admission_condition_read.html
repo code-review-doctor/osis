@@ -46,6 +46,7 @@
             {% endif %}
 
             {% if training.is_bachelor or training.is_master_specialized or training.is_aggregation or training.is_master_60_credits or training.is_master_120_credits or training.is_master_180_240_credits %}
+                <!-- Conditions d'accès générales -->
                 {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_bacs_cond_generales" text=_("General Access Requirements") field=common_admission_condition.general_conditions.text_fr field_en=common_admission_condition.general_conditions.text_en can_edit=False %}
             {% endif %}
 
@@ -63,6 +64,10 @@
                 {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=common_admission_condition.french_proficiency_examination.text_fr field_en=common_admission_condition.french_proficiency_examination.text_en can_edit=False %}
                 {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=common_admission_condition.subscription_lightening.text_fr field_en=common_admission_condition.subscription_lightening.text_en can_edit=False %}
                 {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=common_admission_condition.opening_to_adults.text_fr field_en=common_admission_condition.opening_to_adults.text_en can_edit=False %}
+
+                <!-- Procédures d'admission et d'inscription -->
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="common_admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=common_admission_condition.admission_enrollment_procedures.text_fr field_en=common_admission_condition.admission_enrollment_procedures.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.admission_enrollment_procedures.text_fr field_en=admission_condition.admission_enrollment_procedures.text_en can_edit=True %}
             {% endif %}
 
             {% if training.is_master_60_credits or training.is_master_120_credits or training.is_master_180_240_credits %}
