@@ -8,8 +8,8 @@
             - UE modifiée --> état inconsistant --> difficulté de maintenance
 
 - Note : un validateur ne peut jamais modifier les arguments qu'il reçoit pour sa propre validation
-    - Exemple (à éviter) : `self.transition_name = "TRANSITION " + transition_name` (https://github.com/uclouvain/osis/pull/9680/files#)
-    - Exemple (à éviter) : `self.field_to_validate = str(field_to_validate)`
+    - Exemple (**à éviter**) : `self.transition_name = "TRANSITION " + transition_name` (https://github.com/uclouvain/osis/pull/9680/files#)
+    - Exemple (**à éviter**) : `self.field_to_validate = str(field_to_validate)`
     - Solution : Utiliser la librairie [python attrs](https://www.attrs.org/en/stable/) pour les validateurs
 
 
@@ -24,6 +24,7 @@ class MyBusinessValidator(BusinessValidator):
     other_object_used_for_validation = attr.ib(type=object)
 
     def validate(self):
+        self.object_used_for_validation = ...  # Will raise an exception due to frozen=True
         if self.object_used_for_validation != self.other_object_used_for_validation:
             raise MyOwnValidatorBusinessException()
 
@@ -51,7 +52,7 @@ class MyBusinessValidator(BusinessValidator):
 ### Proposition 1 : valider ces champs en dehors de nos ApplicationService
 
 Avantages :
-- Réutilisation aisée des Django forms et leurs validations
+- Réutilisation aisée des outils externes de validation (Django forms, ...)
 
 Inconvénients :
 - Duplication : ces validations devront être répétées pour chaque client 
@@ -125,7 +126,229 @@ Inconvénients :
     - Inclus toutes les validations qui ne sont pas des "data contract"
 
 
+
 <br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Comment afficher les BusinessExceptions (invariants) par champ dans un form ? Comment éviter de s'arrêter à la 1ère exception ? Et comment afficher toutes les erreurs au client ?
+
+### Principe du "Fail fast"
+
+- Stopper l'opération en cours dès qu'une erreur inattendue se produit
+- Objectif : application plus stable
+    - Limite le temps de réaction pour corriger un bug
+        - Erreur rapide = stacktrace = rollback (si activé) = information d'une erreur au plus tôt (à l'utilisateur)
+    - Empêche de stocker des données en état inconsistant
+    - Principe opposé : fail-silently (try-except)
+- Exemple dans Osis : les validateurs
+    - Tout invariant métier non respecté lève immédiatement une `BusinessException`
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+### Solution : ValidatorList + TwoStepsMultipleBusinessExceptionListValidator + DisplayExceptionsByFieldNameMixin
+
+- Faire hériter nos ValidatorLists de `TwoStepsMultipleBusinessExceptionListValidator` (implémentation ci-dessous)
+    - Toute règle métier (Validator) raise une `BusinessException`
+    - Toute action métier (application service) raise une MultipleBusinessExceptions (ValidatorList)
+    - Toute MultipleBusinessExceptions gérable par le client (view, API...)
+
+- Utiliser `DisplayExceptionsByFieldNameMixin` dans nos Django forms
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+```python
+class DisplayExceptionsByFieldNameMixin:
+    """
+    This Mixin provides a fonction 'display_exceptions' used to display business validation messages (business Exceptions)
+    inside defined fields in the attribute 'field_name_by_exception'
+    """
+
+    # Dict[Exception, Tuple[FormFieldNameStr]]
+    # Example : {CodeAlreadyExistException: ('code',), AcronymAlreadyExist: ('acronym',)}
+    field_name_by_exception = None
+
+    # If True, exceptions that are not configured in `field_name_by_exception` will be displayed.
+    # If False, exceptions that are not configured in `field_name_by_exception` will be ignored.
+    display_exceptions_by_default = True
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.field_name_by_exception is None:
+            self.field_name_by_exception = {}
+
+    def call_application_service(self):
+        raise NotImplementedError
+
+    def save(self):
+        try:
+            if self.is_valid():  # to clean data
+                return self.call_application_service()
+        except MultipleBusinessExceptions as multiple_exceptions:
+            self.display_exceptions(multiple_exceptions)
+
+    def display_exceptions(self, exceptions_to_display: MultipleBusinessExceptions):
+        """
+        Add the exception messages in the fields specified in the 'field_name_by_exception' attribute.
+        Add a generic error by default if no fields are defined.
+        :param exceptions_to_display: MultipleBusinessExceptions
+        :return: 
+        """
+        copied_list = list(exceptions_to_display.exceptions)
+        for exception in copied_list:
+            field_names = self.field_name_by_exception.get(type(exception), [])
+            if self.display_exceptions_by_default and not field_names:
+                self.add_error('', exception.message)
+            else:
+                for field_name in field_names:
+                    self.add_error(field_name, exception.message)
+            exceptions_to_display.exceptions.remove(exception)
+
+
+#-------------------------------------------------------------------------------------------------------------------
+
+@attr.s(slots=True)
+class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        """Contains ONLY validations for : 
+        - Type of fields
+        - Enums fields
+        - RequiredFields
+        - ValidationRules (cf. "validation_rules.csv")
+        """
+        raise NotImplementedError()
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        raise NotImplementedError()
+
+    def __validate_data_contract(self):
+        self.__validate(self.get_input_validators())
+
+    def __validate_invariants(self):
+        self.__validate(self.get_invariants_validators())
+
+    @staticmethod
+    def __validate(business_validators):
+        exceptions = set()
+        for validator in business_validators:
+            try:
+                validator.validate()
+            except MultipleBusinessExceptions as e:
+                exceptions |= e.exceptions
+            except BusinessException as e:
+                exceptions.add(e)
+
+        if exceptions:
+            raise MultipleBusinessExceptions(exceptions=exceptions)
+
+    def validate(self):
+        self.__validate_data_contract()
+        self.__validate_invariants()
+
+
+
+
+#-------------------------------------------------------------------------------------------------------------------
+# ddd/service/write 
+def update_training_service(command: UpdateTrainingCommand) -> 'TrainingIdentity':
+    identity = TrainingIdentity(acronym=command.acronym, year=command.year)
+    
+    training = TrainingRepository().get(identity)
+    training.update(command)
+    
+    TrainingRepository().save(training)
+    
+    return identity
+
+
+#-------------------------------------------------------------------------------------------------------------------
+# ddd/validators/validators_by_business_action.py
+@attr.s(slots=True)
+class UpdateTrainingValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    command = attr.ib(type=CommandRequest)
+    existing_training = attr.ib(type=Training)
+    existing_training_identities = attr.ib(type=List[TrainingIdentity])
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        # Devrait être toujours valide via client Django Form, car validé via Parsley
+        return [
+            AcronymRequiredValidator(self.command.acronym),
+            TypeChoiceValidator(self.command.type),
+            # ...
+        ]
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            HopsValuesValidator(self.existing_training),
+            StartYearEndYearValidator(self.existing_training),
+            UniqueAcronymValidator(self.command.acronym, self.existing_training_identities),
+            # ...
+        ]
+
+
+
+#-------------------------------------------------------------------------------------------------------------------
+# Django Form
+class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin, forms.Form):
+    code = UpperCaseCharField(label=_("Code"))
+    min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize())
+    max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize())
+
+    field_name_by_exception = {
+        CodeAlreadyExistException: ('code',),
+        ContentConstraintMinimumMaximumMissing: ('min_constraint', 'max_constraint'),
+        ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum: ('min_constraint', 'max_constraint'),
+        ContentConstraintMinimumInvalid: ('min_constraint',),
+        ContentConstraintMaximumInvalid: ('max_constraint',),
+    }
+
+    def call_application_service(self):
+        command = ...
+        return update_training_service(command)
+
+
+#-------------------------------------------------------------------------------------------------------------------
+# Django View
+class CreateTrainingView(generics.View):
+
+    def post(self, *args, **kwargs):
+        form = CreateTrainingForm(request.POST)
+        # if form.is_valid():
+        form.save()  # Appelle form.is_valid()
+        if not form.errors:
+            return success_redirect()
+        return error_redirect()
+
+```
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Validateurs génériques
+
+- (à implémenter et à intégrer dans la lib DDD)
+    - RequiredFieldsValidator
+    - MaximumValueValidator
+    - MinimumValueValidator
+    - MaximumLengthValidator
+    - MinimumLengthValidator
+    - StringFormatValidator (regex)
+    - ... à compléter ? 
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 
 ### Quid de Parsley ? Si on "mappe" toutes nos erreurs à partir de nos validateurs ?
@@ -364,223 +587,4 @@ ValidationRule(
             - Tout doit-il faire partie d'une seule transaction (taille des aggrégats) ?
             - Peut-on découper notre domaine ?
 
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-## Comment afficher les BusinessExceptions (invariants) par champ dans un form ? Comment éviter de s'arrêter à la 1ère exception ? Et comment afficher toutes les erreurs au client ?
-
-### Principe du "Fail fast"
-
-- Stopper l'opération en cours dès qu'une erreur inattendue se produit
-- Objectif : application plus stable
-    - Limite le temps de réaction pour corriger un bug
-        - Erreur rapide = stacktrace = rollback (si activé) = information d'une erreur au plus tôt (à l'utilisateur)
-    - Empêche de stocker des données en état inconsistant
-    - Principe opposé : fail-silently (try-except)
-- Exemple dans Osis : les validateurs
-    - Tout invariant métier non respecté lève immédiatement une `BusinessException`
-
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-### Solution : ValidatorList + TwoStepsMultipleBusinessExceptionListValidator + DisplayExceptionsByFieldNameMixin
-
-- Faire hériter nos ValidatorLists de `TwoStepsMultipleBusinessExceptionListValidator` (implémentation ci-dessous)
-    - Toute règle métier (Validator) raise une `BusinessException`
-    - Toute action métier (application service) raise une MultipleBusinessExceptions (ValidatorList)
-    - Toute MultipleBusinessExceptions gérable par le client (view, API...)
-
-- Utiliser `DisplayExceptionsByFieldNameMixin` dans nos Django forms
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-```python
-class DisplayExceptionsByFieldNameMixin:
-    """
-    This Mixin provides a fonction 'display_exceptions' used to display business validation messages (business Exceptions)
-    inside defined fields in the attribute 'field_name_by_exception'
-    """
-
-    # Dict[Exception, Tuple[FormFieldNameStr]]
-    # Example : {CodeAlreadyExistException: ('code',), AcronymAlreadyExist: ('acronym',)}
-    field_name_by_exception = None
-
-    # If True, exceptions that are not configured in `field_name_by_exception` will be displayed.
-    # If False, exceptions that are not configured in `field_name_by_exception` will be ignored.
-    display_exceptions_by_default = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.field_name_by_exception is None:
-            self.field_name_by_exception = {}
-
-    def call_application_service(self):
-        raise NotImplementedError
-
-    def save(self):
-        try:
-            if self.is_valid():  # to clean data
-                return self.call_application_service()
-        except MultipleBusinessExceptions as multiple_exceptions:
-            self.display_exceptions(multiple_exceptions)
-
-    def display_exceptions(self, exceptions_to_display: MultipleBusinessExceptions):
-        """
-        Add the exception messages in the fields specified in the 'field_name_by_exception' attribute.
-        Add a generic error by default if no fields are defined.
-        :param exceptions_to_display: MultipleBusinessExceptions
-        :return: 
-        """
-        copied_list = list(exceptions_to_display.exceptions)
-        for exception in copied_list:
-            field_names = self.field_name_by_exception.get(type(exception), [])
-            if self.display_exceptions_by_default and not field_names:
-                self.add_error('', exception.message)
-            else:
-                for field_name in field_names:
-                    self.add_error(field_name, exception.message)
-            exceptions_to_display.exceptions.remove(exception)
-
-
-#-------------------------------------------------------------------------------------------------------------------
-
-@attr.s(slots=True)
-class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
-
-    def get_data_contract_validators(self) -> List[BusinessValidator]:
-        """Contains ONLY validations for : 
-        - Type of fields
-        - Enums fields
-        - RequiredFields
-        - ValidationRules (cf. "validation_rules.csv")
-        """
-        raise NotImplementedError()
-
-    def get_invariants_validators(self) -> List[BusinessValidator]:
-        raise NotImplementedError()
-
-    def __validate_data_contract(self):
-        self.__validate(self.get_input_validators())
-
-    def __validate_invariants(self):
-        self.__validate(self.get_invariants_validators())
-
-    @staticmethod
-    def __validate(business_validators):
-        exceptions = set()
-        for validator in business_validators:
-            try:
-                validator.validate()
-            except MultipleBusinessExceptions as e:
-                exceptions |= e.exceptions
-            except BusinessException as e:
-                exceptions.add(e)
-
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
-
-    def validate(self):
-        self.__validate_data_contract()
-        self.__validate_invariants()
-
-
-
-
-#-------------------------------------------------------------------------------------------------------------------
-# ddd/service/write 
-def update_training_service(command: UpdateTrainingCommand) -> 'TrainingIdentity':
-    identity = TrainingIdentity(acronym=command.acronym, year=command.year)
-    
-    training = TrainingRepository().get(identity)
-    training.update(command)
-    
-    TrainingRepository().save(training)
-    
-    return identity
-
-
-#-------------------------------------------------------------------------------------------------------------------
-# ddd/validators/validators_by_business_action.py
-@attr.s(slots=True)
-class UpdateTrainingValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-    command = attr.ib(type=CommandRequest)
-    existing_training = attr.ib(type=Training)
-    existing_training_identities = attr.ib(type=List[TrainingIdentity])
-
-    def get_data_contract_validators(self) -> List[BusinessValidator]:
-        # Devrait être toujours valide via client Django Form, car validé via Parsley
-        return [
-            AcronymRequiredValidator(self.command.acronym),
-            TypeChoiceValidator(self.command.type),
-            # ...
-        ]
-
-    def get_invariants_validators(self) -> List[BusinessValidator]:
-        return [
-            HopsValuesValidator(self.existing_training),
-            StartYearEndYearValidator(self.existing_training),
-            UniqueAcronymValidator(self.command.acronym, self.existing_training_identities),
-            # ...
-        ]
-
-
-
-#-------------------------------------------------------------------------------------------------------------------
-# Django Form
-class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin, forms.Form):
-    code = UpperCaseCharField(label=_("Code"))
-    min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize())
-    max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize())
-
-    field_name_by_exception = {
-        CodeAlreadyExistException: ('code',),
-        ContentConstraintMinimumMaximumMissing: ('min_constraint', 'max_constraint'),
-        ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum: ('min_constraint', 'max_constraint'),
-        ContentConstraintMinimumInvalid: ('min_constraint',),
-        ContentConstraintMaximumInvalid: ('max_constraint',),
-    }
-
-    def call_application_service(self):
-        command = ...
-        return update_training_service(command)
-
-
-#-------------------------------------------------------------------------------------------------------------------
-# Django View
-class CreateTrainingView(generics.View):
-
-    def post(self, *args, **kwargs):
-        form = CreateTrainingForm(request.POST)
-        # if form.is_valid():
-        form.save()  # Appelle form.is_valid()
-        if not form.errors:
-            return success_redirect()
-        return error_redirect()
-
-```
-
-
-<br/><br/><br/><br/><br/><br/><br/><br/>
-
-
-
-## Validateurs génériques
-
-- (à implémenter et à intégrer dans la lib DDD)
-    - RequiredFieldsValidator
-    - MaximumValueValidator
-    - MinimumValueValidator
-    - MaximumLengthValidator
-    - MinimumLengthValidator
-    - StringFormatValidator (regex)
-    - ... à compléter ? 
 
