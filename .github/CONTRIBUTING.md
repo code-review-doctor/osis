@@ -32,7 +32,7 @@
         - [ValueObject](#ddddomainvalueobject)
         - [EntityIdentity](#ddddomainentityidentity)
         - [BusinessException](#ddddomainbusinessexception)
-    - [Factory](#dddfactory)
+    - [Builder (factory)](#dddbuilder)
     - [Repository](#dddrepository)
     - [Domain service](#domain-services)
     - [Application service](#dddservice-application-service)
@@ -386,7 +386,7 @@ django_app
  |   |   ├─ _entity.py (protected)
  |   |   ├─ _value_object.py (protected)
  |   |
- |   ├─ factory
+ |   ├─ builder
  |   |   ├─ <objet_métier>_builder.py  (Builder pour RootEntity)
  |   |   ├─ <identité_objet_métier>_builder.py  (Builder pour EntityIdentity)
  |   |
@@ -631,19 +631,20 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 
 <br/><br/><br/><br/>
 
-#### ddd/factory
+#### ddd/builder
 
 - Regroupe l'ensemble des factories et builders pour nos objets du domaine
-    - Cf. [Pattners Factory et Builder](#../doc/patterns_factory_builder_singleton.md)
+    - Cf. [Patterns Factory et Builder](#../doc/patterns_factory_builder_singleton.md)
 - Obligatoire pour tous nos objets `RootEntity` et `EntityIdentity`
-    - Avantage : pas d'ambiguité : tout objet du domaine ne peut être instancié que via factory
-    - Avantage : facilité de distinction `privé` - `publique` : ce qui est `publique` possède une factory
-    - Inconvénient : pattern "factory" complexe pour des objets simples ("overengineering")
+    - Tout ce qui est `publique` dans notre domaine possède un `Builder`
 - Nommage des fichiers : <objet_métier>_builder.py
 - Nommage des objets : <ObjetMetier>Builder
-- Accès : 
+- Accès :
     - [couche Domain](#ddddomain)
 - Cf. [interface.EntityIdentity](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L28)
+- Note : le pattern 'builder' peut être réutilisé pour nos `Entity` et `ValueObject` 
+    - scope : `privé`
+    - encapsulé dans le même fichier que `Entity` / `ValueObject`
 
 Exemple :
 ```python
@@ -676,7 +677,7 @@ class TrainingBuilder(interface.RootEntityBuilder):
 - Accès :
     - [couche Django Model](#modle-django-model)
     - [couche Domain](#ddddomain)
-    - [couche Factory](#dddfactory)
+    - [couche Builder](#dddbuilder)
 
 Exemple :
 ```python
@@ -737,7 +738,7 @@ class GenerateSequenceId(interface.DomainService):
 - Nommage des fonctions : <action_metier>
 - Cf. [application service VS domain service](application_service_vs_domain_service.md)
 - Accès:
-    - [couche Factory](#dddfactory)
+    - [couche Builder](#dddbuilder)
     - [couche Domaine](#ddddomain)
     - [couche DomainService](#domain-services)
     - [couche Repository](#dddrepository)
