@@ -22,6 +22,7 @@ def __gt__(self, other):
 - Ajouter une classe RequiredBoostrapField pour les "*" - si required=False à tous les forms
 
 
+- TODO :: comment gérer injection enttiy dans UE ? Repository pour ValueObject ? 
 
 
 

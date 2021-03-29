@@ -201,6 +201,7 @@ Essai N°4 :
 ValueObject VS Entity
 - Du point de vue du domaine UE, qu'est-ce qu'une ResponsibleEntity ? 
     - ValueObject avec un code et un type
+ TODO :: corriger les FIXME (Language)
 
 
 Essai n°5 :
@@ -239,7 +240,7 @@ Et pour les DTO : on utiliserais 1 DTO par AggregateRoot ? Pour fusionner le Bui
 
 ### Commands : rappel
 
-- Représente les actions qu'un utilisateur peut effectuer
+- Représente les actions possibles d'un utilisateur
     - Fait partie entièrement du domaine
 - Déclenche une modification dans notre domaine
 - Une commande peut ne pas être "valide" pour notre domaine (cf. validateurs) 
@@ -271,8 +272,38 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
     end_year = attr.ib(type=Optional[int])
 ```
 
+- Application service == command handlers (gestionnaire de commandes)
+
+
+### Événements
+
+- Résultat d'une action métier
+    - Résultat d'une commande
+- Exemples : 
+    - Formation créée
+    - Groupement supprimé
+    - Unité d'enseignement reportée
+    - Volumes de l'UE mis à jour
+
+
+### Message bus
+
+#### Définition et objectifs
+
 
 - [W6] message bus - pour aider aux unit tests https://github.com/uclouvain/osis/commit/520789ff538cc2046237f817f439c273c9093cae
 - injection des repositories
 - [W6] Pourquoi ne pas utiliser l'héritage pour les commandes qui ont (et qui doivent avoir ! ) les mêmes paramètres que d'autres commandes? (Exemple : UpdateAndPostpone hériterait d'Update, etc.)
 
+
+#### Implémentation
+
+```python
+
+class MessageBus(AbstractMessageBus):
+    EVENT_HANDLERS = {}
+    COMMAND_HANDLERS = {
+        command.CreateOrphanGroupCommand: lambda cmd: create_group_service.create_orphan_group(cmd, GroupRepository())
+    }
+
+```

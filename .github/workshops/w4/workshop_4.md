@@ -10,11 +10,15 @@
 - Workshop :
     - Refactoring de notre code (UE) :
         - Utiliser attr pour nos validateurs et ValidatorList
-    - Use case : En tant qu'utilisateur, je veux afficher toutes les erreurs en une seule fois (à l'écran - dans les champs de formulaire) lorsque je soumets mon formulaire de création d'une UE
-        - Associer les erreurs métier aux champs du formulaire (CreateLearningUnitForm)
-        - Créer une View (CreateLearningUnitView) et tester notre code (via interface graphique uniquement)
-    - (reprise du workshop 2) : Use case : créer un partim
+    - Use case : En tant qu'utilisateur, je veux afficher toutes les erreurs en une seule fois (à l'écran - dans les champs de formulaire)
+        - Créer une View (CreateLearningUnitView) + Form + url
+    - (reprise du workshop 4) : Use case : créer les parties magistrales et pratiques d'une UE
 
 
-Pratique :
-- Corriger les FIXME dans le code (workshop 1)
+## Cas d'utilisation
+### user story
+En tant qu'utilisateur facultaire, je veux afficher toutes les erreurs en une seule fois (à l'écran - dans les champs de formulaire)
+### business rules
+- Lorsque je soumets n'importe quel formulaire (création d'une UE, création d'un partim, suppression d'une UE...)
+- Associer les erreurs métier aux champs du formulaire (CreateLearningUnitForm)
+
