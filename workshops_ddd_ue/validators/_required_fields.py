@@ -1,13 +1,14 @@
+import attr
+
 from base.ddd.utils.business_validator import BusinessValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.exceptions import EmptyRequiredFieldsException
 
 
+@attr.s(frozen=True, slots=True)
 class RequiredFieldsValidator(BusinessValidator):
 
-    def __init__(self, command: CreateLearningUnitCommand):
-        super().__init__()
-        self.command = command
+    command = attr.ib(type=CreateLearningUnitCommand)
 
     def validate(self, *args, **kwargs):
         mandatory_field = [

@@ -1,14 +1,15 @@
+import attr
+
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.entity_type import EntityType
 from workshops_ddd_ue.domain.exceptions import InvalidResponsibleEntityTypeOrCodeException
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
 
 
+@attr.s(frozen=True, slots=True)
 class ResponsibleEntityAuthorizedTypeOrCode(BusinessValidator):
 
-    def __init__(self, responsible_entity: 'ResponsibleEntity'):
-        super().__init__()
-        self.responsible_entity = responsible_entity
+    responsible_entity = attr.ib(type=ResponsibleEntity)
 
     def validate(self, *args, **kwargs):
         authorized_types = [
