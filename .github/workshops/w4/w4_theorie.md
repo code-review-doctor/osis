@@ -44,6 +44,10 @@ class MyBusinessValidator(BusinessValidator):
 - Liste de choix / choix multiples
 
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ### Proposition 1 : valider ces champs en dehors de nos ApplicationService
 
 Avantages :
@@ -59,6 +63,11 @@ Inconvénients :
 - Difficulté de testing : métier à tester dans 2 couches différentes
 
 
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ### Proposition 2 : valider ces champs dans notre commande
 
 Avantages : 
@@ -72,6 +81,10 @@ Inconvénients :
 - Difficulté de testing : métier à tester dans 2 couches différentes
 - Validation déclarative (et non impérative)
     - `if command.is_valid(): ...`
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
 
 
 ### Proposition 3 : valider ces champs dans notre domaine (ValidatorList)
@@ -180,7 +193,7 @@ ValidationRule(
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
 
-### Intégration dans le DDD et dans les forms
+### ValidationRules : Intégration dans le DDD et dans les forms
 
 - À réutiliser dans
     - dans les `BusinessValidator` dans notre domaine (domaine complet)
@@ -222,7 +235,7 @@ ValidationRule(
 
 - Notes :
     - Mécanisme permettant de réutiliser des mêmes règles côté backend et côté frontend
-        - Si `backend Django` + `frontend Angular` ==> règles seraient dupliquées
+        - NB : Si `backend Django` + `frontend Angular` ==> règles seraient dupliquées
     - Ce sont les forms qui devront s'adapter au format utilisé par notre domaine (et non l'inverse)
     - Les validation rules ne seront peut-être plus réutilisées à l'avenir
         - Utile uniquement pour formulaires massifs et complexes
@@ -286,13 +299,15 @@ ValidationRule(
 
 
 
-### Intégration dans le DDD et dans les forms
+### FieldReference : Intégration dans le DDD et dans les forms
 
 - À réutiliser
     - dans les DomainService
     - dans les Django Forms (existe déjà - `PermissionFieldMixin`)
 
-- Question : pourquoi ne pas réutiliser FieldReference dans nos validateurs (domaine) plutôt que dans un DomainService ?
+
+#### :question: pourquoi ne pas réutiliser FieldReference dans nos validateurs (domaine) plutôt que dans un DomainService ?
+
 
 - Différence avec l'utilisation d'aujourd'hui :
     - le nommage des champs stockés dans `field_reference.json` seront des **termes métier du domaine**
@@ -341,7 +356,7 @@ ValidationRule(
 
 - Notes :
     - Mécanisme permettant de réutiliser des mêmes règles côté backend et côté frontend
-        - Si `backend Django` + `frontend Angular` ==> règles seraient dupliquées
+        - NB : Si `backend Django` + `frontend Angular` ==> règles seraient dupliquées
     - Ce sont les forms qui devront s'adapter au format utilisé par notre domaine (et non l'inverse)
     - Les FieldReference ne seront peut-être plus réutilisées à l'avenir
         - Utile uniquement pour formulaires massifs et complexes
@@ -382,6 +397,11 @@ ValidationRule(
     - Toute MultipleBusinessExceptions gérable par le client (view, API...)
 
 - Utiliser `DisplayExceptionsByFieldNameMixin` dans nos Django forms
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
 
 ```python
 class DisplayExceptionsByFieldNameMixin:
@@ -448,7 +468,7 @@ class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
     def get_invariants_validators(self) -> List[BusinessValidator]:
         raise NotImplementedError()
 
-    def __validate_inputs(self):
+    def __validate_data_contract(self):
         self.__validate(self.get_input_validators())
 
     def __validate_invariants(self):
@@ -469,7 +489,7 @@ class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
             raise MultipleBusinessExceptions(exceptions=exceptions)
 
     def validate(self):
-        self.__validate_inputs()
+        self.__validate_data_contract()
         self.__validate_invariants()
 
 

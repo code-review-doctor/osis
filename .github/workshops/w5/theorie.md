@@ -1,4 +1,4 @@
-## DTO : Data Transfer Objects
+## DTO : Data Transfer Object
 
 
 ### Définition
@@ -8,8 +8,10 @@
 - Objectif : simplifier le transfert des données entre les couches d'une application logicielle 
 - Possède uniquement des déclarations d'attributs
 - Aucune logique technique, métier, fonction...
-- "Contrat de données" qui nous aide à atteindre la compatibilité entre les différentes couche d'une application
- 
+- "Contrat de données" qui nous aide à atteindre la compatibilité entre les différentes couches d'une application
+- Enlève l'interdépendance entre couches
+    - Facilite le refactoring
+
 - Question : avons-nous déjà des DTO dans notre code actuel ?
 
 
@@ -31,6 +33,7 @@
     - intitulé complet
     - type
     - entité de charge
+    - entité d'attribution
     
 ```python
 # Application service
@@ -44,7 +47,13 @@ Constats :
     - je n'affiche que 5 champs de l'objet LearningUnit
     - renvoie LearningUnit objet complet du domaine avec toutes entities imbriquées
 
-Solution : 
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+### Solution
 
 
 ```python
@@ -57,6 +66,7 @@ class SearchLearningUnitDTO(interface.DTO):
     responsible_entity = attr.ib(type=str)
 
 
+# TODO : create IReadLearningUnitRepository ? 
 class LearningUnitRepository(interface.AbstractRepository):
 
     def search(self, **searchparams) -> List[SearchLearningUnitDTO]:
@@ -66,90 +76,78 @@ class LearningUnitRepository(interface.AbstractRepository):
 ```
 
 
-Inconvénients : 
-- Couplage fort avec la DB
+Inconvénients :
 - Logique métier encapsulée dans la query de sélection
     - intitulé complet
-    
 - Peut devenir difficile si nécessite d'afficher des données de domaines différents
 
+
 Avantages :
+- Découplage de la DB (et des querysets)
+    - Contrat de données attendues pour la recherche d'une liste de LearningUnit
 - performances
 
 
-### Problème 2
-
-- En tant qu'utilisateur, je veux consulter la liste des groupements et formations qui utilisent une UE
-
-```python
-
-# Application service
-def search_formations_by_learning_unit_service(cmd: interface.CommandRequest) -> List['ProgramTreeVersion']:
-    return ProgramTreeVersionRepository().search(learning_unit_identity=LearningUnitIdentity(com.code, cmd.year))
-
-```
-
-- Même constat et mémé solution que le cas ci-dessus
+Question : 
+- Doit-on créer un DTO par ListView / form de recherche ?
 
 
-- POurquoi DTo ? Car nécessaire de pouvoir proposer du contenu en lecture uniquement dans un premier temps (le DDD pourrait venir par rapèrs)
-- FAQ : Quand utiliser les DTO pour la consultation quand utiliser nos objets du domaine ?
-- Un DTO peut il être utilisé dans le Domaine ??
-- Utiliser un IReadRepository pour les DTO (afin de séparer les repo READ / WRITE == CQS)
-- données initiales de Forms filtrées : DTO ou domain service ? (exemple : filtrer les etds en états X ou Y)
-- Nos Interface.CommandRequest sont des DTO
-
-Ok donc on va partir sur des DTO + repository qui renvoient des DTO + querysets UNIQUEMENT dans les repos. 
-Les Serializers, forms, views utilisent alors un application service qui renvoie DTO à parir d'un repo 
-
-
-- UQand utilise run DTO :
-    - Repository : lrosqi'ullelle utilise une factory
-    - Repository : tout ce qui vient du'n qyuersyet django
-    - Quid des données initiales (filtrées) pour les formulaires ? Cf. DTO
-    - Lecute d'objets :
-        - dont le ocntenu n'existe pas das le domaine (domaine non dfini)
-        - Beosin que de certains chamsp dans plusieurs doamiens (trop complexe de charger tous les chamsp)
-
-## Commands : rappel
-- Fait partie entièrement du domaine
-- Représente les actions qu'un utilisateur peut effectuer
-- Déclenche une modification dans notre domaine
- - [W4] Les paramètres d'une commande ne peuvent jamais être considérés comme une valeur "valide" : 
- le domaine ne peut pas s'y fier. Interdit de passer des valeurs calculées "businessement" dans une commande.
-- "Appels de méthode sérialisables"
-- Exemple :
-```python
-
-@attr.s(frozen=True, slots=True)
-class CreateOrphanGroupCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    abbreviated_title = attr.ib(type=str)
-    title_fr = attr.ib(type=str)
-    title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    constraint_type = attr.ib(type=str)
-    min_constraint = attr.ib(type=int)
-    max_constraint = attr.ib(type=int)
-    management_entity_acronym = attr.ib(type=str)
-    teaching_campus_name = attr.ib(type=str)
-    organization_name = attr.ib(type=str)
-    remark_fr = attr.ib(type=str)
-    remark_en = attr.ib(type=str)
-    start_year = attr.ib(type=int)
-    end_year = attr.ib(type=Optional[int])
-```
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 
+## Quand utiliser un DTO ?
+
+- Toujours maximiser la réutilisation de nos objets du domaine
+    - Mapping avec la DB déjà effectuée (via repository)
+    - Logique métier encapsulée dans nos objets du domaine
+
+- Lorsque les performances en lecture deviennent excessives. 
+    - Cas possibles : 
+        - Vue de recherche (vue liste)
+        - données initiales de Forms filtrées : DTO ou domain service ? (exemple : filtrer les etds en états X ou Y)
+        - Fichier Excel
+        - Fichier PDF
+    - Dans ce cas, les Views/forms/pdf/excel... réutilisent un ApplicationService qui renvoie un DTO à partir d'un Repository
+
+- Dans les repositories, tout ce qui vient d'un Queryset Django
+
+- Dans les `Repository.get()` qui utilisent les Factory pour créer un objet du domaine
+    - Permet de typer les valeurs de retour des querysets
+
+
+- Utiliser un IReadRepository pour les DTO (afin de séparer les repo READ / WRITE == CQS) ?
+
+- Lorsque le domaine métier n'existe pas encore, mais qu'on doit développer des écrans en lecture seule
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Interface : définition
+
+- Déclaration d'un ensemble standardisé de méthode
+- Intermédiaire entre 2 logiciels au travers d'un langage commun
+- Objectif : cacher la difficulté d'accès à un logiciel
+- Plus notre logiciel est modulaire/découplé, plus il y aura d'interfaces 
+- Exemple :
+    - API : Application Programming Interface
+        - Protocole de communication : HTTP / HTTPS
+
+
+#### :question: avons-nous d'autres interfaces dans notre code ?
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
 
 ## Architecture en oignon
 
-### Interface : définition
 
 
 ### Bounded Context
@@ -158,7 +156,7 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
 
 En partant de l'idée qu'on aura 1 seule factory pour 1 Repository et 1 application service :
 
-Essai n°1 : 
+Essai n°1 :
 - Injecter ResponsibleEntity dans LearningUnitBuilder
 - Inconvénients :
     - LearningUnitRepository.get() a besoin de ResponsibleEntityRepository
@@ -228,10 +226,51 @@ Et pour les DTO : on utiliserais 1 DTO par AggregateRoot ? Pour fusionner le Bui
 - Changer le dossier "service" en "use cases" ?
 - W5 : ou placer les exceptions.py ? (exceptions business)
 - Où placer les command.py ?  
+- Où placer les DTOs ?  
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 
 
 ## Message bus
+
+
+### Commands : rappel
+
+- Représente les actions qu'un utilisateur peut effectuer
+    - Fait partie entièrement du domaine
+- Déclenche une modification dans notre domaine
+- Une commande peut ne pas être "valide" pour notre domaine (cf. validateurs) 
+    - Les paramètres d'une commande ne peuvent jamais être considérés comme une valeur "valide"
+    - Le domaine ne peut pas s'y fier et doit valider les paramètres d'entrée
+    - Interdit de passer des valeurs calculées "businessement" dans une commande
+- "Appels de méthode sérialisables"
+- Exemple :
+```python
+
+@attr.s(frozen=True, slots=True)
+class CreateOrphanGroupCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    abbreviated_title = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    constraint_type = attr.ib(type=str)
+    min_constraint = attr.ib(type=int)
+    max_constraint = attr.ib(type=int)
+    management_entity_acronym = attr.ib(type=str)
+    teaching_campus_name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    remark_fr = attr.ib(type=str)
+    remark_en = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=Optional[int])
+```
+
 
 - [W6] message bus - pour aider aux unit tests https://github.com/uclouvain/osis/commit/520789ff538cc2046237f817f439c273c9093cae
 - injection des repositories

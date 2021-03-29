@@ -27,6 +27,7 @@
 - repository : regroupe uniquement les interfaces
       - Nomenclature : IRepository
       - Exemple : ProgramTreeIRepository.search_from_children()
+- Seul à connaître les Querysets
 
 -------------------------------
 

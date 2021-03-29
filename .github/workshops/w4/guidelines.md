@@ -16,6 +16,9 @@
 
 ### validateurs
 
+
+GUIDELINE : nomencalture : valiators  :"SHOULD"
+
 - Interdit de passer des Command dans un Validator 
 --> Modifier interface BusinessValidator, qui peut recevoir uniquement : 
     - EntityRoot
