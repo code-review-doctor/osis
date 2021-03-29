@@ -644,7 +644,7 @@ msgstr ""
 msgid "Number of elements"
 msgstr ""
 
-msgid "Opening to Adults"
+msgid "Open to adults"
 msgstr ""
 
 msgid "Other academic responsibles"

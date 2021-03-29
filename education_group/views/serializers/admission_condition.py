@@ -262,7 +262,7 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'opening_to_adults': {
-            'label_translated': _('Opening to Adults'),
+            'label_translated': _('Open to adults'),
             'text_fr': '',
             'text_en': ''
         },

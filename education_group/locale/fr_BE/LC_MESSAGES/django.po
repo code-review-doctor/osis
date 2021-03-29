@@ -681,7 +681,7 @@ msgstr "Bacheliers non universitaires"
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
 
-msgid "Opening to Adults"
+msgid "Open to adults"
 msgstr "Ouverture aux adultes"
 
 msgid "Other academic responsibles"
