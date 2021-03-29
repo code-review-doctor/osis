@@ -1,0 +1,83 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load static bootstrap3 %}
+{% load i18n %}
+
+{% block breadcrumb %}
+    {{ block.super }}
+    <li class="active">
+        {% trans 'New learning unit' %}
+    </li>
+{% endblock breadcrumb %}
+
+{% block header_content %}
+    <div class="page-header">
+        <h2>{% trans 'New learning unit' %}</h2>
+    </div>
+{% endblock header_content %}
+
+{% block content %}
+
+    {% bootstrap_form_errors form %}
+
+    <form method="post" id="LearningUnitYearForm" novalidate>
+        <div class="panel-footer">
+            {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+        </div>
+
+        <div class="panel-body">
+
+            {% csrf_token %}
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+
+                            <div class="row">
+                                <div class="col-md-4 acronym-group">
+                                    {% bootstrap_label form.code.label label_class="control-label" %}
+                                    <abbr title="{% trans 'acronym rules' %}">
+                                                <span class="glyphicon glyphicon-question-sign "
+                                                      title="{% trans 'acronym rules' %}"
+                                                      style="font-size: 14pt;"></span>
+                                    </abbr>
+                                    {% bootstrap_field form.code show_label=False %}
+                                </div>
+                                {% bootstrap_field form.type form_group_class="col-md-3" %}
+                                {% bootstrap_field form.internship_subtype form_group_class="col-md-5" %}
+                            </div>
+                            <div class="row">
+                                {% bootstrap_field form.credits form_group_class="col-md-3" field_class="ignore-js-validator" %}
+                                {% bootstrap_field form.periodicity form_group_class="col-md-3" %}
+    {#                            {% bootstrap_field form.status form_group_class="col-md-2" %}#}
+                                {% bootstrap_field form.language form_group_class="col-md-4" %}
+                            </div>
+
+                            <br>
+
+                            {% include "workshop/_panel_titles.html" %}
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            {% bootstrap_field form.remark_faculty %}
+                            {% bootstrap_field form.remark_publication_fr %}
+                            {% bootstrap_field form.remark_publication_en %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    {% include "workshop/_panel_institution.html" %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="panel-footer">
+            {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+        </div>
+
+
+    </form>
+{% endblock content %}

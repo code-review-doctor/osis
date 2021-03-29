@@ -1,0 +1,35 @@
+{% load bootstrap3 %}
+{% load i18n %}
+{% load learning_unit %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <label title="{% trans "The title is made up of the common part and / or any supplement" %}">
+            {% trans "Title" %} *
+        </label>
+        <br>
+        <label style="font-style:italic" title="{% trans "Part of the title which is common to the complete EU, to its partims and to its classes" %}">
+            {% trans "Common part" %}
+        </label>
+        {% bootstrap_field form.common_title_fr form_group_class="form-group" show_label=False %}
+        <label style="font-style:italic">{% trans "Specific complement (Full)" %}</label>
+        {% bootstrap_field form.specific_title_fr form_group_class="form-group" show_label=False %}
+    </div>
+</div>
+
+<br/>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <label title="{% trans "The title is made up of the common part and / or any supplement" %}">
+            {% trans "Title in English" %}
+        </label>
+        <br>
+        <label style="font-style:italic" title="{% trans "Part of the title which is common to the complete EU, to its partims and to its classes" %}">
+            {% trans "Common part" %}
+        </label>
+        {% bootstrap_field form.common_title_en form_group_class="form-group" show_label=False %}
+        <label style="font-style:italic">{% trans "Specific complement (Full)" %}</label>
+        {% bootstrap_field form.specific_title_en form_group_class="form-group" show_label=False %}
+    </div>
+</div>

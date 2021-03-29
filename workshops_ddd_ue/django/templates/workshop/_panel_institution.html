@@ -1,0 +1,27 @@
+{% load bootstrap3 i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <div class="row form-group">
+            {% bootstrap_field form.responsible_entity form_group_class="col-md-12"%}
+        </div>
+
+        {% bootstrap_field form.academic_year %}
+    </div>
+</div>
+
+{{ form.media }}
+
+<style>
+    /* Overrided to get items in list */
+    .select2-container .select2-selection--multiple {
+        box-sizing: border-box;
+        cursor: pointer;
+        display: inline-grid;
+        min-height: 32px;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+</style>
+
