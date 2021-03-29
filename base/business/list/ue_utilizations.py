@@ -230,5 +230,5 @@ def _check_cell_to_color(dict_to_update: dict, learning_unit_yr: LearningUnitYea
 def _get_management_entity_faculty(management_entity: EntityVersion, academic_year: AcademicYear) -> str:
     if management_entity:
         faculty_entity = management_entity.find_faculty_version(academic_year)
-        return faculty_entity.acronym if faculty_entity else '-'
+        return faculty_entity.acronym if faculty_entity else management_entity.acronym
     return '-'
