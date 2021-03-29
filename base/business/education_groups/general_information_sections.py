@@ -63,7 +63,7 @@ OPTIONS = 'options'
 INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
-ADMISSION_CONDITION = 'conditions_admission'
+ACCESS_REQUIREMENTS = 'conditions_admission'
 CAREER_DEVELOPMENT = 'career_development'
 TUITION_FEES = 'tuition_fees'
 VERSIONS = 'versions'
@@ -124,8 +124,8 @@ SECTION_LIST = [
             ]),
 ]
 
-# Common type which have admission conditions sections + relevant sections
-COMMON_TYPE_ADMISSION_CONDITIONS = {
+# Common type which have access requirements sections + relevant sections
+COMMON_TYPE_ACCESS_REQUIREMENTS = {
     TrainingType.BACHELOR.name:
         ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
          'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', 'free',),
@@ -153,7 +153,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -177,7 +177,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -201,7 +201,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -225,7 +225,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -249,7 +249,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -268,14 +268,14 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
     },
     TrainingType.CAPAES.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, VERSIONS]
+        'specific': [WELCOME_INTRODUCTION, ACCESS_REQUIREMENTS, VERSIONS]
     },
     TrainingType.RESEARCH_CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
@@ -285,7 +285,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PEDAGOGY,
             DETAILED_PROGRAM,
             STRUCTURE,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             VERSIONS
         ]
     },
@@ -309,7 +309,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -334,7 +334,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -360,7 +360,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -398,7 +398,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -434,7 +434,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             COMPLEMENTARY_MODULE,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -456,7 +456,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             OPTIONS,
             VERSIONS
@@ -479,7 +479,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -501,7 +501,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -523,7 +523,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -545,7 +545,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -567,7 +567,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -589,7 +589,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
