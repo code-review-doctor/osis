@@ -5,7 +5,7 @@ from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
+from workshops_ddd_ue.business_types import *
 
 
 class AcademicYearLowerThan2019Exception(BusinessException):

@@ -5,8 +5,8 @@ from osis_common.ddd import interface
 from workshops_ddd_ue.command import CreatePartimCommand
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnit
 from workshops_ddd_ue.validators.validators_by_business_action import CreatePartimValidatorList
+from workshops_ddd_ue.business_types import *
 
 
 @attr.s(frozen=True, slots=True)

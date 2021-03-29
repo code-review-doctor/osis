@@ -3,7 +3,6 @@ from typing import List
 from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity, LearningUnit
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
 from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator
 from workshops_ddd_ue.validators._credits_minimum_value import CreditsMinimumValueValidator
@@ -16,6 +15,7 @@ from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code imp
 from workshops_ddd_ue.validators._subdivision_should_contain_only_one_letter import \
     SubdivisionShouldContainOnlyOneLetterValidator
 from workshops_ddd_ue.validators._subdivision_should_not_exist import SubdivisionShouldNotExistValidator
+from workshops_ddd_ue.business_types import *
 
 
 class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
