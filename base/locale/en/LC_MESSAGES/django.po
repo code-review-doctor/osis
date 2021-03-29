@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-18 08:39+0100\n"
+"POT-Creation-Date: 2021-03-26 14:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,6 +137,9 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
+msgstr ""
+
 msgid "Academic"
 msgstr ""
 
@@ -150,6 +153,9 @@ msgid "Academic calendar"
 msgstr ""
 
 msgid "Academic calendar management"
+msgstr ""
+
+msgid "Academic nature, category of decree and university certificate"
 msgstr ""
 
 msgid "Academic partner"
@@ -642,11 +648,6 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
-msgstr ""
-
 msgid "Default learning unit enrollment"
 msgstr ""
 
@@ -687,6 +688,9 @@ msgid "Details other educational facilities"
 msgstr ""
 
 msgid "Diploma title"
+msgstr ""
+
+msgid "Diploma title, professionnal title and aims"
 msgstr ""
 
 msgid "Diploma/certificat"
@@ -840,9 +844,6 @@ msgstr ""
 msgid "Enrolled to learning unit"
 msgstr ""
 
-msgid "Enrollment"
-msgstr ""
-
 msgid "Enrollment campus"
 msgstr ""
 
@@ -850,6 +851,9 @@ msgid "Enrollment date"
 msgstr ""
 
 msgid "Enrollment enabled"
+msgstr ""
+
+msgid "Enrollment, partial deliberation and admission exam"
 msgstr ""
 
 msgid "Enrollments to learning unit"
@@ -888,6 +892,11 @@ msgid "Entity manager"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid ""
+"Entity, location, language, duration, schedule and types of activities "
+"present in the training"
 msgstr ""
 
 msgid "Entrepreneur"
@@ -1358,6 +1367,9 @@ msgstr ""
 msgid "Local credits"
 msgstr ""
 
+msgid "Location, language and types of activities present in the training"
+msgstr ""
+
 msgid "Lock"
 msgstr ""
 
@@ -1699,9 +1711,6 @@ msgid "Organizational chart"
 msgstr ""
 
 msgid "Organizations"
-msgstr ""
-
-msgid "Osis code"
 msgstr ""
 
 msgid "Other academic responsible"
@@ -2074,6 +2083,9 @@ msgstr ""
 
 msgctxt "Submission email table header"
 msgid "Registration number"
+msgstr ""
+
+msgid "Remarks, comments and constraints"
 msgstr ""
 
 msgid "Req. Entities"
