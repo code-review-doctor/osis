@@ -86,6 +86,7 @@ class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditi
     ca_maitrise_fr = serializers.CharField(read_only=True)
     ca_allegement = serializers.CharField(read_only=True)
     ca_ouv_adultes = serializers.CharField(read_only=True)
+    admission_enrollment_procedures = serializers.CharField(read_only=True)
 
     class Meta:
         model = AdmissionCondition
@@ -96,7 +97,8 @@ class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditi
             'ca_cond_generales',
             'ca_maitrise_fr',
             'ca_allegement',
-            'ca_ouv_adultes'
+            'ca_ouv_adultes',
+            'admission_enrollment_procedures'
         )
 
 

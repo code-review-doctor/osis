@@ -115,7 +115,8 @@ class AggregationAdmissionConditionsSerializerTestCase(TestCase):
             'ca_cond_generales',
             'ca_maitrise_fr',
             'ca_allegement',
-            'ca_ouv_adultes'
+            'ca_ouv_adultes',
+            'admission_enrollment_procedures'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

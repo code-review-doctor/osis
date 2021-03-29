@@ -69,12 +69,12 @@ class TestGetCommonAdmissionConditionSerializer(TestCase):
                 'text_en': cls.common_admission_training_120.text_ca_maitrise_fr_en
             },
             'subscription_lightening': {
-                'label_translated': _('Reduction'),
+                'label_translated': _('Reduced credit registration'),
                 'text_fr': cls.common_admission_training_120.text_ca_allegement,
                 'text_en': cls.common_admission_training_120.text_ca_allegement_en
             },
             'opening_to_adults': {
-                'label_translated': _('Opening to Adults'),
+                'label_translated': _('Open to adults'),
                 'text_fr': cls.common_admission_training_120.text_ca_ouv_adultes,
                 'text_en': cls.common_admission_training_120.text_ca_ouv_adultes_en
             },
