@@ -1,6 +1,7 @@
 
 - W5 : mettre à jour la partie "abroerscence des packages" dans le CONTRIBUTING (suite à workshop)
 
+- Référencer les Aggregates à travers leur EntityIdentity pour assurer découplage
 
 
 -------------------------------
@@ -9,6 +10,8 @@
 
 - [W6] # GUIDELINES :: 1 commande par service obligatoire !
 - [W6] Un service == CommandHandler
+ - [W4] Les paramètres d'une commande ne peuvent jamais être considérés comme une valeur "valide" : 
+ le domaine ne peut pas s'y fier. Interdit de passer des valeurs calculées "businessement" dans une commande.
 
 
 -------------------------------

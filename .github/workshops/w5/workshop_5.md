@@ -8,6 +8,7 @@
         Refactorer notre code selon cette architecture
         Injection des dépendances des repositories dans les application services
         Créer un Form, une view, un template pour créer une UE
+        Command bus : implémentation
 
 
 ## Cas d'utilisation

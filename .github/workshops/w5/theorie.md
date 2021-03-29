@@ -103,11 +103,20 @@ Ok donc on va partir sur des DTO + repository qui renvoient des DTO + querysets 
 Les Serializers, forms, views utilisent alors un application service qui renvoie DTO à parir d'un repo 
 
 
+- UQand utilise run DTO :
+    - Repository : lrosqi'ullelle utilise une factory
+    - Repository : tout ce qui vient du'n qyuersyet django
+    - Quid des données initiales (filtrées) pour les formulaires ? Cf. DTO
+    - Lecute d'objets :
+        - dont le ocntenu n'existe pas das le domaine (domaine non dfini)
+        - Beosin que de certains chamsp dans plusieurs doamiens (trop complexe de charger tous les chamsp)
 
 ## Commands : rappel
 - Fait partie entièrement du domaine
 - Représente les actions qu'un utilisateur peut effectuer
 - Déclenche une modification dans notre domaine
+ - [W4] Les paramètres d'une commande ne peuvent jamais être considérés comme une valeur "valide" : 
+ le domaine ne peut pas s'y fier. Interdit de passer des valeurs calculées "businessement" dans une commande.
 - "Appels de méthode sérialisables"
 - Exemple :
 ```python
