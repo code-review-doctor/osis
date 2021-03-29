@@ -62,7 +62,7 @@
 
             {% if training.is_aggregation %}
                 {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=common_admission_condition.french_proficiency_examination.text_fr field_en=common_admission_condition.french_proficiency_examination.text_en can_edit=False %}
-                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=common_admission_condition.subscription_lightening.text_fr field_en=common_admission_condition.subscription_lightening.text_en can_edit=False %}
+                {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduced credit registration") field=common_admission_condition.subscription_lightening.text_fr field_en=common_admission_condition.subscription_lightening.text_en can_edit=False %}
                 {% include 'education_group_app/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=common_admission_condition.opening_to_adults.text_fr field_en=common_admission_condition.opening_to_adults.text_en can_edit=False %}
 
                 <!-- Procédures d'admission et d'inscription -->

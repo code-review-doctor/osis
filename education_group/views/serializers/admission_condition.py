@@ -248,7 +248,7 @@ def __default_common_admission_condition():
             'text_en': ''
         },
         'subscription_lightening': {
-            'label_translated': _('Reduction'),
+            'label_translated': _('Reduced credit registration'),
             'text_fr': '',
             'text_en': ''
         },
