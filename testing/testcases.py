@@ -74,6 +74,10 @@ class DDDTestCase(TestCase):
         self.fake_mini_training_repository._mini_trainings = list()
         self.fake_training_repository._trainings = list()
 
+        self.fake_node_repository._nodes = list()
+        self.fake_program_tree_repository._trees = list()
+        self.fake_program_tree_version_repository._trees_version = list()
+
     def mock_repo(self, repository_path: 'str', fake_repo: 'Any') -> mock.Mock:
         repository_patcher = mock.patch(repository_path, new=fake_repo)
         self.addCleanup(repository_patcher.stop)
@@ -85,27 +89,6 @@ class DDDTestCase(TestCase):
         self.addCleanup(service_patcher.stop)
 
         return service_patcher.start()
-
-    def _init_fake_repos(self):
-        self._init_education_group_app_repo()
-
-        self.fake_program_tree_version_repository = get_fake_program_tree_version_repository([])
-        self.mock_repo(
-            "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
-            self.fake_program_tree_version_repository
-        )
-
-        self.fake_program_tree_repository = get_fake_program_tree_repository([])
-        self.mock_repo(
-            "program_management.ddd.repositories.program_tree.ProgramTreeRepository",
-            self.fake_program_tree_repository
-        )
-
-        self.fake_node_repository = get_fake_node_repository([])
-        self.mock_repo(
-            "program_management.ddd.repositories.node.NodeRepository",
-            self.fake_node_repository
-        )
 
     def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):
         self.fake_program_tree_version_repository._trees_version.append(tree_version)

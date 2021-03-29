@@ -50,7 +50,7 @@ NEXT_ACADEMIC_YEAR_YEAR = 2022
 @override_settings(YEAR_LIMIT_EDG_MODIFICATION=PAST_ACADEMIC_YEAR_YEAR)
 class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
 
         self.tree_version_from = SpecificProgramTreeVersionFactory(
             tree=ProgramTreeBachelorFactory(current_year=CURRENT_ACADEMIC_YEAR_YEAR, end_year=NEXT_ACADEMIC_YEAR_YEAR)
@@ -224,7 +224,7 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
 @override_settings(YEAR_LIMIT_EDG_MODIFICATION=PAST_ACADEMIC_YEAR_YEAR)
 class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
 
         self.tree_version_from = SpecificProgramTreeVersionFactory(
             tree=ProgramTreeBachelorFactory(current_year=CURRENT_ACADEMIC_YEAR_YEAR, end_year=NEXT_ACADEMIC_YEAR_YEAR)
