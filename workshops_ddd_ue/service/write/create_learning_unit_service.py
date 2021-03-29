@@ -4,8 +4,8 @@ from django.db import transaction
 
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity, LearningUnit
-from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
-from workshops_ddd_ue.factory.responsible_entity_identity_factory import ResponsibleEntityIdentityBuilder
+from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
+from workshops_ddd_ue.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
 from workshops_ddd_ue.repository.entity_repository import EntityRepository
 from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 

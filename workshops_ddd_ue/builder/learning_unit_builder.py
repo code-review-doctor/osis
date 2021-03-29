@@ -16,7 +16,7 @@ from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUni
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
 from workshops_ddd_ue.dto.learning_unit_dto import DTO, LearningUnitFromRepositoryDTO
-from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
+from workshops_ddd_ue.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
 

@@ -5,7 +5,7 @@ import attr
 class DTO:
     """
     Data Transfer Object : only contains declaration of primitive fields.
-    Used as 'contract" between 2 layers in the code (example : repository <-> factory)
+    Used as 'contract" between 2 layers in the code (example : querysets Django (repository) <-> Builder)
     """
     pass
 

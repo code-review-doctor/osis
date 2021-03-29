@@ -4,8 +4,8 @@ from django.db import transaction
 
 from workshops_ddd_ue.command import CreateLearningUnitCommand, CopyLearningUnitToNextYearCommand
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity, LearningUnit
-from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
-from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
+from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
+from workshops_ddd_ue.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 
 

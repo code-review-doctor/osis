@@ -14,7 +14,7 @@ from reference.models.language import Language as LanguageDatabase
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
-from workshops_ddd_ue.factory.learning_unit_factory import LearningUnitBuilder
+from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
 
 
 class LearningUnitRepository(interface.AbstractRepository):

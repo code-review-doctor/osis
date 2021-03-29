@@ -5,7 +5,7 @@ import attr
 from base.ddd.utils.business_validator import BusinessValidator
 from workshops_ddd_ue.domain.exceptions import LearningUnitAlreadyExistsException
 from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
-from workshops_ddd_ue.factory.learning_unit_identity_factory import LearningUnitIdentityBuilder
+from workshops_ddd_ue.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
 @attr.s(frozen=True, slots=True)
