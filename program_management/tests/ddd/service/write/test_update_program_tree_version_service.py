@@ -36,6 +36,7 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 from testing.mocks import MockPatcherMixin
 
 
+#  FIXME delete because this application service is not called directly
 @mock.patch("program_management.ddd.service.write.delete_specific_version_service.delete_specific_version")
 class TestUpdateTrainingVersion(TestCase, MockPatcherMixin):
 
