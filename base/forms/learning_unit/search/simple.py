@@ -132,7 +132,7 @@ class LearningUnitFilter(FilterSet):
         method="filter_only_proposals",
         label=_('Only proposals'),
         widget=forms.CheckboxInput,
-        initial='False'
+        initial=False
     )
 
     order_by_field = 'ordering'
@@ -165,6 +165,7 @@ class LearningUnitFilter(FilterSet):
         self.form.fields["academic_year"].initial = AcademicYear.objects.filter(
             year__in=targeted_year_opened
         ).first() or current_academic_year()
+
 
     def filter_tutor(self, queryset, name, value):
         value = value.replace(' ', '\\s')
