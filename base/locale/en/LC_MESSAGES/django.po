@@ -1668,6 +1668,9 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
+msgid "Only proposals"
+msgstr ""
+
 msgid "Only the volume Q1 must have a value"
 msgstr ""
 
