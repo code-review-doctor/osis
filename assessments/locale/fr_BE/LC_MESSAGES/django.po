@@ -291,9 +291,6 @@ msgstr "Unité d'apprentissage"
 msgid "Line"
 msgstr "Ligne"
 
-msgid "Locality"
-msgstr "Localité"
-
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
@@ -548,6 +545,9 @@ msgstr "Etat"
 
 msgid "Status"
 msgstr "Status"
+
+msgid "Street and number"
+msgstr "Rue et numéro"
 
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"

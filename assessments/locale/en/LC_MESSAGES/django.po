@@ -272,9 +272,6 @@ msgstr ""
 msgid "Line"
 msgstr ""
 
-msgid "Locality"
-msgstr ""
-
 msgid "M=Justified Absence"
 msgstr ""
 
@@ -516,6 +513,9 @@ msgid "State"
 msgstr ""
 
 msgid "Status"
+msgstr ""
+
+msgid "Street and number"
 msgstr ""
 
 msgid "Student not registered for exam"
