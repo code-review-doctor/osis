@@ -665,6 +665,9 @@ msgstr "Catégorie décret"
 msgid "Deepening"
 msgstr "Approfondissement"
 
+msgid "Default information"
+msgstr "Informations par défaut"
+
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
 

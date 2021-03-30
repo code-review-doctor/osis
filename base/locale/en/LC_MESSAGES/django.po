@@ -648,6 +648,9 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
+msgid "Default information"
+msgstr ""
+
 msgid "Default learning unit enrollment"
 msgstr ""
 
