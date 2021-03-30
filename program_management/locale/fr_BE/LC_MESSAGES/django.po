@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-30 10:56+0200\n"
+"POT-Creation-Date: 2021-03-30 11:38+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -723,6 +723,13 @@ msgstr "Activité cyclique dispensée en"
 
 msgid "Periodicity"
 msgstr "Périodicité"
+
+#, python-format
+msgid ""
+"Please create at least a transition version [%(transition_name)s] for one of "
+"the finalities %(finalities)s in %(academic_year)s."
+msgstr "Veuillez créer au moins une version de transition [%(transition_name)s] "
+"pour une des finalités de %(finalities)s en %(academic_year)s."
 
 msgid "Please cut or copy an item before paste"
 msgstr "Veuillez copier ou couper un élément avant de le coller"

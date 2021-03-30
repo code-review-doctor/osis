@@ -446,3 +446,16 @@ class CannotFillContentOfProgramTreeOfTypeFinalityException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Tree is finality")
         super().__init__(message, **kwargs)
+
+
+class FinalitiesHaveNoCorrespondingTransitionVersionException(BusinessException):
+    def __init__(self, finalities: Set['Node'], to_tree: 'ProgramTree', **kwargs):
+        message = _(
+            "Please create at least a transition version [%(transition_name)s] for one of the finalities %(finalities)s"
+            " in %(academic_year)s."
+        ) % {
+            "transition_name": to_tree.root_node.transition_name,
+            "finalities": ", ".join([str(finality) for finality in finalities]),
+            "academic_year": to_tree.root_node.academic_year
+        }
+        super().__init__(message, **kwargs)

@@ -262,7 +262,11 @@ class ProgramTreeBuilder:
             existing_nodes: Set['Node'],
             node_code_generator: 'GenerateNodeCode'
     ) -> 'ProgramTree':
-        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
+        validators_by_business_action.FillTransitionProgramTreeValidatorList(
+            from_tree,
+            to_tree,
+            existing_nodes
+        ).validate()
 
         self._fill_node_from_node_in_case_of_transition(
             from_tree.root_node,

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-30 10:56+0200\n"
+"POT-Creation-Date: 2021-03-30 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -665,6 +665,12 @@ msgid "Periodic courses taught during"
 msgstr ""
 
 msgid "Periodicity"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please create at least a transition version [%(transition_name)s] for one of "
+"the finalities %(finalities)s in %(academic_year)s."
 msgstr ""
 
 msgid "Please cut or copy an item before paste"
