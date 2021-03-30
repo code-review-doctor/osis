@@ -49,9 +49,13 @@ XLS_DESCRIPTION = _('List of learning units with one line per training')
 WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
 FIRST_TRAINING_COLUMN = 26
-TOTAL_NB_OF_COLUMNS = 29
+TOTAL_NB_OF_COLUMNS = 31
 HEADER_PROGRAMS = [
-    str(_('Gathering')), str(_('Training code')), str(_('Training title')), str(_('Training management entity'))
+    str(_('Gathering')),
+    str(_('Training code')),
+    str(_('Training title')),
+    str(_('Training management entity')),
+    str(_('Training management entity faculty')),
 ]
 
 
@@ -164,6 +168,7 @@ def _build_training_data_columns(leaf_credits: str,
         Q(end_date__isnull=True) | Q(end_date__gt=an_academic_year.end_date)
     ).last()
     data.append(management_entity.acronym if management_entity else '-')
+    data.append(_get_management_entity_faculty(management_entity, an_academic_year))
     return data
 
 
@@ -220,3 +225,10 @@ def _check_cell_to_color(dict_to_update: dict, learning_unit_yr: LearningUnitYea
                 cells_to_color.append(cell_ref)
         colored_cells[PROPOSAL_LINE_STYLES.get(learning_unit_yr.proposallearningunit.type)].extend(cells_to_color)
     return colored_cells
+
+
+def _get_management_entity_faculty(management_entity: EntityVersion, academic_year: AcademicYear) -> str:
+    if management_entity:
+        faculty_entity = management_entity.find_faculty_version(academic_year)
+        return faculty_entity.acronym if faculty_entity else management_entity.acronym
+    return '-'
