@@ -80,13 +80,16 @@ class NotCopyTrainingMiniTrainingNotExistingEvent(ReportEvent):
 @attr.s(frozen=True, slots=True)
 class CopyTransitionTrainingNotExistingEvent(ReportEvent):
     node = attr.ib(type='NodeGroupYear')
-    copy_year = attr.ib(type=AcademicYear)
+    root_node = attr.ib(type='NodeGroupYear')
 
     def __str__(self):
-        return _("Training %(title)s transition version is non existent.") % {
-                   "title": self.node.full_acronym(),
-                   "copy_year": self.copy_year,
-               }
+        return _(
+            "The transition version [%(version)s] of the training %(title)s does not exist in %(academic_year)s"
+        ) % {
+            "version": self.root_node.version_label,
+            "title": self.node.full_acronym(),
+            "academic_year": self.root_node.academic_year,
+        }
 
 
 @attr.s(frozen=True, slots=True)

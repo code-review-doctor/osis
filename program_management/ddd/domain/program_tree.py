@@ -328,8 +328,8 @@ class ProgramTreeBuilder:
             if not child and source_link.child.is_training():
                 to_tree.report.add_warning(
                     report_events.CopyTransitionTrainingNotExistingEvent(
+                        root_node=to_tree.root_node,
                         node=source_link.child,
-                        copy_year=to_node.academic_year
                     )
                 )
                 continue
