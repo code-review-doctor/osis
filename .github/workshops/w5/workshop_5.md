@@ -1,14 +1,14 @@
 ## [W6] Formation 5 :
 
-    Théorie :
-        Architecture iognon : définition + structure dossiers (attention à inclure la position des views, forms...)
-        Command bus : définition
-        DTO : définition
-    Workshop [contenu à développer]
-        Refactorer notre code selon cette architecture
-        Injection des dépendances des repositories dans les application services
-        Créer un Form, une view, un template pour créer une UE
-        Command bus : implémentation
+Théorie :
+    Architecture iognon : définition + structure dossiers
+    Command bus : définition
+    DTO : définition
+Workshop [contenu à développer]
+    Refactorer notre code selon cette architecture
+    Injection des dépendances des repositories dans les application services
+    Créer un Form, une view, un template pour créer une UE
+    Command bus : implémentation
 
 
 ## Cas d'utilisation

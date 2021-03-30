@@ -17,12 +17,6 @@
 
 -------------------------------
 
-### Application service
-
-- [W6] Injection de dépendances des repositories
-
--------------------------------
-
 ### Repository
 
 - repository : regroupe uniquement les interfaces
@@ -30,11 +24,6 @@
       - Exemple : ProgramTreeIRepository.search_from_children()
 - Seul à connaître les Querysets
 
--------------------------------
-
-### Coding styles
-
-- [W5] Correction d'un bug = obligation d'un test unitaire.
 
 -------------------------------
 
@@ -53,4 +42,5 @@
 - [W5] Note importante : un service NE PEUT PAS être réutilisable et ne doit faire qu'une seule chose à la fois.
 Par exemple, un service de mise à jour ne doit faire qu'une mise à jour et rien de plus (pas de report !).
 En d'autres termes, si une action (bouton) utilisateur nécessite de créer un training, reporter ce training, créer le programme type, le reporter, créer le gorupement et le reporter, etc... cela doit être 1 service qui fait appel à tous les RootEntity/DomainServices implémentés dans des domaines différents.
+- [W6] Injection de dépendances des repositories
 
