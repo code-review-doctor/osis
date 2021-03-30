@@ -348,15 +348,23 @@ class ProgramTreeBuilder:
             to_node.children.append(copied_link)
 
             if self._can_link_child_be_filled(copied_link, relationships):
-                self._fill_node_from_node_in_case_of_transition(
-                    source_link.child,
-                    child,
-                    relationships,
-                    existing_nodes,
-                    transition_name,
-                    node_code_generator,
-                    to_tree
-                )
+                if copied_link.child.is_option():
+                    self._fill_node_from_last_year_node(
+                        source_link.child,
+                        child,
+                        existing_nodes,
+                        to_tree
+                    )
+                else:
+                    self._fill_node_from_node_in_case_of_transition(
+                        source_link.child,
+                        child,
+                        relationships,
+                        existing_nodes,
+                        transition_name,
+                        node_code_generator,
+                        to_tree
+                    )
             elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) \
                     and copied_link.child.is_group():
                 to_tree.report.add_warning(
