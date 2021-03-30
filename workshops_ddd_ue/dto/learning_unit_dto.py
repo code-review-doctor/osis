@@ -1,13 +1,6 @@
 import attr
 
-
-# TODO :: to move into osis_common.ddd.interface
-class DTO:
-    """
-    Data Transfer Object : only contains declaration of primitive fields.
-    Used as 'contract" between 2 layers in the code (example : querysets Django (repository) <-> Builder)
-    """
-    pass
+from osis_common.ddd.interface import DTO
 
 
 @attr.s(frozen=True, slots=True)

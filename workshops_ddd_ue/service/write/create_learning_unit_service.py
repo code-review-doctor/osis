@@ -23,6 +23,6 @@ def create_learning_unit(cmd: CreateLearningUnitCommand) -> LearningUnitIdentity
     learning_unit = LearningUnitBuilder.build_from_command(cmd, all_existing_identities, entity)
 
     # THEN
-    repository.create(learning_unit)
+    repository.save(learning_unit)
 
     return learning_unit.entity_id

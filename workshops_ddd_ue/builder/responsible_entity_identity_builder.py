@@ -13,11 +13,11 @@ class ResponsibleEntityIdentityBuilder(EntityIdentityBuilder):
 
     @classmethod
     def build_from_command(cls, cmd: 'CommandRequest') -> 'EntityIdentity':
-        pass
+        raise NotImplementedError
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EntityIdentity':
-        pass
+        raise NotImplementedError
 
     @classmethod
     def build_from_code(cls, code: str) -> 'ResponsibleEntityIdentity':

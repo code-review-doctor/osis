@@ -21,7 +21,7 @@ from workshops_ddd_ue.validators._subdivision_should_not_exist import Subdivisio
 from workshops_ddd_ue.business_types import *
 
 
-@attr.s(slots=True)
+@attr.s(frozen=True, slots=True)
 class CreateLearningUnitValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
     command = attr.ib(type=CreateLearningUnitCommand)

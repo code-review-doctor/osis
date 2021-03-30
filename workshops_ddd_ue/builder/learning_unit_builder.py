@@ -1,4 +1,3 @@
-import abc
 from typing import List, Type
 
 import attr
@@ -6,31 +5,19 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from osis_common.ddd.interface import CommandRequest, RootEntity
+from osis_common.ddd.interface import RootEntityBuilder
+from workshops_ddd_ue.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
-from workshops_ddd_ue.dto.learning_unit_dto import DTO, LearningUnitFromRepositoryDTO
-from workshops_ddd_ue.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
+from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
-
-
-# TODO :: to move into osis_common.ddd.interface
-class RootEntityBuilder(abc.ABC):
-
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'RootEntity':
-        raise NotImplementedError()
-
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'RootEntity':
-        raise NotImplementedError()
 
 
 class LearningUnitBuilder(RootEntityBuilder):

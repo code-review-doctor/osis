@@ -11,15 +11,16 @@ from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearD
 from osis_common.ddd import interface
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
+from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
-from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
 
 
 class LearningUnitRepository(interface.AbstractRepository):
+
     @classmethod
-    def create(cls, entity: LearningUnit, **kwargs) -> LearningUnitIdentity:
+    def save(cls, entity: LearningUnit) -> None:
         learning_container = LearningContainerDatabase.objects.create()
 
         learning_unit = LearningUnitDatabase.objects.create(
@@ -64,10 +65,6 @@ class LearningUnitRepository(interface.AbstractRepository):
         )
 
         return entity.entity_id
-
-    @classmethod
-    def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
-        raise NotImplementedError
 
     @classmethod
     def get(cls, entity_id: LearningUnitIdentity) -> LearningUnit:

@@ -1,28 +1,16 @@
-import abc
 from typing import Union
 
-from osis_common.ddd.interface import CommandRequest, EntityIdentity
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO, EntityIdentity
+from workshops_ddd_ue.business_types import *
 from workshops_ddd_ue.command import CopyLearningUnitToNextYearCommand
 from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.dto.learning_unit_dto import DTO
-from workshops_ddd_ue.business_types import *
-
-
-# TODO :: to move into osis_common.ddd.interface
-
-
-class EntityIdentityBuilder(abc.ABC):
-
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'EntityIdentity':
-        raise NotImplementedError()
-
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EntityIdentity':
-        raise NotImplementedError()
 
 
 class LearningUnitIdentityBuilder(EntityIdentityBuilder):
+
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EntityIdentity':
+        raise NotImplementedError
 
     @classmethod
     def build_from_command(cls, cmd: Union[CopyLearningUnitToNextYearCommand]) -> 'LearningUnitIdentity':

@@ -20,6 +20,6 @@ def copy_learning_unit_to_next_year(cmd: CopyLearningUnitToNextYearCommand) -> L
     learning_unit_net_year = LearningUnitBuilder.copy_to_next_year(learning_unit, all_existing_learning_unit_identities)
 
     # THEN
-    repository.create(learning_unit_net_year)
+    repository.save(learning_unit_net_year)
 
     return learning_unit.entity_id

@@ -2,19 +2,15 @@ from typing import Optional, List
 
 from base.models.entity_version import EntityVersion
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
 from workshops_ddd_ue.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 
 
 class EntityRepository(interface.AbstractRepository):
     @classmethod
-    def create(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
-        pass
-
-    @classmethod
-    def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
-        pass
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
 
     @classmethod
     def get(cls, entity_id: 'ResponsibleEntityIdentity') -> 'ResponsibleEntity':
