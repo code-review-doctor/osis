@@ -39,6 +39,7 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import CannotCopyPrerequisiteException
 from program_management.ddd.domain.report_events import CannotCopyPrerequisiteAsLearningUnitNotPresent
 from program_management.ddd.validators import validators_by_business_action
+from program_management.ddd.domain.node import NodeIdentity
 
 AND_OPERATOR = "ET"
 OR_OPERATOR = 'OU'
@@ -237,8 +238,8 @@ class PrerequisiteFactory:
     def copy_to_tree(cls, to_copy: 'Prerequisite', to_tree: 'ProgramTree') -> 'Prerequisite':
         node_having_prerequisite_identity = attr.evolve(to_copy.node_having_prerequisites, year=to_tree.entity_id.year)
 
-        codes_inside_tree = {node.code for node in to_tree.get_all_nodes()}
-        if node_having_prerequisite_identity.code not in codes_inside_tree:
+        nodes_inside_tree = {node.entity_id for node in to_tree.get_all_nodes()}
+        if node_having_prerequisite_identity not in nodes_inside_tree:
             to_tree.report.add_warning(
                 CannotCopyPrerequisiteAsLearningUnitNotPresent(
                     prerequisite_code=node_having_prerequisite_identity.code,
@@ -249,13 +250,15 @@ class PrerequisiteFactory:
             )
             raise CannotCopyPrerequisiteException()
 
-        prerequisite_items_code = {item.code for item in to_copy.get_all_prerequisite_items()}
-        if prerequisite_items_code.difference(codes_inside_tree):
-            for code in prerequisite_items_code.difference(codes_inside_tree):
+        prerequisite_items_code = {
+            NodeIdentity(code=item.code, year=to_tree.entity_id.year) for item in to_copy.get_all_prerequisite_items()
+        }
+        if prerequisite_items_code.difference(nodes_inside_tree):
+            for identity in prerequisite_items_code.difference(nodes_inside_tree):
                 to_tree.report.add_warning(
                     CannotCopyPrerequisiteAsLearningUnitNotPresent(
                         prerequisite_code=node_having_prerequisite_identity.code,
-                        learning_unit_code=code,
+                        learning_unit_code=identity.code,
                         training_root_node=to_tree.root_node,
                         copy_year=to_tree.root_node.academic_year
                     )
