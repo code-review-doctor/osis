@@ -47,3 +47,9 @@ class DeleteLearningUnitCommand(interface.CommandRequest):
 class CopyLearningUnitToNextYearCommand(interface.CommandRequest):
     copy_from_code = attr.ib(type=str)
     copy_from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateCommand(interface.CommandRequest):
+    copy_from_code = attr.ib(type=str)
+    copy_from_year = attr.ib(type=int)

@@ -12,7 +12,7 @@ from workshops_ddd_ue.domain._language import Language
 from workshops_ddd_ue.domain._remarks import Remarks
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
+from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
 from workshops_ddd_ue.dto.learning_unit_dto import DTO, LearningUnitFromRepositoryDTO

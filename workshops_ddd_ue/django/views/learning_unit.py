@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
 from base.views.common import display_success_messages
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
 from workshops_ddd_ue.django.forms.learning_unit import LearningUnitCreateForm
 
 

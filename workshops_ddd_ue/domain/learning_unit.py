@@ -9,11 +9,11 @@ from osis_common.ddd import interface
 from workshops_ddd_ue.command import CreatePartimCommand
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain._language import Language
-from workshops_ddd_ue.domain._remarks import Remarks
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
-from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain._partim import Partim, PartimBuilder
-from workshops_ddd_ue.validators.validators_by_business_action import CreatePartimValidatorList
+from workshops_ddd_ue.domain._remarks import Remarks
+from workshops_ddd_ue.domain._titles import Titles
+from workshops_ddd_ue.domain._volumes_repartition import LecturingPart, PracticalPart
+from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntityIdentity
 
 
 @attr.s(frozen=True, slots=True)
@@ -43,6 +43,8 @@ class LearningUnit(interface.RootEntity):
     language = attr.ib(type=Language)
     remarks = attr.ib(type=Remarks)
     partims = attr.ib(type=List[Partim])
+    # lecturing_part = attr.ib(type=LecturingPart)
+    # practical_part = attr.ib(type=PracticalPart)
 
     @property
     def academic_year(self) -> 'AcademicYear':

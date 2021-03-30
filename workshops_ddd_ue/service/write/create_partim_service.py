@@ -3,7 +3,7 @@ from typing import List
 from django.db import transaction
 
 from workshops_ddd_ue.command import CreatePartimCommand
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity, LearningUnit
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity, LearningUnit
 from workshops_ddd_ue.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 

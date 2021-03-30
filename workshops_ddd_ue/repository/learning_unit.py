@@ -12,7 +12,7 @@ from osis_common.ddd import interface
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
 from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnit, LearningUnitIdentity
+from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
 from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
 

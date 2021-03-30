@@ -40,7 +40,7 @@ from education_group.forms.fields import UpperCaseCharField
 from reference.models.language import Language, FR_CODE_LANGUAGE
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain import exceptions
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
 from workshops_ddd_ue.service.write import create_learning_unit_service
 
 

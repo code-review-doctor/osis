@@ -2,7 +2,7 @@ from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from workshops_ddd_ue.domain.exceptions import LearningUnitUsedInProgramTreeException
-from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
 
 
 class LearningUnitCanBeDeleted(interface.DomainService):
