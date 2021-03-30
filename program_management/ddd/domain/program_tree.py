@@ -343,6 +343,8 @@ class ProgramTreeBuilder:
                 continue
 
             copied_link = LinkBuilder().from_link(source_link, to_node, child)
+            if copied_link.child.is_group() and copied_link.is_reference():
+                copied_link.link_type = None
             to_node.children.append(copied_link)
 
             if self._can_link_child_be_filled(copied_link, relationships):
