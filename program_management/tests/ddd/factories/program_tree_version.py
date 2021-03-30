@@ -28,7 +28,8 @@ import factory.fuzzy
 
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
     NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
-from program_management.ddd.repositories import program_tree as program_tree_repository
+from program_management.ddd.repositories import program_tree as program_tree_repository,\
+    program_tree_version as program_tree_version_repository
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -64,6 +65,11 @@ class ProgramTreeVersionFactory(factory.Factory):
     version_name = factory.SelfAttribute("entity_id.version_name")
     transition_name = factory.SelfAttribute("tree.root_node.transition_name")
     end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            program_tree_version_repository.ProgramTreeVersionRepository.create(obj)
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':

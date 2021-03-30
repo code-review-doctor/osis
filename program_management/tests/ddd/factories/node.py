@@ -33,6 +33,8 @@ from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYe
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.repositories import node as node_repository
+from program_management.tests.ddd.factories import program_tree as tree_factory
 
 
 def generate_end_date(node):
@@ -52,6 +54,12 @@ class NodeFactory(factory.Factory):
     start_year = factory.SelfAttribute("year")
     end_date = factory.LazyAttribute(generate_end_date)
     entity_id = factory.LazyAttribute(generate_node_identity)
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            node_repository.NodeRepository.create(obj)
+            tree_factory.ProgramTreeFactory(root_node=obj, persist=True, load_fixture=True)
 
 
 class CampusFactory(factory.Factory):

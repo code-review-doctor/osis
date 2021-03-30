@@ -30,13 +30,16 @@ import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import GroupType, TrainingType
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
+    AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
+from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 class ProgramTreeFactory(factory.Factory):
@@ -46,7 +49,9 @@ class ProgramTreeFactory(factory.Factory):
         abstract = False
 
     root_node = factory.SubFactory(NodeGroupYearFactory)
-    authorized_relationships = AuthorizedRelationshipList([])
+    authorized_relationships = factory.SubFactory(
+        AuthorizedRelationshipListFactory,
+    )
     entity_id = factory.SubFactory(
         ProgramTreeIdentityFactory,
         code=factory.SelfAttribute("..root_node.code"),
@@ -56,6 +61,16 @@ class ProgramTreeFactory(factory.Factory):
         PrerequisitesFactory,
         context_tree=factory.SelfAttribute("..entity_id")
     )
+
+    class Params:
+        load_fixture = factory.Trait(
+            authorized_relationships=AuthorizedRelationshipListFactory.load_from_fixture()
+        )
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            program_tree_repository.ProgramTreeRepository.create(obj)
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTree':
@@ -89,42 +104,28 @@ class ProgramTreeFactory(factory.Factory):
         return tree_standard
 
 
-def _tree_builder(data: Dict) -> 'Node':
+def _tree_builder(data: Dict, persist: bool = False) -> 'Node':
     _data = data.copy()
     children = _data.pop("children", [])
 
-    node = _node_builder(_data)
+    node = _node_builder(_data, persist=persist)
 
     for child_data, order in zip(children, itertools.count()):
         link_data = child_data.pop("link_data", {})
-        child_node = _tree_builder(child_data)
+        child_node = _tree_builder(child_data, persist=persist)
         LinkFactory(parent=node, child=child_node, **link_data, order=order)
 
     return node
 
 
-def _node_builder(data: Dict) -> 'Node':
+def _node_builder(data: Dict, persist: bool = False) -> 'Node':
     node_factory = NodeGroupYearFactory
     if data["node_type"] == NodeType.LEARNING_UNIT:
         node_factory = NodeLearningUnitYearFactory
-    return node_factory(**data)
+    return node_factory(**data, persist=persist)
 
 
-def _build_authorized_relationships(root_node: 'Node') -> 'AuthorizedRelationshipList':
-    all_links = root_node.get_all_children()
-    relationships = [
-        AuthorizedRelationshipObjectFactory(
-            parent_type=link.parent.node_type,
-            child_type=link.child.node_type,
-            min_count_authorized=0,
-            max_count_authorized=10
-        )
-        for link in all_links
-    ]
-    return AuthorizedRelationshipList(relationships)
-
-
-def tree_builder(data: Dict) -> 'ProgramTree':
-    root_node = _tree_builder(data)
-    authorized_relationships = _build_authorized_relationships(root_node)
-    return ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
+def tree_builder(data: Dict, persist: bool = False) -> 'ProgramTree':
+    root_node = _tree_builder(data, persist)
+    authorized_relationships = AuthorizedRelationshipListFactory.load_from_fixture()
+    return ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships, persist=persist)
