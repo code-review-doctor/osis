@@ -21,10 +21,9 @@ class LearningUnitCreateView(View):
 
     def post(self, request, *args, **kwargs):
         form = LearningUnitCreateForm(request.POST, user=self.request.user)
-        if form.is_valid():
-            learning_unit_identity = form.save()
-            if not form.errors:
-                display_success_messages(request, self.get_success_msg(learning_unit_identity), extra_tags='safe')
+        learning_unit_identity = form.save()
+        if not form.errors:
+            display_success_messages(request, self.get_success_msg(learning_unit_identity), extra_tags='safe')
 
         return render(request, self.template_name, {
             "form": form,

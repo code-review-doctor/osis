@@ -9,9 +9,9 @@ from workshops_ddd_ue.domain.exceptions import InternshipSubtypeMandatoryExcepti
 @attr.s(frozen=True, slots=True)
 class InternshipSubtypeMandatoryValidator(BusinessValidator):
 
-    learning_unit_type = attr.ib(type=LearningContainerYearType)
-    internship_subtype = attr.ib(type=InternshipSubtype)
+    learning_unit_type = attr.ib(type=str)
+    internship_subtype = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        if self.learning_unit_type == LearningContainerYearType.INTERNSHIP and not self.internship_subtype:
+        if self.learning_unit_type == LearningContainerYearType.INTERNSHIP.name and not self.internship_subtype:
             raise InternshipSubtypeMandatoryException()

@@ -1,6 +1,9 @@
 from typing import List
 
-from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator
+import attr
+
+from base.ddd.utils.business_validator import MultipleExceptionBusinessListValidator, \
+    TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
 from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
@@ -18,23 +21,27 @@ from workshops_ddd_ue.validators._subdivision_should_not_exist import Subdivisio
 from workshops_ddd_ue.business_types import *
 
 
-class CreateLearningUnitValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(
-            self,
-            responsible_entity: 'ResponsibleEntity',
-            command: CreateLearningUnitCommand,
-            all_existing_identities: List['LearningUnitIdentity']
-    ):
-        self.validators = [
-            AcademicYearGreaterThan2019(command.academic_year),
-            CodeAlreadyExistsValidator(command.code, all_existing_identities),
-            CreditsMinimumValueValidator(command.credits),
-            CodeStructureValidator(command.code),
-            RequiredFieldsValidator(command),
-            ResponsibleEntityAuthorizedTypeOrCode(responsible_entity),
-            InternshipSubtypeMandatoryValidator(command.type, command.internship_subtype),
+@attr.s(slots=True)
+class CreateLearningUnitValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+
+    command = attr.ib(type=CreateLearningUnitCommand)
+    responsible_entity = attr.ib(type=ResponsibleEntity)
+    all_existing_identities = attr.ib(type=List['LearningUnitIdentity'])  # type: List['LearningUnitIdentity']
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return [
+            RequiredFieldsValidator(self.command),
         ]
-        super().__init__()
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            InternshipSubtypeMandatoryValidator(self.command.type, self.command.internship_subtype),
+            AcademicYearGreaterThan2019(self.command.academic_year),
+            CodeAlreadyExistsValidator(self.command.code, self.all_existing_identities),
+            CreditsMinimumValueValidator(self.command.credits),
+            CodeStructureValidator(self.command.code),
+            ResponsibleEntityAuthorizedTypeOrCode(self.responsible_entity),
+        ]
 
 
 class CopyLearningUnitToNextYearValidatorList(MultipleExceptionBusinessListValidator):

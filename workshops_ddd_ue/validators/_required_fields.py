@@ -17,7 +17,6 @@ class RequiredFieldsValidator(BusinessValidator):
             'common_title_fr',
             'specific_title_fr',
             'credits',
-            'internship_subtype',
             'responsible_entity_code',
             'periodicity',
             'iso_code',

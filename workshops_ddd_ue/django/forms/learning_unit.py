@@ -34,33 +34,56 @@ from base.models.academic_year import AcademicYear
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from education_group.forms import fields
 from education_group.forms.fields import UpperCaseCharField
 from reference.models.language import Language, FR_CODE_LANGUAGE
 from workshops_ddd_ue.command import CreateLearningUnitCommand
+from workshops_ddd_ue.domain import exceptions
+from workshops_ddd_ue.domain.learning_unit_year import LearningUnitIdentity
 from workshops_ddd_ue.service.write import create_learning_unit_service
 
 
-class LearningUnitCreateForm(forms.Form):
+class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
-    code = UpperCaseCharField(max_length=15, label=_("Code"), required=False)
+    field_name_by_exception = {
+        # exceptions.EmptyRequiredFieldsException: ('code',
+        #                                           'academic_year',
+        #                                           'common_title_fr',
+        #                                           'specific_title_fr',
+        #                                           'credits',
+        #                                           'internship_subtype',
+        #                                           'responsible_entity',
+        #                                           'periodicity',
+        #                                           'language',),
+        exceptions.AcademicYearLowerThan2019Exception: ('academic_year',),
+        exceptions.CreditsShouldBeGreatherThanZeroException: ('credits',),
+        exceptions.InternshipSubtypeMandatoryException: ('internship_subtype',),
+        # exceptions.LearningUnitAlreadyExistsException: ('code', 'academic_year',),
+        exceptions.LearningUnitCodeAlreadyExistsException: ('code', 'academic_year',),
+        exceptions.InvalidResponsibleEntityTypeOrCodeException: ('responsible_entity',),
+        exceptions.LearningUnitCodeStructureInvalidException: ('code',),
+        # exceptions.SubdivisionAlreadyExistException: ('code',),
+    }
+
+    code = UpperCaseCharField(max_length=15, label=_("Code"), required=True)
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_("Validity"),
-        required=False
+        required=True
     )  # FIXME
     type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(LearningContainerYearType.choices()),
         label=_("Learning unit type"),
-        required=False,
+        required=True,
     )
     abbreviated_title = UpperCaseCharField(
         max_length=40,
         label=_("Acronym/Short title"),
         required=False
     )
-    common_title_fr = forms.CharField(max_length=240, label=_("Common title in French"), required=False)
-    specific_title_fr = forms.CharField(max_length=240, label=_("Specific title in French"), required=False)
+    common_title_fr = forms.CharField(max_length=240, label=_("Common title in French"), required=True)
+    specific_title_fr = forms.CharField(max_length=240, label=_("Specific title in French"), required=True)
     common_title_en = forms.CharField(max_length=240, label=_("Common title in English"), required=False)
     specific_title_en = forms.CharField(max_length=240, label=_("Specific title in English"), required=False)
     credits = fields.CreditField(required=False)
@@ -69,11 +92,11 @@ class LearningUnitCreateForm(forms.Form):
         label=_("Internship subtype"),
         required=False,
     )
-    responsible_entity = forms.CharField(required=False)  # FIXME
+    responsible_entity = forms.CharField(required=True)  # FIXME
     periodicity = forms.ChoiceField(
         choices=BLANK_CHOICE + list(PeriodicityEnum.choices()),
         label=_("Periodicity"),
-        required=False,
+        required=True,
     )
     language = forms.ModelChoiceField(
         queryset=Language.objects.all().order_by('name'),  # FIXME
@@ -120,12 +143,12 @@ class LearningUnitCreateForm(forms.Form):
             return self.cleaned_data['language'].code
         return None
 
-    def clean_responsible_entity(self):
-        if self.cleaned_data['responsible_entity']:
-            return self.cleaned_data['responsible_entity'].acronym
-        return None
+    # def clean_responsible_entity(self):
+    #     if self.cleaned_data['responsible_entity']:
+    #         return self.cleaned_data['responsible_entity'].acronym
+    #     return None
 
-    def save(self):
+    def call_application_service(self) -> 'LearningUnitIdentity':
         cmd_create = CreateLearningUnitCommand(
             code=self.cleaned_data['code'],
             academic_year=self.cleaned_data['academic_year'],

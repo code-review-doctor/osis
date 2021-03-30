@@ -42,7 +42,11 @@ class LearningUnitBuilder(RootEntityBuilder):
             all_existing_identities: List['LearningUnitIdentity'],
             responsible_entity: ResponsibleEntity
     ) -> 'LearningUnit':
-        CreateLearningUnitValidatorList(responsible_entity, cmd, all_existing_identities).validate()
+        CreateLearningUnitValidatorList(
+            command=cmd,
+            responsible_entity=responsible_entity,
+            all_existing_identities=all_existing_identities
+        ).validate()
         dto = cmd
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.academic_year),
