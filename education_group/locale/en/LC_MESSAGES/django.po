@@ -566,7 +566,7 @@ msgstr ""
 
 msgid ""
 "Management common topics in the context of training's general informations "
-"and access conditions"
+"and access requirements"
 msgstr ""
 
 msgid "Management entity"

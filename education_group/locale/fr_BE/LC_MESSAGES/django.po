@@ -591,10 +591,10 @@ msgstr "Gestion des rubriques communes"
 
 msgid ""
 "Management common topics in the context of training's general informations "
-"and access conditions"
+"and access requirements"
 msgstr ""
 "Gestion des rubriques communes pour les informations générales et les "
-"conditions d'admission aux formations"
+"conditions d'accès aux formations"
 
 msgid "Management entity"
 msgstr "Entité de gestion"
