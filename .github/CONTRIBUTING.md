@@ -790,12 +790,33 @@ from base.ddd.utils import business_validator
 
 
 @attr.s(frozen=True, slots=True)
+class BusinessActionValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+
+    command = attr.ib(type=CommandRequest)
+    any_domain_object = attr.ib(type=Union[RootEntity, Entity, EntityIdentity, ValueObject, PrimitiveType])
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return [
+            FieldNameRequiredFieldValidator(self.command.field_name),
+            FieldNameChoiceFieldValidator(self.command.field_name),
+            FieldNameTypeFieldValidator(self.command.field_name),
+        ]
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldValidateRuleAValidator(self.command.field_name, self.any_domain_object),
+            ShouldValidateRuleBValidator(self.command.other_field, self.command.field_a, self.command.field_b),
+            ShouldValidateRuleCValidator(self.any_domain_object),
+            # ...
+        ]
+
+
+@attr.s(frozen=True, slots=True)
 class MyBusinessValidator(BusinessValidator):
     object_used_for_validation = attr.ib(type=Union[RootEntity, Entity, EntityIdentity, ValueObject, PrimitiveType])
     other_object_used_for_validation = attr.ib(type=Union[RootEntity, Entity, ValueObject, EntityIdentity, PrimitiveType])
 
     def validate(self):
-        self.object_used_for_validation = ...  # Will raise an exception due to frozen=True
         if self.object_used_for_validation != self.other_object_used_for_validation:
             raise MyOwnValidatorBusinessException()
 
