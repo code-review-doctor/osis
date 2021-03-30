@@ -1070,7 +1070,7 @@ msgid ""
 "Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
 "is not copied in %(copy_year)s."
 msgstr ""
-"La formation/mini-formation %(title)s est inconsistente. Cet élément n'est "
+"La formation/mini-formation %(title)s est inconsistante. Cet élément n'est "
 "pas recopié en %(copy_year)s."
 
 msgid "Trainings"

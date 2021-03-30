@@ -243,8 +243,7 @@ class PrerequisiteFactory:
                 CannotCopyPrerequisiteAsLearningUnitNotPresent(
                     prerequisite_code=node_having_prerequisite_identity.code,
                     learning_unit_code=node_having_prerequisite_identity.code,
-                    training_acronym=to_tree.root_node.title,
-                    training_code=to_tree.root_node.code,
+                    training_root_node=to_tree.root_node,
                     copy_year=to_tree.root_node.academic_year
                 )
             )
@@ -257,8 +256,7 @@ class PrerequisiteFactory:
                     CannotCopyPrerequisiteAsLearningUnitNotPresent(
                         prerequisite_code=node_having_prerequisite_identity.code,
                         learning_unit_code=code,
-                        training_acronym=to_tree.root_node.title,
-                        training_code=to_tree.root_node.code,
+                        training_root_node=to_tree.root_node,
                         copy_year=to_tree.root_node.academic_year
                     )
                 )
