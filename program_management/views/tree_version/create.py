@@ -235,7 +235,6 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
             )
 
             identities = []
-            print("IIIIIIIIIIIN")
             try:
                 if not last_existing_version:
                     command = _convert_form_to_create_transition_version_command(form)
@@ -246,8 +245,8 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
                         _convert_form_to_prolong_command(form, last_existing_version)
                     )
             except (program_exception.TransitionNameExistsCurrentYearAndInFuture,
-                    MultipleBusinessExceptions,
-                    exception.MultipleEntitiesFoundException) as err:
+                    exception.MultipleEntitiesFoundException,
+                    MultipleBusinessExceptions) as err:
                 if isinstance(err, MultipleBusinessExceptions):
                     err = next(e for e in err.exceptions)
                 form.add_error('transition_name', err.message)
