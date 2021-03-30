@@ -9,7 +9,7 @@ from workshops_ddd_ue.business_types import *
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitYearExistsNextYearValidator(BusinessValidator):
+class ShouldLearningUnitNotExistNextYearValidator(BusinessValidator):
     learning_unit_identity = attr.ib(type='LearningUnitIdentity')  # type: LearningUnitIdentity
     all_existing_lear_unit_identities = attr.ib(type=List['LearningUnitIdentity'])  # type: List[LearningUnitIdentity]
 

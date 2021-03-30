@@ -1,13 +1,12 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from workshops_ddd_ue.domain.exceptions import InternshipSubtypeMandatoryException
 
 
 @attr.s(frozen=True, slots=True)
-class InternshipSubtypeMandatoryValidator(BusinessValidator):
+class ShouldInternshipSubtypeBeMandatoryValidator(BusinessValidator):
 
     learning_unit_type = attr.ib(type=str)
     internship_subtype = attr.ib(type=str)

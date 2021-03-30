@@ -6,15 +6,15 @@ from base.ddd.utils.business_validator import MultipleExceptionBusinessListValid
     TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
-from workshops_ddd_ue.validators._academic_year_greater_than_2019 import AcademicYearGreaterThan2019
-from workshops_ddd_ue.validators._code_already_exists import CodeAlreadyExistsValidator
-from workshops_ddd_ue.validators._credits_minimum_value import CreditsMinimumValueValidator
-from workshops_ddd_ue.validators._internship_subtype_mandatory import InternshipSubtypeMandatoryValidator
-from workshops_ddd_ue.validators._learning_unit_code_structure import CodeStructureValidator
-from workshops_ddd_ue.validators._learning_unit_exists_in_next_year import LearningUnitYearExistsNextYearValidator
-from workshops_ddd_ue.validators._required_fields import RequiredFieldsValidator
-from workshops_ddd_ue.validators._responsible_entity_authorized_type_or_code import \
-    ResponsibleEntityAuthorizedTypeOrCode
+from workshops_ddd_ue.validators._should_academic_year_be_greater_than_2019 import ShouldAcademicYearGreaterThan2019
+from workshops_ddd_ue.validators._should_code_not_exist import ShouldCodeAlreadyExistsValidator
+from workshops_ddd_ue.validators._should_credits_respect_minimum_value import ShouldCreditsRespectMinimumValueValidator
+from workshops_ddd_ue.validators._should_internship_subtype_be_mandatory import ShouldInternshipSubtypeBeMandatoryValidator
+from workshops_ddd_ue.validators._should_learning_unit_code_respect_naming_convention import ShouldCodeRespectNamingConventionValidator
+from workshops_ddd_ue.validators._should_learning_unit_not_exists_in_next_year import ShouldLearningUnitNotExistNextYearValidator
+from workshops_ddd_ue.validators._should_fields_be_required import ShouldFieldsBeRequiredValidator
+from workshops_ddd_ue.validators._should_responsible_entity_have_authorized_type_or_code import \
+    ShouldResponsibleEntityHaveAuthorizedTypeOrCode
 from workshops_ddd_ue.validators._subdivision_should_contain_only_one_letter import \
     SubdivisionShouldContainOnlyOneLetterValidator
 from workshops_ddd_ue.validators._subdivision_should_not_exist import SubdivisionShouldNotExistValidator
@@ -30,17 +30,17 @@ class CreateLearningUnitValidatorList(TwoStepsMultipleBusinessExceptionListValid
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
-            RequiredFieldsValidator(self.command),
+            ShouldFieldsBeRequiredValidator(self.command),
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            InternshipSubtypeMandatoryValidator(self.command.type, self.command.internship_subtype),
-            AcademicYearGreaterThan2019(self.command.academic_year),
-            CodeAlreadyExistsValidator(self.command.code, self.all_existing_identities),
-            CreditsMinimumValueValidator(self.command.credits),
-            CodeStructureValidator(self.command.code),
-            ResponsibleEntityAuthorizedTypeOrCode(self.responsible_entity),
+            ShouldInternshipSubtypeBeMandatoryValidator(self.command.type, self.command.internship_subtype),
+            ShouldAcademicYearGreaterThan2019(self.command.academic_year),
+            ShouldCodeAlreadyExistsValidator(self.command.code, self.all_existing_identities),
+            ShouldCreditsRespectMinimumValueValidator(self.command.credits),
+            ShouldCodeRespectNamingConventionValidator(self.command.code),
+            ShouldResponsibleEntityHaveAuthorizedTypeOrCode(self.responsible_entity),
         ]
 
 
@@ -51,7 +51,7 @@ class CopyLearningUnitToNextYearValidatorList(MultipleExceptionBusinessListValid
             all_existing_lear_unit_identities: List['LearningUnitIdentity'],
     ):
         self.validators = [
-            LearningUnitYearExistsNextYearValidator(learning_unit_identity, all_existing_lear_unit_identities),
+            ShouldLearningUnitNotExistNextYearValidator(learning_unit_identity, all_existing_lear_unit_identities),
         ]
         super().__init__()
 

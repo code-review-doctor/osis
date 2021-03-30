@@ -7,7 +7,7 @@ LIMIT_YEAR_TO_CREATE_LEARNING_UNIT = 2019
 
 
 @attr.s(frozen=True, slots=True)
-class AcademicYearGreaterThan2019(BusinessValidator):
+class ShouldAcademicYearGreaterThan2019(BusinessValidator):
 
     year = attr.ib(type=int)
 

@@ -11,7 +11,7 @@ LEARNING_UNIT_ACRONYM_REGEX_FULL = LEARNING_UNIT_ACRONYM_REGEX_BASE + STRING_END
 
 
 @attr.s(frozen=True, slots=True)
-class CodeStructureValidator(BusinessValidator):
+class ShouldCodeRespectNamingConventionValidator(BusinessValidator):
 
     code = attr.ib(type=str)
 

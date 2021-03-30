@@ -7,7 +7,7 @@ MINIMUM_VALUE = 1
 
 
 @attr.s(frozen=True, slots=True)
-class CreditsMinimumValueValidator(BusinessValidator):
+class ShouldCreditsRespectMinimumValueValidator(BusinessValidator):
 
     credits = attr.ib(type=int)
 

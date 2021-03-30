@@ -6,7 +6,7 @@ from workshops_ddd_ue.domain.exceptions import EmptyRequiredFieldsException
 
 
 @attr.s(frozen=True, slots=True)
-class RequiredFieldsValidator(BusinessValidator):
+class ShouldFieldsBeRequiredValidator(BusinessValidator):
 
     command = attr.ib(type=CreateLearningUnitCommand)
 

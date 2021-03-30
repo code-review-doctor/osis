@@ -8,7 +8,7 @@ from workshops_ddd_ue.business_types import *
 
 
 @attr.s(frozen=True, slots=True)
-class CodeAlreadyExistsValidator(BusinessValidator):
+class ShouldCodeAlreadyExistsValidator(BusinessValidator):
 
     code = attr.ib(type=str)
     all_existing_identities = attr.ib(type=List['LearningUnitIdentity'])  # type: List[LearningUnitIdentity]

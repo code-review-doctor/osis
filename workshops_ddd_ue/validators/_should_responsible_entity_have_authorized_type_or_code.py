@@ -7,7 +7,7 @@ from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
 
 
 @attr.s(frozen=True, slots=True)
-class ResponsibleEntityAuthorizedTypeOrCode(BusinessValidator):
+class ShouldResponsibleEntityHaveAuthorizedTypeOrCode(BusinessValidator):
 
     responsible_entity = attr.ib(type=ResponsibleEntity)
 
