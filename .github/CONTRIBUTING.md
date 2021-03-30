@@ -258,7 +258,11 @@ CATEGORIES = (
 
 ## Formulaire (Django Forms)
 - Regroupe les objets qui permettent de faciliter l'affichage du code HTML côté template
-- Ne peut pas contenir de logique métier
+- Valide uniquement les règles métier suivantes : 
+    - Types de champs (int, str, ...)
+    - Champs requis
+    - Énumérations (ChoiceField)
+    - Toutes ces validations sont **dupliquées** dans notre domaine ([couche Validators](#dddvalidator))
 - Accès :
   - [couche application service](#dddservice-application-service)
 
@@ -768,14 +772,15 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 #### ddd/validator
 
 - Regroupe les invariants métier (règles business)
-- Chargé de raise des BusinessException en cas d'invariant métier non respecté
+- Chargé de raise des `BusinessException` en cas d'invariant métier non respecté
 - Doit hériter de BusinessValidator
 - Visibilité : `protected` (accessibles uniquement par le Domain)
 - 1 fichier par invariant métier
-- Nommage des fichiers : <invariant_metier>.py
-- Nommage des objets : <InvariantMetier>Validator
+- Nommage des fichiers : should_<invariant_metier>.py
+- Nommage des objets : Should<InvariantMetier>Validator
 - Accès : 
     - [couche Domain](#ddddomain) (Les validateurs font partie du domaine)
+    - [couche Exceptions (business exceptions)](#ddddomainbusinessexception)
 
 
 Exemple : 
@@ -784,15 +789,15 @@ Exemple :
 from base.ddd.utils import business_validator
 
 
-class TrainingExistingEnrollmentsValidator(business_validator.BusinessValidator):
-    def __init__(self, training_id: 'TrainingIdentity'):
-        super().__init__()
-        self.training_id = training_id
+@attr.s(frozen=True, slots=True)
+class MyBusinessValidator(BusinessValidator):
+    object_used_for_validation = attr.ib(type=Union[RootEntity, Entity, EntityIdentity, ValueObject, PrimitiveType])
+    other_object_used_for_validation = attr.ib(type=Union[RootEntity, Entity, ValueObject, EntityIdentity, PrimitiveType])
 
-    def validate(self, *args, **kwargs):
-        enrollments_count = EnrollmentCounter().get_training_enrollments_count(self.training_id)
-        if enrollments_count > 0:
-            raise TrainingHaveEnrollments(self.training_id.acronym, self.training_id.year, enrollments_count)
+    def validate(self):
+        self.object_used_for_validation = ...  # Will raise an exception due to frozen=True
+        if self.object_used_for_validation != self.other_object_used_for_validation:
+            raise MyOwnValidatorBusinessException()
 
 ```
 

@@ -3,6 +3,7 @@
 
 - Référencer les Aggregates à travers leur EntityIdentity pour assurer découplage
 
+- mettre "exceptions" dans /validators !
 
 -------------------------------
 

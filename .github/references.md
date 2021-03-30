@@ -38,6 +38,11 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 - [Domain Driven Design : des armes pour affronter la complexité](https://blog.octo.com/domain-driven-design-des-armes-pour-affronter-la-complexite/)
 - [Domain model purity vs. domain model completeness](https://enterprisecraftsmanship.com/posts/domain-model-purity-completeness/) (Anglais)
 - [Domain model purity and lazy loading](https://enterprisecraftsmanship.com/posts/domain-model-purity-lazy-loading/) (Anglais)
+- [Validation inside or outside entities](https://lostechies.com/jimmybogard/2016/04/29/validation-inside-or-outside-entities/) (Anglais)
+- [StackOverFlow : Validation in DDD](https://stackoverflow.com/questions/52883013/validation-in-domain-driven-design) (Anglais)
+- [Validation and DDD](https://enterprisecraftsmanship.com/posts/validation-and-ddd/) (Anglais)
+- [Code contract VS input validation](https://enterprisecraftsmanship.com/posts/code-contracts-vs-input-validation/) (Anglais)
+- [DDD validation for existence of entity in other bounded context](https://stackoverflow.com/questions/60535089/ddd-validation-for-existence-of-entity-in-other-bounded-contexts)
 ### Livres
 - [Architecture patterns with python - Harry J.W. Percival](https://www.amazon.fr/Architecture-Patterns-Python-Domain-Driven-Microservices-ebook/dp/B085KB31X3) (Anglais)
 
@@ -46,6 +51,7 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 ## Design Patterns
 ### Articles
 - [Refactoring.guru - catalogue des patrons de conception](https://refactoring.guru/fr/design-patterns/catalog)
+- [Fail fast](https://enterprisecraftsmanship.com/posts/fail-fast-principle/)
 
 <br/><br/>
 

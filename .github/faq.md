@@ -148,3 +148,24 @@ class EnrollmentRepository(interface.AbstractRepository):
 ```
     
 <br/><br/>
+
+
+#### :question: comment déterminer si une règle métier doit se trouver dans Osis-role ou dans le domaine DDD ?
+
+- Si c'est une permission d'accès à une action (application service) dans le sens "puis-je ou non faire cette action?"
+    - Osis-role
+    - Exemples :
+        - Je ne peux accéder à la fonctionnalité "X" que si je suis un utilisateur central
+        - Je ne peux accéder à la modification d'une UE qui si son entité de charge fait partie des entités que je gère
+        - Je ne peux accéder à la consultation des UEs que si j'ai la permission "can read learning unit"
+
+- Si c'est une règle en rapport avec le calendrier académique
+    - Osis-role
+    - (mais théoriquement : dans le DDD)
+    - Exemple : 
+        - Je ne peux accéder à la modification d'une UE que si l'événement "gestion journalière" est ouvert
+
+- Si c'est une règle en rapport avec le contenu des données postées (formulaire) par le client
+    - Validation de contenu -> Invariant métier -> DDD (domaine - validator)
+    - Exemple : 
+        - Lorsque je crée une UE, son entité de charge doit être une entité qui fait partie des entités que je gère

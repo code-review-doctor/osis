@@ -165,96 +165,6 @@ Inconvénients :
 
 
 ```python
-class DisplayExceptionsByFieldNameMixin:
-    """
-    This Mixin provides a fonction 'display_exceptions' used to display business validation messages (business Exceptions)
-    inside defined fields in the attribute 'field_name_by_exception'
-    """
-
-    # Dict[Exception, Tuple[FormFieldNameStr]]
-    # Example : {CodeAlreadyExistException: ('code',), AcronymAlreadyExist: ('acronym',)}
-    field_name_by_exception = None
-
-    # If True, exceptions that are not configured in `field_name_by_exception` will be displayed.
-    # If False, exceptions that are not configured in `field_name_by_exception` will be ignored.
-    display_exceptions_by_default = True
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.field_name_by_exception is None:
-            self.field_name_by_exception = {}
-
-    def call_application_service(self):
-        raise NotImplementedError
-
-    def save(self):
-        try:
-            if self.is_valid():  # to clean data
-                return self.call_application_service()
-        except MultipleBusinessExceptions as multiple_exceptions:
-            self.display_exceptions(multiple_exceptions)
-
-    def display_exceptions(self, exceptions_to_display: MultipleBusinessExceptions):
-        """
-        Add the exception messages in the fields specified in the 'field_name_by_exception' attribute.
-        Add a generic error by default if no fields are defined.
-        :param exceptions_to_display: MultipleBusinessExceptions
-        :return: 
-        """
-        copied_list = list(exceptions_to_display.exceptions)
-        for exception in copied_list:
-            field_names = self.field_name_by_exception.get(type(exception), [])
-            if self.display_exceptions_by_default and not field_names:
-                self.add_error('', exception.message)
-            else:
-                for field_name in field_names:
-                    self.add_error(field_name, exception.message)
-            exceptions_to_display.exceptions.remove(exception)
-
-
-#-------------------------------------------------------------------------------------------------------------------
-
-@attr.s(slots=True)
-class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
-
-    def get_data_contract_validators(self) -> List[BusinessValidator]:
-        """Contains ONLY validations for : 
-        - Type of fields
-        - Enums fields
-        - RequiredFields
-        - ValidationRules (cf. "validation_rules.csv")
-        """
-        raise NotImplementedError()
-
-    def get_invariants_validators(self) -> List[BusinessValidator]:
-        raise NotImplementedError()
-
-    def __validate_data_contract(self):
-        self.__validate(self.get_input_validators())
-
-    def __validate_invariants(self):
-        self.__validate(self.get_invariants_validators())
-
-    @staticmethod
-    def __validate(business_validators):
-        exceptions = set()
-        for validator in business_validators:
-            try:
-                validator.validate()
-            except MultipleBusinessExceptions as e:
-                exceptions |= e.exceptions
-            except BusinessException as e:
-                exceptions.add(e)
-
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
-
-    def validate(self):
-        self.__validate_data_contract()
-        self.__validate_invariants()
-
-
-
 
 #-------------------------------------------------------------------------------------------------------------------
 # ddd/service/write 
@@ -271,7 +181,7 @@ def update_training_service(command: UpdateTrainingCommand) -> 'TrainingIdentity
 
 #-------------------------------------------------------------------------------------------------------------------
 # ddd/validators/validators_by_business_action.py
-@attr.s(slots=True)
+@attr.s(frozen=True, slots=True)
 class UpdateTrainingValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     command = attr.ib(type=CommandRequest)
     existing_training = attr.ib(type=Training)
