@@ -7,6 +7,41 @@ Dans notre domaine des UEs, ResponsibleEntity (et son validateur) ne respectent 
 - Comment pourrait-on améliorer notre code ?
 
 
+## BusinessValidator : frozen=True ? Quid des propriétés calculées ?
+
+- Si une propriété ne doit être calculée qu'une seule fois : sandwich pattern.
+    - À calculer au départ de la fonction "validate" **dans le domaine**
+    - Propriété (variable) à passer en paramètre de chaque sous fonction, qui seront "statiques"
+        - Car ne modifie pas l'état de l'objet
+
+```python
+
+@attr.s(frozen=True, slots=True)
+class ComplexBusinessValidator(BusinessValidator):
+
+    root_entity = attr.ib(type=RootEntity)
+    attr2 = attr.ib(type=PrimitiveType)
+    attr3 = attr.ib(type=PrimitiveType)
+    attr4 = attr.ib(type=PrimitiveType)
+
+    def validate(self, *args, **kwargs):
+        complex_result = self.root_entity._complex_computation()
+        other_result = self.some_computation(complex_result)
+        another_result = self.some_other_computation(complex_result)
+        # if ... raise ...
+        
+    @staticmethod
+    def some_computation(complex_result):
+        pass
+            
+    @staticmethod
+    def some_other_computation(complex_result):
+        pass    
+
+```
+
+
+
 ## DTO : Data Transfer Object
 
 
