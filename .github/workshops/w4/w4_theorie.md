@@ -20,8 +20,8 @@ from base.ddd.utils.business_validator import BusinessValidator
 
 @attr.s(frozen=True, slots=True)
 class MyBusinessValidator(BusinessValidator):
-    object_used_for_validation = attr.ib(type=object)
-    other_object_used_for_validation = attr.ib(type=object)
+    object_used_for_validation = attr.ib(type=Union[RootEntity, Entity, ValueObject, PrimitiveType])
+    other_object_used_for_validation = attr.ib(type=Union[RootEntity, Entity, ValueObject, PrimitiveType])
 
     def validate(self):
         self.object_used_for_validation = ...  # Will raise an exception due to frozen=True
