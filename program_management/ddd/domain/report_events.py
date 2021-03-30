@@ -56,7 +56,7 @@ class NotCopyTrainingMiniTrainingNotExistForYearEvent(ReportEvent):
             "Training/Mini-Training %(title)s is closed in %(end_year)s. "
             "This training/mini-training is not copied in %(copy_year)s."
         ) % {
-            "title": self.node.full_acronym(),
+            "title": self.node.full_code_acronym_representation(),
             "copy_year": self.copy_year,
             "end_year": self.end_year
         }
@@ -72,7 +72,7 @@ class NotCopyTrainingMiniTrainingNotExistingEvent(ReportEvent):
             "Training/Mini-Training %(title)s is inconsistent."
             "This training/mini-training is not copied in %(copy_year)s."
         ) % {
-            "title": self.node.full_acronym(),
+            "title": self.node.full_code_acronym_representation(),
             "copy_year": self.copy_year,
         }
 
@@ -86,8 +86,8 @@ class CopyTransitionTrainingNotExistingEvent(ReportEvent):
         return _(
             "The transition version [%(version)s] of the training %(title)s does not exist in %(academic_year)s"
         ) % {
-            "version": self.root_node.version_label,
-            "title": self.node.full_acronym(),
+            "version": self.root_node.version_label(),
+            "title": self.node.full_code_acronym_representation(),
             "academic_year": self.root_node.academic_year,
         }
 
@@ -98,7 +98,7 @@ class CopyReferenceGroupEvent(ReportEvent):
 
     def __str__(self):
         return _("The reference group %(title)s has not yet been copied. Its content is still empty.") % {
-            "title": self.node.full_acronym(),
+            "title": self.node.full_code_acronym_representation(),
         }
 
 
@@ -108,7 +108,7 @@ class CopyReferenceEmptyEvent(ReportEvent):
 
     def __str__(self):
         return _("The reference element %(title)s is still empty.") % {
-            "title": self.node.full_acronym(),
+            "title": self.node.full_code_acronym_representation(),
         }
 
 
@@ -122,7 +122,7 @@ class NodeAlreadyCopiedEvent(ReportEvent):
             "The element %(title)s has already been copied in %(copy_year)s in the context of an other training."
             "Its content may have changed."
         ) % {
-            "title": self.node.full_acronym(),
+            "title": self.node.full_code_acronym_representation(),
             "copy_year": self.copy_year
         }
 
@@ -142,5 +142,5 @@ class CannotCopyPrerequisiteAsLearningUnitNotPresent(ReportEvent):
             "prerequisite_code": self.prerequisite_code,
             "learning_unit_code": self.learning_unit_code,
             "copy_year": self.copy_year,
-            "training_title": self.training_root_node.full_acronym()
+            "training_title": self.training_root_node.full_code_acronym_representation()
         }

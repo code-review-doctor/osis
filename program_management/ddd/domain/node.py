@@ -563,6 +563,9 @@ class NodeGroupYear(Node):
                                                self.academic_year)
         return "{}{} - {} ({})".format(self.title, self.get_formatted_transition_name(), self.code, self.academic_year)
 
+    def full_code_acronym_representation(self) -> str:
+        return "{} - {}".format(self.code, self.full_acronym())
+
     def full_acronym(self) -> str:
         if self.version_name:
             return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
