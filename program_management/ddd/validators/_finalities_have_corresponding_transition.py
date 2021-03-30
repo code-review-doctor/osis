@@ -27,6 +27,7 @@ from typing import Set, Optional
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import FinalitiesHaveNoCorrespondingTransitionVersionException
+from program_management.ddd.domain import program_tree
 
 
 class FinalitiesHaveCorrespondingTransitionValidator(business_validator.BusinessValidator):
@@ -42,25 +43,25 @@ class FinalitiesHaveCorrespondingTransitionValidator(business_validator.Business
             return
 
         for finality in finalities:
-            if self._get_existing_transition_node(self.existing_nodes, finality.title, self.to_tree.root_node.year,
-                                                  self.to_tree.root_node.version_name,
-                                                  self.to_tree.root_node.transition_name):
+            if self._has_transition_node(
+                    self.existing_nodes,
+                    finality,
+                    self.to_tree.root_node.transition_name,
+                    self.to_tree.root_node.year
+            ):
                 return
         raise FinalitiesHaveNoCorrespondingTransitionVersionException(finalities, self.to_tree)
 
-    #  FIXME duplicate code
-    def _get_existing_transition_node(
+    def _has_transition_node(
             self,
             existing_nodes: Set['Node'],
-            title: str,
-            year: int,
-            version_name: str,
-            transition_name: str
-    ) -> Optional['Node']:
-        return next((
-            node for node in existing_nodes
-            if not node.is_learning_unit() and node.title == title and node.year == year and
-            node.version_name == version_name and node.transition_name == transition_name
-        ),
-            None
+            finality_node: 'Node',
+            transition_name: str,
+            year: int
+    ) -> bool:
+        return any(
+            (
+                node for node in existing_nodes
+                if program_tree.is_transition_node_equivalent(node, finality_node, transition_name, year)
+            )
         )

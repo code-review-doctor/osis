@@ -320,9 +320,8 @@ class ProgramTreeBuilder:
             elif source_link.child.is_training():
                 child = self._get_existing_transition_node(
                     existing_nodes,
-                    source_link.child.title,
+                    source_link.child,
                     to_node.year,
-                    source_link.child.version_name,
                     transition_name
                 )
             if not child and source_link.child.is_training():
@@ -394,15 +393,13 @@ class ProgramTreeBuilder:
     def _get_existing_transition_node(
             self,
             existing_nodes: Set['Node'],
-            title: str,
+            other_node: 'Node',
             year: int,
-            version_name: str,
             transition_name: str
     ) -> Optional['Node']:
         return next((
                 node for node in existing_nodes
-                if not node.is_learning_unit() and node.title == title and node.year == year and
-                node.version_name == version_name and node.transition_name == transition_name
+                if is_transition_node_equivalent(node, other_node, transition_name, year)
             ),
             None
         )
@@ -953,3 +950,8 @@ def build_path(*nodes):
 
 def _path_contains(path: 'Path', node: 'Node') -> bool:
     return PATH_SEPARATOR + str(node.pk) in path
+
+
+def is_transition_node_equivalent(node: 'Node', other_node: 'Node', transition_name: str, year: int) -> bool:
+    return not node.is_learning_unit() and node.title == other_node.title and node.year == year and \
+           node.version_name == other_node.version_name and node.transition_name == transition_name
