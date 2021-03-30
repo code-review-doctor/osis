@@ -2729,6 +2729,9 @@ msgstr "Formation sigle"
 msgid "Training management entity"
 msgstr "Formation entité de gestion"
 
+msgid "Training management entity faculty"
+msgstr "Formation faculté de l'entité de gestion"
+
 msgid "Training title"
 msgstr "Formation intitulé"
 
