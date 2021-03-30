@@ -34,7 +34,8 @@
             {% if tree_version.get_tree.is_master_2m %}
                 <div class="alert alert-info" role="alert">
                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
-                    {% blocktrans %}In the context of a Master, this action fill the content of the transition version of the Master but also of its finalities if the corresponding transition versions exist. Therefore, it is necessary to create the transition version of the finalities that are wished before executing this action.{% endblocktrans %}
+                    <b>{% trans "It is necessary to create the desired transition version of the finalities before executing this action." %}</b>
+                    {% trans "In the context of a Master, this action fill the content of the transition version of the Master but also of its finalities if the corresponding transition versions exist." %}
                 </div>
             {% endif %}
 
