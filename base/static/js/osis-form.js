@@ -2,10 +2,10 @@ const DEFAULT_CONFIGURATION = {
     errorClass: "has-error",
     successClass: "",
     trigger: "focusin focusout",
-    classHandler: function (inputField){
+    classHandler: function (inputField) {
         return $(inputField.element.closest(".form-group") || inputField.element.closest("div"));
     },
-    errorsContainer: function(inputField){
+    errorsContainer: function (inputField) {
         return inputField.$element.closest(".form-group")
     },
     errorsWrapper: '<div class="help-block"></div>',
@@ -17,11 +17,11 @@ $(document).ready(function () {
     init();
 })
 
-document.addEventListener("formAjaxSubmit:error", function (e){
+document.addEventListener("formAjaxSubmit:error", function (e) {
     init();
 })
 
-$('#form-ajax-modal').on("shown.bs.modal", function (e){
+$('#form-ajax-modal').on("shown.bs.modal", function (e) {
     init();
 })
 
@@ -46,8 +46,8 @@ function init() {
             hideWarning(inputField)
         }
 
-        if(inputField.element.hasAttribute("semi-required")){
-            if (inputField.element.value === ""){
+        if (inputField.element.hasAttribute("semi-required")) {
+            if (inputField.element.value === "") {
                 inputField._ui.$errorClassHandler.addClass("has-warning");
             }
         }
@@ -59,27 +59,29 @@ function init() {
     highlightFormTabsWithError()
 }
 
-function styleBusinessErrorMessages(){
+function styleBusinessErrorMessages() {
     const messagesContainers = document.querySelectorAll(".osis-form div[class=help-block]");
-    for(let container of messagesContainers){
+    for (let container of messagesContainers) {
         container.classList.add("has-error");
     }
 }
 
-function displayWarning(inputField){
+function displayWarning(inputField) {
     inputField._ui.$errorClassHandler.removeClass("has-success");
     inputField._ui.$errorClassHandler.addClass("has-warning");
     inputField._ui.$errorsWrapper.text(inputField.warning);
 }
 
-function hideWarning(inputField){
-    inputField._ui.$errorClassHandler.removeClass("has-warning");
-    inputField._ui.$errorsWrapper.text("");
+function hideWarning(inputField) {
+    if (inputField._ui !== undefined && inputField._ui.$errorClassHandler.hasClass("has-warning")) {
+        inputField._ui.$errorClassHandler.removeClass("has-warning");
+        inputField._ui.$errorsWrapper.text("");
+    }
 }
 
 function remoteFieldValidation(xhr) {
     const inputField = this;
-    return xhr.then(function(jsonResponse) {
+    return xhr.then(function (jsonResponse) {
         if (!jsonResponse["valid"]) {
             hideWarning(inputField);
             return $.Deferred().reject(jsonResponse["msg"]);
@@ -89,32 +91,32 @@ function remoteFieldValidation(xhr) {
     })
 }
 
-function addValidationOnNumberInput($form){
-    $form.find("input[type=number]").each(function(){
+function addValidationOnNumberInput($form) {
+    $form.find("input[type=number]").each(function () {
         convertNumberInputToTextInputWithNumberValidation($(this));
     })
 }
 
-function enableValidationEmptyOnSemiRequiredField($form){
-    $form.find("[semi-required]").each(function(){
+function enableValidationEmptyOnSemiRequiredField($form) {
+    $form.find("[semi-required]").each(function () {
         $(this).attr("data-parsley-validate-if-empty", "")
     })
 }
 
-function convertNumberInputToTextInputWithNumberValidation($numberInput){
+function convertNumberInputToTextInputWithNumberValidation($numberInput) {
     const isDecimal = isDecimalInput($numberInput);
 
     $numberInput.attr("type", "text");
     $numberInput.attr("data-parsley-type", isDecimal ? "number" : "integer");
 }
 
-function isDecimalInput($numberInput){
+function isDecimalInput($numberInput) {
     return $numberInput.attr("step") !== undefined;
 }
 
-function highlightFormTabsWithError(){
+function highlightFormTabsWithError() {
     const formTabsUl = document.getElementsByClassName("form-tab");
-    for (const tabUlElement of formTabsUl){
+    for (const tabUlElement of formTabsUl) {
         const tabContentElement = getTabContentElementFromTabUl(tabUlElement);
         if (doesTabContainsErrors(tabContentElement)) {
             highlightTabUl(tabUlElement)
@@ -122,17 +124,17 @@ function highlightFormTabsWithError(){
     }
 }
 
-function getTabContentElementFromTabUl(tabUlElement){
+function getTabContentElementFromTabUl(tabUlElement) {
     const anchorElement = tabUlElement.getElementsByTagName("A")[0]
     const tabContentId = anchorElement.getAttribute("href").replace("#", "")
     return document.getElementById(tabContentId)
 }
 
-function doesTabContainsErrors(tabContentElement){
+function doesTabContainsErrors(tabContentElement) {
     return tabContentElement.getElementsByClassName('has-error').length > 0 || tabContentElement.getElementsByClassName('has-warning').length > 0
 }
 
-function highlightTabUl(tabUlElement){
+function highlightTabUl(tabUlElement) {
     tabUlElement.classList.add("contains-error");
     displayFormDangerMessage(gettext('Error(s) in form: The modifications are not saved'));
 }
@@ -142,7 +144,7 @@ function displayFormDangerMessage(message) {
     const panelErrorMessages = document.querySelector("#pnl_error_messages");
     const panelListItems = panelErrorMessages.querySelectorAll("ul > li");
     const currentMessages = Array.from(panelListItems).map(e => e.textContent.trim());
-    if(!currentMessages.includes(message)){
+    if (!currentMessages.includes(message)) {
         panelErrorMessages.classList.remove("hidden");
         const newItem = document.createElement("li");
         newItem.innerText = message
