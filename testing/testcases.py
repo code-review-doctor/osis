@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Any
+from typing import Any, Optional
 
 import mock
 from django.test import TestCase
@@ -32,7 +32,7 @@ from education_group.tests.ddd.factories.repository.fake import get_fake_group_r
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
-    get_fake_program_tree_repository, get_fake_node_repository
+    get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository
 
 
 class DDDTestCase(TestCase):
@@ -69,6 +69,11 @@ class DDDTestCase(TestCase):
             self.fake_program_tree_version_repository
         )
 
+        self.mock_service(
+            "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
+            side_effect=get_from_element_id
+        )
+
     def tearDown(self) -> None:
         self.fake_group_repository._groups = list()
         self.fake_mini_training_repository._mini_trainings = list()
@@ -84,8 +89,8 @@ class DDDTestCase(TestCase):
 
         return repository_patcher.start()
 
-    def mock_service(self, service_path: str, return_value: 'Any' = None) -> mock.Mock:
-        service_patcher = mock.patch(service_path, return_value=return_value)
+    def mock_service(self, service_path: str, return_value: 'Any' = None, side_effect: 'Any' = None) -> mock.Mock:
+        service_patcher = mock.patch(service_path, return_value=return_value, side_effect=side_effect)
         self.addCleanup(service_patcher.stop)
 
         return service_patcher.start()
@@ -125,3 +130,11 @@ class DDDTestCase(TestCase):
             func(*args, **kwargs)
         class_exceptions = [exc.__class__ for exc in e.exception.exceptions]
         self.assertIn(exception, class_exceptions)
+
+
+def get_from_element_id(element_id: int) -> Optional['NodeIdentity']:
+    repo = FakeNodeRepository()
+    return next(
+        (node for node in repo._nodes if node.node_id == element_id),
+        None
+    )
