@@ -12,39 +12,36 @@
     - [Pull requests](#pull-requests)
     - [Performance](#performance)
     - [Sécurité](#scurit)
-
 - [Arborescence des packages](#arborescence-des-packages)
-    - [Couche Django app](#couche-django-app)
-        - [API](#api)
-        - Calendar (événements académiques) - Documentation/guidelines à développer
-        - [Forms (Django)](#formulaire-django-forms)
-        - [Model (Django)](#modle-django-model)
-        - [Views (Django)](#vue-django-view)
-        - [Templates (Django)](#gabarit-django-templates)
-        - [Template Tags (Django)](#filtres-de-gabarits-django-template-tags)
-        - Tests (unit tests) - Documentation/guidelines à développer
-    - [Couche DDD : Domain Driven Design](#domain-driven-design)
-        - [Conventions générales](#conventions-gnrales)
-        - [Builder (factory)](#dddbuilder)
-        - [Domaine](#ddddomain)
-            - Model
-                - [Entity](#ddddomainentity)
-                - [RootEntity (aggregate)](#ddddomainrootentity)
-                - [ValueObject](#ddddomainvalueobject)
-                - [EntityIdentity](#ddddomainentityidentity)
-            - Service (Domain Service)
-                - [Domain service](#domain-services)
-            - Validator
-                - [Validator](#dddvalidator)
-                - [BusinessException](#ddddomainbusinessexception)
-        - [Repository (interface)](#dddrepository)
-        - Test (unit tests) - Documentation/guidelines à développer
-        - [Use case (Application Service)](#dddservice-application-service)
-        - [Commande (commands.py)](#dddcommandpy)
-
-    - [Couche Infrastructure](#couche-infrastructure)
-        - [Repository (implémentation)](#repository-implmentation)
-
+- [Couche Django app](#couche-django-app)
+    - [API](#api)
+    - Calendar (événements académiques) - Documentation/guidelines à développer
+    - [Forms (Django)](#formulaire-django-forms)
+    - [Model (Django)](#modle-django-model)
+    - [Views (Django)](#vue-django-view)
+    - [Templates (Django)](#gabarit-django-templates)
+    - [Template Tags (Django)](#filtres-de-gabarits-django-template-tags)
+    - Tests (unit tests) - Documentation/guidelines à développer
+- [Couche DDD : Domain Driven Design](#domain-driven-design)
+    - [Conventions générales](#conventions-gnrales)
+    - [Builder (factory)](#dddbuilder)
+    - [Domaine](#ddddomain)
+        - Model
+            - [Entity](#ddddomainentity)
+            - [RootEntity (aggregate)](#ddddomainrootentity)
+            - [ValueObject](#ddddomainvalueobject)
+            - [EntityIdentity](#ddddomainentityidentity)
+        - Service (Domain Service)
+            - [Domain service](#domain-services)
+        - Validator
+            - [Validator](#dddvalidator)
+            - [BusinessException (exceptions.py)](#ddddomainbusinessexception)
+    - [Repository (interface)](#dddrepository) (implémentation dans la couche "infrastructure")
+    - Test (unit tests) - Documentation/guidelines à développer
+    - [Use case (Application Service)](#dddservice-application-service)
+    - [Commande (commands.py)](#dddcommandpy)
+- [Couche Infrastructure](#couche-infrastructure)
+    - [Repository (implémentation)](#repository-implmentation)
 - [Gestion des permissions](#permissions)
 - [Droits de merge et reviews](#droits-de-merge-et-reviews)
 - [Emails](#emails)
@@ -674,7 +671,7 @@ class GenerateSequenceId(interface.DomainService):
 <br/><br/><br/><br/>
 
 
-### ddd/validator
+## ddd/validator
 
 - Regroupe les invariants métier (règles business)
 - Chargé de raise des `BusinessException` en cas d'invariant métier non respecté
@@ -732,7 +729,7 @@ class MyBusinessValidator(BusinessValidator):
 
 
 
-### ddd/domain/BusinessException
+## ddd/domain/BusinessException
 - Regroupe les exceptions qui représentent des règles métier non respectée
 - Déclare les messages d'erreur **traduits** destinés aux utilisateurs
     - Unique endroit qui "casse" l'isolation du domaine (utilisation externe au domaine) : module de traduction Django
