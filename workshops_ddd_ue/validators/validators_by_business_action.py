@@ -49,7 +49,7 @@ class CreateLearningUnitValidatorList(TwoStepsMultipleBusinessExceptionListValid
 @attr.s(frozen=True, slots=True)
 class CopyLearningUnitToNextYearValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    learning_unit_identity = attr.ib(type=LearningUnitIdentity)
+    learning_unit_identity = attr.ib(type='LearningUnitIdentity')  # type: 'LearningUnitIdentity'
     all_existing_lear_unit_identities = attr.ib(type=List['LearningUnitIdentity'])  # type: List['LearningUnitIdentity']
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -67,7 +67,7 @@ class CopyLearningUnitToNextYearValidatorList(TwoStepsMultipleBusinessExceptionL
 @attr.s(frozen=True, slots=True)
 class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    learning_unit = attr.ib(type=LearningUnit)
+    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
     subdivision = attr.ib(type=str)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:

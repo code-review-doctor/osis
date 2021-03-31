@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import itertools
+from typing import List
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from osis_common.ddd.interface import EntityIdentity
+from infrastructure.messages_bus import message_bus_instance
+from osis_common.ddd.interface import EntityIdentity, CommandRequest, ApplicationServiceResult
 
 
 class DisplayExceptionsByFieldNameMixin:
@@ -48,13 +50,13 @@ class DisplayExceptionsByFieldNameMixin:
         if self.field_name_by_exception is None:
             self.field_name_by_exception = {}
 
-    def call_application_service(self) -> 'EntityIdentity':
+    def get_command(self) -> CommandRequest:
         raise NotImplementedError
 
     def save(self):
         try:
             if self.is_valid():
-                return self.call_application_service()
+                return message_bus_instance.invoke(self.get_command())
         except MultipleBusinessExceptions as multiple_exceptions:
             self.display_exceptions(multiple_exceptions)
 
