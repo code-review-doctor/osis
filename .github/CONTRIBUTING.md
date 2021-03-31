@@ -25,14 +25,13 @@
 - [Couche DDD : Domain Driven Design](#domain-driven-design)
     - [Conventions générales](#conventions-gnrales)
     - [Builder (factory)](#dddbuilder)
-    - [Domaine](#ddddomain)
+    - [Domain](#ddddomain)
         - Model
             - [Entity](#ddddomainentity)
             - [RootEntity (aggregate)](#ddddomainrootentity)
             - [ValueObject](#ddddomainvalueobject)
             - [EntityIdentity](#ddddomainentityidentity)
-        - Service (Domain Service)
-            - [Domain service](#domain-services)
+        - [Service (Domain Service)](#domain-services)
         - Validator
             - [Validator](#dddvalidator)
             - [BusinessException (exceptions.py)](#ddddomainbusinessexception)
