@@ -1658,6 +1658,9 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
+msgid "Only proposals"
+msgstr ""
+
 msgid "Only the volume Q1 must have a value"
 msgstr ""
 
@@ -2607,6 +2610,9 @@ msgid "Training code"
 msgstr ""
 
 msgid "Training management entity"
+msgstr ""
+
+msgid "Training management entity faculty"
 msgstr ""
 
 msgid "Training title"
