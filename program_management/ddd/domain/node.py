@@ -236,7 +236,7 @@ class Node(interface.Entity):
     def children(self, new_children: List['Link']):
         self._children = new_children
 
-    def is_root(self) -> bool:
+    def is_training_formation_root(self) -> bool:
         return (self.is_training() and not self.is_finality()) or (self.is_mini_training() and not self.is_option())
 
     def is_learning_unit(self):

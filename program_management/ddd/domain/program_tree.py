@@ -236,7 +236,8 @@ class ProgramTreeBuilder:
                 to_tree.report.add_warning(
                     report_events.CopyReferenceEmptyEvent(node=last_year_link.child)
                 )
-            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and not copied_link.child.is_root():
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and \
+                    not copied_link.child.is_training_formation_root():
                 to_tree.report.add_warning(
                     report_events.NodeAlreadyCopiedEvent(node=last_year_link.child, copy_year=to_node.academic_year)
                 )
@@ -373,7 +374,8 @@ class ProgramTreeBuilder:
                 to_tree.report.add_warning(
                     report_events.CopyReferenceEmptyEvent(node=copied_link.child)
                 )
-            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and not copied_link.child.is_root():
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and \
+                    not copied_link.child.is_training_formation_root():
                 to_tree.report.add_warning(
                     report_events.NodeAlreadyCopiedEvent(node=copied_link.child, copy_year=to_node.academic_year)
                 )
