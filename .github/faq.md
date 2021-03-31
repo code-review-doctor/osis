@@ -169,3 +169,48 @@ class EnrollmentRepository(interface.AbstractRepository):
     - Validation de contenu -> Invariant métier -> DDD (domaine - validator)
     - Exemple : 
         - Lorsque je crée une UE, son entité de charge doit être une entité qui fait partie des entités que je gère
+
+
+
+<br/><br/>
+
+
+#### :question: quelle était l'arborescence des packages pour le catalogue de formations ?
+
+```
+django_app
+ ├─ ddd
+ |   ├─ command.py
+ |   |
+ |   ├─ domain
+ |   |   ├─ exceptions.py  (exceptions business)
+ |   |   ├─ <objet_métier>.py  (RootEntity)
+ |   |   ├─ _entity.py (protected)
+ |   |   ├─ _value_object.py (protected)
+ |   |
+ |   ├─ builder
+ |   |   ├─ <objet_métier>_builder.py  (Builder pour RootEntity)
+ |   |   ├─ <identité_objet_métier>_builder.py  (Builder pour EntityIdentity)
+ |   |
+ |   ├─ repository
+ |   |   ├─ <objet_métier>.py
+ |   |   ├─ _<entity>.py  (protected)
+ |   |
+ |   ├─ service (application service)
+ |   |   ├─ read
+ |   |   |   ├─ <action_métier>_service.py
+ |   |   |
+ |   |   ├─ write
+ |   |       ├─ <action_métier>_service.py
+ |   |
+ |   ├─ validators
+ |       ├─ invariant_metier.py
+ |       ├─ invariant_metier_2.py
+ |
+ ├── models
+ |
+ ├── views (gestion des httpRequests)
+ |
+ ├── API
+ |   ├─ views
+```
