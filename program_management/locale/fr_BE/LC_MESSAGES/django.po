@@ -1344,7 +1344,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-#~ msgid "Training %(title)s transition version is non existent."
-#~ msgstr ""
-#~ "La version de transition de la formation %(title)s est non existante."
