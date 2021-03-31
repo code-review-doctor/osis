@@ -1,10 +1,10 @@
 ## FAQ
 
 Regroupe les questions dont les réponses ne peuvent pas être formalisée sous forme de guideline/règle stricte, 
-mais plutôt sous forme de "philosophie de développement".
+mais plutôt sous forme de **philosophie de développement**.
 
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
 #### :question: Quand doit-on appliquer le DDD ? Quid du CRUD ? Quid des views de recherche, fichiers excels, pdfs ?
@@ -20,23 +20,23 @@ Si des problèmes de performances sont constatés, diverses solutions pourront �
 Nous modifierons notre manière de travailler et adapterons nos guidelines en conséquence.
 
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
 #### :question: L'analyse est en français, le code en anglais : comment traduire correctement le métier ?
 
 L'objectif du DDD est, entre autres, de construire un langage commun à travers tous les intervenants d'un projet.
 
-Le vocabulaire métier utilisé dans les analyses est notre référence : 
+Le vocabulaire métier utilisé dans les analyses du métier est notre référence : 
 les termes métier **en français** doivent donc être clairs et non ambigus pour le développeur.
 
 Toute ambiguïté sur un terme métier nécessite clarification auprès de l'analyste / du métier.
 
-**Pour la partie en anglais**, Les développeurs doivent être d'accord sur un terme qui identifie clairement l'élément métier, l'objet, la variable... 
-Si lors de la review, le reviewer comprend le code (assez explicite) et identifie clairement la correspondance en français : c'est un accord.
+**Pour la partie en anglais**, les développeurs doivent être d'accord sur un terme qui identifie clairement l'élément métier, l'objet, la variable... 
+Si lors de la review, le reviewer comprend le code développé (assez explicite - correspondance évidente en français) : c'est un accord.
  > :information_source: [WordReference - Dictionnaire en ligne fournissant toutes les traductions possibles d'un mot en fonction de son contexte](https://www.wordreference.com/fr/)
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
 #### :question: Par où commencer pour implémenter une fonctionnalité ? Comment savoir quel code va dans quelle couche ?
@@ -52,11 +52,11 @@ Commencez par ce qui vous semble le plus évident à faire.
     - --> Couche repository
 - J'ai besoin de soumettre un formulaire ? 
     - --> Couche Form (pour le formulaire html)
-    - --> Couche Command + application service
-    - --> Couche Views (pour l'utilisation du form et l'appel au service) 
+    - --> Couche Command + application service (pour l'action métier - use case)
+    - --> Couche Views (pour l'utilisation du form) 
 
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
 #### :question: Jusqu'où doit-on modifier un code non lié à notre ticket ? 
@@ -66,7 +66,7 @@ Cf. [Boyscout rule](https://www.matheus.ro/2017/12/11/clean-code-boy-scout-rule/
 Attention à ne pas tomber dans l'excès, qui mènerait à une PR complexe et longue à reviewer, 
 ou trop détachée de l'objectif original du ticket.
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
 #### :question: Quid si un code "legacy" que je dois modifier ne respecte pas nos guidelines ?
@@ -81,7 +81,7 @@ Ce travail supplémentaire est un gain de temps pour tout prochain développeur 
 
 Si vous ne le faites pas, c'est votre collègue qui perdra du temps.
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
 #### :question: Comment savoir si je dois filtrer une liste d'objets en mémoire via le Domain/DomainService ou via Repository.search/filter (querysets) ?
@@ -147,10 +147,10 @@ class EnrollmentRepository(interface.AbstractRepository):
 
 ```
     
-<br/><br/>
+<br/><br/><br/><br/>
 
 
-#### :question: comment déterminer si une règle métier doit se trouver dans Osis-role ou dans le domaine DDD ?
+#### :question: Comment déterminer si une règle métier doit se trouver dans Osis-role ou dans le domaine DDD ?
 
 - Si c'est une permission d'accès à une action (application service) dans le sens "puis-je ou non faire cette action?"
     - Osis-role
@@ -172,10 +172,10 @@ class EnrollmentRepository(interface.AbstractRepository):
 
 
 
-<br/><br/>
+<br/><br/><br/><br/>
 
 
-#### :question: quelle était l'arborescence des packages pour le catalogue de formations ?
+#### :question: Quelle était l'arborescence des packages pour le catalogue de formations ?
 
 ```
 django_app
