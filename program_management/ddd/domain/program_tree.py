@@ -401,7 +401,7 @@ class ProgramTreeBuilder:
     ) -> Optional['Node']:
         return next((
                 node for node in existing_nodes
-                if is_transition_node_equivalent(node, other_node, transition_name, year)
+                if not node.is_learning_unit() and node.is_transition_node_equivalent(other_node, transition_name, year)
             ),
             None
         )
@@ -899,6 +899,9 @@ class ProgramTree(interface.RootEntity):
     def contains(self, node: Node) -> bool:
         return node in self.get_all_nodes()
 
+    def contains_identity(self, node_identity: 'NodeIdentity') -> bool:
+        return any(node for node in self.get_all_nodes() if node.entity_id == node_identity)
+
     def get_all_prerequisites(self) -> List['Prerequisite']:
         return self.prerequisites.prerequisites
 
@@ -952,8 +955,3 @@ def build_path(*nodes):
 
 def _path_contains(path: 'Path', node: 'Node') -> bool:
     return PATH_SEPARATOR + str(node.pk) in path
-
-
-def is_transition_node_equivalent(node: 'Node', other_node: 'Node', transition_name: str, year: int) -> bool:
-    return not node.is_learning_unit() and node.title == other_node.title and node.year == year and \
-           node.version_name == other_node.version_name and node.transition_name == transition_name

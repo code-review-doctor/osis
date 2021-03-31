@@ -238,8 +238,7 @@ class PrerequisiteFactory:
     def copy_to_tree(cls, to_copy: 'Prerequisite', to_tree: 'ProgramTree') -> 'Prerequisite':
         node_having_prerequisite_identity = attr.evolve(to_copy.node_having_prerequisites, year=to_tree.entity_id.year)
 
-        nodes_inside_tree = {node.entity_id for node in to_tree.get_all_nodes()}
-        if node_having_prerequisite_identity not in nodes_inside_tree:
+        if not to_tree.contains_identity(node_having_prerequisite_identity):
             to_tree.report.add_warning(
                 CannotCopyPrerequisiteAsLearningUnitNotPresent(
                     prerequisite_code=node_having_prerequisite_identity.code,
@@ -250,11 +249,14 @@ class PrerequisiteFactory:
             )
             raise CannotCopyPrerequisiteException()
 
+        nodes_inside_tree = {node.entity_id for node in to_tree.get_all_nodes()}
         prerequisite_items_code = {
             NodeIdentity(code=item.code, year=to_tree.entity_id.year) for item in to_copy.get_all_prerequisite_items()
         }
-        if prerequisite_items_code.difference(nodes_inside_tree):
-            for identity in prerequisite_items_code.difference(nodes_inside_tree):
+        prerequisite_items_not_present_in_tree = prerequisite_items_code.difference(nodes_inside_tree)
+
+        if prerequisite_items_not_present_in_tree:
+            for identity in prerequisite_items_not_present_in_tree:
                 to_tree.report.add_warning(
                     CannotCopyPrerequisiteAsLearningUnitNotPresent(
                         prerequisite_code=node_having_prerequisite_identity.code,

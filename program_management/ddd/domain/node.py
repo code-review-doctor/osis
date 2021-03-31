@@ -593,6 +593,10 @@ class NodeGroupYear(Node):
             return '-{}'.format(self.transition_name) if self.version_name else '[{}]'.format(self.transition_name)
         return ''
 
+    def is_transition_node_equivalent(self, other_node: 'NodeGroupYear', transition_name: str, year: int) -> bool:
+        return self.title == other_node.title and self.year == year and self.version_name == other_node.version_name \
+               and self.transition_name == transition_name
+
 
 @attr.s(slots=True, hash=False, eq=False)
 class NodeLearningUnitYear(Node):

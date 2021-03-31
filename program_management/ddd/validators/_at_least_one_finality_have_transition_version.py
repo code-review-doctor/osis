@@ -22,12 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set, Optional
+from typing import Set, Generator
 
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import NoFinalitiesHaveCorrespondingTransitionVersionException
-from program_management.ddd.domain import program_tree
 
 
 class AtLeastOneFinalityHaveTransitionVersionValidator(business_validator.BusinessValidator):
@@ -55,13 +54,16 @@ class AtLeastOneFinalityHaveTransitionVersionValidator(business_validator.Busine
     def _has_transition_node(
             self,
             existing_nodes: Set['Node'],
-            finality_node: 'Node',
+            finality_node: 'NodeGroupYear',
             transition_name: str,
             year: int
     ) -> bool:
+        group_year_nodes = (
+            node for node in existing_nodes if not node.is_learning_unit()
+        )  # type: Generator[NodeGroupYear]
         return any(
             (
-                node for node in existing_nodes
-                if program_tree.is_transition_node_equivalent(node, finality_node, transition_name, year)
+                node for node in group_year_nodes
+                if node.is_transition_node_equivalent(finality_node, transition_name, year)
             )
         )

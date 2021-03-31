@@ -730,7 +730,7 @@ msgid ""
 "the finalities %(finalities)s in %(academic_year)s."
 msgstr ""
 "Veuillez créer au moins une version de transition [%(transition_name)s] pour "
-"une des finalités de %(finalities)s en %(academic_year)s."
+"une des finalités %(finalities)s en %(academic_year)s."
 
 msgid "Please cut or copy an item before paste"
 msgstr "Veuillez copier ou couper un élément avant de le coller"
