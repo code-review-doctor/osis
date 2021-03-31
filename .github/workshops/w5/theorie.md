@@ -7,6 +7,11 @@ Dans notre domaine des UEs, ResponsibleEntity (et son validateur) ne respectent 
 - Comment pourrait-on améliorer notre code ?
 
 
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ## BusinessValidator : frozen=True ? Quid des propriétés calculées ?
 
 - Si une propriété ne doit être calculée qu'une seule fois : sandwich pattern.
@@ -42,6 +47,10 @@ class ComplexBusinessValidator(BusinessValidator):
 
 
 
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
 ## DTO : Data Transfer Object
 
 
@@ -56,7 +65,8 @@ class ComplexBusinessValidator(BusinessValidator):
 - Enlève l'interdépendance entre couches
     - Facilite le refactoring
 
-- Question : avons-nous déjà des DTO dans notre code actuel ?
+
+#### :question: Avons-nous déjà des DTO dans notre code actuel ?
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -87,11 +97,13 @@ def search_program_trees_versions_service(cmd: interface.CommandRequest) -> List
     return ProgramTreeVersionRepository().search(**cmd)
 ```
 
+<br/><br/><br/><br/>
+
 Constats : 
-- la recherche est (trop) lente
-- charge beaucoup de données inutiles
-- je n'affiche qu'une minorité de champs de l'objet du domaine
-- renvoie ProgramTreeVersion objet complet du domaine avec toutes entities imbriquées (ProgramTree, etc)
+- Recherche lente (performance)
+    - Renvoie ProgramTreeVersion objet complet du domaine avec toutes entities imbriquées (ProgramTree, etc)
+- Charge beaucoup de données inutiles
+    - Peu de champs de l'objet du domaine sont utiles
 
 
 
@@ -139,9 +151,6 @@ Avantages :
 Inconvénients :
 - Mapping supplémentaire entre notre DB et un objet "de vue" (notre DTO)
     - Maintenance supplémentaire
-
-Question : 
-- Doit-on créer un DTO par ListView / form de recherche ?
 
 
 ```python
@@ -196,8 +205,8 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 - En cas d'inexistence du domaine métier (développement d'écrans en lecture seule)
 
 - Données initiales de nos formulaires (ChoiceField, django-autocomplete-light) - à la place des querysets
-    - application service de lecture qui renvoie un DTO
-    - Attention : pas de logique métier dans Queryset !
+    - ApplicationService (lecture) qui renvoie un DTO à partir d'un Repository
+    - **Attention : pas de logique métier dans Queryset !**
         - Exemple : afficher les campus de l'organisation UCL uniquement
             - CampusRepository.search(...)
             - SearchUCLCampusOnlyDomainService qui filtre en mémoire le résultat de CampusRepository.search(...) 
@@ -218,7 +227,7 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
         - Protocole de communication : HTTP / HTTPS
 
 
-#### :question: avons-nous d'autres interfaces dans notre code ?
+#### :question: Avons-nous d'autres interfaces dans notre code ?
 
 
 
@@ -394,7 +403,7 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
 - Lorsqu'on cherche un use case (application service), on doit chercher sa commande correspondante
     - redondance
     - 1 commande == une action métier == 1 application service
-    - pourquoi devoir recherche l'application service lié à la commande ?
+
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -441,9 +450,8 @@ class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin,
     #     command = ...
     #     return update_training_service(command)
 
-    def get_commands(self) -> List[CommandRequest]:
-        command_1 = CommandRequest(**self.validated_data)
-        return [command]
+    def get_command(self) -> CommandRequest:
+        return CommandRequest(**self.validated_data)
 
 ```
 
@@ -461,8 +469,6 @@ class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin,
         - PostgresRepository
         - ...
 
-TODO : messagebus.invoke(command) -> mixinform
-TODO : créer arborescence packages vides dans UE
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
