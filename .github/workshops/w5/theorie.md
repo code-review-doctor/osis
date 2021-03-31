@@ -488,6 +488,8 @@ class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin,
 
 - Difficulté d'être "agile" techniquement
 
+- Testing unitaire complexe, difficile à maintenir
+
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 

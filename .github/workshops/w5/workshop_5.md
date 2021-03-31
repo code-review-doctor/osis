@@ -2,8 +2,8 @@
 - Partie 1
     - (pratique) ResponsibleEntity : refactoring (UE)
     - (théorie) DTO : définition
-    - (pratique) Use case : En tant qu'utilisateur facultaire, je veux visualiser le nombre d'inscrits à une UE.
-    - (pratique) Corriger nos forms pour utiliser DTO ? 
+    - (pratique) Use case : En tant qu'utilisateur, je veux rechercher toutes les UEs sur base d'un formulaire de recherche
+    - (pratique) Corriger nos forms pour utiliser DTO 
 
 - partie 2
     - Théorie :
@@ -11,6 +11,7 @@
         - Command bus : définition
     - Workshop
         - Refactorer notre code (dossiers) selon cette architecture
+            - Définition Repository (interface) et réutilisation dans repository (implémentation)
         - Injection des dépendances des repositories dans les application services
         - Command bus : implémentation
 
