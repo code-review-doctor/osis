@@ -5,6 +5,8 @@
 
 - mettre "exceptions" dans /validators !
 
+- Toute fonction impélmentée dans Repository doit se trouver dans l'interface coté domaine
+
 -------------------------------
 
 ### Commandes

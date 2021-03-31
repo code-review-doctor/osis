@@ -65,31 +65,34 @@ class ComplexBusinessValidator(BusinessValidator):
 
 ### Problème
 
-- En tant qu'utilisateur, je veux rechercher toutes les UEs sur base d'un formulaire de recherche :
-    - code
+- En tant qu'utilisateur, je veux rechercher toutes les formations et versions de formations sur base d'un formulaire de recherche :
     - année académique
+    - Sigle (intitulé abrégé) (toutes versions confondues)
+    - code
     - intitulé
     - type
-    - entité de charge (et entités subordonées)
+    - entité
 - Dans la vue "liste", je veux afficher 
     - année académique
-    - code
-    - intitulé complet
+    - Sigle (intitulé abrégé)
+    - intitulé
     - type
     - entité de charge
-    - entité d'attribution
+        - acronym
+        - intitulé (en helptext)
     
 ```python
 # Application service
-def search_learning_units_service(cmd: interface.CommandRequest) -> List['LearningUnit']:
-    return LearningUnitRepository().search(**cmd)
+def search_program_trees_versions_service(cmd: interface.CommandRequest) -> List['ProgramTreeVersion']:
+    return ProgramTreeVersionRepository().search(**cmd)
 ```
 
 Constats : 
 - la recherche est (trop) lente
 - charge beaucoup de données inutiles
-    - je n'affiche que 5 champs de l'objet LearningUnit
-    - renvoie LearningUnit objet complet du domaine avec toutes entities imbriquées
+- je n'affiche qu'une minorité de champs de l'objet du domaine
+- renvoie ProgramTreeVersion objet complet du domaine avec toutes entities imbriquées (ProgramTree, etc)
+
 
 
 
@@ -102,39 +105,74 @@ Constats :
 
 ```python
 
-class SearchLearningUnitDTO(interface.DTO):
+# ddd/dtos.py
+class SearchProgramTreeVersionDTO(interface.DTO):
     academic_year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    complete_title = attr.ib(type=str)
+    acronym_abbreviated_title = attr.ib(type=str)
+    title = attr.ib(type=str)
     type = attr.ib(type=str)
-    responsible_entity = attr.ib(type=str)
+    entity_acronym = attr.ib(type=str)
+    entity_title = attr.ib(type=str)
+    code = attr.ib(type=str)
 
+#--------------------------------------------------------------------------------------------------------
+# ddd/repository/program_tree_version.py
 
-# TODO : create IReadLearningUnitRepository ? 
-class LearningUnitRepository(interface.AbstractRepository):
+class ProgramTreeVersionRepository(interface.AbstractRepository):
 
-    def search(self, **searchparams) -> List[SearchLearningUnitDTO]:
+    def search(self, **searchparams) -> List[SearchProgramTreeVersionDTO]:
+        # To implement
+        return []
+
+    def search_program_trees_versions(self, **searchparams) -> List[ProgramTreeVersion]:
         # To implement
         return []
 
 ```
 
-
-Inconvénients :
-- Logique métier encapsulée dans la query de sélection
-    - intitulé complet
-- Peut devenir difficile si nécessite d'afficher des données de domaines différents
-
-
 Avantages :
 - Découplage de la DB (et des querysets)
-    - Contrat de données attendues pour la recherche d'une liste de LearningUnit
-- performances
+    - Contrat de données attendues pour la recherche d'une liste de versions de programmes
+- Performances
 
+
+Inconvénients :
+- Mapping supplémentaire entre notre DB et un objet "de vue" (notre DTO)
+    - Maintenance supplémentaire
 
 Question : 
 - Doit-on créer un DTO par ListView / form de recherche ?
 
+
+```python
+
+class ProgramTreeVersionRepository(interface.AbstractRepository):
+
+    def search(self, **searchparams) -> List[SearchProgramTreeVersionDTO]:
+        # To implement
+        return []
+
+    def search_program_trees_versions(self, **searchparams) -> List[ProgramTreeVersion]:
+        # To implement
+        return []
+
+    def search_for_trainings_only(self, **searchparams) -> List[SearchForTrainingsOnlyDTO]:
+        """
+        Uniquement si les données affichées dans la vue liste sont différentes de SearchProgramTreeVersionDTO.
+        Sinon, on réutilise search().
+        """
+        # To implement
+        return []
+
+    def search_for_transitions_only(self, **searchparams) -> List[SearchForTransitionsOnlyDTO]:
+        """
+        Uniquement si les données affichées dans la vue liste sont différentes de SearchProgramTreeVersionDTO.
+        Sinon, on réutilise search().
+        """
+        # To implement
+        return []
+
+```
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -143,11 +181,11 @@ Question :
 
 ## Quand utiliser un DTO ?
 
-- Toujours maximiser la réutilisation de nos objets du domaine
-    - Mapping avec la DB déjà effectuée (via repository)
-    - Logique métier encapsulée dans nos objets du domaine
+- Dans le `Repository`, tout ce qui vient d'un `Queryset` Django, car :
+    - Utilise les Factory (autre couche) pour créer un objet du domaine
+    - Permet de typer les valeurs de retour des querysets
 
-- Lorsque les performances en lecture deviennent excessives. 
+- En cas de problème de performance en lecture
     - Cas possibles : 
         - Vue de recherche (vue liste)
         - données initiales de Forms filtrées : DTO ou domain service ? (exemple : filtrer les etds en états X ou Y)
@@ -155,16 +193,14 @@ Question :
         - Fichier PDF
     - Dans ce cas, les Views/forms/pdf/excel... réutilisent un ApplicationService qui renvoie un DTO à partir d'un Repository
 
-- Dans les repositories, tout ce qui vient d'un Queryset Django
+- En cas d'inexistence du domaine métier (développement d'écrans en lecture seule)
 
-- Dans les `Repository.get()` qui utilisent les Factory pour créer un objet du domaine
-    - Permet de typer les valeurs de retour des querysets
-
-
-- Utiliser un IReadRepository pour les DTO (afin de séparer les repo READ / WRITE == CQS) ?
-
-- Lorsque le domaine métier n'existe pas encore, mais qu'on doit développer des écrans en lecture seule
-
+- Données initiales de nos formulaires (ChoiceField, django-autocomplete-light) - à la place des querysets
+    - application service de lecture qui renvoie un DTO
+    - Attention : pas de logique métier dans Queryset !
+        - Exemple : afficher les campus de l'organisation UCL uniquement
+            - CampusRepository.search(...)
+            - SearchUCLCampusOnlyDomainService qui filtre en mémoire le résultat de CampusRepository.search(...) 
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
@@ -190,32 +226,125 @@ Question :
 
 
 
-## Architecture en oignon
+## Bounded Context
+
+- "Partie définie du logiciel dans laquelle des termes, définitions et règles particulières s'appliquent de manière cohérente"
+
+- Cf. https://martinfowler.com/bliki/BoundedContext.html
+
+- Dans Osis, l'UE a-t-elle une définition exactement la même dans les contextes suivants ?
+    - "UE" dans le catalogue de formation
+    - "UE" dans parcours
+    - "UE" dans attribution
+
+- Exemples de bounded contexts :
+    - Catalogue de formations
+    - Parcours
+    - Inscription centrale
+    - Admission d'un étudiant
+
+- Bounded context = design from scratch
 
 
 
-### Bounded Context
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
-- cf. Language et Entity dans notre domaine UE
 
-En partant de l'idée qu'on aura 1 seule factory pour 1 Repository et 1 application service :
 
-Et pour les DTO : on utiliserais 1 DTO par AggregateRoot ? Pour fusionner le Builder.cuild_from_command et buildfromrepositry? 
+## Et pour les éléments de même définition à travers les bounded contexts ?
 
 ### Shared Kernel
 
-- Quid des value objects réutilisables ?
+- Regroupe les objets réutilisables à travers les bounded contexts
+    - Souvent des ValueObjects
+
+- Exemples :
+    - IbanAccount
+    - Language
+    - Country
+    - ...
+
+- Attention : un shared kernel est difficile à faire évoluer car utilisé dans TOUS les bounded contexts 
+
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Architecture en oignon
 
 ### Schéma et couches
 
+![](architecture_oignon.png)
 
 ### Arborescence des packages
 
-- Changer le dossier "service" en "use cases" ?
-- W5 : ou placer les exceptions.py ? (exceptions business)
-- Où placer les command.py ?  
-- Où placer les DTOs ? 
-- Où placer les Django views, forms... app django ? 
+```
+Osis (racine projet git)
+ ├─ ddd
+ |   ├─ logic (aucun import externe comme Django, etc.)
+ |       ├─ bounded_context_1
+ |       |   |
+ |       |   ├─ builder (factory)
+ |       |   |   ├─ <root_entity>_builder.py  (Builder pour RootEntity)
+ |       |   |   ├─ <root_entity_entity>_builder.py  (Builder pour EntityIdentity)
+ |       |   |
+ |       |   ├─ domain
+ |       |   |   ├─ model
+ |       |   |   |   ├─ <root_entity>.py  (RootEntity)
+ |       |   |   |   ├─ _entity.py (protected)
+ |       |   |   |   ├─ _value_object.py (protected)
+ |       |   |   |
+ |       |   |   ├─ service (Domain Service)
+ |       |   |   |   ├─ <domain_service_name>.py
+ |       |   |   |
+ |       |   |   ├─ validator
+ |       |   |       ├─ _should_<business_validator_rule>.py
+ |       |   |       ├─ exceptions.py
+ |       |   |       ├─ validator_by_business_action.py
+ |       |   |
+ |       |   ├─ repository (uniquement interfaces !)
+ |       |   |   ├─ i_<root_entity>.py
+ |       |   |
+ |       |   ├─ test
+ |       |   |   ├─ ...
+ |       |   |
+ |       |   ├─ use_case (Application Service)
+ |       |   |   ├─ read
+ |       |   |   |   ├─ <action_métier>_service.py
+ |       |   |   |
+ |       |   |   ├─ write
+ |       |   |       ├─ <action_métier>_service.py
+ |       |   |
+ |       |   ├─ commands.py
+ |       |   |
+ |       |   ├─ dtos.py
+ |       |   |
+ |       |   ├─ events.py
+ |       |
+ |       ├─ bounded_context_2
+ |       |
+ |       ├─ bounded_context_3
+ |       |
+ |       ├─ shared_kernel
+ |   
+ ├─ infrastructure
+ |   ├─ bounded_context_1
+ |   |   ├─ repository (implémentation des interfaces)
+ |   |       ├─ <objet_métier>.py
+ |   |
+ |   ├─ bounded_context_2
+ |   |
+ |   ├─ bounded_context_3
+ |   |
+ |   ├─ message_bus.py
+ |
+ ├─ django_app_1
+ |
+ ├─ django_app_2
+
+```
 
 
 
@@ -262,36 +391,126 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
 
 - Application service == command handlers (gestionnaire de commandes)
 
-
-### Événements
-
-- Résultat d'une action métier
-    - Résultat d'une commande
-- Exemples : 
-    - Formation créée
-    - Groupement supprimé
-    - Unité d'enseignement reportée
-    - Volumes de l'UE mis à jour
+- Lorsqu'on cherche un use case (application service), on doit chercher sa commande correspondante
+    - redondance
+    - 1 commande == une action métier == 1 application service
+    - pourquoi devoir recherche l'application service lié à la commande ?
 
 
-### Message bus
-
-#### Définition et objectifs
+<br/><br/><br/><br/><br/><br/><br/><br/>
 
 
-- [W6] message bus - pour aider aux unit tests https://github.com/uclouvain/osis/commit/520789ff538cc2046237f817f439c273c9093cae
-- injection des repositories
-- [W6] Pourquoi ne pas utiliser l'héritage pour les commandes qui ont (et qui doivent avoir ! ) les mêmes paramètres que d'autres commandes? (Exemple : UpdateAndPostpone hériterait d'Update, etc.)
+
+### Message bus : Définition et objectifs
 
 
-#### Implémentation
+- Activer les actions correspondantes aux commandes
+- Gérer les événements associés
+- Structure préparée à la gestion des événements
+
+
+
+
+#### Message bus : Implémentation
+
 
 ```python
 
-class MessageBus(AbstractMessageBus):
-    EVENT_HANDLERS = {}
-    COMMAND_HANDLERS = {
+class MessageBus:
+    command_handlers = {
         command.CreateOrphanGroupCommand: lambda cmd: create_group_service.create_orphan_group(cmd, GroupRepository())
     }
 
+
+#-------------------------------------------------------------------------------------------------------------------
+# Django Form
+class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin, forms.Form):
+    code = UpperCaseCharField(label=_("Code"))
+    min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize())
+    max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize())
+
+    field_name_by_exception = {
+        CodeAlreadyExistException: ('code',),
+        ContentConstraintMinimumMaximumMissing: ('min_constraint', 'max_constraint'),
+        ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum: ('min_constraint', 'max_constraint'),
+        ContentConstraintMinimumInvalid: ('min_constraint',),
+        ContentConstraintMaximumInvalid: ('max_constraint',),
+    }
+    
+    # def call_application_service(self):
+    #     command = ...
+    #     return update_training_service(command)
+
+    def get_commands(self) -> List[CommandRequest]:
+        command_1 = CommandRequest(**self.validated_data)
+        return [command]
+
 ```
+
+- Implique
+    - Injection des `Repository` dans les application services
+    - Une action métier (commande) correspond à un application service (exécution de l'action)
+        - 2 commandes == 2 actions métier différentes
+            - Pas d'héritage de commande
+            - Pas de réutilisation d'1 command dans 2 Application services
+
+- Avantages
+    - Views django : plus d'import d'application service, uniquement de commands
+    - Tests unitaires facilités : injection `repository` en fonction de l'environnement
+        - InMemoryRepository
+        - PostgresRepository
+        - ...
+
+TODO : messagebus.invoke(command) -> mixinform
+TODO : créer arborescence packages vides dans UE
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+# Conclusion
+
+## Rappel : problèmes constatés (mars 2020)
+
+- Osis est rigide
+    - difficile à faire évoluer car un changement ciblé peut affecter une autre partie du système
+- Osis est fragile
+    - lorsqu‘on fait un changement, cela amène des régressions non prévisibles sur le système
+- Osis est immobile
+    - difficile à réutiliser dans une autre application (difficile de dissocier une partie métier)
+
+- Difficulté d'être "agile" techniquement
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/>
+
+
+
+## Solution
+
+- Langage commun et universel à travers tous les intervenant du projet
+    - analystes <-> experts métier <-> développeurs ...
+    - devs <-> devs
+        - guidelines : langage commun
+- Découplage complet
+    - Technique
+        - Outils : Django, Postgres...
+        - Affichage des données
+        - Stockage des données
+        - Domaine métier
+        - Validations métier
+        - ...
+     - Logique métier
+
+- Couches structurées à responsabilités définies et limitées
+    - Architecture en "oignon"
+    - DDD
+        - Domaine Pure et incomplet
+        - DomainService, ApplicationService
+    - Design patterns (Factory, Builder...)
+    - DTO
+    - CQRS
+        - Commandes
+        - CommandBus
+    - ...

@@ -43,6 +43,8 @@ et qui nous ont permis d'évoluer techniquement sur un plan personnel et d'équi
 - [Validation and DDD](https://enterprisecraftsmanship.com/posts/validation-and-ddd/) (Anglais)
 - [Code contract VS input validation](https://enterprisecraftsmanship.com/posts/code-contracts-vs-input-validation/) (Anglais)
 - [DDD validation for existence of entity in other bounded context](https://stackoverflow.com/questions/60535089/ddd-validation-for-existence-of-entity-in-other-bounded-contexts)
+- [Bounded context](https://martinfowler.com/bliki/BoundedContext.html)
+- [Defining bounded context](https://www.infoq.com/news/2019/06/bounded-context-eric-evans/)
 ### Livres
 - [Architecture patterns with python - Harry J.W. Percival](https://www.amazon.fr/Architecture-Patterns-Python-Domain-Driven-Microservices-ebook/dp/B085KB31X3) (Anglais)
 
