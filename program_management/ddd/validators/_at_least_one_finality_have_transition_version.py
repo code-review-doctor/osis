@@ -26,11 +26,11 @@ from typing import Set, Optional
 
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import FinalitiesHaveNoCorrespondingTransitionVersionException
+from program_management.ddd.domain.exception import NoFinalitiesHaveCorrespondingTransitionVersionException
 from program_management.ddd.domain import program_tree
 
 
-class FinalitiesHaveCorrespondingTransitionValidator(business_validator.BusinessValidator):
+class AtLeastOneFinalityHaveTransitionVersionValidator(business_validator.BusinessValidator):
     def __init__(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree', existing_nodes: Set['Node']):
         self.from_tree = from_tree
         self.to_tree = to_tree
@@ -50,7 +50,7 @@ class FinalitiesHaveCorrespondingTransitionValidator(business_validator.Business
                     self.to_tree.root_node.year
             ):
                 return
-        raise FinalitiesHaveNoCorrespondingTransitionVersionException(finalities, self.to_tree)
+        raise NoFinalitiesHaveCorrespondingTransitionVersionException(finalities, self.to_tree)
 
     def _has_transition_node(
             self,
