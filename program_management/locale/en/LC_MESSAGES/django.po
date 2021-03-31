@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-24 08:16+0100\n"
+"POT-Creation-Date: 2021-03-30 14:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -379,9 +379,7 @@ msgstr ""
 msgid ""
 "In the context of a Master, this action fill the content of the transition "
 "version of the Master but also of its finalities if the corresponding "
-"transition versions exist. Therefore, it is necessary to create the "
-"transition version of the finalities that are wished before executing this "
-"action."
+"transition versions exist."
 msgstr ""
 
 msgid "Include subordinate entities"
@@ -414,6 +412,11 @@ msgctxt "male"
 msgid ""
 "It is impossible to create a %(category)s under a parent type of "
 "%(parent_type)s"
+msgstr ""
+
+msgid ""
+"It is necessary to create the desired transition version of the finalities "
+"before executing this action."
 msgstr ""
 
 #, python-format
@@ -664,6 +667,12 @@ msgstr ""
 msgid "Periodicity"
 msgstr ""
 
+#, python-format
+msgid ""
+"Please create at least a transition version [%(transition_name)s] for one of "
+"the finalities %(finalities)s in %(academic_year)s."
+msgstr ""
+
 msgid "Please cut or copy an item before paste"
 msgstr ""
 
@@ -907,6 +916,12 @@ msgstr ""
 msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
+#, python-format
+msgid ""
+"The transition version [%(version)s] of the training %(title)s does not "
+"exist in %(academic_year)s"
+msgstr ""
+
 msgid "Themes discussed"
 msgstr ""
 
@@ -943,10 +958,6 @@ msgstr ""
 msgid ""
 "Training %(offer_acronym)s[%(acronym)s] successfully deleted from "
 "%(academic_year)s."
-msgstr ""
-
-#, python-format
-msgid "Training %(title)s transition version is non existent."
 msgstr ""
 
 #, python-format
