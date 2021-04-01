@@ -12,6 +12,7 @@
     - [Pull requests](#pull-requests)
     - [Performance](#performance)
     - [Sécurité](#scurit)
+- [Onion Architecture](https://dev.to/barrymcauley/onion-architecture-3fgl)
 - [Arborescence des packages](#arborescence-des-packages)
 - [Couche Django app](#couche-django-app)
     - [API](#api)
@@ -23,6 +24,7 @@
     - [Template Tags (Django)](#filtres-de-gabarits-django-template-tags)
     - Tests (unit tests) - Documentation/guidelines à développer
 - [Couche DDD : Domain Driven Design](#domain-driven-design)
+    - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/workshops-mob-programming/ddd)
     - [Conventions générales](#conventions-gnrales)
     - [Builder (factory)](#dddbuilder)
     - [Domain](#ddddomain)
@@ -42,6 +44,7 @@
     - [Commande (commands.py)](#dddcommandpy)
     - [DTOs (dtos.py)](#dto--data-transfer-object)
 - [Couche Infrastructure](#couche-infrastructure)
+    - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/workshops-mob-programming/infrastructure)
     - [Repository (implémentation)](#repository-implmentation)
 - [Gestion des permissions](#permissions)
 - [Droits de merge et reviews](#droits-de-merge-et-reviews)
@@ -238,8 +241,6 @@ CATEGORIES = (
 
 
 # Arborescence des packages
-
-- [Onion Architecture](https://dev.to/barrymcauley/onion-architecture-3fgl)
 
 ```
 Osis (racine projet git)
