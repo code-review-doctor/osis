@@ -63,7 +63,7 @@ def fill_program_tree_version_content_from_program_tree_version(
     )
     to_tree_version.get_tree().report = Report(entity_id=ReportIdentity(transaction_id=cmd.transaction_id))
 
-    exising_transition_tree_versions = tree_version_repository.search(
+    existing_transition_tree_versions = tree_version_repository.search(
         version_name=to_tree_version.version_name,
         transition_name=to_tree_version.transition_name,
         year=cmd.to_year
@@ -81,7 +81,7 @@ def fill_program_tree_version_content_from_program_tree_version(
         ]
     )
 
-    existing_nodes = [tree_version.get_tree().root_node for tree_version in exising_transition_tree_versions] +\
+    existing_nodes = [tree_version.get_tree().root_node for tree_version in existing_transition_tree_versions] +\
         [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
 
     existing_codes = [identity.code for identity in tree_repository.get_all_identities()]
@@ -101,7 +101,8 @@ def fill_program_tree_version_content_from_program_tree_version(
     else:
         tree_repository.create(
             to_tree_version.get_tree(),
-            create_orphan_group_service=create_group_service.create_orphan_group
+            create_orphan_group_service=create_group_service.create_orphan_group,
+            copy_group_service=copy_group_service.copy_group
         )
 
     copy_tree_cms.CopyCms().from_tree(from_tree_version.get_tree(), to_tree_version.get_tree())
