@@ -90,7 +90,7 @@ class TestCreateAndReportMiniTrainingWithProgramTree(DDDTestCase):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
 
     def test_cannot_create_mini_training_for_which_acronym_already_exists(self):
-        GroupFactory(abbreviated_title='MININFO', persist=True)
+        GroupFactory(abbreviated_title=self.cmd.abbreviated_title, persist=True)
 
         with self.assertRaises(MultipleBusinessExceptions):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(self.cmd)
@@ -121,6 +121,17 @@ class TestCreateAndReportMiniTrainingWithProgramTree(DDDTestCase):
         expected = [
             MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
             for year in range(2021, self.max_postponement_year+1)
+        ]
+        self.assertListEqual(expected, result)
+
+    def test_should_create_mini_trainings_until_end_year_when_inferior_to_max_postponement_year(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year + 2)
+
+        result = create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
+
+        expected = [
+            MiniTrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(cmd.start_year, cmd.end_year + 1)
         ]
         self.assertListEqual(expected, result)
 

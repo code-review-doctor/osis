@@ -23,9 +23,11 @@
 # ############################################################################
 from collections import namedtuple
 
+import attr
 import mock
 from django.test import TestCase
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType
@@ -35,9 +37,12 @@ from education_group.ddd.domain import training
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
     CreateAndPostponeTrainingAndProgramTreeCommandFactory
+from education_group.tests.ddd.factories.group import GroupFactory
+from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain import program_tree, program_tree_version
-from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
+from program_management.ddd.service.read import get_program_tree_version_service
 from program_management.ddd.service.write import create_training_with_program_tree
 from testing.testcases import DDDTestCase
 
@@ -99,9 +104,9 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
             funding_orientation=None,
             can_be_international_funded=True,
             international_funding_orientation=None,
-            ares_code=None,
-            ares_graca=None,
-            ares_authorization=None,
+            ares_code=10,
+            ares_graca=25,
+            ares_authorization=15,
             code_inter_cfb=None,
             coefficient=None,
             academic_type=None,
@@ -117,6 +122,88 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
             return_value=namedtuple("academic_year", "year")(self.starting_academic_year_year)
         )
 
+    def test_cannot_create_training_for_which_code_already_exists(self):
+        GroupFactory(entity_identity__code=self.cmd.code, persist=True)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
+
+    def test_acronym_should_be_required(self):
+        cmd = attr.evolve(self.cmd, abbreviated_title="")
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+    def test_cannot_create_training_for_which_acronym_already_exists(self):
+        GroupFactory(abbreviated_title=self.cmd.abbreviated_title, persist=True)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
+
+    def test_start_year_cannot_be_greater_than_end_year(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year - 1)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+    def test_credits_cannot_be_inferior_to_0(self):
+        cmd = attr.evolve(self.cmd, credits=-1)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+    def test_if_min_or_max_constraint_is_set_then_constraint_type_must_be_set(self):
+        # For all business rules for constraints see
+        # education_group.tests.ddd.service.write.test_create_group_service.TestCreateGroup
+        cmd = attr.evolve(self.cmd, constraint_type=None)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+    def test_hops_valus_can_all_be_none(self):
+        cmd = attr.evolve(
+            self.cmd,
+            ares_code=None,
+            ares_graca=None,
+            ares_authorization=None
+        )
+
+        result = create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+        self.assertTrue(result)
+
+    def test_hops_values_should_all_be_defined(self):
+        cmd = attr.evolve(
+            self.cmd,
+            ares_code=10,
+            ares_graca=None,
+            ares_authorization=10
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+    def test_ares_graca_is_optional_for_formation_phd(self):
+        cmd = attr.evolve(
+            self.cmd,
+            type=TrainingType.FORMATION_PHD.name,
+            ares_code=10,
+            ares_graca=None,
+            ares_authorization=10
+        )
+
+        result = create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+        self.assertTrue(result)
+
+    def test_hops_values_should_be_comprised_between_0_and_9999(self):
+        cmds = [
+            attr.evolve(self.cmd, ares_code=-1, ares_graca=52, ares_authorization=21),
+            attr.evolve(self.cmd, ares_code=1, ares_graca=-1, ares_authorization=21),
+            attr.evolve(self.cmd, ares_code=1, ares_graca=52, ares_authorization=-1)
+        ]
+        for cmd in cmds:
+            with self.subTest(cmd=cmd):
+                with self.assertRaises(MultipleBusinessExceptions):
+                    create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
     def test_should_return_identities_of_trainings_created(self):
         result = create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
 
@@ -125,3 +212,32 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
             for year in range(2021, self.max_postponement_year+1)
         ]
         self.assertListEqual(expected, result)
+
+    def test_should_create_trainings_until_end_year_when_inferior_to_max_postponement_year(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year + 2)
+
+        result = create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+        expected = [
+            TrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(cmd.start_year, cmd.end_year + 1)
+        ]
+        self.assertListEqual(expected, result)
+
+    def test_should_create_tree_versions_of_trainings(self):
+        training_identities = create_training_with_program_tree. \
+            create_and_report_training_with_program_tree(self.cmd)
+
+        cmds = [
+            GetProgramTreeVersionCommand(
+                acronym=identity.acronym,
+                year=identity.year,
+                version_name=STANDARD,
+                transition_name=NOT_A_TRANSITION
+            )
+            for identity in training_identities
+        ]
+
+        tree_versions = [get_program_tree_version_service.get_program_tree_version(cmd) for cmd in cmds]
+        self.assertEqual(len(training_identities), len(tree_versions))
+
