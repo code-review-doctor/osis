@@ -23,20 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import List
 
-from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.entity_type import EntityType
+from osis_common.ddd import interface
+from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
+from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.exceptions import InvalidResponsibleEntityTypeOrCodeException
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
 from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldResponsibleEntityHaveAuthorizedTypeOrCode(BusinessValidator):
+class CreateLearningUnit(interface.DomainService):
 
-    responsible_entity = attr.ib(type=ResponsibleEntity)
+    @classmethod
+    def create(
+            cls,
+            responsible_entity: 'ResponsibleEntity',
+            cmd: 'CreateLearningUnitCommand',
+            all_existing_identities: List['LearningUnitIdentity']
+    ):
+        cls._should_responsible_entity_have_authorized_type_or_code(responsible_entity)
+        learning_unit = LearningUnitBuilder.build_from_command(
+            cmd,
+            all_existing_identities,
+            responsible_entity.entity_id
+        )
+        return learning_unit
 
-    def validate(self, *args, **kwargs):
+    @classmethod
+    def _should_responsible_entity_have_authorized_type_or_code(cls, responsible_entity: 'ResponsibleEntity'):
         authorized_types = [
             EntityType.SECTOR,
             EntityType.FACULTY,
@@ -49,7 +65,7 @@ class ShouldResponsibleEntityHaveAuthorizedTypeOrCode(BusinessValidator):
             "CCR",
             "LLL",
         ]
-        if not(self.responsible_entity.type in authorized_types or self.responsible_entity.code in authorized_codes):
+        if not(responsible_entity.type in authorized_types or responsible_entity.code in authorized_codes):
             raise InvalidResponsibleEntityTypeOrCodeException(
                 authorized_types=authorized_types,
                 authorized_codes=authorized_codes

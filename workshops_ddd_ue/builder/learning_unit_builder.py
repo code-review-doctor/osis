@@ -39,7 +39,7 @@ from workshops_ddd_ue.domain._titles import Titles
 from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
+from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
 from workshops_ddd_ue.validators.validators_by_business_action import CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
@@ -52,11 +52,10 @@ class LearningUnitBuilder(RootEntityBuilder):
             cls,
             cmd: 'CreateLearningUnitCommand',
             all_existing_identities: List['LearningUnitIdentity'],
-            responsible_entity: ResponsibleEntity
+            responsible_entity_identity: ResponsibleEntityIdentity
     ) -> 'LearningUnit':
         CreateLearningUnitValidatorList(
             command=cmd,
-            responsible_entity=responsible_entity,
             all_existing_identities=all_existing_identities
         ).validate()
         dto = cmd
@@ -70,7 +69,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype],
-            responsible_entity=responsible_entity,
+            responsible_entity_identity=responsible_entity_identity,
             periodicity=PeriodicityEnum[dto.periodicity],
             language=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
@@ -93,7 +92,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype],
-            responsible_entity=_build_responsible_entity(dto.responsible_entity_code),
+            responsible_entity_identity=_build_responsible_entity(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
             language=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),

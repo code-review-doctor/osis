@@ -27,7 +27,6 @@ from workshops_ddd_ue.validators._subdivision_should_not_exist import Subdivisio
 class CreateLearningUnitValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
     command = attr.ib(type=CreateLearningUnitCommand)
-    responsible_entity = attr.ib(type=ResponsibleEntity)
     all_existing_identities = attr.ib(type=List['LearningUnitIdentity'])  # type: List[LearningUnitIdentity]
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -42,7 +41,6 @@ class CreateLearningUnitValidatorList(TwoStepsMultipleBusinessExceptionListValid
             ShouldCodeAlreadyExistsValidator(self.command.code, self.all_existing_identities),
             ShouldCreditsRespectMinimumValueValidator(self.command.credits),
             ShouldCodeRespectNamingConventionValidator(self.command.code),
-            ShouldResponsibleEntityHaveAuthorizedTypeOrCode(self.responsible_entity),
         ]
 
 

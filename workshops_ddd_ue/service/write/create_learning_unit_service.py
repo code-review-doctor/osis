@@ -29,6 +29,7 @@ from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
 from workshops_ddd_ue.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
 from workshops_ddd_ue.command import CreateLearningUnitCommand
 from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from workshops_ddd_ue.domain.service.create_learning_unit import CreateLearningUnit
 from workshops_ddd_ue.repository.entity_repository import EntityRepository
 from workshops_ddd_ue.repository.learning_unit import LearningUnitRepository
 
@@ -43,7 +44,7 @@ def create_learning_unit(cmd: CreateLearningUnitCommand) -> LearningUnitIdentity
     )
 
     # WHEN
-    learning_unit = LearningUnitBuilder.build_from_command(cmd, all_existing_identities, entity)
+    learning_unit = CreateLearningUnit.create(entity, cmd, all_existing_identities)
 
     # THEN
     repository.save(learning_unit)
