@@ -40,6 +40,7 @@
     - Test (unit tests) - Documentation/guidelines à développer
     - [Use case (Application Service)](#dddservice-application-service)
     - [Commande (commands.py)](#dddcommandpy)
+    - [DTOs (dtos.py)](#dto--data-transfer-object)
 - [Couche Infrastructure](#couche-infrastructure)
     - [Repository (implémentation)](#repository-implmentation)
 - [Gestion des permissions](#permissions)
@@ -237,6 +238,8 @@ CATEGORIES = (
 
 
 # Arborescence des packages
+
+- [Onion Architecture](https://dev.to/barrymcauley/onion-architecture-3fgl)
 
 ```
 Osis (racine projet git)
@@ -808,13 +811,15 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 
 ## ddd/repository
 
-- Regroupe les **objets** qui permettent de faire le lien entre le stockage des données et nos objets du domaine.
-- Chargée de persist / load les données (pour Osis, le stockage est fait une DB PostGres)
+- Regroupe les **interfaces** qui déclarent les fonctions de liaison entre le stockage des données et nos objets du domaine
+- Chargée de persister et charger les données
 - Hérite de `AbstractRepository`
-- Renvoie / persiste uniquement des RootEntity qui sont complets (ne peut pas renvoyer de types primitifs ou ValueObjects)
-    - Évite les risque d'inconsistance dans les vérifications des invariants métier
-- Nommage des fichiers : <objet_métier>.py
-- Nommage des objets : <ObjetMetier>Repository
+- Persiste uniquement des RootEntity qui sont [complets](https://github.com/uclouvain/osis/blob/workshops/doc/domain_purity_and_completeness.md)
+    - Évite les risque d'inconsistance dans les vérifications des invariants métier (cf. [validation avant ou après?](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md#appliquer-les-validateurs-avant-ou-apr%C3%A8s-ex%C3%A9cution-dune-action-m%C3%A9tier-de-lobjet-du-domaine-))
+- Peut déclarer des fonctions qui renvoient des [DTOs](https://github.com/uclouvain/osis/blob/workshops/doc/dto.md) 
+dans des cas spécifiques relatifs à la consultation (cf. [quand utiliser des DTO ?](https://github.com/uclouvain/osis/blob/workshops/doc/dto.md#quand-utiliser-un-dto-))
+- Nommage des fichiers : i_<objet_métier>.py
+- Nommage des objets : <ObjetMetier>IRepository
 - Cf. [interface.AbstractRepository](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L53)
 - Accès :
     - [couche Django Model](#modle-django-model)
@@ -826,10 +831,16 @@ Exemple :
 # ddd/repository/training.py
 from osis_common.ddd import interface
 
-class TrainingRepository(interface.AbstractRepository):
-    """Chargé d'implémenter les fonctions fournies par AbstractRepository."""
-    pass
- 
+class TrainingIRepository(interface.AbstractRepository):
+    """
+    Chargé de déclarer les fonctions que devra fournir toute implémentation d'un stockage de données.
+    L'interface peut être vide (déclairer uniquement les fonctions de bases proposées par AbstractRepository).
+    """
+    
+    def search_only_for_specific_list_view(self, search_param1: str, search_param2: int) -> List[DTO]:
+        raise NotImplementedError
+
+
 ```
 
 
@@ -900,6 +911,22 @@ class UpdateTrainingCommand(interface.CommandRequest):
 ```
 
 
+<br/><br/><br/><br/>
+
+
+
+## DTO : Data Transfer Object
+
+- "Objet de transfert de données"
+- Patron de conception d'architecture
+- Objectif : simplifier le transfert des données entre les couches d'une application logicielle 
+- Possède uniquement des déclarations d'attributs
+- Aucune logique technique, métier, fonction...
+- "Contrat de données" qui nous aide à atteindre la compatibilité entre les différentes couches d'une application
+- Enlève l'interdépendance entre couches
+    - Facilite le refactoring
+- Cf. [quand utiliser un DTO ?](https://github.com/uclouvain/osis/blob/workshops/doc/dto.md#quand-utiliser-un-dto-)    
+
 
 <br/><br/><br/><br/><br/><br/><br/><br/>
 
@@ -913,7 +940,28 @@ class UpdateTrainingCommand(interface.CommandRequest):
 
 ## Repository (implémentation)
 
-TODO
+- Regroupe les **objets** qui implémentent les [interfaces IRepository](#dddrepository) pour les accès à la couche de persistence
+- Chargée de persist / load les données (pour Osis, le stockage est fait une DB PostGres)
+- Hérite de [interfaces IRepository](#dddrepository)
+- Nommage des fichiers : <objet_métier>.py
+- Nommage des objets : <ObjetMetier>Repository
+- Accès :
+    - [couche Django Model](#modle-django-model)
+    - [couche Domain](#ddddomain)
+    - [couche Builder](#dddbuilder)
+
+Exemple :
+```python
+# ddd/repository/training.py
+from ddd.logic.training_bounded_context.repository import TrainingIRepository
+
+class TrainingRepository(TrainingIRepository):
+    """Chargé d'implémenter les fonctions fournies par TrainingIRepository."""
+    pass
+ 
+```
+
+
 
 
 
