@@ -21,56 +21,107 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from collections import namedtuple
+
 import mock
 from django.test import TestCase
 
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import TrainingType
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command
 from education_group.ddd.domain import training
+from education_group.ddd.domain.training import TrainingIdentity
 from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
     CreateAndPostponeTrainingAndProgramTreeCommandFactory
 from program_management.ddd.domain import program_tree, program_tree_version
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
+from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
 from program_management.ddd.service.write import create_training_with_program_tree
+from testing.testcases import DDDTestCase
 
 
-class TestCreateAndReportTrainingWithProgramTree(TestCase):
-    @mock.patch(
-        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.create_standard_version_service.create_standard_program_version")
-    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
-    @mock.patch(
-        "program_management.ddd.service.write.create_standard_program_tree_service.create_standard_program_tree")
-    @mock.patch("education_group.ddd.service.write.create_orphan_training_service.create_and_postpone_orphan_training")
-    def test_should_create_trainings_until_postponement_limit(
-            self,
-            mock_create_and_postpone_orphan_training,
-            mock_create_standard_program_tree,
-            mock_postpone_program_tree,
-            mock_create_standard_program_version,
-            mock_postpone_program_tree_version,):
+class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.starting_academic_year_year = 2020
+        cls.max_postponement_year = cls.starting_academic_year_year + DEFAULT_YEARS_TO_POSTPONE
 
-        training_identities = [
-            training.TrainingIdentity(acronym="ACRONYM", year=2020),
-            training.TrainingIdentity(acronym="ACRONYM", year=2021),
-            training.TrainingIdentity(acronym="ACRONYM", year=2022)
-        ]
+    def setUp(self) -> None:
+        super().setUp()
 
-        mock_create_and_postpone_orphan_training.return_value = training_identities
-        mock_create_standard_program_tree.return_value = program_tree.ProgramTreeIdentity(code="CODE", year=2020)
-        mock_postpone_program_tree.return_value = None
-        mock_create_standard_program_version.return_value = program_tree_version.ProgramTreeVersionIdentity(
-            offer_acronym="Offer",
-            year=2020,
-            version_name="",
-            transition_name=NOT_A_TRANSITION,
+        self.cmd = command.CreateAndPostponeTrainingAndProgramTreeCommand(
+            code="INFO1BA",
+            year=2021,
+            type=TrainingType.BACHELOR.name,
+            abbreviated_title="INFO100B",
+            title_fr="Bachelier en info",
+            title_en="Bachelor info",
+            keywords="",
+            status=ActiveStatusEnum.ACTIVE.name,
+            schedule_type=ScheduleTypeEnum.DAILY.name,
+            credits=180,
+            constraint_type=ConstraintTypeEnum.CREDITS.name,
+            min_constraint=0,
+            max_constraint=5,
+            remark_fr="",
+            remark_en="",
+            start_year=2021,
+            end_year=None,
+            duration=3,
+            partial_title_fr=None,
+            partial_title_en=None,
+            internship_presence=None,
+            is_enrollment_enabled=False,
+            has_online_re_registration=False,
+            has_partial_deliberation=False,
+            has_admission_exam=False,
+            has_dissertation=False,
+            produce_university_certificate=True,
+            decree_category=None,
+            rate_code=None,
+            main_language='French',
+            english_activities=None,
+            other_language_activities=None,
+            internal_comment="",
+            main_domain_code=None,
+            main_domain_decree=None,
+            secondary_domains=[],
+            isced_domain_code=None,
+            management_entity_acronym="INFO",
+            administration_entity_acronym="INFO",
+            teaching_campus_name="LLN",
+            teaching_campus_organization_name='UCL',
+            enrollment_campus_name="LLN",
+            enrollment_campus_organization_name="UCL",
+            other_campus_activities=None,
+            funding_orientation=None,
+            can_be_international_funded=True,
+            international_funding_orientation=None,
+            ares_code=None,
+            ares_graca=None,
+            ares_authorization=None,
+            code_inter_cfb=None,
+            coefficient=None,
+            academic_type=None,
+            duration_unit=None,
+            leads_to_diploma=True,
+            printing_title='',
+            professional_title='',
+            can_be_funded=True,
         )
-        mock_postpone_program_tree_version.return_value = None
 
-        cmd = CreateAndPostponeTrainingAndProgramTreeCommandFactory()
-        result = create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+        self.mock_service(
+            "base.models.academic_year.starting_academic_year",
+            return_value=namedtuple("academic_year", "year")(self.starting_academic_year_year)
+        )
 
-        self.assertListEqual(training_identities, result)
-        self.assertTrue(mock_create_and_postpone_orphan_training.called)
-        self.assertTrue(mock_create_standard_program_tree.called)
-        self.assertTrue(mock_postpone_program_tree.called)
-        self.assertTrue(mock_create_standard_program_version.called)
-        self.assertTrue(mock_postpone_program_tree_version.called)
+    def test_should_return_identities_of_trainings_created(self):
+        result = create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
+
+        expected = [
+            TrainingIdentity(acronym=self.cmd.abbreviated_title, year=year)
+            for year in range(2021, self.max_postponement_year+1)
+        ]
+        self.assertListEqual(expected, result)
