@@ -24,13 +24,16 @@
 #
 ##############################################################################
 import string
+from typing import List
 
 import factory.fuzzy
 
 from base.models.enums import active_status, schedule_type as schedule_type_enum
 from base.models.enums.education_group_types import MiniTrainingType
+from education_group.ddd import command
 from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
 from education_group.ddd.repository import mini_training as mini_training_repository
+from education_group.ddd.service.write import copy_mini_training_service
 from education_group.tests.ddd.factories.entity import EntityFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
 
@@ -66,3 +69,16 @@ class MiniTrainingFactory(factory.Factory):
     def persist(obj, create, extracted, **kwargs):
         if extracted:
             mini_training_repository.MiniTrainingRepository.create(obj)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['MiniTraining']:
+        first_mini_training = cls(*args, **kwargs)  # type: MiniTraining
+
+        result = [first_mini_training]
+        for year in range(first_mini_training.year, first_mini_training.year + n - 1):
+            identity = copy_mini_training_service.copy_mini_training_to_next_year(
+                command.CopyMiniTrainingToNextYearCommand(acronym=first_mini_training.acronym, postpone_from_year=year)
+            )
+            result.append(mini_training_repository.MiniTrainingRepository.get(identity))
+
+        return result

@@ -36,6 +36,8 @@ class FakeGroupRepository(group_repository.GroupRepository):
     @classmethod
     def create(cls, group: 'Group', **_) -> 'GroupIdentity':
         cls._groups.append(group)
+        from program_management.tests.ddd.factories import node as node_factory
+        node_factory.NodeGroupYearFactory.from_group(group, persist=True)
         return group.entity_id
 
     @classmethod

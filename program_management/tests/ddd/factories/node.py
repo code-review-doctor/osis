@@ -30,6 +30,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
+from education_group.ddd.business_types import *
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.models.enums.node_type import NodeType
@@ -107,6 +108,28 @@ class NodeGroupYearFactory(NodeFactory):
         )
         listchoice = factory.Trait(
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
+        )
+
+    @classmethod
+    def from_group(cls, group: 'Group', persist: bool) -> 'Node':
+        return cls(
+            code=group.code,
+            title=group.abbreviated_title,
+            year=group.year,
+            start_year=group.start_year,
+            end_year=group.end_year,
+            end_date=group.end_year,
+            node_type=group.type,
+            teaching_campus=group.teaching_campus,
+            remark_fr=group.remark.text_fr,
+            remark_en=group.remark.text_en,
+            group_title_fr=group.titles.title_fr,
+            group_title_en=group.titles.title_en,
+            offer_title_fr=group.titles.title_fr,
+            offer_title_en=group.titles.title_en,
+            offer_partial_title_fr=group.titles.partial_title_fr,
+            offer_partial_title_en=group.titles.partial_title_en,
+            persist=persist
         )
 
 

@@ -21,18 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Any, Optional
+from typing import Any, Optional, List
 
 import mock
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
-    get_fake_mini_training_repository, get_fake_training_repository
+    get_fake_mini_training_repository, get_fake_training_repository, FakeGroupRepository
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
-    get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository
+    get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository, FakeProgramTreeVersionRepository
 
 
 class DDDTestCase(TestCase):
@@ -72,6 +72,17 @@ class DDDTestCase(TestCase):
         self.mock_service(
             "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
             side_effect=get_from_element_id
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch."
+            "get_from_node_identities",
+            side_effect=get_program_tree_version_identity_from_node_identities
+        )
+
+        self.mock_service(
+            "education_group.ddd.domain.service.abbreviated_title_exist.CheckAcronymExist.exists",
+            side_effect=check_acronym_exists
         )
 
     def tearDown(self) -> None:
@@ -138,3 +149,19 @@ def get_from_element_id(element_id: int) -> Optional['NodeIdentity']:
         (node for node in repo._nodes if node.node_id == element_id),
         None
     )
+
+
+def get_program_tree_version_identity_from_node_identities(
+        node_identities: List['NodeIdentity']
+) -> List['ProgramTreeVersionIdentity']:
+    repo = FakeProgramTreeVersionRepository()
+    node_identities_set = set(node_identities)
+    return [
+        tree_version.entity_id for tree_version in repo._trees_version
+        if tree_version.get_tree().root_node.entity_id in node_identities_set
+    ]
+
+
+def check_acronym_exists(abbreviated_title: str) -> bool:
+    repo = FakeGroupRepository()
+    return any(group for group in repo._groups if group.abbreviated_title == abbreviated_title)
