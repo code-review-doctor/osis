@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import itertools
+from datetime import datetime
 from typing import Iterable
 
 from django.contrib import messages
@@ -54,34 +55,50 @@ def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
 
     summary_edition_calendar = LearningUnitSummaryEditionCalendar()
-    summary_edition_academic_events = summary_edition_calendar.get_opened_academic_events()
-    if summary_edition_academic_events:
-        main_summary_edition_academic_event = summary_edition_academic_events[0]
-    else:
-        main_summary_edition_academic_event = summary_edition_calendar.get_previous_academic_event()
-        messages.add_message(
-            request,
-            messages.INFO,
-            _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
-                "data_year": display_as_academic_year(main_summary_edition_academic_event.authorized_target_year),
-                "end_date": main_summary_edition_academic_event.end_date.strftime('%d/%m/%Y'),
-            }
+    summary_edition_academic_events_opened = summary_edition_calendar.get_opened_academic_events()
+    force_majeur_summary_edition_calendar = LearningUnitForceMajeurSummaryEditionCalendar()
+    force_majeure_academic_events_opened = force_majeur_summary_edition_calendar.get_opened_academic_events()
+
+    if summary_edition_academic_events_opened or force_majeure_academic_events_opened:
+        event_based = min(
+            summary_edition_academic_events_opened + force_majeure_academic_events_opened,
+            key=lambda event: event.authorized_target_year
         )
-        next_academic_event = summary_edition_calendar.get_next_academic_event()
-        if next_academic_event:
+        year_displayed = event_based.authorized_target_year
+    else:
+        year_displayed = datetime.today().year
+
+    main_summary_edition_academic_event = next(
+        (event for event in summary_edition_academic_events_opened if event.authorized_target_year == year_displayed),
+        None
+    )
+    if not main_summary_edition_academic_event:
+        main_summary_edition_academic_event = summary_edition_calendar.get_academic_event(year_displayed)
+        if not main_summary_edition_academic_event.is_open_now():
+            messages.add_message(
+                request,
+                messages.INFO,
+                _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
+                    "data_year": display_as_academic_year(main_summary_edition_academic_event.authorized_target_year),
+                    "end_date": main_summary_edition_academic_event.end_date.strftime('%d/%m/%Y'),
+                }
+            )
+        next_summary_edition_academic_event = summary_edition_calendar.get_academic_event(year_displayed+1)
+        if next_summary_edition_academic_event and not next_summary_edition_academic_event.is_open_now():
             messages.add_message(
                 request,
                 messages.INFO,
                 _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
-                    "data_year": display_as_academic_year(next_academic_event.authorized_target_year),
-                    "start_date": next_academic_event.start_date.strftime('%d/%m/%Y'),
+                    "data_year": display_as_academic_year(next_summary_edition_academic_event.authorized_target_year),
+                    "start_date": next_summary_edition_academic_event.start_date.strftime('%d/%m/%Y'),
                 }
             )
 
-    force_majeur_summary_edition_calendar = LearningUnitForceMajeurSummaryEditionCalendar()
-    force_majeur_summary_edition_academic_events = force_majeur_summary_edition_calendar.get_opened_academic_events()
-    if force_majeur_summary_edition_academic_events:
-        force_majeure_academic_event = force_majeur_summary_edition_academic_events[0]
+    force_majeure_academic_event = next(
+        (event for event in force_majeure_academic_events_opened if event.authorized_target_year == year_displayed),
+        None
+    )
+    if force_majeure_academic_event:
         messages.add_message(
             request,
             messages.WARNING,
@@ -95,11 +112,6 @@ def list_my_attributions_summary_editable(request):
         force_majeure_academic_event = force_majeur_summary_edition_calendar.get_academic_event(
             target_year=main_summary_edition_academic_event.authorized_target_year
         )
-
-    if not main_summary_edition_academic_event.is_open_now() and force_majeure_academic_event.is_open_now():
-        year_displayed = force_majeure_academic_event.authorized_target_year
-    else:
-        year_displayed = main_summary_edition_academic_event.authorized_target_year
 
     academic_year = AcademicYear.objects.get(year=year_displayed)
     learning_unit_years_qs = LearningUnitYear.objects_with_container.filter(
