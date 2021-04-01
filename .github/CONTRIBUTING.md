@@ -566,6 +566,7 @@ class StudyDomain(interface.Entity):
     - **Public** : utilisable par les couches en dehors du domaine ([service](#dddservice-application-service), [repository](#dddrepository)...)
     - Possède un [repository](#dddrepository) associé
         - persistence : 1 transaction par aggrégat (tout l'aggrégat est persisté, ou rien du tout - mais pas à moitié)
+    - Si un aggregate en contient un autre, référencer l'Aggregates par EntityIdentity **pour assurer le découplage**
 - Exemple : 
 ```python
 # .../domain/training.py
@@ -852,7 +853,9 @@ class TrainingIRepository(interface.AbstractRepository):
 
 - Regroupe les **fonctions** qui implémentent les uses cases des utilisateurs (Given when then)
 - Chargé d'orchestrer les appels vers les couches du DDD (repository, domain...) et de déclencher les événements (exemple : envoi de mail)
-- Reçoit en paramètre uniquement des objets CommandRequest ([ddd/command.py](#ddd/command.py))
+- Reçoit en paramètre :
+    - 1 CommandRequest ([ddd/command.py](#ddd/command.py))
+    - 1 ou plusieurs [repositories](#dddrepository)
 - Renvoit toujours un EntityIdentity ; c'est la responsabilité des views de gérer les messages de succès ;
 - Séparé en 2 catégories : `write` et `read`
 - Doit être documentée (car couche publique réutilisable)
@@ -864,7 +867,7 @@ class TrainingIRepository(interface.AbstractRepository):
     - [couche Builder](#dddbuilder)
     - [couche Domaine](#ddddomain)
     - [couche DomainService](#domain-services)
-    - [couche Repository](#dddrepository)
+    - [couche Repository](#dddrepository) (via injection de dépendance)
 
 
 Exemple:
@@ -893,6 +896,8 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 - Public : utilisables en dehors de la couche du domaine ([service](#dddservice-application-service), [views](#vue-django-view)...)
 - Séparé en read/write ([CQS](CQS_command_query_separation.md))
 - Doit obligatoirement hériter de l'objet CommandRequest
+- Pas d'héritage d'une autre commande, 1 commande = 1 action métier = 1 application service (use case)
+    - Cf. [message bus](https://github.com/uclouvain/osis/blob/workshops/doc/messages_bus.md)
 - Nommage des classes de commande : <ActionMetier>Command
 
 Exemple : 
@@ -942,7 +947,7 @@ class UpdateTrainingCommand(interface.CommandRequest):
 ## Repository (implémentation)
 
 - Regroupe les **objets** qui implémentent les [interfaces IRepository](#dddrepository) pour les accès à la couche de persistence
-- Chargée de persist / load les données (pour Osis, le stockage est fait une DB PostGres)
+- Chargée de persist / load les données : **il est le seul à connaître les Querysets Django**
 - Hérite de [interfaces IRepository](#dddrepository)
 - Nommage des fichiers : <objet_métier>.py
 - Nommage des objets : <ObjetMetier>Repository
