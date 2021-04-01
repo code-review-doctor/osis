@@ -28,4 +28,4 @@ from typing import TYPE_CHECKING
 # FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
 
 if TYPE_CHECKING:
-    from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity
+    from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity

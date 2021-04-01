@@ -26,19 +26,22 @@
 from django.db import transaction
 
 from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
-from ddd.logic.learning_unit.command import CreateLearningUnitCommand
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.domain.service.create_learning_unit import CreateLearningUnit
-from infrastructure.learning_unit.repository.entity_repository import EntityRepository
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.learning_unit.repository.i_responsible_entity import IResponsibleEntityRepository
 
 
 @transaction.atomic()
-def create_learning_unit(cmd: CreateLearningUnitCommand) -> LearningUnitIdentity:
+def create_learning_unit(
+        cmd: CreateLearningUnitCommand,
+        learning_unit_repository: ILearningUnitRepository,
+        entity_repository: IResponsibleEntityRepository,
+) -> LearningUnitIdentity:
     # GIVEN
-    repository = LearningUnitRepository()
-    all_existing_identities = repository.get_identities()
-    entity = EntityRepository.get(
+    all_existing_identities = learning_unit_repository.get_identities()
+    entity = entity_repository.get(
         entity_id=ResponsibleEntityIdentityBuilder.build_from_code(cmd.responsible_entity_code),
     )
 
@@ -46,6 +49,6 @@ def create_learning_unit(cmd: CreateLearningUnitCommand) -> LearningUnitIdentity
     learning_unit = CreateLearningUnit.create(entity, cmd, all_existing_identities)
 
     # THEN
-    repository.save(learning_unit)
+    learning_unit_repository.save(learning_unit)
 
     return learning_unit.entity_id

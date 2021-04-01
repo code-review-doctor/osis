@@ -3,7 +3,7 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.learning_unit.command import CreateLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import ShouldAcademicYearGreaterThan2019
 from ddd.logic.learning_unit.domain.validator._should_code_not_exist import ShouldCodeAlreadyExistsValidator
 from ddd.logic.learning_unit.domain.validator._should_credits_respect_minimum_value import ShouldCreditsRespectMinimumValueValidator

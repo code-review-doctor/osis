@@ -30,7 +30,7 @@ from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from osis_common.ddd import interface
 
 
-class ILearningUnitRepository(abc.ABC, interface.AbstractRepository):
+class ILearningUnitRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod

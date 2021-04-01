@@ -25,8 +25,8 @@
 ##############################################################################
 from django.db import transaction
 
-from ddd.logic.learning_unit.command import CreatePartimCommand
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.commands import CreatePartimCommand
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 

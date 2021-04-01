@@ -25,12 +25,16 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
+from infrastructure.learning_unit.repository.entity_repository import EntityRepository
+from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 
 
 class MessageBus:
     command_handlers = {
-
+        CreateLearningUnitCommand: lambda cmd: create_learning_unit(cmd, LearningUnitRepository(), EntityRepository()),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

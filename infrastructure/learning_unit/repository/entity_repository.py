@@ -25,14 +25,15 @@
 ##############################################################################
 from typing import Optional, List
 
+
 from base.models.entity_version import EntityVersion
-from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
 from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
+from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity, ResponsibleEntity
+from ddd.logic.learning_unit.repository.i_responsible_entity import IResponsibleEntityRepository
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
 
 
-class EntityRepository(interface.AbstractRepository):
+class EntityRepository(IResponsibleEntityRepository):
     @classmethod
     def save(cls, entity: RootEntity) -> None:
         raise NotImplementedError

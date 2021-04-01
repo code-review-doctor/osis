@@ -26,7 +26,7 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.learning_unit.command import CreateLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.validator.exceptions import EmptyRequiredFieldsException
 
 

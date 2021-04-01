@@ -35,13 +35,12 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.validator import exceptions
 from education_group.forms import fields
 from education_group.forms.fields import UpperCaseCharField
+from osis_common.ddd.interface import CommandRequest
 from reference.models.language import Language, FR_CODE_LANGUAGE
-from ddd.logic.learning_unit.command import CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.validator import exceptions
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.use_case.write import create_learning_unit_service
 
 
 class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
@@ -148,8 +147,8 @@ class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     #         return self.cleaned_data['responsible_entity'].acronym
     #     return None
 
-    def call_application_service(self) -> 'LearningUnitIdentity':
-        cmd_create = CreateLearningUnitCommand(
+    def get_command(self) -> CommandRequest:
+        return CreateLearningUnitCommand(
             code=self.cleaned_data['code'],
             academic_year=self.cleaned_data['academic_year'],
             type=self.cleaned_data['type'],
@@ -166,4 +165,3 @@ class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             remark_publication_fr=self.cleaned_data['remark_publication_fr'],
             remark_publication_en=self.cleaned_data['remark_publication_en'],
         )
-        return create_learning_unit_service.create_learning_unit(cmd_create)

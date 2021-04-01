@@ -27,8 +27,6 @@ from typing import Optional, List
 
 from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value
 from django.db.models.functions import Concat
-from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from base.models.entity_version import EntityVersion as EntityVersionDatabase
@@ -37,6 +35,8 @@ from base.models.learning_container_year import LearningContainerYear as Learnin
 from base.models.learning_unit import LearningUnit as LearningUnitDatabase
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
+from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
@@ -119,7 +119,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         return result
 
     @classmethod
-    def save(cls, entity: LearningUnit) -> None:
+    def save(cls, entity: 'LearningUnit') -> None:
         learning_container = LearningContainerDatabase.objects.create()
 
         learning_unit = LearningUnitDatabase.objects.create(
@@ -166,7 +166,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         return entity.entity_id
 
     @classmethod
-    def get(cls, entity_id: LearningUnitIdentity) -> LearningUnit:
+    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
         qs = _get_common_queryset().filter(acronym=entity_id.code, academic_year__year=entity_id.year)
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
@@ -179,7 +179,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: LearningUnitIdentity, **kwargs: ApplicationService) -> None:
+    def delete(cls, entity_id: 'LearningUnitIdentity', **kwargs: 'ApplicationService') -> None:
         obj = LearningUnitYearDatabase.objects.get(
             acronym=entity_id.code,
             academic_year__year=entity_id.year,

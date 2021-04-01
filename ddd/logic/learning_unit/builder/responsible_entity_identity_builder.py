@@ -23,10 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from osis_common.ddd.interface import CommandRequest, EntityIdentity, EntityIdentityBuilder
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntityIdentity
-from workshops_ddd_ue.dto.learning_unit_dto import DTO
+from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity
+from osis_common.ddd.interface import CommandRequest, EntityIdentity, EntityIdentityBuilder, DTO
 
 
 class ResponsibleEntityIdentityBuilder(EntityIdentityBuilder):

@@ -23,19 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from osis_common.ddd import interface
 
 
-def search_learning_units(cmd: LearningUnitSearchCommand) -> List['LearningUnitSearchDTO']:
-    repository = LearningUnitRepository()
-    return repository.search_learning_units_dto(
-        code=cmd.code,
-        year=cmd.year,
-        full_title=cmd.full_title,
-        type=cmd.type,
-        responsible_entity_code=cmd.responsible_entity_code,
-    )
+class IResponsibleEntityRepository(interface.AbstractRepository):
+    pass

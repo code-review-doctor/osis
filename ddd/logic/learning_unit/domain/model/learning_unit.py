@@ -30,14 +30,14 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
+from ddd.logic.learning_unit.domain.model._language import Language
+from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
+from ddd.logic.learning_unit.domain.model._titles import Titles
+from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity
 from osis_common.ddd import interface
-from ddd.logic.learning_unit.command import CreatePartimCommand
-from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.domain._language import Language
-from workshops_ddd_ue.domain._partim import Partim, PartimBuilder
+from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
-from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntityIdentity
 
 
 @attr.s(frozen=True, slots=True)

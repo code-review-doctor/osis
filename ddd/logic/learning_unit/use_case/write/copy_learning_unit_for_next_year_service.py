@@ -28,13 +28,13 @@ from django.db import transaction
 
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.command import CopyLearningUnitToNextYearCommand
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 
 
 @transaction.atomic()
-def copy_learning_unit_to_next_year(cmd: CopyLearningUnitToNextYearCommand) -> LearningUnitIdentity:
+def copy_learning_unit_to_next_year(cmd: CopyLearningUnitToNextYearCommand) -> 'LearningUnitIdentity':
     # GIVEN
     repository = LearningUnitRepository()
     learning_unit = repository.get(entity_id=LearningUnitIdentityBuilder.build_from_command(cmd))

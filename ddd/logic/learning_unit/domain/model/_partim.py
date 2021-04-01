@@ -26,11 +26,12 @@
 import attr
 
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from ddd.logic.learning_unit.domain.model._language import Language
 from osis_common.ddd import interface
-from ddd.logic.learning_unit.command import CreatePartimCommand
-from workshops_ddd_ue.domain._language import Language
+from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreatePartimValidatorList
+from ddd.logic.learning_unit.business_types import *
 
 
 @attr.s(frozen=True, slots=True)

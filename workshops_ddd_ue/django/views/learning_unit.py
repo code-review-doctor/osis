@@ -28,7 +28,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import View
 
 from base.views.common import display_success_messages
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from workshops_ddd_ue.django.forms.learning_unit import LearningUnitCreateForm
 
 
@@ -54,7 +54,7 @@ class LearningUnitCreateView(View):
             "form": form,
         })
 
-    def get_success_msg(self, learning_unit_identity: LearningUnitIdentity):
+    def get_success_msg(self, learning_unit_identity: 'LearningUnitIdentity'):
         return _("Learning unit %(code)s (%(academic_year)s) successfully created.") % {
             "code": learning_unit_identity.code,
             "academic_year": learning_unit_identity.academic_year,

@@ -25,10 +25,10 @@
 ##############################################################################
 from django.db import transaction
 
+from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from ddd.logic.learning_unit.command import DeleteLearningUnitCommand
-from workshops_ddd_ue.domain._academic_year import AcademicYear
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.commands import DeleteLearningUnitCommand
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.domain.service.learning_unit_is_contained_in_program_tree import \
     LearningUnitCanBeDeleted
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository

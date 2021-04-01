@@ -25,9 +25,10 @@
 ##############################################################################
 from typing import Union
 
+from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO, EntityIdentity
-from ddd.logic.learning_unit.command import CopyLearningUnitToNextYearCommand
-from workshops_ddd_ue.domain._academic_year import AcademicYear
+from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
+from ddd.logic.learning_unit.business_types import *
 
 
 class LearningUnitIdentityBuilder(EntityIdentityBuilder):

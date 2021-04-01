@@ -30,19 +30,21 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from osis_common.ddd.interface import RootEntityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.command import CreateLearningUnitCommand
-from workshops_ddd_ue.domain._language import Language
+from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.model._language import Language
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
-from workshops_ddd_ue.domain._titles import Titles
-from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
+from ddd.logic.learning_unit.domain.model._titles import Titles
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
-from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO
-from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CopyLearningUnitToNextYearValidatorList, \
+from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity
+from ddd.logic.learning_unit.domain.validator.validators_by_business_action import \
+    CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
+from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO
+from osis_common.ddd.interface import RootEntityBuilder
 
 
 class LearningUnitBuilder(RootEntityBuilder):
@@ -79,7 +81,6 @@ class LearningUnitBuilder(RootEntityBuilder):
     def build_from_repository_dto(
             cls,
             dto: 'LearningUnitFromRepositoryDTO',
-            responsible_entity: 'ResponsibleEntity'
     ) -> 'LearningUnit':
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
@@ -92,7 +93,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype],
-            responsible_entity_identity=_build_responsible_entity(dto.responsible_entity_code),
+            responsible_entity_identity=ResponsibleEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
             language=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),

@@ -25,13 +25,15 @@
 ##############################################################################
 from typing import List
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.entity_type import EntityType
+from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntity
 from osis_common.ddd import interface
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
-from ddd.logic.learning_unit.command import CreateLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.validator.exceptions import InvalidResponsibleEntityTypeOrCodeException
-from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
-from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from osis_common.ddd.interface import BusinessException
 
 
 class CreateLearningUnit(interface.DomainService):
@@ -43,12 +45,22 @@ class CreateLearningUnit(interface.DomainService):
             cmd: 'CreateLearningUnitCommand',
             all_existing_identities: List['LearningUnitIdentity']
     ):
-        cls._should_responsible_entity_have_authorized_type_or_code(responsible_entity)
-        learning_unit = LearningUnitBuilder.build_from_command(
-            cmd,
-            all_existing_identities,
-            responsible_entity.entity_id
-        )
+        # FIXME :: créer une fonction utilitaire pour exécuter chaque statement en try except
+        #  pour lancer 1 seule MultipleBusinessExceptions
+        #  et éviter de devoir ajouter manuellement les try-except comme ci-dessous
+        exceptions = []
+        try:
+            cls._should_responsible_entity_have_authorized_type_or_code(responsible_entity)
+        except BusinessException as e:
+            exceptions.append(e)
+        try:
+            learning_unit = LearningUnitBuilder.build_from_command(
+                cmd,
+                all_existing_identities,
+                responsible_entity.entity_id
+            )
+        except MultipleBusinessExceptions as e:
+            raise MultipleBusinessExceptions(exceptions=e.exceptions | set(exceptions))
         return learning_unit
 
     @classmethod
