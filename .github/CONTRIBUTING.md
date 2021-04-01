@@ -33,6 +33,7 @@
             - [EntityIdentity](#ddddomainentityidentity)
         - [Service (Domain Service)](#domain-services)
         - Validator
+            - [ValidatorList (validators_by_business_action.py)](#dddvalidator-list)
             - [Validator](#dddvalidator)
             - [BusinessException (exceptions.py)](#ddddomainbusinessexception)
     - [Repository (interface)](#dddrepository) (implémentation dans la couche "infrastructure")
@@ -249,9 +250,9 @@ Osis (racine projet git)
  |       |   |
  |       |   ├─ domain
  |       |   |   ├─ model
- |       |   |   |   ├─ <root_entity>.py  (RootEntity)
- |       |   |   |   ├─ _entity.py (protected)
- |       |   |   |   ├─ _value_object.py (protected)
+ |       |   |   |   ├─ <root_entity>.py  (Aggregate)
+ |       |   |   |   ├─ _<entity>.py (protected)
+ |       |   |   |   ├─ _<value_object>.py (protected)
  |       |   |   |
  |       |   |   ├─ service (Domain Service)
  |       |   |   |   ├─ <domain_service_name>.py
@@ -328,7 +329,11 @@ Osis (racine projet git)
 - Incrémenter la version du schema.yml (cf. `info: version: 'X.Y'`) à chaque modification de celui-ci
 - Tout champ utilisé dans les filters (django-filters) doit se trouver aussi dans le serializer (tout champ "filtre" doit se trouver dans la donnée renvoyée)
  
-<br/><br/>
+ 
+ 
+<br/><br/><br/><br/>
+
+
 
 ## Formulaire (Django Forms)
 - Regroupe les objets qui permettent de faciliter l'affichage du code HTML côté template
@@ -337,10 +342,39 @@ Osis (racine projet git)
     - Champs requis
     - Énumérations (ChoiceField)
     - Toutes ces validations sont **dupliquées** dans notre domaine ([couche Validators](#dddvalidator))
-- Accès :
-  - [couche application service](#dddservice-application-service)
+    - Cf. [doc sur "two steps validation"](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md)
+- Doit hériter de `DisplayExceptionsByFieldNameMixin`
+    - Fournit `field_name_by_exception` et `get_command()` - Cf. [doc sur "two steps validation"](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md)
 
-<br/><br/>
+- Accès :
+  - [couche Commands](#dddcommandpy)
+
+
+```python
+# Django Form
+class UpdateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
+    code = UpperCaseCharField(label=_("Code"))
+    min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize())
+    max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize())
+
+    field_name_by_exception = {
+        CodeAlreadyExistException: ('code',),
+        ContentConstraintMinimumMaximumMissing: ('min_constraint', 'max_constraint'),
+        ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum: ('min_constraint', 'max_constraint'),
+        ContentConstraintMinimumInvalid: ('min_constraint',),
+        ContentConstraintMaximumInvalid: ('max_constraint',),
+    }
+    
+    def get_command(self) -> CommandRequest:
+        return CommandRequest(**self.validated_data)
+
+```
+
+
+<br/><br/><br/><br/>
+
+
+
 
 ## Modèle (Django Model)
 - Regroupe les modèles Django et les classes pour la partie administration de Django
@@ -670,24 +704,16 @@ class GenerateSequenceId(interface.DomainService):
 <br/><br/><br/><br/>
 
 
-## ddd/validator
-
-- Regroupe les invariants métier (règles business)
-- Chargé de raise des `BusinessException` en cas d'invariant métier non respecté
-- Doit hériter de BusinessValidator
+## ddd/validator list
+- Regroupe le listing des règles métier à respecter par action métier
+- Doit hériter de [TwoStepsMultipleBusinessExceptionListValidator](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md)
 - Visibilité : `protected` (accessibles uniquement par le Domain)
-- 1 fichier par invariant métier
-- Nommage des fichiers : should_<invariant_metier>.py
-- Nommage des objets : Should<InvariantMetier>Validator
+- 1 fichier pour toutes les règles par action : `validators_by_business_action.py`
 - Accès : 
     - [couche Domain](#ddddomain) (Les validateurs font partie du domaine)
-    - [couche Exceptions (business exceptions)](#ddddomainbusinessexception)
-
-
-Exemple : 
+    - [couche Validator](#dddvalidator) (Les validateurs font partie du domaine)
+Exemple :
 ```python
-# ddd/validator/_existing_enrollments.py  # protected
-from base.ddd.utils import business_validator
 
 
 @attr.s(frozen=True, slots=True)
@@ -711,6 +737,30 @@ class BusinessActionValidatorList(TwoStepsMultipleBusinessExceptionListValidator
             # ...
         ]
 
+
+```
+
+<br/><br/>
+
+
+
+## ddd/validator
+
+- Regroupe les invariants métier (règles business)
+- Chargé de raise des `BusinessException` en cas d'invariant métier non respecté
+- Doit hériter de BusinessValidator
+- Visibilité : `protected` (accessibles uniquement par le Domain)
+- 1 fichier par invariant métier
+- Nommage des fichiers : should_<invariant_metier>.py
+- Nommage des objets : Should<InvariantMetier>Validator
+- Accès : 
+    - [couche Domain](#ddddomain) (Les validateurs font partie du domaine)
+    - [couche Exceptions (business exceptions)](#ddddomainbusinessexception)
+
+
+Exemple : 
+```python
+from base.ddd.utils import business_validator
 
 @attr.s(frozen=True, slots=True)
 class MyBusinessValidator(BusinessValidator):
