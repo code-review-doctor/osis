@@ -24,12 +24,12 @@
 #
 ##############################################################################
 from abc import ABC
-from typing import List, Set
+from typing import List, Set, Union
 
 import attr
 
 from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
-from osis_common.ddd.interface import BusinessException
+from osis_common.ddd.interface import BusinessException, RootEntity, Entity, EntityIdentity, ValueObject, PrimitiveType
 
 
 class BusinessValidator(ABC):
@@ -40,7 +40,11 @@ class BusinessValidator(ABC):
 
     success_messages = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+            self,
+            *args: Union['RootEntity', 'Entity', 'EntityIdentity', 'ValueObject', 'PrimitiveType'],
+            **kwargs: Union['RootEntity', 'Entity', 'EntityIdentity', 'ValueObject', 'PrimitiveType']
+    ):
         self._messages = []
         if self.success_messages is None:
             self.success_messages = []
