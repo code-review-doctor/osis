@@ -23,35 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
-from osis_common.ddd.interface import DTO
+from django.db import transaction
 
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.command import CopyLearningUnitToNextYearCommand
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+@transaction.atomic()
+def copy_learning_unit_to_next_year(cmd: CopyLearningUnitToNextYearCommand) -> LearningUnitIdentity:
+    # GIVEN
+    repository = LearningUnitRepository()
+    learning_unit = repository.get(entity_id=LearningUnitIdentityBuilder.build_from_command(cmd))
+    all_existing_learning_unit_identities = repository.get_identities()
+
+    # WHEN
+    learning_unit_net_year = LearningUnitBuilder.copy_to_next_year(learning_unit, all_existing_learning_unit_identities)
+
+    # THEN
+    repository.save(learning_unit_net_year)
+
+    return learning_unit.entity_id

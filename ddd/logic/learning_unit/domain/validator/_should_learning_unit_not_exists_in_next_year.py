@@ -23,35 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 import attr
 
-from osis_common.ddd.interface import DTO
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.learning_unit.domain.validator.exceptions import LearningUnitAlreadyExistsException
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+class ShouldLearningUnitNotExistNextYearValidator(BusinessValidator):
+    learning_unit_identity = attr.ib(type='LearningUnitIdentity')  # type: LearningUnitIdentity
+    all_existing_lear_unit_identities = attr.ib(type=List['LearningUnitIdentity'])  # type: List[LearningUnitIdentity]
 
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+    def validate(self, *args, **kwargs):
+        identity_next_year = LearningUnitIdentityBuilder.build_for_next_year(
+            self.learning_unit_identity
+        )
+        if identity_next_year in set(self.all_existing_lear_unit_identities):
+            raise LearningUnitAlreadyExistsException(identity_next_year)

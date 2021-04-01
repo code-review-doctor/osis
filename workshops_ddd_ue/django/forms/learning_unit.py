@@ -38,10 +38,10 @@ from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from education_group.forms import fields
 from education_group.forms.fields import UpperCaseCharField
 from reference.models.language import Language, FR_CODE_LANGUAGE
-from workshops_ddd_ue.command import CreateLearningUnitCommand
-from workshops_ddd_ue.domain import exceptions
+from ddd.logic.learning_unit.command import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.validator import exceptions
 from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
-from workshops_ddd_ue.service.write import create_learning_unit_service
+from ddd.logic.learning_unit.use_case.write import create_learning_unit_service
 
 
 class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):

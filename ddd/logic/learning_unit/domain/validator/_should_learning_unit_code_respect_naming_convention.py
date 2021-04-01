@@ -23,35 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 import attr
 
-from osis_common.ddd.interface import DTO
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.learning_unit.domain.validator.exceptions import LearningUnitCodeStructureInvalidException
+
+LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BELMWX][A-Z]{2,4}[1-9]\d{3}"
+STRING_END = "$"
+LEARNING_UNIT_ACRONYM_REGEX_FULL = LEARNING_UNIT_ACRONYM_REGEX_BASE + STRING_END
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+class ShouldCodeRespectNamingConventionValidator(BusinessValidator):
 
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
     code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+
+    def validate(self, *args, **kwargs):
+        if not bool(re.match(LEARNING_UNIT_ACRONYM_REGEX_FULL, self.code)):
+            raise LearningUnitCodeStructureInvalidException(code=self.code)

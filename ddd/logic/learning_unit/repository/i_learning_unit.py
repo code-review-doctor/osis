@@ -23,35 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+import abc
+from typing import List
 
-from osis_common.ddd.interface import DTO
-
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
+from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+class ILearningUnitRepository(abc.ABC, interface.AbstractRepository):
+
+    @classmethod
+    @abc.abstractmethod
+    def search_learning_units_dto(
+            cls,
+            code: str = None,
+            year: int = None,
+            full_title: str = None,
+            type: str = None,
+            responsible_entity_code: str = None
+    ) -> List['LearningUnitSearchDTO']:
+        pass

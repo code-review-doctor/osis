@@ -23,35 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import Optional, List
 
-from osis_common.ddd.interface import DTO
-
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from base.models.entity_version import EntityVersion
+from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
+from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
+from workshops_ddd_ue.domain.responsible_entity import ResponsibleEntity, ResponsibleEntityIdentity
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+class EntityRepository(interface.AbstractRepository):
+    @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def get(cls, entity_id: 'ResponsibleEntityIdentity') -> 'ResponsibleEntity':
+        entity_version = EntityVersion.objects.get(acronym=entity_id.code)
+        return ResponsibleEntity(
+            entity_id=ResponsibleEntityIdentityBuilder.build_from_code(code=entity_version.acronym),
+            type=entity_version.entity_type
+        )  # FIXME :: reuse Builder instead
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
+        raise NotImplementedError

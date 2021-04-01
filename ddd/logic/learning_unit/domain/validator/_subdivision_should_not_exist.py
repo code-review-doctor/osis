@@ -25,33 +25,16 @@
 ##############################################################################
 import attr
 
-from osis_common.ddd.interface import DTO
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.learning_unit.domain.validator.exceptions import SubdivisionAlreadyExistException
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+class SubdivisionShouldNotExistValidator(BusinessValidator):
 
+    subdivision = attr.ib(type=str)
+    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+    def validate(self, *args, **kwargs):
+        if self.learning_unit.contains_partim_subdivision(self.subdivision):
+            raise SubdivisionAlreadyExistException(self.learning_unit.entity_id, self.subdivision)

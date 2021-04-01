@@ -23,35 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import Union
 
-from osis_common.ddd.interface import DTO
-
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO, EntityIdentity
+from ddd.logic.learning_unit.command import CopyLearningUnitToNextYearCommand
+from workshops_ddd_ue.domain._academic_year import AcademicYear
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+class LearningUnitIdentityBuilder(EntityIdentityBuilder):
+
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EntityIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def build_from_command(cls, cmd: Union[CopyLearningUnitToNextYearCommand]) -> 'LearningUnitIdentity':
+        return cls.build_from_code_and_year(cmd.copy_from_code, cmd.copy_from_year)
+
+    @classmethod
+    def build_for_next_year(cls, learning_unit_identity: 'LearningUnitIdentity') -> 'LearningUnitIdentity':
+        return cls.build_from_code_and_year(learning_unit_identity.code, learning_unit_identity.get_next_year())
+
+    @classmethod
+    def build_from_code_and_year(cls, code: str, year: int) -> 'LearningUnitIdentity':
+        return LearningUnitIdentity(
+            academic_year=AcademicYear(year=year),
+            code=code,
+        )

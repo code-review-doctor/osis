@@ -23,35 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from django.db import transaction
 
-from osis_common.ddd.interface import DTO
-
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from ddd.logic.learning_unit.command import CreatePartimCommand
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+@transaction.atomic()
+def create_partim(cmd: CreatePartimCommand) -> LearningUnitIdentity:
+    # GIVEN
+    repository = LearningUnitRepository()
+    learning_unit = repository.get(
+        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.learning_unit_year)
+    )
+    # WHEN
+    learning_unit.create_partim(cmd)
+
+    # THEN
+    repository.save(learning_unit)
+
+    return learning_unit.entity_id

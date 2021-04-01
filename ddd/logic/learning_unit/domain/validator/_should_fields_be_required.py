@@ -25,33 +25,30 @@
 ##############################################################################
 import attr
 
-from osis_common.ddd.interface import DTO
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.learning_unit.command import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.validator.exceptions import EmptyRequiredFieldsException
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+class ShouldFieldsBeRequiredValidator(BusinessValidator):
 
+    command = attr.ib(type=CreateLearningUnitCommand)
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+    def validate(self, *args, **kwargs):
+        mandatory_field = [
+            'code',
+            'academic_year',
+            'common_title_fr',
+            'specific_title_fr',
+            'credits',
+            'responsible_entity_code',
+            'periodicity',
+            'iso_code',
+        ]
+        empty_required_fields = []
+        for field in mandatory_field:
+            if not getattr(self.command, field, False):
+                empty_required_fields.append(field)
+        if empty_required_fields:
+            raise EmptyRequiredFieldsException(empty_required_fields=empty_required_fields)

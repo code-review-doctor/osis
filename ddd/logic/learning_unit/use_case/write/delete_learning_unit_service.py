@@ -23,35 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from django.db import transaction
 
-from osis_common.ddd.interface import DTO
-
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from ddd.logic.learning_unit.command import DeleteLearningUnitCommand
+from workshops_ddd_ue.domain._academic_year import AcademicYear
+from workshops_ddd_ue.domain.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.learning_unit_is_contained_in_program_tree import \
+    LearningUnitCanBeDeleted
+from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+@transaction.atomic()
+def delete_learning_unit(cmd: DeleteLearningUnitCommand) -> LearningUnitIdentity:
+    # GIVEN
+    repository = LearningUnitRepository()
+    learning_unit = repository.get(
+        entity_id=LearningUnitIdentity(
+            code=cmd.code,
+            academic_year=AcademicYear(year=cmd.academic_year),
+        )
+    )
+
+    # WHEN
+    LearningUnitCanBeDeleted().validate(learning_unit.entity_id, ProgramTreeRepository())
+
+    # THEN
+    repository.delete(learning_unit.entity_id)
+
+    return learning_unit.entity_id
