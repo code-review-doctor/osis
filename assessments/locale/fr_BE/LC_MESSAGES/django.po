@@ -677,7 +677,7 @@ msgid ""
 "our database"
 msgstr ""
 "Vous n'avez pas les droits d'accès pour cette unité d'enseignement ou elle "
-"n'existe pas dans notre base de donénes"
+"n'existe pas dans notre base de données"
 
 msgid ""
 "You don't have access rights for this offer or it doesn't exist in our "
