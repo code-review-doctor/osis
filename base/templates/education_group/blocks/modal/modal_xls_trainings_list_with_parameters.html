@@ -36,31 +36,27 @@
             {% csrf_token %}
             <label>{% trans 'Do you want to export the following informations' %}?</label><br>
             <span title="{% trans 'Ac. yr., acronym/short title, title, category, type, credits, code' %}">
-                <input type="checkbox" disabled id="unmutable_chb" checked
-                       title="{% trans 'Ac. yr., acronym/short title, title, category, type, credits, code' %}"> {% trans 'Default information' %}
+                <input type="checkbox" disabled id="unmutable_chb" checked> {% trans 'Default information' %}
             </span>
             <br>
             <span title="{% trans 'Select/deselect all' %}">
-                <input type="checkbox" id="chb_all_param" title="{% trans 'Select/deselect all' %}"> <strong>{% trans 'Select all' %}</strong>
+                <input type="checkbox" id="chb_all_param"> <strong>{% trans 'Select all' %}</strong>
             </span>
             <br>
             <input type="checkbox" id="chb_with_validity" value="chb_with_validity" class="chb_parameters"> {% trans 'Validity' %}<br>
             <input type="checkbox" id="chb_with_partial_english_titles" value="chb_with_partial_english_titles" class="chb_parameters"> {% trans 'Titles(partial/English)' %}<br>
             <input type="checkbox" id="chb_with_education_fields" value="chb_with_education_fields" class="chb_parameters"> {% trans 'Education fields' context 'list' %}<br>
             <span title="{% trans 'Entity, location, language, duration, schedule and types of activities present in the training' %}">
-                <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"
-                       title="{% trans 'Entity, location, language, duration, schedule and types of activities present in the training' %}"> {% trans 'Organization' %}
+                <input type="checkbox" id="chb_with_organization" value="chb_with_organization" class="chb_parameters"> {% trans 'Organization' %}
             </span>
             <br>
             <input type="checkbox" id="chb_with_responsibles_and_contacts" value="chb_with_responsibles_and_contacts" class="chb_parameters"> {% trans 'Responsibles and contacts' %}<br>
             <span title="{% trans 'Location, language and types of activities present in the training' %}">
-                <input type="checkbox" id="chb_with_activities" value="chb_with_activities" class="chb_parameters"
-                       title="{% trans 'Location, language and types of activities present in the training' %}"> {% trans 'Activities' %}
+                <input type="checkbox" id="chb_with_activities" value="chb_with_activities" class="chb_parameters"> {% trans 'Activities' %}
             </span>
             <br>
             <span title="{% trans 'Diploma title, professionnal title and aims' %}">
-                <input type="checkbox" id="chb_with_diploma_and_certificat" value="chb_with_diploma_and_certificat" class="chb_parameters"
-                       title="{% trans 'Diploma title, professionnal title and aims' %}"> {% trans 'Diploma/certificat' %}
+                <input type="checkbox" id="chb_with_diploma_and_certificat" value="chb_with_diploma_and_certificat" class="chb_parameters"> {% trans 'Diploma/certificat' %}
             </span>
             <br>
             <input type="checkbox" id="chb_with_co_graduation_and_partnership" value="chb_with_co_graduation_and_partnership" class="chb_parameters"> {% trans 'Co-graduation/partnership' %}<br>
@@ -73,8 +69,7 @@
             </span>
             <br>
             <span title="{% trans 'Remarks, comments and constraints' %}">
-                <input type="checkbox" id="chb_with_additional_info" value="chb_with_additional_info" class="chb_parameters"
-                       title="{% trans 'Remarks, comments and constraints' %}"> {% trans 'Additional info' %}
+                <input type="checkbox" id="chb_with_additional_info" value="chb_with_additional_info" class="chb_parameters"> {% trans 'Additional info' %}
             </span>
             <br>
 
