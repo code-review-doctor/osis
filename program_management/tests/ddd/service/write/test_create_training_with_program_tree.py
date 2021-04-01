@@ -24,8 +24,6 @@
 from collections import namedtuple
 
 import attr
-import mock
-from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.active_status import ActiveStatusEnum
@@ -33,13 +31,9 @@ from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
-from education_group.ddd.domain import training
 from education_group.ddd.domain.training import TrainingIdentity
-from education_group.tests.ddd.factories.command.create_and_postpone_training_and_tree_command import \
-    CreateAndPostponeTrainingAndProgramTreeCommandFactory
 from education_group.tests.ddd.factories.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
-from program_management.ddd.domain import program_tree, program_tree_version
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE
 from program_management.ddd.service.read import get_program_tree_version_service
