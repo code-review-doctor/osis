@@ -78,3 +78,12 @@ class CopyLearningUnitToNextYearCommand(interface.CommandRequest):
 class CreateCommand(interface.CommandRequest):
     copy_from_code = attr.ib(type=str)
     copy_from_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitSearchCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    type = attr.ib(type=str)
+    full_title = attr.ib(type=str)
+    responsible_entity_code = attr.ib(type=str)

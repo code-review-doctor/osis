@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import Optional, List
 
-from django.db.models import F, OuterRef, Subquery
+from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value
+from django.db.models.functions import Concat
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from base.models.entity_version import EntityVersion as EntityVersionDatabase
@@ -40,9 +41,83 @@ from workshops_ddd_ue.builder.learning_unit_builder import LearningUnitBuilder
 from workshops_ddd_ue.domain._academic_year import AcademicYear
 from workshops_ddd_ue.domain.learning_unit import LearningUnit, LearningUnitIdentity
 from workshops_ddd_ue.dto.learning_unit_dto import LearningUnitFromRepositoryDTO
+from workshops_ddd_ue.dto.search_learning_unit_dto import LearningUnitSearchDTO
 
 
 class LearningUnitRepository(interface.AbstractRepository):
+
+    @classmethod
+    def search_learning_units_dto(
+            cls,
+            code: str = None,
+            year: int = None,
+            full_title: str = None,
+            type: str = None,
+            responsible_entity_code: str = None
+    ) -> List['LearningUnitSearchDTO']:
+        qs = _get_common_queryset()
+        # FIXME :: reuse Django filter
+        if code is not None:
+            qs = qs.filter(
+                acronym__icontains=code,
+            )
+        if year is not None:
+            qs = qs.filter(
+                academic_year__year=year,
+            )
+        if type is not None:
+            qs = qs.filter(
+                learning_container_year__container_type=type,
+            )
+        if responsible_entity_code is not None:
+            qs = qs.filter(
+                requirement_entity__entityversion__acronym__icontains=responsible_entity_code,
+            )
+        if full_title is not None:
+            qs = qs.filter(
+                Q(learning_container_year__common_title__icontains=full_title)
+                | Q(specific_title__icontains=full_title),
+            )
+
+        qs = qs.annotate(
+            code=F('acronym'),
+            year=F('academic_year__year'),
+            type=F('learning_container_year__container_type'),
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
+            ),
+            responsible_entity_code=Subquery(
+                EntityVersionDatabase.objects.filter(
+                    entity__id=OuterRef('requirement_entity_id')
+                ).order_by('-start_date').values('acronym')[:1]
+            ),
+            responsible_entity_title=Subquery(
+                EntityVersionDatabase.objects.filter(
+                    entity__id=OuterRef('requirement_entity_id')
+                ).order_by('-start_date').values('title')[:1]
+            ),
+        ).values(
+            "year",
+            "code",
+            "full_title",
+            "type",
+            "responsible_entity_code",
+            "responsible_entity_title",
+        )
+        result = []
+        for data_dict in qs.values():
+            result.append(LearningUnitSearchDTO(**data_dict))
+        return result
 
     @classmethod
     def save(cls, entity: LearningUnit) -> None:
