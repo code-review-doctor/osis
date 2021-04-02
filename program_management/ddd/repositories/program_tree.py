@@ -83,7 +83,8 @@ class ProgramTreeRepository(interface.AbstractRepository):
             copy_group_service: interface.ApplicationService = None,
     ) -> 'ProgramTreeIdentity':
         for node in [n for n in program_tree.get_all_nodes() if n._has_changed and not n.is_learning_unit()]:
-            if create_orphan_group_service:
+            # FIXME _is_copied attribute is a dirty fix for the issue of having to know whether to create or copy
+            if create_orphan_group_service and not node._is_copied:
                 create_orphan_group_service(
                     CreateOrphanGroupCommand(
                         code=node.code,
@@ -105,7 +106,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                         end_year=node.end_year,
                     )
                 )
-            if copy_group_service:
+            elif copy_group_service:
                 copy_group_service(
                     CopyGroupCommand(
                         from_code=node.code,

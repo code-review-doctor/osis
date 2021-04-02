@@ -69,6 +69,7 @@ class NodeFactory:
             attributes_to_update["end_year"] = end_year
         node_next_year = attr.evolve(copy_from_node, **attributes_to_update)
         node_next_year._has_changed = True
+        node_next_year._is_copied = True
         return node_next_year
 
     @classmethod
@@ -205,6 +206,7 @@ class Node(interface.Entity):
 
     _academic_year = None
     _has_changed = False
+    _is_copied = False  # FIXME dirty solution to fix create or copy node on repo
 
     @entity_id.default
     def _entity_id(self) -> NodeIdentity:
