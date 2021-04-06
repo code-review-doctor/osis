@@ -139,18 +139,9 @@ def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publi
 
 
 def _build_language(iso_code: str):
-    return Language(  # FIXME
-        ietf_code=None,
-        name=None,
+    return Language(
         iso_code=iso_code,
     )
-
-
-# def _build_responsible_entity(responsible_entity_code: str):
-#     return ResponsibleEntity(  # FIXME
-#         entity_id=ResponsibleEntityIdentity(code=responsible_entity_code),
-#         type=None,
-#     )
 
 
 def _build_titles(common_title_fr: str, specific_title_fr: str, common_title_en: str, specific_title_en: str):

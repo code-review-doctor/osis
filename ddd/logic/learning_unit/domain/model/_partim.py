@@ -56,10 +56,8 @@ class PartimBuilder:
             credits=cmd.credits,
             periodicity=PeriodicityEnum[cmd.periodicity],
             language=Language(
-                ietf_code=None,
-                name=None,
                 iso_code=cmd.iso_code,
-            ),  # FIXME
+            ),
             remarks=Remarks(
                 faculty=cmd.remark_faculty,
                 publication_fr=cmd.remark_publication_fr,
