@@ -24,21 +24,21 @@
 #
 ##############################################################################
 from base.models.enums.entity_type import EntityType
-from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
-from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntity
-from ddd.logic.learning_unit.dtos import ResponsibleEntityDataDTO
+from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
+from ddd.logic.learning_unit.domain.model.responsible_entity import UclEntity
+from ddd.logic.learning_unit.dtos import UclEntityDataDTO
 from osis_common.ddd.interface import CommandRequest, RootEntityBuilder
 
 
-class ResponsibleEntityBuilder(RootEntityBuilder):
+class UclEntityBuilder(RootEntityBuilder):
 
     @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'ResponsibleEntity':
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'UclEntity':
         raise NotImplementedError
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'ResponsibleEntityDataDTO') -> 'ResponsibleEntity':
-        return ResponsibleEntity(
-            entity_id=ResponsibleEntityIdentityBuilder.build_from_code(code=dto_object.code),
+    def build_from_repository_dto(cls, dto_object: 'UclEntityDataDTO') -> 'UclEntity':
+        return UclEntity(
+            entity_id=UclEntityIdentityBuilder.build_from_code(code=dto_object.code),
             type=EntityType[dto_object.type],
         )

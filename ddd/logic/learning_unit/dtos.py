@@ -58,6 +58,6 @@ class LearningUnitSearchDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class ResponsibleEntityDataDTO(DTO):
+class UclEntityDataDTO(DTO):
     code = attr.ib(type=str)
     type = attr.ib(type=str)

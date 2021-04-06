@@ -39,12 +39,9 @@ class AcademicYearLowerThan2019Exception(BusinessException):
 
 
 class InvalidResponsibleEntityTypeOrCodeException(BusinessException):
-    def __init__(self, authorized_types: List['EntityType'], authorized_codes: List['str'],  *args, **kwargs):
+    def __init__(self, entity_code: str, *args, **kwargs):
         message = _(
-            "Responsible entity must be of types = {authorized_types} or haing code = {authorized_codes}".format(
-                authorized_types=authorized_types,
-                authorized_codes=authorized_codes,
-            )
+            "Selected entity {} is not an authorized responsible entity".format(entity_code)
         )
         super().__init__(message, **kwargs)
 

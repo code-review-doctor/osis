@@ -23,20 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity
-from osis_common.ddd.interface import CommandRequest, EntityIdentity, EntityIdentityBuilder, DTO
+from osis_common.ddd import interface
 
 
-class ResponsibleEntityIdentityBuilder(EntityIdentityBuilder):
-
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'EntityIdentity':
-        raise NotImplementedError
-
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EntityIdentity':
-        raise NotImplementedError
-
-    @classmethod
-    def build_from_code(cls, code: str) -> 'ResponsibleEntityIdentity':
-        return ResponsibleEntityIdentity(code=code)
+class IUclEntityRepository(interface.AbstractRepository):
+    pass

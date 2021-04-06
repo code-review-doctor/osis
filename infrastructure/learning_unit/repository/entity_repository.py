@@ -28,23 +28,22 @@ from typing import Optional, List
 from django.db.models import F
 
 from base.models.entity_version import EntityVersion
-from base.models.enums.entity_type import EntityType
-from ddd.logic.learning_unit.builder.responsible_entity_builder import ResponsibleEntityBuilder
-from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
-from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity, ResponsibleEntity
-from ddd.logic.learning_unit.dtos import ResponsibleEntityDataDTO
-from ddd.logic.learning_unit.repository.i_responsible_entity import IResponsibleEntityRepository
+from base.models.enums import organization_type
+from ddd.logic.learning_unit.builder.ucl_entity_builder import UclEntityBuilder
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity, UclEntity
+from ddd.logic.learning_unit.dtos import UclEntityDataDTO
+from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
 
 
-class ResponsibleEntityRepository(IResponsibleEntityRepository):
+class UclEntityRepository(IUclEntityRepository):
     @classmethod
     def save(cls, entity: RootEntity) -> None:
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'ResponsibleEntityIdentity') -> 'ResponsibleEntity':
-        entity_version_as_dict = EntityVersion.objects.filter(
+    def get(cls, entity_id: 'UCLEntityIdentity') -> 'UclEntity':
+        entity_version_as_dict = _get_common_queryset().filter(
             acronym=entity_id.code
         ).annotate(
             code=F('acronym'),
@@ -53,8 +52,8 @@ class ResponsibleEntityRepository(IResponsibleEntityRepository):
             'code',
             'type',
         ).get()
-        dto = ResponsibleEntityDataDTO(**entity_version_as_dict)
-        return ResponsibleEntityBuilder.build_from_repository_dto(dto)
+        dto = UclEntityDataDTO(**entity_version_as_dict)
+        return UclEntityBuilder.build_from_repository_dto(dto)
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
@@ -63,3 +62,9 @@ class ResponsibleEntityRepository(IResponsibleEntityRepository):
     @classmethod
     def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
         raise NotImplementedError
+
+
+def _get_common_queryset():
+    return EntityVersion.objects.filter(
+        entity__organization__type=organization_type.MAIN,
+    )

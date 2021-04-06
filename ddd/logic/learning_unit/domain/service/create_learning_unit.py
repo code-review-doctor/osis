@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from functools import partial
 from typing import List
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.entity_type import EntityType
-from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntity
+from ddd.logic.learning_unit.domain.model.responsible_entity import UclEntity
+from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
 from osis_common.ddd import interface
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
@@ -41,7 +43,7 @@ class CreateLearningUnit(interface.DomainService):
     @classmethod
     def create(
             cls,
-            responsible_entity: 'ResponsibleEntity',
+            ucl_entity: 'UclEntity',
             cmd: 'CreateLearningUnitCommand',
             all_existing_identities: List['LearningUnitIdentity']
     ):
@@ -50,35 +52,16 @@ class CreateLearningUnit(interface.DomainService):
         #  et éviter de devoir ajouter manuellement les try-except comme ci-dessous
         exceptions = []
         try:
-            cls._should_responsible_entity_have_authorized_type_or_code(responsible_entity)
+            if not ucl_entity.is_responsible_entity():
+                raise InvalidResponsibleEntityTypeOrCodeException(ucl_entity.code)
         except BusinessException as e:
             exceptions.append(e)
         try:
             learning_unit = LearningUnitBuilder.build_from_command(
                 cmd,
                 all_existing_identities,
-                responsible_entity.entity_id
+                ucl_entity.entity_id
             )
         except MultipleBusinessExceptions as e:
             raise MultipleBusinessExceptions(exceptions=e.exceptions | set(exceptions))
         return learning_unit
-
-    @classmethod
-    def _should_responsible_entity_have_authorized_type_or_code(cls, responsible_entity: 'ResponsibleEntity'):
-        authorized_types = [
-            EntityType.SECTOR,
-            EntityType.FACULTY,
-            EntityType.SCHOOL,
-            EntityType.DOCTORAL_COMMISSION,
-        ]
-        authorized_codes = [
-            "ILV",
-            "IUFC",
-            "CCR",
-            "LLL",
-        ]
-        if not(responsible_entity.type in authorized_types or responsible_entity.code in authorized_codes):
-            raise InvalidResponsibleEntityTypeOrCodeException(
-                authorized_types=authorized_types,
-                authorized_codes=authorized_codes
-            )

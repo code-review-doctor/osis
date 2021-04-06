@@ -31,7 +31,7 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
+from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.model._language import Language
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
@@ -39,7 +39,7 @@ from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
-from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import \
     CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
@@ -54,7 +54,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             cls,
             cmd: 'CreateLearningUnitCommand',
             all_existing_identities: List['LearningUnitIdentity'],
-            responsible_entity_identity: ResponsibleEntityIdentity
+            responsible_entity_identity: UCLEntityIdentity
     ) -> 'LearningUnit':
         CreateLearningUnitValidatorList(
             command=cmd,
@@ -93,7 +93,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype],
-            responsible_entity_identity=ResponsibleEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
+            responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
             language=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),

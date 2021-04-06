@@ -30,27 +30,32 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class ResponsibleEntityIdentity(interface.EntityIdentity):
+class UCLEntityIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
 
 
 @attr.s(slots=True, hash=False, eq=False)
-class ResponsibleEntity(interface.RootEntity):
-    entity_id = attr.ib(type=ResponsibleEntityIdentity)
+class UclEntity(interface.RootEntity):
+    entity_id = attr.ib(type=UCLEntityIdentity)
     type = attr.ib(type=EntityType)
 
     @property
     def code(self) -> str:
         return self.entity_id.code
 
-    def is_sector(self):
-        return self.type == EntityType.SECTOR
-
-    def is_faculty(self):
-        return self.type == EntityType.FACULTY
-
-    def is_school(self):
-        return self.type == EntityType.SCHOOL
-
-    def is_doctoral_commission(self):
-        return self.type == EntityType.DOCTORAL_COMMISSION
+    def is_responsible_entity(self) -> bool:
+        authorized_types = [
+            EntityType.SECTOR,
+            EntityType.FACULTY,
+            EntityType.SCHOOL,
+            EntityType.DOCTORAL_COMMISSION,
+        ]
+        authorized_codes = [
+            "ILV",
+            "IUFC",
+            "CCR",
+            "LLL",
+        ]
+        if not(self.type in authorized_types or self.code in authorized_codes):
+            return False
+        return True

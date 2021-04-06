@@ -34,7 +34,7 @@ from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
 from ddd.logic.learning_unit.domain.model._language import Language
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from osis_common.ddd import interface
 from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
@@ -62,7 +62,7 @@ class LearningUnit(interface.RootEntity):
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=InternshipSubtype)
-    responsible_entity_identity = attr.ib(type=ResponsibleEntityIdentity)
+    responsible_entity_identity = attr.ib(type=UCLEntityIdentity)
     periodicity = attr.ib(type=PeriodicityEnum)
     language = attr.ib(type=Language)
     remarks = attr.ib(type=Remarks)
