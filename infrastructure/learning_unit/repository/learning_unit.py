@@ -120,6 +120,7 @@ class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
     def save(cls, entity: 'LearningUnit') -> None:
+        # FIXME :: use get_or_create (or save) instead of Django create()
         learning_container = LearningContainerDatabase.objects.create()
 
         learning_unit = LearningUnitDatabase.objects.create(
