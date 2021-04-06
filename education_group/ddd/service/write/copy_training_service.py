@@ -32,7 +32,7 @@ from education_group.ddd.repository import training as training_repository
 
 
 @transaction.atomic()
-def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) -> 'TrainingIdentity':
+def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand, year: int) -> 'TrainingIdentity':
     # GIVEN
     repository = training_repository.TrainingRepository()
     existing_training = repository.get(
@@ -40,7 +40,7 @@ def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) 
     )
 
     # WHEN
-    training_next_year = TrainingBuilder().copy_to_next_year(existing_training, repository)
+    training_next_year = TrainingBuilder().copy_to_next_year(existing_training, repository, year)
 
     # THEN
     try:

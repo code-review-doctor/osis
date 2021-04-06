@@ -72,13 +72,20 @@ class TrainingIdentityThroughYears(interface.ValueObject):
 
 class TrainingBuilder:
 
-    def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':
+    def copy_to_next_year(
+            self,
+            training_from: 'Training',
+            training_repository: 'TrainingRepository',
+            from_year: int
+    ) -> 'Training':
         identity_next_year = TrainingIdentity(acronym=training_from.acronym, year=training_from.year + 1)
-        CopyTrainingValidatorList(training_from).validate()
         try:
             training_next_year = training_repository.get(identity_next_year)
-            training_next_year.update_from_other_training(training_from)
         except TrainingNotFoundException:
+            training_next_year = None
+
+        CopyTrainingValidatorList(training_from, training_next_year, from_year).validate()
+        if training_next_year is None:
             training_next_year = attr.evolve(
                 training_from,
                 entity_identity=identity_next_year,

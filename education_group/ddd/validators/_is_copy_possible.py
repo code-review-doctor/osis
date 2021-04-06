@@ -1,4 +1,4 @@
-# ############################################################################
+#############################################################################
 #  OSIS stands for Open Student Information System. It's an application
 #  designed to manage the core business of higher education institutions,
 #  such as universities, faculties, institutes and professional schools.
@@ -20,8 +20,8 @@
 #  A copy of this license - GNU General Public License - is available
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
-# ############################################################################
-
+#############################################################################
+from typing import Union
 from django.conf import settings
 
 from base.ddd.utils import business_validator
@@ -30,10 +30,12 @@ from education_group.ddd.domain.exception import CannotCopyTrainingDueToLimitYea
 
 
 class CheckCopyPossibleValidator(business_validator.BusinessValidator):
-    def __init__(self, training: 'Training'):
+    def __init__(self, training: 'Training', next_year_training: Union['Training', None], from_year: int):
         super().__init__()
         self.training = training
+        self.next_year_training = next_year_training
+        self.from_year = from_year
 
     def validate(self, *args, **kwargs):
-        if self.training.year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
+        if self.next_year_training and self.from_year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
             raise CannotCopyTrainingDueToLimitYearOfModification(training=self.training)

@@ -115,10 +115,10 @@ class UpdateCertificateAimsValidatorList(business_validator.BusinessListValidato
 
 class CopyTrainingValidatorList(business_validator.BusinessListValidator):
 
-    def __init__(self, training_from: 'Training'):
+    def __init__(self, training_from: 'Training', next_year_training: 'Training', from_year: int):
         self.validators = [
             CheckTrainingEndDateValidator(training_from),
-            CheckCopyPossibleValidator(training_from),
+            CheckCopyPossibleValidator(training_from, next_year_training, from_year),
         ]
         super().__init__()
 
