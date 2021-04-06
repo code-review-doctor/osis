@@ -24,7 +24,8 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import TransitionNameExistsInPast
+from program_management.ddd.domain.exception import TransitionNameExistsInPast, \
+    TransitionNameExistsInPastButExistenceOfOtherTransitionException
 
 
 class TransitionNameExistedValidator(BusinessValidator):
@@ -44,4 +45,14 @@ class TransitionNameExistedValidator(BusinessValidator):
             self.transition_name
         )
         if last_version_identity and last_version_identity.year < self.working_year:
-            raise TransitionNameExistsInPast(last_version_identity.transition_name)
+            if self.working_year - 1 == last_version_identity.year:
+                raise TransitionNameExistsInPast(
+                    last_version_identity.transition_name
+                )
+            raise TransitionNameExistsInPastButExistenceOfOtherTransitionException(
+                self.offer_acronym,
+                self.working_year,
+                last_version_identity.year,
+                self.transition_name,
+                self.version_name
+            )

@@ -58,3 +58,11 @@ msgstr "Prolonger"
 
 msgid "Search"
 msgstr "Rechercher"
+
+#, fuzzy, python-brace-format
+msgid ""
+"You can't extend the transition version '{full_code}' in {year} as other "
+"transition version exists in {transition_year}"
+msgstr ""
+"Vous ne pouvez pas étendre la version de transition '{code}' en {year} parce qu'il "
+"existe une autre version de transition en {transition_year}"

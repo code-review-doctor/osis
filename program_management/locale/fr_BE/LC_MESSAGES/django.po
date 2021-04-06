@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-12 15:28+0100\n"
+"POT-Creation-Date: 2021-04-06 18:53+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -372,7 +372,9 @@ msgstr ""
 
 #, python-format
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
-msgstr "Impossible de mettre la dernière année d'organisation à %(end_year)s : %(msg)s"
+msgstr ""
+"Impossible de mettre la dernière année d'organisation à %(end_year)s : "
+"%(msg)s"
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -1098,6 +1100,14 @@ msgid ""
 "version exists in {transition_year}"
 msgstr ""
 "Vous ne pouvez pas étendre la formation '{code}' en {year} parce qu'il "
+"existe une autre version de transition en {transition_year}"
+
+#, fuzzy, python-brace-format
+msgid ""
+"You can't extend the transition version '{full_code}' in {year} as other "
+"transition version exists in {transition_year}"
+msgstr ""
+"Vous ne pouvez pas étendre la version de transition '{code}' en {year} parce qu'il "
 "existe une autre version de transition en {transition_year}"
 
 #, python-format
