@@ -29,7 +29,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import CannotCopyTrainingDueToLimitYearOfModification
 
 
-class CheckCopyPossibleValidator(business_validator.BusinessValidator):
+class CannotCopyTrainingDueToLimitYearOfModificationValidator(business_validator.BusinessValidator):
     def __init__(self, training: 'Training', next_year_training: Union['Training', None], from_year: int):
         super().__init__()
         self.training = training

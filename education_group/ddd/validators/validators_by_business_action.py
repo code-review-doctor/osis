@@ -40,7 +40,7 @@ from education_group.ddd.validators._start_year_end_year import StartYearEndYear
 from education_group.ddd.validators._unique_code import UniqueCodeValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
-from education_group.ddd.validators._is_copy_possible import CheckCopyPossibleValidator
+from education_group.ddd.validators._is_copy_possible import CannotCopyTrainingDueToLimitYearOfModificationValidator
 
 
 class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
@@ -118,7 +118,7 @@ class CopyTrainingValidatorList(business_validator.BusinessListValidator):
     def __init__(self, training_from: 'Training', next_year_training: 'Training', from_year: int):
         self.validators = [
             CheckTrainingEndDateValidator(training_from),
-            CheckCopyPossibleValidator(training_from, next_year_training, from_year),
+            CannotCopyTrainingDueToLimitYearOfModificationValidator(training_from, next_year_training, from_year),
         ]
         super().__init__()
 

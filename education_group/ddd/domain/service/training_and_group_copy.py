@@ -30,7 +30,7 @@ from education_group.ddd.domain.exception import CannotCopyTrainingDueToLimitYea
 from education_group.ddd.domain.service.conflicted_fields import Year, FieldLabel
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.ddd.validators._is_copy_possible import CheckCopyPossibleValidator
+from education_group.ddd.validators._is_copy_possible import CannotCopyTrainingDueToLimitYearOfModificationValidator
 from education_group.ddd.validators.validators_by_business_action import CopyTrainingValidatorList
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
