@@ -25,26 +25,36 @@
 ##############################################################################
 from typing import Optional, List
 
+from django.db.models import F
 
 from base.models.entity_version import EntityVersion
+from base.models.enums.entity_type import EntityType
+from ddd.logic.learning_unit.builder.responsible_entity_builder import ResponsibleEntityBuilder
 from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
 from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntityIdentity, ResponsibleEntity
+from ddd.logic.learning_unit.dtos import ResponsibleEntityDataDTO
 from ddd.logic.learning_unit.repository.i_responsible_entity import IResponsibleEntityRepository
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
 
 
-class EntityRepository(IResponsibleEntityRepository):
+class ResponsibleEntityRepository(IResponsibleEntityRepository):
     @classmethod
     def save(cls, entity: RootEntity) -> None:
         raise NotImplementedError
 
     @classmethod
     def get(cls, entity_id: 'ResponsibleEntityIdentity') -> 'ResponsibleEntity':
-        entity_version = EntityVersion.objects.get(acronym=entity_id.code)
-        return ResponsibleEntity(
-            entity_id=ResponsibleEntityIdentityBuilder.build_from_code(code=entity_version.acronym),
-            type=entity_version.entity_type
-        )  # FIXME :: reuse Builder instead
+        entity_version_as_dict = EntityVersion.objects.filter(
+            acronym=entity_id.code
+        ).annotate(
+            code=F('acronym'),
+            type=F('entity_type'),
+        ).values(
+            'code',
+            'type',
+        ).get()
+        dto = ResponsibleEntityDataDTO(**entity_version_as_dict)
+        return ResponsibleEntityBuilder.build_from_repository_dto(dto)
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:

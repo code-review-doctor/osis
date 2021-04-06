@@ -55,3 +55,9 @@ class LearningUnitSearchDTO(DTO):
     type = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
     responsible_entity_title = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class ResponsibleEntityDataDTO(DTO):
+    code = attr.ib(type=str)
+    type = attr.ib(type=str)

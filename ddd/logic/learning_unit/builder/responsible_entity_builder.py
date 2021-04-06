@@ -23,25 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, Callable, List
-
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
-from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
-from infrastructure.learning_unit.repository.entity_repository import ResponsibleEntityRepository
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
-from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
+from base.models.enums.entity_type import EntityType
+from ddd.logic.learning_unit.builder.responsible_entity_identity_builder import ResponsibleEntityIdentityBuilder
+from ddd.logic.learning_unit.domain.model.responsible_entity import ResponsibleEntity
+from ddd.logic.learning_unit.dtos import ResponsibleEntityDataDTO
+from osis_common.ddd.interface import CommandRequest, RootEntityBuilder
 
 
-class MessageBus:
-    command_handlers = {
-        CreateLearningUnitCommand: lambda cmd: create_learning_unit(cmd, LearningUnitRepository(), ResponsibleEntityRepository()),
-    }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
+class ResponsibleEntityBuilder(RootEntityBuilder):
 
-    def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
-        return self.command_handlers[command.__class__](command)
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'ResponsibleEntity':
+        raise NotImplementedError
 
-    def invoke_multiple(self, commands: List['CommandRequest']) -> List[ApplicationServiceResult]:
-        return [self.invoke(command) for command in commands]
-
-
-message_bus_instance = MessageBus()
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'ResponsibleEntityDataDTO') -> 'ResponsibleEntity':
+        return ResponsibleEntity(
+            entity_id=ResponsibleEntityIdentityBuilder.build_from_code(code=dto_object.code),
+            type=EntityType[dto_object.type],
+        )
