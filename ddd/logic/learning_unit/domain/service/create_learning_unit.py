@@ -26,16 +26,13 @@
 from functools import partial
 from typing import List
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.entity_type import EntityType
-from ddd.logic.learning_unit.domain.model.responsible_entity import UclEntity
-from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import execute_functions_and_aggregate_exceptions
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.validator.exceptions import InvalidResponsibleEntityTypeOrCodeException
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd.interface import BusinessException
+from ddd.logic.learning_unit.domain.model.responsible_entity import UclEntity
+from ddd.logic.learning_unit.domain.validator.exceptions import InvalidResponsibleEntityTypeOrCodeException
+from osis_common.ddd import interface
 
 
 class CreateLearningUnit(interface.DomainService):
@@ -47,21 +44,13 @@ class CreateLearningUnit(interface.DomainService):
             cmd: 'CreateLearningUnitCommand',
             all_existing_identities: List['LearningUnitIdentity']
     ):
-        # FIXME :: créer une fonction utilitaire pour exécuter chaque statement en try except
-        #  pour lancer 1 seule MultipleBusinessExceptions
-        #  et éviter de devoir ajouter manuellement les try-except comme ci-dessous
-        exceptions = []
-        try:
-            if not ucl_entity.is_responsible_entity():
-                raise InvalidResponsibleEntityTypeOrCodeException(ucl_entity.code)
-        except BusinessException as e:
-            exceptions.append(e)
-        try:
-            learning_unit = LearningUnitBuilder.build_from_command(
-                cmd,
-                all_existing_identities,
-                ucl_entity.entity_id
-            )
-        except MultipleBusinessExceptions as e:
-            raise MultipleBusinessExceptions(exceptions=e.exceptions | set(exceptions))
+        __, learning_unit = execute_functions_and_aggregate_exceptions(
+            partial(_should_be_responsible_entity, ucl_entity),
+            partial(LearningUnitBuilder.build_from_command, cmd, all_existing_identities, ucl_entity.entity_id),
+        )
         return learning_unit
+
+
+def _should_be_responsible_entity(ucl_entity: 'UclEntity'):
+    if not ucl_entity.is_responsible_entity():
+        raise InvalidResponsibleEntityTypeOrCodeException(ucl_entity.code)

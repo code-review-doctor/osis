@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from abc import ABC
+from functools import partial
 from typing import List, Set, Union
 
 import attr
@@ -168,3 +169,28 @@ class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
     def validate(self):
         self.__validate_data_contract()
         self.__validate_invariants()
+
+
+def execute_functions_and_aggregate_exceptions(*functions_to_execute: partial) -> list:
+    """
+    Execute functions given in parameter.
+    All Exceptions of type :
+        - BusinessException
+        - MultipleBusinessExceptions
+    raised by these functions are aggregated to raise a single MultipleBusinessExceptions.
+
+    :param functions_to_execute: List of functools.partial thaht will be called
+    :return: List of results of each executed function
+    """
+    exceptions = []
+    function_results = []
+    for func in functions_to_execute:
+        try:
+            function_results.append(func())
+        except BusinessException as e:
+            exceptions.append(e)
+        except MultipleBusinessExceptions as e:
+            exceptions.extend(e.exceptions)
+    if exceptions:
+        raise MultipleBusinessExceptions(exceptions=set(exceptions))
+    return function_results
