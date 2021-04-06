@@ -38,7 +38,11 @@ class Duration(interface.ValueObject):
 
     @property
     def quantity_in_hours(self) -> Decimal:
-        return Decimal(self.hours + self.minutes)  # FIXME
+        minutes_in_1_hour = 60
+        minutes_from_hours = self.hours * minutes_in_1_hour
+        total_minutes = minutes_from_hours + self.minutes
+        number_of_decimals = 2
+        return round(Decimal(total_minutes / minutes_in_1_hour), number_of_decimals)
 
 
 @attr.s(frozen=True, slots=True)
