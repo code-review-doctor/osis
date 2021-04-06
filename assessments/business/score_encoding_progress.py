@@ -25,7 +25,8 @@
 ##############################################################################
 
 from attribution.models import attribution
-from base.models import exam_enrollment, tutor, education_group_year
+from base.models import exam_enrollment, education_group_year
+from base.auth.roles import tutor
 from base.models.education_group_year import EducationGroupYear
 from base.models.session_exam_deadline import compute_deadline_tutor
 

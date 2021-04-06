@@ -42,6 +42,7 @@ from assessments.forms.score_file import ScoreFileForm
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
+from base.auth.roles import tutor as tutor_mdl
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
 col_academic_year = HEADER.index(_('Academic year'))
@@ -360,7 +361,7 @@ def _is_informative_justification(enrollment, xls_justification, is_program_mana
 
 
 def __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year):
-    tutor = mdl.tutor.find_by_user(request.user)
+    tutor = tutor_mdl.find_by_user(request.user)
     if tutor and not mdl_attr.attribution.is_score_responsible(request.user, learning_unit_year):
         messages.add_message(request, messages.SUCCESS,
                              '%s' % _("The scores responsible must still submit the scores"))

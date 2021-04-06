@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-04 14:37+0100\n"
+"POT-Creation-Date: 2021-03-25 14:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,6 +39,12 @@ msgstr ""
 msgid ""
 "Learning unit type is not deletable because it is either a full course or it "
 "has the following type: %(types)s"
+msgstr ""
+
+msgid "Not in period to edit description fiche."
+msgstr ""
+
+msgid "Not in period to edit force majeure section."
 msgstr ""
 
 msgid "Only letters are allowed."
@@ -76,6 +82,9 @@ msgstr ""
 
 #, python-format
 msgid "The learning unit start year is set before %(year)d."
+msgstr ""
+
+msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 msgid "The proposal is not on this academic year"

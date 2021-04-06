@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,44 +23,61 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import messages
-from django.contrib.auth.models import Group
+import rules
 from django.db import models
 from django.db.models import Q
 
+from django.utils.translation import gettext_lazy as _
+
+
 from attribution.models import attribution
 from base.models import person
+from learning_unit.auth import predicates as learning_unit_predicates
+from attribution.auth import predicates as attribution_predicates
 from osis_common.models import serializable_model
+from osis_role.contrib.admin import RoleModelAdmin
+from osis_role.contrib.models import RoleModel
 
 
-class TutorAdmin(serializable_model.SerializableModelAdmin):
-    actions = ['add_to_group']
+class TutorAdmin(RoleModelAdmin, serializable_model.SerializableModelAdmin):
     list_display = ('person', 'changed')
     list_filter = ('person__gender', 'person__language')
     search_fields = ['person__first_name', 'person__last_name', 'person__global_id']
 
-    def add_to_group(self, request, queryset):
-        group_name = "tutors"
-        try:
-            group = Group.objects.get(name=group_name)
-            count = 0
-            for tutor in queryset:
-                user = tutor.person.user
-                if user and not user.groups.filter(name=group_name).exists():
-                    user.groups.add(group)
-                    count += 1
-            self.message_user(request, "{} users added to the group 'tutors'.".format(count), level=messages.SUCCESS)
-        except Group.DoesNotExist:
-            self.message_user(request, "Group {} doesn't exist.".format(group_name), level=messages.ERROR)
 
-
-class Tutor(serializable_model.SerializableModel):
+class Tutor(RoleModel, serializable_model.SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     person = models.OneToOneField('Person', on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = _("Tutor")
+        verbose_name_plural = _("Tutors")
+        group_name = "tutors"
+
     def __str__(self):
         return u"%s" % self.person
+
+    @classmethod
+    def rule_set(cls):
+        return rules.RuleSet({
+            'assessments.can_access_scoreencoding': rules.always_allow,
+            'base.can_access_academicyear': rules.always_allow,
+            'base.can_access_catalog': rules.always_allow,
+            'base.can_access_evaluation': rules.always_allow,
+            'base.can_access_student_path': rules.always_allow,
+            'base.can_access_learningunit_pedagogy': attribution_predicates.have_attribution_on_learning_unit_year,
+            'base.can_edit_learningunit_pedagogy':
+                learning_unit_predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                learning_unit_predicates.is_learning_unit_year_summary_editable &
+                attribution_predicates.have_attribution_on_learning_unit_year &
+                learning_unit_predicates.is_learning_unit_summary_edition_calendar_open,
+            'base.can_edit_learningunit_pedagogy_force_majeur':
+                learning_unit_predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                learning_unit_predicates.is_learning_unit_year_summary_editable &
+                attribution_predicates.have_attribution_on_learning_unit_year &
+                learning_unit_predicates.is_learning_unit_force_majeur_summary_edition_calendar_open,
+        })
 
 
 def find_by_user(user):

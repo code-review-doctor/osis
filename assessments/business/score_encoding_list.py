@@ -30,8 +30,8 @@ from decimal import Decimal, Context, Inexact
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from base.models import exam_enrollment, tutor, learning_unit_year, education_group_year
-from base.auth.roles import program_manager
+from base.models import exam_enrollment, learning_unit_year, education_group_year
+from base.auth.roles import program_manager, tutor
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import exam_enrollment_justification_type
