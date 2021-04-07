@@ -443,7 +443,6 @@ class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessE
             transition_year: int,
             transition_name: str,
             version_name: str,
-            *args,
             **kwargs
     ):
         if version_name:
