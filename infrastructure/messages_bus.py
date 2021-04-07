@@ -40,7 +40,9 @@ from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 
 class MessageBus:
     command_handlers = {
-        CreateLearningUnitCommand: lambda cmd: create_learning_unit(cmd, LearningUnitRepository(), UclEntityRepository()),
+        CreateLearningUnitCommand: lambda cmd: create_learning_unit(
+            cmd, LearningUnitRepository(), UclEntityRepository()
+        ),
         SearchLanguagesCommand: lambda cmd: search_languages(cmd, LanguageRepository()),
         SearchAcademicYearCommand: lambda cmd: search_academic_years(cmd, AcademicYearRepository()),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

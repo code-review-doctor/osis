@@ -51,4 +51,3 @@ class ILanguageRepository(interface.AbstractRepository):
     @abstractmethod
     def save(cls, entity: 'Language') -> None:
         pass
-

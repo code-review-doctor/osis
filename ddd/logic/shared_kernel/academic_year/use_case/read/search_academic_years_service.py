@@ -30,5 +30,8 @@ from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import Aca
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 
 
-def search_academic_years(cmd: SearchAcademicYearCommand, repository: 'IAcademicYearRepository') -> List['AcademicYear']:
+def search_academic_years(
+        cmd: SearchAcademicYearCommand,
+        repository: 'IAcademicYearRepository'
+) -> List['AcademicYear']:
     return repository.search()

@@ -33,7 +33,8 @@ from osis_common.ddd.interface import EntityIdentity, CommandRequest, Applicatio
 
 class DisplayExceptionsByFieldNameMixin:
     """
-    This Mixin provides a fonction 'display_exceptions' used to display business validation messages (business Exceptions)
+    This Mixin provides a fonction 'display_exceptions'
+    used to display business validation messages (business Exceptions)
     inside defined fields in the attribute 'field_name_by_exception'
     """
 
@@ -65,7 +66,7 @@ class DisplayExceptionsByFieldNameMixin:
         Add the exception messages in the fields specified in the 'field_name_by_exception' attribute.
         Add a generic error by default if no fields are defined.
         :param exceptions_to_display: MultipleBusinessExceptions
-        :return: 
+        :return:
         """
         self.__check_if_fields_exists()
         copied_list = list(exceptions_to_display.exceptions)

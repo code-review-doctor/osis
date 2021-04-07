@@ -114,20 +114,22 @@ class LearningUnitBuilder(RootEntityBuilder):
 
 
 def _get_learning_unit_class(type: str) -> Type[LearningUnit]:
+    subclass = None
     if type == LearningContainerYearType.COURSE.name:
-        return CourseLearningUnit
-    if type == LearningContainerYearType.INTERNSHIP.name:
-        return InternshipLearningUnit
-    if type == LearningContainerYearType.DISSERTATION.name:
-        return DissertationLearningUnit
-    if type == LearningContainerYearType.OTHER_COLLECTIVE.name:
-        return OtherCollectiveLearningUnit
-    if type == LearningContainerYearType.OTHER_INDIVIDUAL.name:
-        return OtherIndividualLearningUnit
-    if type == LearningContainerYearType.MASTER_THESIS.name:
-        return MasterThesisLearningUnit
-    if type == LearningContainerYearType.EXTERNAL.name:
-        return ExternalLearningUnit
+        subclass = CourseLearningUnit
+    elif type == LearningContainerYearType.INTERNSHIP.name:
+        subclass = InternshipLearningUnit
+    elif type == LearningContainerYearType.DISSERTATION.name:
+        subclass = DissertationLearningUnit
+    elif type == LearningContainerYearType.OTHER_COLLECTIVE.name:
+        subclass = OtherCollectiveLearningUnit
+    elif type == LearningContainerYearType.OTHER_INDIVIDUAL.name:
+        subclass = OtherIndividualLearningUnit
+    elif type == LearningContainerYearType.MASTER_THESIS.name:
+        subclass = MasterThesisLearningUnit
+    elif type == LearningContainerYearType.EXTERNAL.name:
+        subclass = ExternalLearningUnit
+    return subclass
 
 
 def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publication_en: str):
