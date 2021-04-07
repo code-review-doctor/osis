@@ -152,6 +152,7 @@
                             <th id="responsible" class="col-md-2">{% trans 'Scores responsible' %}</th>
                             <th id="tutor_deadlines" class="col-md-2">{% trans 'Tutor deadlines' %}</th>
                             <th id="progress" class="col-md-1">{% trans 'Progress' %}</th>
+                            <th id="has_peps_warning"></th>
                             <th id="encode" class="col-md-1"></th>
                         </tr>
                         </thead>
@@ -232,6 +233,14 @@
                                     </span>
                             </div>
                         </div>
+                    </td>
+                    <td headers="has_peps_warning">
+                        {% if note_detail.has_student_specific_profile %}
+                            <span class="badge warning-color"
+                                  title="{% trans 'Some of the students enrolled to this course have a PEPS status (Program for Students with a Specific Profile). You will find detailled information in the Excel file to encode notes' %}">
+                                PEPS
+                            </span>
+                        {% endif %}
                     </td>
                     <td headers="encode">
                         <a class="btn btn-default"

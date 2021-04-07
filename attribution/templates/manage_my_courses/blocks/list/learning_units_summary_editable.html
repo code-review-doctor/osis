@@ -1,6 +1,29 @@
 {% load i18n dictionnary %}
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
 
-{% if learning_unit_years_with_errors %}
+{% if learning_unit_years %}
     <table id="table_learning_units" class="table table-striped table-hover">
         <thead>
             <tr>
@@ -13,8 +36,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for luy, error, error_force_majeure in learning_unit_years_with_errors %}
-                {% with requirement_entity=luy.requirement_entity %}
+            {% for luy in learning_unit_years %}
                 <tr data-id="{{luy.id}}" data-value="{{luy.acronym}}">
                     <td>{{ luy.academic_year }}</td>
                     <td>
@@ -23,36 +45,32 @@
                         </a>
                     </td>
                     <td>{{ luy.complete_title|default_if_none:'' }}</td>
-                    <td>{{ requirement_entity|default_if_none:'-' }}</td>
+                    <td>{{ luy.requirement_entity|default_if_none:'-' }}</td>
 
                     {% trans 'Editable' as title_status_true %}
-                    {% if requirement_entity %}
-                        {% with entity_calendar=entity_calendars|get_item:requirement_entity.id %}
-                            <td {% if event_perm_desc_fiche_open %}style="color: green" {% else %}style="color: red"{% endif %}>
-                                {% trans 'From' context "Du" %} {% if entity_calendar %} {{ entity_calendar|get_item:'start_date'|date:"d/m/Y" }} {% endif %}
-                                {% trans 'to' context "au" %} {% if entity_calendar %} {{ entity_calendar|get_item:'end_date'|date:"d/m/Y" }} {% endif %}
-                                {% if error.errors|length > 1 %}
-                                    {% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.as_ul %}
-                                {% else %}
-                                    {% include "blocks/span/span_status.html" with status=error.is_valid title_status_false=error.errors.0 %}
-                                {% endif %}
-                            </td>
-                        {% endwith %}
-                    {% else %}
-                        <td>-</td>
-                    {% endif %}
-
-                    <td {% if event_perm_force_majeure_open %}style="color: green"{% else %}style="color: red"{% endif %}>
-                        {% trans 'From' context "Du" %} {{ event_perm_force_majeure_start_date|date:"d/m/Y" }}
-                        {% trans 'to' context "au" %} {{ event_perm_force_majeure_end_date|date:"d/m/Y" }}
-                        {% if error_force_majeure.errors|length > 1 %}
-                            {% include "blocks/span/span_status.html" with status=error_force_majeure.is_valid title_status_false=error_force_majeure.as_ul %}
+                    {% trans 'Not in period to edit description fiche.' as title_status_summary_edition_academic_event_closed %}
+                    <td {% if summary_edition_academic_event.is_open_now %} style="color: green" {% else %} style="color: red" {% endif %}>
+                        {% trans 'From' context "Du" %} {{ summary_edition_academic_event.start_date|date:"d/m/Y" }}
+                        {% trans 'to' context "au" %} {% if summary_edition_academic_event.end_date %} {{ summary_edition_academic_event.end_date|date:"d/m/Y" }} {% endif %}
+                        {% if summary_edition_academic_event.is_open_now %}
+                            {% include "blocks/span/span_status.html" with status=True %}
                         {% else %}
-                            {% include "blocks/span/span_status.html" with status=error_force_majeure.is_valid title_status_false=error_force_majeure.errors.0 %}
+                            {% include "blocks/span/span_status.html" with status=False title_status_false=title_status_summary_edition_academic_event_closed %}
+                        {% endif %}
+                    </td>
+
+                    {% trans 'Not in period to edit force majeure section.' as title_status_summary_edition_academic_event_closed %}
+                    <td {% if force_majeure_academic_event.is_open_now %} style="color: green" {% else %} style="color: red" {% endif %}>
+                        {% trans 'From' context "Du" %} {{ force_majeure_academic_event.start_date|date:"d/m/Y" }}
+                        {% trans 'to' context "au" %} {% if force_majeure_academic_event.end_date %} {{ force_majeure_academic_event.end_date|date:"d/m/Y" }} {% endif %}
+                        {% if force_majeure_academic_event.is_open_now %}
+                            {% include "blocks/span/span_status.html" with status=True %}
+                        {% else %}
+                            {% include "blocks/span/span_status.html" with status=False title_status_false=title_status_summary_edition_academic_event_closed %}
                         {% endif %}
                     </td>
                 </tr>
-                {% endwith %}
+
             {% endfor %}
         </tbody>
     </table>

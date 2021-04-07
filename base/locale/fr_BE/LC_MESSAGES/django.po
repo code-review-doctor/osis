@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 10:53+0100\n"
+"POT-Creation-Date: 2021-03-25 14:38+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1564,10 +1564,6 @@ msgstr "Liste au choix Partenariat mobilité"
 msgid "Modification"
 msgstr "Modification"
 
-#, python-format
-msgid "Modifications should be made in EPC for year %(year)d"
-msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
-
 msgid "Modified"
 msgstr "Modifié"
 
@@ -1669,14 +1665,6 @@ msgstr "Non défini"
 
 msgid "Not enrolled"
 msgstr "Pas inscrit"
-
-msgid "Not in period to edit description fiche."
-msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
-
-msgid "Not in period to edit force majeure section."
-msgstr ""
-"Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
-"force majeure)."
 
 msgid "Not modified"
 msgstr "Non modifié"
@@ -2517,11 +2505,6 @@ msgstr ""
 "L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
 "effectué lors de la consolidation"
 
-msgid "The learning unit's description fiche is not editable."
-msgstr ""
-"La mise-à-jour des fiches descriptives est bloquée pour cette unité "
-"d'enseignement."
-
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
@@ -2915,17 +2898,8 @@ msgstr "Oui"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
-msgid "You are not attributed to this learning unit."
-msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
-
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
-
-#, python-format
-msgid "You can't modify learning unit under year : %(year)d"
-msgstr ""
-"Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
-"inférieure à %(year)d"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
@@ -2949,17 +2923,6 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
 "première année d'organisation de l'UE."
-
-msgid ""
-"You do not have the permission to refresh the publication for this learning "
-"unit"
-msgstr ""
-"Vous n'avez pas la permission d'actualiser la publication pour cette unité "
-"d'enseignement"
-
-msgid "You do not have the permission to refresh the publication for this year"
-msgstr ""
-"Vous n'avez pas la permission d'actualiser la publication pour cette année"
 
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"

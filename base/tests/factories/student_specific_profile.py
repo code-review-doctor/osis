@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,14 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import PermissionDenied
+import factory.fuzzy
 
-from attribution.business.perms import can_tutor_view_educational_information
+from base.tests.factories.student import StudentFactory
+from base.models.enums import peps_type
 
 
-def tutor_can_view_educational_information(view_func):
-    def f_tutor_can_view_educational_information(request, learning_unit_year_id):
-        if not can_tutor_view_educational_information(request.user, learning_unit_year_id):
-            raise PermissionDenied("User cannot view educational information")
-        return view_func(request, learning_unit_year_id)
-    return f_tutor_can_view_educational_information
+class StudentSpecificProfileFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = 'base.StudentSpecificProfile'
+
+    student = factory.SubFactory(StudentFactory)
+    type = peps_type.PepsTypes.ARTIST
+    subtype_disability = ''
+    subtype_sport = ''
+    guide = None
+    arrangement_additional_time = False
+    arrangement_appropriate_copy = False
+    arrangement_other = False
+    arrangement_specific_locale = False
+    arrangement_comment = None
