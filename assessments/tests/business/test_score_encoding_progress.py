@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.student import StudentFactory
+from base.tests.factories.student_specific_profile import StudentSpecificProfileFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment
 
@@ -60,8 +61,14 @@ class ScoreEncodingProgressTest(TestCase):
         cls._create_context_exam_enrollments(cls.learning_unit_year, cls.educ_group_year, 10, 3)
 
         cls.learning_unit_year_2 = LearningUnitYearFactory(acronym="LBIR1211", academic_year=cls.academic_year)
-        cls._create_context_exam_enrollments(cls.learning_unit_year_2, cls.educ_group_year, 5)
-
+        learning_unit_year_2_enrollments = cls._create_context_exam_enrollments(
+            cls.learning_unit_year_2,
+            cls.educ_group_year,
+            5
+        )
+        peps_student = StudentSpecificProfileFactory()
+        learning_unit_year_2_enrollments[0].offer_enrollment.student = peps_student.student
+        learning_unit_year_2_enrollments[0].offer_enrollment.save()
         # Offer year DIR2BA
         cls.educ_group_year_2 = EducationGroupYearFactory(acronym="DIR2BA", academic_year=cls.academic_year)
         cls._create_context_exam_enrollments(cls.learning_unit_year, cls.educ_group_year_2, 8, 5)
@@ -91,6 +98,9 @@ class ScoreEncodingProgressTest(TestCase):
         # Check progress
         self.assertEqual(progress_list[1].progress_int, 100)
 
+        self.assertFalse(progress_list[0].has_student_specific_profile)
+        self.assertTrue(progress_list[1].has_student_specific_profile)
+
     def test_get_scores_encoding_progress_program_manager_with_filter_offer_year(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=self.program_manager.person.user,
@@ -119,6 +129,8 @@ class ScoreEncodingProgressTest(TestCase):
         self.assertEqual(len(progress_list), 1)
         self.assertEqual(len(progress_list[0].tutors), 3)
         self.assertEqual(len(progress_list[0].score_responsibles), 1)
+
+        self.assertFalse(progress_list[0].has_student_specific_profile)
 
     def test_get_scores_encoding_progress_filter_only_incomplete(self):
         progress_list = score_encoding_progress.get_scores_encoding_progress(
@@ -205,6 +217,22 @@ class ScoreEncodingProgressTest(TestCase):
         self.assertEqual(len(progress_list), 1)
         # CHIM1BA - LBIR1210 (10) + DIR1BA - LBIR1210(8)
         self.assertEqual(progress_list[0].total_exam_enrollments, 18)
+        self.assertFalse(progress_list[0].has_student_specific_profile)
+
+    def test_get_scores_encoding_progress_tutor_and_peps_student_exists(self):
+        tutor_2 = TutorFactory(person=PersonFactory())
+        AttributionFactory(tutor=tutor_2, learning_unit_year=self.learning_unit_year_2, score_responsible=True)
+        progress_list = score_encoding_progress.get_scores_encoding_progress(
+            user=tutor_2.person.user,
+            education_group_year_id=None,
+            number_session=number_session.ONE,
+            academic_year=self.academic_year
+        )
+
+        progress_list = score_encoding_progress.group_by_learning_unit_year(progress_list)
+        self.assertEqual(len(progress_list), 1)
+        self.assertEqual(progress_list[0].total_exam_enrollments, 5)
+        self.assertTrue(progress_list[0].has_student_specific_profile)
 
     @classmethod
     def _create_context_exam_enrollments(cls, learning_unit_year, educ_group_year, nb_enrollment=10, nb_filled=10):
@@ -214,7 +242,7 @@ class ScoreEncodingProgressTest(TestCase):
             academic_calendar=cls.academic_calendar,
             education_group_year=educ_group_year
         )
-
+        learning_unit_enrollments = []
         for _ in range(0, nb_enrollment):
             offer_enrollment = test_offer_enrollment.create_offer_enrollment(StudentFactory(), educ_group_year)
             learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(
@@ -225,3 +253,5 @@ class ScoreEncodingProgressTest(TestCase):
                 exam_enrollment.score_final = randint(0, 20)
                 exam_enrollment.save()
                 counter_filled -= 1
+            learning_unit_enrollments.append(learning_unit_enrollment)
+        return learning_unit_enrollments
