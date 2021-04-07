@@ -22,30 +22,30 @@ paths:
       operationId: trainings_list
       parameters:
         - in: query
-        name: limit
-        schema:
-          description: Number of results to return per page.
-          type: integer
-      - in: query
-        name: offset
-        schema:
-          description: The initial index from which to return the results.
-          type: integer
-      - in: query
-        name: acronym
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: partial_acronym
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: title
-        schema:
-          description: ''
-          type: string
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: acronym
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: partial_acronym
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: title
+          schema:
+            description: ''
+            type: string
         - in: query
           name: education_group_type
           schema:
@@ -74,41 +74,41 @@ paths:
           schema:
             description: To which training year we want to display
             type: integer
-      - in: query
-        name: title_english
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: campus
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: ares_ability
-        schema:
-          description: ''
-          type: integer
-      - in: query
-        name: year
-        schema:
-          description: ''
-          type: integer
-      - in: query
-        name: ordering
-        schema:
-          description: Which field to use when ordering the results.
-          type: string
-      - in: query
-        name: search
-        schema:
-          description: A search term.
-          type: string
-      - in: query
-        name: study_domain
-        schema:
-          description: UUID of main study domain
-          type: string
+        - in: query
+          name: title_english
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: campus
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: ares_ability
+          schema:
+            description: ''
+            type: integer
+        - in: query
+          name: year
+          schema:
+            description: ''
+            type: integer
+        - in: query
+          name: ordering
+          schema:
+            description: Which field to use when ordering the results.
+            type: string
+        - in: query
+          name: search
+          schema:
+            description: A search term.
+            type: string
+        - in: query
+          name: study_domain
+          schema:
+            description: UUID of main study domain
+            type: string
       responses:
         '200':
           description: OK
