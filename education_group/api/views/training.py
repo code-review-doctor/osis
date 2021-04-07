@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Case, When, Value, F, CharField, Q
+from django.db.models import Case, When, Value, F, CharField
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
@@ -53,18 +54,17 @@ class TrainingFilter(filters.FilterSet):
         choices=TrainingType.choices()
     )
     study_domain = filters.UUIDFilter(field_name="offer__main_domain__uuid", method="filter_by_study_domain")
+    active = filters.MultipleChoiceFilter(
+        field_name='offer__active',
+        choices=ActiveStatusEnum.choices()
+    )
 
     class Meta:
         model = EducationGroupVersion
         fields = [
-            'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'education_group_type'
+            'acronym', 'partial_acronym', 'title', 'title_english', 'education_group_type',
+            'from_year', 'to_year'
         ]
-
-    @staticmethod
-    def filter_by_study_domain(queryset, name, value):
-        return queryset.filter(
-            Q(offer__main_domain__uuid=value) | Q(offer__main_domain__parent__uuid=value)
-        )
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):

@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/education_group/
    description: 'Production server'
 info:
-  version: '1.05'
+  version: '1.06'
   title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
@@ -21,7 +21,7 @@ paths:
       description: Return a list of all the training with optional filtering.
       operationId: trainings_list
       parameters:
-      - in: query
+        - in: query
         name: limit
         schema:
           description: Number of results to return per page.
@@ -46,25 +46,34 @@ paths:
         schema:
           description: ''
           type: string
-      - in: query
-        name: education_group_type
-        schema:
-          description: Filter result by specified training types
-          type: array
-          items:
-            type: string
-        style: form
-        explode: true
-      - in: query
-        name: from_year
-        schema:
-          description: From which training year we want to display
-          type: integer
-      - in: query
-        name: to_year
-        schema:
-          description: To which training year we want to display
-          type: integer
+        - in: query
+          name: education_group_type
+          schema:
+            description: Filter result by specified training types
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: active
+          schema:
+            description: Filter result by specified active status of training
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: from_year
+          schema:
+            description: From which training year we want to display
+            type: integer
+        - in: query
+          name: to_year
+          schema:
+            description: To which training year we want to display
+            type: integer
       - in: query
         name: title_english
         schema:
@@ -545,6 +554,15 @@ paths:
           name: education_group_type
           schema:
             description: Filter result by specified mini-training types
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: active
+          schema:
+            description: Filter result by specified active status of mini-training
             type: array
             items:
               type: string
