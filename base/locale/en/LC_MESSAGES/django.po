@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-18 08:39+0100\n"
+"POT-Creation-Date: 2021-03-25 14:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1056,7 +1056,7 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-msgid "General information and Admission condition"
+msgid "General information and Access requirements"
 msgstr ""
 
 msgid "Generate PDF not available. Please use EPC."
@@ -1528,10 +1528,6 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
-#, python-format
-msgid "Modifications should be made in EPC for year %(year)d"
-msgstr ""
-
 msgid "Modified"
 msgstr ""
 
@@ -1632,12 +1628,6 @@ msgid "Not defined"
 msgstr ""
 
 msgid "Not enrolled"
-msgstr ""
-
-msgid "Not in period to edit description fiche."
-msgstr ""
-
-msgid "Not in period to edit force majeure section."
 msgstr ""
 
 msgid "Not modified"
@@ -2439,9 +2429,6 @@ msgid ""
 "done at consolidation"
 msgstr ""
 
-msgid "The learning unit's description fiche is not editable."
-msgstr ""
-
 msgid "The learning units"
 msgstr ""
 
@@ -2806,14 +2793,7 @@ msgstr ""
 msgid "Yes, I confirm."
 msgstr ""
 
-msgid "You are not attributed to this learning unit."
-msgstr ""
-
 msgid "You are succesfully logout."
-msgstr ""
-
-#, python-format
-msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 
 msgid ""
@@ -2830,14 +2810,6 @@ msgstr ""
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
-msgstr ""
-
-msgid ""
-"You do not have the permission to refresh the publication for this learning "
-"unit"
-msgstr ""
-
-msgid "You do not have the permission to refresh the publication for this year"
 msgstr ""
 
 msgid "You have the choice between"

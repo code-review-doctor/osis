@@ -249,10 +249,10 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Common admission conditions can only be edited by central manager"
+msgid "Common access requirements can only be edited by central manager"
 msgstr ""
 
-msgid "Common admission conditions will be published soon"
+msgid "Common access requirements will be published soon"
 msgstr ""
 
 msgid "Common general informations will be published soon"
@@ -566,7 +566,7 @@ msgstr ""
 
 msgid ""
 "Management common topics in the context of training's general informations "
-"and access conditions"
+"and access requirements"
 msgstr ""
 
 msgid "Management entity"
@@ -914,7 +914,7 @@ msgid "UCL Diploma"
 msgstr ""
 
 #, python-brace-format
-msgid "Unable to publish common admission conditions for {year}"
+msgid "Unable to publish common access requirements for {year}"
 msgstr ""
 
 #, python-brace-format
