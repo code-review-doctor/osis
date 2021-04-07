@@ -1078,8 +1078,8 @@ msgstr "Genre"
 msgid "General configuration"
 msgstr "Configuration générale"
 
-msgid "General information and Admission condition"
-msgstr "Informations générales et Conditions d'admission"
+msgid "General information and Access requirements"
+msgstr "Informations générales et Conditions d'accès"
 
 msgid "Generate PDF not available. Please use EPC."
 msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."

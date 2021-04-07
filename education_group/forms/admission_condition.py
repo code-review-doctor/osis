@@ -25,9 +25,9 @@
 ##############################################################################
 from django import forms
 
-from base.business.education_groups.admission_condition import postpone_admission_condition_line
+from base.business.education_groups.access_requirements import postpone_access_requirements_line
 from base.forms.utils.fields import OsisRichTextFormField
-from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES, AdmissionConditionLine
+from base.models.admission_condition import ACCESS_REQUIREMENTS_ACCESSES, AdmissionConditionLine
 
 
 class UpdateLineForm(forms.Form):
@@ -36,7 +36,7 @@ class UpdateLineForm(forms.Form):
     language = forms.CharField(widget=forms.HiddenInput())
     diploma = forms.CharField(widget=forms.Textarea, required=False)
     conditions = OsisRichTextFormField(required=False)
-    access = forms.ChoiceField(choices=CONDITION_ADMISSION_ACCESSES, required=False)
+    access = forms.ChoiceField(choices=ACCESS_REQUIREMENTS_ACCESSES, required=False)
     remarks = OsisRichTextFormField(required=False)
 
 
@@ -44,7 +44,7 @@ class SaveAdmissionLineMixin:
     def save(self, *args, **kwargs):
         instance = super().save(*args, **kwargs)
         if self.data.get("to_postpone"):
-            postpone_admission_condition_line(instance.admission_condition.education_group_year, instance.section)
+            postpone_access_requirements_line(instance.admission_condition.education_group_year, instance.section)
         return instance
 
 
