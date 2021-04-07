@@ -42,8 +42,8 @@ class TestCommonListFilter(TestCase):
         cls.academic_years = AcademicYearFactory.produce(number_past=2, number_future=5)
 
     def test_ensure_academic_year_initial_value_case_no_education_group_switch_calendar_opened(self):
-        filter = CommonListFilter()
-        self.assertIsNone(filter.form['academic_year'].initial)
+        common_filter = CommonListFilter()
+        self.assertIsNone(common_filter.form['academic_year'].initial)
 
     def test_ensure_academic_year_initial_value_case_one_education_group_switch_calendar_opened(self):
         OpenAcademicCalendarFactory(
@@ -51,8 +51,8 @@ class TestCommonListFilter(TestCase):
             data_year=self.academic_years[2]
         )
 
-        filter = CommonListFilter()
-        self.assertEqual(filter.form['academic_year'].initial, self.academic_years[2])
+        common_filter = CommonListFilter()
+        self.assertEqual(common_filter.form['academic_year'].initial, self.academic_years[2])
 
     def test_ensure_academic_year_initial_value_case_multiple_education_group_switch_calendar_opened(self):
         for academic_year in self.academic_years[:2]:
@@ -61,8 +61,8 @@ class TestCommonListFilter(TestCase):
                 data_year=academic_year
             )
 
-        filter = CommonListFilter()
-        self.assertEqual(filter.form['academic_year'].initial, self.academic_years[0])
+        common_filter = CommonListFilter()
+        self.assertEqual(common_filter.form['academic_year'].initial, self.academic_years[0])
 
 
 class TestCommonListView(TestCase):
@@ -114,7 +114,7 @@ class TestCommonListFilterSerializer(TestCase):
         bachelor_common = EducationGroupYearCommonBachelorFactory()
 
         expected_url = reverse(
-            'common_bachelor_admission_condition',
+            'common_bachelor_access_requirements',
             kwargs={'year': bachelor_common.academic_year.year}
         )
         self.assertEqual(
@@ -126,7 +126,7 @@ class TestCommonListFilterSerializer(TestCase):
         aggregate_common = EducationGroupYearCommonAgregationFactory()
 
         expected_url = reverse(
-            'common_aggregate_admission_condition',
+            'common_aggregate_access_requirements',
             kwargs={'year': aggregate_common.academic_year.year}
         )
         self.assertEqual(
@@ -138,7 +138,7 @@ class TestCommonListFilterSerializer(TestCase):
         master_2m_common = EducationGroupYearCommonMasterFactory()
 
         expected_url = reverse(
-            'common_master_admission_condition',
+            'common_master_access_requirements',
             kwargs={'year': master_2m_common.academic_year.year}
         )
         self.assertEqual(
@@ -150,7 +150,7 @@ class TestCommonListFilterSerializer(TestCase):
         master_mc_common = EducationGroupYearCommonSpecializedMasterFactory()
 
         expected_url = reverse(
-            'common_master_specialized_admission_condition',
+            'common_master_specialized_access_requirements',
             kwargs={'year': master_mc_common.academic_year.year}
         )
         self.assertEqual(

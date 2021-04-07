@@ -1056,7 +1056,7 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-msgid "General information and Admission condition"
+msgid "General information and Access requirements"
 msgstr ""
 
 msgid "Generate PDF not available. Please use EPC."
