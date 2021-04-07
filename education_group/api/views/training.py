@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Case, When, Value, F, CharField
+from django.db.models import Case, When, Value, F, CharField, Q
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -65,6 +65,12 @@ class TrainingFilter(filters.FilterSet):
             'acronym', 'partial_acronym', 'title', 'title_english', 'education_group_type',
             'from_year', 'to_year'
         ]
+
+    @staticmethod
+    def filter_by_study_domain(queryset, name, value):
+        return queryset.filter(
+            Q(offer__main_domain__uuid=value) | Q(offer__main_domain__parent__uuid=value)
+        )
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
