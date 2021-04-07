@@ -25,11 +25,11 @@
 ##############################################################################
 from typing import List
 
-from base.models.enums.entity_type import EntityType
-from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
 
+from osis_common.ddd.interface import BusinessException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from ddd.logic.learning_unit.business_types import *
 
 
 class AcademicYearLowerThan2019Exception(BusinessException):
@@ -75,7 +75,13 @@ class EmptyRequiredFieldsException(BusinessException):
 
 
 class LearningUnitUsedInProgramTreeException(BusinessException):
-    def __init__(self, learning_unit: 'LearningUnitIdentity', program_identities: List['ProgramTreeIdentity'], *args, **kwargs):
+    def __init__(
+            self,
+            learning_unit: 'LearningUnitIdentity',
+            program_identities: List['ProgramTreeIdentity'],
+            *args,
+            **kwargs
+    ):
         message = _("Learning unit {} is used in following programs : {}").format(
             learning_unit,
             ",".join([identity.code for identity in program_identities])
