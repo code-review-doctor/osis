@@ -131,7 +131,7 @@ COMMON_TYPE_ACCESS_REQUIREMENTS = {
          'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', 'free',),
     TrainingType.AGGREGATION.name:
         ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr',
-         'ca_allegement', 'ca_ouv_adultes',),
+         'ca_allegement', 'ca_ouv_adultes', 'admission_enrollment_procedures',),
     TrainingType.PGRM_MASTER_120.name:
         ('alert_message', 'ca_cond_generales', 'non_university_bachelors', 'adults_taking_up_university_training',
          'personalized_access', 'admission_enrollment_procedures',),

@@ -48,6 +48,8 @@ def get_access_requirements(acronym: str, year: int):
             personalized_access_en=F('text_personalized_access_en'),
             admission_enrollment_procedures_fr=F('text_admission_enrollment_procedures'),
             admission_enrollment_procedures_en=F('text_admission_enrollment_procedures_en'),
+            subscription_lightening_fr=F('text_ca_allegement'),
+            subscription_lightening_en=F('text_ca_allegement_en'),
         ).values(
             'admission_requirements_fr',
             'admission_requirements_en',
@@ -61,6 +63,8 @@ def get_access_requirements(acronym: str, year: int):
             'personalized_access_en',
             'admission_enrollment_procedures_fr',
             'admission_enrollment_procedures_en',
+            'subscription_lightening_fr',
+            'subscription_lightening_en'
         ).get()
     except AdmissionCondition.DoesNotExist:
         return __default_access_requirements()
@@ -106,7 +110,12 @@ def __default_access_requirements():
             'label_translated': _('Admission and Enrolment Procedures for general registration'),
             'text_fr': '',
             'text_en': ''
-        }
+        },
+        'subscription_lightening': {
+            'label_translated': _('Reduced credit registration'),
+            'text_fr': '',
+            'text_en': ''
+        },
     }
 
 
@@ -145,20 +154,20 @@ def get_common_access_requirements(offer_type: str, year: int):
             alert_message_fr=F('text_alert_message'),
             alert_message_en=F('text_alert_message_en'),
             general_conditions_fr=Case(
-               When(
+                When(
                     education_group_year__education_group_type__name=TrainingType.BACHELOR.name,
                     then=F('text_ca_bacs_cond_generales')
-               ),
-               default=F('text_ca_cond_generales'),
-               output_field=CharField(),
+                ),
+                default=F('text_ca_cond_generales'),
+                output_field=CharField(),
             ),
             general_conditions_en=Case(
-               When(
+                When(
                     education_group_year__education_group_type__name=TrainingType.BACHELOR.name,
                     then=F('text_ca_bacs_cond_generales_en')
-               ),
-               default=F('text_ca_cond_generales_en'),
-               output_field=CharField(),
+                ),
+                default=F('text_ca_cond_generales_en'),
+                output_field=CharField(),
             ),
             specific_conditions_fr=F('text_ca_bacs_cond_particulieres'),
             specific_conditions_en=F('text_ca_bacs_cond_particulieres_en'),
@@ -248,12 +257,12 @@ def __default_common_access_requirements():
             'text_en': ''
         },
         'subscription_lightening': {
-            'label_translated': _('Reduction'),
+            'label_translated': _('Reduced credit registration'),
             'text_fr': '',
             'text_en': ''
         },
         'opening_to_adults': {
-            'label_translated': _('Opening to Adults'),
+            'label_translated': _('Open to adults'),
             'text_fr': '',
             'text_en': ''
         },
