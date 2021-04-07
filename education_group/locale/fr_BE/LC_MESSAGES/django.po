@@ -262,13 +262,13 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
-msgid "Common admission conditions can only be edited by central manager"
+msgid "Common access requirements can only be edited by central manager"
 msgstr ""
-"Les conditions d'admission communes peuvent seulement être modifiées par un "
+"Les conditions d'accès communes peuvent seulement être modifiées par un "
 "gestionnaire en central"
 
-msgid "Common admission conditions will be published soon"
-msgstr "Les conditions d'admission communes seront publiées sous peu"
+msgid "Common access requirements will be published soon"
+msgstr "Les conditions d'accès communes seront publiées sous peu"
 
 msgid "Common general informations will be published soon"
 msgstr "Les informations générales communes seront publiées sous peu"
@@ -591,10 +591,10 @@ msgstr "Gestion des rubriques communes"
 
 msgid ""
 "Management common topics in the context of training's general informations "
-"and access conditions"
+"and access requirements"
 msgstr ""
 "Gestion des rubriques communes pour les informations générales et les "
-"conditions d'admission aux formations"
+"conditions d'accès aux formations"
 
 msgid "Management entity"
 msgstr "Entité de gestion"
@@ -981,8 +981,8 @@ msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
 
 #, python-brace-format
-msgid "Unable to publish common admission conditions for {year}"
-msgstr "Impossible de publier les conditions d'admission communes pour {year}"
+msgid "Unable to publish common access requirements for {year}"
+msgstr "Impossible de publier les conditions d'accès communes pour {year}"
 
 #, python-brace-format
 msgid "Unable to publish common general informations for {year}"

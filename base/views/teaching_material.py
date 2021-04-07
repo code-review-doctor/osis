@@ -28,33 +28,33 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.decorators.http import require_http_methods
 
-from base.business.learning_units import perms
 from base.business.learning_units.pedagogy import delete_teaching_material
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import display_success_messages
 from base.views.learning_units.pedagogy import update as update_pedagogy
-from base.views.learning_units.perms import PermissionDecorator
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-@PermissionDecorator(perms.is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def create(request, learning_unit_year_id):
     return create_view(request, learning_unit_year_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-@PermissionDecorator(perms.is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def update(request, learning_unit_year_id, teaching_material_id):
     return update_view(request, learning_unit_year_id, teaching_material_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-@PermissionDecorator(perms.is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def delete(request, learning_unit_year_id, teaching_material_id):
     return delete_view(request, learning_unit_year_id, teaching_material_id)
 

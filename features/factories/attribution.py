@@ -28,7 +28,7 @@ import factory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.academic_year import current_academic_year
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.tutor import Tutor
+from base.auth.roles.tutor import Tutor
 
 
 class AttributionGenerator:

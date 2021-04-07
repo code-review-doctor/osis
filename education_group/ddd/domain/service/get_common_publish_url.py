@@ -31,7 +31,7 @@ from osis_common.ddd import interface
 
 class GetCommonPublishUrl(interface.DomainService):
     @classmethod
-    def get_url_admission_conditions(cls, year: int) -> str:
+    def get_url_access_requirements(cls, year: int) -> str:
         if not all([settings.ESB_API_URL, settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
             raise ImproperlyConfigured('ESB_API_URL / ESB_REFRESH_COMMON_ADMISSION_ENDPOINT'
                                        'must be set in configuration')
