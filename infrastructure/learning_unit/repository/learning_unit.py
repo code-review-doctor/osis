@@ -35,10 +35,10 @@ from base.models.learning_container_year import LearningContainerYear as Learnin
 from base.models.learning_unit import LearningUnit as LearningUnitDatabase
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
-from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
 from reference.models.language import Language as LanguageDatabase
 
@@ -196,7 +196,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         return [
             LearningUnitIdentity(
                 code=learning_unit['acronym'],
-                academic_year=AcademicYear(year=learning_unit['academic_year__year'])
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=learning_unit['academic_year__year'])
             )
             for learning_unit in all_learn_unit_years
         ]

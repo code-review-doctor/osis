@@ -30,11 +30,11 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from ddd.logic.learning_unit.domain.model._academic_year import AcademicYear
-from ddd.logic.learning_unit.domain.model._language import Language
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd import interface
 from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
@@ -42,7 +42,7 @@ from ddd.logic.learning_unit.domain.model._remarks import Remarks
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitIdentity(interface.EntityIdentity):
-    academic_year = attr.ib(type=AcademicYear)
+    academic_year = attr.ib(type=AcademicYearIdentity)
     code = attr.ib(type=str)
 
     def __str__(self):
@@ -64,14 +64,14 @@ class LearningUnit(interface.RootEntity):
     internship_subtype = attr.ib(type=InternshipSubtype)
     responsible_entity_identity = attr.ib(type=UCLEntityIdentity)
     periodicity = attr.ib(type=PeriodicityEnum)
-    language = attr.ib(type=Language)
+    language_id = attr.ib(type=LanguageIdentity)
     remarks = attr.ib(type=Remarks)
     partims = attr.ib(type=List[Partim])
     # lecturing_part = attr.ib(type=LecturingPart)
     # practical_part = attr.ib(type=PracticalPart)
 
     @property
-    def academic_year(self) -> 'AcademicYear':
+    def academic_year(self) -> 'AcademicYearIdentity':
         return self.entity_id.academic_year
 
     @property

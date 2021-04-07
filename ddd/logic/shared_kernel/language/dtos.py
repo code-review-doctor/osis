@@ -25,13 +25,10 @@
 ##############################################################################
 import attr
 
-from osis_common.ddd import interface
+from osis_common.ddd.interface import DTO
 
 
 @attr.s(frozen=True, slots=True)
-class AcademicYear(interface.ValueObject):
-    year = attr.ib(type=int)
-
-    def __str__(self):
-        # 2021-22
-        return "{}-{}".format(self.year, self.year + 1)
+class LanguageDataDTO(DTO):
+    code_iso = attr.ib(type=str)
+    name = attr.ib(type=str)

@@ -23,32 +23,32 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+from abc import abstractmethod
+from typing import Optional, List
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from ddd.logic.learning_unit.commands import DeleteLearningUnitCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.domain.service.learning_unit_is_contained_in_program_tree import \
-    LearningUnitCanBeDeleted
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from ddd.logic.shared_kernel.language.domain.model.language import Language, LanguageIdentity
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-@transaction.atomic()
-def delete_learning_unit(cmd: DeleteLearningUnitCommand) -> LearningUnitIdentity:
-    # GIVEN
-    repository = LearningUnitRepository()
-    learning_unit = repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.code,
-            year=cmd.academic_year,
-        )
-    )
+class ILanguageRepository(interface.AbstractRepository):
+    @classmethod
+    @abstractmethod
+    def get(cls, entity_id: 'LanguageIdentity') -> 'Language':
+        pass
 
-    # WHEN
-    LearningUnitCanBeDeleted().validate(learning_unit.entity_id, ProgramTreeRepository())
+    @classmethod
+    @abstractmethod
+    def search(cls, entity_ids: Optional[List['LanguageIdentity']] = None, **kwargs) -> List['Language']:
+        pass
 
-    # THEN
-    repository.delete(learning_unit.entity_id)
+    @classmethod
+    @abstractmethod
+    def delete(cls, entity_id: 'LanguageIdentity', **kwargs: ApplicationService) -> None:
+        pass
 
-    return learning_unit.entity_id
+    @classmethod
+    @abstractmethod
+    def save(cls, entity: 'Language') -> None:
+        pass
+

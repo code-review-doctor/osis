@@ -27,44 +27,40 @@ from typing import Optional, List
 
 from django.db.models import F
 
-from base.models.entity_version import EntityVersion as EntityVersionDatabase
-from base.models.enums import organization_type
-from ddd.logic.learning_unit.builder.ucl_entity_builder import UclEntityBuilder
-from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity, UclEntity
-from ddd.logic.learning_unit.dtos import UclEntityDataDTO
-from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
-from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
+from ddd.logic.shared_kernel.language.builder.language_builder import LanguageBuilder
+from ddd.logic.shared_kernel.language.domain.model.language import Language
+from ddd.logic.shared_kernel.language.dtos import LanguageDataDTO
+from ddd.logic.shared_kernel.language.repository.i_language import ILanguageRepository
+from osis_common.ddd.interface import RootEntity, EntityIdentity, ApplicationService
+from reference.models.language import Language as LanguageDatabase
 
 
-class UclEntityRepository(IUclEntityRepository):
+class LanguageRepository(ILanguageRepository):
     @classmethod
-    def save(cls, entity: RootEntity) -> None:
+    def get(cls, entity_id: EntityIdentity) -> RootEntity:
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'UCLEntityIdentity') -> 'UclEntity':
-        entity_version_as_dict = _get_common_queryset().filter(
-            acronym=entity_id.code
-        ).annotate(
-            code=F('acronym'),
-            type=F('entity_type'),
+    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Language]:
+        objects_as_dict = _get_common_queryset().annotate(
+            code_iso=F('code'),
         ).values(
-            'code',
-            'type',
-        ).get()
-        dto = UclEntityDataDTO(**entity_version_as_dict)
-        return UclEntityBuilder.build_from_repository_dto(dto)
-
-    @classmethod
-    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
-        raise NotImplementedError
+            'code_iso',
+            'name',
+        )
+        return [
+            LanguageBuilder.build_from_repository_dto(LanguageDataDTO(**obj_as_dict))
+            for obj_as_dict in objects_as_dict
+        ]
 
     @classmethod
     def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
         raise NotImplementedError
 
+    @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
+
 
 def _get_common_queryset():
-    return EntityVersionDatabase.objects.filter(
-        entity__organization__type=organization_type.MAIN,
-    )
+    return LanguageDatabase.objects.all()

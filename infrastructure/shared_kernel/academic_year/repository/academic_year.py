@@ -25,46 +25,39 @@
 ##############################################################################
 from typing import Optional, List
 
-from django.db.models import F
-
-from base.models.entity_version import EntityVersion as EntityVersionDatabase
-from base.models.enums import organization_type
-from ddd.logic.learning_unit.builder.ucl_entity_builder import UclEntityBuilder
-from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity, UclEntity
-from ddd.logic.learning_unit.dtos import UclEntityDataDTO
-from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
-from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity, RootEntity
+from base.models.academic_year import AcademicYear as AcademicYearDatabase
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import AcademicYearBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
+from osis_common.ddd.interface import RootEntity, EntityIdentity, ApplicationService
 
 
-class UclEntityRepository(IUclEntityRepository):
+class AcademicYearRepository(IAcademicYearRepository):
     @classmethod
-    def save(cls, entity: RootEntity) -> None:
+    def get(cls, entity_id: AcademicYearIdentity) -> 'AcademicYear':
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'UCLEntityIdentity') -> 'UclEntity':
-        entity_version_as_dict = _get_common_queryset().filter(
-            acronym=entity_id.code
-        ).annotate(
-            code=F('acronym'),
-            type=F('entity_type'),
-        ).values(
-            'code',
-            'type',
-        ).get()
-        dto = UclEntityDataDTO(**entity_version_as_dict)
-        return UclEntityBuilder.build_from_repository_dto(dto)
+    def search(cls, entity_ids: Optional[List['AcademicYearIdentity']] = None, **kwargs) -> List['AcademicYear']:
+        objects_as_dict = _get_common_queryset().values(
+            'year',
+            'start_date',
+            'end_date',
+        )
+        return [
+            AcademicYearBuilder.build_from_repository_dto(AcademicYearDataDTO(**obj_as_dict))
+            for obj_as_dict in objects_as_dict
+        ]
 
     @classmethod
-    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
+    def delete(cls, entity_id: 'AcademicYearIdentity', **kwargs: ApplicationService) -> None:
         raise NotImplementedError
 
     @classmethod
-    def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
+    def save(cls, entity: 'AcademicYear') -> None:
         raise NotImplementedError
 
 
 def _get_common_queryset():
-    return EntityVersionDatabase.objects.filter(
-        entity__organization__type=organization_type.MAIN,
-    )
+    return AcademicYearDatabase.objects.all()

@@ -23,11 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 import attr
 
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class Language(interface.ValueObject):
-    iso_code = attr.ib(type=str)
+class AcademicYearIdentity(interface.EntityIdentity):
+    year = attr.ib(type=int)
+
+    def __str__(self):
+        return u"%s-%s" % (self.year, str(self.year + 1)[-2:])
+
+
+@attr.s(slots=True, hash=False, eq=False)
+class AcademicYear(interface.RootEntity):
+    entity_id = attr.ib(type=AcademicYearIdentity)
+    start_date = attr.ib(type=datetime.date)
+    end_date = attr.ib(type=datetime.date)
+
+    def __str__(self):
+        return str(self.entity_id)
+
+    @property
+    def year(self) -> int:
+        return self.entity_id.year

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django import forms
 from django.contrib.auth.models import User
@@ -30,47 +31,39 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.forms.utils.fields import OsisRichTextFormField
-from base.models.academic_year import AcademicYear
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.validator import exceptions
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
+from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
+from ddd.logic.shared_kernel.language.domain.model.language import Language
 from education_group.forms import fields
 from education_group.forms.fields import UpperCaseCharField
+from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd.interface import CommandRequest
-from reference.models.language import Language, FR_CODE_LANGUAGE
+from reference.models.language import FR_CODE_LANGUAGE
 
 
 class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     field_name_by_exception = {
-        # exceptions.EmptyRequiredFieldsException: ('code',
-        #                                           'academic_year',
-        #                                           'common_title_fr',
-        #                                           'specific_title_fr',
-        #                                           'credits',
-        #                                           'internship_subtype',
-        #                                           'responsible_entity',
-        #                                           'periodicity',
-        #                                           'language',),
         exceptions.AcademicYearLowerThan2019Exception: ('academic_year',),
         exceptions.CreditsShouldBeGreatherThanZeroException: ('credits',),
         exceptions.InternshipSubtypeMandatoryException: ('internship_subtype',),
-        # exceptions.LearningUnitAlreadyExistsException: ('code', 'academic_year',),
         exceptions.LearningUnitCodeAlreadyExistsException: ('code', 'academic_year',),
         exceptions.InvalidResponsibleEntityTypeOrCodeException: ('responsible_entity',),
         exceptions.LearningUnitCodeStructureInvalidException: ('code',),
-        # exceptions.SubdivisionAlreadyExistException: ('code',),
     }
 
     code = UpperCaseCharField(max_length=15, label=_("Code"), required=True)
-    academic_year = forms.ModelChoiceField(
-        queryset=AcademicYear.objects.all(),
+    academic_year = forms.ChoiceField(
         label=_("Validity"),
         required=True
-    )  # FIXME
+    )
     type = forms.ChoiceField(
         choices=BLANK_CHOICE + list(LearningContainerYearType.choices()),
         label=_("Learning unit type"),
@@ -91,16 +84,14 @@ class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         label=_("Internship subtype"),
         required=False,
     )
-    responsible_entity = forms.CharField(required=True)  # FIXME
+    responsible_entity = forms.CharField(required=True)
     periodicity = forms.ChoiceField(
         choices=BLANK_CHOICE + list(PeriodicityEnum.choices()),
         label=_("Periodicity"),
         required=True,
     )
-    language = forms.ModelChoiceField(
-        queryset=Language.objects.all().order_by('name'),  # FIXME
+    language = forms.ChoiceField(
         label=_('Primary language'),
-        to_field_name="name",
         initial=FR_CODE_LANGUAGE
     )
     remark_faculty = OsisRichTextFormField(
@@ -122,7 +113,19 @@ class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     def __init__(self, *args, user: User, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
+        self.__init_language_choices()
+        self.__init_academic_year_choices()
         self.__init_requirement_entity_field()
+
+    def __init_language_choices(self):
+        all_languages = message_bus_instance.invoke(SearchLanguagesCommand())  # type: List[Language]
+        choices = [(lang.code_iso, lang.name) for lang in all_languages]
+        self.fields['language'].choices = choices
+
+    def __init_academic_year_choices(self):
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand())  # type: List[AcademicYear]
+        choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
+        self.fields['academic_year'].choices = choices
 
     def __init_requirement_entity_field(self):
         self.fields['responsible_entity'] = fields.ManagementEntitiesModelChoiceField(
@@ -130,27 +133,12 @@ class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             initial=self.initial.get('responsible_entity'),
             disabled=self.fields['responsible_entity'].disabled,
             required=False
-        )  # FIXME
-
-    def clean_academic_year(self):
-        if self.cleaned_data['academic_year']:
-            return self.cleaned_data['academic_year'].year
-        return None
-
-    def clean_language(self):
-        if self.cleaned_data['language']:
-            return self.cleaned_data['language'].code
-        return None
-
-    # def clean_responsible_entity(self):
-    #     if self.cleaned_data['responsible_entity']:
-    #         return self.cleaned_data['responsible_entity'].acronym
-    #     return None
+        )  # RoleEntity : OK to use the queryset ONLY for this case of usage
 
     def get_command(self) -> CommandRequest:
         return CreateLearningUnitCommand(
             code=self.cleaned_data['code'],
-            academic_year=self.cleaned_data['academic_year'],
+            academic_year=int(self.cleaned_data['academic_year']),
             type=self.cleaned_data['type'],
             common_title_fr=self.cleaned_data['common_title_fr'],
             specific_title_fr=self.cleaned_data['specific_title_fr'],

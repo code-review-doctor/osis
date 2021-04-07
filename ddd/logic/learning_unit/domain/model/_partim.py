@@ -26,7 +26,8 @@
 import attr
 
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from ddd.logic.learning_unit.domain.model._language import Language
+from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
+from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd import interface
 from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
@@ -55,9 +56,7 @@ class PartimBuilder:
             title_en=cmd.title_en,
             credits=cmd.credits,
             periodicity=PeriodicityEnum[cmd.periodicity],
-            language=Language(
-                iso_code=cmd.iso_code,
-            ),
+            language_id=LanguageIdentityBuilder.build_from_code_iso(cmd.iso_code),
             remarks=Remarks(
                 faculty=cmd.remark_faculty,
                 publication_fr=cmd.remark_publication_fr,
@@ -73,7 +72,7 @@ class Partim(interface.Entity):
     title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     periodicity = attr.ib(type=PeriodicityEnum)
-    language = attr.ib(type=Language)
+    language_id = attr.ib(type=LanguageIdentity)
     remarks = attr.ib(type=Remarks)
 
     @property

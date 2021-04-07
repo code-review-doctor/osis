@@ -23,32 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
-
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from ddd.logic.learning_unit.commands import DeleteLearningUnitCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.domain.service.learning_unit_is_contained_in_program_tree import \
-    LearningUnitCanBeDeleted
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
+from osis_common.ddd.interface import CommandRequest, EntityIdentityBuilder, DTO
 
 
-@transaction.atomic()
-def delete_learning_unit(cmd: DeleteLearningUnitCommand) -> LearningUnitIdentity:
-    # GIVEN
-    repository = LearningUnitRepository()
-    learning_unit = repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.code,
-            year=cmd.academic_year,
-        )
-    )
+class LanguageIdentityBuilder(EntityIdentityBuilder):
 
-    # WHEN
-    LearningUnitCanBeDeleted().validate(learning_unit.entity_id, ProgramTreeRepository())
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'LanguageIdentity':
+        raise NotImplementedError
 
-    # THEN
-    repository.delete(learning_unit.entity_id)
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'LanguageIdentity':
+        raise NotImplementedError
 
-    return learning_unit.entity_id
+    @classmethod
+    def build_from_code_iso(cls, code_iso: str) -> 'LanguageIdentity':
+        return LanguageIdentity(code_iso=code_iso)

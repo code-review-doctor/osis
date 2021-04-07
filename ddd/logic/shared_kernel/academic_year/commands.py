@@ -23,32 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+import attr
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from ddd.logic.learning_unit.commands import DeleteLearningUnitCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.domain.service.learning_unit_is_contained_in_program_tree import \
-    LearningUnitCanBeDeleted
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from osis_common.ddd import interface
 
 
-@transaction.atomic()
-def delete_learning_unit(cmd: DeleteLearningUnitCommand) -> LearningUnitIdentity:
-    # GIVEN
-    repository = LearningUnitRepository()
-    learning_unit = repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.code,
-            year=cmd.academic_year,
-        )
-    )
-
-    # WHEN
-    LearningUnitCanBeDeleted().validate(learning_unit.entity_id, ProgramTreeRepository())
-
-    # THEN
-    repository.delete(learning_unit.entity_id)
-
-    return learning_unit.entity_id
+@attr.s(frozen=True, slots=True)
+class SearchAcademicYearCommand(interface.CommandRequest):
+    pass  # Filters can ba added later when it's needed

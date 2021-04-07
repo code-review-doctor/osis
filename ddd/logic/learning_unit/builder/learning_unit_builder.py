@@ -33,7 +33,6 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.model._language import Language
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
@@ -44,6 +43,7 @@ from ddd.logic.learning_unit.domain.validator.validators_by_business_action impo
     CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
 from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO
+from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
 from osis_common.ddd.interface import RootEntityBuilder
 
 
@@ -73,7 +73,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             internship_subtype=InternshipSubtype[dto.internship_subtype],
             responsible_entity_identity=responsible_entity_identity,
             periodicity=PeriodicityEnum[dto.periodicity],
-            language=_build_language(dto.iso_code),
+            language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
         )
 
@@ -95,7 +95,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             internship_subtype=InternshipSubtype[dto.internship_subtype],
             responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
-            language=_build_language(dto.iso_code),
+            language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
         )
 
@@ -139,9 +139,7 @@ def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publi
 
 
 def _build_language(iso_code: str):
-    return Language(
-        iso_code=iso_code,
-    )
+    return LanguageIdentityBuilder.build_from_code_iso(iso_code)
 
 
 def _build_titles(common_title_fr: str, specific_title_fr: str, common_title_en: str, specific_title_en: str):

@@ -23,32 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
-
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from ddd.logic.learning_unit.commands import DeleteLearningUnitCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.domain.service.learning_unit_is_contained_in_program_tree import \
-    LearningUnitCanBeDeleted
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
+from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
+from osis_common.ddd.interface import CommandRequest, RootEntityBuilder
 
 
-@transaction.atomic()
-def delete_learning_unit(cmd: DeleteLearningUnitCommand) -> LearningUnitIdentity:
-    # GIVEN
-    repository = LearningUnitRepository()
-    learning_unit = repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.code,
-            year=cmd.academic_year,
+class AcademicYearBuilder(RootEntityBuilder):
+
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'AcademicYear':
+        raise NotImplementedError
+
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'AcademicYearDataDTO') -> 'AcademicYear':
+        return AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(dto_object.year),
+            start_date=dto_object.start_date,
+            end_date=dto_object.end_date,
         )
-    )
-
-    # WHEN
-    LearningUnitCanBeDeleted().validate(learning_unit.entity_id, ProgramTreeRepository())
-
-    # THEN
-    repository.delete(learning_unit.entity_id)
-
-    return learning_unit.entity_id
