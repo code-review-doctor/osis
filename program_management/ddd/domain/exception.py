@@ -446,9 +446,10 @@ class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessE
             *args,
             **kwargs
     ):
-        full_code = \
-            offer_acronym+"["+version_name+" - "+transition_name+"]" \
-                if version_name else offer_acronym+"["+transition_name+"]"
+        if version_name:
+            full_code = offer_acronym + "[" + version_name+" - " + transition_name + "]"
+        else:
+            full_code = offer_acronym + "[" + transition_name + "]"
         message = _(
             "You can't extend the transition version '{full_code}' in {year} as other transition version exists in "
             "{transition_year}"
