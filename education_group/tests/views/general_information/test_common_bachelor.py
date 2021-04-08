@@ -23,28 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import urllib
 
 from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
+from rest_framework import status
 
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_year import EducationGroupYearCommonBachelorFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
-from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.views.general_information.common_bachelor import Tab
-from rest_framework import status
 
 
-class TestCommonBachelorAdmissionCondition(TestCase):
+class TestCommonBachelorAccessRequirements(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
         cls.common_bachelor_education_group_year = EducationGroupYearCommonBachelorFactory(academic_year__year=2018)
         AdmissionConditionFactory(education_group_year=cls.common_bachelor_education_group_year)
-        cls.url = reverse('common_bachelor_admission_condition', kwargs={'year': 2018})
+        cls.url = reverse('common_bachelor_access_requirements', kwargs={'year': 2018})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -62,7 +60,7 @@ class TestCommonBachelorAdmissionCondition(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
 
     def test_case_common_and_admission_condition_not_exists(self):
-        dummy_url = reverse('common_bachelor_admission_condition', kwargs={'year': 1990})
+        dummy_url = reverse('common_bachelor_access_requirements', kwargs={'year': 1990})
         response = self.client.get(dummy_url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
@@ -70,12 +68,12 @@ class TestCommonBachelorAdmissionCondition(TestCase):
     def test_case_common_exist_but_admission_condition_not_exist(self):
         obj = EducationGroupYearCommonBachelorFactory(academic_year__year=1990)
 
-        dummy_url = reverse('common_bachelor_admission_condition', kwargs={'year': 1990})
+        dummy_url = reverse('common_bachelor_access_requirements', kwargs={'year': 1990})
         response = self.client.get(dummy_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.context['object'], obj)
-        self.assertEqual(response.context['admission_condition'].education_group_year, obj)
+        self.assertEqual(response.context['access_requirements'].education_group_year, obj)
 
     def test_assert_template_used(self):
         response = self.client.get(self.url)
@@ -87,12 +85,12 @@ class TestCommonBachelorAdmissionCondition(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.context['object'], self.common_bachelor_education_group_year)
-        expected_publish_url = reverse('publish_common_bachelor_admission_condition', kwargs={
+        expected_publish_url = reverse('publish_common_bachelor_access_requirements', kwargs={
             'year': self.common_bachelor_education_group_year.academic_year.year
         })
         self.assertEqual(response.context['publish_url'], expected_publish_url)
         self.assertEqual(
-            response.context['admission_condition'],
+            response.context['access_requirements'],
             self.common_bachelor_education_group_year.admissioncondition
         )
         self.assertIn("tab_urls", response.context)
@@ -102,4 +100,4 @@ class TestCommonBachelorAdmissionCondition(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(len(response.context['tab_urls']), 1)
-        self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
+        self.assertTrue(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['active'])

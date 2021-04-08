@@ -38,8 +38,9 @@ from openpyxl import load_workbook
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
-from base.models.enums import academic_calendar_type, entity_type
+from base.models.enums import entity_type
 from base.models.enums import organization_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -47,7 +48,6 @@ from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
@@ -77,7 +77,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -191,7 +191,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -203,8 +203,6 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
 
         cls.url = reverse('learning_units_summary')
         cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
-        PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
-
         # Generate data for XLS export
         cls.learning_unit_year_with_mandatory_teaching_materials = LearningUnitYearFactory(
             acronym="LBIR1100",
@@ -332,7 +330,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -350,7 +348,6 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         )
         cls.url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
         cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
-        PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
         self.cms = LearningUnitYearTranslatedTextFactory(

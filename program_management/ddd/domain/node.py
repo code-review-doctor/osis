@@ -69,6 +69,7 @@ class NodeFactory:
             attributes_to_update["end_year"] = end_year
         node_next_year = attr.evolve(copy_from_node, **attributes_to_update)
         node_next_year._has_changed = True
+        node_next_year._is_copied = True
         return node_next_year
 
     @classmethod
@@ -205,6 +206,7 @@ class Node(interface.Entity):
 
     _academic_year = None
     _has_changed = False
+    _is_copied = False  # FIXME dirty solution to fix create or copy node on repo
 
     @entity_id.default
     def _entity_id(self) -> NodeIdentity:
@@ -235,6 +237,9 @@ class Node(interface.Entity):
     @children.setter
     def children(self, new_children: List['Link']):
         self._children = new_children
+
+    def is_training_formation_root(self) -> bool:
+        return (self.is_training() and not self.is_finality()) or (self.is_mini_training() and not self.is_option())
 
     def is_learning_unit(self):
         return self.type == NodeType.LEARNING_UNIT
@@ -560,6 +565,9 @@ class NodeGroupYear(Node):
                                                self.academic_year)
         return "{}{} - {} ({})".format(self.title, self.get_formatted_transition_name(), self.code, self.academic_year)
 
+    def full_code_acronym_representation(self) -> str:
+        return "{} - {}".format(self.code, self.full_acronym())
+
     def full_acronym(self) -> str:
         if self.version_name:
             return "{}[{}{}]".format(self.title, self.version_name, self.get_formatted_transition_name())
@@ -586,6 +594,10 @@ class NodeGroupYear(Node):
         if self.transition_name:
             return '-{}'.format(self.transition_name) if self.version_name else '[{}]'.format(self.transition_name)
         return ''
+
+    def is_transition_node_equivalent(self, other_node: 'NodeGroupYear', transition_name: str, year: int) -> bool:
+        return self.title == other_node.title and self.year == year and self.version_name == other_node.version_name \
+               and self.transition_name == transition_name
 
 
 @attr.s(slots=True, hash=False, eq=False)

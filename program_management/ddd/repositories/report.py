@@ -41,7 +41,7 @@ class ReportRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, report_identity: ReportIdentity) -> Optional['Report']:
-        return cache.get(str(report_identity))
+        return cache.get(str(report_identity.transaction_id))
 
     @classmethod
     def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:

@@ -36,6 +36,7 @@ from django.utils.translation import gettext as _
 
 import base.business.learning_unit
 from base import models as mdl
+from base.auth.roles import tutor as tutor_mdl
 from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
@@ -133,7 +134,7 @@ def profile_attributions(request):
 @login_required
 def _get_data(request):
     person = mdl.person.find_by_user(request.user)
-    tutor = mdl.tutor.find_by_person(person)
+    tutor = tutor_mdl.find_by_person(person)
     programs = base.auth.roles.program_manager.find_by_person(person).prefetch_related(
         Prefetch(
             'education_group__educationgroupyear_set',

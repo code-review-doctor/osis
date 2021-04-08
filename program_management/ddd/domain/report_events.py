@@ -28,6 +28,7 @@ from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.report import ReportEvent
+from program_management.ddd.business_types import *
 
 
 @attr.s(frozen=True, slots=True)
@@ -46,15 +47,16 @@ class CopyLearningUnitNotExistForYearEvent(ReportEvent):
 
 @attr.s(frozen=True, slots=True)
 class NotCopyTrainingMiniTrainingNotExistForYearEvent(ReportEvent):
-    code = attr.ib(type=str)
-    acronym = attr.ib(type=str)
+    node = attr.ib(type='NodeGroupYear')
     end_year = attr.ib(type=AcademicYear)
     copy_year = attr.ib(type=AcademicYear)
 
     def __str__(self):
-        return _("Training/Mini-Training %(title)s is closed in %(end_year)s. "
-                 "This training/mini-training is not copied in %(copy_year)s.") % {
-            "title": "{} - {}".format(self.code, self.acronym),
+        return _(
+            "Training/Mini-Training %(title)s is closed in %(end_year)s. "
+            "This training/mini-training is not copied in %(copy_year)s."
+        ) % {
+            "title": self.node.full_code_acronym_representation(),
             "copy_year": self.copy_year,
             "end_year": self.end_year
         }
@@ -62,57 +64,57 @@ class NotCopyTrainingMiniTrainingNotExistForYearEvent(ReportEvent):
 
 @attr.s(frozen=True, slots=True)
 class NotCopyTrainingMiniTrainingNotExistingEvent(ReportEvent):
-    code = attr.ib(type=str)
-    acronym = attr.ib(type=str)
+    node = attr.ib(type='NodeGroupYear')
     copy_year = attr.ib(type=AcademicYear)
 
     def __str__(self):
-        return _("Training/Mini-Training %(title)s is inconsistent."
-                 "This training/mini-training is not copied in %(copy_year)s.") % {
-                   "title": "{} - {}".format(self.code, self.acronym),
-                   "copy_year": self.copy_year,
-               }
+        return _(
+            "Training/Mini-Training %(title)s is inconsistent."
+            "This training/mini-training is not copied in %(copy_year)s."
+        ) % {
+            "title": self.node.full_code_acronym_representation(),
+            "copy_year": self.copy_year,
+        }
 
 
 @attr.s(frozen=True, slots=True)
 class CopyTransitionTrainingNotExistingEvent(ReportEvent):
-    code = attr.ib(type=str)
-    acronym = attr.ib(type=str)
-    copy_year = attr.ib(type=AcademicYear)
+    node = attr.ib(type='NodeGroupYear')
+    root_node = attr.ib(type='NodeGroupYear')
 
     def __str__(self):
-        return _("Training/Mini-Training %(title)s transition version is non existent.") % {
-                   "title": "{} - {}".format(self.code, self.acronym),
-                   "copy_year": self.copy_year,
-               }
+        return _(
+            "The transition version [%(version)s] of the training %(title)s does not exist in %(academic_year)s"
+        ) % {
+            "version": self.root_node.version_label(),
+            "title": self.node.full_code_acronym_representation(),
+            "academic_year": self.root_node.academic_year,
+        }
 
 
 @attr.s(frozen=True, slots=True)
 class CopyReferenceGroupEvent(ReportEvent):
-    code = attr.ib(type=str)
-    acronym = attr.ib(type=str)
+    node = attr.ib(type='NodeGroupYear')
 
     def __str__(self):
         return _("The reference group %(title)s has not yet been copied. Its content is still empty.") % {
-            "title": "{} - {}".format(self.code, self.acronym),
+            "title": self.node.full_code_acronym_representation(),
         }
 
 
 @attr.s(frozen=True, slots=True)
 class CopyReferenceEmptyEvent(ReportEvent):
-    code = attr.ib(type=str)
-    acronym = attr.ib(type=str)
+    node = attr.ib(type='NodeGroupYear')
 
     def __str__(self):
         return _("The reference element %(title)s is still empty.") % {
-            "title": "{} - {}".format(self.code, self.acronym),
+            "title": self.node.full_code_acronym_representation(),
         }
 
 
 @attr.s(frozen=True, slots=True)
 class NodeAlreadyCopiedEvent(ReportEvent):
-    code = attr.ib(type=str)
-    acronym = attr.ib(type=str)
+    node = attr.ib(type='NodeGroupYear')
     copy_year = attr.ib(type=AcademicYear)
 
     def __str__(self):
@@ -120,7 +122,7 @@ class NodeAlreadyCopiedEvent(ReportEvent):
             "The element %(title)s has already been copied in %(copy_year)s in the context of an other training."
             "Its content may have changed."
         ) % {
-            "title": "{} - {}".format(self.code, self.acronym),
+            "title": self.node.full_code_acronym_representation(),
             "copy_year": self.copy_year
         }
 
@@ -129,8 +131,7 @@ class NodeAlreadyCopiedEvent(ReportEvent):
 class CannotCopyPrerequisiteAsLearningUnitNotPresent(ReportEvent):
     prerequisite_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
-    training_code = attr.ib(type=str)
-    training_acronym = attr.ib(type=str)
+    training_root_node = attr.ib(type='NodeGroupYear')
     copy_year = attr.ib(type=AcademicYear)
 
     def __str__(self):
@@ -141,5 +142,5 @@ class CannotCopyPrerequisiteAsLearningUnitNotPresent(ReportEvent):
             "prerequisite_code": self.prerequisite_code,
             "learning_unit_code": self.learning_unit_code,
             "copy_year": self.copy_year,
-            "training_title": "{} - {}".format(self.training_code, self.training_acronym)
+            "training_title": self.training_root_node.full_code_acronym_representation()
         }

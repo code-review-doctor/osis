@@ -33,7 +33,7 @@ from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
 from base.models.enums import learning_container_year_types, learning_component_year_type
 from base.models.person import Person
-from base.models.tutor import Tutor
+from base.auth.roles.tutor import Tutor
 
 
 class AttributionForm(forms.ModelForm):

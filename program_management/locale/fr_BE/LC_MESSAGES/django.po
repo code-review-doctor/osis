@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 11:46+0100\n"
+"POT-Creation-Date: 2021-03-30 14:26+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -17,10 +17,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
-
-#, python-format
-msgid " Fill %(title)s in %(year)s "
-msgstr ""
 
 #, python-format
 msgid "\"%(child)s\" has been %(copy_message)s into \"%(parent)s\""
@@ -316,6 +312,10 @@ msgid "Export"
 msgstr "Exporter"
 
 #, python-format
+msgid "Fill %(title)s in %(year)s"
+msgstr "Remplir %(title)s en %(year)s "
+
+#, python-format
 msgid "Fill from specific official of last year: %(title)s in %(year)s"
 msgstr ""
 "Recopier à partir de la version particulière de l'année passée: %(title)s en "
@@ -417,15 +417,11 @@ msgstr ""
 msgid ""
 "In the context of a Master, this action fill the content of the transition "
 "version of the Master but also of its finalities if the corresponding "
-"transition versions exist. Therefore, it is necessary to create the "
-"transition version of the finalities that are wished before executing this "
-"action."
+"transition versions exist."
 msgstr ""
 "Dans le cadre d'un Master, cette action alimente le contenu de la version de "
 "transition du Master, mais également le contenu de ses finalités si les "
-"versions de transitions correspondantes existent. Par conséquent, il est "
-"nécessaire de créer les versions de transition des finalités souhaitées "
-"avant de lancer cette action."
+"versions de transition correspondantes existent."
 
 msgid "Include subordinate entities"
 msgstr "Inclure transition"
@@ -462,6 +458,13 @@ msgid ""
 msgstr ""
 "Il n'est pas possible de créer un %(category)s sous un parent de type "
 "%(parent_type)s"
+
+msgid ""
+"It is necessary to create the desired transition version of the finalities "
+"before executing this action."
+msgstr ""
+"Il est nécessaire de créer les versions de transition des finalités "
+"souhaitées avant de lancer cette action."
 
 #, python-format
 msgid ""
@@ -623,6 +626,13 @@ msgstr "Nom"
 msgid "Name of the teacher responsible"
 msgstr "Nom du professeur responsable de programme"
 
+msgid ""
+"Name version cannot contain TRANSITION. Please create a transition version "
+"if necessary"
+msgstr ""
+"Le nom de version ne peut pas contenir TRANSITION. Veuillez créer une "
+"version de transition si nécessaire."
+
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
 
@@ -720,6 +730,14 @@ msgstr "Activité cyclique dispensée en"
 
 msgid "Periodicity"
 msgstr "Périodicité"
+
+#, python-format
+msgid ""
+"Please create at least a transition version [%(transition_name)s] for one of "
+"the finalities %(finalities)s in %(academic_year)s."
+msgstr ""
+"Veuillez créer au moins une version de transition [%(transition_name)s] pour "
+"une des finalités %(finalities)s en %(academic_year)s."
 
 msgid "Please cut or copy an item before paste"
 msgstr "Veuillez copier ou couper un élément avant de le coller"
@@ -991,6 +1009,12 @@ msgstr ""
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 
+msgid ""
+"The transition version [%(version)s] of the training %(title)s does not "
+"exist in %(academic_year)s"
+msgstr ""
+"La version de transition [%(version)s] de la formation %(title)s n'existe pas en %(academic_year)s."
+
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
 
@@ -1056,14 +1080,8 @@ msgid ""
 "Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
 "is not copied in %(copy_year)s."
 msgstr ""
-"La formation/mini-formation %(title)s est inconsistente. Cet élément n'est "
+"La formation/mini-formation %(title)s est inconsistante. Cet élément n'est "
 "pas recopié en %(copy_year)s."
-
-#, python-format
-msgid "Training/Mini-Training %(title)s transition version is non existent."
-msgstr ""
-"La version de transition de la formation/mini-formation %(title)s est non "
-"existante."
 
 msgid "Trainings"
 msgstr "Formations"

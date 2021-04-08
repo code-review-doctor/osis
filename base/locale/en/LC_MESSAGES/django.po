@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-18 08:39+0100\n"
+"POT-Creation-Date: 2021-03-26 14:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,6 +137,9 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
+msgstr ""
+
 msgid "Academic"
 msgstr ""
 
@@ -150,6 +153,9 @@ msgid "Academic calendar"
 msgstr ""
 
 msgid "Academic calendar management"
+msgstr ""
+
+msgid "Academic nature, category of decree and university certificate"
 msgstr ""
 
 msgid "Academic partner"
@@ -642,9 +648,7 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
+msgid "Default information"
 msgstr ""
 
 msgid "Default learning unit enrollment"
@@ -687,6 +691,9 @@ msgid "Details other educational facilities"
 msgstr ""
 
 msgid "Diploma title"
+msgstr ""
+
+msgid "Diploma title, professionnal title and aims"
 msgstr ""
 
 msgid "Diploma/certificat"
@@ -840,9 +847,6 @@ msgstr ""
 msgid "Enrolled to learning unit"
 msgstr ""
 
-msgid "Enrollment"
-msgstr ""
-
 msgid "Enrollment campus"
 msgstr ""
 
@@ -850,6 +854,9 @@ msgid "Enrollment date"
 msgstr ""
 
 msgid "Enrollment enabled"
+msgstr ""
+
+msgid "Enrollment, partial deliberation and admission exam"
 msgstr ""
 
 msgid "Enrollments to learning unit"
@@ -888,6 +895,11 @@ msgid "Entity manager"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid ""
+"Entity, location, language, duration, schedule and types of activities "
+"present in the training"
 msgstr ""
 
 msgid "Entrepreneur"
@@ -1059,7 +1071,7 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-msgid "General information and Admission condition"
+msgid "General information and Access requirements"
 msgstr ""
 
 msgid "Generate PDF not available. Please use EPC."
@@ -1361,6 +1373,9 @@ msgstr ""
 msgid "Local credits"
 msgstr ""
 
+msgid "Location, language and types of activities present in the training"
+msgstr ""
+
 msgid "Lock"
 msgstr ""
 
@@ -1531,10 +1546,6 @@ msgstr ""
 msgid "Modification"
 msgstr ""
 
-#, python-format
-msgid "Modifications should be made in EPC for year %(year)d"
-msgstr ""
-
 msgid "Modified"
 msgstr ""
 
@@ -1637,12 +1648,6 @@ msgstr ""
 msgid "Not enrolled"
 msgstr ""
 
-msgid "Not in period to edit description fiche."
-msgstr ""
-
-msgid "Not in period to edit force majeure section."
-msgstr ""
-
 msgid "Not modified"
 msgstr ""
 
@@ -1669,6 +1674,9 @@ msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
 
 msgid "One of the partial volumes must have a value to 0."
+msgstr ""
+
+msgid "Only proposals"
 msgstr ""
 
 msgid "Only the volume Q1 must have a value"
@@ -1702,9 +1710,6 @@ msgid "Organizational chart"
 msgstr ""
 
 msgid "Organizations"
-msgstr ""
-
-msgid "Osis code"
 msgstr ""
 
 msgid "Other academic responsible"
@@ -2079,6 +2084,9 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr ""
 
+msgid "Remarks, comments and constraints"
+msgstr ""
+
 msgid "Req. Entities"
 msgstr ""
 
@@ -2439,9 +2447,6 @@ msgid ""
 "done at consolidation"
 msgstr ""
 
-msgid "The learning unit's description fiche is not editable."
-msgstr ""
-
 msgid "The learning units"
 msgstr ""
 
@@ -2625,6 +2630,9 @@ msgstr ""
 msgid "Training management entity"
 msgstr ""
 
+msgid "Training management entity faculty"
+msgstr ""
+
 msgid "Training title"
 msgstr ""
 
@@ -2803,14 +2811,7 @@ msgstr ""
 msgid "Yes, I confirm."
 msgstr ""
 
-msgid "You are not attributed to this learning unit."
-msgstr ""
-
 msgid "You are succesfully logout."
-msgstr ""
-
-#, python-format
-msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 
 msgid ""
@@ -2827,14 +2828,6 @@ msgstr ""
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
-msgstr ""
-
-msgid ""
-"You do not have the permission to refresh the publication for this learning "
-"unit"
-msgstr ""
-
-msgid "You do not have the permission to refresh the publication for this year"
 msgstr ""
 
 msgid "You have the choice between"

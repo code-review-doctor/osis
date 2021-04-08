@@ -40,6 +40,7 @@ from program_management.views.tree_version import create as create_program_tree_
     update_mini_training, fill_content
 from program_management.views.tree_version.delete import TreeVersionDeleteView
 
+
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
         groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_pdf_content"),
@@ -134,13 +135,13 @@ urlpatterns = [
 
     ])),
     path(
-        '<int:year>/<str:acronym>/<str:transition_name>/',
+        '<int:year>/<acronym:acronym>/<str:transition_name>/fill',
         fill_content.FillTransitionVersionContentView.as_view(),
         name='fill_transition_version_content',
         kwargs={'version_name': program_tree_version.STANDARD}
     ),
     path(
-        '<int:year>/<str:acronym>/<str:transition_name>/<str:version_name>',
+        '<int:year>/<acronym:acronym>/<str:transition_name>/<str:version_name>/fill',
         fill_content.FillTransitionVersionContentView.as_view(),
         name='fill_transition_version_content'
     ),

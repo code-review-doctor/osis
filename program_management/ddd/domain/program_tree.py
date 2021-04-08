@@ -191,8 +191,7 @@ class ProgramTreeBuilder:
         for link in links_that_cannot_be_copied:
             to_tree.report.add_warning(
                 report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
-                    acronym=link.child.title,
-                    code=link.child.code,
+                    node=link.child,
                     end_year=link.child.end_academic_year,
                     copy_year=to_node.academic_year
                 )
@@ -217,8 +216,7 @@ class ProgramTreeBuilder:
             elif not child:
                 to_tree.report.add_warning(
                     report_events.NotCopyTrainingMiniTrainingNotExistingEvent(
-                        acronym=last_year_link.child.title,
-                        code=last_year_link.child.code,
+                        node=last_year_link.child,
                         copy_year=to_node.academic_year
                     )
                 )
@@ -229,27 +227,19 @@ class ProgramTreeBuilder:
 
             if self._can_link_child_be_filled(copied_link, to_tree.authorized_relationships):
                 self._fill_node_from_last_year_node(last_year_link.child, child, existing_nodes, to_tree)
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) and\
+                    copied_link.child.is_group():
+                to_tree.report.add_warning(
+                    report_events.CopyReferenceGroupEvent(node=last_year_link.child)
+                )
             elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
                 to_tree.report.add_warning(
-                    report_events.CopyReferenceEmptyEvent(
-                        acronym=last_year_link.child.title,
-                        code=last_year_link.child.code
-                    )
+                    report_events.CopyReferenceEmptyEvent(node=last_year_link.child)
                 )
-            elif copied_link.is_reference():
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and \
+                    not copied_link.child.is_training_formation_root():
                 to_tree.report.add_warning(
-                    report_events.CopyReferenceGroupEvent(
-                        acronym=last_year_link.child.title,
-                        code=last_year_link.child.code
-                    )
-                )
-            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
-                to_tree.report.add_warning(
-                    report_events.NodeAlreadyCopiedEvent(
-                        acronym=last_year_link.child.title,
-                        code=last_year_link.child.code,
-                        copy_year=to_node.academic_year
-                    )
+                    report_events.NodeAlreadyCopiedEvent(node=last_year_link.child, copy_year=to_node.academic_year)
                 )
 
         return to_node
@@ -261,7 +251,11 @@ class ProgramTreeBuilder:
             existing_nodes: Set['Node'],
             node_code_generator: 'GenerateNodeCode'
     ) -> 'ProgramTree':
-        validators_by_business_action.FillProgramTreeValidatorList(to_tree).validate()
+        validators_by_business_action.FillTransitionProgramTreeValidatorList(
+            from_tree,
+            to_tree,
+            existing_nodes
+        ).validate()
 
         self._fill_node_from_node_in_case_of_transition(
             from_tree.root_node,
@@ -296,8 +290,7 @@ class ProgramTreeBuilder:
         for link in links_that_cannot_be_copied:
             to_tree.report.add_warning(
                 report_events.NotCopyTrainingMiniTrainingNotExistForYearEvent(
-                    acronym=link.child.title,
-                    code=link.child.code,
+                    node=link.child,
                     end_year=link.child.end_academic_year,
                     copy_year=to_node.academic_year
                 )
@@ -328,65 +321,63 @@ class ProgramTreeBuilder:
             elif source_link.child.is_training():
                 child = self._get_existing_transition_node(
                     existing_nodes,
-                    source_link.child.title,
+                    source_link.child,
                     to_node.year,
-                    source_link.child.version_name,
                     transition_name
                 )
             if not child and source_link.child.is_training():
                 to_tree.report.add_warning(
                     report_events.CopyTransitionTrainingNotExistingEvent(
-                        acronym=source_link.child.title,
-                        code=source_link.child.code,
-                        copy_year=to_node.academic_year
+                        root_node=to_tree.root_node,
+                        node=source_link.child,
                     )
                 )
                 continue
             elif not child:
                 to_tree.report.add_warning(
                     report_events.NotCopyTrainingMiniTrainingNotExistingEvent(
-                        acronym=source_link.child.title,
-                        code=source_link.child.code,
+                        node=source_link.child,
                         copy_year=to_node.academic_year
                     )
                 )
                 continue
 
             copied_link = LinkBuilder().from_link(source_link, to_node, child)
+            if copied_link.child.is_group() and copied_link.is_reference():
+                copied_link.link_type = None
             to_node.children.append(copied_link)
 
             if self._can_link_child_be_filled(copied_link, relationships):
-                self._fill_node_from_node_in_case_of_transition(
-                    source_link.child,
-                    child,
-                    relationships,
-                    existing_nodes,
-                    transition_name,
-                    node_code_generator,
-                    to_tree
-                )
+                if copied_link.child.is_option():
+                    self._fill_node_from_last_year_node(
+                        source_link.child,
+                        child,
+                        existing_nodes,
+                        to_tree
+                    )
+                else:
+                    self._fill_node_from_node_in_case_of_transition(
+                        source_link.child,
+                        child,
+                        relationships,
+                        existing_nodes,
+                        transition_name,
+                        node_code_generator,
+                        to_tree
+                    )
             elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) \
                     and copied_link.child.is_group():
                 to_tree.report.add_warning(
-                    report_events.CopyReferenceGroupEvent(
-                        acronym=copied_link.child.title,
-                        code=copied_link.child.code
-                    )
+                    report_events.CopyReferenceGroupEvent(node=copied_link.child)
                 )
             elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships):
                 to_tree.report.add_warning(
-                    report_events.CopyReferenceEmptyEvent(
-                        acronym=copied_link.child.title,
-                        code=copied_link.child.code
-                    )
+                    report_events.CopyReferenceEmptyEvent(node=copied_link.child)
                 )
-            elif not is_empty(copied_link.child, to_tree.authorized_relationships):
+            elif not is_empty(copied_link.child, to_tree.authorized_relationships) and \
+                    not copied_link.child.is_training_formation_root():
                 to_tree.report.add_warning(
-                    report_events.NodeAlreadyCopiedEvent(
-                        acronym=copied_link.child.title,
-                        code=copied_link.child.code,
-                        copy_year=to_node.academic_year
-                    )
+                    report_events.NodeAlreadyCopiedEvent(node=copied_link.child, copy_year=to_node.academic_year)
                 )
 
         return to_node
@@ -404,15 +395,13 @@ class ProgramTreeBuilder:
     def _get_existing_transition_node(
             self,
             existing_nodes: Set['Node'],
-            title: str,
+            other_node: 'Node',
             year: int,
-            version_name: str,
             transition_name: str
     ) -> Optional['Node']:
         return next((
                 node for node in existing_nodes
-                if not node.is_learning_unit() and node.title == title and node.year == year and
-                node.version_name == version_name and node.transition_name == transition_name
+                if not node.is_learning_unit() and node.is_transition_node_equivalent(other_node, transition_name, year)
             ),
             None
         )
@@ -909,6 +898,9 @@ class ProgramTree(interface.RootEntity):
 
     def contains(self, node: Node) -> bool:
         return node in self.get_all_nodes()
+
+    def contains_identity(self, node_identity: 'NodeIdentity') -> bool:
+        return any(node for node in self.get_all_nodes() if node.entity_id == node_identity)
 
     def get_all_prerequisites(self) -> List['Prerequisite']:
         return self.prerequisites.prerequisites
