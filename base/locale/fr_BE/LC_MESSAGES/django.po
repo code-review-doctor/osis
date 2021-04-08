@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:38+0100\n"
+"POT-Creation-Date: 2021-03-26 14:57+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -148,6 +148,11 @@ msgstr "Absent"
 msgid "Ac yr."
 msgstr "Anac."
 
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
+msgstr ""
+"Anac, sigle/int.abr, intitulé complet en français, catégorie, type de "
+"formation, nombre de crédits, code"
+
 msgid "Academic"
 msgstr "Académique"
 
@@ -162,6 +167,9 @@ msgstr "Calendrier académique"
 
 msgid "Academic calendar management"
 msgstr "Gestion du calendrier académique"
+
+msgid "Academic nature, category of decree and university certificate"
+msgstr "Caractère académique (nature), catégorie de décret et certificat universitaire"
 
 msgid "Academic partner"
 msgstr "Partenaire académique"
@@ -657,12 +665,8 @@ msgstr "Catégorie décret"
 msgid "Deepening"
 msgstr "Approfondissement"
 
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
-msgstr ""
-"Informations par défaut (anac, sigle/int abr, intitulé complet en français, "
-"catégorie, type de formation, nombre de crédits)"
+msgid "Default information"
+msgstr "Informations par défaut"
 
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
@@ -705,6 +709,9 @@ msgstr "Détails autre aménagement"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
+
+msgid "Diploma title, professionnal title and aims"
+msgstr "Intitulé du diplôme, titre professionnel et attendus"
 
 msgid "Diploma/certificat"
 msgstr "Diplôme/certificat"
@@ -858,9 +865,6 @@ msgstr "Inscrit"
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
 
-msgid "Enrollment"
-msgstr "Inscription"
-
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
 
@@ -869,6 +873,9 @@ msgstr "Date d'inscription"
 
 msgid "Enrollment enabled"
 msgstr "Inscriptible"
+
+msgid "Enrollment, partial deliberation and admission exam"
+msgstr "Inscription, sous-épreuve et concours"
 
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
@@ -910,6 +917,11 @@ msgstr "Gestionnaire d'entités"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
+
+msgid ""
+"Entity, location, language, duration, schedule and types of activities "
+"present in the training"
+msgstr "Entité, lieu, langue, durée, horaire et types d'activités présentes dans la formation"
 
 msgid "Entrepreneur"
 msgstr "Entreprenariat"
@@ -1390,6 +1402,9 @@ msgstr "Liste des propositions"
 msgid "Local credits"
 msgstr "Crédits locaux"
 
+msgid "Location, language and types of activities present in the training"
+msgstr "Lieu, langue et types d'activités présentes dans la formation"
+
 msgid "Lock"
 msgstr "Bloquer"
 
@@ -1732,9 +1747,6 @@ msgstr "Organigramme"
 
 msgid "Organizations"
 msgstr "Organisations"
-
-msgid "Osis code"
-msgstr "Code Osis"
 
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
@@ -2126,6 +2138,9 @@ msgstr "Noma"
 msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
+
+msgid "Remarks, comments and constraints"
+msgstr "Remarques, commentaires et contraintes"
 
 msgid "Req. Entities"
 msgstr "Ent. charges"
