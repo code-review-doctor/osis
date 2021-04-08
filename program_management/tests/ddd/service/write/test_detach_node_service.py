@@ -23,104 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
-from django.test import SimpleTestCase, TestCase
+from django.test import override_settings
 
-import osis_common.ddd.interface
-from base.ddd.utils import business_validator
-from base.models.enums.education_group_types import TrainingType
-from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.program_tree import build_path, ProgramTree
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from program_management.ddd import command
+from program_management.ddd.domain.link import LinkIdentity
+from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.write import detach_node_service
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
-from program_management.tests.ddd.factories.commands.detach_node_command import DetachNodeCommandFactory
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, \
-    NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
+from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import BisProgramTreeBachelorFactory
+from testing.testcases import DDDTestCase
 
 
-# todo refactor
-class TestDetachNode(TestCase, ValidatorPatcherMixin):
-
+class TestDetachNode(DDDTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(
-            node_type=TrainingType.BACHELOR,
-            node_id=1
+        super().setUp()
+        self.bachelor = BisProgramTreeBachelorFactory(current_year=2018, end_year=2021, persist=True)
+        path = build_path(
+            self.bachelor.root_node,
+            self.bachelor.get_node_by_code_and_year("LOSIS101T", 2018),
+            self.bachelor.get_node_by_code_and_year("LOSIS101R", 2018),
+            self.bachelor.get_node_by_code_and_year("LSINF1002", 2018),
         )
-        self.link = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=2))
-        self.tree = ProgramTreeFactory(
-            root_node=self.root_node,
-            authorized_relationships=AuthorizedRelationshipListFactory()
-        )
-        self.root_path = str(self.root_node.node_id)
-        self.node_to_detach = self.link.child
-        self.path_to_detach = build_path(self.link.parent, self.link.child)
+        self.cmd = command.DetachNodeCommand(path=path, commit=True)
 
-        self.detach_command = DetachNodeCommandFactory(path=self.path_to_detach, commit=True)
+    @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
+    def test_cannot_detach_from_tree_before_minimum_editable_year(self):
+        with self.assertRaises(MultipleBusinessExceptions):
+            detach_node_service.detach_node(self.cmd)
 
-        self._patch_persist_tree()
-        self._patch_search_tree_identity()
-        self._patch_get_tree()
-        self._patch_load_tree()
-        self._patch_load_trees_from_children()
+    def test_should_return_link_identity_of_link_deleted(self):
+        result = detach_node_service.detach_node(self.cmd)
 
-    def _patch_persist_tree(self):
-        patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
-        self.addCleanup(patcher_persist.stop)
-        self.mock_persist = patcher_persist.start()
-
-    def _patch_search_tree_identity(self):
-        patcher_search_identity = patch("program_management.ddd.domain.service.identity_search."
-                                        "ProgramTreeIdentitySearch.get_from_element_id")
-        self.addCleanup(patcher_search_identity.stop)
-        self.mock_search_identity = patcher_search_identity.start()
-        self.mock_search_identity.return_value = self.tree.entity_id
-
-    def _patch_get_tree(self):
-        patcher_load = patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository.get")
-        self.addCleanup(patcher_load.stop)
-        self.mock_get = patcher_load.start()
-        self.mock_get.return_value = self.tree
-
-    def _patch_load_tree(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load = patcher_load.start()
-        self.mock_load.return_value = self.tree
-
-    def _patch_load_trees_from_children(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load_tress_from_children = patcher_load.start()
-        self.mock_load_tress_from_children.return_value = [self.tree]
-
-    @patch.object(program_tree.ProgramTree, 'detach_node')
-    def test_should_return_link_created_identity_and_persist_it_when_valid_and_commit_set_to_true(self, mock_detach_node):
-        mock_detach_node.return_value = self.link
-        link_identity = detach_node_service.detach_node(self.detach_command)
-
-        self.assertEqual(link_identity, self.link.entity_id)
-        self.assertTrue(self.mock_persist.called)
-
-    @patch.object(ProgramTree, 'detach_node')
-    def test_should_return_link_identity_and_not_persist_when_valid_and_commit_set_to_false(self, mock_detach_node):
-        mock_detach_node.return_value = self.link
-        detach_node_command = DetachNodeCommandFactory(path=self.path_to_detach, commit=False)
-        detach_node_service.detach_node(detach_node_command)
-        assertion_message = "Should not persist any data into database. " \
-                            "It only tests and applies detach action on the in-memory object."
-        self.assertFalse(self.mock_persist.called, assertion_message)
-
-    @patch.object(program_tree.ProgramTree, 'detach_node')
-    def test_should_raise_exception_when_detach_node_raise_exception(self, mock_detach_node):
-        mock_detach_node.side_effect = osis_common.ddd.interface.BusinessExceptions(["error message"])
-        with self.assertRaises(osis_common.ddd.interface.BusinessExceptions) as exception_context:
-            detach_node_service.detach_node(self.detach_command)
-
-        self.assertListEqual(
-            exception_context.exception.messages,
-            ['error message']
-        )
+        expected = LinkIdentity(parent_code="LOSIS101R", child_code="LSINF1002", parent_year=2018, child_year=2018)
+        self.assertEqual(expected, result)
