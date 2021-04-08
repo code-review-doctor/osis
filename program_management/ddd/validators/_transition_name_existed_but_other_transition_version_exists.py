@@ -48,37 +48,38 @@ class TransitionNameExistsInPastButExistenceOfOtherTransitionValidator(BusinessV
 
     def validate(self):
         last_version_identity = self.get_last_existing_transition_version()
-        if last_version_identity and last_version_identity.entity_identity.year < self.from_specific_version.year:
-            first_other_transition_version = self.find_other_transition_version_exists_in_past(last_version_identity)
+        if last_version_identity and last_version_identity[0].entity_identity.year < self.from_specific_version.year:
+            first_other_transition_version = self.find_other_transition_version_exists_in_past(last_version_identity[0])
             if first_other_transition_version:
                 raise TransitionNameExistsInPastButExistenceOfOtherTransitionException(
-                    last_version_identity.entity_identity.offer_acronym,
-                    last_version_identity.entity_identity.year,
-                    first_other_transition_version.entity_identity.year,
-                    last_version_identity.transition_name,
-                    last_version_identity.version_name
+                    last_version_identity[0].entity_identity.offer_acronym,
+                    last_version_identity[0].entity_identity.year,
+                    first_other_transition_version[0].entity_identity.year,
+                    last_version_identity[0].transition_name,
+                    last_version_identity[0].version_name
                 )
 
     def get_last_existing_transition_version(self):
-        return next(
-            sorted(
-                filter(
-                    lambda transition_version:
-                    transition_version.transition_name == transition_version
-                    and transition_version.version_name == self.from_specific_version.version_name
-                    and transition_version.offer_accronym == self.from_specific_version.offer_acronym
-                    and transition_version.year < self.from_specific_version.year,
-                    self.all_transition_versions,
-                ),
-                key=lambda transition_version: transition_version.year,
-                reverse=True
-            )
+        return sorted(
+            filter(
+                lambda transition_version:
+                transition_version.transition_name == self.transition_name
+                and transition_version.version_name == self.from_specific_version.version_name
+                and transition_version.entity_identity.offer_acronym == self.from_specific_version.offer_acronym
+                and transition_version.entity_identity.year < self.from_specific_version.year,
+                self.all_transition_versions,
+            ),
+            key=lambda transition_version: transition_version.entity_identity.year,
+            reverse=True
         )
 
     def find_other_transition_version_exists_in_past(self, last_version_identity):
-        return next(
+        return sorted(
             filter(
-                lambda transition_version: transition_version.year > last_version_identity.year,
+                lambda transition_version:
+                transition_version.entity_identity.year > last_version_identity.entity_identity.year,
                 self.all_transition_versions,
-            )
+            ),
+            key=lambda transition_version: transition_version.entity_identity.year,
+            reverse=True
         )

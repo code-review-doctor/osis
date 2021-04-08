@@ -36,28 +36,31 @@ class TransitionNameExistsValidator(BusinessValidator):
             self,
             from_specific_version: ProgramTreeVersionIdentity,
             transition_name: str,
+            all_versions: List[ProgramTreeVersion]
     ):
         super(TransitionNameExistsValidator, self).__init__()
         self.from_specific_version = from_specific_version
         self.transition_name = transition_name
+        self.all_transition_versions = [
+            transition_version for transition_version in all_versions
+            if transition_version.transition_name
+        ]
 
     def validate(self):
         last_version_identity = self.get_last_existing_transition_version()
-        if last_version_identity and last_version_identity.year >= self.from_specific_version.year:
-            raise TransitionNameExistsCurrentYearAndInFuture(last_version_identity.transition_name)
+        if last_version_identity and last_version_identity[0].entity_identity.year >= self.from_specific_version.year:
+            raise TransitionNameExistsCurrentYearAndInFuture(last_version_identity[0].transition_name)
 
     def get_last_existing_transition_version(self):
-        return next(
-            sorted(
-                filter(
-                    lambda transition_version:
-                    transition_version.transition_name == transition_version
-                    and transition_version.version_name == self.from_specific_version.version_name
-                    and transition_version.offer_accronym == self.from_specific_version.offer_acronym
-                    and transition_version.year < self.from_specific_version.year,
-                    self.transition_name,
-                ),
-                key=lambda transition_version: transition_version.year,
-                reverse=True
-            )
+        return sorted(
+            filter(
+                lambda transition_version:
+                transition_version.transition_name == transition_version
+                and transition_version.version_name == self.from_specific_version.version_name
+                and transition_version.offer_acronym == self.from_specific_version.offer_acronym
+                and transition_version.year < self.from_specific_version.year,
+                self.all_transition_versions,
+            ),
+            key=lambda transition_version: transition_version.entity_identity.year,
+            reverse=True
         )

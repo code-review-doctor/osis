@@ -333,13 +333,13 @@ class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
 class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(
             self,
-            from_specific_version: ProgramTreeVersionIdentity,
+            from_specific_version: 'ProgramTreeVersionIdentity',
             new_transition_name: str,
             all_versions: List['ProgramTreeVersion']
     ):
         self.validators = [
             TransitionNamePatternValidator(transition_name=new_transition_name),
-            TransitionNameExistsValidator(from_specific_version, new_transition_name),
+            TransitionNameExistsValidator(from_specific_version, new_transition_name, all_versions),
             TransitionNameExistedValidator(from_specific_version, new_transition_name, all_versions),
             TransitionNameExistsInPastButExistenceOfOtherTransitionValidator(
                 from_specific_version,
