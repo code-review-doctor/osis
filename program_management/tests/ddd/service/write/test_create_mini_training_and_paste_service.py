@@ -29,6 +29,7 @@ from program_management.ddd import command
 from program_management.ddd.service.write import create_and_attach_mini_training_service
 
 
+# todo refactor
 class TestCreateMiniTrainingAndAttach(TestCase):
     def setUp(self) -> None:
         self.command = command.CreateMiniTrainingAndPasteCommand(

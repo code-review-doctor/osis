@@ -45,6 +45,7 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 from testing.mocks import MockPatcherMixin
 
 
+# todo refactor
 class TestDeleteAllProgramTreeVersions(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):

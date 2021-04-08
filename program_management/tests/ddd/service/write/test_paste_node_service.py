@@ -53,6 +53,7 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 from testing.testcases import DDDTestCase
 
 
+# TODO implement with factories
 class TestPasteLearningUnitNodeService(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()

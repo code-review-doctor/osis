@@ -31,6 +31,7 @@ from program_management.ddd.domain.service.identity_search import ProgramTreeVer
 from program_management.ddd.service.write import delete_mini_training_standard_version_service
 
 
+# todo create tests
 @transaction.atomic()
 def delete_permanently_mini_training_standard_version(
         cmd: command.DeletePermanentlyMiniTrainingStandardVersionCommand

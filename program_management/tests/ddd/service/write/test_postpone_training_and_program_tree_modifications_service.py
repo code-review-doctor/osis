@@ -29,6 +29,7 @@ from program_management.tests.ddd.factories.commands.postpone_training_and_root_
     import PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory
 
 
+# todo do tests
 class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
     @classmethod
     def setUpTestData(cls):

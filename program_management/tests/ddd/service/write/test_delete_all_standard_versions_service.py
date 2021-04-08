@@ -32,6 +32,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.service.write import delete_all_standard_versions_service
 
 
+# todo refactor
 class TestDeleteAllStandardVersionsService(TestCase):
     def setUp(self):
         self.training = TrainingFactory()

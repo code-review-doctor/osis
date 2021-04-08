@@ -31,6 +31,7 @@ from program_management.tests.ddd.factories.commands.update_mini_training_versio
     UpdateMiniTrainingVersionCommandFactory
 
 
+# todo do tests
 class TestUpdateAndPostponeMiniTrainingVersion(TestCase):
     @mock.patch(
         "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")

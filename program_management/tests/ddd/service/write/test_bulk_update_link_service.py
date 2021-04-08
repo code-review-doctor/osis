@@ -42,6 +42,7 @@ def mock_decorator(f):
     return decorated_function(f)
 
 
+# todo refactor
 class TestBulkUpdateLink(SimpleTestCase):
 
     def setUp(self):

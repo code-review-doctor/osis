@@ -31,6 +31,7 @@ from program_management.tests.ddd.factories.commands.update_training_version_com
     UpdateTrainingVersionCommandFactory
 
 
+# todo do tests
 class TestUpdateTrainingVersion(TestCase):
 
     @mock.patch(

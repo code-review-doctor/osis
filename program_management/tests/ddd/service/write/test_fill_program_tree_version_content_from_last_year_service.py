@@ -47,6 +47,7 @@ CURRENT_ACADEMIC_YEAR_YEAR = 2021
 NEXT_ACADEMIC_YEAR_YEAR = 2022
 
 
+# todo refactor
 @override_settings(YEAR_LIMIT_EDG_MODIFICATION=PAST_ACADEMIC_YEAR_YEAR)
 class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
     def setUp(self) -> None:

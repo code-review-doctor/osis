@@ -42,6 +42,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
+# todo refactor
 class TestDetachNode(TestCase, ValidatorPatcherMixin):
 
     def setUp(self):

@@ -32,6 +32,7 @@ from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.write import create_group_and_attach_service
 
 
+# todo refactor
 class TestCreateGroupAndAttachService(TestCase):
     def setUp(self) -> None:
         self.cmd = command.CreateGroupAndAttachCommand(

@@ -34,6 +34,7 @@ from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
+# todo refactor
 class TestDeleteAllProgramTreeService(TestCase):
     def setUp(self):
         self.tree = ProgramTreeFactory()
