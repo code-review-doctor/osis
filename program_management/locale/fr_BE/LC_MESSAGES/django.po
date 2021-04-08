@@ -1107,7 +1107,7 @@ msgid ""
 "You can't extend the transition version '{full_code}' in {year} as other "
 "transition version exists in {transition_year}"
 msgstr ""
-"Vous ne pouvez pas étendre la version de transition '{code}' en {year} parce qu'il "
+"Vous ne pouvez pas étendre la version de transition '{full_code}' en {year} parce qu'il "
 "existe une autre version de transition en {transition_year}"
 
 #, python-format
