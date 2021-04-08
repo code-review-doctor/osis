@@ -202,6 +202,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
+            "fill_transition_version_content_permission_name":
+                self.get_fill_transition_version_content_permission_name(),
+            "fill_transition_version_content_url": self.get_fill_transition_version_content_url(),
             "create_specific_version_url": self.get_create_specific_version_url(),
             "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
@@ -253,6 +256,21 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         if self.current_version.is_official_standard:
             return "base.change_minitraining"
         return "program_management.change_minitraining_version"
+
+    def get_fill_transition_version_content_permission_name(self) -> str:
+        return "base.fill_minitraining_version"
+
+    def get_fill_transition_version_content_url(self):
+        if self.is_root_node and self.program_tree_version_identity.is_transition:
+            return reverse(
+                "fill_transition_version_content",
+                kwargs={
+                    'year': self.current_version.entity_id.year,
+                    'acronym': self.current_version.entity_id.offer_acronym,
+                    'transition_name': self.current_version.entity_id.transition_name,
+                    'version_name': self.current_version.entity_id.version_name,
+                }
+            )
 
     def get_create_specific_version_url(self):
         if self.is_root_node() and self.program_tree_version_identity.is_official_standard:

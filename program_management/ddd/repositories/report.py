@@ -22,18 +22,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
+from typing import Optional, List
 
-from base.ddd.utils import business_validator
-from program_management.ddd.business_types import *
-from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo
+from django.core.cache import cache
+
+from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, ApplicationService, Entity
+from program_management.ddd.domain.report import Report, ReportIdentity
+
+DEFAULT_TIMEOUT = 60  # seconds
 
 
-class CheckValidTreeVersionToFillTo(business_validator.BusinessValidator):
-    def __init__(self, tree_version_to_fill: 'ProgramTreeVersion'):
-        self.tree_version_to = tree_version_to_fill
-        super().__init__()
+class ReportRepository(interface.AbstractRepository):
+    @classmethod
+    def create(cls, report: Report, **kwargs) -> ReportIdentity:
+        cache.set(str(report.entity_id.transaction_id), report, timeout=DEFAULT_TIMEOUT)
+        return report.entity_id
 
-    def validate(self, *args, **kwargs):
-        if self.tree_version_to.entity_id.year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
-            raise InvalidTreeVersionToFillTo(self.tree_version_to)
+    @classmethod
+    def get(cls, report_identity: ReportIdentity) -> Optional['Report']:
+        return cache.get(str(report_identity.transaction_id))
+
+    @classmethod
+    def update(cls, entity: Entity, **kwargs: ApplicationService) -> EntityIdentity:
+        pass
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Entity]:
+        pass
+
+    @classmethod
+    def delete(cls, entity_id: EntityIdentity, **kwargs: ApplicationService) -> None:
+        pass

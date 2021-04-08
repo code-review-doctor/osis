@@ -22,18 +22,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import academic_year
+import abc
+import uuid
+from typing import List
+
+import attr
+
 from osis_common.ddd import interface
-from program_management.ddd.domain.academic_year import AcademicYear
 
 
-class GetAcademicYear(interface.DomainService):
-    @classmethod
-    def get_next_academic_year(cls) -> 'AcademicYear':
-        year = academic_year.current_academic_year().year + 1
-        return AcademicYear(year)
+class ReportEvent(abc.ABC):
+    def __str__(self):
+        raise NotImplementedError
 
-    @classmethod
-    def get_current_academic_year(cls) -> 'AcademicYear':
-        year = academic_year.current_academic_year().year
-        return AcademicYear(year)
+
+@attr.s(frozen=True, slots=True)
+class ReportIdentity(interface.EntityIdentity):
+    transaction_id = attr.ib(type=uuid.UUID)
+
+
+@attr.s()
+class Report(interface.Entity):
+    entity_id = attr.ib(type=ReportIdentity)
+    changes = attr.ib(init=False, type=List[ReportEvent], factory=list)
+    warnings = attr.ib(init=False, type=List[ReportEvent], factory=list)
+
+    def add_change(self, event: ReportEvent) -> None:
+        self.changes.append(event)
+
+    def add_warning(self, event: ReportEvent) -> None:
+        self.warnings.append(event)
+
+    def get_changes(self) -> List[ReportEvent]:
+        return self.changes
+
+    def get_warnings(self) -> List[ReportEvent]:
+        return self.warnings

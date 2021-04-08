@@ -34,10 +34,30 @@ class CheckValidTreeVersionToFillFrom(business_validator.BusinessValidator):
         super().__init__()
 
     def validate(self, *args, **kwargs):
-        if self.tree_version_to.is_specific_official and self.__is_last_year_tree():
+        if self.tree_version_to.is_specific_official and self.__is_tree_from_last_year_tree():
             return
+
+        if self.tree_version_to.is_transition and self.__is_tree_from_last_year_tree():
+            return
+
+        if self.tree_version_to.is_transition and self.__is_tree_from_last_year_same_version_tree():
+            return
+
+        if self.tree_version_to.is_transition and self.__is_tree_from_same_year_same_version_tree():
+            return
+
         raise InvalidTreeVersionToFillFrom(self.tree_version_from)
 
-    def __is_last_year_tree(self) -> bool:
-        return self.tree_version_from.entity_id.year + 1 == self.tree_version_to.entity_id.year and \
+    def __is_tree_from_last_year_tree(self) -> bool:
+        return self.tree_version_from.academic_year == self.tree_version_to.academic_year.past() and \
                self.tree_version_from.program_tree_identity.code == self.tree_version_to.program_tree_identity.code
+
+    def __is_tree_from_last_year_same_version_tree(self):
+        return self.tree_version_from.academic_year == self.tree_version_to.academic_year.past() and \
+            self.tree_version_from.version_name == self.tree_version_to.version_name and \
+            not self.tree_version_from.is_transition
+
+    def __is_tree_from_same_year_same_version_tree(self):
+        return self.tree_version_from.academic_year == self.tree_version_to.academic_year and \
+               self.tree_version_from.version_name == self.tree_version_to.version_name and \
+               not self.tree_version_from.is_transition

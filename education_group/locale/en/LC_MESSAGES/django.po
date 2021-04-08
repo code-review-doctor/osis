@@ -901,6 +901,11 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
+msgid ""
+"Transition version of finalities must be filled from transition version of "
+"master"
+msgstr ""
+
 msgid "Type of constraint"
 msgstr ""
 
