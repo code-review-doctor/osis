@@ -30,6 +30,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.business.education_groups import general_information_sections
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearCommonFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
@@ -104,6 +106,10 @@ class TestUpdateCommonGetGeneralInformation(TestCase):
         AcademicYearFactory(current=True)
         cls.common_education_group_year = EducationGroupYearCommonFactory(academic_year__year=2018)
         cls.central_manager = CentralManagerFactory(entity=cls.common_education_group_year.management_entity)
+        OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
+            data_year__year=2018
+        )
 
         cls.label_name = random.choice(general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific'])
         TextLabelFactory(label=cls.label_name, entity=entity_name.OFFER_YEAR)
