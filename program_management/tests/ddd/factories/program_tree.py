@@ -24,14 +24,16 @@
 #
 ##############################################################################
 import itertools
-from typing import Dict
+from typing import Dict, List
 
 import factory.fuzzy
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import GroupType, TrainingType
+from program_management.ddd import command
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.service.write import copy_program_tree_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
     AuthorizedRelationshipListFactory
@@ -71,6 +73,19 @@ class ProgramTreeFactory(factory.Factory):
     def persist(obj, create, extracted, **kwargs):
         if extracted:
             program_tree_repository.ProgramTreeRepository.create(obj)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['ProgramTree']:
+        first_tree = cls(*args, **kwargs)  # type: ProgramTree
+
+        result = [first_tree]
+        for year in range(first_tree.root_node.year, first_tree.root_node.year + n - 1):
+            identity = copy_program_tree_service.copy_program_tree_to_next_year(
+                command.CopyProgramTreeToNextYearCommand(code=first_tree.root_node.code, year=year)
+            )
+            result.append(program_tree_repository.ProgramTreeRepository.get(identity))
+
+        return result
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTree':

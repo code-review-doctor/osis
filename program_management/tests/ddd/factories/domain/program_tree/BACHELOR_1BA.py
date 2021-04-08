@@ -22,11 +22,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd import command
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.prerequisite import PrerequisiteFactory
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.repositories import program_tree as program_tree_repository
+from program_management.ddd.service.write import copy_program_tree_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
@@ -86,6 +91,19 @@ class MinorFactory:
 class BisProgramTreeBachelorFactory:
     def __new__(cls, current_year: int, end_year: int, *args, persist: bool = False, **kwargs):
         return cls.produce_bachelor_tree(current_year, end_year, persist)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['ProgramTree']:
+        first_tree = cls(*args, **kwargs)  # type: ProgramTree
+
+        result = [first_tree]
+        for year in range(first_tree.root_node.year, first_tree.root_node.year + n - 1):
+            identity = copy_program_tree_service.copy_program_tree_to_next_year(
+                command.CopyProgramTreeToNextYearCommand(code=first_tree.root_node.code, year=year)
+            )
+            result.append(program_tree_repository.ProgramTreeRepository.get(identity))
+
+        return result
 
     @staticmethod
     def produce_bachelor_tree(current_year: int, end_year: int, persist: bool) -> 'ProgramTree':
@@ -183,6 +201,14 @@ class BisProgramTreeBachelorFactory:
                                                     "code": "LINFO1212",
                                                 }
                                             ]
+                                        },
+                                        {
+                                            "node_type": GroupType.SUB_GROUP,
+                                            "year": current_year,
+                                            "end_year": end_year,
+                                            "code": "LINFO102R",
+                                            "title": "MINBASEINFO2",
+                                            "children": []
                                         }
                                     ]
                                 }

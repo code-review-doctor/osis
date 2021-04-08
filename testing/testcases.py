@@ -32,7 +32,8 @@ from education_group.tests.ddd.factories.repository.fake import get_fake_group_r
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
-    get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository, FakeProgramTreeVersionRepository
+    get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository, FakeProgramTreeVersionRepository, \
+    FakeProgramTreeRepository
 
 
 class DDDTestCase(TestCase):
@@ -72,6 +73,11 @@ class DDDTestCase(TestCase):
         self.mock_service(
             "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
             side_effect=get_from_element_id
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.node_identities_search.NodeIdentitiesSearch.search_from_code",
+            side_effect=get_node_identities_from_code
         )
 
         self.mock_service(
@@ -149,6 +155,11 @@ def get_from_element_id(element_id: int) -> Optional['NodeIdentity']:
         (node for node in repo._nodes if node.node_id == element_id),
         None
     )
+
+
+def get_node_identities_from_code(group_code: str) -> List['NodeIdentity']:
+    repo = FakeProgramTreeRepository()
+    return [tree.root_node.entity_id for tree in repo._trees if tree.root_node.code == group_code]
 
 
 def get_program_tree_version_identity_from_node_identities(
