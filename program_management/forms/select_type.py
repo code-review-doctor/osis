@@ -43,7 +43,8 @@ class SelectTypeForm(forms.Form):
         }
         self.fields["name"].choices = self.get_name_choices(category, path_to)
 
-    def get_name_choices(self, category, path_to):
+    @staticmethod
+    def get_name_choices(category, path_to):
         cmd = command.GetAllowedChildTypeCommand(category=category, path_to_paste=path_to)
         allowed_child_types = allowed_children_types_service.get_allowed_child_types(cmd)
         choices = sorted(
