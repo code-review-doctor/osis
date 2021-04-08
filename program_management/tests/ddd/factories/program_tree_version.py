@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 import factory.fuzzy
 
+from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
     NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
 from program_management.ddd.repositories import program_tree as program_tree_repository,\
     program_tree_version as program_tree_version_repository
+from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -70,6 +73,34 @@ class ProgramTreeVersionFactory(factory.Factory):
     def persist(obj, create, extracted, **kwargs):
         if extracted:
             program_tree_version_repository.ProgramTreeVersionRepository.create(obj)
+
+    @classmethod
+    def multiple(cls, n, *args, **kwargs) -> List['ProgramTreeVersion']:
+        first_tree_version = cls(*args, **kwargs)  # type: ProgramTreeVersion
+
+        result = [first_tree_version]
+        for year in range(first_tree_version.entity_id.year, first_tree_version.entity_id.year + n - 1):
+            identity = copy_program_version_service.copy_tree_version_to_next_year(
+                command.CopyTreeVersionToNextYearCommand(
+                    from_year=year,
+                    from_offer_acronym=first_tree_version.entity_id.offer_acronym,
+                    from_offer_code=first_tree_version.program_tree_identity.code,
+                    from_version_name=first_tree_version.version_name,
+                    from_transition_name=first_tree_version.transition_name
+                )
+            )
+            result.append(program_tree_version_repository.ProgramTreeVersionRepository.get(identity))
+
+        for from_tree_version, to_tree_version in zip(result, result[1:]):
+            identity = copy_program_tree_service.copy_program_tree_to_next_year(
+                command.CopyProgramTreeToNextYearCommand(
+                    code=from_tree_version.program_tree_identity.code,
+                    year=from_tree_version.program_tree_identity.year
+                )
+            )
+            to_tree_version.tree = program_tree_repository.ProgramTreeRepository.get(identity)
+
+        return result
 
     @staticmethod
     def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':

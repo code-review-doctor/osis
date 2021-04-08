@@ -214,8 +214,8 @@ class FakeProgramTreeVersionRepository(tree_version_repository.ProgramTreeVersio
             cls._trees_version.pop(idx)
 
         cmd = command.DeleteProgramTreeCommand(
-            code=tree_version.tree.root_node.code,
-            year=tree_version.tree.root_node.year
+            code=tree_version.tree.entity_id.code,
+            year=tree_version.tree.entity_id.year
         )
         delete_program_tree_service(cmd)
 
