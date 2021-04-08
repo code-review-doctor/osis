@@ -28,7 +28,7 @@ from django.test import TestCase
 
 from base.models import models_signals as mdl_signals, person as mdl_person
 from base.models.person import Person
-from base.models.tutor import Tutor
+from base.auth.roles.tutor import Tutor
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.entity_version import EntityVersionFactory

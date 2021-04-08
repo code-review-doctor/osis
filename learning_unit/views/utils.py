@@ -29,4 +29,7 @@ from base.models.learning_unit_year import LearningUnitYear
 
 
 def learning_unit_year_getter(request, *view_args, **view_kwargs):
-    return get_object_or_404(LearningUnitYear, pk=view_kwargs.get('learning_unit_year_id'))
+    return get_object_or_404(
+        LearningUnitYear.objects.all().select_related('learning_container_year', 'academic_year'),
+        pk=view_kwargs.get('learning_unit_year_id')
+    )

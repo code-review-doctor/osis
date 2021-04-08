@@ -250,3 +250,21 @@ def is_education_group_type_eligible_to_be_filled(self, user, obj: Union['GroupY
     if obj:
         return obj.education_group_type.name not in TrainingType.finality_types()
     return None
+
+
+@predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_group_year_an_eligible_transition(
+        self,
+        user: User,
+        obj: GroupYear = None
+):
+    if obj:
+        is_transition = obj and obj.partial_acronym.upper().startswith('T')
+        links_to_parent = obj.element.children_elements.all()
+        if links_to_parent:
+            parents = [link.parent_element.group_year for link in links_to_parent]
+            all_parents_transition = all(parent.partial_acronym.upper().startswith('T') for parent in parents)
+            return is_transition and all_parents_transition
+        return is_transition
+    return None

@@ -568,6 +568,11 @@ msgstr ""
 msgid "Name of the teacher responsible"
 msgstr ""
 
+msgid ""
+"Name version cannot contain TRANSITION. Please create a transition version "
+"if necessary"
+msgstr ""
+
 msgid "New Education Group"
 msgstr ""
 

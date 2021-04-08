@@ -47,6 +47,7 @@ from education_group.ddd.domain.service.identity_search import TrainingIdentityS
 from education_group.ddd.service.read import get_group_service, get_training_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.forms.tree_version_choices import get_tree_versions_choices
+from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -209,7 +210,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "show_coorganization": has_coorganization(self.education_group_version.offer),
             "view_publish_btn":
                 self.request.user.has_perm('base.view_publish_btn') and
-                (self.have_general_information_tab() or self.have_admission_condition_tab() or
+                (self.have_general_information_tab() or self.have_access_requirements_tab() or
                  self.have_skills_and_achievements_tab()),
             "publish_url": self.get_publish_url(),
 
@@ -355,11 +356,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 'display': self.have_skills_and_achievements_tab(),
                 'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.path),
             },
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
-                'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self.have_admission_condition_tab(),
-                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.path),
+                'active': Tab.ACCESS_REQUIREMENTS == self.active_tab,
+                'display': self.have_access_requirements_tab(),
+                'url': get_tab_urls(Tab.ACCESS_REQUIREMENTS, self.node_identity, self.path),
             },
         })
 
@@ -381,9 +382,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return self.current_version.is_official_standard and \
                self.group.type.name in TrainingType.with_skills_achievements()
 
-    def have_admission_condition_tab(self):
+    def have_access_requirements_tab(self):
         return self.current_version.is_official_standard and \
-               self.group.type.name in TrainingType.with_admission_condition()
+               self.group.type.name in TrainingType.with_access_requirements()
 
     def get_publish_url(self):
         return reverse('publish_general_information', args=[
@@ -401,7 +402,7 @@ def _get_view_name_from_tab(tab: Tab):
         Tab.UTILIZATION: 'training_utilization',
         Tab.GENERAL_INFO: 'training_general_information',
         Tab.SKILLS_ACHIEVEMENTS: 'training_skills_achievements',
-        Tab.ADMISSION_CONDITION: 'training_admission_condition',
+        Tab.ACCESS_REQUIREMENTS: 'training_access_requirements',
     }[tab]
 
 

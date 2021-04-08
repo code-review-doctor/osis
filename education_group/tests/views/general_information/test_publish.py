@@ -38,7 +38,7 @@ class TestPublishCommonAdmissionCondition(TestCase):
     def setUp(self) -> None:
         self.publish_service_patcher = mock.patch(
             "education_group.views.general_information.publish."
-            "publish_common_admission_conditions_service.publish_common_admission_conditions",
+            "publish_common_access_requirements_service.publish_common_access_requirements",
             return_value=None
         )
         self.mocked_publish_service = self.publish_service_patcher.start()
@@ -49,44 +49,44 @@ class TestPublishCommonAdmissionCondition(TestCase):
     def test_case_user_not_logged(self):
         self.client.logout()
 
-        url = reverse('publish_common_master_specialized_admission_condition', kwargs={'year': 2018})
+        url = reverse('publish_common_master_specialized_access_requirements', kwargs={'year': 2018})
         response = self.client.post(url)
         self.assertRedirects(response, '/login/?next={}'.format(url))
 
     def test_assert_redirect_on_view_after_refresh_case_master_specialized(self):
-        url = reverse('publish_common_master_specialized_admission_condition', kwargs={'year': 2018})
+        url = reverse('publish_common_master_specialized_access_requirements', kwargs={'year': 2018})
 
         response = self.client.post(url, {})
         self.assertTrue(self.mocked_publish_service.called)
 
-        expected_redirection = reverse('common_master_specialized_admission_condition', kwargs={'year': 2018})
+        expected_redirection = reverse('common_master_specialized_access_requirements', kwargs={'year': 2018})
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
     def test_assert_redirect_on_view_after_refresh_case_master(self):
-        url = reverse('publish_common_master_admission_condition', kwargs={'year': 2018})
+        url = reverse('publish_common_master_access_requirements', kwargs={'year': 2018})
 
         response = self.client.post(url, {})
         self.assertTrue(self.mocked_publish_service.called)
 
-        expected_redirection = reverse('common_master_admission_condition', kwargs={'year': 2018})
+        expected_redirection = reverse('common_master_access_requirements', kwargs={'year': 2018})
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
     def test_assert_redirect_on_view_after_refresh_case_aggregate(self):
-        url = reverse('publish_common_aggregate_admission_condition', kwargs={'year': 2018})
+        url = reverse('publish_common_aggregate_access_requirements', kwargs={'year': 2018})
 
         response = self.client.post(url, {})
         self.assertTrue(self.mocked_publish_service.called)
 
-        expected_redirection = reverse('common_aggregate_admission_condition', kwargs={'year': 2018})
+        expected_redirection = reverse('common_aggregate_access_requirements', kwargs={'year': 2018})
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
     def test_assert_redirect_on_view_after_refresh_case_bachelor(self):
-        url = reverse('publish_common_bachelor_admission_condition', kwargs={'year': 2018})
+        url = reverse('publish_common_bachelor_access_requirements', kwargs={'year': 2018})
 
         response = self.client.post(url, {})
         self.assertTrue(self.mocked_publish_service.called)
 
-        expected_redirection = reverse('common_bachelor_admission_condition', kwargs={'year': 2018})
+        expected_redirection = reverse('common_bachelor_access_requirements', kwargs={'year': 2018})
         self.assertRedirects(response, expected_redirection, fetch_redirect_response=False)
 
 

@@ -27,7 +27,6 @@ from django.db import transaction, Error
 from base.business.education_groups.postponement import ConsistencyError
 from base.business.utils.model import update_related_object
 from base.business.utils.postponement import AutomaticPostponement
-
 from base.models.education_group_year import EducationGroupYear
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText

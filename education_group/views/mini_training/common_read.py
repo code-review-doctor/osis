@@ -41,6 +41,8 @@ from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.urls import reverse_with_get
 from base.views.common import display_warning_messages
 from education_group.ddd import command
+from education_group.ddd.domain.group import Group
+from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
 from education_group.ddd.domain.service.identity_search import MiniTrainingIdentitySearch
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
@@ -50,7 +52,9 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
-from program_management.ddd.domain.program_tree_version import version_label
+from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.domain.program_tree_version import version_label, ProgramTreeVersionIdentity, \
+    ProgramTreeVersion
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import node_identity_service
@@ -282,10 +286,12 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
 
-    def get_create_version_permission_name(self) -> str:
+    @staticmethod
+    def get_create_version_permission_name() -> str:
         return "base.add_minitraining_version"
 
-    def get_create_transition_version_permission_name(self) -> str:
+    @staticmethod
+    def get_create_transition_version_permission_name() -> str:
         return "base.add_minitraining_transition_version"
 
     def get_delete_permanently_tree_version_url(self):
@@ -298,7 +304,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 }
             )
 
-    def get_delete_permanently_tree_version_permission_name(self):
+    @staticmethod
+    def get_delete_permanently_tree_version_permission_name():
         return "program_management.delete_permanently_minitraining_version"
 
     def get_delete_permanently_mini_training_url(self):
@@ -340,11 +347,11 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 'display': self.have_skills_and_achievements_tab(),
                 'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
             },
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
-                'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self.have_admission_condition_tab(),
-                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
+                'active': Tab.ACCESS_REQUIREMENTS == self.active_tab,
+                'display': self.have_access_requirements_tab(),
+                'url': get_tab_urls(Tab.ACCESS_REQUIREMENTS, self.node_identity, self.get_path()),
             },
         })
 
@@ -358,9 +365,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return self.current_version.is_official_standard and \
                self.get_group().type.name in MiniTrainingType.with_skills_achievements()
 
-    def have_admission_condition_tab(self):
+    def have_access_requirements_tab(self):
         return self.current_version.is_official_standard and \
-               self.get_group().type.name in MiniTrainingType.with_admission_condition()
+               self.get_group().type.name in MiniTrainingType.with_access_requirements()
 
     def get_publish_url(self):
         return reverse('publish_general_information', args=[
@@ -376,7 +383,7 @@ def _get_view_name_from_tab(tab: Tab):
         Tab.UTILIZATION: 'mini_training_utilization',
         Tab.GENERAL_INFO: 'mini_training_general_information',
         Tab.SKILLS_ACHIEVEMENTS: 'mini_training_skills_achievements',
-        Tab.ADMISSION_CONDITION: 'mini_training_admission_condition',
+        Tab.ACCESS_REQUIREMENTS: 'mini_training_access_requirements',
     }[tab]
 
 

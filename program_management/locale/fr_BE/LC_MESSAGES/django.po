@@ -626,6 +626,13 @@ msgstr "Nom"
 msgid "Name of the teacher responsible"
 msgstr "Nom du professeur responsable de programme"
 
+msgid ""
+"Name version cannot contain TRANSITION. Please create a transition version "
+"if necessary"
+msgstr ""
+"Le nom de version ne peut pas contenir TRANSITION. Veuillez créer une "
+"version de transition si nécessaire."
+
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
 
