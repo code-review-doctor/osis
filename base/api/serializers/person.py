@@ -65,7 +65,7 @@ class PersonRolesSerializer(serializers.ModelSerializer):
     def get_roles(self, obj):
         roles = {
             'reddot': {
-                'description': _('General information and Admission condition'),
+                'description': _('General information and Access requirements'),
                 'scope': self.roles_for_reddot(obj)
             },
             'program_manager': {

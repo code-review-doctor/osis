@@ -37,7 +37,7 @@ def create_program_tree_transition_version(
     # GIVEN
     tree_version_identity_from = ProgramTreeVersionIdentity(
         offer_acronym=command.offer_acronym,
-        year=command.start_year,
+        year=command.from_year,
         version_name=command.version_name,
         transition_name=NOT_A_TRANSITION
     )

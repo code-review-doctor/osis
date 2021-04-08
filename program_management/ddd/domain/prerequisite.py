@@ -37,7 +37,9 @@ from base.utils.cache import cached_result
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import CannotCopyPrerequisiteException
+from program_management.ddd.domain.report_events import CannotCopyPrerequisiteAsLearningUnitNotPresent
 from program_management.ddd.validators import validators_by_business_action
+from program_management.ddd.domain.node import NodeIdentity
 
 AND_OPERATOR = "ET"
 OR_OPERATOR = 'OU'
@@ -233,24 +235,42 @@ class PrerequisiteFactory:
         return AND
 
     @classmethod
-    def copy_to_next_year(cls, to_copy: 'Prerequisite', next_year_tree: 'ProgramTree') -> 'Prerequisite':
-        next_year_identity = attr.evolve(
-            to_copy.node_having_prerequisites,
-            year=to_copy.node_having_prerequisites.year+1
-        )
+    def copy_to_tree(cls, to_copy: 'Prerequisite', to_tree: 'ProgramTree') -> 'Prerequisite':
+        node_having_prerequisite_identity = attr.evolve(to_copy.node_having_prerequisites, year=to_tree.entity_id.year)
 
-        code_presents = {node.code for node in next_year_tree.get_all_nodes()}
-        if next_year_identity.code not in code_presents:
+        if not to_tree.contains_identity(node_having_prerequisite_identity):
+            to_tree.report.add_warning(
+                CannotCopyPrerequisiteAsLearningUnitNotPresent(
+                    prerequisite_code=node_having_prerequisite_identity.code,
+                    learning_unit_code=node_having_prerequisite_identity.code,
+                    training_root_node=to_tree.root_node,
+                    copy_year=to_tree.root_node.academic_year
+                )
+            )
             raise CannotCopyPrerequisiteException()
 
-        items_code = {item.code for item in to_copy.get_all_prerequisite_items()}
-        if items_code.difference(code_presents):
+        nodes_inside_tree = {node.entity_id for node in to_tree.get_all_nodes()}
+        prerequisite_items_code = {
+            NodeIdentity(code=item.code, year=to_tree.entity_id.year) for item in to_copy.get_all_prerequisite_items()
+        }
+        prerequisite_items_not_present_in_tree = prerequisite_items_code.difference(nodes_inside_tree)
+
+        if prerequisite_items_not_present_in_tree:
+            for identity in prerequisite_items_not_present_in_tree:
+                to_tree.report.add_warning(
+                    CannotCopyPrerequisiteAsLearningUnitNotPresent(
+                        prerequisite_code=node_having_prerequisite_identity.code,
+                        learning_unit_code=identity.code,
+                        training_root_node=to_tree.root_node,
+                        copy_year=to_tree.root_node.academic_year
+                    )
+                )
             raise CannotCopyPrerequisiteException()
 
         return cls().from_expression(
             cls._normalize_expression(to_copy.get_prerequisite_expression(translate=False)),
-            next_year_identity,
-            next_year_tree.entity_id
+            node_having_prerequisite_identity,
+            to_tree.entity_id
         )
 
     # FIX: Because the expression varies with translation
@@ -263,14 +283,14 @@ factory = PrerequisiteFactory()
 
 
 class PrerequisitesBuilder:
-    def copy_to_next_year(self, from_prerequisites: 'Prerequisites', to_tree: 'ProgramTree') -> 'Prerequisites':
-        next_year_prerequisites = list()
+    def copy_to_tree(self, from_prerequisites: 'Prerequisites', to_tree: 'ProgramTree') -> 'Prerequisites':
+        copy_prerequisites = list()
         for prerequisite in from_prerequisites.prerequisites:
             with contextlib.suppress(CannotCopyPrerequisiteException):
-                next_year_prerequisites.append(
-                    factory.copy_to_next_year(prerequisite, to_tree)
+                copy_prerequisites.append(
+                    factory.copy_to_tree(prerequisite, to_tree)
                 )
-        return Prerequisites(to_tree.entity_id, next_year_prerequisites)
+        return Prerequisites(to_tree.entity_id, copy_prerequisites)
 
 
 @attr.s(slots=True)
