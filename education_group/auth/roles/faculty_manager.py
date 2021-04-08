@@ -67,7 +67,7 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                     (predicates.is_group_year_an_eligible_transition
                         & predicates.is_education_group_extended_daily_management_calendar_open)
                     |
-                        predicates.is_program_edition_period_open
+                    predicates.is_program_edition_period_open
                 ),
             'base.change_prerequisite':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
