@@ -27,15 +27,32 @@ from typing import List
 
 from django.db.models import F
 
-from osis_common.ddd import interface
 from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
 class NodeIdentitiesSearch(interface.DomainService):
     def search_from_code(self, group_code: str) -> List[NodeIdentity]:
         years = GroupYear.objects.filter(
             group__groupyear__partial_acronym=group_code,
+        ).annotate(
+            year=F('academic_year__year'),
+        ).values_list(
+            'year',
+            'partial_acronym'
+        ).distinct().order_by('year')
+
+        return [NodeIdentity(code=year[1], year=year[0]) for year in years]
+
+    def search_for_years(self, program_tree_version_identity: 'ProgramTreeVersionIdentity') -> List[NodeIdentity]:
+        years = GroupYear.objects.filter(
+            educationgroupversion__offer__acronym=program_tree_version_identity.offer_acronym,
+            educationgroupversion__version_name=program_tree_version_identity.version_name,
+            educationgroupversion__transition_name=program_tree_version_identity.transition_name,
+        ).select_related(
+            'educationgroupversion'
         ).annotate(
             year=F('academic_year__year'),
         ).values_list(
