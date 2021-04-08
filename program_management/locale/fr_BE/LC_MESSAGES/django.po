@@ -1102,7 +1102,7 @@ msgstr ""
 "Vous ne pouvez pas étendre la formation '{code}' en {year} parce qu'il "
 "existe une autre version de transition en {transition_year}"
 
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "You can't extend the transition version '{full_code}' in {year} as other "
 "transition version exists in {transition_year}"

@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -59,7 +58,7 @@ msgstr "Prolonger"
 msgid "Search"
 msgstr "Rechercher"
 
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid ""
 "You can't extend the transition version '{full_code}' in {year} as other "
 "transition version exists in {transition_year}"

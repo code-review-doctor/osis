@@ -46,13 +46,12 @@ from education_group.forms.widgets import CertificateAimsWidget
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from program_management.ddd.command import GetVersionMaxEndYear
 from program_management.ddd.service.read import get_transition_version_max_end_year_service
-from program_management.forms.version import VersionForm
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT
 from rules_management.mixins import PermissionFieldMixin
 
 
-class TransitionVersionForm(VersionForm):
+class TransitionVersionForm(forms.Form):
     version_name = forms.CharField(
         max_length=28,
         required=False,

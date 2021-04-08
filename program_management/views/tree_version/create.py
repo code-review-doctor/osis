@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import functools
-from typing import List
+from typing import List, Union
 
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -58,7 +58,7 @@ from program_management.ddd.service.read import get_last_existing_version_servic
 from program_management.ddd.service.write import create_and_postpone_tree_specific_version_service, \
     prolong_existing_tree_version_service, create_and_postpone_tree_transition_version_service
 from program_management.forms.transition import TransitionVersionForm
-from program_management.forms.version import SpecificVersionForm, VersionForm
+from program_management.forms.version import SpecificVersionForm
 
 
 class CreateProgramTreeVersionType(ChoiceEnum):
@@ -331,7 +331,7 @@ def _convert_form_to_create_transition_version_command(
 
 
 def _convert_form_to_prolong_command(
-        form: VersionForm,
+        form: Union[TransitionVersionForm, SpecificVersionForm],
         last_existing_version_identity: 'ProgramTreeVersionIdentity'
 ) -> ProlongExistingProgramTreeVersionCommand:
     last_program_tree_version = ProgramTreeVersionRepository.get(

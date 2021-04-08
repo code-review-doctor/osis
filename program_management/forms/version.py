@@ -57,11 +57,7 @@ from rules_management.mixins import PermissionFieldMixin
 TRANSITION = " - Transition"
 
 
-class VersionForm(forms.Form):
-    pass
-
-
-class SpecificVersionForm(VersionForm):
+class SpecificVersionForm(forms.Form):
     version_name = forms.CharField(
         max_length=15,
         required=True,
