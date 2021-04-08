@@ -214,16 +214,6 @@ def is_education_group_limited_daily_management_calendar_open(self, user, group_
 
 
 @predicate(bind=True)
-@predicate_failed_msg(message=_("This education group is not editable during this period."))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_education_group_switch_calendar_open(self, user, group_year: 'GroupYear' = None):
-    calendar = EducationGroupSwitchCalendar()
-    if group_year:
-        return calendar.is_target_year_authorized(target_year=group_year.academic_year.year)
-    return bool(calendar.get_target_years_opened())
-
-
-@predicate(bind=True)
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_continuing_education_group_year(self, user, obj: Union['GroupYear', 'EducationGroupYear'] = None):
     return obj and obj.education_group_type.name in TrainingType.continuing_education_types()
