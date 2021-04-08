@@ -64,10 +64,12 @@ from program_management.tests.factories.education_group_version import StandardE
 from program_management.tests.factories.element import ElementGroupYearFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 
+FIRST_CUSTOMIZABLE_COL = 7
+
 UNSPECIFIED_FR = "Indéterminé"
 
 
-DEFAULT_FR_HEADERS = ['Anac.', 'Sigle/Int. abr.', 'Intitulé', 'Catégorie', 'Type', 'Crédits']
+DEFAULT_FR_HEADERS = ['Anac.', 'Sigle/Int. abr.', 'Intitulé', 'Catégorie', 'Type', 'Crédits', 'Code']
 VALIDITY_HEADERS = ["Statut", "Début", "Dernière année d'org."]
 PARTIAL_ENGLISH_TITLES = ["Intitulé en anglais", "Intitulé partiel en français", "Intitulé partiel en anglais", ]
 EDUCATION_FIELDS_HEADERS = ["Domaine principal", "Domaines secondaires", "Domaine ISCED/CITE"]
@@ -119,9 +121,8 @@ class XlsCustomizedHeadersTestCase(SimpleTestCase):
 
     def test_headers_with_all_parameters_selected(self):
         headers = _build_headers(TRAINING_LIST_CUSTOMIZABLE_PARAMETERS)
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:9], VALIDITY_HEADERS)
-        self.assertListEqual(headers[9:10], ["Code"])
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:10], VALIDITY_HEADERS)
         self.assertListEqual(headers[10:13], PARTIAL_ENGLISH_TITLES)
         self.assertListEqual(headers[13:16], EDUCATION_FIELDS_HEADERS)
         self.assertListEqual(headers[16:27], ORGANIZATION_HEADERS)
@@ -137,33 +138,33 @@ class XlsCustomizedHeadersTestCase(SimpleTestCase):
 
     def test_no_duplicate_headers_when_organization_and_activities(self):
         headers = _build_headers([WITH_ORGANIZATION, WITH_ACTIVITIES])
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:], ORGANIZATION_HEADERS)
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:], ORGANIZATION_HEADERS)
 
     def test_no_duplicate_headers_when_organization_and_without_activities(self):
         headers = _build_headers([WITH_ORGANIZATION])
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:], ORGANIZATION_HEADERS)
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:], ORGANIZATION_HEADERS)
 
     def test_no_duplicate_headers_without_organization_and_with_activities(self):
         headers = _build_headers([WITH_ACTIVITIES])
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:], ACTIVITIES_HEADERS)
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:], ACTIVITIES_HEADERS)
 
     def test_no_duplicate_headers_with_co_graduation_and_partnership_and_ares_code(self):
         headers = _build_headers([WITH_CO_GRADUATION_AND_PARTNERSHIP, WITH_ARES_CODE])
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:], CO_GRADUATION_AND_PARTNERSHIP_HEADERS + ARES_HEADERS_ONLY)
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:], CO_GRADUATION_AND_PARTNERSHIP_HEADERS + ARES_HEADERS_ONLY)
 
     def test_headers_without_co_graduation_and_partnership_and_with_ares_code(self):
         headers = _build_headers([WITH_ARES_CODE])
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:], ARES_HEADERS)
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:], ARES_HEADERS)
 
     def test_headers_with_co_graduation_and_partnership_and_without_ares_code(self):
         headers = _build_headers([WITH_CO_GRADUATION_AND_PARTNERSHIP])
-        self.assertListEqual(headers[0:6], DEFAULT_FR_HEADERS)
-        self.assertListEqual(headers[6:], CO_GRADUATION_AND_PARTNERSHIP_HEADERS)
+        self.assertListEqual(headers[0:FIRST_CUSTOMIZABLE_COL], DEFAULT_FR_HEADERS)
+        self.assertListEqual(headers[FIRST_CUSTOMIZABLE_COL:], CO_GRADUATION_AND_PARTNERSHIP_HEADERS)
 
 
 class XlsCustomizedContentTestCase(TestCase):
