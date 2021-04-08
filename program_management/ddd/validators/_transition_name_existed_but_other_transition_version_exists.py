@@ -26,11 +26,11 @@
 from typing import List
 
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import TransitionNameExistsInPast
+from program_management.ddd.domain.exception import TransitionNameExistsInPastButExistenceOfOtherTransitionException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersion
 
 
-class TransitionNameExistedValidator(BusinessValidator):
+class TransitionNameExistsInPastButExistenceOfOtherTransitionValidator(BusinessValidator):
 
     def __init__(
             self,
@@ -49,9 +49,15 @@ class TransitionNameExistedValidator(BusinessValidator):
     def validate(self):
         last_version_identity = self.get_last_existing_transition_version()
         if last_version_identity and last_version_identity.entity_identity.year < self.from_specific_version.year:
-            raise TransitionNameExistsInPast(
-                last_version_identity.transition_name
-            )
+            first_other_transition_version = self.find_other_transition_version_exists_in_past(last_version_identity)
+            if first_other_transition_version:
+                raise TransitionNameExistsInPastButExistenceOfOtherTransitionException(
+                    last_version_identity.entity_identity.offer_acronym,
+                    last_version_identity.entity_identity.year,
+                    first_other_transition_version.entity_identity.year,
+                    last_version_identity.transition_name,
+                    last_version_identity.version_name
+                )
 
     def get_last_existing_transition_version(self):
         return next(
@@ -66,5 +72,13 @@ class TransitionNameExistedValidator(BusinessValidator):
                 ),
                 key=lambda transition_version: transition_version.year,
                 reverse=True
+            )
+        )
+
+    def find_other_transition_version_exists_in_past(self, last_version_identity):
+        return next(
+            filter(
+                lambda transition_version: transition_version.year > last_version_identity.year,
+                self.all_transition_versions,
             )
         )

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import Optional, List
 
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
@@ -58,6 +58,8 @@ from program_management.ddd.validators._prerequisite_expression_syntax import Pr
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators._transition_name_existed import TransitionNameExistedValidator
+from program_management.ddd.validators._transition_name_existed_but_other_transition_version_exists import \
+    TransitionNameExistsInPastButExistenceOfOtherTransitionValidator
 from program_management.ddd.validators._transition_name_exists import TransitionNameExistsValidator
 from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator
 from program_management.ddd.validators._update_check_existence_of_transition import CheckExistenceOfTransition
@@ -329,10 +331,21 @@ class CheckVersionNameValidatorList(MultipleExceptionBusinessListValidator):
 
 
 class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
-    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
+    def __init__(
+            self,
+            from_specific_version: ProgramTreeVersionIdentity,
+            new_transition_name: str,
+            all_versions: List['ProgramTreeVersion']
+    ):
         self.validators = [
-            TransitionNamePatternValidator(transition_name=transition_name),
-            TransitionNameExistsValidator(year, offer_acronym, version_name, transition_name),
-            TransitionNameExistedValidator(year, offer_acronym, version_name, transition_name),
+            TransitionNamePatternValidator(transition_name=new_transition_name),
+            TransitionNameExistsValidator(from_specific_version, new_transition_name),
+            TransitionNameExistedValidator(from_specific_version, new_transition_name, all_versions),
+            TransitionNameExistsInPastButExistenceOfOtherTransitionValidator(
+                from_specific_version,
+                new_transition_name,
+                all_versions
+            ),
+
         ]
         super().__init__()
