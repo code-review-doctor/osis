@@ -31,7 +31,7 @@ from program_management.ddd.command import PostponeProgramTreeCommand, CopyProgr
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.ddd.service.write import copy_program_tree_service
 
 
@@ -46,7 +46,7 @@ def postpone_program_tree(
     from_year = postpone_cmd.from_year
     end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_program_tree(
         identity=ProgramTreeIdentity(code=postpone_cmd.from_code, year=postpone_cmd.from_year),
-        repository=ProgramTreeVersionRepository()
+        repository=program_tree_version_repository.ProgramTreeVersionRepository()
     )
 
     # WHEN

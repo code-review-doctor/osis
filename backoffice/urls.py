@@ -68,6 +68,12 @@ if 'partnership' in settings.INSTALLED_APPS:
     )
 if 'continuing_education' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^continuing_education/', include('continuing_education.urls')),)
+if 'admission' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^admissions/', include('admission.urls', namespace='admissions')),
+        # API
+        url(r'^admissions/v1/', include('admission.api.urls_v1', namespace='admission_api_v1')),
+    )
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

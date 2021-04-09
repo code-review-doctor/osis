@@ -29,7 +29,7 @@ from django.utils import timezone
 
 from base.models import entity_calendar
 from base.models.entity_calendar import find_by_entity_and_reference, EntityCalendar
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EXAM_ENROLLMENTS
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
@@ -41,8 +41,8 @@ class TestEntityCalendar(TestCase):
     def setUpTestData(cls):
         current_academic_year = create_current_academic_year()
 
-        cls.aca_calendar = AcademicCalendarFactory(academic_year=current_academic_year,
-                                                   reference=SUMMARY_COURSE_SUBMISSION)
+        cls.aca_calendar = AcademicCalendarFactory(data_year=current_academic_year,
+                                                   reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
         cls.entity_version = EntityVersionFactory()
 
     def test_raise_exception_create_entity_calendar_not_authorized(self):
@@ -56,21 +56,26 @@ class TestFindByReferenceForCurrentAcademicYear(TestCase):
         current_academic_year = create_current_academic_year()
         previous_academic_year = AcademicYearFactory(year=current_academic_year.year-1)
 
-        cls.current_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=current_academic_year,
-                                                            academic_calendar__reference=SUMMARY_COURSE_SUBMISSION)
-        EntityCalendarFactory(academic_calendar__academic_year=previous_academic_year,
-                                                         academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
-                                                         entity=cls.current_entity_calendar.entity)
+        cls.current_entity_calendar = EntityCalendarFactory(
+            academic_calendar__data_year=current_academic_year,
+            academic_calendar__reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+        )
+        EntityCalendarFactory(
+            academic_calendar__data_year=previous_academic_year,
+            academic_calendar__reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            entity=cls.current_entity_calendar.entity
+        )
 
     def test_when_no_data_match_criteria(self):
         entity_calendar_obj = find_by_entity_and_reference(
-            self.current_entity_calendar.entity.id, EXAM_ENROLLMENTS)
+            self.current_entity_calendar.entity.id, AcademicCalendarTypes.EXAM_ENROLLMENTS.name
+        )
         self.assertIsNone(entity_calendar_obj)
 
     def test_find_for_current_academic_year(self):
         entity_calendar_obj = find_by_entity_and_reference(
             self.current_entity_calendar.entity.id,
-            SUMMARY_COURSE_SUBMISSION
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
         self.assertEqual(entity_calendar_obj, self.current_entity_calendar)
 
@@ -80,9 +85,8 @@ class TestBuildCalendarByEntity(TestCase):
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
         cls.ac_calendar = AcademicCalendarFactory(
-            academic_year=cls.academic_year,
             data_year=cls.academic_year,
-            reference=SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         # Create structure entity
@@ -95,8 +99,10 @@ class TestBuildCalendarByEntity(TestCase):
         cls.entity_agro = EntityVersionFactory(acronym='AGRO', parent=cls.entity_sst.entity)
 
     def test_build_calendar_by_entity_no_entity_calendars(self):
-        entity_calendar_computed = entity_calendar.build_calendar_by_entities(self.academic_year,
-                                                                              SUMMARY_COURSE_SUBMISSION)
+        entity_calendar_computed = entity_calendar.build_calendar_by_entities(
+            self.academic_year,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+        )
         default_date = {'start_date': self.ac_calendar.start_date, 'end_date': self.ac_calendar.end_date}
         # Check on SSH node
         self.assertDictEqual(entity_calendar_computed[self.entity_ssh.entity.id], default_date)
@@ -119,8 +125,10 @@ class TestBuildCalendarByEntity(TestCase):
         EntityCalendarFactory(academic_calendar=self.ac_calendar, entity=self.entity_agro.entity, **agro_date)
         EntityCalendarFactory(academic_calendar=self.ac_calendar, entity=self.entity_lsm.entity, **lsm_date)
 
-        entity_calendar_computed = entity_calendar.build_calendar_by_entities(self.academic_year,
-                                                                              SUMMARY_COURSE_SUBMISSION)
+        entity_calendar_computed = entity_calendar.build_calendar_by_entities(
+            self.academic_year,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+        )
         default_date = {'start_date': self.ac_calendar.start_date, 'end_date': self.ac_calendar.end_date}
         # Check on SSH node
         self.assertDictEqual(entity_calendar_computed[self.entity_ssh.entity.id], default_date)
@@ -138,8 +146,10 @@ class TestBuildCalendarByEntity(TestCase):
         }
         EntityCalendarFactory(academic_calendar=self.ac_calendar, entity=self.entity_sst.entity, **sst_date)
 
-        entity_calendar_computed = entity_calendar.build_calendar_by_entities(self.academic_year,
-                                                                              SUMMARY_COURSE_SUBMISSION)
+        entity_calendar_computed = entity_calendar.build_calendar_by_entities(
+            self.academic_year,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+        )
         default_date = {'start_date': self.ac_calendar.start_date, 'end_date': self.ac_calendar.end_date}
         # Check on SSH node
         self.assertDictEqual(entity_calendar_computed[self.entity_ssh.entity.id], default_date)
@@ -152,8 +162,11 @@ class TestBuildCalendarByEntity(TestCase):
 
     def test_find_interval_dates_for_entity(self):
         expected_date = {'start_date': self.ac_calendar.start_date, 'end_date': self.ac_calendar.end_date}
-        result = entity_calendar.find_interval_dates_for_entity(self.academic_year, SUMMARY_COURSE_SUBMISSION,
-                                                                self.entity_ssh.entity)
+        result = entity_calendar.find_interval_dates_for_entity(
+            self.academic_year,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            self.entity_ssh.entity
+        )
         self.assertDictEqual(result, expected_date)
 
     def test_find_interval_dates_for_entity_with_a_parent_entity_calendar(self):
@@ -164,8 +177,11 @@ class TestBuildCalendarByEntity(TestCase):
         EntityCalendarFactory(academic_calendar=self.ac_calendar, entity=self.entity_sst.entity, **sst_date)
 
         expected_date = _convert_datetime_to_date(sst_date)
-        result = entity_calendar.find_interval_dates_for_entity(self.academic_year, SUMMARY_COURSE_SUBMISSION,
-                                                                self.entity_drt.entity)
+        result = entity_calendar.find_interval_dates_for_entity(
+            self.academic_year,
+            AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            self.entity_drt.entity
+        )
         self.assertDictEqual(result, expected_date)
 
 
