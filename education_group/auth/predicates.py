@@ -14,6 +14,7 @@ from education_group.calendar.education_group_extended_daily_management import \
 from education_group.calendar.education_group_limited_daily_management import \
     EducationGroupLimitedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_role.cache import predicate_cache
@@ -229,4 +230,31 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, obj: Union['Gr
             for entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids()
         }
         return user_scopes.get(obj.management_entity_id) == Scope.ALL.value
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Transition version of finalities must be filled from transition version of master"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_education_group_type_eligible_to_be_filled(self, user, obj: Union['GroupYear', 'EducationGroupYear']):
+    if obj:
+        return obj.education_group_type.name not in TrainingType.finality_types()
+    return None
+
+
+@predicate(bind=True)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_group_year_an_eligible_transition(
+        self,
+        user: User,
+        obj: GroupYear = None
+):
+    if obj:
+        is_transition = obj and obj.partial_acronym.upper().startswith('T')
+        links_to_parent = obj.element.children_elements.all()
+        if links_to_parent:
+            parents = [link.parent_element.group_year for link in links_to_parent]
+            all_parents_transition = all(parent.partial_acronym.upper().startswith('T') for parent in parents)
+            return is_transition and all_parents_transition
+        return is_transition
     return None
