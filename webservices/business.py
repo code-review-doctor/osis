@@ -37,11 +37,11 @@ EVALUATION_KEY = 'evaluation'
 CONTACT_INTRO_KEY = 'contact_intro'
 UNIVERSITY_TYPES = ['bachelors_dutch', 'foreign_bachelors', 'others_bachelors_french', 'ucl_bachelors']
 SECOND_DEGREE_TYPES = ['masters', 'graduates']
-ADMISSION_CONDITION_LINE_FIELDS = [
+ACCESS_REQUIREMENTS_LINE_FIELDS = [
     ('university_bachelors', UNIVERSITY_TYPES),
     ('holders_second_university_degree', SECOND_DEGREE_TYPES)
 ]
-ADMISSION_CONDITION_FIELDS = [
+ACCESS_REQUIREMENTS_FIELDS = [
     'admission_enrollment_procedures',
     'non_university_bachelors',
     'holders_non_university_second_degree',

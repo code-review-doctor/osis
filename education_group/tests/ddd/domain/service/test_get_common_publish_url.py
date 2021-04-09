@@ -31,17 +31,17 @@ from education_group.ddd.domain.service.get_common_publish_url import GetCommonP
     ESB_API_URL="api.esb.com",
     ESB_REFRESH_COMMON_ADMISSION_ENDPOINT="common/{year}/refresh",
 )
-class TestGetCommonAdmissionConditionsPublishUrl(SimpleTestCase):
+class TestGetCommonAccessRequirementsPublishUrl(SimpleTestCase):
     @override_settings(ESB_REFRESH_COMMON_ADMISSION_ENDPOINT=None)
     def test_publish_case_missing_settings(self):
         with self.assertRaises(ImproperlyConfigured):
-            GetCommonPublishUrl.get_url_admission_conditions(2018)
+            GetCommonPublishUrl.get_url_access_requirements(2018)
 
-    def test_assert_common_admission_conditions_publish_url(self):
+    def test_assert_common_access_requirements_publish_url(self):
         expected_publish_url = "api.esb.com/common/2018/refresh"
 
         self.assertEqual(
-            GetCommonPublishUrl.get_url_admission_conditions(2018),
+            GetCommonPublishUrl.get_url_access_requirements(2018),
             expected_publish_url
         )
 
@@ -56,7 +56,7 @@ class TestGetCommonPedagogyPublishUrl(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             GetCommonPublishUrl.get_url_pedagogy(2018)
 
-    def test_assert_common_admission_conditions_publish_url(self):
+    def test_assert_common_access_requirements_publish_url(self):
         expected_publish_url = "api.esb.com/common-pedagogy/2018/refresh"
 
         self.assertEqual(

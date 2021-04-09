@@ -212,7 +212,7 @@ def check_paste(request, node_to_paste) -> List[str]:
     root_id = int(request.GET["path"].split("|")[0])
     check_command = program_management.ddd.command.CheckPasteNodeCommand(
         root_id=root_id,
-        node_to_past_code=node_to_paste["element_code"],
+        node_to_paste_code=node_to_paste["element_code"],
         node_to_paste_year=node_to_paste["element_year"],
         path_to_detach=node_to_paste["path_to_detach"],
         path_to_paste=request.GET["path"],

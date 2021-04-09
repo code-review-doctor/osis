@@ -94,4 +94,10 @@ def create_and_report_training_with_program_tree(
 
 
 def __convert_to_training_command(cmd: CreateAndPostponeTrainingAndProgramTreeCommand) -> 'CreateTrainingCommand':
-    return CreateTrainingCommand(**attr.asdict(cmd, recurse=False))
+    return CreateTrainingCommand(
+        **attr.asdict(
+            cmd,
+            recurse=False,
+            filter=attr.filters.exclude(attr.fields(CreateAndPostponeTrainingAndProgramTreeCommand).transaction_id)
+        ),
+    )

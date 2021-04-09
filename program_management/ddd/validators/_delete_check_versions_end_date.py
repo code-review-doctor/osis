@@ -44,7 +44,7 @@ class CheckVersionsEndDateValidator(business_validator.BusinessValidator):
                 transition_version_greater_than_standard_year(self.tree_version)
             if exists:
                 raise exception.CannotDeleteStandardDueToTransitionVersionEndDate(self.tree_version)
-        else:
+        elif self.tree_version.is_specific_official:
             exists = has_transition_version_with_greater_end_year.HasTransitionVersionWithGreaterEndYear. \
                 transition_version_greater_than_specific_version_year(self.tree_version)
             if exists:
