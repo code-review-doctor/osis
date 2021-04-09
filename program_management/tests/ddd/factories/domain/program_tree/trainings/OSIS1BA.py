@@ -37,56 +37,6 @@ from program_management.tests.ddd.factories.domain.prerequisite.prerequisite imp
 from program_management.tests.ddd.factories.program_tree import tree_builder
 
 
-class MinorFactory:
-    def __new__(cls, current_year: int, end_year: int, *args, persist: bool = False, **kwargs):
-        return cls.produce_minor_tree(current_year, end_year, persist)
-
-    @staticmethod
-    def produce_minor_tree(current_year: int, end_year: int, persist: bool) -> 'ProgramTree':
-        tree_data = {
-            "link_data": {"link_type": LinkTypes.REFERENCE},
-            "node_type": MiniTrainingType.ACCESS_MINOR,
-            "year": current_year,
-            "end_year": end_year,
-            "code": "LECON100I",
-            "title": "MINECON",
-            "children": [
-                {
-                    "node_type": GroupType.COMMON_CORE,
-                    "year": current_year,
-                    "end_year": end_year,
-                    "code": "LECON100T",
-                    "title": "PARTIEDEBASEMINECON",
-                    "children": [
-                        {
-                            "node_type": GroupType.SUB_GROUP,
-                            "year": current_year,
-                            "end_year": end_year,
-                            "code": "LECON101R",
-                            "title": "MINBASEECO",
-                            "children": [
-                                {
-                                    "node_type": NodeType.LEARNING_UNIT,
-                                    "year": current_year,
-                                    "end_date": end_year,
-                                    "code": "LECON1101",
-                                },
-                                {
-                                    "node_type": NodeType.LEARNING_UNIT,
-                                    "year": current_year,
-                                    "end_date": end_year,
-                                    "code": "LECON1102",
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-        tree = tree_builder(tree_data, persist)
-        return tree
-
-
 class BisProgramTreeBachelorFactory:
     def __new__(cls, current_year: int, end_year: int, *args, persist: bool = False, **kwargs):
         return cls.produce_bachelor_tree(current_year, end_year, persist)
@@ -232,6 +182,7 @@ class BisProgramTreeBachelorFactory:
         tree.prerequisites = PrerequisitesFactory(context_tree=tree.entity_id, prerequisites=prerequisites)
 
 
+# FIXME DEPRECATED replace by the above bachelor factory
 class ProgramTreeBachelorFactory:
     def __new__(cls, current_year: int, end_year: int, *args, **kwargs):
         return cls.produce_bachelor_tree(current_year, end_year)

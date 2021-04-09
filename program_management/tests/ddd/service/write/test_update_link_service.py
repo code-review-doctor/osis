@@ -27,7 +27,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.service.write import update_link_service
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
 from testing.testcases import DDDTestCase
 
 

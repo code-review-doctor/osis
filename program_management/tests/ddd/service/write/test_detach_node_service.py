@@ -33,7 +33,7 @@ from program_management.ddd import command
 from program_management.ddd.domain.link import LinkIdentity
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.write import detach_node_service
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
 from testing.testcases import DDDTestCase
 
 

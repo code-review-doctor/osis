@@ -41,7 +41,7 @@ from program_management.ddd.service.write import paste_element_service
 from program_management.ddd.validators.validators_by_business_action import CheckPasteNodeValidatorList
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.paste_element_command import PasteElementCommandFactory
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.domain.program_tree.MASTER_2M import ProgramTree2MFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory

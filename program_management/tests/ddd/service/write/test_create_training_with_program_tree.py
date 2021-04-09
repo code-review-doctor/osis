@@ -44,7 +44,6 @@ from testing.testcases import DDDTestCase
 class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.starting_academic_year_year = 2020
         cls.max_postponement_year = cls.starting_academic_year_year + DEFAULT_YEARS_TO_POSTPONE
 
     def setUp(self) -> None:
@@ -109,11 +108,6 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
             printing_title='',
             professional_title='',
             can_be_funded=True,
-        )
-
-        self.mock_service(
-            "base.models.academic_year.starting_academic_year",
-            return_value=namedtuple("academic_year", "year")(self.starting_academic_year_year)
         )
 
     def test_cannot_create_training_for_which_code_already_exists(self):

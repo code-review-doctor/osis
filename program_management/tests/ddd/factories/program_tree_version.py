@@ -27,17 +27,26 @@ from typing import List
 
 import factory.fuzzy
 
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.activity_presence import ActivityPresence
+from base.models.enums.decree_category import DecreeCategories
+from base.models.enums.education_group_types import TrainingType
+from base.models.enums.internship_presence import InternshipPresence
+from base.models.enums.rate_code import RateCode
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command as education_group_command
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
     NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
-from program_management.ddd.repositories import program_tree as program_tree_repository,\
+from program_management.ddd.repositories import program_tree as program_tree_repository, \
     program_tree_version as program_tree_version_repository
-from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service
+from program_management.ddd.service.read import get_program_tree_version_service
+from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service, \
+    create_training_with_program_tree
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
 class ProgramTreeVersionIdentityFactory(factory.Factory):
-
     class Meta:
         model = ProgramTreeVersionIdentity
         abstract = False
@@ -49,7 +58,6 @@ class ProgramTreeVersionIdentityFactory(factory.Factory):
 
 
 class ProgramTreeVersionFactory(factory.Factory):
-
     class Meta:
         model = ProgramTreeVersion
         abstract = False
@@ -101,17 +109,6 @@ class ProgramTreeVersionFactory(factory.Factory):
             to_tree_version.tree = program_tree_repository.ProgramTreeRepository.get(identity)
 
         return result
-
-    @staticmethod
-    def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTreeVersion':
-        """Creates a 2M standard version"""
-        tree_standard = ProgramTreeFactory.produce_standard_2M_program_tree(current_year, end_year)
-
-        return ProgramTreeVersionFactory(
-            tree=tree_standard,
-            entity_id__year=current_year,
-            program_tree_identity=tree_standard.entity_id,
-        )
 
     class Params:
         transition = factory.Trait(

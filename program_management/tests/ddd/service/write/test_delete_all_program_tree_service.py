@@ -29,7 +29,7 @@ from program_management.ddd.domain.exception import ProgramTreeNotFoundException
     NodeHaveLinkException
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import delete_all_program_tree_service
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from testing.testcases import DDDTestCase
 

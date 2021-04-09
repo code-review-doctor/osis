@@ -35,7 +35,7 @@ from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
     fill_program_tree_version_content_from_program_tree_version
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import ProgramTreeBachelorFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \

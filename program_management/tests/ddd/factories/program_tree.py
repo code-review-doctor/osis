@@ -87,37 +87,6 @@ class ProgramTreeFactory(factory.Factory):
 
         return result
 
-    @staticmethod
-    def produce_standard_2M_program_tree(current_year: int, end_year: int) -> 'ProgramTree':
-        """Creates a 2M standard version"""
-
-        tree_standard = ProgramTreeFactory(
-            root_node__node_type=TrainingType.PGRM_MASTER_120,
-            root_node__end_year=end_year,
-            root_node__year=current_year,
-        )
-        link1 = LinkFactory(
-            parent=tree_standard.root_node,
-            child__node_type=GroupType.COMMON_CORE,
-            child__end_year=end_year,
-            child__year=current_year,
-        )
-        link2 = LinkFactory(
-            parent=tree_standard.root_node,
-            child__node_type=GroupType.FINALITY_120_LIST_CHOICE,
-            child__end_year=end_year,
-            child__year=current_year,
-        )
-        link3 = LinkFactory(
-            parent=tree_standard.root_node,
-            child__node_type=GroupType.OPTION_LIST_CHOICE,
-            child__end_year=end_year,
-            child__year=current_year,
-        )
-        tree_standard.root_node.children = [link1, link2, link3]
-
-        return tree_standard
-
 
 def _tree_builder(data: Dict, persist: bool = False) -> 'Node':
     _data = data.copy()

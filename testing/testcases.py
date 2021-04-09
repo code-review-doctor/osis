@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from collections import namedtuple
 from typing import Any, Optional, List
 
 import mock
@@ -37,8 +38,14 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 
 
 class DDDTestCase(TestCase):
+    starting_academic_year_year = 2020
+
     def setUp(self) -> None:
         super().setUp()
+        self.mock_service(
+            "base.models.academic_year.starting_academic_year",
+            return_value=namedtuple("academic_year", "year")(self.starting_academic_year_year)
+        )
         self._init_education_group_app_repo()
         self._init_program_management_app_repo()
 
