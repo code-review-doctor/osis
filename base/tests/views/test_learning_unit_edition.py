@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 import json
-from unittest import mock
 
 from django.contrib import messages
 from django.contrib.auth.models import Permission
@@ -52,7 +51,6 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
@@ -96,9 +94,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         response = self.client.get(reverse(learning_unit_edition_end_date, args=[self.learning_unit_year.id]))
         self.assertTemplateUsed(response, "learning_unit/simple/update_end_date.html")
 
-    @mock.patch('base.business.event_perms.EventPerm.get_academic_years_ids')
-    def test_view_learning_unit_edition_post(self, mock_get_academic_years_ids):
-        mock_get_academic_years_ids.return_value = [self.starting_academic_year.pk]
+    def test_view_learning_unit_edition_post(self):
         form_data = {"academic_year": self.starting_academic_year.pk}
         response = self.client.post(
             reverse("learning_unit_edition_end_date", args=[self.learning_unit_year.id]),
@@ -440,7 +436,6 @@ class TestLearningUnitVolumesManagement(TestCase):
             'form_type': 'full'
         })
 
-        PersonEntityFactory(entity=cls.generate_container.entities[0], person=cls.person)
         cls.data = get_valid_formset_data(cls.learning_unit_year.acronym)
         cls.partim_formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym, is_partim=True)
         cls.formset_data = get_valid_formset_data(cls.learning_unit_year_partim.acronym)
