@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import skip
 
+import attr
 from django.test import override_settings
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -46,6 +48,33 @@ class TestDetachNode(DDDTestCase):
             self.bachelor.get_node_by_code_and_year("LSINF1002", 2018),
         )
         self.cmd = command.DetachNodeCommand(path=path, commit=True)
+
+    @skip("Define 2M tree")
+    def test_cannot_detach_option_which_is_used_by_finality(self):
+        pass
+
+    @skip("Define prerequisites repository")
+    def test_cannot_detach_learning_unit_which_is_a_prerequisite(self):
+        with self.assertRaises(MultipleBusinessExceptions):
+            detach_node_service.detach_node(self.cmd)
+
+    def test_cannot_detach_mandatory_children(self):
+        path = build_path(
+            self.bachelor.root_node,
+            self.bachelor.get_node_by_code_and_year("LOSIS101T", 2018),
+        )
+        cmd = attr.evolve(self.cmd, path=path)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            detach_node_service.detach_node(cmd)
+
+    @skip("Code breaks when path is root node")
+    def test_cannot_detach_root_from_tree(self):
+        path = build_path(self.bachelor.root_node)
+        cmd = attr.evolve(self.cmd, path=path)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            detach_node_service.detach_node(cmd)
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_cannot_detach_from_tree_before_minimum_editable_year(self):
