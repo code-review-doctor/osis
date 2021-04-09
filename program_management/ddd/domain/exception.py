@@ -406,6 +406,12 @@ class InvalidVersionNameException(BusinessException):
         super().__init__(message)
 
 
+class InvalidVersionNameWithTransitionException(BusinessException):
+    def __init__(self):
+        message = _("Name version cannot contain TRANSITION. Please create a transition version if necessary")
+        super().__init__(message)
+
+
 class InvalidTransitionNameException(BusinessException):
     def __init__(self):
         message = _("This value is invalid.")
@@ -439,4 +445,23 @@ class InvalidTreeVersionToFillTo(BusinessException):
 class CannotCopyPrerequisiteException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Cannot copy prerequisite")
+        super().__init__(message, **kwargs)
+
+
+class CannotFillContentOfProgramTreeOfTypeFinalityException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Tree is finality")
+        super().__init__(message, **kwargs)
+
+
+class NoFinalitiesHaveCorrespondingTransitionVersionException(BusinessException):
+    def __init__(self, finalities: Set['NodeGroupYear'], to_tree: 'ProgramTree', **kwargs):
+        message = _(
+            "Please create at least a transition version [%(transition_name)s] for one of the finalities %(finalities)s"
+            " in %(academic_year)s."
+        ) % {
+            "transition_name": to_tree.root_node.transition_name,
+            "finalities": ", ".join([str(finality.full_acronym()) for finality in finalities]),
+            "academic_year": to_tree.root_node.academic_year
+        }
         super().__init__(message, **kwargs)

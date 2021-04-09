@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class GetLearningUnitYearCommand(interface.CommandRequest):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

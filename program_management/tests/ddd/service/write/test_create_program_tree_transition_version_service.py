@@ -61,6 +61,7 @@ class TestCreateProgramTreeVersion(TestCase):
             transition_name=TRANSITION,
             title_en='Title in English',
             title_fr='Intitulé en français',
+            from_year=self.standard_version.entity_identity.year,
         )
 
     def _create_standard_version(self):

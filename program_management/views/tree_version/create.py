@@ -323,6 +323,7 @@ def _convert_form_to_create_transition_version_command(
         title_en=form.cleaned_data.get("version_title_en"),
         title_fr=form.cleaned_data.get("version_title_fr"),
         end_year=form.cleaned_data.get("end_year"),
+        from_year=form.tree_version_identity.year
     )
 
 
