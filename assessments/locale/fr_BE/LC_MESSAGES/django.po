@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-16 13:17+0100\n"
+"POT-Creation-Date: 2021-03-29 11:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -291,9 +291,6 @@ msgstr "Unité d'apprentissage"
 msgid "Line"
 msgstr "Ligne"
 
-msgid "Locality"
-msgstr "Localité"
-
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
 
@@ -541,6 +538,9 @@ msgstr "Etat"
 msgid "Status"
 msgstr "Status"
 
+msgid "Street and number"
+msgstr "Rue et numéro"
+
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
 
@@ -669,7 +669,7 @@ msgid ""
 "our database"
 msgstr ""
 "Vous n'avez pas les droits d'accès pour cette unité d'enseignement ou elle "
-"n'existe pas dans notre base de donénes"
+"n'existe pas dans notre base de données"
 
 msgid ""
 "You don't have access rights for this offer or it doesn't exist in our "
