@@ -334,10 +334,12 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
     def test_can_fill_transition_from_its_same_year_equivalent_non_transition(self):
         tree_version_to_fill_from = SpecificProgramTreeVersionFactory(
-            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR
+            tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__node_type=TrainingType.BACHELOR
         )
         tree_version_to_fill = SpecificTransitionProgramTreeVersionFactory(
             tree__root_node__year=NEXT_ACADEMIC_YEAR_YEAR,
+            tree__root_node__node_type=TrainingType.BACHELOR
         )
 
         self.add_tree_version_to_repo(tree_version_to_fill_from)
