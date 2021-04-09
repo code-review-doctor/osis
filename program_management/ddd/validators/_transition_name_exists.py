@@ -48,19 +48,23 @@ class TransitionNameExistsValidator(BusinessValidator):
 
     def validate(self):
         last_version_identity = self.get_last_existing_transition_version()
-        if last_version_identity and last_version_identity[0].entity_identity.year >= self.from_specific_version.year:
-            raise TransitionNameExistsCurrentYearAndInFuture(last_version_identity[0].transition_name)
+        if last_version_identity and last_version_identity.entity_identity.year >= self.from_specific_version.year:
+            raise TransitionNameExistsCurrentYearAndInFuture(last_version_identity.transition_name)
 
     def get_last_existing_transition_version(self):
-        return sorted(
-            filter(
-                lambda transition_version:
-                transition_version.transition_name == transition_version
-                and transition_version.version_name == self.from_specific_version.version_name
-                and transition_version.offer_acronym == self.from_specific_version.offer_acronym
-                and transition_version.year < self.from_specific_version.year,
-                self.all_transition_versions,
-            ),
-            key=lambda transition_version: transition_version.entity_identity.year,
-            reverse=True
+        return next(
+            iter(
+                sorted(
+                    filter(
+                        lambda transition_version:
+                        transition_version.transition_name == transition_version
+                        and transition_version.version_name == self.from_specific_version.version_name
+                        and transition_version.offer_acronym == self.from_specific_version.offer_acronym
+                        and transition_version.year < self.from_specific_version.year,
+                        self.all_transition_versions,
+                    ),
+                    key=lambda transition_version: transition_version.entity_identity.year,
+                    reverse=True
+                )
+            ), None
         )
