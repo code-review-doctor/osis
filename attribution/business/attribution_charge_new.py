@@ -48,7 +48,6 @@ def find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year
 def create_attributions_dictionary(attribution_charges: List[AttributionChargeNew]):
     attributions = OrderedDict()
     for attribution_charge in attribution_charges:
-        print(attribution_charge.attribution.id)
         key = attribution_charge.attribution.id
         attribution_dict = {"person": attribution_charge.attribution.tutor.person,
                             "function": attribution_charge.attribution.function,
