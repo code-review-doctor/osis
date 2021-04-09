@@ -32,7 +32,8 @@ from django.views.decorators.http import require_http_methods
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.decorators.ajax import ajax_required
 from program_management.ddd import command
-from program_management.ddd.domain.exception import TransitionNameExistsInPast
+from program_management.ddd.domain.exception import TransitionNameExistsInPast, \
+    TransitionNameExistsInPastButExistenceOfOtherTransitionException
 from program_management.ddd.domain.program_tree_version import TRANSITION_PREFIX
 from program_management.ddd.service.read import check_transition_name_service
 
@@ -41,25 +42,29 @@ from program_management.ddd.service.read import check_transition_name_service
 @ajax_required
 @require_http_methods(['GET'])
 def check_transition_name(request, year, acronym, version_name=""):
-    transition_name = request.GET['transition_name']
+    transition_name = request.GET['transition_name'].upper()
     cmd = command.CheckTransitionNameCommand(
-        year=year,
-        offer_acronym=acronym,
-        version_name=version_name,
-        transition_name=TRANSITION_PREFIX+" "+transition_name if transition_name else TRANSITION_PREFIX
+        from_year=year,
+        from_offer_acronym=acronym,
+        from_version_name=version_name,
+        new_transition_name=TRANSITION_PREFIX + " " + transition_name if transition_name else TRANSITION_PREFIX
     )
 
     try:
         check_transition_name_service.check_transition_name(cmd)
     except MultipleBusinessExceptions as multiple_exceptions:
         first_exception = next(e for e in multiple_exceptions.exceptions)
+        if isinstance(first_exception, TransitionNameExistsInPastButExistenceOfOtherTransitionException):
+            return JsonResponse({
+                "valid": False,
+                "msg": first_exception.message
+            })
         if isinstance(first_exception, TransitionNameExistsInPast):
             msg = ". ".join([first_exception.message, str(_("Save will prolong the past version"))])
             return JsonResponse({
                 "valid": True,
                 "msg": msg
             })
-
         return JsonResponse({
             "valid": False,
             "msg": first_exception.message

@@ -435,6 +435,31 @@ class TransitionNameExistsInPast(BusinessException):
         message = _("Transition name {} existed").format(transition_name)
         super().__init__(message, **kwargs)
 
+
+class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessException):
+    def __init__(
+            self, offer_acronym: str,
+            year: int,
+            transition_year: int,
+            transition_name: str,
+            version_name: str,
+            **kwargs
+    ):
+        if version_name:
+            full_code = offer_acronym + "[" + version_name+" - " + transition_name + "]"
+        else:
+            full_code = offer_acronym + "[" + transition_name + "]"
+        message = _(
+            "You can't extend the transition version '{full_code}' in {year} as other transition version exists in "
+            "{transition_year}"
+        ).format(
+            full_code=full_code,
+            year=year,
+            transition_year=transition_year
+        )
+        super().__init__(message, **kwargs)
+
+
 class InvalidTreeVersionToFillFrom(BusinessException):
     def __init__(self, tree_version_to_fill_from: 'ProgramTreeVersion', **kwargs):
         message = _("Cannot fill content from {}").format(tree_version_to_fill_from)

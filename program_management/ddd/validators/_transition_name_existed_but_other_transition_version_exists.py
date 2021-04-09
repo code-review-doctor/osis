@@ -26,11 +26,11 @@
 from typing import List
 
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import TransitionNameExistsCurrentYearAndInFuture
+from program_management.ddd.domain.exception import TransitionNameExistsInPastButExistenceOfOtherTransitionException
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersion
 
 
-class TransitionNameExistsValidator(BusinessValidator):
+class TransitionNameExistsInPastButExistenceOfOtherTransitionValidator(BusinessValidator):
 
     def __init__(
             self,
@@ -38,7 +38,7 @@ class TransitionNameExistsValidator(BusinessValidator):
             transition_name: str,
             all_versions: List[ProgramTreeVersion]
     ):
-        super(TransitionNameExistsValidator, self).__init__()
+        super().__init__()
         self.from_specific_version = from_specific_version
         self.transition_name = transition_name
         self.all_transition_versions = [
@@ -48,8 +48,16 @@ class TransitionNameExistsValidator(BusinessValidator):
 
     def validate(self):
         last_version_identity = self.get_last_existing_transition_version()
-        if last_version_identity and last_version_identity.entity_identity.year >= self.from_specific_version.year:
-            raise TransitionNameExistsCurrentYearAndInFuture(last_version_identity.transition_name)
+        if last_version_identity and last_version_identity.entity_identity.year < self.from_specific_version.year:
+            first_other_transition_version = self.find_other_transition_version_exists_in_past(last_version_identity)
+            if first_other_transition_version:
+                raise TransitionNameExistsInPastButExistenceOfOtherTransitionException(
+                    last_version_identity.entity_identity.offer_acronym,
+                    last_version_identity.entity_identity.year,
+                    first_other_transition_version.entity_identity.year,
+                    last_version_identity.transition_name,
+                    last_version_identity.version_name
+                )
 
     def get_last_existing_transition_version(self):
         return next(
@@ -57,10 +65,25 @@ class TransitionNameExistsValidator(BusinessValidator):
                 sorted(
                     filter(
                         lambda transition_version:
-                        transition_version.transition_name == transition_version
+                        transition_version.transition_name == self.transition_name
                         and transition_version.version_name == self.from_specific_version.version_name
-                        and transition_version.offer_acronym == self.from_specific_version.offer_acronym
-                        and transition_version.year < self.from_specific_version.year,
+                        and transition_version.entity_identity.offer_acronym == self.from_specific_version.offer_acronym
+                        and transition_version.entity_identity.year < self.from_specific_version.year,
+                        self.all_transition_versions,
+                    ),
+                    key=lambda transition_version: transition_version.entity_identity.year,
+                    reverse=True
+                )
+            ), None
+        )
+
+    def find_other_transition_version_exists_in_past(self, last_version_identity):
+        return next(
+            iter(
+                sorted(
+                    filter(
+                        lambda transition_version:
+                        transition_version.entity_identity.year > last_version_identity.entity_identity.year,
                         self.all_transition_versions,
                     ),
                     key=lambda transition_version: transition_version.entity_identity.year,
