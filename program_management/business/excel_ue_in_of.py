@@ -47,6 +47,8 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.excel import get_html_to_text
+from ddd.logic.attribution.commands import SearchScoresResponsibleCommand
+from ddd.logic.attribution.use_case.read.search_scores_responsibles_service import search_scores_responsibles
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -192,6 +194,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 
 
 def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, hierarchy: 'ProgramTree'):
+    print('ici')
     data = _build_excel_lines_ues(custom_xls_form, hierarchy)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
     return _get_workbook_for_custom_xls(data.get('content'),
@@ -347,6 +350,7 @@ def _add_optional_titles(custom_xls_form: CustomXlsForm):
 
 
 def _get_attribution_line(a_person_teacher: 'Teacher'):
+    # print('iiiiii')
     if a_person_teacher:
         return " ".join([
             (a_person_teacher.last_name or "").upper(),
@@ -378,6 +382,7 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
         teachers = _get_distinct_teachers(
             luy
         )
+
         data.append(
             ";".join(
                 [_get_attribution_line(teacher)
@@ -389,6 +394,26 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
             ";".join(
                 [teacher.email
                  for teacher in teachers
+                 ]
+            )
+        )
+        score_responsibles = _get_distinct_score_responsibles(
+            luy
+        )
+        data.append(
+            ";".join(
+                [" ".join([
+                    (teacher.last_name or "").upper(),
+                    teacher.first_name or ""
+                ]).strip()
+                 for teacher in score_responsibles
+                 ]
+            )
+        )
+        data.append(
+            ";".join(
+                [teacher.email
+                 for teacher in score_responsibles
                  ]
             )
         )
@@ -603,6 +628,7 @@ def get_explore_parents(parents_of_ue: List['Node']) -> Dict[str, 'Node']:
 def _get_distinct_teachers(luy):
     teachers = []
     for attribution in luy.attributions:
+        print(type(attribution))
         if attribution.teacher not in teachers:
             teachers.append(attribution.teacher)
     return teachers
@@ -622,3 +648,9 @@ def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersio
         tree.root_node.title,
         version_label(program_tree_version.entity_id)
     ) if program_tree_version else tree.root_node.title
+
+
+def _get_distinct_score_responsibles(luy):
+    cmds = [SearchScoresResponsibleCommand(code=luy.acronym, year=luy.academic_year.year)]
+    score_responsibles = search_scores_responsibles(cmds)
+    return score_responsibles

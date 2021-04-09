@@ -38,7 +38,7 @@ class CustomXlsForm(forms.Form):
     quadrimester = forms.BooleanField(required=False, label=_('Quadrimester'))
     session_derogation = forms.BooleanField(required=False, label=_('Session derogation'))
     volume = forms.BooleanField(required=False, label=_('Volume'))
-    teacher_list = forms.BooleanField(required=False, label=_('Tutors'))
+    teacher_list = forms.BooleanField(required=False, label=_('Tutors (scores responsibles included)'))
     proposition = forms.BooleanField(required=False, label=_('Proposals'))
     english_title = forms.BooleanField(required=False, label=_('Title in English'))
     language = forms.BooleanField(required=False, label=_('Language'))
