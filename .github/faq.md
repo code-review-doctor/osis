@@ -141,8 +141,8 @@ class EnrollmentRepository(interface.AbstractRepository):
     ) -> List[FormationEnrollmentEntity]:
         data_from_db = EnrollmentDatabaseDjangoModel.objects.filter(
             student__registration_id=student_identity.registration_id,
-            enrollment_state__in={state.name for state in states},
         )
+        # Filter on "pertinent" enrollment_states is made in memory, inside DomainService (or Domain)
         return [FormationEnrollmentEntity(...obj) for obj in data_from_db]
 
 ```
