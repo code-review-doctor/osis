@@ -22,10 +22,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Iterable
+from typing import Iterable, Optional
 
 from base.business.education_groups.general_information_sections import get_general_information_labels
-from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from education_group.models.group_year import GroupYear
@@ -34,16 +34,25 @@ from program_management.ddd.business_types import *
 
 
 class CopyCms(interface.DomainService):
-    def from_past_year(self, to_tree: 'ProgramTree') -> None:
-        nodes_to_copy_cms = to_tree.get_mandatory_children(to_tree.root_node)
-        for node in nodes_to_copy_cms:
-            if node.is_group():
-                _copy_group_cms_from_last_year(node.code, node.year)
+    def from_tree(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree') -> None:
+        common_cores = to_tree.get_all_nodes({GroupType.COMMON_CORE})
+        for common_core in common_cores:
+            corresponding_node = self._find_corresponding_node_in_tree(from_tree, common_core)
+            if not corresponding_node:
+                continue
+            _copy_group_cms_from(corresponding_node.code, corresponding_node.year, common_core.code, common_core.year)
+
+    def _find_corresponding_node_in_tree(self, tree: 'ProgramTree', node_to_search: 'Node') -> Optional['Node']:
+        return next(
+            (node for node in tree.get_all_nodes({node_to_search.node_type})
+             if node.code == node_to_search.code or node.title == node_to_search.title),
+            None
+        )
 
 
-def _copy_group_cms_from_last_year(code: str, year: int) -> None:
-    copy_to = GroupYear.objects.get(partial_acronym=code, academic_year__year=year)
-    copy_from = GroupYear.objects.get(academic_year__year=year-1, group=copy_to.group)
+def _copy_group_cms_from(from_code: str, from_year: int, to_code: str, to_year) -> None:
+    copy_from = GroupYear.objects.get(academic_year__year=from_year, partial_acronym=from_code)
+    copy_to = GroupYear.objects.get(partial_acronym=to_code, academic_year__year=to_year)
 
     cms_to_copy_from = TranslatedText.objects.filter(
         reference=copy_from.id,
