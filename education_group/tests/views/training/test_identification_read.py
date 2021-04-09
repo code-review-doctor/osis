@@ -163,7 +163,7 @@ class TestTrainingReadIdentification(TestCase):
         self.assertEqual(
             response.context['academic_year_choices'],
             [
-                (self.url + "?path=" + str(self.training_version.root_group.element.pk), self.current_year)
+                (self.url, self.current_year)
             ]
         )
 
