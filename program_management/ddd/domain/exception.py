@@ -325,7 +325,8 @@ class ChildTypeNotAuthorizedException(BusinessException):
         }
         super().__init__(message)
 
-    def _format_node(self, node: 'Node') -> str:
+    @staticmethod
+    def _format_node(node: 'Node') -> str:
         return "{} ({})".format(str(node), node.node_type.value)
 
 
