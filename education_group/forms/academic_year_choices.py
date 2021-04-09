@@ -55,7 +55,7 @@ def get_academic_year_choices_for_trainings_and_mini_training(
         program_tree_version_identity: 'ProgramTreeVersionIdentity',
         active_view_name: str,
 ) -> List[Tuple[str, int]]:
-    node_ids = NodeIdentitiesSearch().search_for_years(program_tree_version_identity)
+    node_ids = NodeIdentitiesSearch.search_from_program_tree_version_identity_for_years(program_tree_version_identity)
 
     result = [
         (_get_href(node_id, '', active_view_name), node_id.year)

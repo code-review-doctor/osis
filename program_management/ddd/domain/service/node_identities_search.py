@@ -46,8 +46,11 @@ class NodeIdentitiesSearch(interface.DomainService):
 
         return [NodeIdentity(code=year[1], year=year[0]) for year in years]
 
-    def search_for_years(self, program_tree_version_identity: 'ProgramTreeVersionIdentity') -> List[NodeIdentity]:
-        years = GroupYear.objects.filter(
+    @staticmethod
+    def search_from_program_tree_version_identity_for_years(
+            program_tree_version_identity: 'ProgramTreeVersionIdentity'
+    ) -> List[NodeIdentity]:
+        group_years = GroupYear.objects.filter(
             educationgroupversion__offer__acronym=program_tree_version_identity.offer_acronym,
             educationgroupversion__version_name=program_tree_version_identity.version_name,
             educationgroupversion__transition_name=program_tree_version_identity.transition_name,
@@ -60,4 +63,4 @@ class NodeIdentitiesSearch(interface.DomainService):
             'partial_acronym'
         ).distinct().order_by('year')
 
-        return [NodeIdentity(code=year[1], year=year[0]) for year in years]
+        return [NodeIdentity(code=group_year[1], year=group_year[0]) for group_year in group_years]
