@@ -29,47 +29,58 @@ import logging
 from django.conf import settings
 
 from base.models import session_exam_calendar, offer_year_calendar
-from base.models.enums import academic_calendar_type as ac_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_deadline import SessionExamDeadline
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 def recompute_all_deadlines(academic_calendar):
-    if academic_calendar.reference == ac_type.SCORES_EXAM_SUBMISSION:
+    if academic_calendar.reference == AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name:
         for off_year_cal in academic_calendar.offeryearcalendar_set.all():
             compute_deadline(off_year_cal)
 
 
 def compute_deadline_by_student(session_exam_deadline):
-    # TODO :: replace usage of offer_year by education_group_year !
-    off_year_calendar = offer_year_calendar.search(offer_year=session_exam_deadline.offer_enrollment.offer_year,
-                                                   academic_calendar_reference=ac_type.DELIBERATION,
-                                                   number_session=session_exam_deadline.number_session).first()
+    off_year_calendar = offer_year_calendar.search(
+        education_group_year_id=session_exam_deadline.offer_enrollment.education_group_year_id,
+        academic_calendar_reference=AcademicCalendarTypes.DELIBERATION.name,
+        number_session=session_exam_deadline.number_session,
+    ).select_related(
+        'education_group_year__academic_year',
+        'academic_calendar'
+    ).first()
     if off_year_calendar:
         compute_deadline(off_year_calendar, session_exam_deadlines=[session_exam_deadline])
     else:
-        msg = "No OfferYearCalendar found for OfferYear = {}, type = {} and number_session = {}"
-        logger.warning(msg.format(session_exam_deadline.offer_enrollment.offer_year.acronym,
-                                  ac_type.SCORES_EXAM_SUBMISSION,
-                                  session_exam_deadline.number_session))
+        msg = "No OfferYearCalendar found for EducationGroupYear = {}, type = {} and number_session = {}"
+        logger.warning(
+            msg.format(
+                str(session_exam_deadline.offer_enrollment.education_group_year),
+                AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
+                session_exam_deadline.number_session
+            )
+        )
 
 
 def compute_deadline(off_year_calendar, session_exam_deadlines=None):
     if not _impact_scores_encodings_deadlines(off_year_calendar):
         return
 
-    oyc_deliberation = _find_by_reference(off_year_calendar, ac_type.DELIBERATION)
-    oyc_scores_exam_submission = _find_by_reference(off_year_calendar, ac_type.SCORES_EXAM_SUBMISSION)
+    oyc_deliberation = _find_by_reference(off_year_calendar, AcademicCalendarTypes.DELIBERATION.name)
+    oyc_scores_exam_submission = _find_by_reference(
+        off_year_calendar,
+        AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+    )
 
-    end_date_offer_year = _one_day_before_deliberation_date(oyc_deliberation)
+    end_date_educ_group_year = _one_day_before_deliberation_date(oyc_deliberation)
     tutor_submission_date = _get_end_date_value(oyc_scores_exam_submission)
 
     end_date_academic = oyc_scores_exam_submission.academic_calendar.end_date if oyc_scores_exam_submission else None
     if session_exam_deadlines is None:
         session_exam_deadlines = _get_list_sessions_exam_deadlines(off_year_calendar.academic_calendar,
-                                                                   off_year_calendar.offer_year)
-    _save_new_deadlines(session_exam_deadlines, end_date_academic, end_date_offer_year, tutor_submission_date)
+                                                                   off_year_calendar.education_group_year)
+    _save_new_deadlines(session_exam_deadlines, end_date_academic, end_date_educ_group_year, tutor_submission_date)
 
 
 def _get_end_date_value(off_year_cal):
@@ -86,15 +97,16 @@ def _get_date_instance(date):
 
 
 def _impact_scores_encodings_deadlines(oyc):
-    return oyc.academic_calendar.reference in (ac_type.DELIBERATION, ac_type.SCORES_EXAM_SUBMISSION)
+    return oyc.academic_calendar.reference in (AcademicCalendarTypes.DELIBERATION.name,
+                                               AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
 
 
-def _save_new_deadlines(sessions_exam_deadlines, end_date_academic, end_date_offer_year, tutor_submission_date):
+def _save_new_deadlines(sessions_exam_deadlines, end_date_academic, end_date_educ_group_year, tutor_submission_date):
     for sess_exam_deadline in sessions_exam_deadlines:
         end_date_student = _one_day_before(sess_exam_deadline.deliberation_date)
 
         new_deadline = min(filter(None, (_get_date_instance(end_date_academic),
-                                         _get_date_instance(end_date_offer_year),
+                                         _get_date_instance(end_date_educ_group_year),
                                          _get_date_instance(end_date_student))))
         new_deadline_tutor = _compute_delta_deadline_tutor(new_deadline, tutor_submission_date)
 
@@ -114,9 +126,11 @@ def _find_by_reference(off_year_calendar, reference):
     else:
         result = _get_oyc_by_reference(off_year_calendar, reference)
     if not result:
-        msg = "No OfferYearCalendar '{}' found for offerYear = {}"
-        if off_year_calendar.offer_year:
-            logger.warning(msg.format(ac_type.DELIBERATION, off_year_calendar.offer_year.acronym))
+        msg = "No OfferYearCalendar '{}' found for EducationGroupYear = {}"
+        if off_year_calendar.education_group_year:
+            logger.warning(
+                msg.format(AcademicCalendarTypes.DELIBERATION.name, off_year_calendar.education_group_year.acronym)
+            )
     return result
 
 
@@ -124,20 +138,21 @@ def _get_oyc_by_reference(off_year_calendar, reference):
     number_session = session_exam_calendar.get_number_session_by_academic_calendar(off_year_calendar.academic_calendar)
     if number_session:
         try:
-            return offer_year_calendar.search(education_group_year=off_year_calendar.education_group_year,
-                                              offer_year=off_year_calendar.offer_year,
-                                              academic_calendar_reference=reference,
-                                              number_session=number_session).get()
+            return offer_year_calendar.search(
+                education_group_year_id=off_year_calendar.education_group_year_id,
+                academic_calendar_reference=reference,
+                number_session=number_session,
+            ).get()
         except offer_year_calendar.OfferYearCalendar.DoesNotExist:
             return None
 
 
-def _get_list_sessions_exam_deadlines(academic_calendar, offer_year):
+def _get_list_sessions_exam_deadlines(academic_calendar, education_group_year):
     session_exam_deadlines = []
     number_session = session_exam_calendar.get_number_session_by_academic_calendar(academic_calendar)
     if number_session:
         session_exam_deadlines = SessionExamDeadline.objects.filter(
-            offer_enrollment__offer_year=offer_year, number_session=number_session)
+            offer_enrollment__education_group_year=education_group_year, number_session=number_session)
     else:
         msg = "No SessionExamCalendar (number session) found for academic calendar = {}"
         logger.warning(msg.format(academic_calendar.title))
@@ -159,5 +174,5 @@ def _one_day_before(current_date):
 def _compute_delta_deadline_tutor(deadline, tutor_submission_date):
     delta_tutor_deadline = 0
     if deadline and tutor_submission_date and deadline > tutor_submission_date:
-            delta_tutor_deadline = (deadline - tutor_submission_date).days
+        delta_tutor_deadline = (deadline - tutor_submission_date).days
     return delta_tutor_deadline

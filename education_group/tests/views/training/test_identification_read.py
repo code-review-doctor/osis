@@ -179,7 +179,7 @@ class TestTrainingReadIdentification(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
-        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['active'])
 
     def test_assert_displayed_general_information_tabs(self):
         from education_group.views.training.common_read import Tab
@@ -215,22 +215,22 @@ class TestTrainingReadIdentification(TestCase):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
 
-    def test_assert_displayed_admission_condition_tabs(self):
+    def test_assert_displayed_access_requirements_tabs(self):
         from education_group.views.training.common_read import Tab
 
         with mock.patch(
-                'base.models.enums.education_group_types.TrainingType.with_admission_condition',
+                'base.models.enums.education_group_types.TrainingType.with_access_requirements',
                 side_effect=(lambda: [self.training_version.root_group.education_group_type.name])
         ):
             response = self.client.get(self.url)
-            self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+            self.assertTrue(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])
 
         with mock.patch(
-                'base.models.enums.education_group_types.TrainingType.with_admission_condition',
+                'base.models.enums.education_group_types.TrainingType.with_access_requirements',
                 side_effect=(lambda: [])
         ):
             response = self.client.get(self.url)
-            self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+            self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])
 
     def test_assert_ordered_versions_choices_on_context_data(self):
         response = self.client.get(self.url_multiple_version)
@@ -330,7 +330,7 @@ class TestTrainingReadIdentificationTabs(TestCase):
         self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
-        self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])
 
     def test_assert_tabs_displayed_for_particular_version(self):
         response = self.client.get(self.url_particular)
@@ -340,4 +340,4 @@ class TestTrainingReadIdentificationTabs(TestCase):
         self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
-        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])

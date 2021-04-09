@@ -61,5 +61,4 @@ def load() -> AuthorizedRelationshipList:  # TODO :: add unit tests
                 999,
             )
         )
-    if authorized_relationships:
-        return AuthorizedRelationshipList(authorized_relationships)
+    return AuthorizedRelationshipList(authorized_relationships)

@@ -25,6 +25,7 @@ from typing import Set
 
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType, MiniTrainingType, EducationGroupTypesEnum
+from base.models.enums.link_type import LinkTypes
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd import command
 from program_management.ddd.domain.node import Node
@@ -51,11 +52,16 @@ def get_allowed_child_types(cmd: command.GetAllowedChildTypeCommand) -> Set[Educ
         tree = ProgramTreeRepository.get(node_to_paste_into_id)
 
         def check_paste_validator(child_type: EducationGroupTypesEnum) -> bool:
+            link_type = None
+            child_node = Node(node_type=child_type)
+            if tree.root_node.is_minor_major_list_choice() and child_node.is_minor_major_deepening():
+                link_type = LinkTypes.REFERENCE
             try:
                 PasteAuthorizedRelationshipValidator(
                     tree,
-                    Node(node_type=child_type),
-                    tree.root_node
+                    child_node,
+                    tree.root_node,
+                    link_type=link_type
                 ).validate()
             except BusinessException:
                 return False
