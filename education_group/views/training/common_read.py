@@ -45,7 +45,7 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.ddd.service.read import get_group_service, get_training_service
-from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.forms.academic_year_choices import get_academic_year_choices_for_trainings_and_mini_training
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -163,9 +163,8 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "training": self.training,  # TODO: Rename to training (DDD concept)
             "node_path": self.path,
             "form_xls_custom": CustomXlsForm(year=self.node_identity.year, code=self.node_identity.code),
-            "academic_year_choices": get_academic_year_choices(
-                self.node_identity,
-                self.path,
+            "academic_year_choices": get_academic_year_choices_for_trainings_and_mini_training(
+                self.program_tree_version_identity,
                 _get_view_name_from_tab(self.active_tab),
             ) if self.is_root_node else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
