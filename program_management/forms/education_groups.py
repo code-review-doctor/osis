@@ -238,5 +238,5 @@ class GroupFilter(FilterSet):
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)
         qs = super().filter_queryset(queryset)
-        order_fields = qs.query.order_by + ('id',)
+        order_fields = qs.query.order_by + ('academic_year__year', 'id')
         return qs.order_by(*order_fields)
