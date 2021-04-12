@@ -22,19 +22,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.enums.education_group_types import MiniTrainingType, GroupType
-from base.models.enums.link_type import LinkTypes
+import factory
+
+from base.models.enums.education_group_types import GroupType, MiniTrainingType
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.program_tree import tree_builder
-from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 
 
-class MinorFactory:
-    def __new__(cls, current_year: int, end_year: int, *args, persist: bool = False, **kwargs):
-        return cls.produce_minor_tree(current_year, end_year, persist)
+class MINECONTreeFactory(factory.Factory):
+    class Meta:
+        model = ProgramTree
+        abstract = False
 
-    @staticmethod
-    def produce_minor_tree(current_year: int, end_year: int, persist: bool) -> 'ProgramTree':
+    current_year = 2018
+    end_year = 2025
+    persist = True
+
+    @classmethod
+    def _create(cls, model_class, *args, **kwargs) -> 'ProgramTree':
+        return cls.produce_tree(*args, **kwargs)
+
+    @classmethod
+    def produce_tree(cls, current_year: int, end_year: int, persist: bool) -> 'ProgramTree':
         tree_data = {
             "node_type": MiniTrainingType.ACCESS_MINOR,
             "year": current_year,
@@ -75,4 +87,13 @@ class MinorFactory:
             ]
         }
         tree = tree_builder(tree_data, persist)
+
         return tree
+
+
+class MINECONFactory(ProgramTreeVersionFactory):
+    tree = factory.SubFactory(MINECONTreeFactory)
+
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        program_tree_version_repository.ProgramTreeVersionRepository.create(obj)
