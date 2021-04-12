@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ from django.db.models import Prefetch, Case, When, Value, IntegerField, CharFiel
 from django.db.models.expressions import F
 from django.db.models.functions import Concat, Upper
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Font
 from openpyxl.utils import get_column_letter
 from reversion.models import Version
 
@@ -55,9 +55,10 @@ XLS_FILENAME = _('LearningUnitsList')
 WORKSHEET_TITLE = _('Learning units list')
 WRAP_TEXT_ALIGN = Alignment(wrapText=True, vertical="top")
 CMS_ALLOWED_TAGS = []
+BOLD_FONT = Font(bold=True)
 
 
-def create_xls_educational_information_and_specifications(user, learning_units, request):
+def create_xls_educational_information_and_specifications(user, learning_units, request, filters):
     titles = _get_titles()
 
     working_sheet_data = prepare_xls_educational_information_and_specifications(learning_units, request)
@@ -75,10 +76,11 @@ def create_xls_educational_information_and_specifications(user, learning_units, 
                       WRAP_TEXT_ALIGN: _get_wrapped_cells_educational_information_and_specifications(
                           learning_units, len(titles)
                       )
-                  }
+                  },
+                  xls_build.FONT_ROWS: {BOLD_FONT: [0]}
                   }
 
-    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheet_data, parameters))
+    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheet_data, parameters), filters)
 
 
 def _get_titles():

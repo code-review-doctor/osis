@@ -123,7 +123,8 @@ def __create(context, view_obj, method):
 def _create_xls_educational_specifications(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["filter"].qs
-    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
+    filters = _get_filter(context["form"], view_obj.search_type)
+    return create_xls_educational_information_and_specifications(user, luys, view_obj.request, filters)
 
 
 def _create_xls_comparison(view_obj, context, **response_kwargs):
