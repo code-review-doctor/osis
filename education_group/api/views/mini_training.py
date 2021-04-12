@@ -31,6 +31,7 @@ import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from backoffice.settings.rest_framework.filters import OrderingFilterWithDefault
 from base.models.enums import education_group_categories
+from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
@@ -54,7 +55,10 @@ class MiniTrainingFilter(filters.FilterSet):
     title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
     year = filters.NumberFilter(field_name="offer__academic_year__year")
-
+    active = filters.MultipleChoiceFilter(
+        field_name='offer__active',
+        choices=ActiveStatusEnum.choices()
+    )
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(
         fields=(
