@@ -28,6 +28,7 @@ from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.tests.ddd.factories.program_tree import tree_builder
 
 
+# TODO delete
 class ProgramTree2MFactory:
     def __new__(cls, current_year: int, end_year: int, *args, **kwargs):
         return cls.produce_standard_2m_tree(current_year, end_year)
