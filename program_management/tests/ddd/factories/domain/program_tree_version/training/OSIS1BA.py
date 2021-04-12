@@ -22,40 +22,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import factory
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd import command
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.prerequisite import PrerequisiteFactory
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.repositories import program_tree as program_tree_repository
-from program_management.ddd.service.write import copy_program_tree_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.program_tree import tree_builder
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+from program_management.ddd.repositories import program_tree_version as program_tree_version_repository
 
 
-class BisProgramTreeBachelorFactory:
-    def __new__(cls, current_year: int, end_year: int, *args, persist: bool = False, **kwargs):
-        return cls.produce_bachelor_tree(current_year, end_year, persist)
+class OSIS1BATreeFactory(factory.Factory):
+    class Meta:
+        model = ProgramTree
+        abstract = False
+
+    current_year = 2018
+    end_year = 2025
+    persist = True
 
     @classmethod
-    def multiple(cls, n, *args, **kwargs) -> List['ProgramTree']:
-        first_tree = cls(*args, **kwargs)  # type: ProgramTree
+    def _create(cls, model_class, *args, **kwargs) -> 'ProgramTree':
+        return cls.produce_tree(*args, **kwargs)
 
-        result = [first_tree]
-        for year in range(first_tree.root_node.year, first_tree.root_node.year + n - 1):
-            identity = copy_program_tree_service.copy_program_tree_to_next_year(
-                command.CopyProgramTreeToNextYearCommand(code=first_tree.root_node.code, year=year)
-            )
-            result.append(program_tree_repository.ProgramTreeRepository.get(identity))
-
-        return result
-
-    @staticmethod
-    def produce_bachelor_tree(current_year: int, end_year: int, persist: bool) -> 'ProgramTree':
+    @classmethod
+    def produce_tree(cls, current_year: int, end_year: int, persist: bool) -> 'ProgramTree':
         tree_data = {
             "node_type": TrainingType.BACHELOR,
             "year": current_year,
@@ -168,7 +163,7 @@ class BisProgramTreeBachelorFactory:
             ]
         }
         tree = tree_builder(tree_data, persist)
-        BisProgramTreeBachelorFactory._build_prerequisites(tree)
+        cls._build_prerequisites(tree)
 
         return tree
 
@@ -182,104 +177,9 @@ class BisProgramTreeBachelorFactory:
         tree.prerequisites = PrerequisitesFactory(context_tree=tree.entity_id, prerequisites=prerequisites)
 
 
-# FIXME DEPRECATED replace by the above bachelor factory
-class ProgramTreeBachelorFactory:
-    def __new__(cls, current_year: int, end_year: int, *args, **kwargs):
-        return cls.produce_bachelor_tree(current_year, end_year)
+class OSIS1BAFactory(ProgramTreeVersionFactory):
+    tree = factory.SubFactory(OSIS1BATreeFactory)
 
-    @staticmethod
-    def produce_bachelor_tree(current_year: int, end_year: int) -> 'ProgramTree':
-        tree_data = {
-            "node_type": TrainingType.BACHELOR,
-            "year": current_year,
-            "end_year": end_year,
-            "node_id": 1,
-            "children": [
-                {
-                    "node_type": GroupType.COMMON_CORE,
-                    "year": current_year,
-                    "end_year": end_year,
-                    "node_id": 21,
-                    "children": [
-                        {
-                            "node_type": GroupType.SUB_GROUP,
-                            "year": current_year,
-                            "end_year": end_year,
-                            "node_id": 31,
-                            "children": [
-                                {
-                                    "node_type": NodeType.LEARNING_UNIT,
-                                    "year": current_year,
-                                    "end_date": end_year,
-                                    "node_id": 41,
-                                },
-                                {
-                                    "node_type": NodeType.LEARNING_UNIT,
-                                    "year": current_year,
-                                    "end_date": end_year,
-                                    "node_id": 42,
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    "node_type": GroupType.MINOR_LIST_CHOICE,
-                    "year": current_year,
-                    "end_year": end_year,
-                    "node_id": 22,
-                    "children": [
-                        {
-                            "link_data": {"link_type": LinkTypes.REFERENCE},
-                            "node_type": MiniTrainingType.DEEPENING,
-                            "year": current_year,
-                            "end_year": end_year,
-                            "node_id": 32,
-                            "children": [
-                                {
-                                    "node_type": GroupType.COMMON_CORE,
-                                    "year": current_year,
-                                    "end_year": end_year,
-                                    "node_id": 1211,
-                                    "children": [
-                                        {
-                                            "node_type": GroupType.SUB_GROUP,
-                                            "year": current_year,
-                                            "end_year": end_year,
-                                            "node_id": 43,
-                                            "children": [
-                                                {
-                                                    "node_type": NodeType.LEARNING_UNIT,
-                                                    "year": current_year,
-                                                    "end_date": end_year,
-                                                    "node_id": 51,
-                                                },
-                                                {
-                                                    "node_type": NodeType.LEARNING_UNIT,
-                                                    "year": current_year,
-                                                    "end_date": end_year,
-                                                    "node_id": 52,
-                                                }
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                    ]
-                },
-                {
-                    "node_type": NodeType.LEARNING_UNIT,
-                    "year": current_year,
-                    "end_date": end_year,
-                }
-            ]
-        }
-        tree = tree_builder(tree_data)
-        PrerequisitesFactory.produce_inside_tree(
-            tree,
-            tree.get_node("1|22|32|1211|43|51"),
-            [tree.get_node("1|22|32|1211|43|52")]
-        )
-
-        return tree
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        program_tree_version_repository.ProgramTreeVersionRepository.create(obj)

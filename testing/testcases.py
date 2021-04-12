@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import warnings
 from collections import namedtuple
 from typing import Any, Optional, List
 
@@ -37,6 +38,7 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
     FakeProgramTreeRepository
 
 
+# FIXME should herit from SimpleTestCase
 class DDDTestCase(TestCase):
     starting_academic_year_year = 2020
 
@@ -114,6 +116,13 @@ class DDDTestCase(TestCase):
         return repository_patcher.start()
 
     def mock_service(self, service_path: str, return_value: 'Any' = None, side_effect: 'Any' = None) -> mock.Mock:
+        warnings.warn(
+            "Deprecated an application service should not call an other application service. "
+            "A domain service should not be mocked and should have it's repository injected.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         service_patcher = mock.patch(service_path, return_value=return_value, side_effect=side_effect)
         self.addCleanup(service_patcher.stop)
 

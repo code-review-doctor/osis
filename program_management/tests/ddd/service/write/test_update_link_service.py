@@ -27,14 +27,14 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.service.write import update_link_service
-from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
 
 
 class TestUpdateLink(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.tree = BisProgramTreeBachelorFactory(2016, 2018, persist=True)
+        self.tree = OSIS1BAFactory().tree
         self.cmd = UpdateLinkCommand(
             block="123",
             parent_node_code=self.tree.root_node.code,

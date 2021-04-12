@@ -27,22 +27,12 @@ from typing import List
 
 import factory.fuzzy
 
-from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.activity_presence import ActivityPresence
-from base.models.enums.decree_category import DecreeCategories
-from base.models.enums.education_group_types import TrainingType
-from base.models.enums.internship_presence import InternshipPresence
-from base.models.enums.rate_code import RateCode
-from base.models.enums.schedule_type import ScheduleTypeEnum
-from education_group.ddd import command as education_group_command
 from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
     NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
 from program_management.ddd.repositories import program_tree as program_tree_repository, \
     program_tree_version as program_tree_version_repository
-from program_management.ddd.service.read import get_program_tree_version_service
-from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service, \
-    create_training_with_program_tree
+from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -70,10 +60,11 @@ class ProgramTreeVersionFactory(factory.Factory):
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name=factory.SelfAttribute("..tree.root_node.version_name"),
         transition_name=factory.SelfAttribute("..tree.root_node.transition_name")
     )
     entity_identity = factory.SelfAttribute("entity_id")
-    version_name = factory.SelfAttribute("entity_id.version_name")
+    version_name = factory.SelfAttribute("tree.root_node.version_name")
     transition_name = factory.SelfAttribute("tree.root_node.transition_name")
     end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
 

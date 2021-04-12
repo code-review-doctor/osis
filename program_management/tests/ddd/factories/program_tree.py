@@ -28,20 +28,16 @@ from typing import Dict, List
 
 import factory.fuzzy
 
-from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import GroupType, TrainingType
 from program_management.ddd import command
-from program_management.ddd.domain import exception
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.ddd.service.write import copy_program_tree_service
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory, \
-    AuthorizedRelationshipListFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
 from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-from program_management.ddd.repositories import program_tree as program_tree_repository
 
 
 class ProgramTreeFactory(factory.Factory):

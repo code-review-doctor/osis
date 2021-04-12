@@ -27,14 +27,14 @@ import attr
 from program_management.ddd.command import OrderUpLinkCommand
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service.write import up_link_service
-from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
 
 
 class TestUpLinkService(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.tree = BisProgramTreeBachelorFactory(current_year=2018, end_year=2020, persist=True)
+        self.tree = OSIS1BAFactory().tree
         self.cmd = OrderUpLinkCommand(
             path=program_tree.build_path(self.tree.root_node, self.tree.root_node.children_as_nodes[1])
         )

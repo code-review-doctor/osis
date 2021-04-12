@@ -33,14 +33,14 @@ from program_management.ddd import command
 from program_management.ddd.domain.link import LinkIdentity
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.write import detach_node_service
-from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
 
 
 class TestDetachNode(DDDTestCase):
     def setUp(self):
         super().setUp()
-        self.bachelor = BisProgramTreeBachelorFactory(current_year=2018, end_year=2021, persist=True)
+        self.bachelor = OSIS1BAFactory().tree
         path = build_path(
             self.bachelor.root_node,
             self.bachelor.get_node_by_code_and_year("LOSIS101T", 2018),

@@ -29,7 +29,7 @@ from program_management.ddd.domain.exception import ProgramTreeNotFoundException
     NodeHaveLinkException
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write import delete_all_program_tree_service
-from program_management.tests.ddd.factories.domain.program_tree.trainings.OSIS1BA import BisProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from testing.testcases import DDDTestCase
 
@@ -41,7 +41,7 @@ class TestDeleteAllProgramTreeService(DDDTestCase):
         self.cmd = command.DeleteAllProgramTreeCommand(code='LOSIS100B')
 
     def test_cannot_delete_tree_that_are_not_empty(self):
-        non_empty_trees = BisProgramTreeBachelorFactory.multiple(3, current_year=2018, end_year=2025, persist=True)
+        non_empty_trees = [tree_version.tree for tree_version in OSIS1BAFactory.multiple(3)]
 
         cmd = attr.evolve(self.cmd, code=non_empty_trees[0].root_node.code)
 
@@ -49,7 +49,7 @@ class TestDeleteAllProgramTreeService(DDDTestCase):
             delete_all_program_tree_service.delete_all_program_tree(cmd)
 
     def test_cannot_delete_trees_that_are_used(self):
-        bachelors = BisProgramTreeBachelorFactory.multiple(3, current_year=2018, end_year=2025, persist=True)
+        OSIS1BAFactory.multiple(3)
 
         cmd = attr.evolve(self.cmd, code='LINFO102R')
 
