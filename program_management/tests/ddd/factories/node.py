@@ -35,7 +35,6 @@ from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.models.enums.node_type import NodeType
 from program_management.ddd.repositories import node as node_repository
-from program_management.tests.ddd.factories import program_tree as tree_factory
 
 
 def generate_end_date(node):
@@ -59,6 +58,7 @@ class NodeFactory(factory.Factory):
     @factory.post_generation
     def persist(obj, create, extracted, **kwargs):
         if extracted:
+            from program_management.tests.ddd.factories import program_tree as tree_factory
             node_repository.NodeRepository.create(obj)
             tree_factory.ProgramTreeFactory(root_node=obj, persist=True, load_fixture=True)
 
