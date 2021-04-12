@@ -39,6 +39,7 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 
 
 # FIXME should herit from SimpleTestCase
+# TODO should implement class to assert raises specific business exception
 class DDDTestCase(TestCase):
     starting_academic_year_year = 2020
 

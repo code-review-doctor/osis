@@ -84,15 +84,19 @@ class ProgramTreeFactory(factory.Factory):
         return result
 
 
-def _tree_builder(data: Dict, persist: bool = False) -> 'Node':
+def _tree_builder(data: Dict, nodes_generated: Dict, persist: bool = False) -> 'Node':
     _data = data.copy()
     children = _data.pop("children", [])
 
+    if _data["code"] in nodes_generated:
+        return nodes_generated[_data["code"]]
+
     node = _node_builder(_data, persist=persist)
+    nodes_generated[node.code] = node
 
     for child_data, order in zip(children, itertools.count()):
         link_data = child_data.pop("link_data", {})
-        child_node = _tree_builder(child_data, persist=persist)
+        child_node = _tree_builder(child_data, nodes_generated, persist=persist)
         LinkFactory(parent=node, child=child_node, **link_data, order=order)
 
     return node
@@ -106,6 +110,6 @@ def _node_builder(data: Dict, persist: bool = False) -> 'Node':
 
 
 def tree_builder(data: Dict, persist: bool = False) -> 'ProgramTree':
-    root_node = _tree_builder(data, persist)
+    root_node = _tree_builder(data, {}, persist)
     authorized_relationships = AuthorizedRelationshipListFactory.load_from_fixture()
     return ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships, persist=persist)
