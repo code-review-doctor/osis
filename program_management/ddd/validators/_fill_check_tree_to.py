@@ -22,10 +22,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
+
 from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import InvalidTreeVersionToFillTo
-from program_management.ddd.domain.service import get_academic_year
 
 
 class CheckValidTreeVersionToFillTo(business_validator.BusinessValidator):
@@ -34,6 +35,5 @@ class CheckValidTreeVersionToFillTo(business_validator.BusinessValidator):
         super().__init__()
 
     def validate(self, *args, **kwargs):
-        next_academic_year = get_academic_year.GetAcademicYear().get_next_academic_year()
-        if self.tree_version_to.entity_id.year != next_academic_year.year:
+        if self.tree_version_to.entity_id.year <= settings.YEAR_LIMIT_EDG_MODIFICATION:
             raise InvalidTreeVersionToFillTo(self.tree_version_to)

@@ -27,7 +27,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.search.search_form import BaseSearchForm
-from base.models import tutor
+from base.auth.roles import tutor
 
 
 class TutorSearchForm(BaseSearchForm):

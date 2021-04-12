@@ -162,6 +162,9 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         self.assertEqual(
             version_tree_domain_obj.end_year_of_existence, root_group.group.end_year.year
         )
+        self.assertEqual(
+            version_tree_domain_obj.start_year, root_group.group.start_year.year
+        )
 
     def test_field_mapping_with_transition_version(self):
         entity_id = ProgramTreeVersionIdentityFactory(year=self.year, transition_name='Transition')
@@ -197,4 +200,7 @@ class TestProgramTreeVersionRepositoryGetMethod(TestCase):
         )
         self.assertEqual(
             version_tree_domain_obj.end_year_of_existence, root_group.group.end_year.year
+        )
+        self.assertEqual(
+            version_tree_domain_obj.start_year, root_group.group.start_year.year
         )
