@@ -40,13 +40,13 @@ from base.utils.urls import reverse_with_get
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.service.read import get_group_service
-from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.forms.academic_year_choices import get_academic_year_choices_for_groups
 from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
@@ -95,7 +95,7 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group": self.get_group(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
-            "academic_year_choices": get_academic_year_choices(
+            "academic_year_choices": get_academic_year_choices_for_groups(
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab)
