@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-12-11 14:07+0100\n"
+"POT-Creation-Date: 2021-03-29 15:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,13 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#, python-format
 msgid ""
 "\n"
 "                                    If you customize one of the field below, "
 "it only change the address displayed on the\n"
 "                                    score encodings sheets for the program "
-"%(program)s.\n"
+"%(acronym)s.\n"
 "                                    It will never change the address of any "
 "structure. The list below will help you to\n"
 "                                    pre-fill in the form.\n"
@@ -31,8 +30,8 @@ msgstr ""
 "\n"
 "Si vous personnalisez l'un des champs ci-dessous, cela ne changera que "
 "l'adresse affichée sur les pages d'encodage de notes pour la formation "
-"%(program)s. Cela ne changera jamais l'adresse d'une structure. La liste ci-"
-"dessous vous aidera à pré-remplir le formulaire."
+"%(acronym)s. Cela ne changera jamais l'adresse d'une structure. La "
+"liste ci-dessous vous aidera à pré-remplir le formulaire."
 
 #, python-format
 msgid ""
@@ -164,6 +163,9 @@ msgstr "Les notes décimales sont autorisées pour ce cours"
 msgid "Definitive submission (Submit to faculty)"
 msgstr "Soumission définitive (Soumettre à la faculté)"
 
+msgid "Details other educational facilities"
+msgstr "Détails autre aménagement"
+
 msgid "Display all deadlines for this learning unit"
 msgstr "Afficher toutes les dates d'échéance pour cette unité d'enseignement"
 
@@ -288,9 +290,6 @@ msgstr "Unité d'apprentissage"
 
 msgid "Line"
 msgstr "Ligne"
-
-msgid "Locality"
-msgstr "Localité"
 
 msgid "M=Justified Absence"
 msgstr "M=Absence Justifiée"
@@ -479,14 +478,14 @@ msgstr "Note contenant plus de 2 décimales"
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
 
-msgid "Score(s) saved"
-msgstr "Note(s) sauvée(s)"
-
 msgid "Score sheet address was successfully saved."
 msgstr "L'adresse de la feuille de notes a été sauvée avec succès."
 
 msgid "Score submitted"
 msgstr "note soumise"
+
+msgid "Score(s) saved"
+msgstr "Note(s) sauvée(s)"
 
 msgid "Scores encoding"
 msgstr "Encodage de notes"
@@ -530,6 +529,14 @@ msgstr "Session"
 msgid "Session number"
 msgstr "Numéro de session"
 
+msgid ""
+"Some of the students enrolled to this course have a PEPS status (Program for "
+"Students with a Specific Profile). You will find detailled information in "
+"the Excel file to encode notes"
+msgstr ""
+"Certain.e.s des étudiant.e.s inscrit.e.s à ce cours ont un statut PEPS (Projet pour étudiant.e à profil spécifique). "
+"Vous trouverez les informations détaillées dans le fichier Excel d'encodage des notes"
+
 msgid "Specific room of examination"
 msgstr "Local spécifique"
 
@@ -538,6 +545,9 @@ msgstr "Etat"
 
 msgid "Status"
 msgstr "Status"
+
+msgid "Street and number"
+msgstr "Rue et numéro"
 
 msgid "Student not registered for exam"
 msgstr "L'étudiant n'est plus inscrit à l'examen"
@@ -667,7 +677,7 @@ msgid ""
 "our database"
 msgstr ""
 "Vous n'avez pas les droits d'accès pour cette unité d'enseignement ou elle "
-"n'existe pas dans notre base de donénes"
+"n'existe pas dans notre base de données"
 
 msgid ""
 "You don't have access rights for this offer or it doesn't exist in our "

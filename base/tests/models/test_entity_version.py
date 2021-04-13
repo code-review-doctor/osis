@@ -30,7 +30,6 @@ import factory.fuzzy
 from django.test import TestCase
 from django.utils import timezone
 
-from base.business.learning_units.perms import find_last_requirement_entity_version
 from base.forms.learning_unit.entity_form import find_attached_faculty_entities_version
 from base.models import entity_version
 from base.models.entity_version import (
@@ -45,7 +44,6 @@ from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE, SECTOR
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory, EntityWithVersionFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from osis_common.utils.datetime import get_tzinfo
@@ -627,25 +625,3 @@ class EntityVersionLoadInMemoryTest(TestCase):
                                                                         .most_recent_acronym,
                                                                         entity_type=case.get('entity_type'))
                 self.assertEqual(case.get('expected_result'), to_test)
-
-
-class TestFindLastEntityVersionByLearningUnitYearId(TestCase):
-    def test_when_entity_version(self):
-        learning_unit_year = LearningUnitYearFactory()
-
-        actual_entity_version = find_last_requirement_entity_version(
-            learning_unit_year_id=learning_unit_year.id,
-        )
-
-        self.assertIsNone(actual_entity_version)
-
-    def test_find_last_entity_version_by_learning_unit_year_id(self):
-        an_entity_version = EntityVersionFactory()
-        learning_unit_year = LearningUnitYearFactory(
-            learning_container_year__requirement_entity=an_entity_version.entity
-        )
-
-        actual_entity_version = find_last_requirement_entity_version(
-            learning_unit_year_id=learning_unit_year.id,
-        )
-        self.assertEqual(an_entity_version, actual_entity_version)

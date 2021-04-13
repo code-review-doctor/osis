@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/education_group/
    description: 'Production server'
 info:
-  version: '1.02'
+  version: '1.05'
   title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
@@ -94,6 +94,11 @@ paths:
         name: search
         schema:
           description: A search term.
+          type: string
+      - in: query
+        name: study_domain
+        schema:
+          description: UUID of main study domain
           type: string
       responses:
         '200':
@@ -911,6 +916,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         prerequisites_string:
           type: string
           example: (codeA OR codeB) AND (codeC)
@@ -927,6 +934,8 @@ components:
           type: string
           format: uri
         title:
+          type: string
+        title_en:
           type: string
     Hops:
       type: object
@@ -951,12 +960,15 @@ components:
           type: string
         code:
           type: string
+        transition_name:
+          type: string
         is_transition:
           type: boolean
       required:
         - url
         - version_name
         - code
+        - transition_name
         - is_transition
     PaginatedTraining:
       allOf:
@@ -1147,8 +1159,8 @@ components:
               type: string
             version_name:
               type: string
-            is_transition:
-              type: boolean
+            transition_name:
+              type: string
             versions:
               $ref: '#/components/schemas/ArrayOfVersions'
     GroupDetailed:
@@ -1401,6 +1413,7 @@ components:
         - access_condition
         - comment
         - remark
+        - remark_en
         - link_type
         - link_type_text
         - children

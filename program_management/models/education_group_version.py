@@ -23,18 +23,85 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.utils.constants import YES, NO
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
+def fill_from_past_year(modeladmin, request, queryset):
+    from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
+    from program_management.ddd.service.write import bulk_fill_program_tree_version_content_service_from_past_year
+    cmds = []
+    qs = queryset.select_related("offer", "root_group", "offer__academic_year")
+    for obj in qs:
+        cmd = FillProgramTreeVersionContentFromProgramTreeVersionCommand(
+            from_year=obj.offer.academic_year.past_year,
+            from_offer_acronym=obj.offer.acronym,
+            from_version_name=obj.version_name,
+            from_transition_name=obj.transition_name,
+            to_year=obj.offer.academic_year.year,
+            to_offer_acronym=obj.offer.acronym,
+            to_version_name=obj.version_name,
+            to_transition_name=obj.transition_name
+        )
+        cmds.append(cmd)
+    result = bulk_fill_program_tree_version_content_service_from_past_year.\
+        bulk_fill_program_tree_version_content_from_last_year(cmds)
+    modeladmin.message_user(request, "{} programs have been filled".format(len(result)))
+
+
+fill_from_past_year.short_description = _("Fill program tree content from last year")
+
+
+class StandardListFilter(admin.SimpleListFilter):
+    title = _('Version')
+
+    parameter_name = 'standard'
+
+    def lookups(self, request, model_admin):
+        return (
+            (YES, _("Standard")),
+            (NO, _("Particular"))
+        )
+
+    def queryset(self, request, queryset):
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.filter(version_name=program_tree_version.STANDARD)
+        if self.value() == NO:
+            return queryset.exclude(version_name=program_tree_version.STANDARD)
+        return queryset
+
+
+class TransitionListFilter(admin.SimpleListFilter):
+    title = _('Transition')
+
+    parameter_name = 'transition'
+
+    def lookups(self, request, model_admin):
+        return (
+            (YES, _("Yes")),
+            (NO, _("No"))
+        )
+
+    def queryset(self, request, queryset):
+        from program_management.ddd.domain import program_tree_version
+        if self.value() == YES:
+            return queryset.exclude(transition_name=program_tree_version.NOT_A_TRANSITION)
+        if self.value() == NO:
+            return queryset.filter(transition_name=program_tree_version.NOT_A_TRANSITION)
+        return queryset
+
+
 class EducationGroupVersionAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('offer', 'version_name', 'root_group', 'is_transition')
-    list_filter = ('is_transition', 'offer__academic_year')
+    list_display = ('offer', 'version_name', 'root_group', 'transition_name')
+    list_filter = (StandardListFilter, TransitionListFilter, 'offer__academic_year',)
     search_fields = ('offer__acronym', 'root_group__partial_acronym', 'version_name')
+    actions = [fill_from_past_year]
 
 
 class StandardEducationGroupVersionManager(models.Manager):
@@ -46,7 +113,12 @@ class EducationGroupVersion(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    is_transition = models.BooleanField(verbose_name=_('Transition'))
+    transition_name = models.CharField(
+        blank=True,
+        max_length=25,
+        verbose_name=_('Transition name'),
+        default=''
+    )
     version_name = models.CharField(
         blank=True,
         max_length=25,
@@ -80,8 +152,23 @@ class EducationGroupVersion(models.Model):
     standard = StandardEducationGroupVersionManager()
 
     def __str__(self):
-        return "{} ({})".format(self.offer, self.version_name) if self.version_name else str(self.offer)
+        offer_name = self.offer.acronym
+        if self.version_name and self.transition_name:
+            offer_name += '[{}-{}]'.format(self.version_name, self.transition_name)
+        elif self.version_name:
+            offer_name += '[{}]'.format(self.version_name)
+        elif self.transition_name:
+            offer_name += '[{}]'.format(self.transition_name)
+        offer_name += ' - {}'.format(self.offer.academic_year)
+        return offer_name
 
     class Meta:
-        unique_together = ('version_name', 'offer', 'is_transition')
+        unique_together = ('version_name', 'offer', 'transition_name')
         default_manager_name = 'objects'
+
+    def version_label(self):
+        if self.version_name and self.transition_name:
+            return '[{}-{}]'.format(self.version_name, self.transition_name)
+        elif self.version_name or self.transition_name:
+            return '[{}]'.format(self.version_name if self.version_name else self.transition_name)
+        return ''

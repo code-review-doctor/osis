@@ -1,7 +1,6 @@
 from .common import CommonGeneralInformation, UpdateCommonGeneralInformation
-from .common_bachelor import CommonBachelorAdmissionCondition, UpdateCommonBachelorAdmissionCondition
-from .common_aggregate import CommonAggregateAdmissionCondition, UpdateCommonAggregateAdmissionCondition
-from .common_master import CommonMasterAdmissionCondition, UpdateCommonMasterAdmissionCondition
-from .common_master_specialized import CommonMasterSpecializedAdmissionCondition, \
-    UpdateCommonMasterSpecializedAdmissionCondition
-from .publish import publish_common_admission_conditions, publish_common_pedagogy
+from .common_aggregate import CommonAggregateAccessRequirements
+from .common_bachelor import CommonBachelorAccessRequirements
+from .common_master import CommonMasterAccessRequirements
+from .common_master_specialized import CommonMasterSpecializedAccessRequirements
+from .publish import publish_common_access_requirements, publish_common_pedagogy

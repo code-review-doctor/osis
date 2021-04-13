@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -116,13 +116,16 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
         'can_edit_learning_unit_proposal': person.user.has_perm('base.can_edit_learning_unit_proposal', luy),
         'can_consolidate_proposal': person.user.has_perm('base.can_consolidate_learningunit_proposal', luy),
         'can_manage_volume': person.user.has_perm('base.can_edit_learningunit', luy),
+        'can_cancel_proposal': person.user.has_perm('base.can_cancel_proposal', luy),
     })
 
     return context
 
 
-def get_common_context_learning_unit_year(person, learning_unit_year_id: Optional[int] = None,
-                                          code: Optional[str] = None, year: Optional[int] = None):
+def get_common_context_learning_unit_year(person,
+                                          learning_unit_year_id: Optional[int] = None,
+                                          code: Optional[str] = None,
+                                          year: Optional[int] = None):
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -136,6 +139,7 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
         learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     else:
         learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
+
     return {
         'learning_unit_year': learning_unit_year,
         'current_academic_year': mdl.academic_year.starting_academic_year(),
@@ -146,3 +150,14 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
 def get_text_label_translated(text_lb, user_language):
     return next((txt for txt in text_lb.translated_text_labels
                  if txt.language == user_language), None)
+
+
+def get_common_context_to_publish(person, learning_unit_year: LearningUnitYear):
+    can_edit_pedagogy = person.user.has_perm('base.can_edit_learningunit_pedagogy', learning_unit_year)
+    can_edit_pedagogy_force_majeur = person.user.has_perm(
+        'base.can_edit_learningunit_pedagogy_force_majeur', learning_unit_year
+    )
+    return {
+        'can_edit_information': can_edit_pedagogy,
+        'can_edit_force_majeur_section': can_edit_pedagogy_force_majeur
+    }

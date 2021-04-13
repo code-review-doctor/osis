@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
 from base import models as mdl
+from base.business.education_group import has_coorganization
 from base.business.education_groups import general_information_sections
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
@@ -46,19 +47,20 @@ from education_group.ddd.domain.service.identity_search import TrainingIdentityS
 from education_group.ddd.service.read import get_group_service, get_training_service
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.forms.tree_version_choices import get_tree_versions_choices
+from education_group.models.group_year import GroupYear
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
-from program_management.ddd.business_types import *
 from program_management.ddd import command as command_program_management
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import node_identity_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
-from base.business.education_group import has_coorganization
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -104,7 +106,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
 
     @cached_property
-    def education_group_version(self):
+    def education_group_version(self) -> 'EducationGroupVersion':
         try:
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group__academic_year', 'root_group__education_group_type'
@@ -145,15 +147,16 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             ).format(
                 root=root_node,
                 version="[{}]".format(version_identity.version_name)
-                if version_identity and not version_identity.is_standard() else ""
+                if version_identity and not version_identity.is_official_standard else ""
             )
             display_warning_messages(self.request, message)
             return root_node
 
     def get_context_data(self, **kwargs):
+        user_person = self.request.user.person
         return {
             **super().get_context_data(**kwargs),
-            "person": self.request.user.person,
+            "person": user_person,
             "enums": mdl.enums.education_group_categories,
             "tab_urls": self.get_tab_urls(),
             "group": self.group,
@@ -169,6 +172,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
             "is_root_node": self.is_root_node,
+            "version_label": version_label(self.program_tree_version_identity),
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
@@ -183,8 +187,13 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
-            "create_version_url": self.get_create_version_url(),
+            "fill_transition_version_content_url": self.get_fill_transition_version_content_url(),
+            "fill_transition_version_content_permission_name":
+                self.get_fill_transition_version_content_permission_name(),
+            "create_specific_version_url": self.get_create_specific_version_url(),
+            "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
+            "create_transition_version_permission_name": self.get_create_transition_version_permission_name(),
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.education_group_version.root_group.academic_year.year,
                                                   self.education_group_version.root_group.partial_acronym]
@@ -199,6 +208,12 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                                               ]
                                         ),
             "show_coorganization": has_coorganization(self.education_group_version.offer),
+            "view_publish_btn":
+                self.request.user.has_perm('base.view_publish_btn') and
+                (self.have_general_information_tab() or self.have_access_requirements_tab() or
+                 self.have_skills_and_achievements_tab()),
+            "publish_url": self.get_publish_url(),
+
         }
 
     def get_permission_object(self) -> 'GroupYear':
@@ -217,7 +232,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                "?path_to={}".format(self.path)
 
     def get_update_training_url(self):
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return reverse_with_get(
                 'training_update',
                 kwargs={'code': self.kwargs['code'], 'year': self.kwargs['year'],
@@ -231,19 +246,19 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         )
 
     def get_update_permission_name(self) -> str:
-        if self.current_version.is_standard_version:
+        if self.current_version.is_official_standard:
             return "base.change_training"
         return "program_management.change_training_version"
 
     def get_delete_permanently_training_url(self):
-        if self.program_tree_version_identity.is_standard():
+        if self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'training_delete',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             )
 
     def get_delete_permanently_tree_version_url(self):
-        if not self.program_tree_version_identity.is_standard():
+        if not self.program_tree_version_identity.is_official_standard:
             return reverse(
                 'delete_permanently_tree_version',
                 kwargs={
@@ -255,10 +270,32 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_delete_permanently_tree_version_permission_name(self):
         return "program_management.delete_permanently_training_version"
 
-    def get_create_version_url(self):
-        if self.is_root_node and self.program_tree_version_identity.is_standard():
+    def get_fill_transition_version_content_permission_name(self):
+        return "base.fill_training_version"
+
+    def get_fill_transition_version_content_url(self):
+        if self.is_root_node and self.program_tree_version_identity.is_transition:
             return reverse(
-                'create_education_group_version',
+                "fill_transition_version_content",
+                kwargs={
+                    'year': self.current_version.entity_id.year,
+                    'acronym': self.current_version.entity_id.offer_acronym,
+                    'transition_name': self.current_version.entity_id.transition_name,
+                    'version_name': self.current_version.entity_id.version_name,
+                }
+            )
+
+    def get_create_specific_version_url(self):
+        if self.is_root_node and self.program_tree_version_identity.is_official_standard:
+            return reverse(
+                'create_education_group_specific_version',
+                kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
+            ) + "?path={}".format(self.path)
+
+    def get_create_transition_version_url(self):
+        if self.is_root_node and not self.program_tree_version_identity.is_transition:
+            return reverse(
+                'create_education_group_transition_version',
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.path)
 
@@ -272,6 +309,9 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
     def get_create_version_permission_name(self) -> str:
         return "base.add_training_version"
 
+    def get_create_transition_version_permission_name(self) -> str:
+        return "base.add_training_transition_version"
+
     def get_tab_urls(self):
         tab_urls = OrderedDict({
             Tab.IDENTIFICATION: {
@@ -283,7 +323,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
-                'display': self.current_version.is_standard_version,
+                'display': self.current_version.is_official_standard,
                 'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, self.node_identity, self.path),
             },
             Tab.ADMINISTRATIVE_DATA: {
@@ -316,11 +356,11 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
                 'display': self.have_skills_and_achievements_tab(),
                 'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.path),
             },
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
-                'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self.have_admission_condition_tab(),
-                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.path),
+                'active': Tab.ACCESS_REQUIREMENTS == self.active_tab,
+                'display': self.have_access_requirements_tab(),
+                'url': get_tab_urls(Tab.ACCESS_REQUIREMENTS, self.node_identity, self.path),
             },
         })
 
@@ -332,19 +372,25 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
 
     def have_administrative_data_tab(self):
         return self.group.type not in TrainingType.root_master_2m_types_enum() and \
-               self.current_version.is_standard_version
+               self.current_version.is_official_standard
 
     def have_general_information_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in general_information_sections.SECTIONS_PER_OFFER_TYPE
 
     def have_skills_and_achievements_tab(self):
-        return self.current_version.is_standard_version and \
+        return self.current_version.is_official_standard and \
                self.group.type.name in TrainingType.with_skills_achievements()
 
-    def have_admission_condition_tab(self):
-        return self.current_version.is_standard_version and \
-               self.group.type.name in TrainingType.with_admission_condition()
+    def have_access_requirements_tab(self):
+        return self.current_version.is_official_standard and \
+               self.group.type.name in TrainingType.with_access_requirements()
+
+    def get_publish_url(self):
+        return reverse('publish_general_information', args=[
+            self.node_identity.year,
+            self.node_identity.code
+        ]) + "?path={}".format(self.path)
 
 
 def _get_view_name_from_tab(tab: Tab):
@@ -356,7 +402,7 @@ def _get_view_name_from_tab(tab: Tab):
         Tab.UTILIZATION: 'training_utilization',
         Tab.GENERAL_INFO: 'training_general_information',
         Tab.SKILLS_ACHIEVEMENTS: 'training_skills_achievements',
-        Tab.ADMISSION_CONDITION: 'training_admission_condition',
+        Tab.ACCESS_REQUIREMENTS: 'training_access_requirements',
     }[tab]
 
 

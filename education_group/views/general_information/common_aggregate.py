@@ -27,47 +27,47 @@ from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
-from django.views.generic import TemplateView
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import TemplateView
 
 from base.models.admission_condition import AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
-from education_group.views.general_information.update_common_condition import UpdateCommonCondition
 from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class Tab(Enum):
-    ADMISSION_CONDITION = 0
+    ACCESS_REQUIREMENTS = 0
 
 
-class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
+class CommonAggregateAccessRequirements(PermissionRequiredMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
     template_name = "education_group_app/general_information/common_aggregate.html"
 
     def get_context_data(self, **kwargs):
-        object = self.get_object()
+        obj = self.get_object()
         return {
             **super().get_context_data(**kwargs),
-            "object": object,
-            "admission_condition": self.get_admission_condition(),
+            "object": obj,
+            "access_requirements": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
             ),
             "update_text_url": self.get_update_text_url(),
-            "publish_url": self.get_publish_url()
+            "publish_url": self.get_publish_url(),
+            "view_publish_btn": True,
         }
 
     def get_tab_urls(self):
         return {
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
                 'active': True,
                 'display': True,
-                'url': reverse('common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})
+                'url': reverse('common_aggregate_access_requirements', kwargs={'year': self.kwargs['year']})
             }
         }
 
@@ -81,13 +81,14 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
             raise Http404
 
     def get_publish_url(self):
-        return reverse('publish_common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})
+        return reverse('publish_common_aggregate_access_requirements', kwargs={'year': self.kwargs['year']})
 
     def get_update_text_url(self) -> str:
         return reverse(
-            'update_common_aggregate_admission_condition',
+            'education_group_year_access_requirements_update_text',
             kwargs={
-                'year': self.kwargs['year'],
+                'year': self.get_object().academic_year.year,
+                'code': self.get_object().partial_acronym
             }
         )
 
@@ -96,16 +97,3 @@ class CommonAggregateAdmissionCondition(PermissionRequiredMixin, TemplateView):
         if hasattr(obj, 'admissioncondition'):
             return obj.admissioncondition
         return AdmissionCondition.objects.get_or_create(education_group_year=obj)[0]
-
-
-class UpdateCommonAggregateAdmissionCondition(UpdateCommonCondition):
-    def get_admission_condition(self):
-        common = EducationGroupYear.objects.look_for_common(
-            academic_year__year=self.kwargs['year'],
-            education_group_type__name=TrainingType.AGGREGATION.name,
-            admissioncondition__isnull=False
-        ).select_related('admissioncondition').get()
-        return common.admissioncondition
-
-    def get_success_url(self) -> str:
-        return reverse('common_aggregate_admission_condition', kwargs={'year': self.kwargs['year']})

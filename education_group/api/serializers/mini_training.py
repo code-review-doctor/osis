@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.db.models import Case, Value, BooleanField, When
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -31,10 +31,10 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.education_group_version import MiniTrainingVersionListSerializer
 from education_group.api.serializers.education_group_title import EducationGroupTitleAllLanguagesSerializer
+from education_group.api.serializers.education_group_version import MiniTrainingVersionListSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 
 
 class MiniTrainingListSerializer(EducationGroupTitleAllLanguagesSerializer, serializers.ModelSerializer):
@@ -116,7 +116,13 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
         )
 
     def get_versions(self, version):
-        versions = version.offer.educationgroupversion_set.filter(is_transition=False)
+        versions = version.offer.educationgroupversion_set.filter(transition_name=NOT_A_TRANSITION).annotate(
+            is_transition=Case(
+                When(transition_name='', then=Value(False)),
+                default=Value(True),
+                output_field=BooleanField()
+            )
+        )
         return MiniTrainingVersionListSerializer(versions, many=True, context=self.context).data
 
     def to_representation(self, obj):

@@ -29,18 +29,18 @@ from django.utils import translation
 from django.views.generic import FormView
 from waffle.decorators import waffle_switch
 
-from program_management.forms.pdf_select_language import PDFSelectLanguage
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums.education_group_types import GroupType
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch, \
     ProgramTreeIdentitySearch
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from backoffice.settings.base import LANGUAGE_CODE_EN
-from program_management.ddd.domain import exception
-
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.forms.pdf_select_language import PDFSelectLanguage
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
 MAIN_PART_INIT_SIZE = 650
@@ -73,19 +73,20 @@ def pdf_content(request, year, code, language):
         title = tree.root_node.group_title_en if language == LANGUAGE_CODE_EN and tree.root_node.group_title_en \
             else tree.root_node.group_title_fr
 
-    if program_tree_version and program_tree_version.version_label:
+    version_str = version_label(program_tree_version.entity_identity) if program_tree_version else ''
+    if version_str:
         version_title = program_tree_version.title_en \
             if language == LANGUAGE_CODE_EN and program_tree_version.title_en else program_tree_version.title_fr
-        title = "{} - {}{}".format(title, version_title, program_tree_version.version_label)
+        title = "{} - {}{}".format(title, version_title, version_str)
 
     context = {
         'root': tree.root_node,
-        'tree': tree.root_node.children,
+        'tree': tree,
         'language': language,
         'created': datetime.datetime.now(),
         'max_block': tree.get_greater_block_value(),
         'main_part_col_length': get_main_part_col_length(tree.get_greater_block_value()),
-        'title': title
+        'title': title.strip()
     }
 
     with translation.override(language):
@@ -94,8 +95,7 @@ def pdf_content(request, year, code, language):
             context=context,
             filename="{}{}".format(
                 tree.root_node.title,
-                program_tree_version.version_label if program_tree_version and program_tree_version.version_label
-                else ''
+                version_str if version_str else ''
             ),
             template='pdf_content.html',
         )

@@ -42,6 +42,7 @@ from assessments.forms.score_file import ScoreFileForm
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
+from base.auth.roles import tutor as tutor_mdl
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
 col_academic_year = HEADER.index(_('Academic year'))
@@ -167,8 +168,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
 
     score_list = _get_score_list_filtered_by_enrolled_state(learning_unit_year_id, request.user)
 
-    offer_acronyms_managed_by_user = {offer_year.acronym for offer_year
-                                      in score_encoding_list.find_related_offer_years(score_list)}
+    offer_acronyms_managed_by_user = {educ_group_year.acronym for educ_group_year
+                                      in score_encoding_list.find_related_education_group_years(score_list)}
     learn_unit_acronyms_managed_by_user = {learning_unit_year.acronym for learning_unit_year
                                             in score_encoding_list.find_related_learning_unit_years(score_list)}
     registration_ids_managed_by_user = score_encoding_list.find_related_registration_ids(score_list)
@@ -360,7 +361,7 @@ def _is_informative_justification(enrollment, xls_justification, is_program_mana
 
 
 def __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year):
-    tutor = mdl.tutor.find_by_user(request.user)
+    tutor = tutor_mdl.find_by_user(request.user)
     if tutor and not mdl_attr.attribution.is_score_responsible(request.user, learning_unit_year):
         messages.add_message(request, messages.SUCCESS,
                              '%s' % _("The scores responsible must still submit the scores"))

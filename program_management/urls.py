@@ -27,7 +27,9 @@ from django.conf.urls import url
 from django.urls import include, path
 
 import program_management.views.tree.copy_cut
+import program_management.views.tree_version.check_transition_name
 import program_management.views.tree_version.check_version_name
+from program_management.ddd.domain import program_tree_version
 from program_management.views import content
 from program_management.views import groupelementyear_read, element_utilization, excel, search, \
     tree, prerequisite_read, prerequisite_update
@@ -35,8 +37,9 @@ from program_management.views import quick_search, create_element, publish_gener
 from program_management.views.proxy.content import ContentRedirectView
 from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views.tree_version import create as create_program_tree_version, update_training, \
-    update_mini_training
+    update_mini_training, fill_content
 from program_management.views.tree_version.delete import TreeVersionDeleteView
+
 
 urlpatterns = [
     url(r'^group_pdf_content/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/',
@@ -118,19 +121,41 @@ urlpatterns = [
         path('', IdentificationRedirectView.as_view(), name='element_identification'),
         path('content/', ContentRedirectView.as_view(), name='element_content'),
         path(
-            'create_education_group_version/',
-            create_program_tree_version.CreateProgramTreeVersion.as_view(),
-            name="create_education_group_version"
+            'create_education_group_specific_version/',
+            create_program_tree_version.CreateProgramTreeSpecificVersion.as_view(),
+            name="create_education_group_specific_version"
+        ),
+        path(
+            'create_education_group_transition_version/',
+            create_program_tree_version.CreateProgramTreeTransitionVersion.as_view(),
+            name="create_education_group_transition_version"
         ),
         path('publish', publish_general_information.publish, name='publish_general_information'),
         path('delete/', TreeVersionDeleteView.as_view(), name='delete_permanently_tree_version'),
+
     ])),
+    path(
+        '<int:year>/<acronym:acronym>/<str:transition_name>/fill',
+        fill_content.FillTransitionVersionContentView.as_view(),
+        name='fill_transition_version_content',
+        kwargs={'version_name': program_tree_version.STANDARD}
+    ),
+    path(
+        '<int:year>/<acronym:acronym>/<str:transition_name>/<str:version_name>/fill',
+        fill_content.FillTransitionVersionContentView.as_view(),
+        name='fill_transition_version_content'
+    ),
 
     path('<int:year>/<acronym:acronym>/', include([
         path(
             'check_version_name/',
             program_management.views.tree_version.check_version_name.check_version_name,
             name="check_version_name"
+        ),
+        path(
+            'check_transition_name/',
+            program_management.views.tree_version.check_transition_name.check_transition_name,
+            name="check_transition_name"
         ),
     ])),
 ]

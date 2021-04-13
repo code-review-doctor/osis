@@ -25,7 +25,7 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required
 from django.db.models import Prefetch
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -34,17 +34,13 @@ from django.views.decorators.http import require_http_methods
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
-    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views import learning_unit
 from base.views.common import display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
-from base.views.learning_units.perms import PermissionDecorator
 from cms.models.text_label import TextLabel
 from learning_unit.views.utils import learning_unit_year_getter
 from osis_role.contrib.views import permission_required
@@ -63,15 +59,15 @@ def toggle_summary_locked(request, learning_unit_year_id):
 
 @login_required
 @require_http_methods(["GET", "POST"])
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def learning_unit_pedagogy_edit(request, learning_unit_year_id):
     return edit_learning_unit_pedagogy(request, learning_unit_year_id)
 
 
 @login_required
 @require_http_methods(["GET", "POST"])
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, "learning_unit_year_id",
-                     LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy_force_majeur', fn=learning_unit_year_getter,
+                     raise_exception=True)
 def learning_unit_pedagogy_force_majeure_edit(request, learning_unit_year_id):
     if request.method == 'POST':
         return post_method_edit_force_majeure_pedagogy(request)

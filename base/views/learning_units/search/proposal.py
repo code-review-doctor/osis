@@ -1,3 +1,28 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 from django.contrib.messages import WARNING
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -13,7 +38,9 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.search import RenderToExcel
 from base.views.common import display_messages_by_level
 from base.views.learning_units.search.common import _create_xls_proposal, \
-    _create_xls_proposal_comparison, BaseLearningUnitSearch, SearchTypes
+    _create_xls_proposal_comparison, BaseLearningUnitSearch, SearchTypes, _create_xls_with_parameters, \
+    _create_xls_attributions, _create_xls_ue_utilizations_with_one_training_per_line, \
+    _create_xls_educational_specifications
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 ACTION_BACK_TO_INITIAL = "back_to_initial"
@@ -23,6 +50,10 @@ ACTION_FORCE_STATE = "force_state"
 
 @RenderToExcel("xls", _create_xls_proposal)
 @RenderToExcel("xls_comparison", _create_xls_proposal_comparison)
+@RenderToExcel("xls_with_parameters", _create_xls_with_parameters)
+@RenderToExcel("xls_one_pgm_per_line", _create_xls_ue_utilizations_with_one_training_per_line)
+@RenderToExcel("xls_attributions", _create_xls_attributions)
+@RenderToExcel("xls_educational_specifications", _create_xls_educational_specifications)
 class SearchLearningUnitProposal(BaseLearningUnitSearch):
     template_name = "learning_unit/search/proposal.html"
     search_type = SearchTypes.PROPOSAL_SEARCH

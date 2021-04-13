@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,128 +23,135 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 import itertools
+from datetime import datetime
 from typing import Iterable
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 
-from attribution.views.perms import tutor_can_view_educational_information
-from base.business import event_perms
-from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy, \
-    find_educational_information_submission_dates_of_learning_unit_year, CanUserEditEducationalInformation, \
-    find_educational_information_force_majeure_submission_dates_of_learning_unit_year, \
-    is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, CanUserEditEducationalInformationForceMajeure
-from base.models import entity_calendar
-from base.models.enums import academic_calendar_type
+from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
-from base.models.tutor import Tutor
+from base.auth.roles.tutor import Tutor
 from base.views import teaching_material
 from base.views.learning_unit import get_specifications_context, get_achievements_group_by_language, \
     get_languages_settings
 from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy, \
     post_method_edit_force_majeure_pedagogy
-from base.views.learning_units.perms import PermissionDecorator
+from education_group.templatetags.academic_year_display import display_as_academic_year
+from learning_unit.calendar.learning_unit_force_majeur_summary_edition import \
+    LearningUnitForceMajeurSummaryEditionCalendar
+from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @login_required
 def list_my_attributions_summary_editable(request):
     tutor = get_object_or_404(Tutor, person__user=request.user)
-    event_perm_desc_fiche = event_perms.EventPermSummaryCourseSubmission()
-    event_perm_force_majeure = event_perms.EventPermSummaryCourseSubmissionForceMajeure()
 
-    if event_perm_desc_fiche.is_open():
-        data_year = event_perm_desc_fiche.get_academic_years().get()
-    else:
-        previous_opened_calendar = event_perm_desc_fiche.get_previous_opened_calendar()
-        data_year = previous_opened_calendar.data_year
-        messages.add_message(
-            request,
-            messages.INFO,
-            _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
-                "data_year": data_year,
-                "end_date": (previous_opened_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
-            }
+    summary_edition_calendar = LearningUnitSummaryEditionCalendar()
+    summary_edition_academic_events_opened = summary_edition_calendar.get_opened_academic_events()
+    force_majeur_summary_edition_calendar = LearningUnitForceMajeurSummaryEditionCalendar()
+    force_majeure_academic_events_opened = force_majeur_summary_edition_calendar.get_opened_academic_events()
+
+    if summary_edition_academic_events_opened or force_majeure_academic_events_opened:
+        event_based = min(
+            summary_edition_academic_events_opened + force_majeure_academic_events_opened,
+            key=lambda event: event.authorized_target_year
         )
-        next_opened_calendar = event_perm_desc_fiche.get_next_opened_calendar()
-        if next_opened_calendar:
+        year_displayed = event_based.authorized_target_year
+    else:
+        year_displayed = datetime.today().year
+
+    main_summary_edition_academic_event = next(
+        (event for event in summary_edition_academic_events_opened if event.authorized_target_year == year_displayed),
+        None
+    )
+    if not main_summary_edition_academic_event:
+        main_summary_edition_academic_event = summary_edition_calendar.get_academic_event(year_displayed)
+        if not main_summary_edition_academic_event.is_open_now():
+            messages.add_message(
+                request,
+                messages.INFO,
+                _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
+                    "data_year": display_as_academic_year(main_summary_edition_academic_event.authorized_target_year),
+                    "end_date": main_summary_edition_academic_event.end_date.strftime('%d/%m/%Y'),
+                }
+            )
+        next_summary_edition_academic_event = summary_edition_calendar.get_academic_event(year_displayed+1)
+        if next_summary_edition_academic_event and not next_summary_edition_academic_event.is_open_now():
             messages.add_message(
                 request,
                 messages.INFO,
                 _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
-                    "data_year": next_opened_calendar.data_year,
-                    "start_date": next_opened_calendar.start_date.strftime('%d/%m/%Y'),
+                    "data_year": display_as_academic_year(next_summary_edition_academic_event.authorized_target_year),
+                    "start_date": next_summary_edition_academic_event.start_date.strftime('%d/%m/%Y'),
                 }
             )
 
-    if event_perm_force_majeure.is_open():
-        force_majeure_calendar = event_perm_force_majeure.get_open_academic_calendars_queryset().get()
+    force_majeure_academic_event = next(
+        (event for event in force_majeure_academic_events_opened if event.authorized_target_year == year_displayed),
+        None
+    )
+    if force_majeure_academic_event:
         messages.add_message(
             request,
             messages.WARNING,
             _('Force majeure case : Some fields of the description fiche can be edited from %(start_date)s '
               'to %(end_date)s.') % {
-                "start_date": force_majeure_calendar.start_date.strftime('%d/%m/%Y'),
-                "end_date": (force_majeure_calendar.end_date - datetime.timedelta(days=1)).strftime('%d/%m/%Y'),
-                # TODO :: Remove timedelta when end_date is included in period
+                "start_date": force_majeure_academic_event.start_date.strftime('%d/%m/%Y'),
+                "end_date": force_majeure_academic_event.end_date.strftime('%d/%m/%Y'),
             }
         )
     else:
-        force_majeure_calendar = event_perm_force_majeure.get_academic_calendars_queryset(data_year=data_year).first()
+        force_majeure_academic_event = force_majeur_summary_edition_calendar.get_academic_event(
+            target_year=main_summary_edition_academic_event.authorized_target_year
+        )
 
-    learning_unit_years = find_learning_unit_years_by_academic_year_tutor_attributions(
-        academic_year=data_year,
-        tutor=tutor
-    )
-    entity_calendars = entity_calendar.build_calendar_by_entities(
-        ac_year=data_year,
-        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-    )
-
-    errors = (CanUserEditEducationalInformation(
-        user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)
-    errors_force_majeure = (CanUserEditEducationalInformationForceMajeure(
-        user=tutor.person.user, learning_unit_year_id=luy.id) for luy in learning_unit_years)
+    academic_year = AcademicYear.objects.get(year=year_displayed)
+    learning_unit_years_qs = LearningUnitYear.objects_with_container.filter(
+        academic_year=academic_year,
+        learningcomponentyear__attributionchargenew__attribution__tutor=tutor
+    ).select_related(
+        'academic_year', 'learning_container_year__requirement_entity'
+    ).distinct().order_by('academic_year__year', 'acronym')
 
     context = {
-        'learning_unit_years_with_errors': list(zip(learning_unit_years, errors, errors_force_majeure)),
-        'entity_calendars': entity_calendars,
-        'event_perm_desc_fiche_open': event_perm_desc_fiche.is_open(),
-        'event_perm_force_majeure_open': event_perm_force_majeure.is_open(),
-        'event_perm_force_majeure_start_date': force_majeure_calendar.start_date if force_majeure_calendar else None,
-        'event_perm_force_majeure_end_date': force_majeure_calendar.end_date if force_majeure_calendar else None
+        'learning_unit_years': learning_unit_years_qs,
+        'summary_edition_academic_event': main_summary_edition_academic_event,
+        'force_majeure_academic_event': force_majeure_academic_event,
     }
     return render(request, 'manage_my_courses/list_my_courses_summary_editable.html', context)
 
 
 @login_required
-@tutor_can_view_educational_information
+@permission_required('base.can_access_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def view_educational_information(request, learning_unit_year_id):
     context = {
-        'submission_dates': find_educational_information_submission_dates_of_learning_unit_year(
-            learning_unit_year_id),
-        'force_majeure_submission_dates':
-            find_educational_information_force_majeure_submission_dates_of_learning_unit_year(learning_unit_year_id),
         'create_teaching_material_urlname': 'tutor_teaching_material_create',
         'update_teaching_material_urlname': 'tutor_teaching_material_edit',
         'delete_teaching_material_urlname': 'tutor_teaching_material_delete',
         'update_mobility_modality_urlname': 'tutor_mobility_modality_update'
     }
     template = 'manage_my_courses/educational_information.html'
-    query_set = LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year')
+    query_set = LearningUnitYear.objects.all().select_related(
+        'learning_unit', 'learning_container_year', 'academic_year'
+    )
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
+
     context.update(get_specifications_context(learning_unit_year, request))
-
+    context['submission_dates'] = LearningUnitSummaryEditionCalendar().get_academic_event(
+        learning_unit_year.academic_year.year
+    )
+    context['force_majeure_submission_dates'] = LearningUnitForceMajeurSummaryEditionCalendar().get_academic_event(
+        learning_unit_year.academic_year.year
+    )
     context["achievements"] = _fetch_achievements_by_language(learning_unit_year)
-
     context.update(get_languages_settings())
     context['div_class'] = 'collapse'
     return read_learning_unit_pedagogy(request, learning_unit_year_id, context, template)
@@ -158,14 +165,14 @@ def _fetch_achievements_by_language(learning_unit_year: LearningUnitYear) -> Ite
 
 
 @login_required
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def edit_educational_information(request, learning_unit_year_id):
     return edit_learning_unit_pedagogy(request, learning_unit_year_id)
 
 
 @login_required
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy_force_majeure_section, "learning_unit_year_id",
-                     LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy_force_majeur', fn=learning_unit_year_getter,
+                     raise_exception=True)
 def edit_educational_information_force_majeure(request, learning_unit_year_id):
     if request.method == 'POST':
         return post_method_edit_force_majeure_pedagogy(request)
@@ -174,20 +181,20 @@ def edit_educational_information_force_majeure(request, learning_unit_year_id):
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def create_teaching_material(request, learning_unit_year_id):
     return teaching_material.create_view(request, learning_unit_year_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def update_teaching_material(request, learning_unit_year_id, teaching_material_id):
     return teaching_material.update_view(request, learning_unit_year_id, teaching_material_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@permission_required('base.can_edit_learningunit_pedagogy', fn=learning_unit_year_getter, raise_exception=True)
 def delete_teaching_material(request, learning_unit_year_id, teaching_material_id):
     return teaching_material.delete_view(request, learning_unit_year_id, teaching_material_id)

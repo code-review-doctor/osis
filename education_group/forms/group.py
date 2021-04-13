@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,14 +29,15 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from education_group.calendar.education_group_extended_daily_management import \
-    EducationGroupExtendedDailyManagementCalendar
-from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from base.forms.common import ValidationRuleMixin
 from base.forms.utils.choice_field import BLANK_CHOICE
+from base.forms.utils.fields import OsisRichTextFormField
 from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from education_group.forms import fields
 from education_group.forms.fields import UpperCaseCharField
 from rules_management.enums import GROUP_PGRM_ENCODING_PERIOD, GROUP_DAILY_MANAGEMENT
@@ -64,8 +65,8 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         required=False,
         to_field_name='name',
     )
-    remark_fr = forms.CharField(widget=forms.Textarea, label=_("Remark"), required=False)
-    remark_en = forms.CharField(widget=forms.Textarea, label=_("remark in english"), required=False)
+    remark_fr = OsisRichTextFormField(config_name='link_only', label=_("Remark"), required=False)
+    remark_en = OsisRichTextFormField(config_name='link_only', label=_("remark in english"), required=False)
 
     def __init__(self, *args, user: User, group_type: str, **kwargs):
         self.user = user
@@ -78,8 +79,10 @@ class GroupForm(ValidationRuleMixin, forms.Form):
         self.__init_teaching_campus()
 
     def __init_academic_year_field(self):
+
+        is_transition = self.initial.get('code', '').upper().startswith('T')
         target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-        if self.user.person.is_faculty_manager:
+        if self.user.person.is_faculty_manager and not is_transition:
             target_years_opened = EducationGroupPreparationCalendar().get_target_years_opened()
 
         self.fields['academic_year'].queryset = self.fields['academic_year'].queryset.filter(
@@ -133,8 +136,9 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
 
     # PermissionFieldMixin
     def get_context(self) -> str:
+        is_transition = self.initial.get('code').upper().startswith('T')
         is_edition_period_opened = EducationGroupPreparationCalendar().is_target_year_authorized(target_year=self.year)
-        return GROUP_PGRM_ENCODING_PERIOD if is_edition_period_opened else GROUP_DAILY_MANAGEMENT
+        return GROUP_PGRM_ENCODING_PERIOD if is_transition or is_edition_period_opened else GROUP_DAILY_MANAGEMENT
 
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:

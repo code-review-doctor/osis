@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -60,7 +60,6 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.proposal_type import ProposalType
@@ -68,7 +67,7 @@ from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -85,7 +84,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
@@ -117,8 +116,9 @@ class LearningUnitViewCreateFullTestCase(TestCase):
     def setUpTestData(cls):
         FrenchLanguageFactory()
         cls.current_academic_year = create_current_academic_year()
+        generate_learning_unit_edition_calendars([cls.current_academic_year])
         cls.url = reverse('learning_unit_create', kwargs={'academic_year_id': cls.current_academic_year.id})
-        cls.user = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit").user
+        cls.user = CentralManagerFactory().person.user
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -246,12 +246,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
-        AcademicCalendarFactory(
-            data_year=cls.current_academic_year,
-            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        generate_learning_unit_edition_calendars([cls.current_academic_year])
         entity_version = EntityVersionFactory()
         cls.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
@@ -364,12 +359,7 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
-        AcademicCalendarFactory(
-            data_year=cls.current_academic_year,
-            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        generate_learning_unit_edition_calendars(cls.academic_years)
 
         cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
 
@@ -560,51 +550,6 @@ class LearningUnitViewTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
-
-    def test_learning_units_search_with_service_course_no_result(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'AGRO',
-            'with_entity_subordinated': True
-        }
-        number_of_results = 0
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_learning_units_search_with_service_course_without_entity_subordinated(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'ELOG',
-            'with_entity_subordinated': False
-        }
-        number_of_results = 1
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_learning_units_search_with_service_course_with_entity_subordinated(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'PSP',
-            'with_entity_subordinated': True
-        }
-
-        number_of_results = 1
-        self.service_course_search(filter_data, number_of_results)
-
-    def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self):
-        filter_data = {
-            'academic_year': self.current_academic_year.id,
-            'requirement_entity': 'PSP',
-            'allocation_entity': 'ELOG',
-            'with_entity_subordinated': True
-        }
-        number_of_results = 0
-        self.service_course_search(filter_data, number_of_results)
-
-    def service_course_search(self, filter_data, number_of_results):
-        self._prepare_context_learning_units_search()
-        response = self.client.get(reverse("learning_units_service_course"), data=filter_data)
-
-        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
-        self.assertEqual(response.context['learning_units_count'], number_of_results)
 
     def test_learning_units_search_quadrimester(self):
         self._prepare_context_learning_units_search()
@@ -877,25 +822,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
         self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
-    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
-    def test_learning_unit_pedagogy_publish_button_enabled(self, mock_perm_pedagogy):
-        mock_perm_pedagogy.return_value = True
-        response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
-
-        self.assertTrue(response.context['luy_in_current_or_future_anac'])
-        self.assertTrue(response.context['enable_publish_button'])
-
-    @mock.patch(
-        "base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy_force_majeure_section")
-    @mock.patch("base.views.learning_units.pedagogy.read.is_eligible_to_update_learning_unit_pedagogy")
-    def test_learning_unit_pedagogy_publish_button_disabled(self, mock_perm_pedagogy, mock_perm_force_majeure):
-        mock_perm_pedagogy.return_value = False
-        mock_perm_force_majeure.return_value = False
-        response = self.client.get(reverse(learning_unit_pedagogy, args=[self.luy.pk]))
-
-        self.assertTrue(response.context['luy_in_current_or_future_anac'])
-        self.assertFalse(response.context['enable_publish_button'])
-
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
         fr = FrenchLanguageFactory()
@@ -914,6 +840,8 @@ class LearningUnitViewTestCase(TestCase):
             response.context['achievements'],
             list(itertools.zip_longest([learning_unit_achievements_fr], [learning_unit_achievements_en]))
         )
+        self.assertIn('can_edit_information', response.context)
+        self.assertIn('can_edit_force_majeur_section', response.context)
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
@@ -1118,7 +1046,7 @@ class TestCreateXls(TestCase):
 
 
 def _generate_xls_build_parameter(xls_data, user):
-    titles = learning_unit_titles_part_1()
+    titles = learning_unit_titles_part_1(display_proposal=True)
     titles.extend(learning_unit_titles_part2())
     return {
         xls_build.LIST_DESCRIPTION_KEY: _(base.business.learning_unit_xls.XLS_DESCRIPTION),

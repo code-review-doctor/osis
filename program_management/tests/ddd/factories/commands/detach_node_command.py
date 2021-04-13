@@ -31,5 +31,5 @@ class DetachNodeCommandFactory(factory.Factory):
         model = command.DetachNodeCommand
         abstract = False
 
-    path_where_to_detach = "12"
+    path = "12"
     commit = False

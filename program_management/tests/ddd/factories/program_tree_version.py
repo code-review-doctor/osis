@@ -26,8 +26,9 @@
 
 import factory.fuzzy
 
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
+    NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -40,7 +41,7 @@ class ProgramTreeVersionIdentityFactory(factory.Factory):
     offer_acronym = factory.Sequence(lambda n: 'OFFERACRONYM%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     version_name = factory.Sequence(lambda n: 'VERSION%02d' % n)
-    is_transition = False
+    transition_name = NOT_A_TRANSITION
 
 
 class ProgramTreeVersionFactory(factory.Factory):
@@ -51,15 +52,17 @@ class ProgramTreeVersionFactory(factory.Factory):
 
     tree = factory.SubFactory(ProgramTreeFactory)
     program_tree_identity = factory.SelfAttribute("tree.entity_id")
-    program_tree_repository = ProgramTreeRepository()
+    program_tree_repository = factory.LazyAttribute(lambda obj: program_tree_repository.ProgramTreeRepository())
     start_year = factory.SelfAttribute("tree.root_node.start_year")
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
-        year=factory.SelfAttribute("..tree.root_node.year")
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        transition_name=factory.SelfAttribute("..tree.root_node.transition_name")
     )
     entity_identity = factory.SelfAttribute("entity_id")
     version_name = factory.SelfAttribute("entity_id.version_name")
+    transition_name = factory.SelfAttribute("tree.root_node.transition_name")
     end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
 
     @staticmethod
@@ -73,13 +76,42 @@ class ProgramTreeVersionFactory(factory.Factory):
             program_tree_identity=tree_standard.entity_id,
         )
 
+    class Params:
+        transition = factory.Trait(
+            tree=factory.SubFactory(
+                ProgramTreeFactory,
+                root_node__transition_name='TRANSITION TEST'
+            ),
+            entity_id=factory.SubFactory(
+                ProgramTreeVersionIdentityFactory,
+                offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+                year=factory.SelfAttribute("..tree.root_node.year"),
+                transition_name='TRANSITION TEST',
+                version_name=""
+            )
+        )
+
 
 class StandardProgramTreeVersionFactory(ProgramTreeVersionFactory):
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year"),
-        version_name=""
+        version_name=STANDARD
+    )
+
+
+class StandardTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    tree = factory.SubFactory(
+        ProgramTreeFactory,
+        root_node__transition_name=TRANSITION_PREFIX
+    )
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name=STANDARD,
+        transition_name=TRANSITION_PREFIX
     )
 
 
@@ -89,4 +121,14 @@ class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
         year=factory.SelfAttribute("..tree.root_node.year"),
         version_name="SPECIFIC"
+    )
+
+
+class SpecificTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    entity_id = factory.SubFactory(
+        ProgramTreeVersionIdentityFactory,
+        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
+        year=factory.SelfAttribute("..tree.root_node.year"),
+        version_name="SPECIFIC",
+        transition_name=TRANSITION_PREFIX
     )

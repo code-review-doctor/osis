@@ -89,7 +89,7 @@ class EducationGroupYearLearningUnitsPrerequisitesToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title + formatter.format_version_name(self.tree.root_node)
+            'acronym': self.tree.root_node.title + formatter.format_version_label(self.tree.root_node)
         }
 
 
@@ -110,7 +110,7 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
     language = translation.get_language()
     content = _first_line_content(
         HeaderLine(
-            egy_acronym=tree.root_node.title + formatter.format_version_name(tree.root_node),
+            egy_acronym=tree.root_node.title + formatter.format_version_label(tree.root_node),
             egy_title="{title}{version_title}".format(
                 title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
@@ -128,14 +128,14 @@ def _build_excel_lines(tree: 'ProgramTree') -> List:
             LearningUnitYearLine(luy_acronym=node.code, luy_title=complete_title(node))
         )
 
-        for group_number, group in enumerate(node.prerequisite.prerequisite_item_groups, start=1):
+        for group_number, group in enumerate(tree.get_prerequisite(node).prerequisite_item_groups, start=1):
             for position, prerequisite_item in enumerate(group.prerequisite_items, start=1):
                 prerequisite_item_links = tree.search_links_using_node(
                     tree.get_node_by_code_and_year(code=prerequisite_item.code, year=prerequisite_item.year)
                 )
                 prerequisite_line = _prerequisite_item_line(tree,
                                                             prerequisite_item, prerequisite_item_links,
-                                                            node.prerequisite, group_number, position,
+                                                            tree.get_prerequisite(node), group_number, position,
                                                             len(group.prerequisite_items))
                 content.append(prerequisite_line)
 
@@ -265,7 +265,7 @@ class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
     def to_excel(self):
         return {
             'workbook': save_virtual_workbook(self._to_workbook()),
-            'acronym': self.tree.root_node.title + formatter.format_version_name(self.tree.root_node)
+            'acronym': self.tree.root_node.title + formatter.format_version_label(self.tree.root_node)
         }
 
 
@@ -306,7 +306,7 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
     language = translation.get_language()
     content = _first_line_content(
         HeaderLinePrerequisiteOf(
-            node_title=tree.root_node.title + formatter.format_version_name(tree.root_node),
+            node_title=tree.root_node.title + formatter.format_version_label(tree.root_node),
             tree_title="{title}{version_title}".format(
                 title=_get_group_or_offer_title(language, tree),
                 version_title=formatter.format_version_title(tree.root_node, language)
@@ -318,12 +318,12 @@ def _build_excel_lines_prerequisited(tree: 'ProgramTree') -> List:
         )
     )
     for child_node in tree.get_nodes_that_are_prerequisites():
-        if child_node.is_prerequisite:
+        if tree.is_prerequisite(child_node):
             content.append(
                 LearningUnitYearLine(luy_acronym=child_node.code, luy_title=child_node.title)
             )
             first = True
-            for prerequisite_node in child_node.get_is_prerequisite_of():
+            for prerequisite_node in tree.search_is_prerequisite_of(child_node):
                 if child_node.year == prerequisite_node.year:
                     prerequisite_line = _build_is_prerequisite_for_line(
                         prerequisite_node,

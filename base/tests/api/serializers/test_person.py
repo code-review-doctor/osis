@@ -41,7 +41,8 @@ class PersonDetailSerializerTestCase(TestCase):
             'last_name',
             'email',
             'gender',
-            'uuid'
+            'uuid',
+            'birth_date'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

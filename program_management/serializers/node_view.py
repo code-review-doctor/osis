@@ -24,19 +24,19 @@
 #
 ##############################################################################
 from collections import namedtuple
-from typing import List, Dict
+from typing import List
 
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from base.utils.urls import reverse_with_get
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
+from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import ProgramTreeIdentitySearch
 from program_management.models.enums.node_type import NodeType
 
@@ -109,11 +109,11 @@ def _get_leaf_view_attribute_serializer(link: 'Link', tree: 'ProgramTree', conte
         ),
         'paste_url': None,
         'search_url': None,
-        'has_prerequisite': link.child.has_prerequisite,
-        'is_prerequisite': link.child.is_prerequisite,
+        'has_prerequisite': tree.has_prerequisites(link.child),
+        'is_prerequisite': tree.is_prerequisite(link.child),
         'class': __get_css_class(link),
         'element_type': NodeType.LEARNING_UNIT.name,
-        'title': __get_title(link),
+        'title': __get_title(tree, link),
     })
     return attrs
 
@@ -126,13 +126,16 @@ def __get_css_class(link: 'Link'):
             ProposalType.SUPPRESSION.name: "proposal proposal_suppression"}.get(link.child.proposal_type) or ""
 
 
-def __get_title(obj: 'Link') -> str:
-    title = obj.child.title
-    if obj.child.has_prerequisite and obj.child.is_prerequisite:
+def __get_title(tree: 'ProgramTree', obj: 'Link') -> str:
+    child_node = obj.child
+    title = child_node.title
+    has_prerequisite = tree.has_prerequisites(child_node)
+    is_prerequisite = tree.is_prerequisite(child_node)
+    if has_prerequisite and is_prerequisite:
         title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
-    elif obj.child.has_prerequisite:
+    elif has_prerequisite:
         title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
-    elif obj.child.is_prerequisite:
+    elif is_prerequisite:
         title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
     return title
 
@@ -167,18 +170,21 @@ def _leaf_view_serializer(link: 'Link', tree: 'ProgramTree', context: NodeViewCo
     return {
         'id': context.current_path,
         'path': context.current_path,
-        'icon': __get_learning_unit_node_icon(link),
+        'icon': __get_learning_unit_node_icon(tree, link),
         'text': __get_learning_unit_node_text(link, context),
         'a_attr': _get_leaf_view_attribute_serializer(link, tree, context),
     }
 
 
-def __get_learning_unit_node_icon(link: 'Link') -> str:
-    if link.child.has_prerequisite and link.child.is_prerequisite:
+def __get_learning_unit_node_icon(tree: 'ProgramTree', link: 'Link') -> str:
+    child_node = link.child
+    has_prerequisite = tree.has_prerequisites(child_node)
+    is_prerequisite = tree.is_prerequisite(child_node)
+    if has_prerequisite and is_prerequisite:
         return "fa fa-exchange-alt"
-    elif link.child.has_prerequisite:
+    elif has_prerequisite:
         return "fa fa-arrow-left"
-    elif link.child.is_prerequisite:
+    elif is_prerequisite:
         return "fa fa-arrow-right"
     return "far fa-file"
 
@@ -194,7 +200,7 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
         program_tree_identity = ProgramTreeIdentitySearch().get_from_node_identity(node_identity)
         return next(
             (
-                program_tree_version.version_label for program_tree_version in tree_versions
+                version_label(program_tree_version.program_tree_identity) for program_tree_version in tree_versions
                 if program_tree_version.program_tree_identity == program_tree_identity
             ),
             ''
@@ -203,6 +209,9 @@ def get_program_tree_version_name(node_identity: 'NodeIdentity', tree_versions: 
 
 
 def _format_node_group_text(node: 'NodeGroupYear') -> str:
+    transition_suffix = node.get_formatted_transition_name()
     if node.version_name:
-        return "{node.code} - {node.title}[{node.version_name}]".format(node=node)
-    return "{node.code} - {node.title}".format(node=node)
+        return "{node.code} - {node.title}[{node.version_name}{transition_name}]".format(
+            node=node, transition_name=transition_suffix
+        )
+    return "{node.code} - {node.title}{transition_name}".format(node=node, transition_name=transition_suffix)

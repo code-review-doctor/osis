@@ -8,6 +8,7 @@ from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.access_requirements_sections import ConditionSectionsTypes
 from base.models.enums.education_group_types import TrainingType
 from osis_common.models import osis_model_admin
 
@@ -71,7 +72,7 @@ class AdmissionCondition(models.Model):
     text_ca_ouv_adultes_en = models.TextField(default='')
 
     def __str__(self):
-        return "Admission condition - {}".format(self.education_group_year)
+        return "Access requirements - {}".format(self.education_group_year)
 
     class Meta:
         permissions = (
@@ -102,7 +103,7 @@ class AdmissionConditionAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
         return obj.education_group_year.acronym
 
 
-CONDITION_ADMISSION_ACCESSES = [
+ACCESS_REQUIREMENTS_ACCESSES = [
     ('-', '-'),
     ('on_the_file', _('On the file: direct access or access with additional training')),
     ('direct_access', _('Direct Access')),
@@ -121,15 +122,15 @@ class AdmissionConditionLineQuerySet(models.QuerySet):
 
 class AdmissionConditionLine(OrderedModel):
     admission_condition = models.ForeignKey(
-        AdmissionCondition, on_delete=models.CASCADE
+        AdmissionCondition, on_delete=models.CASCADE,
     )
 
-    section = models.CharField(max_length=32)
+    section = models.CharField(max_length=32, choices=ConditionSectionsTypes.choices())
     # this external_id is used just for the import, once reddot is dead, we could remove it.
     external_id = models.CharField(max_length=32, null=True, db_index=True)
 
-    access = models.CharField(choices=CONDITION_ADMISSION_ACCESSES, max_length=32,
-                              default=CONDITION_ADMISSION_ACCESSES[0][0])
+    access = models.CharField(choices=ACCESS_REQUIREMENTS_ACCESSES, max_length=32,
+                              default=ACCESS_REQUIREMENTS_ACCESSES[0][0])
 
     diploma = models.TextField(default='')
     conditions = models.TextField(default='')
@@ -148,7 +149,7 @@ class AdmissionConditionLine(OrderedModel):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if self.access not in dict(CONDITION_ADMISSION_ACCESSES):
+        if self.access not in dict(ACCESS_REQUIREMENTS_ACCESSES):
             raise ValidationError({
                 'access': _('%(access_value)s is not an accepted value') % {'access_value': self.access}
             })

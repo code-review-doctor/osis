@@ -30,7 +30,7 @@ import attr
 
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -57,7 +57,15 @@ class GroupBuilder:
         except exception.GroupNotFoundException:
             group_next_year = copy.deepcopy(group_from)
             group_next_year.entity_id = identity_next_year
+        cls._update_end_year(group_next_year)
         return group_next_year
+
+    @staticmethod
+    def _update_end_year(group: 'Group') -> None:
+        if not group.end_year:
+            return
+        if group.year > group.end_year:
+            group.end_year = group.year
 
     @classmethod
     def build_from_create_cmd(cls, cmd: command.CreateOrphanGroupCommand):
@@ -137,6 +145,9 @@ class Group(interface.RootEntity):
 
     def is_training(self):
         return self.type in TrainingType
+
+    def is_mini_training(self):
+        return self.type in MiniTrainingType
 
     def update(
             self,

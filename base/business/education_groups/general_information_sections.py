@@ -24,13 +24,16 @@
 #
 ##############################################################################
 from collections import namedtuple
+from typing import Union, List
 
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 # This all text_label which are related to "general information" for education group year
 # The key MUST be in french because it depend on Webservice (filtering)
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
+from education_group.models.group_year import GroupYear
 
 SKILLS_AND_ACHIEVEMENTS = 'comp_acquis'
 PEDAGOGY = 'pedagogie'
@@ -60,7 +63,7 @@ OPTIONS = 'options'
 INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
-ADMISSION_CONDITION = 'conditions_admission'
+ACCESS_REQUIREMENTS = 'conditions_admission'
 CAREER_DEVELOPMENT = 'career_development'
 TUITION_FEES = 'tuition_fees'
 VERSIONS = 'versions'
@@ -121,16 +124,16 @@ SECTION_LIST = [
             ]),
 ]
 
-# Common type which have admission conditions sections + relevant sections
-COMMON_TYPE_ADMISSION_CONDITIONS = {
+# Common type which have access requirements sections + relevant sections
+COMMON_TYPE_ACCESS_REQUIREMENTS = {
     TrainingType.BACHELOR.name:
         ('alert_message', 'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres',
-         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales',),
+         'ca_bacs_examen_langue', 'ca_bacs_cond_speciales', 'free',),
     TrainingType.AGGREGATION.name:
         ('alert_message', 'ca_cond_generales', 'ca_maitrise_fr',
-         'ca_allegement', 'ca_ouv_adultes',),
+         'ca_allegement', 'ca_ouv_adultes', 'admission_enrollment_procedures',),
     TrainingType.PGRM_MASTER_120.name:
-        ('alert_message', 'non_university_bachelors', 'adults_taking_up_university_training',
+        ('alert_message', 'ca_cond_generales', 'non_university_bachelors', 'adults_taking_up_university_training',
          'personalized_access', 'admission_enrollment_procedures',),
     TrainingType.MASTER_MC.name: ('alert_message', 'ca_cond_generales',)
 }
@@ -150,7 +153,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -174,7 +177,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -198,7 +201,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -222,7 +225,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -246,7 +249,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -265,14 +268,14 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             PREREQUISITE,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
     },
     TrainingType.CAPAES.name: {
         'common': [],
-        'specific': [WELCOME_INTRODUCTION, ADMISSION_CONDITION, VERSIONS]
+        'specific': [WELCOME_INTRODUCTION, ACCESS_REQUIREMENTS, VERSIONS]
     },
     TrainingType.RESEARCH_CERTIFICATE.name: {
         'common': [CAAP, EVALUATION, PREREQUISITE, ],
@@ -282,7 +285,7 @@ SECTIONS_PER_OFFER_TYPE = {
             PEDAGOGY,
             DETAILED_PROGRAM,
             STRUCTURE,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             VERSIONS
         ]
     },
@@ -306,7 +309,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -331,7 +334,7 @@ SECTIONS_PER_OFFER_TYPE = {
             TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             STRUCTURE,
             VERSIONS
         ]
@@ -357,7 +360,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -395,7 +398,7 @@ SECTIONS_PER_OFFER_TYPE = {
             CONTACTS,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -431,7 +434,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             COMPLEMENTARY_MODULE,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -453,7 +456,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROGRAM,
             PREREQUISITE,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             OPTIONS,
             VERSIONS
@@ -476,7 +479,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -498,7 +501,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -520,7 +523,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -542,7 +545,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -564,7 +567,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -586,7 +589,7 @@ SECTIONS_PER_OFFER_TYPE = {
             WELCOME_PROFIL,
             WELCOME_PROGRAM,
             SKILLS_AND_ACHIEVEMENTS,
-            ADMISSION_CONDITION,
+            ACCESS_REQUIREMENTS,
             EVALUATION,
             VERSIONS
         ]
@@ -610,3 +613,15 @@ SECTIONS_PER_OFFER_TYPE = {
         'specific': [AGREGATION, CAAP, PREREQUISITE, COMMON_DIDACTIC_PURPOSES, COMPLEMENTARY_MODULE, EVALUATION, ]
     }
 }
+
+
+def can_postpone_general_information(obj: Union['EducationGroupYear', 'GroupYear']) -> bool:
+    return not obj.academic_year.is_past
+
+
+def get_general_information_labels() -> List[str]:
+    result = []
+    for section in SECTION_LIST:
+        result.extend(section.labels)
+
+    return result

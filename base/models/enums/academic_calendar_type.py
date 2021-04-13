@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,81 +25,23 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-# TYPES_CATEGORIES
-ACADEMIC_CATEGORY = "ACADEMIC"
-PROJECT_CATEGORY = "PROJECT"
-AD_HOC_CATEGORY = "AD_HOC"
-
-# ACADEMIC_CALENDAR_TYPES
-DELIBERATION = "DELIBERATION"
-DISSERTATION_SUBMISSION = "DISSERTATION_SUBMISSION"
-EXAM_ENROLLMENTS = "EXAM_ENROLLMENTS"
-SCORES_EXAM_DIFFUSION = "SCORES_EXAM_DIFFUSION"
-SCORES_EXAM_SUBMISSION = "SCORES_EXAM_SUBMISSION"
-TEACHING_CHARGE_APPLICATION = "TEACHING_CHARGE_APPLICATION"
-COURSE_ENROLLMENT = "COURSE_ENROLLMENT"
-SUMMARY_COURSE_SUBMISSION = "SUMMARY_COURSE_SUBMISSION"
-SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE = "SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE"
-EDUCATION_GROUP_EDITION = "EDUCATION_GROUP_EDITION"
-EDUCATION_GROUP_SWITCH = "EDUCATION_GROUP_SWITCH"
-EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT = "EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT"
-EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT = "EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT"
-LEARNING_UNIT_EDITION_CENTRAL_MANAGERS = "LEARNING_UNIT_EDITION_CENTRAL_MANAGERS"
-LEARNING_UNIT_EDITION_FACULTY_MANAGERS = "LEARNING_UNIT_EDITION_FACULTY_MANAGERS"
-CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS = "CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS"
-CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS = "CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS"
-MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS = "MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS"
-MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS = "MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS"
-CONTINUING_EDUCATION_ACADEMIC_YEAR_LINKABLE_TO_ADMISSION = "CONTINUING_EDUCATION_ACADEMIC_YEAR_LINKABLE_TO_ADMISSION"
-
-# PROJECT_CALENDAR_TYPES
-TESTING = "TESTING"
-RELEASE = "RELEASE"
+from base.models.utils.utils import ChoiceEnum
 
 
-ACADEMIC_CALENDAR_TYPES = (
-    (DELIBERATION, _("Deliberation")),
-    (DISSERTATION_SUBMISSION, _("Dissertation submission")),
-    (EXAM_ENROLLMENTS, _("Exam enrollments")),
-    (SCORES_EXAM_DIFFUSION, _("Scores exam diffusion")),
-    (SCORES_EXAM_SUBMISSION, _("Scores exam submission")),
-    (TEACHING_CHARGE_APPLICATION, _("Teaching charge application")),
-    (COURSE_ENROLLMENT, _("Course enrollment")),
-    (SUMMARY_COURSE_SUBMISSION, _("Summary course submission")),
-    (SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE, _("Summary course submission force majeure")),
-    (EDUCATION_GROUP_SWITCH, _("Education group switch")),
-    (EDUCATION_GROUP_EDITION, _("Education group edition")),
-    (EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT, _("Education group extended daily management")),
-    (EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT, _("Education group limited daily management")),
-    (LEARNING_UNIT_EDITION_CENTRAL_MANAGERS, _("Learning unit edition by central managers")),
-    (LEARNING_UNIT_EDITION_FACULTY_MANAGERS, _("Learning unit edition by faculty managers")),
-    (CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS,
-     _("Creation or end date proposal by central managers")),
-    (CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS,
-     _("Creation or end date proposal by faculty managers")),
-    (MODIFICATION_OR_TRANSFORMATION_PROPOSAL_CENTRAL_MANAGERS,
-     _("Modification or transformation proposal by central managers")),
-    (MODIFICATION_OR_TRANSFORMATION_PROPOSAL_FACULTY_MANAGERS,
-     _("Modification or transformation proposal by faculty managers")),
-    (CONTINUING_EDUCATION_ACADEMIC_YEAR_LINKABLE_TO_ADMISSION,
-     _("Continuing education academic year linkable to admission")),
-)
-
-PROJECT_CALENDAR_TYPES = (
-    (TESTING, _("Testing")),
-)
-
-AD_HOC_CALENDAR_TYPES = (
-    (RELEASE, _("Release")),
-)
-
-CALENDAR_TYPES = ACADEMIC_CALENDAR_TYPES + PROJECT_CALENDAR_TYPES + AD_HOC_CALENDAR_TYPES
-
-CALENDAR_TYPES_COLORS = {
-    DELIBERATION: '#d9534f',
-    DISSERTATION_SUBMISSION: '#5bc0de',
-    EXAM_ENROLLMENTS: '#5bc0de',
-    SCORES_EXAM_DIFFUSION: '#5cb85c',
-    SCORES_EXAM_SUBMISSION: '#f0ad4e',
-    TEACHING_CHARGE_APPLICATION: '#337ab7'
-}
+class AcademicCalendarTypes(ChoiceEnum):
+    DELIBERATION = _("Deliberation")
+    DISSERTATION_SUBMISSION = _("Dissertation submission")
+    EXAM_ENROLLMENTS = _("Exam enrollments")
+    SCORES_EXAM_DIFFUSION = _("Scores diffusion")
+    SCORES_EXAM_SUBMISSION = _("Scores exam submission")
+    TEACHING_CHARGE_APPLICATION = _("Application for vacant courses")
+    ACCESS_SCHEDULE_CALENDAR = _("Access schedule calendar")
+    COURSE_ENROLLMENT = _("Course enrollment")
+    SUMMARY_COURSE_SUBMISSION = _("Summary course submission")
+    SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE = _("Summary course submission force majeure")
+    EDUCATION_GROUP_SWITCH = _("Education group switch")
+    EDUCATION_GROUP_EDITION = _("Education group edition")
+    EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT = _("Education group extended daily management")
+    EDUCATION_GROUP_LIMITED_DAILY_MANAGEMENT = _("Education group limited daily management")
+    LEARNING_UNIT_EXTENDED_PROPOSAL_MANAGEMENT = _("Extended proposal management")
+    LEARNING_UNIT_LIMITED_PROPOSAL_MANAGEMENT = _("Limited proposal management")

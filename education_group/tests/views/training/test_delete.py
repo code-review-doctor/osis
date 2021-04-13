@@ -30,14 +30,14 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -55,14 +55,14 @@ class TestDeleteTrainingGetMethod(TestCase):
                 offer_acronym=cls.training.acronym,
                 year=cls.training.year,
                 version_name="",
-                is_transition=False
+                transition_name=NOT_A_TRANSITION
             ),
             tree=ProgramTreeFactory(root_node=cls.root_node)
         )
 
         cls.central_manager = CentralManagerFactory()
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.root_node.year
         )
         cls.url = reverse('training_delete', kwargs={'year': cls.root_node.year, 'code': cls.root_node.code})
@@ -137,14 +137,14 @@ class TestDeleteTrainingPostMethod(TestCase):
                 offer_acronym=cls.training.acronym,
                 year=cls.training.year,
                 version_name="",
-                is_transition=False
+                transition_name=NOT_A_TRANSITION
             ),
             tree=ProgramTreeFactory(root_node=cls.root_node)
         )
 
         cls.central_manager = CentralManagerFactory()
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.root_node.year
         )
 
