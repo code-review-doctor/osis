@@ -48,7 +48,7 @@ class ShouldFieldsBeRequiredValidator(BusinessValidator):
         ]
         empty_required_fields = []
         for field in mandatory_field:
-            if not getattr(self.command, field, False):
+            if getattr(self.command, field, None) is None:  # FIXME :: validate empty str, int(0), ...
                 empty_required_fields.append(field)
         if empty_required_fields:
             raise EmptyRequiredFieldsException(empty_required_fields=empty_required_fields)

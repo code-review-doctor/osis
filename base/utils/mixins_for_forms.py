@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import itertools
+from abc import abstractmethod
 from typing import List
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -51,10 +52,12 @@ class DisplayExceptionsByFieldNameMixin:
         if self.field_name_by_exception is None:
             self.field_name_by_exception = {}
 
+    @abstractmethod
     def get_command(self) -> CommandRequest:
         raise NotImplementedError
+        # return self.get_colmmand_class(**self.validated_data)  # FIXME ::
 
-    def save(self):
+def save(self):
         try:
             if self.is_valid():
                 return message_bus_instance.invoke(self.get_command())
