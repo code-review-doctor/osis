@@ -33,7 +33,6 @@ from program_management.ddd.service.write import postpone_tree_specific_version_
     postpone_program_tree_service, create_program_tree_transition_version_service
 
 
-# todo create tests
 def create_and_postpone_program_tree_transition_version(
         command: 'CreateProgramTreeTransitionVersionCommand'
 ) -> List[ProgramTreeVersionIdentity]:
