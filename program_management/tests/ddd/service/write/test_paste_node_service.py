@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
