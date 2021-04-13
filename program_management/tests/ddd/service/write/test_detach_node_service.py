@@ -34,7 +34,7 @@ from program_management.ddd.domain.link import LinkIdentity
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.write import detach_node_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
-from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2mFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
 from testing.testcases import DDDTestCase
 
 
@@ -51,7 +51,7 @@ class TestDetachNode(DDDTestCase):
         self.cmd = command.DetachNodeCommand(path=path, commit=True)
 
     def test_cannot_detach_option_which_is_used_by_finality(self):
-        master_2m = OSIS2mFactory().tree
+        master_2m = OSIS2MFactory().tree
         path = build_path(
             master_2m.root_node,
             master_2m.get_node_by_code_and_year("LOSIS106G", 2018),

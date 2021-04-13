@@ -21,51 +21,127 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+import attr
 
-from education_group.tests.ddd.factories.group import GroupIdentityFactory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.service.write import update_and_postpone_training_version_service
-from program_management.tests.ddd.factories.commands.update_training_version_command import \
-    UpdateTrainingVersionCommandFactory
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.constraint_type import ConstraintTypeEnum
+from base.models.enums.education_group_types import TrainingType
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd import command
+from education_group.ddd.service.read import get_training_service
+from program_management.ddd.command import UpdateTrainingVersionCommand
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
+from program_management.ddd.service.write import update_and_postpone_training_version_service, \
+    create_training_with_program_tree
+from testing.testcases import DDDTestCase
 
 
-# todo do tests
-class TestUpdateTrainingVersion(TestCase):
+# TODO implement test when finalities present
+# TODO implement test when transitions present
+# TODO should generate a specific version training
+class TestUpdateTrainingVersion(DDDTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.trainings = self.generate_trainings()
 
-    @mock.patch(
-        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
-    @mock.patch(
-        "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity")
-    @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
-    @mock.patch("program_management.ddd.service.write.update_and_postpone_group_version_service."
-                "update_and_postpone_group_version")
-    def test_should_call_update_group_service_and_update_tree_version_service(
-            self,
-            mock_postpone_group_version_service,
-            mock_update_tree_version_service,
-            mock_identity_converter,
-            mock_postpone_program_tree,
-            mock_postpone_program_tree_version
-    ):
-        cmd = UpdateTrainingVersionCommandFactory()
-        identity_expected = ProgramTreeVersionIdentity(
-            offer_acronym=cmd.offer_acronym,
-            year=cmd.year,
-            version_name=cmd.version_name,
-            transition_name=cmd.transition_name,
+        self.cmd = UpdateTrainingVersionCommand(
+            offer_acronym="INFO100B",
+            version_name=STANDARD,
+            transition_name=NOT_A_TRANSITION,
+            year=2021,
+            credits=23,
+            end_year=None,
+            title_fr="Bachelier en info",
+            title_en="Bachelor info",
+            teaching_campus_name="LLN",
+            management_entity_acronym="INFO",
+            teaching_campus_organization_name='UCL',
+            constraint_type=None,
+            min_constraint=None,
+            max_constraint=None,
+            remark_fr=None,
+            remark_en=None,
         )
-        mock_update_tree_version_service.return_value = identity_expected
-        mock_identity_converter.return_value = GroupIdentityFactory()
-        mock_postpone_group_version_service.return_value = []
 
-        result = update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
+    def test_credits_must_be_greater_than_0(self):
+        cmd = attr.evolve(self.cmd, credits=-1)
 
-        self.assertTrue(mock_postpone_group_version_service.called)
-        self.assertTrue(mock_update_tree_version_service.called)
-        self.assertTrue(mock_postpone_program_tree.called)
-        self.assertTrue(mock_postpone_program_tree_version.called)
+        with self.assertRaises(MultipleBusinessExceptions):
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
-        self.assertEqual(result, [identity_expected])
+    def test_constraints_must_be_legit(self):
+        cmd = attr.evolve(self.cmd, min_constraint=150)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
+
+
+    def generate_trainings(self):
+        cmd = command.CreateAndPostponeTrainingAndProgramTreeCommand(
+            code="INFO1BA",
+            year=2021,
+            type=TrainingType.BACHELOR.name,
+            abbreviated_title="INFO100B",
+            title_fr="Bachelier en info",
+            title_en="Bachelor info",
+            keywords="",
+            status=ActiveStatusEnum.ACTIVE.name,
+            schedule_type=ScheduleTypeEnum.DAILY.name,
+            credits=180,
+            constraint_type=ConstraintTypeEnum.CREDITS.name,
+            min_constraint=0,
+            max_constraint=5,
+            remark_fr="",
+            remark_en="",
+            start_year=2021,
+            end_year=None,
+            duration=3,
+            partial_title_fr=None,
+            partial_title_en=None,
+            internship_presence=None,
+            is_enrollment_enabled=False,
+            has_online_re_registration=False,
+            has_partial_deliberation=False,
+            has_admission_exam=False,
+            has_dissertation=False,
+            produce_university_certificate=True,
+            decree_category=None,
+            rate_code=None,
+            main_language='French',
+            english_activities=None,
+            other_language_activities=None,
+            internal_comment="",
+            main_domain_code=None,
+            main_domain_decree=None,
+            secondary_domains=[],
+            isced_domain_code=None,
+            management_entity_acronym="INFO",
+            administration_entity_acronym="INFO",
+            teaching_campus_name="LLN",
+            teaching_campus_organization_name='UCL',
+            enrollment_campus_name="LLN",
+            enrollment_campus_organization_name="UCL",
+            other_campus_activities=None,
+            funding_orientation=None,
+            can_be_international_funded=True,
+            international_funding_orientation=None,
+            ares_code=10,
+            ares_graca=25,
+            ares_authorization=15,
+            code_inter_cfb=None,
+            coefficient=None,
+            academic_type=None,
+            duration_unit=None,
+            leads_to_diploma=True,
+            printing_title='',
+            professional_title='',
+            can_be_funded=True,
+        )
+
+        training_identities = create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
+
+        return [
+            get_training_service.get_training(command.GetTrainingCommand(acronym=identity.acronym, year=identity.year))
+            for identity in training_identities
+        ]

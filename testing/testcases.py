@@ -29,6 +29,7 @@ import mock
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from education_group.ddd.domain.group import GroupIdentity
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
     get_fake_mini_training_repository, get_fake_training_repository, FakeGroupRepository
 from program_management.ddd.business_types import *
@@ -99,6 +100,11 @@ class DDDTestCase(TestCase):
         self.mock_service(
             "education_group.ddd.domain.service.abbreviated_title_exist.CheckAcronymExist.exists",
             side_effect=check_acronym_exists
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity",
+            side_effect=get_group_identity_from_tree_version_identity
         )
 
     def tearDown(self) -> None:
@@ -188,6 +194,15 @@ def get_program_tree_version_identity_from_node_identities(
         tree_version.entity_id for tree_version in repo._trees_version
         if tree_version.get_tree().root_node.entity_id in node_identities_set
     ]
+
+
+def get_group_identity_from_tree_version_identity(identity: 'ProgramTreeVersionIdentity') -> 'GroupIdentity':
+    repo = FakeProgramTreeVersionRepository()
+    return next(
+        (GroupIdentity(code=tree_version.program_tree_identity.code, year=tree_version.program_tree_identity.year) for
+         tree_version in repo._trees_version),
+        None
+    )
 
 
 def check_acronym_exists(abbreviated_title: str) -> bool:

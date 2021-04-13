@@ -37,7 +37,7 @@ from program_management.ddd.service.write import paste_element_service
 from program_management.tests.ddd.factories.domain.program_tree_version.mini_training.MINECON import MINECONFactory
 from program_management.tests.ddd.factories.domain.program_tree_version.training.ARKE2M import ARKE2MFactory
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
-from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2mFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from testing.testcases import DDDTestCase
 
@@ -163,7 +163,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_already_reached(self):
-        osis2m = OSIS2mFactory().tree
+        osis2m = OSIS2MFactory().tree
         arke2m = ARKE2MFactory().tree
 
         path = build_path(
