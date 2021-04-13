@@ -14,17 +14,17 @@ This repo `/doc` summarise **theory** (with examples) about concepts used in Osi
 
 
 - Documentation about our implementation of DDD
-    - [Pure and Complete Domain](#domain_purity_and_completeness.md)
-    - [Application Service and Domain Service](#application_service_vs_domain_service.md)
-    - [Aggregate size](#aggregate_size.md)
-    - [Design Patterns : Factory, Builder, Singleton](#patterns_factory_builder_singleton.md)
-    - [Two steps validation](#two_steps_validation.md)
-    - [CSQ : Command Query Separation](#CQS_command_query_separation.md)
-    - [DTO : Data Transfer Object](#dto.md)
-    - [Bounded Context and Shared Kernel](#bounded_context_and_shared_kernel.md)
-    - [Interface](#interface.md)
-    - [Message Bus](#messages_bus.md)
-    - [Update or create : who manage it ?](#update_or_create.md)
+    - [Pure and Complete Domain](domain_purity_and_completeness.md)
+    - [Application Service and Domain Service](application_service_vs_domain_service.md)
+    - [Aggregate size](aggregate_size.md)
+    - [Design Patterns : Factory, Builder, Singleton](patterns_factory_builder_singleton.md)
+    - [Two steps validation](two_steps_validation.md)
+    - [CSQ : Command Query Separation](CQS_command_query_separation.md)
+    - [DTO : Data Transfer Object](dto.md)
+    - [Bounded Context and Shared Kernel](bounded_context_and_shared_kernel.md)
+    - [Interface](interface.md)
+    - [Message Bus](messages_bus.md)
+    - [Update or create : who manage it ?](update_or_create.md)
 - Installation manual
     - [Technical manual](https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#osis-technical-manual)
 
