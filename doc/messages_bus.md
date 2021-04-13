@@ -60,6 +60,8 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
 
 #### Message bus : Implémentation
 
+- Cf. [DisplayExceptionsByFieldNameMixin](https://github.com/uclouvain/osis/blob/workshops-mob-programming/base/utils/mixins_for_forms.py#L35)
+pour fonctions à redéfinir dans un Form
 
 ```python
 
@@ -71,7 +73,7 @@ class MessageBus:
 
 #-------------------------------------------------------------------------------------------------------------------
 # Django Form
-class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin, forms.Form):
+class UpdateTrainingForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     code = UpperCaseCharField(label=_("Code"))
     min_constraint = forms.IntegerField(label=_("minimum constraint").capitalize())
     max_constraint = forms.IntegerField(label=_("maximum constraint").capitalize())
@@ -84,10 +86,6 @@ class UpdateTrainingForm(ValidationRuleMixin, DisplayExceptionsByFieldNameMixin,
         ContentConstraintMaximumInvalid: ('max_constraint',),
     }
     
-    # def call_application_service(self):
-    #     command = ...
-    #     return update_training_service(command)
-
     def get_command(self) -> CommandRequest:
         return CommandRequest(**self.validated_data)
 
