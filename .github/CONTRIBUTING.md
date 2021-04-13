@@ -187,6 +187,9 @@ def verbose_value(value: int) -> str:
 
 ## Enums
 - Utiliser des `ChoiceEnum` plutôt que des `CONSTANTES` contenant des tuples
+- Doit être déclaré dans le [domaine (DDD)](#ddddomain)
+    - Note : à refactorer : le code Osis actuel définit encore les énumérations dans les fichiers Django "models"
+- Les modèles Django peuvent réutiliser les énumérations du Domaine (pour les `ChoiceField`)
 ```python
 from base.models.utils.utils import ChoiceEnum
 
