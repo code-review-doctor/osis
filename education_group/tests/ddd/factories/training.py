@@ -51,6 +51,8 @@ from education_group.tests.ddd.factories.isced_domain import IscedDomainFactory
 from education_group.tests.ddd.factories.language import LanguageFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 
 
 def generate_end_date(training):
@@ -136,3 +138,17 @@ class TrainingFactory(factory.Factory):
             result.append(training_repository.TrainingRepository.get(identity))
 
         return result
+
+    @classmethod
+    def from_node(cls, node: 'Node') -> Training:
+        return cls(
+            code=node.code,
+            type=node.node_type,
+            entity_identity__acronym=node.title,
+            entity_identity__year=node.year,
+            start_year=node.start_year,
+            end_year=node.end_date,
+            persist=True
+        )
+
+

@@ -37,6 +37,8 @@ from education_group.tests.ddd.factories.content_constraint import ContentConstr
 from education_group.tests.ddd.factories.entity import EntityFactory
 from education_group.tests.ddd.factories.remark import RemarkFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
+from program_management.ddd.domain.node import Node
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 
 
 def generate_end_date(group):
@@ -87,3 +89,17 @@ class GroupFactory(factory.Factory):
             result.append(group_repository.GroupRepository.get(identity))
 
         return result
+
+    @classmethod
+    def from_node(cls, node: 'Node') -> Group:
+        return cls(
+            abbreviated_title=node.title,
+            type=node.node_type,
+            entity_identity__code=node.code,
+            entity_identity__year=node.year,
+            start_year=node.start_year,
+            end_year=node.end_date,
+            persist=True
+        )
+
+

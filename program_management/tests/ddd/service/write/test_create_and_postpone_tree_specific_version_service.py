@@ -25,6 +25,7 @@
 from collections import namedtuple
 
 from program_management.ddd import command
+from program_management.ddd.domain.exception import VersionNameAlreadyExist
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, NOT_A_TRANSITION, \
     ProgramTreeVersionIdentity
 from program_management.ddd.service.write import create_and_postpone_tree_specific_version_service
@@ -32,12 +33,11 @@ from program_management.tests.ddd.factories.domain.program_tree_version.training
 from testing.testcases import DDDTestCase
 
 
-# TODO add invariants
 class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.standard_bachelor = OSIS1BAFactory()  # type: ProgramTreeVersion
+        self.standard_bachelor = OSIS1BAFactory.multiple(5)[0]  # type: ProgramTreeVersion
         self.cmd = command.CreateProgramTreeSpecificVersionCommand(
             end_year=self.standard_bachelor.end_year.year,
             offer_acronym=self.standard_bachelor.entity_id.offer_acronym,
@@ -55,6 +55,18 @@ class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
             "program_management.ddd.domain.service.validation_rule.FieldValidationRule.get",
             return_value=namedtuple("Credits", "initial_value")(15)
         )
+
+    def test_cannot_create_specific_version_if_version_already_exists_in_the_future(self):
+        OSIS1BAFactory.create_specific_version_from_tree_version(
+            self.standard_bachelor,
+            from_start_year=self.cmd.start_year+2,
+            version_name="VERSION"
+        )
+
+        with self.assertRaises(VersionNameAlreadyExist):
+            create_and_postpone_tree_specific_version_service.create_and_postpone_program_tree_specific_version(
+                self.cmd
+            )
 
     def test_should_return_tree_version_identities(self):
         result = create_and_postpone_tree_specific_version_service.create_and_postpone_program_tree_specific_version(

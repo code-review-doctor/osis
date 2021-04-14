@@ -140,3 +140,79 @@ class OSIS2MFactory(ProgramTreeVersionBuilder):
         ]
 
     }
+
+
+class OSIS2MSpecificVersionFactory(ProgramTreeVersionBuilder):
+    tree_data = {
+        "node_type": TrainingType.PGRM_MASTER_120,
+        "code": "LOSIS201M",
+        "title": "OSIS2M",
+        "version_name": "VERSION",
+        "children": [
+            {
+                "node_type": GroupType.COMMON_CORE,
+                "code": "LOSIS202T",
+                "title": "TRONCCOMMUNOSIS2MV",
+                "children": [
+                    {
+                        "node_type": GroupType.SUB_GROUP,
+                        "code": "LOSIS202R",
+                        "title": "GROUPEMENTAV",
+                        "children": [
+                            {
+                                "node_type": NodeType.LEARNING_UNIT,
+                                "title": "UE LINGE3",
+                                "code": "LINGE2003",
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "node_type": GroupType.FINALITY_120_LIST_CHOICE,
+                "code": "LOSIS105G",
+                "title": "LISTEAUCHOIXDEFINALITESOSIS2MV",
+                "children": [
+                    {
+                        "node_type": TrainingType.MASTER_MD_120,
+                        "code": "LOSIS221D",
+                        "title": "OSIS2MD",
+                        "version_name": "VERSION",
+                        "children": [
+                            {
+                                "node_type": GroupType.COMMON_CORE,
+                                "code": "LOSIS203T",
+                                "title": "PARTIEDEBASEOSIS2MDV",
+                                "children": [
+                                    {
+                                        "node_type": GroupType.SUB_GROUP,
+                                        "code": "LOSIS211R",
+                                        "title": "GROUPEMENTBASEV",
+                                        "children": [
+                                            {
+                                                "node_type": NodeType.LEARNING_UNIT,
+                                                "title": "UE LSINF1",
+                                                "code": "LSINF2011",
+                                            },
+                                        ]
+                                    },
+                                ]
+                            },
+                            {
+                                "node_type": GroupType.OPTION_LIST_CHOICE,
+                                "code": "LOSIS108G",
+                                "title": "LISTEAUCHOIXOPTIONSOSIS2MDV",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "node_type": GroupType.OPTION_LIST_CHOICE,
+                "code": "LOSIS109G",
+                "title": "OPTIONSAUCHOIXOSIS2MV",
+                "children": []
+            }
+        ]
+    }

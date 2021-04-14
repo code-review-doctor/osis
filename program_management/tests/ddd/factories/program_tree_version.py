@@ -141,11 +141,9 @@ class StandardTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
 
 
 class SpecificProgramTreeVersionFactory(ProgramTreeVersionFactory):
-    entity_id = factory.SubFactory(
-        ProgramTreeVersionIdentityFactory,
-        offer_acronym=factory.SelfAttribute("..tree.root_node.title"),
-        year=factory.SelfAttribute("..tree.root_node.year"),
-        version_name="SPECIFIC"
+    tree = factory.SubFactory(
+        ProgramTreeFactory,
+        root_node__version_name="SPECIFIC"
     )
 
 

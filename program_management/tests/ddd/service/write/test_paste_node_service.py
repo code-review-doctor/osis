@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import skip
+
 import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -233,6 +235,17 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
         link = tree_version.get_tree().get_link_by_identity(link_identity)
 
         self.assertTrue(link.is_reference())
+
+    @skip("TODO")
+    def test_cannot_paste_training_with_version_label_different(self):
+        pass
+
+    def test_cannot_paste_finality_with_end_date_greater_than_program(self):
+        pass
+
+    def test_cannot_paste_an_option_inside_finality_if_not_contained_in_list_option_of_program(self):
+        pass
+
 
     def test_should_be_able_to_paste_a_list_minor_major_to_a_list_minor_major(self):
         node_types = [GroupType.MINOR_LIST_CHOICE, GroupType.MAJOR_LIST_CHOICE]

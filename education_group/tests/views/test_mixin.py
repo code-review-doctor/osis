@@ -123,6 +123,6 @@ class TestElementSelectedClipBoardSerializer(TestCase):
             )
         )
         self.assertEqual(
-            self.serializer_instance.get_selected_element_clipboard_message(),
-            expected_result
+            expected_result,
+            self.serializer_instance.get_selected_element_clipboard_message()
         )

@@ -22,24 +22,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import namedtuple
 
 import attr
 
 from program_management.ddd import command
-from program_management.ddd.domain.exception import InvalidTransitionNameException
+from program_management.ddd.domain.exception import InvalidTransitionNameException, VersionNameAlreadyExist
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.service.write import create_and_postpone_tree_transition_version_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
 
 
-# TODO add invariants
 class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.standard_bachelor = OSIS1BAFactory()  # type: ProgramTreeVersion
+        self.standard_bachelor = OSIS1BAFactory.multiple(5)[0]  # type: ProgramTreeVersion
         self.cmd = command.CreateProgramTreeTransitionVersionCommand(
             end_year=self.standard_bachelor.end_year.year,
             offer_acronym=self.standard_bachelor.entity_id.offer_acronym,
@@ -50,14 +48,18 @@ class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
             title_en="Title in english",
             from_year=self.standard_bachelor.entity_id.year,
         )
-        self.mock_service(
-            "program_management.ddd.domain.service.generate_node_code.GenerateNodeCode._generate_node_code",
-            side_effect=generate_node_code
+
+    def test_cannot_create_transition_version_if_transition_already_exists_in_the_future(self):
+        OSIS1BAFactory.create_transition_from_tree_version(
+            self.standard_bachelor,
+            from_start_year=self.cmd.start_year+2,
+            transition_name="TRANSITION TRANS"
         )
-        self.mock_service(
-            "program_management.ddd.domain.service.validation_rule.FieldValidationRule.get",
-            return_value=namedtuple("Credits", "initial_value")(15)
-        )
+
+        with self.assertRaises(VersionNameAlreadyExist):
+            create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
+                self.cmd
+            )
 
     def test_transition_name_should_contain_TRANSITION(self):
         cmd = attr.evolve(self.cmd, transition_name="NOPE")
@@ -80,7 +82,3 @@ class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
             ) for year in range(self.cmd.start_year, 2026)
         ]
         self.assertEqual(expected, result)
-
-
-def generate_node_code(code, child_node_type):
-    return code[:-1] + "X"

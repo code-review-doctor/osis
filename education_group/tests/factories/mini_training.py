@@ -36,6 +36,7 @@ from education_group.ddd.repository import mini_training as mini_training_reposi
 from education_group.ddd.service.write import copy_mini_training_service
 from education_group.tests.ddd.factories.entity import EntityFactory
 from education_group.tests.ddd.factories.titles import TitlesFactory
+from program_management.ddd.domain.node import Node
 
 
 class MiniTrainingIdentityFactory(factory.Factory):
@@ -82,3 +83,17 @@ class MiniTrainingFactory(factory.Factory):
             result.append(mini_training_repository.MiniTrainingRepository.get(identity))
 
         return result
+
+    @classmethod
+    def from_node(cls, node: 'Node') -> MiniTraining:
+        return cls(
+            code=node.code,
+            type=node.node_type,
+            entity_identity__acronym=node.title,
+            entity_identity__year=node.year,
+            start_year=node.start_year,
+            end_year=node.end_date,
+            persist=True
+        )
+
+

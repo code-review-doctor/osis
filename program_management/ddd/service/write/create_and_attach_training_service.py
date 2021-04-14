@@ -34,7 +34,6 @@ from program_management.ddd import command as pgm_command
 from program_management.ddd.service.write import paste_element_service, create_training_with_program_tree
 
 
-# todo create tests
 @transaction.atomic()
 def create_and_attach_training(
         create_and_attach_cmd: pgm_command.CreateAndAttachTrainingCommand

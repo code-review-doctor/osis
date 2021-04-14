@@ -33,7 +33,6 @@ from program_management.ddd import command
 from program_management.ddd.service.write import delete_standard_program_tree_version_service
 
 
-# todo do tests
 @transaction.atomic()
 def delete_training_with_program_tree(
         delete_command: command.DeleteTrainingWithProgramTreeCommand

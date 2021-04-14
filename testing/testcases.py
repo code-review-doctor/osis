@@ -107,6 +107,39 @@ class DDDTestCase(TestCase):
             side_effect=get_group_identity_from_tree_version_identity
         )
 
+        self.mock_service(
+            "program_management.ddd.domain.service.get_last_existing_version_name.GetLastExistingVersion."
+            "get_last_existing_version_identity",
+            side_effect=get_last_existing_version_identity
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.generate_node_code.GenerateNodeCode._generate_node_code",
+            side_effect=generate_node_code
+        )
+        self.mock_service(
+            "program_management.ddd.domain.service.validation_rule.FieldValidationRule.get",
+            return_value=namedtuple("Credits", "initial_value")(15)
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.get_next_version_if_exists.GetNextVersionIfExists"
+            ".get_next_transition_version_year",
+            side_effect=get_next_transition_version_year
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.has_transition_version_with_greater_end_year"
+            ".HasTransitionVersionWithGreaterEndYear.transition_version_greater_than_specific_version_year",
+            side_effect=transition_version_greater_than_specific_version_year
+        )
+
+        self.mock_service(
+            "program_management.ddd.domain.service.identity_search.ProgramTreeVersionIdentitySearch."
+            "get_all_program_tree_version_identities",
+            side_effect=get_all_program_tree_version_identities
+        )
+
     def tearDown(self) -> None:
         self.fake_group_repository._groups = list()
         self.fake_mini_training_repository._mini_trainings = list()
@@ -200,7 +233,7 @@ def get_group_identity_from_tree_version_identity(identity: 'ProgramTreeVersionI
     repo = FakeProgramTreeVersionRepository()
     return next(
         (GroupIdentity(code=tree_version.program_tree_identity.code, year=tree_version.program_tree_identity.year) for
-         tree_version in repo._trees_version),
+         tree_version in repo._trees_version if tree_version.entity_id == identity),
         None
     )
 
@@ -208,3 +241,59 @@ def get_group_identity_from_tree_version_identity(identity: 'ProgramTreeVersionI
 def check_acronym_exists(abbreviated_title: str) -> bool:
     repo = FakeGroupRepository()
     return any(group for group in repo._groups if group.abbreviated_title == abbreviated_title)
+
+
+def get_last_existing_version_identity(
+        version_name: str,
+        offer_acronym: str,
+        transition_name: str,
+) -> Optional['ProgramTreeVersionIdentity']:
+    repo = FakeProgramTreeVersionRepository()
+    existing_tree_version = repo.search(
+        version_name=version_name,
+        offer_acronym=offer_acronym,
+        transition_name=transition_name
+    )
+    identities = [tree_version.entity_id for tree_version in existing_tree_version]
+    identities_sorted_by_year = sorted(identities, key=lambda identity: identity.year, reverse=True)
+    return next(iter(identities_sorted_by_year), None)
+
+
+def generate_node_code(code, child_node_type):
+    return code[:-1] + "X"
+
+
+def get_next_transition_version_year(version: 'ProgramTreeVersion', initial_end_year: int) -> Optional[int]:
+    repo = FakeProgramTreeVersionRepository()
+    tree_versions = repo.search(version_name=version.version_name, offer_acronym=version.entity_id.offer_acronym)
+    transitions = (tree_version for tree_version in tree_versions if tree_version.is_transition)
+    transitions_year_in_range_year = (
+        transition.entity_id.year for transition in transitions if
+        initial_end_year < transition.entity_id.year <= version.end_year_of_existence
+    )
+    return min(transitions_year_in_range_year, default=None)
+
+
+def transition_version_greater_than_specific_version_year(specific_version: 'ProgramTreeVersion') -> bool:
+    repo = FakeProgramTreeVersionRepository()
+    tree_versions = repo.search(
+        version_name=specific_version.version_name,
+        offer_acronym=specific_version.entity_id.offer_acronym
+    )
+    transitions_year = (tree_version.entity_id.year for tree_version in tree_versions if tree_version.is_transition)
+    return max(transitions_year, default=specific_version.entity_id.year) > specific_version.entity_id.year
+
+
+def get_all_program_tree_version_identities(
+        program_tree_version_identity: 'ProgramTreeVersionIdentity'
+) -> List['ProgramTreeVersionIdentity']:
+    repo = FakeProgramTreeVersionRepository()
+    return [
+        tree_version.entity_id for tree_version in repo._trees_version
+        if (tree_version.entity_id.version_name,
+            tree_version.entity_id.transition_name,
+            tree_version.entity_id.offer_acronym) == (
+           program_tree_version_identity.version_name,
+           program_tree_version_identity.transition_name,
+           program_tree_version_identity.offer_acronym)
+    ]

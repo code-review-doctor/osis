@@ -35,7 +35,6 @@ from program_management.ddd.service.write import postpone_tree_specific_version_
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 
 
-# todo do tests
 def postpone_mini_training_and_program_tree_modifications(
         update_command: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> List['MiniTrainingIdentity']:

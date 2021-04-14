@@ -183,6 +183,8 @@ class FakeProgramTreeVersionRepository(tree_version_repository.ProgramTreeVersio
             **kwargs
     ) -> List['ProgramTreeVersion']:
         result = cls._trees_version  # type: List[ProgramTreeVersion]
+        if entity_ids:
+            result = (tree_version for tree_version in result if tree_version.entity_id in entity_ids)
         if version_name is not None:
             result = (tree_version for tree_version in result if tree_version.version_name == version_name)
         if offer_acronym is not None:

@@ -60,3 +60,38 @@ class MINECONFactory(ProgramTreeVersionBuilder):
             }
         ]
     }
+
+
+class MINECONSpecificVersionFactory(ProgramTreeVersionBuilder):
+    tree_data = {
+        "node_type": MiniTrainingType.ACCESS_MINOR,
+        "code": "LECON200I",
+        "title": "MINECON",
+        "version_name": "VERSION",
+        "children": [
+            {
+                "node_type": GroupType.COMMON_CORE,
+                "code": "LECON200T",
+                "title": "PARTIEDEBASEMINECONV",
+                "children": [
+                    {
+                        "node_type": GroupType.SUB_GROUP,
+                        "code": "LECON201R",
+                        "title": "MINBASEECOV",
+                        "children": [
+                            {
+                                "node_type": NodeType.LEARNING_UNIT,
+                                "title": "Econométrie plus",
+                                "code": "LECON1201",
+                            },
+                            {
+                                "node_type": NodeType.LEARNING_UNIT,
+                                "title": "Sciences politiques",
+                                "code": "LECON1102",
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }

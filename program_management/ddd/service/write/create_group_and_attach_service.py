@@ -36,7 +36,6 @@ from program_management.ddd.service.write import paste_element_service
 
 
 # TODO : Implement Validator (Actually in GroupFrom via ValidationRules)
-# FIXME Is it really an application service ?
 @transaction.atomic()
 def create_group_and_attach(cmd: command_program_mangement.CreateGroupAndAttachCommand) -> 'GroupIdentity':
     cmd_orphan_group = __get_orphan_group_cmd_from_create_group_and_attach_cmd(cmd)

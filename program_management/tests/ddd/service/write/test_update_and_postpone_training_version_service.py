@@ -24,32 +24,32 @@
 import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from program_management.ddd.command import UpdateMiniTrainingVersionCommand
+from program_management.ddd.command import UpdateTrainingVersionCommand
 from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate
-from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
-from program_management.tests.ddd.factories.domain.program_tree_version.mini_training.MINECON import MINECONFactory, \
-    MINECONSpecificVersionFactory
+from program_management.ddd.service.write import update_and_postpone_training_version_service
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory, \
+    OSIS2MSpecificVersionFactory
 from testing.testcases import DDDTestCase
 
 
-class TestUpdateAndPostponeMiniTrainingVersion(DDDTestCase):
+class TestUpdateTrainingVersion(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.minecon_standard_version = MINECONFactory.multiple(5)[0]
-        self.minecon_specific_version = MINECONSpecificVersionFactory.multiple(5)[0]
+        self.osis2m_standard_version = OSIS2MFactory.multiple(5)[0]
+        self.osis2m_specific_version = OSIS2MSpecificVersionFactory.multiple(5)[0]
 
-        self.cmd = UpdateMiniTrainingVersionCommand(
-            offer_acronym=self.minecon_specific_version.entity_id.offer_acronym,
-            version_name=self.minecon_specific_version.version_name,
-            transition_name=self.minecon_specific_version.transition_name,
-            year=self.minecon_specific_version.entity_id.year,
+        self.cmd = UpdateTrainingVersionCommand(
+            offer_acronym=self.osis2m_specific_version.entity_id.offer_acronym,
+            version_name=self.osis2m_specific_version.version_name,
+            transition_name=self.osis2m_specific_version.transition_name,
+            year=self.osis2m_specific_version.entity_id.year,
             credits=23,
             end_year=None,
-            title_fr="fr  title",
-            title_en="title  en",
+            title_fr="Bachelier en info",
+            title_en="Bachelor info",
             teaching_campus_name="LLN",
-            management_entity_acronym="OSIS",
-            teaching_campus_organization_name="OSIS",
+            management_entity_acronym="INFO",
+            teaching_campus_organization_name='UCL',
             constraint_type=None,
             min_constraint=None,
             max_constraint=None,
@@ -61,58 +61,74 @@ class TestUpdateAndPostponeMiniTrainingVersion(DDDTestCase):
         cmd = attr.evolve(self.cmd, credits=-1)
 
         with self.assertRaises(MultipleBusinessExceptions):
-            update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_constraints_must_be_legit(self):
         cmd = attr.evolve(self.cmd, min_constraint=150)
 
         with self.assertRaises(MultipleBusinessExceptions):
-            update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
+
+    def test_cannot_reduce_end_year_of_program_2m_to_one_shorter_to_its_finalities(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.year)
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
+
+    def test_cannot_increase_end_year_of_finality_to_one_greater_than_its_program(self):
+        cmd = attr.evolve(
+            self.cmd,
+            offer_acronym="OSIS2MD",
+            end_year=self.osis2m_specific_version.end_year_of_existence + 1
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions):
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_cannot_increase_transition_end_date_to_a_year_where_a_transition_already_exists(self):
-        transition_in_future = MINECONSpecificVersionFactory.create_transition_from_tree_version(
-            self.minecon_specific_version,
+        transition_in_future = OSIS2MSpecificVersionFactory.create_transition_from_tree_version(
+            self.osis2m_specific_version,
             from_start_year=2022,
             transition_name="TRANSITION FUTURE"
         )[0]
-        transition_in_past = MINECONSpecificVersionFactory.create_transition_from_tree_version(
-            self.minecon_specific_version,
+        transition_in_past = OSIS2MSpecificVersionFactory.create_transition_from_tree_version(
+            self.osis2m_specific_version,
             end_year=2021
         )[0]
         cmd = attr.evolve(
             self.cmd,
             transition_name=transition_in_past.transition_name,
-            end_year=self.minecon_specific_version.end_year_of_existence
+            end_year=self.osis2m_specific_version.end_year_of_existence
         )
 
         with self.assertRaises(MultipleBusinessExceptions):
-            update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_cannot_reduce_specific_version_date_to_one_lower_than_its_transition(self):
         cmd_increase_specific_version_end_date = attr.evolve(
             self.cmd,
-            end_year=self.minecon_specific_version.end_year_of_existence + 1
+            end_year=self.osis2m_specific_version.end_year_of_existence + 1
         )
-        update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(
+        update_and_postpone_training_version_service.update_and_postpone_training_version(
             cmd_increase_specific_version_end_date
         )
 
-        MINECONSpecificVersionFactory.create_transition_from_tree_version(
-            self.minecon_specific_version,
+        OSIS2MSpecificVersionFactory.create_transition_from_tree_version(
+            self.osis2m_specific_version,
         )
 
         cmd = attr.evolve(
             self.cmd,
-            end_year=self.minecon_specific_version.end_year_of_existence - 2
+            end_year=self.osis2m_specific_version.end_year_of_existence - 2
         )
         with self.assertRaises(CannotDeleteSpecificVersionDueToTransitionVersionEndDate):
-            update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
+            update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_should_return_program_tree_version_identity(self):
-        result = update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(self.cmd)
+        result = update_and_postpone_training_version_service.update_and_postpone_training_version(self.cmd)
 
         expected = [
-            attr.evolve(self.minecon_specific_version.entity_id, year=year)
+            attr.evolve(self.osis2m_specific_version.entity_id, year=year)
             for year in range(self.cmd.year, 2027)
         ]
 
