@@ -69,7 +69,7 @@ class TrainingReadIdentification(TrainingRead):
         return []
 
     def is_entity_active(self, acronym_entity: str) -> bool:
-        academic_year = AcademicYear.objects.get(year=self.training_identity.year)
+        academic_year = AcademicYear.objects.get(year=self.program_tree_version_identity.year)
         current_clause = (
                 Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
                 Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |

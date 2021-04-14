@@ -97,10 +97,15 @@ class RoleModel(models.Model, metaclass=RoleModelMeta):
 
 
 class EntityRoleModelQueryset(models.QuerySet):
-    def get_entities_ids(self, academic_year: AcademicYear = None):  # list de toutes les entités actives et inactives
+    # liste de toutes les entités actives et inactives
+    def get_entities_ids(self, academic_year: AcademicYear = None, with_expired: bool = False):
         person_entities = self.values('entity_id', 'with_child')
         entities_with_child = {entity['entity_id'] for entity in person_entities if entity['with_child']}
-        entity_version_tree = EntityVersion.objects.get_tree(entities_with_child, academic_year=academic_year)
+        entity_version_tree = EntityVersion.objects.get_tree(
+            entities_with_child,
+            academic_year=academic_year,
+            with_expired=with_expired
+        )
         entities_without_child = {entity['entity_id'] for entity in person_entities if not entity['with_child']}
         return entities_without_child | {node['entity_id'] for node in entity_version_tree}
 

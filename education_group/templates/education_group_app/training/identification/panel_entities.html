@@ -31,13 +31,13 @@
                 {% bootstrap_label _("Management entity") label_class='d-block'%}
                 {% trans "This entity is not active during this academic year" as msg_inactive_entity %}
                 {% if current_version.is_officiel_standard %}
-                    {% if training.training_active_management_entity %}
+                    {% if training_active_management_entity %}
                     <p>{{ training.management_entity.acronym }}</p>
                     {% else %}
                     <p><del>{{ training.management_entity.acronym }}</del> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="" style="font-size: 12pt;" data-original-title="{{ msg_inactive_entity }}"></span></p>
                     {% endif %}
                 {% else %}
-                    {% if group.group_active_management_entity %}
+                    {% if group_active_management_entity %}
                     <p>{{ group.management_entity.acronym }}</p>
                     {% else %}
                     <p><del>{{ group.management_entity.acronym }}</del> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="" style="font-size: 12pt;" data-original-title="{{ msg_inactive_entity }}"></span></p>
@@ -49,7 +49,7 @@
         <div class="row">
             <div id="administration_entity" class="col-md-12">
                 {% bootstrap_label _("Administration entity") label_class='d-block'%}
-                {% if traning.active_administration_entity %}
+                {% if active_administration_entity %}
                 <p>{{ training.administration_entity.acronym }}</p>
                 {% else %}
                 <p><del>{{ training.administration_entity.acronym }}</del> <span class="glyphicon glyphicon-question-sign" data-toggle="tooltip" data-placement="top" title="" style="font-size: 12pt;" data-original-title="{{ msg_inactive_entity }}"></span></p>

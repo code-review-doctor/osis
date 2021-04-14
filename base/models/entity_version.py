@@ -175,7 +175,14 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(children_entities)
 
-    def with_parents(self, *extra_fields, date=None, academic_year: AcademicYear = None, **filter_kwargs):
+    def with_parents(
+            self,
+            *extra_fields,
+            date=None,
+            academic_year: AcademicYear = None,
+            with_expired: bool = False,
+            **filter_kwargs
+    ):
         """
         Use a Common Table Expression to construct the hierarchy of parent entities
         The Union is made recursively on LEFT.parent_id = CTE.children_id
@@ -187,10 +194,10 @@ class EntityVersionQuerySet(CTEQuerySet):
         :return: a CTE queryset
         :rtype: With
         """
-        if date is None:
-            date = now()
 
-        if academic_year:
+        if with_expired:
+            current_clause = (Q(start_date__isnull=False))
+        elif academic_year:
             current_clause = (
                 Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
                 Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
@@ -203,7 +210,10 @@ class EntityVersionQuerySet(CTEQuerySet):
                 )
             )
         else:
+            if date is None:
+                date = now()
             current_clause = ((Q(end_date__gte=date) | Q(end_date__isnull=True)) & Q(start_date__lte=date))
+        print(current_clause)
 
         def parent_entities(cte):
             """ This function is used for the recursive SQL query """
@@ -240,7 +250,7 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(parent_entities)
 
-    def get_tree(self, entity_ids, date=None, academic_year: AcademicYear = None):
+    def get_tree(self, entity_ids, date=None, academic_year: AcademicYear = None, with_expired: bool = False):
         """
         :return: a list of dictionaries returning
             - entityversion_id,
@@ -268,7 +278,13 @@ class EntityVersionQuerySet(CTEQuerySet):
                 if isinstance(entity, Entity):
                     entity_ids[i] = entity.pk
 
-        cte = self.with_parents('acronym', date=date, academic_year=academic_year, entity_id__in=entity_ids)
+        cte = self.with_parents(
+            'acronym',
+            date=date,
+            academic_year=academic_year,
+            with_expired=with_expired,
+            entity_id__in=entity_ids
+        )
         qs = cte.queryset().with_cte(cte).annotate(
             level=Func('parents', function='cardinality'),
             date=Value(date, models.DateField()),
