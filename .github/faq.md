@@ -41,8 +41,8 @@ Si lors de la review, le reviewer comprend le code développé (assez explicite 
 
 #### :question: Par où commencer pour implémenter une fonctionnalité ? Comment savoir quel code va dans quelle couche ?
 
-Certains développerons dans un fichier vide pour ensuite déplacer le code dans les couches adéquates, 
-d'autres implémenterons directement le code dans les couches pertinentes...
+Certains développeront dans un fichier vide pour ensuite déplacer le code dans les couches adéquates, 
+d'autres implémenteront directement le code dans les couches pertinentes...
 Il n'existe pas de règle stricte qui définit par où démarrer le développement d'une fonctionnalité.
 Commencez par ce qui vous semble le plus évident à faire.
 
