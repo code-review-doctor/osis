@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -474,7 +474,8 @@ def __send_messages_for_each_education_group_year(
             learning_unit_year,
             education_group_year,
             pgm_manager=pgm_manager,
-            score_sheet_address=score_sheet_address
+            score_sheet_address=score_sheet_address,
+            updated_enrollments=updated_enrollments
         )
         if sent_error_message:
             sent_error_messages.append(sent_error_message)
@@ -486,7 +487,8 @@ def __send_message_for_education_group_year(
         learning_unit_year,
         education_group_year,
         pgm_manager: mdl.person.Person,
-        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None
+        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None,
+        updated_enrollments=None
 ):
     enrollments = filter_enrollments_by_education_group_year(all_enrollments, education_group_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
@@ -500,11 +502,13 @@ def __send_message_for_education_group_year(
         if score_sheet_address and score_sheet_address.email:
             # Todo: Refactor CC list must not be a person but a list of email...
             cc_list.append(Person(email=score_sheet_address.email))
+        updated_enrollments_ids = [enrollment.id for enrollment in updated_enrollments]
         sent_error_message = send_mail.send_message_after_all_encoded_by_manager(
             receivers,
             enrollments,
             learning_unit_year.acronym,
             offer_acronym,
+            updated_enrollments_ids,
             cc=cc_list
         )
     return sent_error_message
