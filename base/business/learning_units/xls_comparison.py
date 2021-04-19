@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import defaultdict
 from decimal import Decimal
-from typing import List
+from typing import List, Dict
 
 from django.db.models import Case, When
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
+from openpyxl.styles import Font
 from openpyxl.utils import get_column_letter
 
 from base.business import learning_unit_year_with_context
@@ -53,7 +55,7 @@ from base.models.enums import learning_component_year_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
-from base.models.learning_unit_year import LearningUnitYear, get_by_id
+from base.models.learning_unit_year import LearningUnitYear, get_by_id, LearningUnitYearQuerySet
 from osis_common.document import xls_build
 from reference.models.language import find_by_id as find_language_by_id
 
@@ -70,6 +72,13 @@ ACADEMIC_COL_NUMBER = 1
 CELLS_MODIFIED_NO_BORDER = 'modifications'
 CELLS_TOP_BORDER = 'border_not_modified'
 DATA = 'data'
+
+REQUIREMENT_ENTITY_COL = "P"
+ALLOCATION_ENTITY_COL = "Q"
+ADDITIONAL_ENTITY_1_COL = "R"
+ADDITIONAL_ENTITY_2_COL = "S"
+STRIKETHROUGH_FONT = Font(strikethrough=True)
+BOLD_FONT = Font(bold=True)
 
 
 def learning_unit_titles():
@@ -98,10 +107,14 @@ def create_xls_comparison(user, learning_unit_years: QuerySet, filters, academic
 
     if cells_modified_with_green_font:
         parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
+    else:
+        parameters[xls_build.FONT_CELLS] = {}
 
+    parameters[xls_build.FONT_CELLS].update(
+        _get_strikethrough_cells_on_entity(luys_for_2_years, cells_modified_with_green_font))
     if cells_with_top_border:
         parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_TOP: cells_with_top_border}
-
+    parameters[xls_build.FONT_ROWS] = {BOLD_FONT: [0]}
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
@@ -127,13 +140,18 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison: int,
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1),
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by(preserved, 'academic_year__year')
+
+    learning_unit_years = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(learning_unit_years)
+    learning_unit_years = LearningUnitYearQuerySet.annotate_entities_status(learning_unit_years)
+    learning_unit_years = LearningUnitYearQuerySet.annotate_additional_entities_status(learning_unit_years)
+
     [append_latest_entities(learning_unit) for learning_unit in learning_unit_years]
     [append_components(learning_unit) for learning_unit in learning_unit_years]
     return learning_unit_years
 
 
 def _get_learning_units(learning_unit_years):
-    return list(set([l.learning_unit for l in learning_unit_years]))
+    return list(set([learning_unit_year.learning_unit for learning_unit_year in learning_unit_years]))
 
 
 def prepare_xls_content(learning_unit_yrs):
@@ -193,7 +211,13 @@ def _component_data(components, learning_component_yr_type):
             EMPTY_VALUE, EMPTY_VALUE]
 
 
-def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_comparison=False):
+def _get_data(
+        learning_unit_yr: LearningUnitYear,
+        new_line: bool,
+        first_data: List,
+        partims: bool = True,
+        proposal_comparison: bool = False
+) -> List:
     organization = get_organization_from_learning_unit_year(learning_unit_yr)
     if proposal_comparison:
         academic_year = _format_academic_year(
@@ -220,10 +244,10 @@ def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_com
         get_representing_string(learning_unit_yr.specific_title),
         get_representing_string(learning_unit_yr.learning_container_year.common_title_english),
         get_representing_string(learning_unit_yr.specific_title_english),
-        _get_entity_to_display(learning_unit_yr.entities.get(entity_types.REQUIREMENT_ENTITY)),
-        _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ALLOCATION_ENTITY)),
-        _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1)),
-        _get_entity_to_display(learning_unit_yr.entities.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2)),
+        learning_unit_yr.ent_requirement_acronym,
+        learning_unit_yr.ent_allocation_acronym,
+        learning_unit_yr.additional_entity_1_acronym,
+        learning_unit_yr.additional_entity_2_acronym,
         _('Yes') if learning_unit_yr.professional_integration else _('No'),
         organization.name if organization else BLANK_VALUE,
         learning_unit_yr.campus or BLANK_VALUE]
@@ -511,3 +535,61 @@ def _get_data_from_components_initial_data(data_without_components, initial_data
 def _format_academic_year(start_year, end_year):
     return "{}{}".format(start_year,
                          "   ({} {})".format(_('End').lower(), end_year if end_year else '-'))
+
+
+def _get_strikethrough_cells_on_entity(luys: QuerySet, cells_modified_with_green_font: List) -> Dict:
+    strikethrough_cells = defaultdict(list)
+    strikethrough_cells.update({xls_build.STYLE_MODIFIED: cells_modified_with_green_font})
+
+    for idx, luy in enumerate(list(luys), start=2):
+        strikethrough_cells.update(
+            _check_strike_cell_because_inactive_entity(
+                cells_modified_with_green_font,
+                luy.active_entity_requirement_version,
+                strikethrough_cells,
+                "{}{}".format(REQUIREMENT_ENTITY_COL, idx)
+            )
+        )
+        strikethrough_cells.update(
+            _check_strike_cell_because_inactive_entity(
+                cells_modified_with_green_font,
+                luy.active_entity_allocation_version,
+                strikethrough_cells,
+                "{}{}".format(ALLOCATION_ENTITY_COL, idx)
+            )
+        )
+        strikethrough_cells.update(
+            _check_strike_cell_because_inactive_entity(
+                cells_modified_with_green_font,
+                luy.active_additional_entity_1_version,
+                strikethrough_cells,
+                "{}{}".format(ADDITIONAL_ENTITY_1_COL, idx)
+            )
+        )
+        strikethrough_cells.update(
+            _check_strike_cell_because_inactive_entity(
+                cells_modified_with_green_font,
+                luy.active_additional_entity_2_version,
+                strikethrough_cells,
+                "{}{}".format(ADDITIONAL_ENTITY_2_COL, idx)
+            )
+        )
+
+    return strikethrough_cells
+
+
+def _check_strike_cell_because_inactive_entity(
+        cells_modified_with_green_font: List,
+        is_entity_active: bool,
+        strikethrough_cells_param: Dict,
+        cell_ref: str
+) -> Dict:
+    strike_and_modified_font = xls_build.STYLE_MODIFIED.copy()
+    strike_and_modified_font.strikethrough = True
+    strikethrough_cells = strikethrough_cells_param.copy()
+    if not is_entity_active:
+        if cell_ref in cells_modified_with_green_font:
+            strikethrough_cells[strike_and_modified_font].append(cell_ref)
+        else:
+            strikethrough_cells[STRIKETHROUGH_FONT].append(cell_ref)
+    return strikethrough_cells
