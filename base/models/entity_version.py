@@ -229,7 +229,6 @@ class EntityVersionQuerySet(CTEQuerySet):
             if date is None:
                 date = now()
             current_clause = ((Q(end_date__gte=date) | Q(end_date__isnull=True)) & Q(start_date__lte=date))
-        print(current_clause)
 
         def parent_entities(cte):
             """ This function is used for the recursive SQL query """
