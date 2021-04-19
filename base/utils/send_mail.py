@@ -319,7 +319,7 @@ def send_message_after_all_encoded_by_manager(
 
     rows_styles = None
     txt_complementary_first_col_content_data = None
-    if len(enrollments) > 1 and len(updated_enrollments_ids) == len(enrollments):
+    if len(enrollments) > 1 and len(updated_enrollments_ids) != len(enrollments):
         rows_styles = _html_format_rows_styles(enrollments, updated_enrollments_ids)
         txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
             enrollments,
