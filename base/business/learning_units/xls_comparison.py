@@ -141,7 +141,8 @@ def _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison: int,
         build_entity_container_prefetch(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2),
     ).order_by(preserved, 'academic_year__year')
 
-    learning_unit_years = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(learning_unit_years)
+    learning_unit_years = LearningUnitYearQuerySet\
+        .annotate_entities_allocation_and_requirement_acronym(learning_unit_years)
     learning_unit_years = LearningUnitYearQuerySet.annotate_entities_status(learning_unit_years)
     learning_unit_years = LearningUnitYearQuerySet.annotate_additional_entities_status(learning_unit_years)
 
