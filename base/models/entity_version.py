@@ -92,6 +92,22 @@ class EntityVersionQuerySet(CTEQuerySet):
         else:
             return self
 
+    def active_for_academic_year(self, academic_year: AcademicYear):
+        if academic_year:
+            return self.filter(
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                        Q(start_date__lte=academic_year.start_date) &
+                        (
+                                Q(end_date__isnull=True) |
+                                Q(end_date__gte=academic_year.end_date)
+                        )
+                )
+            )
+        else:
+            return self
+
     def entity(self, entity):
         return self.filter(entity=entity)
 
@@ -539,6 +555,17 @@ def find_latest_version(date) -> EntityVersionQuerySet:
     return EntityVersion.objects.current(date).select_related('entity', 'entity__organization').order_by('-start_date')
 
 
+def find_version_for_academic_year(academic_year: 'AcademicYear') -> EntityVersionQuerySet:
+    return EntityVersion.objects.active_for_academic_year(
+        academic_year
+    ).select_related(
+        'entity',
+        'entity__organization'
+    ).order_by(
+        '-start_date'
+    )
+
+
 def get_last_version(entity, date=None):
     qs = EntityVersion.objects.current(date).entity(entity)
 
@@ -720,6 +747,10 @@ def _get_all_children(
 
 def find_pedagogical_entities_version():
     return find_all_current_entities_version().pedagogical_entities().order_by('acronym')
+
+
+def find_pedagogical_entities_version_for_specific_academic_year(academic_year: 'AcademicYear'):
+    return find_version_for_academic_year(academic_year).pedagogical_entities().order_by('acronym')
 
 
 def find_latest_version_by_entity(entity, date):

@@ -133,6 +133,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         self.fields['academic_year'].required = False
         self.fields['code'].disabled = True
         self.fields['code'].required = False
+        self.__init_management_entity_field()
 
     # PermissionFieldMixin
     def get_context(self) -> str:
@@ -143,3 +144,12 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
     # PermissionFieldMixin
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
+
+    def __init_management_entity_field(self):
+        academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
+        self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
+            person=self.user.person,
+            initial=self.initial.get('management_entity'),
+            disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year
+        )
