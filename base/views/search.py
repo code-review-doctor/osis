@@ -28,7 +28,7 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from base.forms.search.search_tutor import TutorSearchForm
-from base.models.tutor import Tutor
+from base.auth.roles.tutor import Tutor
 from base.utils.cache import RequestCache
 from base.views.common import paginate_queryset
 

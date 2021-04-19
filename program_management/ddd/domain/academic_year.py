@@ -26,10 +26,12 @@
 
 
 # FIXME :: should move into another app ? (This domain object is a common object that will be used everywhere).
-class AcademicYear:
+import attr
 
-    def __init__(self, year: int):
-        self.year = year
+
+@attr.s(str=False)
+class AcademicYear:
+    year = attr.ib(type=int)
 
     def __str__(self):
         return u"%s-%s" % (self.year, str(self.year + 1)[-2:])

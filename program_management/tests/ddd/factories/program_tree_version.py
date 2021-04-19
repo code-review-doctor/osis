@@ -28,7 +28,7 @@ import factory.fuzzy
 
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, \
     NOT_A_TRANSITION, TRANSITION_PREFIX, STANDARD
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -52,7 +52,7 @@ class ProgramTreeVersionFactory(factory.Factory):
 
     tree = factory.SubFactory(ProgramTreeFactory)
     program_tree_identity = factory.SelfAttribute("tree.entity_id")
-    program_tree_repository = ProgramTreeRepository()
+    program_tree_repository = factory.LazyAttribute(lambda obj: program_tree_repository.ProgramTreeRepository())
     start_year = factory.SelfAttribute("tree.root_node.start_year")
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
@@ -102,6 +102,10 @@ class StandardProgramTreeVersionFactory(ProgramTreeVersionFactory):
 
 
 class StandardTransitionProgramTreeVersionFactory(ProgramTreeVersionFactory):
+    tree = factory.SubFactory(
+        ProgramTreeFactory,
+        root_node__transition_name=TRANSITION_PREFIX
+    )
     entity_id = factory.SubFactory(
         ProgramTreeVersionIdentityFactory,
         offer_acronym=factory.SelfAttribute("..tree.root_node.title"),

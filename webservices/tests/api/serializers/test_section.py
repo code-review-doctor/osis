@@ -40,7 +40,7 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer, ContactsSectionSerializer
+    AccessRequirementsSectionSerializer, ContactsSectionSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
 
@@ -108,7 +108,7 @@ class AchievementSectionSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
 
-class AdmissionConditionSectionSerializerTestCase(TestCase):
+class AccessRequirementsSectionSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.data_to_serialize = {
@@ -128,7 +128,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=cls.egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
         AdmissionConditionFactory(education_group_year=cls.egy)
-        cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
+        cls.serializer = AccessRequirementsSectionSerializer(cls.data_to_serialize, context={
             'root_node': cls.node,
             'language': cls.language,
             'offer': cls.egy
@@ -153,7 +153,7 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             year=training_wihtout_admission_condition.academic_year.year,
             node_type=training_wihtout_admission_condition.education_group_type,
         )
-        serializer = AdmissionConditionSectionSerializer({}, context={
+        serializer = AccessRequirementsSectionSerializer({}, context={
             'root_node': node,
             'language': self.language,
             'offer': training_wihtout_admission_condition

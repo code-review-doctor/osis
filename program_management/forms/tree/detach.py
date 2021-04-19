@@ -45,5 +45,5 @@ class DetachNodeForm(forms.Form):
         return cleaned_path
 
     def save(self) -> link.LinkIdentity:
-        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.cleaned_data["path"], commit=True)
+        detach_node_command = command.DetachNodeCommand(path=self.cleaned_data["path"], commit=True)
         return detach_node_service.detach_node(detach_node_command)
