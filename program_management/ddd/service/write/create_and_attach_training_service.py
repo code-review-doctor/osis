@@ -69,6 +69,9 @@ def __convert_command(
         **attr.asdict(
             cmd,
             recurse=False,
-            filter=attr.filters.exclude(attr.fields(pgm_command.CreateAndAttachTrainingCommand).path_to_paste)
+            filter=attr.filters.exclude(
+                attr.fields(pgm_command.CreateAndAttachTrainingCommand).path_to_paste,
+                attr.fields(pgm_command.CreateAndAttachTrainingCommand).transaction_id
+            )
         )
     )

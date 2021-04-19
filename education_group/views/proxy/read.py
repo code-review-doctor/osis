@@ -19,7 +19,7 @@ SUFFIX_CONTENT = 'content'
 SUFFIX_UTILIZATION = 'utilization'
 SUFFIX_GENERAL_INFO = 'general_information'
 SUFFIX_SKILLS_ACHIEVEMENTS = 'skills_achievements'
-SUFFIX_ADMISSION_CONDITION = 'admission_condition'
+SUFFIX_ACCESS_REQUIREMENTS = 'access_requirements'
 
 
 class Tab(IntEnum):
@@ -30,7 +30,7 @@ class Tab(IntEnum):
     UTILIZATION = 4
     GENERAL_INFO = 5
     SKILLS_ACHIEVEMENTS = 6
-    ADMISSION_CONDITION = 7
+    ACCESS_REQUIREMENTS = 7
 
 
 class ReadEducationGroupRedirectView(RedirectView):
@@ -85,7 +85,7 @@ def _get_view_name_from_tab(node: 'Node', tab: Tab):
         Tab.UTILIZATION: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_UTILIZATION),
         Tab.GENERAL_INFO: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_GENERAL_INFO),
         Tab.SKILLS_ACHIEVEMENTS: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_SKILLS_ACHIEVEMENTS),
-        Tab.ADMISSION_CONDITION: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_ADMISSION_CONDITION),
+        Tab.ACCESS_REQUIREMENTS: '{prefix}_{suffix}'.format(prefix=prefix, suffix=SUFFIX_ACCESS_REQUIREMENTS),
     }[tab]
 
 
@@ -131,7 +131,7 @@ def get_training_available_tabs(is_standard_version: bool = True) -> Dict[str, i
                 SUFFIX_ADMINISTRATIVE_DATA: Tab.ADMINISTRATIVE_DATA,
                 SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
                 SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
-                SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+                SUFFIX_ACCESS_REQUIREMENTS: Tab.ACCESS_REQUIREMENTS
             }
         )
     return tabs
@@ -144,7 +144,7 @@ def get_mini_training_available_tabs():
         SUFFIX_UTILIZATION: Tab.UTILIZATION,
         SUFFIX_GENERAL_INFO: Tab.GENERAL_INFO,
         SUFFIX_SKILLS_ACHIEVEMENTS: Tab.SKILLS_ACHIEVEMENTS,
-        SUFFIX_ADMISSION_CONDITION: Tab.ADMISSION_CONDITION
+        SUFFIX_ACCESS_REQUIREMENTS: Tab.ACCESS_REQUIREMENTS
     }
 
 

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
+from base.auth.roles import tutor as tutor_mdl
 from base.models import session_exam_calendar
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
 from base.models.person import Person
@@ -180,8 +181,8 @@ def scores_encoding(request):
                         'incomplete_encodings_only': incomplete_encodings_only,
                         'last_synchronization': mdl.synchronization.find_last_synchronization_date()})
 
-    elif mdl.tutor.is_tutor(request.user):
-        tutor = mdl.tutor.find_by_user(request.user)
+    elif tutor_mdl.is_tutor(request.user):
+        tutor = tutor_mdl.find_by_user(request.user)
         score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=request.user,
             education_group_year_id=None,
@@ -431,7 +432,7 @@ def notes_printing(request, learning_unit_year_id=None, tutor_id=None, education
         tutor_id=tutor_id,
         education_group_year_id=education_group_year_id
     )
-    tutor = mdl.tutor.find_by_user(request.user) if not is_program_manager else None
+    tutor = tutor_mdl.find_by_user(request.user) if not is_program_manager else None
     sheet_data = score_encoding_sheet.scores_sheet_data(scores_list_encoded.enrollments, tutor=tutor)
     return paper_sheet.print_notes(sheet_data)
 
@@ -473,7 +474,8 @@ def __send_messages_for_each_education_group_year(
             learning_unit_year,
             education_group_year,
             pgm_manager=pgm_manager,
-            score_sheet_address=score_sheet_address
+            score_sheet_address=score_sheet_address,
+            updated_enrollments=updated_enrollments
         )
         if sent_error_message:
             sent_error_messages.append(sent_error_message)
@@ -485,23 +487,28 @@ def __send_message_for_education_group_year(
         learning_unit_year,
         education_group_year,
         pgm_manager: mdl.person.Person,
-        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None
+        score_sheet_address: score_sheet_address_mdl.ScoreSheetAddress = None,
+        updated_enrollments=None
 ):
     enrollments = filter_enrollments_by_education_group_year(all_enrollments, education_group_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
     offer_acronym = education_group_year.acronym
     sent_error_message = None
     if progress == 100:
-        receivers = list(set([tutor.person for tutor in mdl.tutor.find_by_learning_unit(learning_unit_year)]))
+        receivers = list(
+            set([tutor.person for tutor in tutor_mdl.find_by_learning_unit(learning_unit_year)])
+        )
         cc_list = [pgm_manager]
         if score_sheet_address and score_sheet_address.email:
             # Todo: Refactor CC list must not be a person but a list of email...
             cc_list.append(Person(email=score_sheet_address.email))
+        updated_enrollments_ids = [enrollment.id for enrollment in updated_enrollments]
         sent_error_message = send_mail.send_message_after_all_encoded_by_manager(
             receivers,
             enrollments,
             learning_unit_year.acronym,
             offer_acronym,
+            updated_enrollments_ids,
             cc=cc_list
         )
     return sent_error_message
@@ -595,7 +602,7 @@ def _get_common_encoding_context(request, learning_unit_year_id):
     score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(
         scores_list.learning_unit_year
     )
-    tutors = mdl.tutor.find_by_learning_unit(scores_list.learning_unit_year) \
+    tutors = tutor_mdl.find_by_learning_unit(scores_list.learning_unit_year) \
         .exclude(id__in=[score_responsible.id for score_responsible in score_responsibles])
     is_coordinator = mdl_attr.attribution.is_score_responsible(request.user, scores_list.learning_unit_year)
     is_program_manager = program_manager.is_program_manager(request.user)
@@ -691,7 +698,7 @@ def get_json_data_scores_sheets(tutor_global_id):
         if isinstance(tutor_global_id, bytes):
             tutor_global_id = tutor_global_id.decode('utf-8')
         person = mdl.person.find_by_global_id(tutor_global_id)
-        tutor = mdl.tutor.find_by_person(person)
+        tutor = tutor_mdl.find_by_person(person)
         number_session = mdl.session_exam_calendar.find_session_exam_number()
         academic_yr = session_exam_calendar.current_opened_academic_year()
 

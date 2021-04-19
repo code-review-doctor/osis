@@ -117,7 +117,7 @@ class TestMiniTrainingReadIdentification(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
-        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['active'])
 
     def test_assert_displayed_general_information_tabs(self):
         with mock.patch(
@@ -128,51 +128,56 @@ class TestMiniTrainingReadIdentification(TestCase):
             self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
 
         with mock.patch(
-            'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
-            {}
+                'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+                {}
         ):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
 
     def test_assert_displayed_skill_and_achievements_tabs(self):
         with mock.patch(
-            'base.models.enums.education_group_types.MiniTrainingType.with_skills_achievements',
-            side_effect=(lambda: [self.mini_training_version.root_group.education_group_type.name])
+                'base.models.enums.education_group_types.MiniTrainingType.with_skills_achievements',
+                side_effect=(lambda: [self.mini_training_version.root_group.education_group_type.name])
         ):
             response = self.client.get(self.url)
             self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
 
         with mock.patch(
-            'base.models.enums.education_group_types.MiniTrainingType.with_skills_achievements',
-            side_effect=(lambda: [])
+                'base.models.enums.education_group_types.MiniTrainingType.with_skills_achievements',
+                side_effect=(lambda: [])
         ):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
 
-    def test_assert_displayed_admission_condition_tabs(self):
+    def test_assert_displayed_access_requirements_tabs(self):
         with mock.patch(
-                'base.models.enums.education_group_types.MiniTrainingType.with_admission_condition',
+                'base.models.enums.education_group_types.MiniTrainingType.with_access_requirements',
                 side_effect=(lambda: [self.mini_training_version.root_group.education_group_type.name])
         ):
             response = self.client.get(self.url)
-            self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+            self.assertTrue(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])
 
         with mock.patch(
-                'base.models.enums.education_group_types.MiniTrainingType.with_admission_condition',
+                'base.models.enums.education_group_types.MiniTrainingType.with_access_requirements',
                 side_effect=(lambda: [])
         ):
             response = self.client.get(self.url)
-            self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+            self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])
 
     def test_assert_create_urls_correctly_computed(self):
         path = "{}".format(self.root_group_element.pk)
-        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
-            "?path_to={}".format(path)
-        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
-            "?path_to={}".format(path)
-        expected_create_mini_training_url = reverse('create_element_select_type',
-                                                    kwargs={'category': Categories.MINI_TRAINING.name}) + \
-            "?path_to={}".format(path)
+        expected_create_group_url = reverse(
+            'create_element_select_type',
+            kwargs={'category': Categories.GROUP.name}
+        ) + "?path_to={}".format(path)
+        expected_create_training_url = reverse(
+            'create_element_select_type',
+            kwargs={'category': Categories.TRAINING.name}
+        ) + "?path_to={}".format(path)
+        expected_create_mini_training_url = reverse(
+            'create_element_select_type',
+            kwargs={'category': Categories.MINI_TRAINING.name}
+        ) + "?path_to={}".format(path)
 
         response = self.client.get(self.url)
         self.assertEqual(response.context['create_group_url'], expected_create_group_url)
@@ -237,7 +242,7 @@ class TestMiniTrainingReadIdentificationTabs(TestCase):
         self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
         self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
-        self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])
 
     def test_assert_tabs_displayed_for_particular_version(self):
         response = self.client.get(self.url_non_particular)
@@ -247,4 +252,4 @@ class TestMiniTrainingReadIdentificationTabs(TestCase):
         self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
-        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['display'])

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -24,80 +24,61 @@
 #
 ##############################################################################
 import datetime
-from unittest import mock
-from unittest.mock import patch
 
+import mock
 from django.contrib import messages
-from django.contrib.auth.models import Permission
-from django.http import HttpResponse, HttpResponseNotFound
-from django.test import RequestFactory
+from django.db.models.query import QuerySet
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponse, HttpResponseNotAllowed
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import gettext as _
-from waffle.testutils import override_flag
 
-from attribution.tests.factories.attribution import AttributionFactory
-from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information, \
-    _fetch_achievements_by_language
-from base.models.enums import academic_calendar_type
-from base.models.enums.entity_type import FACULTY
-from base.models.enums.learning_unit_year_subtypes import FULL
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.views.manage_my_courses import _fetch_achievements_by_language
+from base.business.academic_calendar import AcademicEvent
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
-from base.tests.factories.entity import EntityWithVersionFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from base.tests.factories.learning_container_year import LearningContainerYearInChargeFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.user import UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
 from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
-class ManageMyCoursesViewTestCase(TestCase):
+class ListMyAttributionsSummaryEditableTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
-        cls.user = cls.person.user
-        cls.tutor = TutorFactory(person=cls.person)
-        cls.current_ac_year = create_current_academic_year()
-        ac_year_in_past = AcademicYearFactory.produce_in_past(cls.current_ac_year.year)
-        cls.ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_ac_year.year)
+        cls.tutor = TutorFactory()
 
-        cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.current_ac_year,
-            data_year=cls.current_ac_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-        )
-        cls.academic_calendar_force_majeure = OpenAcademicCalendarFactory(
-            academic_year=cls.current_ac_year,
-            data_year=cls.current_ac_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
-        )
-        requirement_entity = EntityVersionFactory().entity
+        cls.current_academic_year = AcademicYearFactory(current=True)
+        cls.ac_year_in_past = AcademicYearFactory.produce_in_past(cls.current_academic_year.year)
+        cls.ac_year_in_future = AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
+
         # Create multiple attribution in different academic years
-        for ac_year in ac_year_in_past + [cls.current_ac_year] + cls.ac_year_in_future:
-            learning_container_year = LearningContainerYearInChargeFactory(
-                academic_year=ac_year,
-                requirement_entity=requirement_entity
+        for ac_year in cls.ac_year_in_past + [cls.current_academic_year] + cls.ac_year_in_future:
+            learning_unit_year = LearningUnitYearFactory(summary_locked=False, academic_year=ac_year)
+            AttributionChargeNewFactory(
+                attribution__tutor=cls.tutor,
+                attribution__learning_container_year=learning_unit_year.learning_container_year,
+                learning_component_year__learning_unit_year=learning_unit_year,
             )
-            learning_unit_year = LearningUnitYearFactory(
-                summary_locked=False,
-                academic_year=ac_year,
-                learning_container_year=learning_container_year
-            )
-            AttributionFactory(
-                tutor=cls.tutor,
-                summary_responsible=True,
-                learning_unit_year=learning_unit_year,
-            )
-        cls.url = reverse(list_my_attributions_summary_editable)
+        cls.url = reverse('list_my_attributions_summary_editable')
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.summary_course_calendar = OpenAcademicCalendarFactory(
+            data_year=self.current_academic_year,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
+        )
+        self.summary_course_force_majeure_calendar = OpenAcademicCalendarFactory(
+            data_year=self.current_academic_year,
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name
+        )
+
+        self.client.force_login(self.tutor.person.user)
 
     def test_list_my_attributions_summary_editable_user_not_logged(self):
         self.client.logout()
@@ -111,47 +92,53 @@ class ManageMyCoursesViewTestCase(TestCase):
         response = self.client.get(self.url, follow=True)
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
-    def test_list_my_attributions_summary_editable(self):
+    def test_list_my_attributions_summary_editable_assert_template(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
-        context = response.context
-        self.assertIsInstance(context['entity_calendars'], dict)
-        self.assertTrue(context['event_perm_desc_fiche_open'])
+    def test_list_my_attributions_summary_editable_assert_context_keys(self):
+        response = self.client.get(self.url)
 
-        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
-            self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
-            self.assertFalse(error.errors)
+        self.assertIsInstance(response.context['learning_unit_years'], QuerySet)
+        self.assertIsInstance(response.context['summary_edition_academic_event'], AcademicEvent)
+        self.assertEqual(
+            response.context['summary_edition_academic_event'].start_date,
+            self.summary_course_calendar.start_date
+        )
+        self.assertEqual(
+            response.context['summary_edition_academic_event'].end_date,
+            self.summary_course_calendar.end_date
+        )
+
+        self.assertIsInstance(response.context['force_majeure_academic_event'], AcademicEvent)
+        self.assertEqual(
+            response.context['force_majeure_academic_event'].start_date,
+            self.summary_course_force_majeure_calendar.start_date
+        )
+        self.assertEqual(
+            response.context['force_majeure_academic_event'].end_date,
+            self.summary_course_force_majeure_calendar.end_date
+        )
 
     def test_list_my_attributions_summary_editable_after_period(self):
-        self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
-        self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
-        self.academic_calendar.save()
+        self.summary_course_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
+        self.summary_course_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
+        self.summary_course_calendar.save()
 
         next_calendar = AcademicCalendarFactory(
             start_date=datetime.date.today() + datetime.timedelta(weeks=48),
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
-            academic_year=self.ac_year_in_future[1],
             data_year=self.ac_year_in_future[1],
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
         response = self.client.get(self.url)
-
-        self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
-
-        context = response.context
-        self.assertIsInstance(context['entity_calendars'], dict)
-
-        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
-            self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
-            self.assertEqual(error.errors[0], _("Not in period to edit description fiche."))
 
         msg = get_messages_from_response(response)
         self.assertEqual(
             msg[0].get('message'),
             _('For the academic year %(data_year)s, the summary edition period ended on %(end_date)s.') % {
-                "data_year": self.academic_calendar.data_year,
-                "end_date": self.academic_calendar.end_date.strftime('%d/%m/%Y'),
+                "data_year": self.summary_course_calendar.data_year,
+                "end_date": self.summary_course_calendar.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.INFO)
@@ -164,108 +151,71 @@ class ManageMyCoursesViewTestCase(TestCase):
         )
         self.assertEqual(msg[1].get('level'), messages.INFO)
 
-    def test_list_my_attributions_summary_editable_next_data_year(self):
-        self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=1)
-        self.academic_calendar.end_date = datetime.date.today() + datetime.timedelta(weeks=4)
-        self.academic_calendar.academic_year = self.ac_year_in_future[1]  # This is n+1
-        self.academic_calendar.data_year = self.ac_year_in_future[1]  # This is n+1
-        self.academic_calendar.save()
-
-        AcademicCalendarFactory(
-            academic_year=self.ac_year_in_future[1],
-            data_year=self.ac_year_in_future[1],
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE
-        )
-
+    def test_list_my_attributions_force_majeure_editable_assert_warning_message_displayed(self):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
-        context = response.context
-
-        for luy, error, error_force_majeure in context["learning_unit_years_with_errors"]:
-            self.assertEqual(luy.academic_year.year, self.ac_year_in_future[1].year)
-            self.assertFalse(error.errors)
-
-    def test_list_my_attributions_force_majeure_editable(self):
-        response = self.client.get(self.url)
-        context = response.context
-        self.assertTrue(context['event_perm_force_majeure_open'])
-        self.assertEqual(
-            context['event_perm_force_majeure_start_date'],
-            self.academic_calendar_force_majeure.start_date
-        )
-        self.assertEqual(
-            context['event_perm_force_majeure_end_date'],
-            self.academic_calendar_force_majeure.end_date
-        )
         msg = get_messages_from_response(response)
         self.assertEqual(
             msg[0].get('message'),
             _("Force majeure case : Some fields of the description fiche can be edited from %(start_date)s to "
               "%(end_date)s.") % {
                 "start_date":
-                    self.academic_calendar_force_majeure.start_date.strftime('%d/%m/%Y'),
+                    self.summary_course_force_majeure_calendar.start_date.strftime('%d/%m/%Y'),
                 "end_date":
-                    self.academic_calendar_force_majeure.end_date.strftime('%d/%m/%Y'),
+                    self.summary_course_force_majeure_calendar.end_date.strftime('%d/%m/%Y'),
             }
         )
         self.assertEqual(msg[0].get('level'), messages.WARNING)
 
-    def test_list_my_attributions_force_majeure_not_editable(self):
-        self.academic_calendar_force_majeure.start_date = datetime.date.today() + datetime.timedelta(days=7)
-        self.academic_calendar_force_majeure.end_date = datetime.date.today() + datetime.timedelta(days=10)
-        self.academic_calendar_force_majeure.save()
-        response = self.client.get(self.url)
-        context = response.context
-        self.assertFalse(context['event_perm_force_majeure_open'])
 
-
-@override_flag('educational_information_block_action', active=True)
-class TestViewEducationalInformation(TestCase):
+class TestTutorViewEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.current_academic_year = AcademicYearFactory(current=True)
+
         cls.tutor = TutorFactory()
-        AcademicYearFactory.produce()
-        cls.attribution = AttributionFactory(tutor=cls.tutor, summary_responsible=True)
-        cls.url = reverse(view_educational_information, args=[cls.attribution.learning_unit_year.id])
+        cls.learning_unit_year = LearningUnitYearFactory(summary_locked=False, academic_year=cls.current_academic_year)
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
+        )
+        OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=cls.learning_unit_year.academic_year
+        )
+        cls.url = reverse('view_educational_information', args=[cls.learning_unit_year.id])
 
     def setUp(self):
         self.client.force_login(self.tutor.person.user)
-
-        self.patcher_perm_can_view_educational_information = mock.patch(
-            'attribution.views.perms.can_tutor_view_educational_information'
-        )
-        self.mock_perm_view = self.patcher_perm_can_view_educational_information.start()
-        self.mock_perm_view.return_value = True
-
-    def tearDown(self):
-        self.patcher_perm_can_view_educational_information.stop()
 
     def test_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    def test_check_if_user_can_view_educational_information(self):
-        self.mock_perm_view.return_value = False
-
+    def test_user_has_not_permission(self):
+        self.client.force_login(UserFactory())
         response = self.client.get(self.url)
 
-        self.assertTrue(self.mock_perm_view.called)
         self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_template_used(self):
         response = self.client.get(self.url)
-
         self.assertTemplateUsed(response, "manage_my_courses/educational_information.html")
 
+    def test_assert_keys_in_context(self):
+        response = self.client.get(self.url)
+
         context = response.context
-        self.assertEqual(context["learning_unit_year"], self.attribution.learning_unit_year)
+        self.assertEqual(context["learning_unit_year"], self.learning_unit_year)
         self.assertTrue("teaching_materials" in context)
         self.assertFalse(context["cms_labels_translated"])
-        self.assertFalse(context["can_edit_information"])
+        self.assertTrue(context["can_edit_information"])
         self.assertFalse(context["can_edit_summary_locked_field"])
-        self.assertFalse(context["submission_dates"])
+        self.assertIsInstance(context["submission_dates"], AcademicEvent)
+
         # Verify URL for tutor [==> Specific redirection]
         self.assertEqual(context['create_teaching_material_urlname'], 'tutor_teaching_material_create')
         self.assertEqual(context['update_teaching_material_urlname'], 'tutor_teaching_material_edit')
@@ -273,7 +223,7 @@ class TestViewEducationalInformation(TestCase):
         self.assertEqual(context['update_mobility_modality_urlname'], 'tutor_mobility_modality_update')
 
 
-class TestFetchAchievement(TestCase):
+class TestFetchAchievementsByLanguage(TestCase):
     @classmethod
     def setUpTestData(cls):
         fr = FrenchLanguageFactory()
@@ -290,157 +240,317 @@ class TestFetchAchievement(TestCase):
         )
 
 
-class TestManageEducationalInformation(TestCase):
+class TestTutorEditEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory()
-        cls.academic_year = AcademicYearFactory(year=get_current_year())
-        cls.attribution = AttributionFactory(
-            tutor=cls.tutor,
-            summary_responsible=True,
-            learning_unit_year__academic_year=cls.academic_year,
-            learning_unit_year__learning_container_year__requirement_entity=EntityWithVersionFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
+
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year, summary_locked=False)
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
         )
-        cls.url = reverse("tutor_edit_educational_information", args=[cls.attribution.learning_unit_year.id])
+        cls.url = reverse("tutor_edit_educational_information", args=[cls.learning_unit_year.id])
 
     def setUp(self):
+        self.calendar_row = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=self.learning_unit_year.academic_year
+        )
         self.client.force_login(self.tutor.person.user)
 
     def test_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
+
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    def test_check_if_user_can_view_educational_information(self):
+    def test_user_has_not_permission(self):
         self.client.force_login(PersonFactory().user)
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
 
-    @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    @mock.patch("base.models.entity_calendar.find_interval_dates_for_entity")
-    def test_use_edit_learning_unit_pedagogy_method(
-            self,
-            mock_interval_dates,
-            mock_edit_learning_unit_pedagogy
-    ):
-        mock_interval_dates.return_value = {
-            'start_date': self.academic_year.start_date,
-            'end_date': self.academic_year.end_date
-        }
-        self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_summary_course_submission_calendar_is_closed(self):
+        self.calendar_row.start_date = datetime.date.today() - datetime.timedelta(days=3)
+        self.calendar_row.end_date = datetime.date.today() - datetime.timedelta(days=1)
+        self.calendar_row.save()
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('attribution.views.manage_my_courses.edit_learning_unit_pedagogy', return_value=HttpResponse())
+    def test_assert_call_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(mock_edit_learning_unit_pedagogy.called)
 
-    @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    @mock.patch("base.models.entity_calendar.find_interval_dates_for_entity")
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
-    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018(
-            self,
-            mock_interval_dates,
-            mock_edit_learning_unit_pedagogy
-    ):
-        academic_year = AcademicYearFactory(year=2015)
-        mock_interval_dates.return_value = {'start_date': academic_year.start_date, 'end_date': academic_year.end_date}
-        self.attribution.learning_unit_year.academic_year = academic_year
-        self.attribution.learning_unit_year.save()
 
-        self.client.get(self.url)
-        self.assertFalse(mock_edit_learning_unit_pedagogy.called)
-
-
-class ManageMyCoursesMixin(TestCase):
-    """This mixin is used in context of edition of pedagogy data for tutor"""
-
+class TestTutorEditForceMajeurEducationalInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
-        cls.academic_calendar = AcademicCalendarFactory(
-            academic_year=cls.current_academic_year,
-            data_year=cls.current_academic_year,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+        cls.tutor = TutorFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
+
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year, summary_locked=False)
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
         )
-        cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
-        cls.academic_calendar = OpenAcademicCalendarFactory(
-            academic_year=cls.academic_year_in_future,
-            data_year=cls.academic_year_in_future,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-        )
-        a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
-        cls.learning_unit_year = LearningUnitYearFactory(
-            subtype=FULL,
-            academic_year=cls.academic_year_in_future,
-            learning_container_year__academic_year=cls.academic_year_in_future,
-            learning_container_year__requirement_entity=a_valid_entity_version.entity,
-            summary_locked=False
-        )
-        cls.tutor = _get_tutor()
-        # Add attribution to course [set summary responsible]
-        AttributionFactory(
-            tutor=cls.tutor,
-            summary_responsible=True,
-            learning_unit_year=cls.learning_unit_year,
-        )
+        cls.url = reverse("tutor_edit_educational_information_force_majeure", args=[cls.learning_unit_year.id])
 
     def setUp(self):
+        self.calendar_row = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
+            data_year=self.learning_unit_year.academic_year
+        )
         self.client.force_login(self.tutor.person.user)
 
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
 
-class TestManageMyCoursesTeachingMaterials(ManageMyCoursesMixin):
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_user_has_not_permission(self):
+        self.client.force_login(PersonFactory().user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_summary_course_submission_force_majeure_calendar_is_closed(self):
+        self.calendar_row.start_date = datetime.date.today() - datetime.timedelta(days=3)
+        self.calendar_row.end_date = datetime.date.today() - datetime.timedelta(days=1)
+        self.calendar_row.save()
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    @mock.patch('attribution.views.manage_my_courses.edit_learning_unit_pedagogy', return_value=HttpResponse())
+    def test_assert_get_http_call_edit_learning_unit_pedagogy_method(self, mock_edit_learning_unit_pedagogy):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_edit_learning_unit_pedagogy.called)
+
+    @mock.patch('attribution.views.manage_my_courses.post_method_edit_force_majeure_pedagogy',
+                return_value=HttpResponse())
+    def test_assert_post_http_call_edit_learning_unit_pedagogy_method(self, mock_post_learning_unit_pedagogy):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_post_learning_unit_pedagogy.called)
+
+
+class TestTutorCreateTeachingMaterial(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
+
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year, summary_locked=False)
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
+        )
+        cls.url = reverse("tutor_teaching_material_create", args=[cls.learning_unit_year.id])
+
     def setUp(self):
-        super().setUp()
-        self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
-
-    @patch('base.views.teaching_material.create_view')
-    def test_call_view_create_teaching_material(self, mock_create_view):
-        url = reverse('tutor_teaching_material_create', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
-        request = _prepare_request(url, self.tutor.person.user)
-
-        from attribution.views.manage_my_courses import create_teaching_material
-        create_teaching_material(request, learning_unit_year_id=self.learning_unit_year.pk)
-        self.assertTrue(mock_create_view.called)
-
-        mock_create_view.assert_called_once_with(request, self.learning_unit_year.pk)
-
-    @patch('base.views.teaching_material.update_view')
-    def test_call_view_update_teaching_material(self, mock_update_view):
-        url = reverse('tutor_teaching_material_edit', kwargs={'learning_unit_year_id': self.learning_unit_year.id,
-                                                              'teaching_material_id': self.teaching_material.id})
-        request = _prepare_request(url, self.tutor.person.user)
-
-        from attribution.views.manage_my_courses import update_teaching_material
-        update_teaching_material(
-            request,
-            learning_unit_year_id=self.learning_unit_year.pk,
-            teaching_material_id=self.teaching_material.id
+        self.calendar_row = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=self.learning_unit_year.academic_year
         )
-        self.assertTrue(mock_update_view.called)
+        self.client.force_login(self.tutor.person.user)
 
-        mock_update_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id)
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
 
-    @patch('base.views.teaching_material.delete_view')
-    def test_call_view_delete_teaching_material(self, mock_delete_view):
-        url = reverse('tutor_teaching_material_delete', kwargs={'learning_unit_year_id': self.learning_unit_year.id,
-                                                                'teaching_material_id': self.teaching_material.id})
-        request = _prepare_request(url, self.tutor.person.user)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-        from attribution.views.manage_my_courses import delete_teaching_material
-        delete_teaching_material(
-            request,
-            learning_unit_year_id=self.learning_unit_year.pk,
-            teaching_material_id=self.teaching_material.id
+    def test_user_has_not_permission(self):
+        self.client.force_login(PersonFactory().user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_summary_course_submission_calendar_is_closed(self):
+        self.calendar_row.start_date = datetime.date.today() - datetime.timedelta(days=3)
+        self.calendar_row.end_date = datetime.date.today() - datetime.timedelta(days=1)
+        self.calendar_row.save()
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_assert_method_not_allowed(self):
+        methods_not_allowed = ['delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertTemplateUsed(response, "method_not_allowed.html")
+            self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
+
+    @mock.patch('attribution.views.manage_my_courses.teaching_material.create_view', return_value=HttpResponse())
+    def test_assert_get_http_call_teachning_material_create_view(self, mock_teachning_material_create_view):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_teachning_material_create_view.called)
+
+    @mock.patch('attribution.views.manage_my_courses.teaching_material.create_view', return_value=HttpResponse())
+    def test_assert_post_http_call_teachning_material_create_view(self, mock_teachning_material_create_view):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_teachning_material_create_view.called)
+
+
+class TestTutorUpdateTeachingMaterial(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
+
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year, summary_locked=False)
+        cls.teaching_material = TeachingMaterialFactory(learning_unit_year=cls.learning_unit_year)
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
         )
-        self.assertTrue(mock_delete_view.called)
+        cls.url = reverse('tutor_teaching_material_edit', kwargs={
+            'learning_unit_year_id': cls.learning_unit_year.pk,
+            'teaching_material_id': cls.teaching_material.pk
+        })
 
-        mock_delete_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id)
+    def setUp(self):
+        self.calendar_row = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=self.learning_unit_year.academic_year
+        )
+        self.client.force_login(self.tutor.person.user)
+
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_user_has_not_permission(self):
+        self.client.force_login(PersonFactory().user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_summary_course_submission_calendar_is_closed(self):
+        self.calendar_row.start_date = datetime.date.today() - datetime.timedelta(days=3)
+        self.calendar_row.end_date = datetime.date.today() - datetime.timedelta(days=1)
+        self.calendar_row.save()
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_assert_method_not_allowed(self):
+        methods_not_allowed = ['delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertTemplateUsed(response, "method_not_allowed.html")
+            self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
+
+    @mock.patch('attribution.views.manage_my_courses.teaching_material.update_view', return_value=HttpResponse())
+    def test_assert_get_http_call_teachning_material_update_view(self, mock_teachning_material_update_view):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_teachning_material_update_view.called)
+
+    @mock.patch('attribution.views.manage_my_courses.teaching_material.update_view', return_value=HttpResponse())
+    def test_assert_post_http_call_teachning_material_update_view(self, mock_teachning_material_update_view):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_teachning_material_update_view.called)
 
 
-def _prepare_request(url, user):
-    request_factory = RequestFactory()
-    request = request_factory.get(url)
-    request.user = user
-    return request
+class TestTutorDeleteTeachingMaterial(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.academic_year = AcademicYearFactory(current=True)
 
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year, summary_locked=False)
+        cls.teaching_material = TeachingMaterialFactory(learning_unit_year=cls.learning_unit_year)
+        cls.attribution = AttributionChargeNewFactory(
+            attribution__tutor=cls.tutor,
+            attribution__learning_container_year=cls.learning_unit_year.learning_container_year,
+            learning_component_year__learning_unit_year=cls.learning_unit_year,
+        )
+        cls.url = reverse('tutor_teaching_material_delete', kwargs={
+            'learning_unit_year_id': cls.learning_unit_year.pk,
+            'teaching_material_id': cls.teaching_material.pk
+        })
 
-def _get_tutor():
-    tutor = TutorFactory()
-    tutor.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
-    return tutor
+    def setUp(self):
+        self.calendar_row = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=self.learning_unit_year.academic_year
+        )
+        self.client.force_login(self.tutor.person.user)
+
+    def test_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_user_has_not_permission(self):
+        self.client.force_login(PersonFactory().user)
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_summary_course_submission_calendar_is_closed(self):
+        self.calendar_row.start_date = datetime.date.today() - datetime.timedelta(days=3)
+        self.calendar_row.end_date = datetime.date.today() - datetime.timedelta(days=1)
+        self.calendar_row.save()
+
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_assert_method_not_allowed(self):
+        methods_not_allowed = ['delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertTemplateUsed(response, "method_not_allowed.html")
+            self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
+
+    @mock.patch('attribution.views.manage_my_courses.teaching_material.delete_view', return_value=HttpResponse())
+    def test_assert_get_http_call_teachning_material_delete_view(self, mock_teachning_material_delete_view):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_teachning_material_delete_view.called)
+
+    @mock.patch('attribution.views.manage_my_courses.teaching_material.delete_view', return_value=HttpResponse())
+    def test_assert_post_http_call_teachning_material_delete_view(self, mock_teachning_material_delete_view):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_teachning_material_delete_view.called)

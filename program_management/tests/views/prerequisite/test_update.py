@@ -29,14 +29,14 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums import education_group_categories, academic_calendar_type
+from base.models.enums import education_group_categories
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
@@ -63,7 +63,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         GroupElementYearFactory(parent_element=cls.element_parent, child_element=cls.element_child)
         cls.person = CentralManagerFactory(entity=cls.element_parent.group_year.management_entity).person
         OpenAcademicCalendarFactory(
-            reference=academic_calendar_type.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT,
+            reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year=cls.academic_year
         )
         cls.url = reverse("learning_unit_prerequisite_update",
@@ -98,7 +98,6 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             group_year__academic_year=self.academic_year,
             group_year__education_group_type__group=True
         )
-        PersonEntityFactory(person=self.person, entity=group_element.group_year.management_entity)
         url = reverse(
             "learning_unit_prerequisite_update",
             args=[group_element.id, self.element_child.id]

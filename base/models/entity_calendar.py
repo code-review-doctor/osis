@@ -31,14 +31,14 @@ from base.models import academic_calendar
 from base.models import entity_version
 from base.models.abstracts.abstract_calendar import AbstractCalendar
 from base.models.academic_year import starting_academic_year
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class EntityCalendarAdmin(OsisModelAdmin):
     list_display = ('academic_calendar', 'entity', 'start_date', 'end_date', 'changed')
     raw_id_fields = ('entity',)
-    list_filter = ('academic_calendar__academic_year', 'academic_calendar__reference')
+    list_filter = ('academic_calendar__data_year', 'academic_calendar__reference')
 
 
 class EntityCalendar(AbstractCalendar):
@@ -55,7 +55,7 @@ class EntityCalendar(AbstractCalendar):
         self._check_not_summary_course_submission()
 
     def _check_not_summary_course_submission(self):
-        if self.academic_calendar.reference == academic_calendar_type.SUMMARY_COURSE_SUBMISSION:
+        if self.academic_calendar.reference == AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name:
             raise ValidationError({
                 "academic_calendar": _('You cannot have a specific summary course submission event.')
             })
@@ -65,9 +65,9 @@ def find_by_entity_and_reference(entity_id, reference, academic_year=None):
     try:
         return EntityCalendar.objects.filter(
             entity_id=entity_id,
-            academic_calendar__academic_year=academic_year or starting_academic_year(),
+            academic_calendar__data_year=academic_year or starting_academic_year(),
             academic_calendar__reference=reference
-        ).select_related('entity', 'academic_calendar__academic_year').get()
+        ).select_related('entity', 'academic_calendar__data_year').get()
     except ObjectDoesNotExist:
         return None
 

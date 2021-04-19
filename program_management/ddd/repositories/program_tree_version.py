@@ -341,6 +341,8 @@ def _get_common_queryset() -> QuerySet:
                     }
                 ) & Q(
                     version_name=STANDARD
+                ) & Q(
+                    transition_name=NOT_A_TRANSITION
                 ),
                 then=F('offer__education_group__start_year__year')
             ),
