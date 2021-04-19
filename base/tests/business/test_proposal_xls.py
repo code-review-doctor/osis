@@ -43,7 +43,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, simulate_annotate_on_entities
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
@@ -91,14 +91,14 @@ class TestProposalXls(TestCase):
         self.assertEqual(proposals_data[0], self._get_xls_data())
 
     def test_prepare_xls_comparison_content_with_data_without_initial_data(self):
-        luy = _simulate_annotate_on_entities(self.l_unit_yr_1)
+        luy = simulate_annotate_on_entities(self.l_unit_yr_1)
         proposals_data = prepare_xls_content_for_comparison([luy])
         self.assertEqual(len(proposals_data['data']), 1)
 
     def test_prepare_xls_comparison_content_with_data_with_initial_data(self):
         self.proposal_1.initial_data = build_initial_data(self.l_unit_yr_1, self.entity_version.entity)
         self.proposal_1.save()
-        luy = _simulate_annotate_on_entities(self.l_unit_yr_1)
+        luy = simulate_annotate_on_entities(self.l_unit_yr_1)
         proposals_data = prepare_xls_content_for_comparison([luy])
         self.assertEqual(len(proposals_data['data']), 2)
 
@@ -233,15 +233,3 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.BORDER_CELLS: None
         }]
     }
-
-
-def _simulate_annotate_on_entities(luy_to_complete):
-    # Simulate annotate with inactive entities
-    luy = luy_to_complete
-    luy.active_entity_requirement_version = True
-    luy.active_entity_allocation_version = True
-    luy.ent_requirement_acronym = 'DRT'
-    luy.ent_allocation_acronym = 'BUDR'
-    luy.additional_entity_1_acronym = 'AGRO'
-    luy.additional_entity_2_acronym = 'ESPO'
-    return luy

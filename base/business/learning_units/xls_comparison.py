@@ -89,6 +89,7 @@ def create_xls_comparison(user, learning_unit_years: QuerySet, filters, academic
     working_sheets_data = []
     cells_modified_with_green_font = []
     cells_with_top_border = []
+    luys_for_2_years = None
 
     if learning_unit_years:
         luys_for_2_years = _get_learning_unit_yrs_on_2_different_years(academic_yr_comparison,
@@ -109,9 +110,9 @@ def create_xls_comparison(user, learning_unit_years: QuerySet, filters, academic
         parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
     else:
         parameters[xls_build.FONT_CELLS] = {}
-
-    parameters[xls_build.FONT_CELLS].update(
-        _get_strikethrough_cells_on_entity(luys_for_2_years, cells_modified_with_green_font))
+    if luys_for_2_years:
+        parameters[xls_build.FONT_CELLS].update(
+            _get_strikethrough_cells_on_entity(luys_for_2_years, cells_modified_with_green_font))
     if cells_with_top_border:
         parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_TOP: cells_with_top_border}
     parameters[xls_build.FONT_ROWS] = {BOLD_FONT: [0]}
