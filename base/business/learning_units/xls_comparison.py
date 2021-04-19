@@ -302,7 +302,7 @@ def get_translation(value):
 
 
 def _get_entity_to_display(entity):
-    return entity.acronym if entity else BLANK_VALUE
+    return entity if entity else BLANK_VALUE
 
 
 def _check_changes_other_than_code_and_year(first_data, second_data, line_index):
@@ -452,8 +452,10 @@ def get_representing_string(value):
     return value or BLANK_VALUE
 
 
-def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
-    data = prepare_xls_content_for_comparison(learning_units_with_proposal)
+def create_xls_proposal_comparison(user, lus_with_proposal, filters):
+    lus_with_proposal = LearningUnitYearQuerySet.annotate_entities_status(lus_with_proposal)
+    lus_with_proposal = LearningUnitYearQuerySet.annotate_additional_entities_status(lus_with_proposal)
+    data = prepare_xls_content_for_comparison(lus_with_proposal)
 
     working_sheets_data = data.get('data')
     cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
@@ -472,7 +474,9 @@ def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):
 
     if cells_with_top_border:
         parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_BOTTOM: cells_with_top_border}
-
+    parameters[xls_build.FONT_ROWS] = {BOLD_FONT: [0]}
+    parameters[xls_build.FONT_CELLS].update(
+        _get_strikethrough_cells_on_entity(lus_with_proposal, cells_modified_with_green_font))
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
@@ -533,7 +537,7 @@ def _get_data_from_components_initial_data(data_without_components, initial_data
     return data
 
 
-def _format_academic_year(start_year, end_year):
+def _format_academic_year(start_year, end_year) -> str:
     return "{}{}".format(start_year,
                          "   ({} {})".format(_('End').lower(), end_year if end_year else '-'))
 
