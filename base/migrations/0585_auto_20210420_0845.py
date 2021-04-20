@@ -13,6 +13,8 @@ def assign_specific_permissions_and_remove_unused_groups(apps, schema_editor):
             user.user_permissions.add(*permissions_admin_grp)
         admin_grp.delete()
 
+    Group.objects.filter(name="student_update_UE_AA").delete()
+
 
 class Migration(migrations.Migration):
 
