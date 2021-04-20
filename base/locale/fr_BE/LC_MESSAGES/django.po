@@ -2823,7 +2823,7 @@ msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
 
 msgid "Updated"
-msgstr "Mis-à-jour"
+msgstr "Mis à jour"
 
 msgid "Url"
 msgstr "URL"
