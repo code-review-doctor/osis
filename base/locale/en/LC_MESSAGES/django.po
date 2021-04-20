@@ -2165,6 +2165,9 @@ msgstr ""
 msgid "Scores responsibles"
 msgstr ""
 
+msgid "Scores responsibles (emails)"
+msgstr ""
+
 msgid "Search for an entity"
 msgstr ""
 
@@ -2661,6 +2664,9 @@ msgid "Tutor"
 msgstr ""
 
 msgid "Tutors"
+msgstr ""
+
+msgid "Tutors (scores responsibles included)"
 msgstr ""
 
 msgid "Type"
