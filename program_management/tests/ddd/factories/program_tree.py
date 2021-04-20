@@ -29,15 +29,24 @@ from typing import Dict, List
 import factory.fuzzy
 
 from program_management.ddd import command
-from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.ddd.service.write import copy_program_tree_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.domain.prerequisite.prerequisite import PrerequisitesFactory
-from program_management.tests.ddd.factories.domain.program_tree.program_tree_identity import ProgramTreeIdentityFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
+
+
+class ProgramTreeIdentityFactory(factory.Factory):
+
+    class Meta:
+        model = ProgramTreeIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'CODE%02d' % n)
+    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 
 class ProgramTreeFactory(factory.Factory):

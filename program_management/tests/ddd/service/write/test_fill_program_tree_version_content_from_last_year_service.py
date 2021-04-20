@@ -31,10 +31,9 @@ from django.test import override_settings
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
     GetProgramTreeVersionCommand
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty, InvalidTreeVersionToFillTo
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.read import get_program_tree_version_service
 from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
     fill_program_tree_version_content_from_program_tree_version
@@ -42,7 +41,6 @@ from program_management.tests.ddd.factories.domain.program_tree_version.training
     OSIS2MSpecificVersionFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020

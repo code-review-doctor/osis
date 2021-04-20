@@ -168,17 +168,6 @@ class DDDTestCase(TestCase):
 
         return service_patcher.start()
 
-    def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):
-        self.fake_program_tree_version_repository._trees_version.append(tree_version)
-        self.add_tree_to_repo(tree_version.get_tree(), create_tree_version=False)
-
-    def add_tree_to_repo(self, tree: 'ProgramTree', create_tree_version=True):
-        self.fake_program_tree_repository._trees.append(tree)
-
-        self.add_node_to_repo(tree.root_node, create_tree_version=create_tree_version, create_tree=False)
-        for node in tree.root_node.get_all_children_as_nodes():
-            self.add_node_to_repo(node, create_tree_version=True, create_tree=True)
-
     def add_node_to_repo(self, node: 'Node', create_tree_version=True, create_tree=True):
         self.fake_node_repository._nodes.append(node)
 
