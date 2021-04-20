@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from typing import Optional
 
 from django.db import models
 
@@ -53,12 +54,13 @@ class SessionExamCalendar(models.Model):
 
 
 def current_opened_academic_year() -> 'AcademicYear':
+    session_exam = current_session_exam() or get_closest_new_session_exam()
     return AcademicYear.objects.get(
-        year=current_session_exam().authorized_target_year
+        year=session_exam.authorized_target_year
     )
 
 
-def current_session_exam(date=None) -> 'AcademicSessionEvent':
+def current_session_exam(date=None) -> Optional['AcademicSessionEvent']:
     from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
     calendar = ScoresExamSubmissionCalendar()
     events = calendar.get_opened_academic_events(date=date)
