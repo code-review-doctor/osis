@@ -746,34 +746,6 @@
     {
         "model": "auth.group",
         "fields": {
-            "name": "administrator_for_user",
-            "permissions": [
-                [
-                    "is_institution_administrator",
-                    "base",
-                    "person"
-                ],
-                [
-                    "can_read_persons_roles",
-                    "base",
-                    "person"
-                ],
-                [
-                    "can_access_academicyear",
-                    "base",
-                    "academicyear"
-                ],
-                [
-                    "can_access_academic_calendar",
-                    "base",
-                    "academiccalendar"
-                ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
             "name": "partnership_viewers",
             "permissions": [
                 ["can_access_partnerships","partnership","partnership"],
