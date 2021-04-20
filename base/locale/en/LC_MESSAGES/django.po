@@ -2717,6 +2717,9 @@ msgstr ""
 msgid "Update for teacher unlocked"
 msgstr ""
 
+msgid "Updated"
+msgstr ""
+
 msgid "Url"
 msgstr ""
 
