@@ -442,5 +442,4 @@ def _has_to_be_marked(
         encoding_already_completed_before_update: bool,
         enrollment: ExamEnrollment,
         updated_enrollments_ids: List[int]) -> bool:
-    return not encoding_already_completed_before_update or (
-                encoding_already_completed_before_update and enrollment.id in updated_enrollments_ids)
+    return not encoding_already_completed_before_update or enrollment.id in updated_enrollments_ids

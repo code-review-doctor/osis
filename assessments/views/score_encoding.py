@@ -56,6 +56,8 @@ from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
 
+ALL_SCORES_ENCODED = 100
+
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
 
@@ -252,12 +254,12 @@ def online_encoding_form(request, learning_unit_year_id=None):
         else:
             template_name = "online_encoding.html"
             send_messages_to_notify_encoding_progress(
-                context["enrollments"],
-                context["learning_unit_year"],
-                context["is_program_manager"],
-                updated_enrollments,
+                all_enrollments=context["enrollments"],
+                learning_unit_year=context["learning_unit_year"],
+                is_program_manager=context["is_program_manager"],
+                updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=scores_list_before_update.progress_int == 100
+                encoding_already_completed_before_update=scores_list_before_update.progress_int == ALL_SCORES_ENCODED
             )
     else:
         context = _get_common_encoding_context(request, learning_unit_year_id)
@@ -389,12 +391,12 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
                 user=request.user,
                 learning_unit_year_id=learning_unit_year_id)
             send_messages_to_notify_encoding_progress(
-                scores_list_encoded.enrollments,
-                scores_list_encoded.learning_unit_year,
-                is_program_manager,
-                updated_enrollments,
+                all_enrollments=scores_list_encoded.enrollments,
+                learning_unit_year=scores_list_encoded.learning_unit_year,
+                is_program_manager=is_program_manager,
+                updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=scores_list_before_update.progress_int == 100
+                encoding_already_completed_before_update=scores_list_before_update.progress_int == ALL_SCORES_ENCODED
             )
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
@@ -582,12 +584,12 @@ def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollme
                 learning_unit_year_id=learning_unit_year.id
             )
             send_messages_to_notify_encoding_progress(
-                scores_list.enrollments,
-                learning_unit_year,
-                is_program_manager,
-                updated_enrollments,
+                all_enrollments=scores_list.enrollments,
+                learning_unit_year=learning_unit_year,
+                is_program_manager=is_program_manager,
+                updated_enrollments=updated_enrollments,
                 pgm_manager=pgm_manager,
-                encoding_already_completed_before_update=scores_list_before_update.progress_int == 100
+                encoding_already_completed_before_update=scores_list_before_update.progress_int == ALL_SCORES_ENCODED
             )
             mail_already_sent_by_learning_unit.add(learning_unit_year)
 
