@@ -28,7 +28,7 @@ from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
     AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
-    HopsFields2OrNoneForFormationPhdAttestationCertificat
+    HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 
 
 class HopsValuesValidator(business_validator.BusinessValidator):
@@ -61,7 +61,7 @@ class HopsValuesValidator(business_validator.BusinessValidator):
         if self.training_type.name in training_hops_types_names:
             if 0 < len(hops_fields_values) < 2 or \
                     (len(hops_fields_values) == 2 and (self.ares_code is None or self.ares_authorization is None)):
-                exceptions.append(HopsFields2OrNoneForFormationPhdAttestationCertificat())
+                exceptions.append(HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES())
 
         elif 0 < len(hops_fields_values) < 3:
             exceptions.append(HopsFieldsAllOrNone())

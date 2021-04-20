@@ -46,7 +46,7 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, StartYearGreaterThanEndYearException, \
     ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid, \
-    HopsFields2OrNoneForFormationPhdAttestationCertificat
+    HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -168,7 +168,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         training_form.add_error('academic_year', '')
                     elif isinstance(e, HopsFieldsAllOrNone) or \
                             isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999) or \
-                            isinstance(e, HopsFields2OrNoneForFormationPhdAttestationCertificat):
+                            isinstance(e, HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES):
                         training_form.add_error('ares_code', e.message)
                     elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         training_form.add_error('ares_graca', e.message)
