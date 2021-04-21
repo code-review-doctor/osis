@@ -54,9 +54,8 @@ class SessionExamCalendar(models.Model):
 
 
 def current_opened_academic_year() -> 'AcademicYear':
-    session_exam = current_session_exam() or get_closest_new_session_exam()
     return AcademicYear.objects.get(
-        year=session_exam.authorized_target_year
+        year=current_session_exam().authorized_target_year
     )
 
 
