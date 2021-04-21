@@ -42,7 +42,7 @@ from django.views.generic.edit import BaseUpdateView
 from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
 from base.auth.roles.program_manager import ProgramManager
-from base.models import session_exam_calendar
+from base.models import session_exam_calendar, academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -210,7 +210,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 @permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
-    current_academic_yr = session_exam_calendar.current_opened_academic_year()
+    current_academic_yr = academic_year.current_academic_year()
     return render(request, "admin/pgm_manager.html", {
         'academic_year': current_academic_yr,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
@@ -244,7 +244,7 @@ def pgm_manager_search(request):
 
     administrator_entities = get_administrator_entities(request.user)
 
-    current_academic_yr = session_exam_calendar.current_opened_academic_year()
+    current_academic_yr = academic_year.current_academic_year()
 
     data = {
         'academic_year': current_academic_yr,
