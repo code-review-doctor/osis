@@ -193,16 +193,6 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
     def get_next_academic_event(self, date=None) -> AcademicSessionEvent:
         return super().get_next_academic_event(date=date)
 
-    def get_closest_academic_event(self, date=None) -> Optional[AcademicSessionEvent]:
-        opened_academic_events = self.get_opened_academic_events(date)
-        if opened_academic_events:
-            return opened_academic_events[0]
-
-        next_academic_event = self.get_next_academic_event(date)
-        if next_academic_event.session != self.FIRST_SESSION:
-            return next_academic_event
-        return None
-
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
         return sorted(
