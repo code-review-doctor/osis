@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from abc import ABC
-from typing import List, Union
+from typing import List, Union, Optional
 
 import attr
 from django.db.models import F
@@ -170,6 +170,8 @@ class AcademicEventCalendarHelper(ABC):
 
 
 class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
+    FIRST_SESSION = 1
+
     def get_academic_session_event(self, target_year: int, session: int) -> AcademicSessionEvent:
         """
         Return academic session event related to target_year and session provided
@@ -190,6 +192,16 @@ class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
 
     def get_next_academic_event(self, date=None) -> AcademicSessionEvent:
         return super().get_next_academic_event(date=date)
+
+    def get_closest_academic_event(self, date=None) -> Optional[AcademicSessionEvent]:
+        opened_academic_events = self.get_opened_academic_events(date)
+        if opened_academic_events:
+            return opened_academic_events[0]
+
+        next_academic_event = self.get_next_academic_event(date)
+        if next_academic_event.session != self.FIRST_SESSION:
+            return next_academic_event
+        return None
 
     @cached_property
     def _get_academic_events(self) -> List[AcademicSessionEvent]:
