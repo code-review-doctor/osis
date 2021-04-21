@@ -259,7 +259,7 @@ def online_encoding_form(request, learning_unit_year_id=None):
                 updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
                 encoding_already_completed_before_update=
-                scores_list_before_update.exam_enrollments_encoded == scores_list_before_update.total_exam_enrollments
+                scores_list_before_update.enrollment_encoded == scores_list_before_update.enrollments
             )
     else:
         context = _get_common_encoding_context(request, learning_unit_year_id)
@@ -397,7 +397,7 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
                 updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
                 encoding_already_completed_before_update=
-                scores_list_before_update.exam_enrollments_encoded == scores_list_before_update.total_exam_enrollments
+                scores_list_before_update.enrollment_encoded == scores_list_before_update.enrollments
             )
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
@@ -591,7 +591,7 @@ def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollme
                 updated_enrollments=updated_enrollments,
                 pgm_manager=pgm_manager,
                 encoding_already_completed_before_update=
-                scores_list_before_update.exam_enrollments_encoded == scores_list_before_update.total_exam_enrollments
+                scores_list_before_update.enrollment_encoded == scores_list_before_update.enrollments
             )
             mail_already_sent_by_learning_unit.add(learning_unit_year)
 
