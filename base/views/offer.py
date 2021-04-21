@@ -26,7 +26,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 
-from base.models import session_exam_calendar
+from base.models import academic_year
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion
@@ -39,10 +39,10 @@ def offers(request):
     academic_yr = None
     academic_years = AcademicYear.objects.all()
 
-    academic_year_calendar = session_exam_calendar.current_opened_academic_year()
+    default_academic_year = academic_year.current_academic_year()
 
-    if academic_year_calendar:
-        academic_yr = academic_year_calendar.id
+    if default_academic_year:
+        academic_yr = default_academic_year.id
     return render(request, "offers.html", {'academic_year': academic_yr,
                                            'academic_years': academic_years,
                                            'offers': [],
