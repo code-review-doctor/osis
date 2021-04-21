@@ -29,7 +29,7 @@ Please refer to the [Technical manual](https://github.com/uclouvain/osis/blob/de
 
 ## Coding style and guidelines
 
-The repo [.github/contributing](https://github.com/uclouvain/osis/blob/workshops/.github/CONTRIBUTING.md) summarise our **guidelines** about our technical implementation of the DDD.
+The repo [.github/contributing](https://github.com/uclouvain/osis/blob/dev/.github/CONTRIBUTING.md) summarise our **guidelines** about our technical implementation of the DDD.
 
 
 <br/><br/>
@@ -38,8 +38,8 @@ The repo [.github/contributing](https://github.com/uclouvain/osis/blob/workshops
 ## Code examples
 
 Please refer to : 
-- DDD logic : [ddd/logic/](https://github.com/uclouvain/osis/tree/workshops-mob-programming/ddd)
-- infrastructure logic : [infrastructure/](https://github.com/uclouvain/osis/tree/workshops-mob-programming/infrastructure)
+- DDD logic : [ddd/logic/](https://github.com/uclouvain/osis/tree/dev/ddd)
+- infrastructure logic : [infrastructure/](https://github.com/uclouvain/osis/tree/dev/infrastructure)
 
 
 <br/><br/>
@@ -47,7 +47,7 @@ Please refer to :
 
 ## FAQ
 
-Please refer to [ddd/logic/](https://github.com/uclouvain/osis/blob/workshops/.github/faq.md)
+Please refer to [ddd/logic/](https://github.com/uclouvain/osis/blob/dev/.github/faq.md)
 
 
 <br/><br/>
@@ -55,7 +55,7 @@ Please refer to [ddd/logic/](https://github.com/uclouvain/osis/blob/workshops/.g
 
 ## References
 
-**Note** : all guidelines and documentations are inspired from [these references](https://github.com/uclouvain/osis/blob/workshops/.github/references.md).
+**Note** : all guidelines and documentations are inspired from [these references](https://github.com/uclouvain/osis/blob/dev/.github/references.md).
 
 
 <br/><br/>
