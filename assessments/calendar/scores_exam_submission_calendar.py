@@ -44,7 +44,7 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
             return opened_academic_events[0]
 
         next_academic_event = self.get_next_academic_event(date)
-        if next_academic_event.session != FIRST_SESSION:
+        if next_academic_event and next_academic_event.session != FIRST_SESSION:
             return next_academic_event
         return None
 
