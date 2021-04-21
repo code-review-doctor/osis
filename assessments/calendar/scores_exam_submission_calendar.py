@@ -32,6 +32,8 @@ from base.models.academic_year import AcademicYear
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 
+FIRST_SESSION = 1
+
 
 class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
     event_reference = AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
@@ -42,7 +44,7 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
             return opened_academic_events[0]
 
         next_academic_event = self.get_next_academic_event(date)
-        if next_academic_event.session != self.FIRST_SESSION:
+        if next_academic_event.session != FIRST_SESSION:
             return next_academic_event
         return None
 

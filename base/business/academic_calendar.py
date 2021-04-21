@@ -170,7 +170,6 @@ class AcademicEventCalendarHelper(ABC):
 
 
 class AcademicEventSessionCalendarHelper(AcademicEventCalendarHelper):
-    FIRST_SESSION = 1
 
     def get_academic_session_event(self, target_year: int, session: int) -> AcademicSessionEvent:
         """
