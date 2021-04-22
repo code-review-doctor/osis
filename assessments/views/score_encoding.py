@@ -461,7 +461,7 @@ def __send_messages_for_each_education_group_year(
     ]
     education_group_ids = {education_group_year.education_group_id for education_group_year in education_group_years}
     score_sheet_addresses = score_sheet_address_mdl.search_from_education_group_ids(education_group_ids)
-    for education_group_year in education_group_years:
+    for education_group_year in set(education_group_years):
         score_sheet_address = next(
             (
                 score_sheet_address for score_sheet_address in score_sheet_addresses
