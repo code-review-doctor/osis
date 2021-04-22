@@ -78,7 +78,7 @@ class ProgramManager(EducationGroupRoleModel):
     @classmethod
     def rule_set(cls):
         return rules.RuleSet({
-            'assessments.can_access_scoreencoding': is_scores_responsible_period_opened,
+            'assessments.can_access_scoreencoding': rules.always_allow,
             'assessments.change_scoresresponsible': is_scores_responsible_period_opened,
             'assessments.view_scoresresponsible': is_scores_responsible_period_opened,
             'base.can_access_catalog': rules.always_allow,
