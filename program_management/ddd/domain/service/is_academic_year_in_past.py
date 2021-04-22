@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,36 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from abc import abstractmethod
-from typing import Optional, List
-
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
 from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
 
 
-class IAcademicYearRepository(interface.AbstractRepository):
-    @classmethod
-    @abstractmethod
-    def get(cls, entity_id: 'AcademicYearIdentity') -> 'AcademicYear':
-        pass
+class IsAcademicYearInPast(interface.DomainService):
 
-    @classmethod
-    @abstractmethod
-    def search(cls, entity_ids: Optional[List['AcademicYearIdentity']] = None, **kwargs) -> List['AcademicYear']:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def delete(cls, entity_id: 'AcademicYearIdentity', **kwargs: ApplicationService) -> None:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def save(cls, entity: 'AcademicYear') -> None:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def get_current(cls) -> 'AcademicYear':
-        pass
+    @staticmethod
+    def is_in_past(year: int, academic_year_repository: 'IAcademicYearRepository') -> bool:
+        current_anac = academic_year_repository.get_current()
+        return year < current_anac.year

@@ -55,6 +55,7 @@ from education_group.forms import training as training_forms
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
+from infrastructure.messages_bus import message_bus_instance
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
@@ -64,8 +65,6 @@ from program_management.ddd.domain.exception import Program2MEndDateLowerThanIts
     FinalitiesEndDateGreaterThanTheirMasters2MException
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.service.write import delete_training_with_program_tree_service
-from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
-    postpone_training_and_program_tree_modifications
 
 
 class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -167,9 +166,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         try:
             postpone_modification_command = self._convert_form_to_postpone_modification_cmd(self.training_form)
-            updated_training_identities = postpone_training_and_program_tree_modifications(
-                postpone_modification_command
-            )
+            updated_training_identities = message_bus_instance.invoke(postpone_modification_command)
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, ContentConstraintTypeMissing):

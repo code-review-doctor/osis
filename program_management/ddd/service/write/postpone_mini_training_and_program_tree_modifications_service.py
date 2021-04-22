@@ -28,48 +28,81 @@ from typing import List
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import MiniTrainingCopyConsistencyException
-from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service
+from education_group.ddd.service.write import postpone_mini_training_and_orphan_group_modifications_service, \
+    update_mini_training_and_group_service
 from program_management.ddd import command as pgm_cmd
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
+from program_management.ddd.domain.service.is_academic_year_in_past import IsAcademicYearInPast
 from program_management.ddd.service.write import postpone_tree_specific_version_service, \
     postpone_program_tree_service, update_program_tree_version_end_date_service
-from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 
 
 def postpone_mini_training_and_program_tree_modifications(
-        update_command: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
+        update_command: pgm_cmd.PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand,
+        academic_year_repository: 'IAcademicYearRepository'
 ) -> List['MiniTrainingIdentity']:
+    is_in_past = IsAcademicYearInPast().is_in_past(update_command.year, academic_year_repository)
+
     update_program_tree_version_end_date_service.update_program_tree_version_end_date(
         __convert_to_update_program_tree_version_end_date_command(update_command)
     )
+    postpone_cmd = __convert_to_postpone_mini_training_and_group_modification_command(update_command)
+    if not is_in_past:
+        consistency_error = None
+        try:
+            mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service. \
+                postpone_mini_training_and_orphan_group_modifications(postpone_cmd)
+        except MiniTrainingCopyConsistencyException as e:
+            consistency_error = e
 
-    consistency_error = None
-    try:
-        mini_training_identities = postpone_mini_training_and_orphan_group_modifications_service.\
-            postpone_mini_training_and_orphan_group_modifications(
-                __convert_to_postpone_mini_training_and_group_modification_command(update_command)
+        postpone_program_tree_service.postpone_program_tree(
+            pgm_cmd.PostponeProgramTreeCommand(
+                from_code=update_command.code,
+                from_year=update_command.year,
+                offer_acronym=update_command.abbreviated_title,
             )
-    except MiniTrainingCopyConsistencyException as e:
-        consistency_error = e
-
-    postpone_program_tree_service.postpone_program_tree(
-        pgm_cmd.PostponeProgramTreeCommand(
-            from_code=update_command.code,
-            from_year=update_command.year,
-            offer_acronym=update_command.abbreviated_title,
         )
-    )
 
-    postpone_tree_specific_version_service.postpone_program_tree_version(
-        pgm_cmd.PostponeProgramTreeVersionCommand(
-            from_offer_acronym=update_command.abbreviated_title,
-            from_version_name=STANDARD,
-            from_year=update_command.year,
-            from_transition_name=NOT_A_TRANSITION,
+        postpone_tree_specific_version_service.postpone_program_tree_version(
+            pgm_cmd.PostponeProgramTreeVersionCommand(
+                from_offer_acronym=update_command.abbreviated_title,
+                from_version_name=STANDARD,
+                from_year=update_command.year,
+                from_transition_name=NOT_A_TRANSITION,
+            )
         )
-    )
-    if consistency_error:
-        raise consistency_error
+        if consistency_error:
+            raise consistency_error
+    else:
+        mini_training_identities = [
+            __convert_to_update_minitrainng_and_group_command(postpone_cmd)
+        ]
     return mini_training_identities
+
+
+def __convert_to_update_minitrainng_and_group_command(postpone_cmd):
+    return update_mini_training_and_group_service.update_mini_training_and_group(
+        command.UpdateMiniTrainingAndGroupCommand(
+            abbreviated_title=postpone_cmd.postpone_from_abbreviated_title,
+            code=postpone_cmd.code,
+            year=postpone_cmd.postpone_from_year,
+            status=postpone_cmd.status,
+            credits=postpone_cmd.credits,
+            title_fr=postpone_cmd.title_fr,
+            title_en=postpone_cmd.title_en,
+            keywords=postpone_cmd.keywords,
+            management_entity_acronym=postpone_cmd.management_entity_acronym,
+            end_year=postpone_cmd.end_year,
+            teaching_campus_name=postpone_cmd.teaching_campus_name,
+            constraint_type=postpone_cmd.constraint_type,
+            min_constraint=postpone_cmd.min_constraint,
+            max_constraint=postpone_cmd.max_constraint,
+            remark_fr=postpone_cmd.remark_fr,
+            remark_en=postpone_cmd.remark_en,
+            organization_name=postpone_cmd.organization_name,
+            schedule_type=postpone_cmd.schedule_type,
+        )
+    )
 
 
 def __convert_to_postpone_mini_training_and_group_modification_command(

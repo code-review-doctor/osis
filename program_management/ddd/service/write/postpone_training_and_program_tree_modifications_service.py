@@ -28,53 +28,126 @@ from typing import List
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import TrainingCopyConsistencyException
-from education_group.ddd.service.write import postpone_training_and_group_modification_service
+from education_group.ddd.service.write import postpone_training_and_group_modification_service, \
+    update_training_and_group_service
 from program_management.ddd.command import PostponeProgramTreeVersionCommand, \
     PostponeProgramTreeCommand, PostponeTrainingAndRootGroupModificationWithProgramTreeCommand, \
     UpdateProgramTreeVersionEndDateCommand
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
+from program_management.ddd.domain.service.is_academic_year_in_past import IsAcademicYearInPast
 from program_management.ddd.service.write import postpone_tree_specific_version_service, \
     postpone_program_tree_service, update_program_tree_version_end_date_service
 
 
 def postpone_training_and_program_tree_modifications(
-        update_command: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
+        update_command: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand,
+        academic_year_repository: 'IAcademicYearRepository'
 ) -> List['TrainingIdentity']:
+    is_in_past = IsAcademicYearInPast().is_in_past(update_command.postpone_from_year, academic_year_repository)
+
     update_program_tree_version_end_date_service.update_program_tree_version_end_date(
         __convert_to_update_program_tree_version_end_date_command(update_command)
     )
-
-    consistency_error = None
-    try:
-        training_identities = postpone_training_and_group_modification_service.postpone_training_and_group_modification(
-            __convert_to_postpone_training_and_group_modification_command(update_command)
+    postpone_cmd = __convert_to_postpone_training_and_group_modification_command(update_command)
+    if not is_in_past:
+        consistency_error = None
+        try:
+            training_identities = \
+                postpone_training_and_group_modification_service.postpone_training_and_group_modification(
+                    postpone_cmd
+                )
+        except TrainingCopyConsistencyException as e:
+            consistency_error = e
+        postpone_program_tree_service.postpone_program_tree(
+            PostponeProgramTreeCommand(
+                from_code=update_command.code,
+                from_year=update_command.postpone_from_year,
+                offer_acronym=update_command.postpone_from_acronym
+            )
         )
-    except TrainingCopyConsistencyException as e:
-        consistency_error = e
-
-    postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=update_command.code,
-            from_year=update_command.postpone_from_year,
-            offer_acronym=update_command.postpone_from_acronym
+        postpone_tree_specific_version_service.postpone_program_tree_version(
+            PostponeProgramTreeVersionCommand(
+                from_offer_acronym=update_command.postpone_from_acronym,
+                from_version_name=STANDARD,
+                from_year=update_command.postpone_from_year,
+                from_transition_name=NOT_A_TRANSITION
+            )
         )
-    )
+        if consistency_error:
+            raise consistency_error
+    else:
+        training_identities = [
+            update_training_and_group_service.update_training_and_group(
+                __convert_to_update_training_and_group_command(postpone_cmd)
+            )
+        ]
 
-    postpone_tree_specific_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=update_command.postpone_from_acronym,
-            from_version_name=STANDARD,
-            from_year=update_command.postpone_from_year,
-            from_transition_name=NOT_A_TRANSITION
-        )
-    )
-    if consistency_error:
-        raise consistency_error
     return training_identities
 
 
+def __convert_to_update_training_and_group_command(postpone_cmd):
+    return command.UpdateTrainingAndGroupCommand(
+        acronym=postpone_cmd.postpone_from_acronym,
+        code=postpone_cmd.code,
+        year=postpone_cmd.postpone_from_year,
+        status=postpone_cmd.status,
+        credits=postpone_cmd.credits,
+        duration=postpone_cmd.duration,
+        title_fr=postpone_cmd.title_fr,
+        partial_title_fr=postpone_cmd.partial_title_fr,
+        title_en=postpone_cmd.title_en,
+        partial_title_en=postpone_cmd.partial_title_en,
+        keywords=postpone_cmd.keywords,
+        internship_presence=postpone_cmd.internship_presence,
+        is_enrollment_enabled=postpone_cmd.is_enrollment_enabled,
+        has_online_re_registration=postpone_cmd.has_online_re_registration,
+        has_partial_deliberation=postpone_cmd.has_partial_deliberation,
+        has_admission_exam=postpone_cmd.has_admission_exam,
+        has_dissertation=postpone_cmd.has_dissertation,
+        produce_university_certificate=postpone_cmd.produce_university_certificate,
+        main_language=postpone_cmd.main_language,
+        english_activities=postpone_cmd.english_activities,
+        other_language_activities=postpone_cmd.other_language_activities,
+        internal_comment=postpone_cmd.internal_comment,
+        main_domain_code=postpone_cmd.main_domain_code,
+        main_domain_decree=postpone_cmd.main_domain_decree,
+        secondary_domains=postpone_cmd.secondary_domains,
+        isced_domain_code=postpone_cmd.isced_domain_code,
+        management_entity_acronym=postpone_cmd.management_entity_acronym,
+        administration_entity_acronym=postpone_cmd.administration_entity_acronym,
+        end_year=postpone_cmd.end_year,
+        teaching_campus_name=postpone_cmd.teaching_campus_name,
+        teaching_campus_organization_name=postpone_cmd.teaching_campus_organization_name,
+        enrollment_campus_name=postpone_cmd.enrollment_campus_name,
+        enrollment_campus_organization_name=postpone_cmd.enrollment_campus_organization_name,
+        other_campus_activities=postpone_cmd.other_campus_activities,
+        can_be_funded=postpone_cmd.can_be_funded,
+        funding_orientation=postpone_cmd.funding_orientation,
+        can_be_international_funded=postpone_cmd.can_be_international_funded,
+        international_funding_orientation=postpone_cmd.international_funding_orientation,
+        ares_code=postpone_cmd.ares_code,
+        ares_graca=postpone_cmd.ares_graca,
+        ares_authorization=postpone_cmd.ares_authorization,
+        code_inter_cfb=postpone_cmd.code_inter_cfb,
+        coefficient=postpone_cmd.coefficient,
+        duration_unit=postpone_cmd.duration_unit,
+        leads_to_diploma=postpone_cmd.leads_to_diploma,
+        printing_title=postpone_cmd.printing_title,
+        professional_title=postpone_cmd.professional_title,
+        constraint_type=postpone_cmd.constraint_type,
+        min_constraint=postpone_cmd.min_constraint,
+        max_constraint=postpone_cmd.max_constraint,
+        remark_fr=postpone_cmd.remark_fr,
+        remark_en=postpone_cmd.remark_en,
+        organization_name=postpone_cmd.organization_name,
+        schedule_type=postpone_cmd.schedule_type,
+        decree_category=postpone_cmd.decree_category,
+        rate_code=postpone_cmd.rate_code
+    )
+
+
 def __convert_to_postpone_training_and_group_modification_command(
-    cmd: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
+        cmd: PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
 ) -> command.PostponeTrainingAndGroupModificationCommand:
     return command.PostponeTrainingAndGroupModificationCommand(
         postpone_from_acronym=cmd.postpone_from_acronym,

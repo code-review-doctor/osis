@@ -46,14 +46,14 @@ from education_group.forms import mini_training as mini_training_forms
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from education_group.views.proxy.read import Tab
+from infrastructure.messages_bus import message_bus_instance
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception as program_management_exception
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
-from program_management.ddd.service.write import delete_mini_training_with_program_tree_service, \
-    postpone_mini_training_and_program_tree_modifications_service
+from program_management.ddd.service.write import delete_mini_training_with_program_tree_service
 
 
 class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
@@ -115,8 +115,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
     def update_mini_training(self) -> List['MiniTrainingIdentity']:
         try:
             update_command = self._convert_form_to_update_mini_training_command(self.mini_training_form)
-            return postpone_mini_training_and_program_tree_modifications_service. \
-                postpone_mini_training_and_program_tree_modifications(update_command)
+            return message_bus_instance.invoke(update_command)
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, exception.ContentConstraintTypeMissing):
