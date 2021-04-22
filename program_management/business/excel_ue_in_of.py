@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,9 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
+from attribution.ddd.command import SearchScoresResponsibleCommand
 from attribution.ddd.domain.teacher import Teacher
+from attribution.ddd.service.read.search_scores_responsibles import search_scores_responsibles
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
@@ -47,6 +49,7 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.excel import get_html_to_text
+from ddd.logic.learning_unit.dtos import ScoreResponsibleDTO
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -77,7 +80,13 @@ optional_header_for_proposition = [_('Proposal type'), _('Proposal status')]
 optional_header_for_credits = [_('Relative credits'), _('Absolute credits')]
 optional_header_for_allocation_entity = [_('Alloc. Ent.')]
 optional_header_for_english_title = [_('Title in English')]
-optional_header_for_teacher_list = [_('List of teachers'), "{} ({})".format(_('List of teachers'), _('emails'))]
+optional_header_for_teacher_list = [
+    _('List of teachers'),
+    "{} ({})".format(_('List of teachers'),
+                     _('emails')),
+    _('Scores responsibles'),
+    _('Scores responsibles (emails)')
+]
 optional_header_for_periodicity = [_('Periodicity')]
 optional_header_for_active = [_('Active')]
 optional_header_for_volume = [
@@ -214,8 +223,14 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                 for learn_unt_child in learning_unit_nodes
             ]
         )
+        score_responsibles = search_scores_responsibles(
+            [
+                SearchScoresResponsibleCommand(code=luy.acronym, year=luy.year) for luy in learning_unit_years
+            ]
+        )
     else:
         learning_unit_years = []
+        score_responsibles = []
 
     tree_versions = search_all_versions_from_root_nodes(
         [
@@ -237,7 +252,8 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, tree: 'ProgramTree'):
                     _fix_data(link, luy, parents_data, tree_versions),
                     luy,
                     optional_data_needed,
-                    link
+                    link,
+                    score_responsibles
                 ))
                 if luy.proposal and luy.proposal.type:
                     font_rows[PROPOSAL_LINE_STYLES.get(luy.proposal.type)].append(idx)
@@ -271,7 +287,7 @@ def _initialize_optional_data_dict(custom_xls_form: CustomXlsForm):
     return optional_data
 
 
-def _get_headers(custom_xls_form: CustomXlsForm):
+def _get_headers(custom_xls_form: CustomXlsForm) -> List[str]:
     content = list()
     content.append(FIX_TITLES + _add_optional_titles(custom_xls_form))
     return content
@@ -356,7 +372,13 @@ def _get_attribution_line(a_person_teacher: 'Teacher'):
     return ""
 
 
-def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_needed: Dict[str, bool], link: 'Link'):
+def _get_optional_data(
+        data: List,
+        luy: DddLearningUnitYear,
+        optional_data_needed: Dict[str, bool],
+        link: 'Link',
+        score_responsibles: List[ScoreResponsibleDTO]
+):
     if optional_data_needed['has_required_entity']:
         data.append(luy.entities.requirement_entity_acronym)
     if optional_data_needed['has_allocation_entity']:
@@ -389,6 +411,23 @@ def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_neede
             ";".join(
                 [teacher.email
                  for teacher in teachers
+                 ]
+            )
+        )
+        luy_score_responsibles = _get_luy_score_responsibles(score_responsibles, luy)
+
+        data.append(
+            ";".join(
+                ["{} {}".format((teacher.last_name or "").upper(),
+                                teacher.first_name or "")
+                 for teacher in luy_score_responsibles
+                 ]
+            )
+        )
+        data.append(
+            ";".join(
+                [teacher.email
+                 for teacher in luy_score_responsibles
                  ]
             )
         )
@@ -622,3 +661,13 @@ def _get_xls_title(tree: 'ProgramTree', program_tree_version: 'ProgramTreeVersio
         tree.root_node.title,
         version_label(program_tree_version.entity_id)
     ) if program_tree_version else tree.root_node.title
+
+
+def _get_luy_score_responsibles(
+        score_responsibles: List[ScoreResponsibleDTO],
+        luy: DddLearningUnitYear
+) -> List[ScoreResponsibleDTO]:
+    return [
+        score_responsible for score_responsible in score_responsibles
+        if luy.acronym == score_responsible.code and luy.year == score_responsible.year
+    ]
