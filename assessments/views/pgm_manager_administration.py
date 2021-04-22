@@ -42,7 +42,7 @@ from django.views.generic.edit import BaseUpdateView
 from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
 from base.auth.roles.program_manager import ProgramManager
-from base.models import session_exam_calendar, academic_year
+from base.models import academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -77,7 +77,7 @@ class ProgramManagerListView(ListView):
             offer_acronym=Subquery(
                 EducationGroupYear.objects.filter(
                     education_group_id=OuterRef('education_group_id'),
-                    academic_year__year=session_exam_calendar.current_session_exam().authorized_target_year,
+                    academic_year=academic_year.current_academic_year(),
                 ).values('acronym')[:1]
             ),
         ).select_related(
