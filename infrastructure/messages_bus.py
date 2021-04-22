@@ -51,10 +51,10 @@ class MessageBus:
         ),
         SearchLanguagesCommand: lambda cmd: search_languages(cmd, LanguageRepository()),
         SearchAcademicYearCommand: lambda cmd: search_academic_years(cmd, AcademicYearRepository()),
-        PostponeTrainingAndRootGroupModificationWithProgramTreeCommand: lambda cmd:
-        postpone_training_and_program_tree_modifications(cmd, AcademicYearRepository()),
-        PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand: lambda cmd:
-        postpone_mini_training_and_program_tree_modifications(cmd, AcademicYearRepository())
+        PostponeTrainingAndRootGroupModificationWithProgramTreeCommand:
+            lambda cmd: postpone_training_and_program_tree_modifications(cmd, AcademicYearRepository()),
+        PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand:
+            lambda cmd: postpone_mini_training_and_program_tree_modifications(cmd, AcademicYearRepository())
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
