@@ -279,6 +279,7 @@ def send_message_after_all_encoded_by_manager(
         learning_unit_acronym,
         offer_acronym,
         updated_enrollments_ids,
+        encoding_already_completed_before_update,
         cc=None
 ):
     """
@@ -287,8 +288,9 @@ def send_message_after_all_encoded_by_manager(
     :param enrollments: The enrollments that are encoded and submitted
     :param learning_unit_acronym The learning unit encoded
     :param offer_acronym: The offer which is managed
-    :param cc: Persons (list) need to be in copy (cc) of the emails sent
     :param updated_enrollments_ids: updated enrollments ids
+    :param encoding_already_completed_before_update: Before update encoding was already complete.
+    :param cc: Persons (list) need to be in copy (cc) of the emails sent
     :return: A message if an error occurred, None if it's ok
     """
 
@@ -317,14 +319,15 @@ def send_message_after_all_encoded_by_manager(
 
     receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
 
-    rows_styles = None
-    txt_complementary_first_col_content_data = None
-    if len(enrollments) > 1 and len(updated_enrollments_ids) != len(enrollments):
-        rows_styles = _html_format_rows_styles(enrollments, updated_enrollments_ids)
-        txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
-            enrollments,
-            updated_enrollments_ids
-        )
+    rows_styles = _html_format_rows_styles(
+        enrollments, updated_enrollments_ids,
+        encoding_already_completed_before_update
+    )
+    txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
+        enrollments,
+        updated_enrollments_ids,
+        encoding_already_completed_before_update
+    )
 
     for receiver_lang, receivers in receivers_by_lang:
         receivers = list(receivers)
@@ -335,7 +338,7 @@ def send_message_after_all_encoded_by_manager(
                 "style": rows_styles,
                 "data": enrollments_data,
                 "txt_complementary_first_col": {
-                    "header": _("Updated"),
+                    "header": _get_txt_complementary_first_col_header(receiver_lang),
                     "rows_content": txt_complementary_first_col_content_data
                 }
             },
@@ -398,18 +401,45 @@ def _get_encoding_status(language, all_encoded):
         return translation.gettext(message)
 
 
-def _html_format_rows_styles(enrollments: List[ExamEnrollment], updated_enrollments_ids: List[int]) -> List[str]:
+def _html_format_rows_styles(
+        enrollments: List[ExamEnrollment],
+        updated_enrollments_ids: List[int],
+        encoding_already_completed_before_update: bool
+) -> List[str]:
     css_style_on_rows = []
     for enrollment in enrollments:
-        css_style_on_rows.append('background-color: lime;' if enrollment.id in updated_enrollments_ids else '')
+        has_to_be_marked = _has_to_be_marked(
+            encoding_already_completed_before_update,
+            enrollment,
+            updated_enrollments_ids
+        )
+        css_style_on_rows.append('background-color: lime;' if has_to_be_marked else '')
     return css_style_on_rows
 
 
 def _txt_format_complementary_row_content(
         enrollments: List[ExamEnrollment],
-        updated_enrollments_ids: List[int]
+        updated_enrollments_ids: List[int],
+        encoding_already_completed_before_update: bool
 ) -> List[str]:
     complementary_first_cols_contents = []
     for enrollment in enrollments:
-        complementary_first_cols_contents.append('*' if enrollment.id in updated_enrollments_ids else '')
+        has_to_be_marked = _has_to_be_marked(
+            encoding_already_completed_before_update,
+            enrollment,
+            updated_enrollments_ids
+        )
+        complementary_first_cols_contents.append('*' if has_to_be_marked else '')
     return complementary_first_cols_contents
+
+
+def _get_txt_complementary_first_col_header(lang_code):
+    with translation.override(lang_code):
+        return _('Updated')
+
+
+def _has_to_be_marked(
+        encoding_already_completed_before_update: bool,
+        enrollment: ExamEnrollment,
+        updated_enrollments_ids: List[int]) -> bool:
+    return not encoding_already_completed_before_update or enrollment.id in updated_enrollments_ids
