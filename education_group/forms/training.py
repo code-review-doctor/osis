@@ -356,10 +356,14 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_management_entity_field(self):
+        academic_year = self.initial.get('academic_year')
+        if not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year
         )
 
     def __init_certificate_aims_field(self):
