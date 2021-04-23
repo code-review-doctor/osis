@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus
+from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion, find_pedagogical_entities_version, \
     find_pedagogical_entities_version_for_specific_academic_year
 from education_group.auth.roles.central_manager import CentralManager
@@ -20,7 +21,7 @@ class MainCampusChoiceField(forms.ModelChoiceField):
 
 
 class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
-    def __init__(self, person, initial, academic_year=None, **kwargs):
+    def __init__(self, person, initial, academic_year: 'AcademicYear' = None, **kwargs):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial
         self.academic_year = academic_year
@@ -35,10 +36,11 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
     def get_queryset(self):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
-            print(self.academic_year)
             date = timezone.now()
             # qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
             qs |= EntityVersion.objects.active_for_academic_year(self.academic_year).filter(acronym=self.initial)
+        elif self.academic_year:
+            qs |= EntityVersion.objects.active_for_academic_year(self.academic_year)
         return qs
 
     def clean(self, value):
