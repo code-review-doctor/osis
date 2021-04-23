@@ -850,13 +850,11 @@ msgstr "Enregistrer va prolonger la version existante."
 msgid "Schedule type"
 msgstr "Type horaire"
 
-#, fuzzy
-#| msgid "Academic responsible"
 msgid "Scores responsibles"
-msgstr "Responsable académique"
+msgstr "Responsables de notes"
 
 msgid "Scores responsibles (emails)"
-msgstr ""
+msgstr "Responsables de notes (emails)"
 
 msgid "Search"
 msgstr "Recherche"
