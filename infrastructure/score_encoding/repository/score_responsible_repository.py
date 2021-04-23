@@ -49,6 +49,9 @@ class ScoreResponsibleRepository(IScoreResponsibleRepository):
         queryset = Attribution.objects.filter(score_responsible=True).select_related(
             'learning_unit_year',
             'tutor__person'
+        ).order_by(
+            'tutor__person__last_name',
+            'tutor__person__first_name'
         )
         queryset = queryset.filter(luy_identity_filter_clause).annotate(
             last_name=F('tutor__person__last_name'),
