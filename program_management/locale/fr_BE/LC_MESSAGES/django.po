@@ -1110,7 +1110,7 @@ msgid "Tree is finality"
 msgstr "L'arbre est une finalité"
 
 msgid "Tutors (scores responsibles included)"
-msgstr ""
+msgstr "Enseignant.e.s (responsables de notes inclus)"
 
 msgid "Type"
 msgstr "Type"
