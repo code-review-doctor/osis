@@ -23,41 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+import abc
+from typing import List
 
-from osis_common.ddd.interface import DTO
-
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    common_title_fr = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    common_title_en = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
-    credits = attr.ib(type=int)
-    internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    periodicity = attr.ib(type=str)
-    iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
-class LearningUnitSearchDTO(DTO):
-    year = attr.ib(type=int)
-    code = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    type = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
-    responsible_entity_title = attr.ib(type=str)
+class IScoreResponsibleRepository(interface.AbstractRepository):
 
-
-@attr.s(frozen=True, slots=True)
-class UclEntityDataDTO(DTO):
-    code = attr.ib(type=str)
-    type = attr.ib(type=str)
+    @classmethod
+    @abc.abstractmethod
+    def score_responsible_search(
+            cls,
+            ids: List[LearningUnitYearIdentity]
+    ) -> List['LearningUnitSearchDTO']:
+        pass

@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import attr
 
-from attribution.ddd.command import SearchScoresResponsibleCommand
-from ddd.logic.learning_unit.dtos import ScoreResponsibleDTO
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
-from attribution.ddd.repositories.score_responsible_repository import score_responsible_search
+from osis_common.ddd.interface import DTO
 
 
-def search_scores_responsibles(commands: List[SearchScoresResponsibleCommand]) -> List[ScoreResponsibleDTO]:
-    lu_identities = [LearningUnitYearIdentity(code=command.code, year=command.year) for command in commands]
-    return score_responsible_search(lu_identities)
+@attr.s(frozen=True, slots=True)
+class ScoreResponsibleDTO(DTO):
+    last_name = attr.ib(type=str)
+    first_name = attr.ib(type=str)
+    email = attr.ib(type=str)
+    code_of_learning_unit = attr.ib(type=str)
+    year_of_learning_unit = attr.ib(type=int)

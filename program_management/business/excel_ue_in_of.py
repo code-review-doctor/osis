@@ -35,9 +35,9 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
-from attribution.ddd.command import SearchScoresResponsibleCommand
+from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from attribution.ddd.domain.teacher import Teacher
-from attribution.ddd.service.read.search_scores_responsibles import search_scores_responsibles
+from ddd.logic.score_encoding.use_case.read.search_scores_responsibles_service import search_scores_responsibles
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
@@ -49,7 +49,7 @@ from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.excel import get_html_to_text
-from ddd.logic.learning_unit.dtos import ScoreResponsibleDTO
+from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
@@ -668,6 +668,6 @@ def _get_luy_score_responsibles(
         luy: DddLearningUnitYear
 ) -> List[ScoreResponsibleDTO]:
     return [
-        score_responsible for score_responsible in score_responsibles
-        if luy.acronym == score_responsible.code and luy.year == score_responsible.year
+        score_resp for score_resp in score_responsibles
+        if luy.acronym == score_resp.code_of_learning_unit and luy.year == score_resp.year_of_learning_unit
     ]
