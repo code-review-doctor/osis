@@ -354,8 +354,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_management_entity_field(self):
-        academic_year = self.initial.get('academic_year')
-        if not isinstance(academic_year, AcademicYear):
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
             academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
@@ -365,8 +365,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
         )
 
     def __init_administration_entity_field(self):
-        academic_year = self.initial.get('academic_year')
-        if not isinstance(academic_year, AcademicYear):
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
             academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
         self.fields['administration_entity'] = MainEntitiesVersionChoiceField(
             queryset=None,
