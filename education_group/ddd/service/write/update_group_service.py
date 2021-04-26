@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from typing import List
 
 from django.db import transaction
 
@@ -31,18 +32,57 @@ from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.domain.group import GroupIdentity, Group
+from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from education_group.ddd.repository import group as group_repository
+from education_group.ddd.service.write import copy_group_service
+from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.repositories import load_authorized_relationship
 
 
-@transaction.atomic()
-def update_group(cmd: command.UpdateGroupCommand) -> 'GroupIdentity':
+# DO NOT SET @transaction.atomic() because it breaks the update in case of GroupCopyConsistencyException
+def update_group(cmd: command.UpdateGroupCommand) -> List['GroupIdentity']:
+
+    # GIVEN
     group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
     grp = group_repository.GroupRepository.get(group_identity)
+    authorized_relationships = load_authorized_relationship.load()
+    conflicted_fields = ConflictedFields.get_group_conflicted_fields(grp.entity_id)
 
-    _update_group(grp, cmd)
+    # WHEN
+    grp = _update_group(grp, cmd)
+
+    # THEN
     group_repository.GroupRepository.update(grp)
-    return group_identity
+    updated_identities = [grp.entity_id]
+
+    if authorized_relationships.is_mandatory_child_type(grp.type):
+        # means that this group has been automatically created by the system
+        # behind 'trainings' and 'minitrainings' Nodes/groups in ProgramTree
+        updated_identities = _postpone_group(grp, conflicted_fields)
+
+    return updated_identities
+
+
+# FIXME :: should be a DomainService ?!
+def _postpone_group(grp, conflicted_fields) -> List['GroupIdentity']:
+    identities = []
+    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_for_orphan_group(group=grp)
+    for year in range(grp.year, end_postponement_year):
+        if year + 1 in conflicted_fields:
+            break  # Do not copy info from year to N+1 because conflict detected
+        identity_next_year = copy_group_service.copy_group(
+            cmd=command.CopyGroupCommand(
+                from_code=grp.code,
+                from_year=year
+            )
+        )
+        identities.append(identity_next_year)
+    if conflicted_fields:
+        first_conflict_year = min(conflicted_fields.keys())
+        raise GroupCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
+    return identities
 
 
 def _update_group(group_obj: 'Group', cmd: command.UpdateGroupCommand) -> 'Group':

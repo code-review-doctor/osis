@@ -47,10 +47,10 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
         result = update_group_service.update_group(self.cmd)
 
         expected_result = group.GroupIdentity(code=self.cmd.code, year=self.cmd.year)
-        self.assertEqual(expected_result, result)
+        self.assertEqual(expected_result, result[0])
 
     def test_should_update_value_of_group_based_on_command_value(self):
-        entity_id = update_group_service.update_group(self.cmd)
+        entity_id = update_group_service.update_group(self.cmd)[0]
 
         group_updated = self.fake_group_repo.get(entity_id)
         self.assert_has_same_value_as_update_command(group_updated)
