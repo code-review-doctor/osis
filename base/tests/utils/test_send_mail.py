@@ -158,7 +158,8 @@ class TestSendMessage(TestCase):
             [self.exam_enrollment_1],
             self.learning_unit_year.acronym,
             self.educ_group_year.acronym,
-            [self.exam_enrollment_1.id]
+            [self.exam_enrollment_1.id],
+            False
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')

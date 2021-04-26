@@ -46,7 +46,7 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    HopsFields2OrNoneForFormationPhd
+    HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
@@ -181,7 +181,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     self.training_form.add_error("max_constraint", e.message)
                 elif isinstance(e, HopsFieldsAllOrNone) or \
                         isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999) or \
-                        isinstance(e, HopsFields2OrNoneForFormationPhd):
+                        isinstance(e, HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES):
                     self.training_form.add_error('ares_code', e.message)
                 elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                     self.training_form.add_error('ares_graca', e.message)
