@@ -90,7 +90,7 @@ class TrainingReadIdentification(TrainingRead):
                 output_field=BooleanField()
             )
         ).order_by('-start_date').first()
-        return entity.active_entity_version
+        return entity.active_entity_version if entity else None
 
     def get_related_history(self):
         group_year = self.education_group_version.root_group

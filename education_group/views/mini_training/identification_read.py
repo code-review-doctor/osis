@@ -98,4 +98,4 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
                 output_field=BooleanField()
             )
         ).order_by('-start_date').first()
-        return entity.active_entity_version
+        return entity.active_entity_version if entity else None
