@@ -66,15 +66,15 @@ class GroupReadIdentification(GroupRead):
     def is_entity_active(self, acronym_entity: str) -> bool:
         academic_year = AcademicYear.objects.get(year=self.get_group().year)
         current_clause = (
-                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
-                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+            Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+            Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+            (
+                Q(start_date__lte=academic_year.start_date) &
                 (
-                        Q(start_date__lte=academic_year.start_date) &
-                        (
-                                Q(end_date__isnull=True) |
-                                Q(end_date__gte=academic_year.end_date)
-                        )
+                    Q(end_date__isnull=True) |
+                    Q(end_date__gte=academic_year.end_date)
                 )
+            )
         )
         entity = EntityVersion.objects.filter(
             acronym=acronym_entity,
