@@ -28,7 +28,7 @@ from typing import Union
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO, EntityIdentity
 from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
-from ddd.logic.learning_unit.business_types import *
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
 class LearningUnitIdentityBuilder(EntityIdentityBuilder):
