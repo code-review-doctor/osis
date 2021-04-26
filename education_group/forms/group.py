@@ -150,7 +150,9 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         return {'context': self.get_context()}
 
     def __init_management_entity_field(self):
-        academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
+        academic_year = self.initial.get('academic_year', None)
+        if academic_year and not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
