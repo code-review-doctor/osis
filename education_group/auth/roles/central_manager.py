@@ -37,9 +37,11 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_element_only_inside_standard_program &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.add_minitraining':
+                predicates.is_user_attached_to_all_scopes &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.add_group':
+                predicates.is_user_attached_to_all_scopes &
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.change_training':
@@ -134,7 +136,7 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.change_link_data':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_user_linked_to_all_scopes_of_management_entity &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.add_training_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
