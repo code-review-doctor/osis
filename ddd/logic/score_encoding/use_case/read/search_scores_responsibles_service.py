@@ -34,6 +34,6 @@ from infrastructure.score_encoding.repository.score_responsible_repository impor
 def search_scores_responsibles(commands: List[SearchScoresResponsibleCommand]) -> List[ScoreResponsibleDTO]:
     repository = ScoreResponsibleRepository()
     lu_identities = [
-        LearningUnitIdentityBuilder.build_from_search_scores_responsible_command(command) for command in commands
+        LearningUnitIdentityBuilder.build_from_code_and_year(code=cmd.code, year=cmd.year) for cmd in commands
     ]
     return repository.score_responsible_search(lu_identities)

@@ -25,8 +25,6 @@
 ##############################################################################
 from typing import Union
 
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO, EntityIdentity
 from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
@@ -46,13 +44,6 @@ class LearningUnitIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_for_next_year(cls, learning_unit_identity: 'LearningUnitIdentity') -> 'LearningUnitIdentity':
         return cls.build_from_code_and_year(learning_unit_identity.code, learning_unit_identity.get_next_year())
-
-    @classmethod
-    def build_from_search_scores_responsible_command(
-            cls,
-            cmd: SearchScoresResponsibleCommand
-    ) -> 'LearningUnitIdentity':
-        return cls.build_from_code_and_year(cmd.code, cmd.year)
 
     @classmethod
     def build_from_code_and_year(cls, code: str, year: int) -> 'LearningUnitIdentity':
