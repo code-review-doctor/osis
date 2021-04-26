@@ -26,12 +26,15 @@
 from typing import List
 
 from education_group.ddd.business_types import *
+from education_group.ddd.command import UpdateGroupCommand
+from education_group.ddd.service.write import update_group_service
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateProgramTreeVersionCommand, UpdateMiniTrainingVersionCommand, \
     PostponeGroupVersionCommand, UpdateProgramTreeVersionEndDateCommand, PostponeProgramTreeCommand, \
     PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
+from program_management.ddd.domain.service.is_academic_year_in_past import IsAcademicYearInPast
 from program_management.ddd.service.write import update_and_postpone_group_version_service, \
     postpone_program_tree_service, postpone_tree_specific_version_service
 from program_management.ddd.service.write import update_program_tree_version_service
@@ -39,37 +42,67 @@ from program_management.ddd.service.write import update_program_tree_version_ser
 
 def update_and_postpone_mini_training_version(
         command: 'UpdateMiniTrainingVersionCommand',
+        academic_year_repository: 'IAcademicYearRepository'
 ) -> List['ProgramTreeVersionIdentity']:
+    is_in_past = IsAcademicYearInPast().is_in_past(command.year, academic_year_repository)
+
     tree_version_identity = update_program_tree_version_service.update_program_tree_version(
         __convert_to_update_tree_version_command(command)
     )
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
+    postpone_cmd = __convert_to_postpone_group_version(command, group_identity)
+    postponed_tree_version_identities = []
 
-    postponed_tree_version_identities = update_and_postpone_group_version_service.update_and_postpone_group_version(
-        __convert_to_postpone_group_version(command, group_identity)
-    )
-
-    postpone_program_tree_service.postpone_program_tree(
-        PostponeProgramTreeCommand(
-            from_code=group_identity.code,
-            from_year=group_identity.year,
-            offer_acronym=command.offer_acronym
+    if not is_in_past:
+        postponed_tree_version_identities = update_and_postpone_group_version_service.update_and_postpone_group_version(
+            postpone_cmd
         )
-    )
 
-    postpone_tree_specific_version_service.postpone_program_tree_version(
-        PostponeProgramTreeVersionCommand(
-            from_offer_acronym=command.offer_acronym,
-            from_version_name=command.version_name,
-            from_year=command.year,
-            from_transition_name=command.transition_name,
+        postpone_program_tree_service.postpone_program_tree(
+            PostponeProgramTreeCommand(
+                from_code=group_identity.code,
+                from_year=group_identity.year,
+                offer_acronym=command.offer_acronym
+            )
         )
-    )
+
+        postpone_tree_specific_version_service.postpone_program_tree_version(
+            PostponeProgramTreeVersionCommand(
+                from_offer_acronym=command.offer_acronym,
+                from_version_name=command.version_name,
+                from_year=command.year,
+                from_transition_name=command.transition_name,
+            )
+        )
+    else:
+        update_group_service.update_group(__convert_to_update_group_command(postpone_cmd))
 
     return [tree_version_identity] + postponed_tree_version_identities
 
 
-def __convert_to_update_tree_version_command(command: 'UpdateMiniTrainingVersionCommand'):
+def __convert_to_update_group_command(postpone_cmd: 'PostponeGroupVersionCommand') -> 'UpdateGroupCommand':
+    return UpdateGroupCommand(
+        code=postpone_cmd.code,
+        year=postpone_cmd.postpone_from_year,
+        abbreviated_title=postpone_cmd.abbreviated_title,
+        title_fr=postpone_cmd.title_fr,
+        title_en=postpone_cmd.title_en,
+        credits=postpone_cmd.credits,
+        constraint_type=postpone_cmd.constraint_type,
+        min_constraint=postpone_cmd.min_constraint,
+        max_constraint=postpone_cmd.max_constraint,
+        management_entity_acronym=postpone_cmd.management_entity_acronym,
+        teaching_campus_name=postpone_cmd.teaching_campus_name,
+        organization_name=postpone_cmd.organization_name,
+        remark_fr=postpone_cmd.remark_fr,
+        remark_en=postpone_cmd.remark_en,
+        end_year=postpone_cmd.end_year,
+    )
+
+
+def __convert_to_update_tree_version_command(
+        command: 'UpdateMiniTrainingVersionCommand'
+) -> 'UpdateProgramTreeVersionCommand':
     return UpdateProgramTreeVersionCommand(
         end_year=command.end_year,
         offer_acronym=command.offer_acronym,

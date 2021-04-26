@@ -30,7 +30,7 @@ from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import 
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
 from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
-from osis_common.ddd.interface import RootEntity, EntityIdentity, ApplicationService
+from osis_common.ddd.interface import ApplicationService
 
 
 class AcademicYearRepository(IAcademicYearRepository):
@@ -57,6 +57,15 @@ class AcademicYearRepository(IAcademicYearRepository):
     @classmethod
     def save(cls, entity: 'AcademicYear') -> None:
         raise NotImplementedError
+
+    @classmethod
+    def get_current(cls) -> 'AcademicYear':
+        db_obj = _get_common_queryset().values(
+            'year',
+            'start_date',
+            'end_date',
+        ).current()
+        return AcademicYearBuilder.build_from_repository_dto(AcademicYearDataDTO(**db_obj))
 
 
 def _get_common_queryset():

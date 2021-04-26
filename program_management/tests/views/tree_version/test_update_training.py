@@ -36,8 +36,7 @@ from education_group.tests.ddd.factories.diploma import DiplomaAimFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
-from program_management.forms.transition import UpdateMiniTrainingTransitionVersionForm, \
-    UpdateTrainingTransitionVersionForm
+from program_management.forms.transition import UpdateTrainingTransitionVersionForm
 from program_management.forms.version import UpdateTrainingVersionForm
 from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
     StandardProgramTreeVersionFactory, StandardTransitionProgramTreeVersionFactory, \
@@ -267,9 +266,8 @@ class TestTrainingVersionUpdatePostView(TestCase):
     @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
                 'calculate_specific_version_max_end_year', return_value=2025)
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
-    @mock.patch('program_management.views.tree_version.update_training.update_and_postpone_training_version_service'
-                '.update_and_postpone_training_version', return_value=[])
-    def test_assert_update_training_service_called(self, mock_update_training, mock_program_tree_version_repo, *mock):
+    @mock.patch('infrastructure.messages_bus.message_bus_instance.invoke', return_value=[])
+    def test_assert_update_training_service_called(self, mock_messagebus, mock_program_tree_version_repo, *mock):
         mock_program_tree_version_repo.return_value = self.training_version_obj
         url_with_querystring = self.url + "?path_to=123786|5656565"
 
@@ -279,4 +277,4 @@ class TestTrainingVersionUpdatePostView(TestCase):
             kwargs={"code": self.group_obj.code, "year": self.group_obj.year}
         ) + "?path=123786|5656565"
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
-        self.assertTrue(mock_update_training.called)
+        self.assertTrue(mock_messagebus.called)

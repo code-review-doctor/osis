@@ -24,7 +24,10 @@
 import mock
 from django.test import TestCase
 
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
 from education_group.tests.ddd.factories.group import GroupIdentityFactory
+from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.tests.ddd.factories.commands.update_training_version_command import \
@@ -32,6 +35,22 @@ from program_management.tests.ddd.factories.commands.update_training_version_com
 
 
 class TestUpdateTrainingVersion(TestCase):
+
+    def setUp(self):
+        self.cmd = UpdateTrainingVersionCommandFactory()
+        self.identity_expected = ProgramTreeVersionIdentity(
+            offer_acronym=self.cmd.offer_acronym,
+            year=self.cmd.year,
+            version_name=self.cmd.version_name,
+            transition_name=self.cmd.transition_name,
+        )
+        self.mock_repository = mock.create_autospec(AcademicYearRepository)
+        current_anac = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.cmd.year - 1),
+            start_date=None,
+            end_date=None
+        )
+        self.mock_repository.get_current.return_value = current_anac
 
     @mock.patch(
         "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
@@ -49,22 +68,60 @@ class TestUpdateTrainingVersion(TestCase):
             mock_postpone_program_tree,
             mock_postpone_program_tree_version
     ):
-        cmd = UpdateTrainingVersionCommandFactory()
-        identity_expected = ProgramTreeVersionIdentity(
-            offer_acronym=cmd.offer_acronym,
-            year=cmd.year,
-            version_name=cmd.version_name,
-            transition_name=cmd.transition_name,
-        )
-        mock_update_tree_version_service.return_value = identity_expected
+        mock_update_tree_version_service.return_value = self.identity_expected
         mock_identity_converter.return_value = GroupIdentityFactory()
         mock_postpone_group_version_service.return_value = []
 
-        result = update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
+        result = update_and_postpone_training_version_service.update_and_postpone_training_version(
+            self.cmd,
+            self.mock_repository
+        )
 
         self.assertTrue(mock_postpone_group_version_service.called)
         self.assertTrue(mock_update_tree_version_service.called)
         self.assertTrue(mock_postpone_program_tree.called)
         self.assertTrue(mock_postpone_program_tree_version.called)
 
-        self.assertEqual(result, [identity_expected])
+        self.assertEqual(result, [self.identity_expected])
+
+    @mock.patch("education_group.ddd.service.write.update_group_service.update_group")
+    @mock.patch(
+        "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
+    @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
+    @mock.patch(
+        "program_management.ddd.domain.service.identity_search.GroupIdentitySearch.get_from_tree_version_identity")
+    @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
+    @mock.patch("program_management.ddd.service.write.update_and_postpone_group_version_service."
+                "update_and_postpone_group_version")
+    def test_should_not_call_postponement_service_if_in_past(
+            self,
+            mock_postpone_group_version_service,
+            mock_update_tree_version_service,
+            mock_identity_converter,
+            mock_postpone_program_tree,
+            mock_postpone_program_tree_version,
+            mock_update_group
+    ):
+        current_anac = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.cmd.year + 1),
+            start_date=None,
+            end_date=None
+        )
+        self.mock_repository.get_current.return_value = current_anac
+        mock_update_tree_version_service.return_value = self.identity_expected
+        mock_identity_converter.return_value = GroupIdentityFactory()
+        mock_postpone_group_version_service.return_value = []
+
+        result = update_and_postpone_training_version_service.update_and_postpone_training_version(
+            self.cmd,
+            self.mock_repository
+        )
+
+        self.assertFalse(mock_postpone_group_version_service.called)
+        self.assertFalse(mock_postpone_program_tree.called)
+        self.assertFalse(mock_postpone_program_tree_version.called)
+
+        self.assertTrue(mock_update_tree_version_service.called)
+        self.assertTrue(mock_update_group.called)
+
+        self.assertEqual(result, [self.identity_expected])
