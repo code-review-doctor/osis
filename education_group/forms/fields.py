@@ -36,11 +36,13 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
     def get_queryset(self):
         qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.initial:
-            date = timezone.now()
-            # qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
-            qs |= EntityVersion.objects.active_for_academic_year(self.academic_year).filter(acronym=self.initial)
+            if self.academic_year:
+                qs |= EntityVersion.objects.active_for_academic_year(self.academic_year).filter(acronym=self.initial)
+            else:
+                date = timezone.now()
+                qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
         elif self.academic_year:
-            qs |= EntityVersion.objects.active_for_academic_year(self.academic_year)
+            qs |= EntityVersion.objects.active_for_academic_year(self.academic_year).pedagogical_entities()
         return qs
 
     def clean(self, value):
