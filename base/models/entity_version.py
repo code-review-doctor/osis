@@ -98,11 +98,11 @@ class EntityVersionQuerySet(CTEQuerySet):
                 Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
                 Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
                 (
-                        Q(start_date__lte=academic_year.start_date) &
-                        (
-                                Q(end_date__isnull=True) |
-                                Q(end_date__gte=academic_year.end_date)
-                        )
+                    Q(start_date__lte=academic_year.start_date) &
+                    (
+                        Q(end_date__isnull=True) |
+                        Q(end_date__gte=academic_year.end_date)
+                    )
                 )
             )
         else:
@@ -429,7 +429,7 @@ class EntityVersion(SerializableModel):
                 Q(start_date__range=(self.start_date, self.end_date)) |
                 Q(end_date__range=(self.start_date, self.end_date)) |
                 (
-                        Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
+                    Q(start_date__lte=self.start_date) & Q(end_date__gte=self.end_date)
                 )
             )
         else:
