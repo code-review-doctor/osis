@@ -31,32 +31,34 @@ from program_management.ddd.command import DeletePermanentlyMiniTrainingStandard
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.service.write import delete_all_mini_training_versions_service
 from program_management.tests.ddd.factories.domain.program_tree_version.mini_training.MINECON import MINECONFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.mini_training.empty import \
+    EmptyMiniTrainingFactory
 from testing.testcases import DDDTestCase
 
 
-# TODO generate empty mini training
 class DeletePermanentlyMiniTrainingStandardVersion(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.minecon = MINECONFactory.multiple(5)[0]
+        self.mini_training = EmptyMiniTrainingFactory()
+
         self.cmd = DeletePermanentlyMiniTrainingStandardVersionCommand(
-            acronym=self.minecon.entity_id.offer_acronym,
-            year=self.minecon.entity_id.year + 1
+            acronym=self.mini_training.entity_id.offer_acronym,
+            year=self.mini_training.entity_id.year + 1
         )
 
     def test_cannot_delete_non_empty_mini_training(self):
+        minecon = MINECONFactory.multiple(5)[0]
         cmd = attr.evolve(
             self.cmd,
-            year=self.minecon.entity_id.year
+            acronym=minecon.entity_id.offer_acronym
         )
 
         with self.assertRaises(ProgramTreeNonEmpty):
             delete_all_mini_training_versions_service.delete_permanently_mini_training_standard_version(cmd)
 
-    @skip("Refactor")
     def test_return_mini_training_identities(self):
         result = delete_all_mini_training_versions_service.delete_permanently_mini_training_standard_version(self.cmd)
 
-        expected = [attr.evolve(self.minecon.entity_id, year=year) for year in range(self.cmd.year, 2025)]
+        expected = [self.mini_training.entity_id]
         self.assertListEqual(expected, result)

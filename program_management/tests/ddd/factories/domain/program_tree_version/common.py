@@ -174,7 +174,7 @@ def build_tree(
 
 
 def build_sub_trees(tree_version: 'ProgramTreeVersion'):
-    nodes = tree_version.get_tree().get_all_nodes()
+    nodes = tree_version.get_tree().root_node.get_all_children_as_nodes()
     group_nodes = (node for node in nodes if node.is_group())
     training_mini_training_nodes = (node for node in nodes if node.is_training() or node.is_mini_training())
     trees = [
