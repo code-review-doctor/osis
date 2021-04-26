@@ -269,11 +269,6 @@ class InvalidBlockException(BusinessException):
         super().__init__(message)
 
 
-class BulkUpdateLinkException(Exception):
-    def __init__(self, exceptions: Dict[str, 'MultipleBusinessExceptions']):
-        self.exceptions = exceptions
-
-
 class CannotPasteToLearningUnitException(BusinessException):
     def __init__(self, parent_node):
         message = _("Cannot add any element to learning unit %(parent_node)s") % {

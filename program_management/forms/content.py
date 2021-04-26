@@ -36,8 +36,10 @@ from base.forms.utils import choice_field
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
+from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.service.write import bulk_update_link_service, update_link_service
 
@@ -102,7 +104,13 @@ class LinkForm(forms.Form):
     def save(self):
         if self.is_valid():
             try:
-                return update_link_service.update_link(self.generate_update_link_command())
+                return message_bus_instance.invoke(
+                    command.BulkUpdateLinkCommand(
+                        parent_node_code=self.parent_obj.code,
+                        parent_node_year=self.parent_obj.year,
+                        update_link_cmds=[self.generate_update_link_command()],
+                    )
+                )
             except MultipleBusinessExceptions as e:
                 self.handle_save_exception(e)
         raise InvalidFormException()
@@ -122,6 +130,7 @@ class LinkForm(forms.Form):
             parent_node_year=self.parent_obj.year
         )
 
+    # FIXME :: inherit from Mixin
     def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
         for e in business_exceptions.exceptions:
             if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
@@ -145,8 +154,7 @@ class BaseContentFormSet(BaseFormSet):
     def save(self) -> List['Link']:
         if self.is_valid():
             try:
-                cmd = self.generate_bulk_update_link_command()
-                return bulk_update_link_service.bulk_update_links(cmd)
+                return message_bus_instance.invoke(self.generate_bulk_update_link_command())
             except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
                 for form in self.forms:
                     if e.exceptions.get(form.generate_update_link_command()):
