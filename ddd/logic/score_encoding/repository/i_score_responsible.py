@@ -26,8 +26,8 @@
 import abc
 from typing import List
 
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.ddd import interface
 
 
@@ -37,6 +37,6 @@ class IScoreResponsibleRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def score_responsible_search(
             cls,
-            ids: List[LearningUnitYearIdentity]
+            ids: List[LearningUnitIdentity]
     ) -> List['LearningUnitSearchDTO']:
         pass

@@ -669,5 +669,5 @@ def _get_luy_score_responsibles(
 ) -> List[ScoreResponsibleDTO]:
     return [
         score_resp for score_resp in score_responsibles
-        if luy.acronym == score_resp.code_of_learning_unit and luy.year == score_resp.year_of_learning_unit
+        if luy.entity_id == score_resp.learning_unit_identity
     ]

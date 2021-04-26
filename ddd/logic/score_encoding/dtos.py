@@ -25,7 +25,9 @@
 ##############################################################################
 import attr
 
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from osis_common.ddd.interface import DTO
+from ddd.logic.learning_unit.business_types import *
 
 
 @attr.s(frozen=True, slots=True)
@@ -35,3 +37,10 @@ class ScoreResponsibleDTO(DTO):
     email = attr.ib(type=str)
     code_of_learning_unit = attr.ib(type=str)
     year_of_learning_unit = attr.ib(type=int)
+
+    @property
+    def learning_unit_identity(self) -> 'LearningUnitIdentity':
+        return LearningUnitIdentityBuilder.build_from_code_and_year(
+            self.code_of_learning_unit,
+            self.year_of_learning_unit
+        )

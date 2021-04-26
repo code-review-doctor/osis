@@ -25,13 +25,15 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.score_encoding.commands import SearchScoresResponsibleCommand
 from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from infrastructure.score_encoding.repository.score_responsible_repository import ScoreResponsibleRepository
 
 
 def search_scores_responsibles(commands: List[SearchScoresResponsibleCommand]) -> List[ScoreResponsibleDTO]:
     repository = ScoreResponsibleRepository()
-    lu_identities = [LearningUnitYearIdentity(code=command.code, year=command.year) for command in commands]
+    lu_identities = [
+        LearningUnitIdentityBuilder.build_from_search_scores_responsible_command(command) for command in commands
+    ]
     return repository.score_responsible_search(lu_identities)

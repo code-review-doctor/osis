@@ -32,7 +32,6 @@ from django.db.models import Q, F
 from attribution.models.attribution import Attribution
 from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
 from ddd.logic.score_encoding.repository.i_score_responsible import IScoreResponsibleRepository
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.ddd.interface import EntityIdentity, ApplicationService, RootEntity
 
 
@@ -41,7 +40,7 @@ class ScoreResponsibleRepository(IScoreResponsibleRepository):
     @classmethod
     def score_responsible_search(
             cls,
-            learning_unit_identities: List[LearningUnitYearIdentity]
+            learning_unit_identities: List['LearningUnitIdentity']
     ) -> List[ScoreResponsibleDTO]:
         luy_identity_clauses = [_build_identity_clause(identity) for identity in learning_unit_identities]
         luy_identity_filter_clause = functools.reduce(operator.or_, luy_identity_clauses)
@@ -52,7 +51,7 @@ class ScoreResponsibleRepository(IScoreResponsibleRepository):
         ).order_by(
             'tutor__person__last_name',
             'tutor__person__first_name'
-        )
+        ).distinct()
         queryset = queryset.filter(luy_identity_filter_clause).annotate(
             last_name=F('tutor__person__last_name'),
             first_name=F('tutor__person__first_name'),
@@ -96,6 +95,6 @@ class ScoreResponsibleRepository(IScoreResponsibleRepository):
         raise NotImplementedError
 
 
-def _build_identity_clause(learning_unit_identity: 'LearningUnitYearIdentity') -> Q:
+def _build_identity_clause(learning_unit_identity: 'LearningUnitIdentity') -> Q:
     return Q(learning_unit_year__acronym=learning_unit_identity.code,
              learning_unit_year__academic_year__year=learning_unit_identity.year)
