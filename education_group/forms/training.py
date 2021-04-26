@@ -206,11 +206,8 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
     # panel_entities_form.html
     management_entity = forms.CharField()
-    administration_entity = MainEntitiesVersionChoiceField(
-        queryset=None,
-        to_field_name="acronym",
-        label=_('Administration entity')
-    )
+    administration_entity = forms.CharField()
+
     academic_year = forms.ModelChoiceField(
         queryset=AcademicYear.objects.all(),
         label=_('Start'),
@@ -333,6 +330,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
         self.__init_academic_year_field()
         self.__init_management_entity_field()
+        self.__init_administration_entity_field()
         self.__init_certificate_aims_field()
         self.__init_diploma_fields()
         self.__init_main_language()
@@ -363,6 +361,17 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=academic_year
+        )
+
+    def __init_administration_entity_field(self):
+        academic_year = self.initial.get('academic_year')
+        if not isinstance(academic_year, AcademicYear):
+            academic_year = AcademicYear.objects.get(year=self.initial.get('academic_year'))
+        self.fields['administration_entity'] = MainEntitiesVersionChoiceField(
+            queryset=None,
+            to_field_name="acronym",
+            label=_('Administration entity'),
             academic_year=academic_year
         )
 
