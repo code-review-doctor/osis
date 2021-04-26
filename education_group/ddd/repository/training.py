@@ -586,8 +586,20 @@ def _delete_certificate_aims(education_group_year_db_obj: EducationGroupYearMode
 
 
 def _is_hops_fields_presence_correct(training: 'Training') -> bool:
+    training_hops_types = [
+        TrainingType.PHD,
+        TrainingType.FORMATION_PHD,
+        TrainingType.CERTIFICATE_OF_PARTICIPATION,
+        TrainingType.CERTIFICATE_OF_SUCCESS,
+        TrainingType.CERTIFICATE_OF_HOLDING_CREDITS,
+        TrainingType.CAPAES,
+        TrainingType.CERTIFICATE,
+        TrainingType.RESEARCH_CERTIFICATE,
+        TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE,
+        TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+    ]
     if training.hops:
-        if training.type in (TrainingType.PHD, TrainingType.FORMATION_PHD) and \
+        if training.type in training_hops_types and \
                 training.hops.ares_code and training.hops.ares_authorization:
             return True
         else:
