@@ -25,8 +25,12 @@ import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.command import GetTrainingCommand
+from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing, \
+    AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone
 from education_group.ddd.service.read import get_training_service
 from program_management.ddd.command import PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
+from program_management.ddd.domain.exception import Program2MEndDateLowerThanItsFinalitiesException, \
+    FinalitiesEndDateGreaterThanTheirMasters2MException
 from program_management.ddd.service.write import postpone_training_and_program_tree_modifications_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
 from testing.testcases import DDDTestCase
@@ -103,7 +107,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
     def test_credits_must_be_greater_than_0(self):
         cmd = attr.evolve(self.cmd, credits=-1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
             postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
                 cmd
             )
@@ -111,7 +115,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
     def test_constraints_must_be_legit(self):
         cmd = attr.evolve(self.cmd, min_constraint=150)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
             postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
                 cmd
             )
@@ -119,7 +123,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
     def test_hops_value_should_be_legit(self):
         cmd = attr.evolve(self.cmd, ares_code=10)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(HopsFieldsAllOrNone):
             postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
                 cmd
             )
@@ -127,7 +131,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
     def test_cannot_reduce_end_year_of_program_2m_to_one_shorter_to_its_finalities(self):
         cmd = attr.evolve(self.cmd, end_year=self.cmd.postpone_from_year)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(Program2MEndDateLowerThanItsFinalitiesException):
             postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
                 cmd
             )
@@ -139,7 +143,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
             end_year=self.osis2m.end_year_of_existence + 1
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(FinalitiesEndDateGreaterThanTheirMasters2MException):
             postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
                 cmd
             )

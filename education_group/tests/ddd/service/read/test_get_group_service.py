@@ -37,7 +37,7 @@ class TestGetGroup(DDDTestCase):
 
     def test_throw_exception_when_no_matching_group(self):
         cmd = command.GetGroupCommand(year=self.group.year + 1, code=self.group.code)
-        with self.assertRaises(exception.GroupNotFoundException):
+        with self.assertRaisesBusinessException(exception.GroupNotFoundException):
             get_group_service.get_group(cmd)
 
     def test_return_matching_group(self):

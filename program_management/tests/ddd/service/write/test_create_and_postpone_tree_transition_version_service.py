@@ -56,7 +56,7 @@ class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
             transition_name="TRANSITION TRANS"
         )
 
-        with self.assertRaises(VersionNameAlreadyExist):
+        with self.assertRaisesBusinessException(VersionNameAlreadyExist):
             create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
                 self.cmd
             )
@@ -64,7 +64,7 @@ class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
     def test_transition_name_should_contain_TRANSITION(self):
         cmd = attr.evolve(self.cmd, transition_name="NOPE")
 
-        with self.assertRaises(InvalidTransitionNameException):
+        with self.assertRaisesBusinessException(InvalidTransitionNameException):
             create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(cmd)
 
     def test_should_return_tree_version_identities(self):

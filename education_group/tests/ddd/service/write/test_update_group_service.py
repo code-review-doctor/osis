@@ -27,6 +27,8 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain import group
+from education_group.ddd.domain.exception import ContentConstraintMinimumMaximumMissing, \
+    CreditShouldBeGreaterOrEqualsThanZero
 from education_group.ddd.service.write import update_group_service
 from education_group.ddd.validators import _credits
 from education_group.tests.ddd.factories.group import GroupFactory
@@ -68,13 +70,13 @@ class TestUpdateGroup(DDDTestCase):
         # For all business rules for constraints see TestCreateGroup test cases
         cmd = attr.evolve(self.cmd, min_constraint=None, max_constraint=None)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ContentConstraintMinimumMaximumMissing):
             update_group_service.update_group(cmd)
 
     def test_cannot_have_credits_lower_than_min_accepted_credits_value(self):
         cmd = attr.evolve(self.cmd, credits=_credits.MIN_CREDITS_VALUE - 1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
             update_group_service.update_group(cmd)
 
     def test_should_return_entity_id_of_updated_group(self):

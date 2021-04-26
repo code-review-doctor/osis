@@ -23,9 +23,12 @@
 # ############################################################################
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import UpdateLinkCommand
+from program_management.ddd.domain.exception import InvalidBlockException, \
+    RelativeCreditShouldBeGreaterOrEqualsThanZero, RelativeCreditShouldBeLowerOrEqualThan999, \
+    ReferenceLinkNotAllowedWithLearningUnitException, ChildTypeNotAuthorizedException, \
+    MinimumChildTypesNotRespectedException
 from program_management.ddd.service.write import update_link_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
@@ -52,19 +55,19 @@ class TestUpdateLink(DDDTestCase):
     def test_block_value_should_be_an_increasing_sequence_of_digit_between_1_and_6(self):
         cmd = attr.evolve(self.cmd, block="158")
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(InvalidBlockException):
             update_link_service.update_link(cmd)
 
     def test_cannot_have_relative_credits_lower_than_0(self):
         cmd = attr.evolve(self.cmd, relative_credits=-1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(RelativeCreditShouldBeGreaterOrEqualsThanZero):
             update_link_service.update_link(cmd)
 
     def test_cannot_have_relative_credits_greater_than_999(self):
         cmd = attr.evolve(self.cmd, relative_credits=1000)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(RelativeCreditShouldBeLowerOrEqualThan999):
             update_link_service.update_link(cmd)
 
     def test_cannot_set_link_type_as_reference_for_link_with_a_learning_unit_as_a_child(self):
@@ -78,7 +81,7 @@ class TestUpdateLink(DDDTestCase):
             child_node_year=link_with_learning_unit.child.year,
         )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
+        with self.assertRaisesBusinessException(ReferenceLinkNotAllowedWithLearningUnitException):
             update_link_service.update_link(cmd)
 
     def test_always_reference_link_between_minor_major_list_choice_and_minor_or_major_or_deepening(self):
@@ -99,7 +102,7 @@ class TestUpdateLink(DDDTestCase):
     def test_cannot_set_link_as_reference_when_children_of_child_are_not_valid_children_type_for_parent(self):
         cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
+        with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
             update_link_service.update_link(cmd)
 
     def test_should_update_link_attributes(self):
@@ -116,5 +119,5 @@ class TestUpdateLink(DDDTestCase):
     def test_cannot_convert_mandatory_child_link_to_reference(self):
         cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
+        with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
             update_link_service.update_link(cmd)

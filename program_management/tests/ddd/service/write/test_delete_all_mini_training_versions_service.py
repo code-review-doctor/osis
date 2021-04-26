@@ -54,7 +54,7 @@ class DeletePermanentlyMiniTrainingStandardVersion(DDDTestCase):
             acronym=minecon.entity_id.offer_acronym
         )
 
-        with self.assertRaises(ProgramTreeNonEmpty):
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
             delete_all_mini_training_versions_service.delete_permanently_mini_training_standard_version(cmd)
 
     def test_return_mini_training_identities(self):

@@ -64,7 +64,7 @@ class DeleteMiniTrainingWithProgramTreeTestCase(DDDTestCase):
         return_value=5
     )
     def test_cannot_delete_mini_training_for_which_there_is_enrolments(self, mock_get_enrollments_count):
-        with self.assertRaises(MiniTrainingHaveEnrollments):
+        with self.assertRaisesBusinessException(MiniTrainingHaveEnrollments):
             delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(self.cmd)
 
     @mock.patch(
@@ -72,7 +72,7 @@ class DeleteMiniTrainingWithProgramTreeTestCase(DDDTestCase):
         return_value=True
     )
     def test_cannot_delete_mini_training_for_which_there_is_enrolments(self, mock_has_mini_training_a_link_with_epc):
-        with self.assertRaises(MiniTrainingHaveLinkWithEPC):
+        with self.assertRaisesBusinessException(MiniTrainingHaveLinkWithEPC):
             delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(self.cmd)
 
     @skip("TODO")
@@ -82,21 +82,21 @@ class DeleteMiniTrainingWithProgramTreeTestCase(DDDTestCase):
     def test_cannot_delete_non_empty_program_tree(self):
         cmd = attr.evolve(self.cmd, from_year=self.minecon.entity_id.year)
 
-        with self.assertRaises(ProgramTreeNonEmpty):
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
             delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(cmd)
 
     @skip("Broken service do not take into account new end year")
     def test_cannot_delete_standard_version_if_specific_version_exists_during_those_years(self):
         MINECONFactory.create_specific_version_from_tree_version(self.minecon)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MultipleBusinessExceptions):
             delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(self.cmd)
 
     @skip("Broken service do not take into account new end year")
     def test_cannot_delete_standard_version_if_transition_version_exists_during_those_years(self):
         MINECONFactory.create_transition_from_tree_version(self.minecon)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MultipleBusinessExceptions):
             delete_mini_training_with_program_tree_service.delete_mini_training_with_program_tree(self.cmd)
 
     def test_should_return_mini_training_identities(self):

@@ -50,5 +50,5 @@ class TestDeleteOrphanTraining(DDDTestCase):
 
     def test_should_remove_training_from_repository(self):
         entity_identity_of_deleted_training = delete_orphan_training_service.delete_orphan_training(self.cmd)
-        with self.assertRaises(exception.TrainingNotFoundException):
+        with self.assertRaisesBusinessException(exception.TrainingNotFoundException):
             self.fake_training_repository.get(entity_identity_of_deleted_training)

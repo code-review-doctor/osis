@@ -37,6 +37,7 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 
 
+# TODO refactor
 class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
     def setUp(self) -> None:
         self.tree = ProgramTreeFactory()

@@ -55,5 +55,5 @@ class TestDeleteOrphanMiniTraining(DDDTestCase):
         entity_identity_of_deleted_mini_training = delete_orphan_mini_training_service.delete_orphan_mini_training(
             self.cmd
         )
-        with self.assertRaises(exception.MiniTrainingNotFoundException):
+        with self.assertRaisesBusinessException(exception.MiniTrainingNotFoundException):
             self.fake_mini_training_repository.get(entity_identity_of_deleted_mini_training)

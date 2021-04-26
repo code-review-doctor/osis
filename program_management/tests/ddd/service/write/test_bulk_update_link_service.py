@@ -99,7 +99,7 @@ class TestBulkUpdateLink(DDDTestCase):
             ]
         )
 
-        with self.assertRaises(BulkUpdateLinkException) as e:
+        with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
             bulk_update_link_service.bulk_update_links(cmd)
 
         exceptions = e.exception.exceptions

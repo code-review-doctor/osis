@@ -55,5 +55,5 @@ class TestCheckEmptyFields(DDDTestCase):
         self.training.main_domain = None
         self.training.funding = FundingFactory(funding_orientation=None)
 
-        with self.assertRaises(exception.TrainingEmptyFieldException):
+        with self.assertRaisesBusinessException(exception.TrainingEmptyFieldException):
             check_training_empty_fields_on_warning(self.command)

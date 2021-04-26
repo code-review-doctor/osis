@@ -45,7 +45,7 @@ class TestDeleteAllProgramTreeService(DDDTestCase):
 
         cmd = attr.evolve(self.cmd, code=non_empty_trees[0].root_node.code)
 
-        with self.assertRaises(ProgramTreeNonEmpty):
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
             delete_all_program_tree_service.delete_all_program_tree(cmd)
 
     def test_cannot_delete_trees_that_are_used(self):
@@ -53,7 +53,7 @@ class TestDeleteAllProgramTreeService(DDDTestCase):
 
         cmd = attr.evolve(self.cmd, code='LINFO102R')
 
-        with self.assertRaises(NodeHaveLinkException):
+        with self.assertRaisesBusinessException(NodeHaveLinkException):
             delete_all_program_tree_service.delete_all_program_tree(cmd)
 
     def test_should_return_program_tree_identities(self):
@@ -67,7 +67,7 @@ class TestDeleteAllProgramTreeService(DDDTestCase):
 
         for tree_identity in identities_of_tree_deleted:
             with self.subTest(identity=tree_identity):
-                with self.assertRaises(ProgramTreeNotFoundException):
+                with self.assertRaisesBusinessException(ProgramTreeNotFoundException):
                     get_program_tree_service.get_program_tree(
                         command.GetProgramTree(code=tree_identity.code, year=tree_identity.year)
                     )

@@ -24,8 +24,12 @@
 import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintMinimumInvalid, \
+    ContentConstraintTypeMissing
 from program_management.ddd.command import UpdateTrainingVersionCommand
-from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate
+from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate, \
+    Program2MEndDateLowerThanItsFinalitiesException, FinalitiesEndDateGreaterThanTheirMasters2MException, \
+    CannotExtendTransitionDueToExistenceOfOtherTransitionException
 from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory, \
     OSIS2MSpecificVersionFactory
@@ -60,19 +64,19 @@ class TestUpdateTrainingVersion(DDDTestCase):
     def test_credits_must_be_greater_than_0(self):
         cmd = attr.evolve(self.cmd, credits=-1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
             update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_constraints_must_be_legit(self):
         cmd = attr.evolve(self.cmd, min_constraint=150)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
             update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_cannot_reduce_end_year_of_program_2m_to_one_shorter_to_its_finalities(self):
         cmd = attr.evolve(self.cmd, end_year=self.cmd.year)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(Program2MEndDateLowerThanItsFinalitiesException):
             update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_cannot_increase_end_year_of_finality_to_one_greater_than_its_program(self):
@@ -82,7 +86,7 @@ class TestUpdateTrainingVersion(DDDTestCase):
             end_year=self.osis2m_specific_version.end_year_of_existence + 1
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(FinalitiesEndDateGreaterThanTheirMasters2MException):
             update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_cannot_increase_transition_end_date_to_a_year_where_a_transition_already_exists(self):
@@ -101,7 +105,7 @@ class TestUpdateTrainingVersion(DDDTestCase):
             end_year=self.osis2m_specific_version.end_year_of_existence
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotExtendTransitionDueToExistenceOfOtherTransitionException):
             update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_cannot_reduce_specific_version_date_to_one_lower_than_its_transition(self):
@@ -121,7 +125,7 @@ class TestUpdateTrainingVersion(DDDTestCase):
             self.cmd,
             end_year=self.osis2m_specific_version.end_year_of_existence - 2
         )
-        with self.assertRaises(CannotDeleteSpecificVersionDueToTransitionVersionEndDate):
+        with self.assertRaisesBusinessException(CannotDeleteSpecificVersionDueToTransitionVersionEndDate):
             update_and_postpone_training_version_service.update_and_postpone_training_version(cmd)
 
     def test_should_return_program_tree_version_identity(self):

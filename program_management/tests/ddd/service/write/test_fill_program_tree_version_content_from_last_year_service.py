@@ -31,7 +31,7 @@ from django.test import override_settings
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
     GetProgramTreeVersionCommand
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty
+from program_management.ddd.domain.exception import ProgramTreeNonEmpty, MinimumEditableYearException
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.read import get_program_tree_version_service
@@ -92,11 +92,8 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
             self.cmd
         )
 
-        self.assertRaisesBusinessException(
-            ProgramTreeNonEmpty,
-            fill_program_tree_version_content_from_program_tree_version,
-            cmd
-        )
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
+            fill_program_tree_version_content_from_program_tree_version(cmd)
 
     def test_if_learning_unit_is_not_present_in_next_year_then_attach_its_current_year_version(self):
         ue_node = NodeLearningUnitYearFactory(year=self.cmd.from_year, end_date=self.cmd.from_year)
@@ -246,7 +243,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
     @skip("TODO")
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=CURRENT_ACADEMIC_YEAR_YEAR)
     def test_can_only_fill_content_of_tree_before_year_limit(self):
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MinimumEditableYearException):
             fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
     def test_can_fill_transition_from_transition_past_year(self):
@@ -264,7 +261,7 @@ class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
 
     @skip("TODO")
     def test_cannot_fill_non_empty_tree(self):
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
             fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
     def test_cannot_fill_transition_if_no_finalities_without_transitions(self):

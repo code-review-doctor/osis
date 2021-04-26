@@ -53,7 +53,7 @@ class TestPostponeCertificateAims(DDDTestCase):
     def test_cannot_have_more_than_one_certificate_aim_of_section_2(self):
         cmd = attr.evolve(self.cmd, aims=[(1, 2), (4, 2)])
 
-        with self.assertRaises(MaximumCertificateAimType2Reached):
+        with self.assertRaisesBusinessException(MaximumCertificateAimType2Reached):
             postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(cmd)
 
     def test_should_empty_certificate_aims_if_none_given_of_trainings_from_year(self):
@@ -83,7 +83,7 @@ class TestPostponeCertificateAims(DDDTestCase):
     def test_should_not_update_certificate_aims_of_trainings_with_conflicts_with_previous_year(self):
         self.trainings[2].diploma = DiplomaFactory(with_aims=True)
 
-        with self.assertRaises(CertificateAimsCopyConsistencyException) as e:
+        with self.assertRaisesBusinessException(CertificateAimsCopyConsistencyException) as e:
             postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
 
         self.assertEqual(self.trainings[2].year, e.exception.conflicted_fields_year)

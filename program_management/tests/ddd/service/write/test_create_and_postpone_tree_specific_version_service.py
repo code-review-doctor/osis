@@ -63,7 +63,7 @@ class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
             version_name="VERSION"
         )
 
-        with self.assertRaises(VersionNameAlreadyExist):
+        with self.assertRaisesBusinessException(VersionNameAlreadyExist):
             create_and_postpone_tree_specific_version_service.create_and_postpone_program_tree_specific_version(
                 self.cmd
             )

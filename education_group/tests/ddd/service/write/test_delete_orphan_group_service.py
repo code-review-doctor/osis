@@ -49,5 +49,5 @@ class TestDeleteOrphanGroup(DDDTestCase):
 
     def test_should_remove_group_from_repository(self):
         entity_identity_of_deleted_group = delete_orphan_group_service.delete_orphan_group(self.cmd)
-        with self.assertRaises(exception.GroupNotFoundException):
+        with self.assertRaisesBusinessException(exception.GroupNotFoundException):
             self.fake_group_repository.get(entity_identity_of_deleted_group)

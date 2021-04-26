@@ -37,7 +37,7 @@ class TestGetMiniTraining(DDDTestCase):
 
     def test_throw_exception_when_no_matching_mini_training(self):
         cmd = command.GetMiniTrainingCommand(year=self.mini_training.year + 1, acronym=self.mini_training.acronym)
-        with self.assertRaises(exception.MiniTrainingNotFoundException):
+        with self.assertRaisesBusinessException(exception.MiniTrainingNotFoundException):
             get_mini_training_service.get_mini_training(cmd)
 
     def test_return_matching_mini_training(self):

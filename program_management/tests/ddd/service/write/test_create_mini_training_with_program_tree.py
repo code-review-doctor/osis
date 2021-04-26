@@ -21,16 +21,16 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from collections import namedtuple
 
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
+from education_group.ddd.domain.exception import CodeAlreadyExistException, AcronymRequired, AcronymAlreadyExist, \
+    StartYearGreaterThanEndYearException, CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
 from education_group.tests.ddd.factories.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
@@ -75,30 +75,30 @@ class TestCreateAndReportMiniTrainingWithProgramTree(DDDTestCase):
     def test_cannot_create_mini_training_for_which_code_already_exists(self):
         GroupFactory(entity_identity__code=self.cmd.code, persist=True)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CodeAlreadyExistException):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(self.cmd)
 
     def test_acronym_should_be_required(self):
         cmd = attr.evolve(self.cmd, abbreviated_title="")
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(AcronymRequired):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
 
     def test_cannot_create_mini_training_for_which_acronym_already_exists(self):
         GroupFactory(abbreviated_title=self.cmd.abbreviated_title, persist=True)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(AcronymAlreadyExist):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(self.cmd)
 
     def test_start_year_cannot_be_greater_than_end_year(self):
         cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year - 1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(StartYearGreaterThanEndYearException):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
 
     def test_credits_cannot_be_inferior_to_0(self):
         cmd = attr.evolve(self.cmd, credits=-1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
 
     def test_if_min_or_max_constraint_is_set_then_constraint_type_must_be_set(self):
@@ -106,7 +106,7 @@ class TestCreateAndReportMiniTrainingWithProgramTree(DDDTestCase):
         # education_group.tests.ddd.service.write.test_create_group_service.TestCreateGroup
         cmd = attr.evolve(self.cmd, constraint_type=None)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
             create_mini_training_with_program_tree.create_and_report_mini_training_with_program_tree(cmd)
 
     def test_should_return_identities_of_mini_training_created(self):

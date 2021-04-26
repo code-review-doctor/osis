@@ -30,6 +30,8 @@ from django.test import override_settings
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd import command
+from program_management.ddd.domain.exception import CannotDetachOptionsException, \
+    MinimumChildTypesNotRespectedException, CannotDetachRootException, MinimumEditableYearException
 from program_management.ddd.domain.link import LinkIdentity
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.write import detach_node_service
@@ -59,12 +61,12 @@ class TestDetachNode(DDDTestCase):
         )
         cmd = attr.evolve(self.cmd, path=path)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotDetachOptionsException):
             detach_node_service.detach_node(cmd)
 
     @skip("Define prerequisites repository")
     def test_cannot_detach_learning_unit_which_is_a_prerequisite(self):
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MultipleBusinessExceptions):
             detach_node_service.detach_node(self.cmd)
 
     def test_cannot_detach_mandatory_children(self):
@@ -74,7 +76,7 @@ class TestDetachNode(DDDTestCase):
         )
         cmd = attr.evolve(self.cmd, path=path)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MinimumChildTypesNotRespectedException):
             detach_node_service.detach_node(cmd)
 
     @skip("Code breaks when path is root node")
@@ -82,12 +84,12 @@ class TestDetachNode(DDDTestCase):
         path = build_path(self.bachelor.root_node)
         cmd = attr.evolve(self.cmd, path=path)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotDetachRootException):
             detach_node_service.detach_node(cmd)
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_cannot_detach_from_tree_before_minimum_editable_year(self):
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MinimumEditableYearException):
             detach_node_service.detach_node(self.cmd)
 
     def test_should_return_link_identity_of_link_deleted(self):

@@ -31,6 +31,10 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
+from program_management.ddd.domain.exception import CannotPasteToLearningUnitException, InvalidBlockException, \
+    ReferenceLinkNotAllowedWithLearningUnitException, ChildTypeNotAuthorizedException, \
+    ParentAndChildMustHaveSameAcademicYearException, MaximumChildTypesReachedException, \
+    CannotPasteNodeToHimselfException, CannotAttachSameChildToParentException
 from program_management.ddd.domain.link import LinkIdentity
 from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.read import get_program_tree_version_service
@@ -80,26 +84,26 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
         )
         cmd = attr.evolve(self.cmd, path_where_to_paste=path)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotPasteToLearningUnitException):
             paste_element_service.paste_element(cmd)
 
     def test_block_should_be_a_sequence_of_increasing_digit_comprised_between_1_and_6(self):
         cmd = attr.evolve(self.cmd, block="1298")
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(InvalidBlockException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_create_a_reference_link_with_a_learning_unit_as_child(self):
         cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ReferenceLinkNotAllowedWithLearningUnitException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_learning_unit_to_node_who_do_not_allow_learning_units_as_children(self):
         path = build_path(self.tree.root_node)
         cmd = attr.evolve(self.cmd, path_where_to_paste=path)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_group_year_node_to_node_who_do_not_allow_the_node_type(self):
@@ -110,7 +114,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
             node_to_paste_code=self.mini_training_version.tree.root_node.code
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_group_year_node_with_year_different_than_the_tree(self):
@@ -121,7 +125,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
         )
         cmd = attr.evolve(self.cmd, node_to_paste_code=node_to_paste.code, node_to_paste_year=node_to_paste.year)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ParentAndChildMustHaveSameAcademicYearException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_a_node_if_parent_has_reached_its_maximum_children_allowed_for_this_type(self):
@@ -138,19 +142,19 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
             path_where_to_paste=build_path(self.tree.root_node)
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MaximumChildTypesReachedException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_have_node_containing_itself(self):
         cmd = attr.evolve(self.cmd, node_to_paste_code="LOSIS102R")
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotPasteNodeToHimselfException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_have_multiple_occurrences_of_same_child(self):
         cmd = attr.evolve(self.cmd, node_to_paste_code="LDROI1001")
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotAttachSameChildToParentException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_reference_link_if_referenced_children_not_authorized(self):
@@ -160,7 +164,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
             link_type=LinkTypes.REFERENCE.name
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_already_reached(self):
@@ -175,7 +179,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
 
         cmd = attr.evolve(self.cmd, path_where_to_paste=path, node_to_paste_code=node_to_paste.code)
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
+        with self.assertRaisesBusinessException(MaximumChildTypesReachedException):
             paste_element_service.paste_element(cmd)
 
     def test_should_return_link_identity_of_link_newly_created(self):
@@ -245,7 +249,6 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
 
     def test_cannot_paste_an_option_inside_finality_if_not_contained_in_list_option_of_program(self):
         pass
-
 
     def test_should_be_able_to_paste_a_list_minor_major_to_a_list_minor_major(self):
         node_types = [GroupType.MINOR_LIST_CHOICE, GroupType.MAJOR_LIST_CHOICE]

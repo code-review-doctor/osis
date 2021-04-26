@@ -24,8 +24,10 @@
 import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
-from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate
+from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate, \
+    CannotExtendTransitionDueToExistenceOfOtherTransitionException
 from program_management.ddd.service.write import update_and_postpone_mini_training_version_service
 from program_management.tests.ddd.factories.domain.program_tree_version.mini_training.MINECON import MINECONFactory, \
     MINECONSpecificVersionFactory
@@ -60,13 +62,13 @@ class TestUpdateAndPostponeMiniTrainingVersion(DDDTestCase):
     def test_credits_must_be_greater_than_0(self):
         cmd = attr.evolve(self.cmd, credits=-1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
             update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
 
     def test_constraints_must_be_legit(self):
         cmd = attr.evolve(self.cmd, min_constraint=150)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
             update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
 
     def test_cannot_increase_transition_end_date_to_a_year_where_a_transition_already_exists(self):
@@ -85,7 +87,7 @@ class TestUpdateAndPostponeMiniTrainingVersion(DDDTestCase):
             end_year=self.minecon_specific_version.end_year_of_existence
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CannotExtendTransitionDueToExistenceOfOtherTransitionException):
             update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
 
     def test_cannot_reduce_specific_version_date_to_one_lower_than_its_transition(self):
@@ -105,7 +107,7 @@ class TestUpdateAndPostponeMiniTrainingVersion(DDDTestCase):
             self.cmd,
             end_year=self.minecon_specific_version.end_year_of_existence - 2
         )
-        with self.assertRaises(CannotDeleteSpecificVersionDueToTransitionVersionEndDate):
+        with self.assertRaisesBusinessException(CannotDeleteSpecificVersionDueToTransitionVersionEndDate):
             update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version(cmd)
 
     def test_should_return_program_tree_version_identity(self):

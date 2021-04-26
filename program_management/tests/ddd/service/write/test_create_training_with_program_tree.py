@@ -21,16 +21,19 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from collections import namedtuple
 
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
+from education_group.ddd.domain.exception import CodeAlreadyExistException, AcronymRequired, AcronymAlreadyExist, \
+    StartYearGreaterThanEndYearException, HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone, \
+    CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing, \
+    AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
+    AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.tests.ddd.factories.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
@@ -113,30 +116,30 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
     def test_cannot_create_training_for_which_code_already_exists(self):
         GroupFactory(entity_identity__code=self.cmd.code, persist=True)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CodeAlreadyExistException):
             create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
 
     def test_acronym_should_be_required(self):
         cmd = attr.evolve(self.cmd, abbreviated_title="")
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(AcronymRequired):
             create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_cannot_create_training_for_which_acronym_already_exists(self):
         GroupFactory(abbreviated_title=self.cmd.abbreviated_title, persist=True)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(AcronymAlreadyExist):
             create_training_with_program_tree.create_and_report_training_with_program_tree(self.cmd)
 
     def test_start_year_cannot_be_greater_than_end_year(self):
         cmd = attr.evolve(self.cmd, end_year=self.cmd.start_year - 1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(StartYearGreaterThanEndYearException):
             create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_credits_cannot_be_inferior_to_0(self):
         cmd = attr.evolve(self.cmd, credits=-1)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
             create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_if_min_or_max_constraint_is_set_then_constraint_type_must_be_set(self):
@@ -144,7 +147,7 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
         # education_group.tests.ddd.service.write.test_create_group_service.TestCreateGroup
         cmd = attr.evolve(self.cmd, constraint_type=None)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
             create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_hops_valus_can_all_be_none(self):
@@ -166,7 +169,7 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
             ares_authorization=10
         )
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(HopsFieldsAllOrNone):
             create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_ares_graca_is_optional_for_formation_phd(self):
@@ -182,14 +185,17 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
         self.assertTrue(result)
 
     def test_hops_values_should_be_comprised_between_0_and_9999(self):
-        cmds = [
-            attr.evolve(self.cmd, ares_code=-1, ares_graca=52, ares_authorization=21),
-            attr.evolve(self.cmd, ares_code=1, ares_graca=-1, ares_authorization=21),
-            attr.evolve(self.cmd, ares_code=1, ares_graca=52, ares_authorization=-1)
+        cmds_with_expected_exception = [
+            (attr.evolve(self.cmd, ares_code=-1, ares_graca=52, ares_authorization=21),
+             AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999),
+            (attr.evolve(self.cmd, ares_code=1, ares_graca=-1, ares_authorization=21),
+             AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999),
+            (attr.evolve(self.cmd, ares_code=1, ares_graca=52, ares_authorization=-1),
+             AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999)
         ]
-        for cmd in cmds:
+        for cmd, exception in cmds_with_expected_exception:
             with self.subTest(cmd=cmd):
-                with self.assertRaises(MultipleBusinessExceptions):
+                with self.assertRaisesBusinessException(exception):
                     create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
     def test_should_return_identities_of_trainings_created(self):
@@ -228,4 +234,3 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
 
         tree_versions = [get_program_tree_version_service.get_program_tree_version(cmd) for cmd in cmds]
         self.assertEqual(len(training_identities), len(tree_versions))
-

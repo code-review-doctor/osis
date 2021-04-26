@@ -21,6 +21,8 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import contextlib
+import traceback
 import warnings
 from collections import namedtuple
 from typing import Any, Optional, List
@@ -37,6 +39,38 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository, FakeProgramTreeVersionRepository, \
     FakeProgramTreeRepository
+
+
+class _AssertRaisesBusinessException:
+    def __init__(self, expected, test_case):
+        self.expected = expected
+        self.test_case = test_case
+        self.exception = None
+
+    def _raise_failure(self, standard_msg):
+        msg = self.test_case._formatMessage(None, standard_msg)
+        raise self.test_case.failureException(msg)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_tb):
+        if exc_type is None:
+            try:
+                exc_name = self.expected.__name__
+            except AttributeError:
+                exc_name = str(self.expected)
+            self._raise_failure("{} not raised".format(exc_name))
+        else:
+            traceback.clear_frames(exc_tb)
+        if issubclass(exc_type, self.expected):
+            self.exception = exc_value.with_traceback(None)
+            return True
+        elif issubclass(exc_type, MultipleBusinessExceptions):
+            self.exception = exc_value.with_traceback(None)
+            return self.expected in [type(exc) for exc in exc_value.exceptions]
+
+        return False
 
 
 # FIXME should herit from SimpleTestCase
@@ -187,11 +221,14 @@ class DDDTestCase(TestCase):
                 tree_version.tree
             )
 
-    def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            func(*args, **kwargs)
-        class_exceptions = [exc.__class__ for exc in e.exception.exceptions]
-        self.assertIn(exception, class_exceptions)
+    def assertRaisesBusinessException(self, exception):
+        """
+        Assert that a business exception of exception type is raised.
+        If a multiple business exception is raised, it will check that the exception
+        is present in the list of exceptions.
+        :param exception: A business exception type
+        """
+        return _AssertRaisesBusinessException(exception, self)
 
 
 def get_from_element_id(element_id: int) -> Optional['NodeIdentity']:

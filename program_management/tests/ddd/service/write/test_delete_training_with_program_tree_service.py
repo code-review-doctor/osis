@@ -63,7 +63,7 @@ class DeleteTrainingWithProgramTreeTestCase(DDDTestCase):
         return_value=5
     )
     def test_cannot_delete_training_for_which_there_is_enrolments(self, mock_get_training_enrollments_count):
-        with self.assertRaises(TrainingHaveEnrollments):
+        with self.assertRaisesBusinessException(TrainingHaveEnrollments):
             delete_training_with_program_tree_service.delete_training_with_program_tree(self.cmd)
 
     @mock.patch(
@@ -71,7 +71,7 @@ class DeleteTrainingWithProgramTreeTestCase(DDDTestCase):
         return_value=True
     )
     def test_cannot_delete_training_for_which_there_is_enrolments(self, mock_has_training_a_link_with_epc):
-        with self.assertRaises(TrainingHaveLinkWithEPC):
+        with self.assertRaisesBusinessException(TrainingHaveLinkWithEPC):
             delete_training_with_program_tree_service.delete_training_with_program_tree(self.cmd)
 
     @skip("TODO")
@@ -81,21 +81,21 @@ class DeleteTrainingWithProgramTreeTestCase(DDDTestCase):
     def test_cannot_delete_non_empty_program_tree(self):
         cmd = attr.evolve(self.cmd, from_year=self.osis2m.entity_id.year)
 
-        with self.assertRaises(ProgramTreeNonEmpty):
+        with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
             delete_training_with_program_tree_service.delete_training_with_program_tree(cmd)
 
     @skip("Broken service do not take into account new end year")
     def test_cannot_delete_standard_version_if_specific_version_exists_during_those_years(self):
         OSIS2MFactory.create_specific_version_from_tree_version(self.osis2m)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MultipleBusinessExceptions):
             delete_training_with_program_tree_service.delete_training_with_program_tree(self.cmd)
 
     @skip("Broken service do not take into account new end year")
     def test_cannot_delete_standard_version_if_transition_version_exists_during_those_years(self):
         OSIS2MFactory.create_transition_from_tree_version(self.osis2m)
 
-        with self.assertRaises(MultipleBusinessExceptions):
+        with self.assertRaisesBusinessException(MultipleBusinessExceptions):
             delete_training_with_program_tree_service.delete_training_with_program_tree(self.cmd)
 
     def test_should_return_training_identities(self):
