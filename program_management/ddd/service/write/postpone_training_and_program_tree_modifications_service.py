@@ -85,7 +85,9 @@ def postpone_training_and_program_tree_modifications(
     return training_identities
 
 
-def __convert_to_update_training_and_group_command(postpone_cmd):
+def __convert_to_update_training_and_group_command(
+        postpone_cmd: command.PostponeTrainingAndGroupModificationCommand
+) -> command.UpdateTrainingAndGroupCommand:
     return command.UpdateTrainingAndGroupCommand(
         acronym=postpone_cmd.postpone_from_acronym,
         code=postpone_cmd.code,

@@ -23,6 +23,7 @@ from education_group.ddd.domain.exception import TrainingNotFoundException, Grou
 from education_group.ddd.service.read import get_training_service, get_group_service
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
+from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
@@ -31,7 +32,6 @@ from program_management.ddd.domain import program_tree_version, exception as pro
 from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import get_program_tree_version_from_node_service
-from program_management.ddd.service.write import update_and_postpone_training_version_service
 from program_management.forms import version, transition
 
 
@@ -140,7 +140,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
     def update_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
             update_command = self._convert_form_to_update_training_version_command(self.training_version_form)
-            return update_and_postpone_training_version_service.update_and_postpone_training_version(update_command)
+            return message_bus_instance.invoke(update_command)
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, program_exception.FinalitiesEndDateGreaterThanTheirMasters2MException) or \

@@ -75,33 +75,35 @@ def postpone_mini_training_and_program_tree_modifications(
             raise consistency_error
     else:
         mini_training_identities = [
-            __convert_to_update_minitrainng_and_group_command(postpone_cmd)
+            update_mini_training_and_group_service.update_mini_training_and_group(
+                __convert_to_update_minitraining_and_group_command(postpone_cmd)
+            )
         ]
     return mini_training_identities
 
 
-def __convert_to_update_minitrainng_and_group_command(postpone_cmd):
-    return update_mini_training_and_group_service.update_mini_training_and_group(
-        command.UpdateMiniTrainingAndGroupCommand(
-            abbreviated_title=postpone_cmd.postpone_from_abbreviated_title,
-            code=postpone_cmd.code,
-            year=postpone_cmd.postpone_from_year,
-            status=postpone_cmd.status,
-            credits=postpone_cmd.credits,
-            title_fr=postpone_cmd.title_fr,
-            title_en=postpone_cmd.title_en,
-            keywords=postpone_cmd.keywords,
-            management_entity_acronym=postpone_cmd.management_entity_acronym,
-            end_year=postpone_cmd.end_year,
-            teaching_campus_name=postpone_cmd.teaching_campus_name,
-            constraint_type=postpone_cmd.constraint_type,
-            min_constraint=postpone_cmd.min_constraint,
-            max_constraint=postpone_cmd.max_constraint,
-            remark_fr=postpone_cmd.remark_fr,
-            remark_en=postpone_cmd.remark_en,
-            organization_name=postpone_cmd.organization_name,
-            schedule_type=postpone_cmd.schedule_type,
-        )
+def __convert_to_update_minitraining_and_group_command(
+        postpone_cmd: command.PostponeMiniTrainingAndGroupModificationCommand
+) -> command.UpdateMiniTrainingAndGroupCommand:
+    return command.UpdateMiniTrainingAndGroupCommand(
+        abbreviated_title=postpone_cmd.postpone_from_abbreviated_title,
+        code=postpone_cmd.code,
+        year=postpone_cmd.postpone_from_year,
+        status=postpone_cmd.status,
+        credits=postpone_cmd.credits,
+        title_fr=postpone_cmd.title_fr,
+        title_en=postpone_cmd.title_en,
+        keywords=postpone_cmd.keywords,
+        management_entity_acronym=postpone_cmd.management_entity_acronym,
+        end_year=postpone_cmd.end_year,
+        teaching_campus_name=postpone_cmd.teaching_campus_name,
+        constraint_type=postpone_cmd.constraint_type,
+        min_constraint=postpone_cmd.min_constraint,
+        max_constraint=postpone_cmd.max_constraint,
+        remark_fr=postpone_cmd.remark_fr,
+        remark_en=postpone_cmd.remark_en,
+        organization_name=postpone_cmd.organization_name,
+        schedule_type=postpone_cmd.schedule_type,
     )
 
 
