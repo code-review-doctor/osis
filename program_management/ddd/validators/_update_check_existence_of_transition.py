@@ -42,7 +42,10 @@ class CheckExistenceOfTransition(business_validator.BusinessValidator):
             self.initial_end_year
         )
         if other_transition_year:
-            raise exception.CannotExtendTransitionDueToExistenceOfOtherTransitionException(
-                self.tree_version,
-                other_transition_year
+            raise exception.TransitionNameExistsInPastButExistenceOfOtherTransitionException(
+                self.tree_version.entity_id.offer_acronym,
+                self.tree_version.entity_id.year,
+                other_transition_year,
+                self.tree_version.entity_id.transition_name,
+                self.tree_version.entity_id.version_name,
             )
