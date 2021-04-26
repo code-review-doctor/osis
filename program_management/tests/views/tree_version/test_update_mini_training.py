@@ -261,12 +261,10 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
     @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'
                 'calculate_specific_version_max_end_year', return_value=2025)
     @mock.patch('program_management.forms.version.ProgramTreeVersionRepository.get', return_value=None)
-    @mock.patch('program_management.views.tree_version.update_mini_training.'
-                'update_and_postpone_mini_training_version_service.update_and_postpone_mini_training_version',
-                return_value=[])
+    @mock.patch('infrastructure.messages_bus.message_bus_instance.invoke', return_value=[])
     def test_assert_update_mini_training_service_called(
             self,
-            mock_update_mini_training,
+            mock_messagebus,
             mock_program_tree_version_repo,
             *mock
     ):
@@ -280,4 +278,4 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
             kwargs={"code": self.group_obj.code, "year": self.group_obj.year}
         ) + "?path=123786|5656565"
         self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
-        self.assertTrue(mock_update_mini_training.called)
+        self.assertTrue(mock_messagebus.called)
