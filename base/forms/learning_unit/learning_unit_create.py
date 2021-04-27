@@ -39,7 +39,7 @@ from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, spl
 from base.forms.utils.choice_field import add_blank, add_all
 from base.models import entity_version
 from base.models.campus import find_main_campuses
-from base.models.entity_version import get_last_version
+from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL, \
@@ -339,7 +339,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 forward=['country_requirement_entity'],
             ),
             label=_('Requirement entity'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            help_text=self._get_entity_status_help_text('requirement_entity')
         )
 
     def __init_allocation_entity_field(self):
@@ -357,6 +358,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled,
             queryset=entity_version.find_pedagogical_entities_version(),
+            help_text=self._get_entity_status_help_text('allocation_entity')
         )
 
     def __init_additional_entity_1_field(self):
@@ -390,7 +392,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             ),
             queryset=find_additional_requirement_entities_choices(),
             label=_('Additional requirement entity 1'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            help_text=self._get_entity_status_help_text('additional_entity_1')
         )
 
     def __init_additional_entity_2_field(self):
@@ -414,8 +417,15 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             ),
             queryset=find_additional_requirement_entities_choices(),
             label=_('Additional requirement entity 2'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            help_text=self._get_entity_status_help_text('additional_entity_2')
         )
+
+    def _get_entity_status_help_text(self, field_name):
+        old_entity = self.initial.get(field_name, None)
+        if old_entity:
+            return EntityVersion.get_message_is_entity_active_by_entity_id(old_entity, self.instance.academic_year)
+        return None
 
     class Meta:
         model = LearningContainerYear
