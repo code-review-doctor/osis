@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import datetime
 
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -84,7 +85,9 @@ class PersonRolesSerializer(serializers.ModelSerializer):
                 entity_type=FACULTY
             )
         )
-        if CentralManager.objects.filter(person=obj, scopes__contains=[Scope.IUFC.name]).exists():
+        if CentralManager.objects.filter(person=obj).filter(
+                Q(scopes__contains=[Scope.IUFC.name]) | Q(scopes__contains=[Scope.ALL.name])
+        ).exists():
             all_faculties.add(Scope.IUFC.name)
         return all_faculties
 
