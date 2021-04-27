@@ -23,6 +23,8 @@
 # ############################################################################
 import attr
 
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.command import GetTrainingCommand
 from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing, \
     HopsFieldsAllOrNone
@@ -39,7 +41,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
     def setUp(self):
         super().setUp()
 
-        self.osis2m = OSIS2MFactory.multiple(5)[0]
+        self.osis2m = OSIS2MFactory()[0]
         self.osis2m_training = get_training_service.get_training(
             GetTrainingCommand(acronym=self.osis2m.entity_id.offer_acronym, year=self.osis2m.entity_id.year)
         )
@@ -47,7 +49,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
         self.cmd = PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(
             postpone_from_acronym=self.osis2m.entity_id.offer_acronym,
             postpone_from_year=self.osis2m.entity_id.year,
-            status=self.osis2m_training.status.name,
+            status=ActiveStatusEnum.ACTIVE.name,
             code=self.osis2m.program_tree_identity.code,
             credits=23,
             duration=3,
@@ -98,7 +100,7 @@ class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
             remark_en=None,
             can_be_funded=None,
             organization_name="ORG",
-            schedule_type=self.osis2m_training.schedule_type.name,
+            schedule_type=ScheduleTypeEnum.DAILY.name,
             decree_category=self.osis2m_training.decree_category.name,
             rate_code=None,
         )

@@ -37,7 +37,7 @@ class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.standard_bachelor = OSIS1BAFactory.multiple(5)[0]  # type: ProgramTreeVersion
+        self.standard_bachelor = OSIS1BAFactory()[0]
         self.cmd = command.CreateProgramTreeTransitionVersionCommand(
             end_year=self.standard_bachelor.end_year.year,
             offer_acronym=self.standard_bachelor.entity_id.offer_acronym,

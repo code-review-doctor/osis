@@ -38,7 +38,8 @@ class DeletePermanentlyMiniTrainingStandardVersion(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.mini_training = EmptyMiniTrainingFactory()
+        self.mini_trainings = EmptyMiniTrainingFactory()
+        self.mini_training = self.mini_trainings[0]
 
         self.cmd = DeletePermanentlyMiniTrainingStandardVersionCommand(
             acronym=self.mini_training.entity_id.offer_acronym,
@@ -46,7 +47,7 @@ class DeletePermanentlyMiniTrainingStandardVersion(DDDTestCase):
         )
 
     def test_cannot_delete_non_empty_mini_training(self):
-        minecon = MINECONFactory.multiple(5)[0]
+        minecon = MINECONFactory()[0]
         cmd = attr.evolve(
             self.cmd,
             acronym=minecon.entity_id.offer_acronym
@@ -58,5 +59,5 @@ class DeletePermanentlyMiniTrainingStandardVersion(DDDTestCase):
     def test_return_mini_training_identities(self):
         result = delete_all_mini_training_versions_service.delete_permanently_mini_training_standard_version(self.cmd)
 
-        expected = [self.mini_training.entity_id]
+        expected = [mini_training.entity_id for mini_training in self.mini_trainings]
         self.assertListEqual(expected, result)

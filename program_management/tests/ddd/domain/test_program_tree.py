@@ -338,7 +338,7 @@ class TestGetIndirectParents(DDDTestCase):
 
     def setUp(self) -> None:
         super().setUp()
-        self.program_tree = OSIS2MFactory(year=2020, end_year=2020).get_tree()
+        self.program_tree = OSIS2MFactory(year=2020, end_year=2020)[0].get_tree()
 
     def test_when_child_node_not_in_tree(self):
         child_node = NodeLearningUnitYearFactory()

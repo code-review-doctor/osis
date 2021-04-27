@@ -43,7 +43,7 @@ class DeleteTrainingWithProgramTreeTestCase(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.osis2m = OSIS2MFactory.multiple(5)
+        self.osis2m = OSIS2MFactory()
         [TrainingFactory.from_node(tree_version.get_tree().root_node) for tree_version in self.osis2m[1:]]
         self.osis2m = self.osis2m[0]
         self.osis2m_training = get_training_service.get_training(
@@ -103,6 +103,6 @@ class DeleteTrainingWithProgramTreeTestCase(DDDTestCase):
 
         expected = [
             attr.evolve(self.osis2m_training.entity_id, year=year)
-            for year in range(self.cmd.from_year, 2023)
+            for year in range(self.cmd.from_year, 2026)
         ]
         self.assertEqual(expected, result)

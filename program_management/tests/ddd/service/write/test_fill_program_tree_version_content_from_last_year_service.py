@@ -50,8 +50,8 @@ NEXT_ACADEMIC_YEAR_YEAR = 2022
 class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        OSIS2MFactory.multiple(5)[0]
-        tree_versions = OSIS2MSpecificVersionFactory.multiple(5)
+        OSIS2MFactory()[0]
+        tree_versions = OSIS2MSpecificVersionFactory()
         self.tree_version_from = tree_versions[0]
         self.tree_version_to_fill = tree_versions[1]
 
@@ -85,14 +85,11 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
 
-    @skip("Refactor")
     def test_cannot_fill_non_empty_tree(self):
-        cmd = attr.evolve(
-            self.cmd
-        )
+        fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
         with self.assertRaisesBusinessException(ProgramTreeNonEmpty):
-            fill_program_tree_version_content_from_program_tree_version(cmd)
+            fill_program_tree_version_content_from_program_tree_version(self.cmd)
 
     def test_if_learning_unit_is_not_present_in_next_year_then_attach_its_current_year_version(self):
         ue_node = NodeLearningUnitYearFactory(year=self.cmd.from_year, end_date=self.cmd.from_year)
@@ -146,7 +143,7 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         }
         self.assertFalse(tree_entities_ids.intersection(entities_ids))
 
-    # TODO refactor this
+    @skip("Refactor")
     def test_do_not_overwrite_content_if_node_is_not_empty(self):
         subgroup_node = self.tree_version_from.tree.get_node_by_code_and_year("LOSIS202R", self.cmd.from_year)
         next_year_node = node_factory.copy_to_next_year(subgroup_node)
@@ -176,11 +173,11 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         self.assertCountEqual(expected, actual)
 
 
-class TestFillProgramTreeVersionContentFromSourceTreeVersion(DDDTestCase):
+class TestFillTransitionProgramTreeVersionContent(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        standard = OSIS2MFactory.multiple(5)[0]
-        specific_version = OSIS2MSpecificVersionFactory.multiple(5)[0]
+        standard = OSIS2MFactory()[0]
+        specific_version = OSIS2MSpecificVersionFactory()[0]
 
         self.transitions = OSIS2MSpecificVersionFactory.create_transition_from_tree_version(specific_version)
 

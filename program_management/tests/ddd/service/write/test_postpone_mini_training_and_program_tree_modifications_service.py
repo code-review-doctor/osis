@@ -24,6 +24,8 @@
 import attr
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.command import GetMiniTrainingCommand
 from education_group.ddd.service.read import get_mini_training_service
 from program_management.ddd.command import PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand
@@ -36,7 +38,7 @@ class TestPostponeMiniTrainingAndProgramTreeModificationsService(DDDTestCase):
     def setUp(self):
         super().setUp()
 
-        self.minecon = MINECONFactory.multiple(5)[0]
+        self.minecon = MINECONFactory()[0]
         self.minecon_mini_training = get_mini_training_service.get_mini_training(
             GetMiniTrainingCommand(acronym=self.minecon.entity_id.offer_acronym, year=self.minecon.entity_id.year)
         )
@@ -44,7 +46,7 @@ class TestPostponeMiniTrainingAndProgramTreeModificationsService(DDDTestCase):
         self.cmd = PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand(
             abbreviated_title=self.minecon.entity_id.offer_acronym,
             year=self.minecon.entity_id.year,
-            status=self.minecon_mini_training.status.name,
+            status=ActiveStatusEnum.ACTIVE.name,
             code=self.minecon.program_tree_identity.code,
             credits=23,
             title_fr=self.minecon_mini_training.titles.title_fr,
@@ -60,7 +62,7 @@ class TestPostponeMiniTrainingAndProgramTreeModificationsService(DDDTestCase):
             remark_fr=None,
             remark_en=None,
             organization_name="ORG",
-            schedule_type=self.minecon_mini_training.schedule_type.name,
+            schedule_type=ScheduleTypeEnum.DAILY.name,
         )
 
     def test_credits_must_be_greater_than_0(self):

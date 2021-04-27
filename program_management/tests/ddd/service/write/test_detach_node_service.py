@@ -43,7 +43,7 @@ from testing.testcases import DDDTestCase
 class TestDetachNode(DDDTestCase):
     def setUp(self):
         super().setUp()
-        self.bachelor = OSIS1BAFactory().tree
+        self.bachelor = OSIS1BAFactory()[0].tree
         path = build_path(
             self.bachelor.root_node,
             self.bachelor.get_node_by_code_and_year("LOSIS101T", 2018),
@@ -53,7 +53,7 @@ class TestDetachNode(DDDTestCase):
         self.cmd = command.DetachNodeCommand(path=path, commit=True)
 
     def test_cannot_detach_option_which_is_used_by_finality(self):
-        master_2m = OSIS2MFactory().tree
+        master_2m = OSIS2MFactory()[0].tree
         path = build_path(
             master_2m.root_node,
             master_2m.get_node_by_code_and_year("LOSIS106G", 2018),

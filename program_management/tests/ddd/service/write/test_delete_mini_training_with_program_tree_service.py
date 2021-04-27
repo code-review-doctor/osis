@@ -44,7 +44,7 @@ class DeleteMiniTrainingWithProgramTreeTestCase(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.minecon = MINECONFactory.multiple(5)
+        self.minecon = MINECONFactory()
         [MiniTrainingFactory.from_node(tree_version.get_tree().root_node) for tree_version in self.minecon[1:]]
         self.minecon = self.minecon[0]
         self.minecon_mini_training = get_mini_training_service.get_mini_training(
@@ -104,6 +104,6 @@ class DeleteMiniTrainingWithProgramTreeTestCase(DDDTestCase):
 
         expected = [
             attr.evolve(self.minecon_mini_training.entity_id, year=year)
-            for year in range(self.cmd.from_year, 2023)
+            for year in range(self.cmd.from_year, 2026)
         ]
         self.assertEqual(expected, result)

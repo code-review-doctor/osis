@@ -49,11 +49,11 @@ from testing.testcases import DDDTestCase
 class TestPasteLearningUnitNodeService(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.tree_version = OSIS1BAFactory()
+        self.tree_version = OSIS1BAFactory()[0]
         self.tree = self.tree_version.tree
 
         self.learning_unit_node = NodeLearningUnitYearFactory(year=self.tree.root_node.year, persist=True)
-        self.mini_training_version = MINECONFactory()
+        self.mini_training_version = MINECONFactory()[0]
 
         path = build_path(
             self.tree.root_node,
@@ -167,8 +167,8 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
             paste_element_service.paste_element(cmd)
 
     def test_cannot_paste_list_finalities_inside_list_finalities_if_max_finalities_is_already_reached(self):
-        osis2m = OSIS2MFactory().tree
-        arke2m = ARKE2MFactory().tree
+        osis2m = OSIS2MFactory()[0].tree
+        arke2m = ARKE2MFactory()[0].tree
 
         path = build_path(
             osis2m.root_node,

@@ -34,7 +34,7 @@ from testing.testcases import DDDTestCase
 class TestUpLinkService(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.tree = OSIS1BAFactory().tree
+        self.tree = OSIS1BAFactory()[0].tree
         self.cmd = OrderUpLinkCommand(
             path=program_tree.build_path(self.tree.root_node, self.tree.root_node.children_as_nodes[1])
         )

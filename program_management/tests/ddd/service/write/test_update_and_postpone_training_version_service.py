@@ -37,8 +37,8 @@ from testing.testcases import DDDTestCase
 class TestUpdateTrainingVersion(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.osis2m_standard_version = OSIS2MFactory.multiple(5)[0]
-        self.osis2m_specific_version = OSIS2MSpecificVersionFactory.multiple(5)[0]
+        self.osis2m_standard_version = OSIS2MFactory()[0]
+        self.osis2m_specific_version = OSIS2MSpecificVersionFactory()[0]
 
         self.cmd = UpdateTrainingVersionCommand(
             offer_acronym=self.osis2m_specific_version.entity_id.offer_acronym,

@@ -28,6 +28,7 @@ import factory.fuzzy
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from education_group.models.enums.constraint_type import ConstraintTypes
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
 from education_group.ddd.business_types import *
@@ -59,8 +60,11 @@ class NodeFactory(factory.Factory):
     def persist(obj, create, extracted, **kwargs):
         if extracted:
             from program_management.tests.ddd.factories import program_tree as tree_factory
-            node_repository.NodeRepository.create(obj)
-            tree_factory.ProgramTreeFactory(root_node=obj, persist=True, load_fixture=True)
+            try:
+                node_repository.NodeRepository.get(obj.entity_id)
+            except exception.NodeNotFoundException:
+                node_repository.NodeRepository.create(obj)
+                tree_factory.ProgramTreeFactory(root_node=obj, persist=True, load_fixture=True)
 
 
 class CampusFactory(factory.Factory):

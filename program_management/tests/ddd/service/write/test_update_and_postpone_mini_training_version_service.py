@@ -36,8 +36,8 @@ from testing.testcases import DDDTestCase
 class TestUpdateAndPostponeMiniTrainingVersion(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.minecon_standard_version = MINECONFactory.multiple(5)[0]
-        self.minecon_specific_version = MINECONSpecificVersionFactory.multiple(5)[0]
+        self.minecon_standard_version = MINECONFactory()[0]
+        self.minecon_specific_version = MINECONSpecificVersionFactory()[0]
 
         self.cmd = UpdateMiniTrainingVersionCommand(
             offer_acronym=self.minecon_specific_version.entity_id.offer_acronym,

@@ -30,10 +30,12 @@ import mock
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
     get_fake_mini_training_repository, get_fake_training_repository, FakeGroupRepository
 from program_management.ddd.business_types import *
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository, FakeProgramTreeVersionRepository, \
@@ -112,6 +114,10 @@ class DDDTestCase(TestCase):
             "program_management.ddd.repositories.program_tree_version.ProgramTreeVersionRepository",
             self.fake_program_tree_version_repository
         )
+        self.mock_service(
+            "program_management.ddd.repositories.load_authorized_relationship.load",
+            return_value=AuthorizedRelationshipListFactory.load_from_fixture()
+        )
 
         self.mock_service(
             "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
@@ -151,7 +157,7 @@ class DDDTestCase(TestCase):
         )
         self.mock_service(
             "program_management.ddd.domain.service.validation_rule.FieldValidationRule.get",
-            return_value=namedtuple("Credits", "initial_value")(15)
+            side_effect=get_field_validation_rule
         )
 
         self.mock_service(
@@ -321,3 +327,11 @@ def get_all_program_tree_version_identities(
            program_tree_version_identity.transition_name,
            program_tree_version_identity.offer_acronym)
     ]
+
+
+def get_field_validation_rule(node_type: EducationGroupTypesEnum, field_name: str, is_version: bool = False):
+    if field_name == "title_fr":
+        return namedtuple("Title", "initial_value")("TitleFR")
+    elif field_name == 'abbreviated_title':
+        return namedtuple("AbbreviatedTitle", "initial_value")("AbbrevTitle")
+    return namedtuple("Credits", "initial_value")(15)

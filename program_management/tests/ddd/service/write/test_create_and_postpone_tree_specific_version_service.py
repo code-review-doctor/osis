@@ -22,7 +22,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import namedtuple
 
 from program_management.ddd import command
 from program_management.ddd.domain.exception import VersionNameAlreadyExist
@@ -37,7 +36,7 @@ class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
 
-        self.standard_bachelor = OSIS1BAFactory.multiple(5)[0]  # type: ProgramTreeVersion
+        self.standard_bachelor = OSIS1BAFactory()[0]
         self.cmd = command.CreateProgramTreeSpecificVersionCommand(
             end_year=self.standard_bachelor.end_year.year,
             offer_acronym=self.standard_bachelor.entity_id.offer_acronym,
@@ -46,14 +45,6 @@ class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
             transition_name=NOT_A_TRANSITION,
             title_fr="title in fr",
             title_en="Title in english",
-        )
-        self.mock_service(
-            "program_management.ddd.domain.service.generate_node_code.GenerateNodeCode._generate_node_code",
-            side_effect=generate_node_code
-        )
-        self.mock_service(
-            "program_management.ddd.domain.service.validation_rule.FieldValidationRule.get",
-            return_value=namedtuple("Credits", "initial_value")(15)
         )
 
     def test_cannot_create_specific_version_if_version_already_exists_in_the_future(self):
@@ -82,7 +73,3 @@ class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
             ) for year in range(self.cmd.start_year, 2026)
         ]
         self.assertEqual(expected, result)
-
-
-def generate_node_code(code, child_node_type):
-    return code[:-1] + "X"

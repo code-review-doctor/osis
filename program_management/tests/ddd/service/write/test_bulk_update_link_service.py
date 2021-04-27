@@ -36,7 +36,7 @@ from testing.testcases import DDDTestCase
 class TestBulkUpdateLink(DDDTestCase):
     def setUp(self) -> None:
         super().setUp()
-        self.tree = OSIS1BAFactory().tree
+        self.tree = OSIS1BAFactory()[0].tree
         self.cmd = BulkUpdateLinkCommand(
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
