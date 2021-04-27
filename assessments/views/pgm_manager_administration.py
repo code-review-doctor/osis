@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -210,9 +210,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 @permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
-    current_academic_yr = academic_year.current_academic_year()
     return render(request, "admin/pgm_manager.html", {
-        'academic_year': current_academic_yr,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
         'offer_types': __search_offer_types(),
@@ -247,7 +245,6 @@ def pgm_manager_search(request):
     current_academic_yr = academic_year.current_academic_year()
 
     data = {
-        'academic_year': current_academic_yr,
         'person': manager_person,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
