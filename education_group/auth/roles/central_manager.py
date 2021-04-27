@@ -35,7 +35,7 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.can_access_externallearningunityear': rules.always_allow,
             'base.view_educationgroup': rules.always_allow,
             'base.add_training':
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_element_only_inside_standard_program &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.add_minitraining':
@@ -134,11 +134,11 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.add_training_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.add_training_transition_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
-                predicates.is_user_attached_to_management_entity &
+                predicates.is_education_group_type_authorized_according_to_user_scope &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.fill_training_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
