@@ -26,12 +26,12 @@
 import collections
 import datetime
 from collections import OrderedDict
-from typing import Dict, Iterable, List
+from typing import Dict, Iterable, List, Optional
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q
-from django.db.models.expressions import F, Func, RawSQL, Value
+from django.db.models import Q, BooleanField
+from django.db.models.expressions import F, Func, RawSQL, Value, Case, When
 from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -92,7 +92,7 @@ class EntityVersionQuerySet(CTEQuerySet):
         else:
             return self
 
-    def active_for_academic_year(self, academic_year: AcademicYear):
+    def active_for_academic_year(self, academic_year: Optional[AcademicYear]):
         if academic_year:
             return self.filter(
                 Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
@@ -529,6 +529,31 @@ class EntityVersion(SerializableModel):
                 nodes[row['parent_id']].append_child(node)
 
         return nodes[tree[0]['entity_id']].to_json(limit)
+
+    @classmethod
+    def is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> bool:
+        # academic_year = AcademicYear.objects.get(year=self.get_group().year)
+        current_clause = (
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                        Q(start_date__lte=academic_year.start_date) &
+                        (
+                                Q(end_date__isnull=True) |
+                                Q(end_date__gte=academic_year.end_date)
+                        )
+                )
+        )
+        entity = cls.objects.filter(
+            acronym=acronym_entity,
+        ).annotate(
+            active_entity_version=Case(
+                When(current_clause, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        ).order_by('-start_date').first()
+        return entity.active_entity_version if entity else False
 
 
 def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):

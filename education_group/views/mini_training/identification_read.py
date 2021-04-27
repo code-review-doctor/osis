@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.db.models import Case, When, Value, BooleanField, Q
+from django.utils.functional import cached_property
 from reversion.models import Version
 
 from base.models.academic_year import AcademicYear
@@ -47,7 +48,10 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
             **super().get_context_data(**kwargs),
             "history": self.get_related_history(),
             "permission_object": self.get_permission_object(),
-            "active_management_entity": self.is_entity_active(self.get_group().management_entity.acronym),
+            "active_management_entity": EntityVersion.is_entity_active(
+                self.get_group().management_entity.acronym,
+                self.academic_year
+            ),
         }
 
     def get_related_history(self):
@@ -76,26 +80,6 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
 
-    def is_entity_active(self, acronym_entity: str) -> bool:
-        academic_year = AcademicYear.objects.get(year=self.program_tree_version_identity.year)
-        current_clause = (
-            Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
-            Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
-            (
-                Q(start_date__lte=academic_year.start_date) &
-                (
-                    Q(end_date__isnull=True) |
-                    Q(end_date__gte=academic_year.end_date)
-                )
-            )
-        )
-        entity = EntityVersion.objects.filter(
-            acronym=acronym_entity,
-        ).annotate(
-            active_entity_version=Case(
-                When(current_clause, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
-            )
-        ).order_by('-start_date').first()
-        return entity.active_entity_version if entity else None
+    @cached_property
+    def academic_year(self):
+        return AcademicYear.objects.get(year=self.node_identity.year)
