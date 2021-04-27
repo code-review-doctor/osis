@@ -557,9 +557,9 @@ class EntityVersion(SerializableModel):
     @classmethod
     def get_message_is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> str:
         if acronym_entity and not cls.is_entity_active(acronym_entity, academic_year):
-            msg = _('The entity %(acronym_entity)s is not active for this academic year' % {
+            msg = _('The entity %(acronym_entity)s is not active for this academic year') % {
                 'acronym_entity': acronym_entity
-            })
+            }
         else:
             msg = None
         return msg
