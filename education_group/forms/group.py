@@ -151,20 +151,16 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
     def get_model_permission_filter_kwargs(self) -> Dict:
         return {'context': self.get_context()}
 
-    @cached_property
-    def __academic_year(self):
+    def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
         academic_year = self.initial.get('academic_year', None)
         if academic_year and not isinstance(academic_year, AcademicYear):
             academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
-        return academic_year
-
-    def __init_management_entity_field(self):
-        old_entity = self.initial.get('management_entity', None)
-        msg = EntityVersion.get_message_is_entity_active(old_entity, self.__academic_year)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
-            academic_year=self.__academic_year,
+            academic_year=academic_year,
             help_text=msg
         )
