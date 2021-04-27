@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -33,13 +33,16 @@ from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex
+from base.models import campus
 from base.models import entity_version
-from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 
 PARTICULAR = "PARTICULAR"
 STANDARD = "STANDARD"
@@ -55,14 +58,14 @@ class GroupFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),
         required=False,
         label=_('Category'),
         field_name='education_group_type__category',
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("female plural", "All")
     )
     education_group_type = filters.ModelMultipleChoiceFilter(
         queryset=EducationGroupType.objects.none(),
@@ -89,12 +92,18 @@ class GroupFilter(FilterSet):
         required=False,
         label=_('Acronym/Short title'),
     )
-    title_fr = filters.CharFilter(
-        field_name="title_fr",
+    full_title_fr = filters.CharFilter(
+        field_name="full_title_fr",
         method='filter_education_group_year_field',
         max_length=255,
         required=False,
         label=_('Title')
+    )
+    main_teaching_campus = filters.ModelChoiceFilter(
+        queryset=campus.find_main_campuses(),
+        label=_("Learning location"),
+        required=False,
+        empty_label=pgettext_lazy("male plural", "All"),
     )
     partial_acronym = filters.CharFilter(
         field_name="partial_acronym",
@@ -109,7 +118,7 @@ class GroupFilter(FilterSet):
         required=False,
         label=_('Version'),
         field_name='version',
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
 
     with_entity_transition = filters.BooleanFilter(
@@ -125,9 +134,10 @@ class GroupFilter(FilterSet):
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
             ('academic_year__year', 'academic_year'),
-            ('title_fr', 'title_fr'),
+            ('full_title_fr', 'full_title_fr'),
             ('type_ordering', 'type'),
-            ('entity_management_version', 'management_entity')
+            ('entity_management_version', 'management_entity'),
+            ('main_teaching_campus_name', 'main_teaching_campus'),
         ),
         widget=forms.HiddenInput
     )
@@ -137,19 +147,22 @@ class GroupFilter(FilterSet):
         fields = [
             'acronym',
             'partial_acronym',
-            'title_fr',
+            'full_title_fr',
             'education_group_type__name',
             'management_entity',
             'with_entity_subordinated',
             'version',
-            'with_entity_transition'
+            'with_entity_transition',
+            'main_teaching_campus'
         ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
-        self.form.fields['academic_year'].initial = starting_academic_year()
+        self.form.fields['academic_year'].initial = AcademicYear.objects.filter(
+            year__in=EducationGroupSwitchCalendar().get_target_years_opened()
+        ).first()
         self.form.fields['category'].initial = education_group_categories.TRAINING
         self.form.fields["with_entity_subordinated"].initial = kwargs.pop('with_entity_subordinated', True)
         self.form.fields["version"].initial = kwargs.pop('version', None)
@@ -165,9 +178,12 @@ class GroupFilter(FilterSet):
     def filter_education_group_year_field(queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
 
-    def filter_by_transition(self, queryset, name, value):
+    @staticmethod
+    def filter_by_transition(queryset, name, value):
         if not value:
-            return queryset.exclude(educationgroupversion__is_transition=True)
+            return queryset.filter(
+                Q(educationgroupversion__transition_name=NOT_A_TRANSITION) | Q(educationgroupversion__isnull=True)
+            )
         return queryset
 
     def get_queryset(self):
@@ -181,7 +197,12 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        return GroupYear.objects.all().annotate(
+        standard_clause = (
+                Q(educationgroupversion__version_name='') | Q(educationgroupversion__version_name__isnull=True)
+        )
+        group_clause = Q(educationgroupversion__isnull=True)
+        not_transition_clause = Q(educationgroupversion__transition_name=NOT_A_TRANSITION)
+        return GroupYear.objects.all().select_related('element', 'academic_year').annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
@@ -195,39 +216,27 @@ class GroupFilter(FilterSet):
                 When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
                      then=Value(PARTICULAR)),
                 default=Value(STANDARD),
-                output_field=CharField(),)
+                output_field=CharField(), )
         ).annotate(
             complete_title_fr=Case(
-                When(
-                    Q(educationgroupversion__isnull=False),
-                    then=Case(
-                        When(Q(educationgroupversion__is_transition=True) &
-                             Q(educationgroupversion__version_name=''),
-                             then=Concat('acronym', Value('[Transition]'))),
-                        When(~Q(educationgroupversion__version_name='') &
-                             Q(educationgroupversion__is_transition=True),
-                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
-                        When(~Q(educationgroupversion__version_name='') &
-                             Q(educationgroupversion__is_transition=False),
-                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
-                        default='acronym',
-                        output_field=CharField()
-                    )
-                ),
+                When(~group_clause & standard_clause & ~not_transition_clause,
+                     then=Concat('acronym', Value('['), 'educationgroupversion__transition_name', Value(']'))),
+                When(~group_clause & ~standard_clause & ~not_transition_clause,
+                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value('-'),
+                                 'educationgroupversion__transition_name', Value(']'))),
+                When(~group_clause & ~standard_clause & not_transition_clause,
+                     then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
                 default='acronym',
                 output_field=CharField()
             )
-        ).annotate(
-            title=Case(
-                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__title_fr=''),
-                     then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
-                default='title_fr',
-                output_field=CharField(),)
+        ).annotate_full_titles().annotate(
+            main_teaching_campus_name=Case(
+                default='main_teaching_campus__name',
+                output_field=CharField())
         )
 
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)
         qs = super().filter_queryset(queryset)
-        order_fields = qs.query.order_by + ('id', )
+        order_fields = qs.query.order_by + ('academic_year__year', 'id')
         return qs.order_by(*order_fields)
-

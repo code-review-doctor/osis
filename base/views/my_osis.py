@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,11 +35,12 @@ from django.utils import translation
 from django.utils.translation import gettext as _
 
 import base.business.learning_unit
-from attribution import models as mdl_attr
 from base import models as mdl
+from base.auth.roles import tutor as tutor_mdl
 from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
+from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models import message_history as message_history_mdl
 
 
@@ -133,8 +134,8 @@ def profile_attributions(request):
 @login_required
 def _get_data(request):
     person = mdl.person.find_by_user(request.user)
-    tutor = mdl.tutor.find_by_person(person)
-    programs = mdl.program_manager.find_by_person(person).prefetch_related(
+    tutor = tutor_mdl.find_by_person(person)
+    programs = base.auth.roles.program_manager.find_by_person(person).prefetch_related(
         Prefetch(
             'education_group__educationgroupyear_set',
             queryset=EducationGroupYear.objects.filter(
@@ -144,14 +145,15 @@ def _get_data(request):
         )
     ).order_by('education_group__educationgroupyear__acronym').distinct()
 
-    return {'person': person,
-            'addresses': mdl.person_address.find_by_person(person),
-            'tutor': tutor,
-            'attributions': mdl_attr.attribution.search(tutor=tutor) if tutor else None,
-            'programs': programs,
-            'supported_languages': settings.LANGUAGES,
-            'default_language': settings.LANGUAGE_CODE,
-            'summary_submission_opened': base.business.learning_unit.is_summary_submission_opened()}
+    return {
+        'person': person,
+        'addresses': mdl.person_address.find_by_person(person),
+        'tutor': tutor,
+        'learning_unit_years_attributed': _get_learning_unit_years_attributed(tutor),
+        'programs': programs,
+        'supported_languages': settings.LANGUAGES,
+        'default_language': settings.LANGUAGE_CODE,
+    }
 
 
 def get_messages_formset(my_messages):
@@ -162,3 +164,9 @@ def get_messages_formset(my_messages):
                                 'read': message_hist.read_by_user
                                 } for message_hist in my_messages]
     return formset_factory(MyMessageForm, extra=0)(initial=initial_formset_content)
+
+
+def _get_learning_unit_years_attributed(tutor):
+    res = LearningUnitYear.objects.filter(learning_container_year__attributionnew__tutor=tutor,
+                                          learning_container_year__attributionnew__decision_making='').distinct()
+    return list(res)

@@ -9,10 +9,10 @@ servers:
          - qa # Staging server
          - test # Test server
  - url: https://osis.uclouvain.be/api/v1/education_group/
-   description: Production server
+   description: 'Production server'
 info:
-  version: '1'
-  title: Education Group Service
+  version: '1.06'
+  title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
 paths:
@@ -21,86 +21,124 @@ paths:
       description: Return a list of all the training with optional filtering.
       operationId: trainings_list
       parameters:
-      - in: query
-        name: limit
-        schema:
-          description: Number of results to return per page.
-          type: integer
-      - in: query
-        name: offset
-        schema:
-          description: The initial index from which to return the results.
-          type: integer
-      - in: query
-        name: acronym
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: partial_acronym
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: title
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: from_year
-        schema:
-          description: From which training year we want to display
-          type: integer
-      - in: query
-        name: to_year
-        schema:
-          description: To which training year we want to display
-          type: integer
-      - in: query
-        name: title_english
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: ordering
-        schema:
-          description: Which field to use when ordering the results.
-          type: string
-      - in: query
-        name: search
-        schema:
-          description: A search term.
-          type: string
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: acronym
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: partial_acronym
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: title
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: education_group_type
+          schema:
+            description: Filter result by specified training types
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: active
+          schema:
+            description: Filter result by specified active status of training
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: from_year
+          schema:
+            description: From which training year we want to display
+            type: integer
+        - in: query
+          name: to_year
+          schema:
+            description: To which training year we want to display
+            type: integer
+        - in: query
+          name: title_english
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: campus
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: ares_ability
+          schema:
+            description: ''
+            type: integer
+        - in: query
+          name: year
+          schema:
+            description: ''
+            type: integer
+        - in: query
+          name: ordering
+          schema:
+            description: Which field to use when ordering the results.
+            type: string
+        - in: query
+          name: search
+          schema:
+            description: A search term.
+            type: string
+        - in: query
+          name: study_domain
+          schema:
+            description: UUID of main study domain
+            type: string
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTraining'
+                $ref: '#/components/schemas/PaginatedTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
       tags:
-      - trainings
+        - trainings
   /trainings/{year}/{acronym}:
     get:
       description: Return the detail of the training
       operationId: trainings_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -115,24 +153,100 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
-  /trainings/{year}/{acronym}/tree:
+        - trainings
+  /trainings/{year}/{acronym}/prerequisites:
     get:
-      description: Return the tree of the training
-      operationId: trainings_tree
+      description: Return the prerequisites of the learning units of the training (standard version)
+      operationId: training_prerequisites_official
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/versions/{version_name}:
+    get:
+      description: Return the detail of the training version
+      operationId: training_version
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetailed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/versions/{version_name}/tree:
+    get:
+      description: Return the tree of the version
+      operationId: versions_tree
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -147,7 +261,84 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+        - trainings
+  /trainings/{year}/{acronym}/versions/{version_name}/title:
+    get:
+      description: Return the title of the training
+      operationId: trainingsversiontitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/tree:
+    get:
+      description: Return the tree of the training
+      operationId: trainings_tree
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
   /trainings/{year}/{acronym}/title:
     get:
       description: Return the title of the training
@@ -192,18 +383,18 @@ paths:
       description: Return the detail of the group
       operationId: groups_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -218,24 +409,24 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - groups
+        - groups
   /groups/{year}/{partial_acronym}/tree:
     get:
       description: Return the tree of the group
       operationId: groups_tree
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -250,7 +441,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - groups
+        - groups
   /groups/{year}/{partial_acronym}/title:
     get:
       description: Return the title of the group
@@ -290,6 +481,30 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - groups
+  /hops/{year}:
+    get:
+      description: Return the list of used habilitations for a given year.
+      operationId: habilitations_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hops'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - habilitation_list
   /mini_trainings/:
     get:
       description: Return a list of all the mini_trainings with optional filtering.
@@ -331,14 +546,33 @@ paths:
             description: To which mini-training year we want to display
             type: integer
         - in: query
+          name: year
+          schema:
+            description: ''
+            type: integer
+        - in: query
           name: education_group_type
           schema:
-              description: Filter result by specified mini-training types
-              type: array
-              items:
-                type: string
+            description: Filter result by specified mini-training types
+            type: array
+            items:
+              type: string
           style: form
           explode: true
+        - in: query
+          name: active
+          schema:
+            description: Filter result by specified active status of mini-training
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+        - in: query
+          name: campus
+          schema:
+            description: ''
+            type: string
         - in: query
           name: ordering
           schema:
@@ -355,30 +589,92 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfMiniTraining'
+                $ref: '#/components/schemas/PaginatedMiniTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
       tags:
         - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}:
+  /mini_trainings/{year}/{acronym}/prerequisites:
+    get:
+      description: Return the prerequisites of the learning units of the mini-training (standard version)
+      operationId: mini-training_prerequisites_official
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfProgramTreePrerequisites'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/offer_roots:
+    get:
+      description: Return the list of offer roots for a mini training.
+      operationId: minitrainings_offer_roots
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTraining'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}:
     get:
       description: Return the detail of the mini-training
       operationId: minitrainings_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -393,24 +689,24 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}/tree:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the mini-training
       operationId: minitraining_tree
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -425,8 +721,8 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - mini_trainings
-  /mini_trainings/{year}/{partial_acronym}/title:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/title:
     get:
       description: Return the title of the mini training
       operationId: minitrainingstitle_read
@@ -438,7 +734,128 @@ paths:
             description: ''
             type: integer
         - in: path
-          name: partial_acronym
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/versions/{version_name}:
+    get:
+      description: Return the detail of the mini training version
+      operationId: mini_training_version
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiniTrainingDetailed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/versions/{version_name}/tree:
+    get:
+      description: Return the tree of the version
+      operationId: minitraining_version_tree
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{acronym}/versions/{version_name}/title:
+    get:
+      description: Return the title of the mini training
+      operationId: minitrainings_title_version_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
           required: true
           schema:
             description: ''
@@ -492,10 +909,94 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    ArrayOfTraining:
+    Pagination:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+        previous:
+          type: string
+          format: uri
+    ArrayOfProgramTreePrerequisites:
       type: array
       items:
-        $ref: '#/components/schemas/Training'
+        $ref: '#/components/schemas/ProgramTreePrerequisites'
+    ProgramTreePrerequisites:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        code:
+          type: string
+        title:
+          type: string
+        title_en:
+          type: string
+        prerequisites_string:
+          type: string
+          example: (codeA OR codeB) AND (codeC)
+        prerequisites:
+          type: array
+          items:
+            $ref: '#/components/schemas/NodeBase'
+    NodeBase:
+      type: object
+      properties:
+        code:
+          type: string
+        url:
+          type: string
+          format: uri
+        title:
+          type: string
+        title_en:
+          type: string
+    Hops:
+      type: object
+      properties:
+        count:
+          type: integer
+        ares_abilities:
+          type: array
+          items:
+            type: integer
+    ArrayOfVersions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Version'
+    Version:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        version_name:
+          type: string
+        code:
+          type: string
+        transition_name:
+          type: string
+        is_transition:
+          type: boolean
+      required:
+        - url
+        - version_name
+        - code
+        - transition_name
+        - is_transition
+    PaginatedTraining:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Training'
     Training:
       type: object
       properties:
@@ -512,6 +1013,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         academic_year:
           type: number
         administration_entity:
@@ -522,7 +1025,15 @@ components:
           type: string
         management_faculty:
           type: string
+        ares_ability:
+          type: integer
+        ares_graca:
+          type: integer
+        ares_study:
+          type: integer
         partial_title:
+          type: string
+        partial_title_en:
           type: string
       required:
         - url
@@ -534,6 +1045,9 @@ components:
         - academic_year
         - administration_entity
         - management_entity
+        - ares_ability
+        - ares_graca
+        - ares_study
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'
@@ -566,7 +1080,7 @@ components:
             main_teaching_campus:
               $ref: '#/components/schemas/Campus'
             dissertation:
-               type: boolean
+              type: boolean
             internship:
               $ref: '#/components/schemas/InternshipPresenceEnum'
             internship_text:
@@ -610,7 +1124,7 @@ components:
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
             keywords:
-             type: string
+              type: string
             duration:
               type: integer
               minimum: 1
@@ -624,6 +1138,8 @@ components:
               type: integer
               minimum: 1
             remark:
+              type: string
+            remark_en:
               type: string
             min_constraint:
               type: integer
@@ -659,6 +1175,12 @@ components:
               type: string
             domain_code:
               type: string
+            version_name:
+              type: string
+            transition_name:
+              type: string
+            versions:
+              $ref: '#/components/schemas/ArrayOfVersions'
     GroupDetailed:
       type: object
       properties:
@@ -681,6 +1203,8 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         credits:
           type: integer
           minimum: 1
@@ -696,12 +1220,19 @@ components:
           type: string
         remark:
           type: string
+        remark_en:
+          type: string
         campus:
           $ref: '#/components/schemas/Campus'
-    ArrayOfMiniTraining:
-      type: array
-      items:
-        $ref: '#/components/schemas/MiniTraining'
+    PaginatedMiniTraining:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/MiniTraining'
     MiniTraining:
       type: object
       properties:
@@ -724,11 +1255,15 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
     MiniTrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/MiniTraining'
         - type: object
           properties:
+            version_name:
+              type: string
             credits:
               type: integer
               minimum: 1
@@ -744,6 +1279,8 @@ components:
               type: string
             remark:
               type: string
+            remark_en:
+              type: string
             campus:
               $ref: '#/components/schemas/Campus'
             keywords:
@@ -756,6 +1293,8 @@ components:
               $ref: '#/components/schemas/ScheduleTypeEnum'
             schedule_type_text:
               type: string
+            versions:
+              $ref: '#/components/schemas/ArrayOfVersions'
     Tree:
       type: object
       properties:
@@ -766,11 +1305,29 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        partial_title_en:
+          type: string
+        min_constraint:
+          type: integer
+          minimum: 1
+        max_constraint:
+          type: integer
+          minimum: 1
+        constraint_type:
+          $ref: '#/components/schemas/ConstraintTypeEnum'
+        remark:
+          type: string
+        remark_en:
+          type: string
+        version_name:
           type: string
         children:
           type: array
@@ -803,11 +1360,15 @@ components:
           type: string
         title:
           type: string
+        title_en:
+          type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        partial_title_en:
           type: string
         credits:
           type: number
@@ -833,7 +1394,11 @@ components:
           type: boolean
         comment:
           type: string
+        comment_en:
+          type: string
         remark:
+          type: string
+        remark_en:
           type: string
         link_type:
           $ref: '#/components/schemas/NodeLinkTypeEnum'
@@ -849,6 +1414,8 @@ components:
           minimum: 1
         constraint_type:
           $ref: '#/components/schemas/ConstraintTypeEnum'
+        version_name:
+          type: string
         children:
           type: array
           items:
@@ -864,32 +1431,33 @@ components:
         - access_condition
         - comment
         - remark
+        - remark_en
         - link_type
         - link_type_text
         - children
     ActiveEnum:
       type: string
       enum:
-       - ACTIVE
-       - INACTIVE
-       - RE_REGISTRATION
+        - 'ACTIVE'
+        - 'INACTIVE'
+        - 'RE_REGISTRATION'
     NodeTypeEnum:
       type: string
       enum:
-        - GROUP
-        - TRAINING
-        - MINI_TRAINING
-        - LEARNING_UNIT
+        - 'GROUP'
+        - 'TRAINING'
+        - 'MINI_TRAINING'
+        - 'LEARNING_UNIT'
     LearningUnitTypeEnum:
       type: string
       enum:
-        - COURSE
-        - INTERNSHIP
-        - DISSERTATION
-        - OTHER_COLLECTIVE
-        - OTHER_INDIVIDUAL
-        - MASTER_THESIS
-        - EXTERNAL
+        - 'COURSE'
+        - 'INTERNSHIP'
+        - 'DISSERTATION'
+        - 'OTHER_COLLECTIVE'
+        - 'OTHER_INDIVIDUAL'
+        - 'MASTER_THESIS'
+        - 'EXTERNAL'
     NodeSubTypeEnum:
       allOf:
         - $ref: '#/components/schemas/LearningUnitTypeEnum'
@@ -899,168 +1467,154 @@ components:
     NodeLinkTypeEnum:
       type: string
       enum:
-        - REFERENCE
+        - 'REFERENCE'
     InternshipPresenceEnum:
       type: string
       enum:
-        - YES
-        - NO
-        - OPTIONAL
+        - 'YES'
+        - 'NO'
+        - 'OPTIONAL'
     ScheduleTypeEnum:
       type: string
       enum:
-        - DAILY
-        - SHIFTED
-        - ADAPTED
+        - 'DAILY'
+        - 'SHIFTED'
+        - 'ADAPTED'
     ActivityPresenceEnum:
       type: string
       enum:
-        - YES
-        - NO
-        - OPTIONAL
+        - 'YES'
+        - 'NO'
+        - 'OPTIONAL'
     PrintOrientationEnum:
       type: string
       enum:
-        - NO_PRINT
-        - IN_HEADING_2_OF_DIPLOMA
-        - IN_EXPECTED_FORM
+        - 'NO_PRINT'
+        - 'IN_HEADING_2_OF_DIPLOMA'
+        - 'IN_EXPECTED_FORM'
     DurationUnitEnum:
       type: string
       enum:
-        - QUADRIMESTER
-        - TRIMESTER
-        - MONTH
-        - WEEK
-        - DAY
+        - 'QUADRIMESTER'
+        - 'TRIMESTER'
+        - 'MONTH'
+        - 'WEEK'
+        - 'DAY'
     ConstraintTypeEnum:
       type: string
       enum:
-        - CREDITS
-        - NUMBER_OF_ELEMENTS
+        - 'CREDITS'
+        - 'NUMBER_OF_ELEMENTS'
     DecreeCategoryEnum:
       type: string
       enum:
-        - FCONT
-        - BAS1
-        - BAS2
-        - AESS
-        - DEC1
-        - DEC2
-        - DES
-        - DEA
-        - DOC
-        - AES
-        - AUTRE
-        - BAC
-        - AP2C
-        - MA1
-        - MA2X
-        - MA2D
-        - MA2S
-        - MA2A
-        - MA2M
-        - AS2C
-        - MACO
-        - AESSB
-        - CAPS
-        - AS3C
-        - FODO
-        - DOCB
-        - CEMC
-        - MED
-        - VETE
+        - 'FCONT'
+        - 'DOC'
+        - 'BAC'
+        - 'MA1'
+        - 'MA2X'
+        - 'MA2D'
+        - 'MA2S'
+        - 'MA2A'
+        - 'MA2M'
+        - 'MACO'
+        - 'AESSB'
+        - 'CAPS'
+        - 'FODO'
+        - 'DOCB'
+        - 'CEMC'
     RateCodeEnum:
       type: string
       enum:
-        - NO_ADDITIONAL_FEES
-        - AESS_CAPAES
-        - MINERVAL_COMPLETE
-        - UNIVERSITY_CERTIFICATE
-        - ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION
-        - ACCESS_CONTEST
-        - UNIVERSITY_CERTIFICATE_30_CREDITS
-        - CERTIFICATE_MEDECINE_COMPETENCE
+        - 'NO_ADDITIONAL_FEES'
+        - 'AESS_CAPAES'
+        - 'MINERVAL_COMPLETE'
+        - 'UNIVERSITY_CERTIFICATE'
+        - 'ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION'
+        - 'ACCESS_CONTEST'
+        - 'UNIVERSITY_CERTIFICATE_30_CREDITS'
+        - 'CERTIFICATE_MEDECINE_COMPETENCE'
     TrainingTypeEnum:
       type: string
       enum:
-        - AGGREGATION
-        - CERTIFICATE_OF_PARTICIPATION
-        - CERTIFICATE_OF_SUCCESS
-        - CERTIFICATE_OF_HOLDING_CREDITS
-        - BACHELOR
-        - CERTIFICATE
-        - CAPAES
-        - RESEARCH_CERTIFICATE
-        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
-        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
-        - ACCESS_CONTEST
-        - LANGUAGE_CLASS
-        - ISOLATED_CLASS
-        - PHD
-        - FORMATION_PHD
-        - JUNIOR_YEAR
-        - PGRM_MASTER_120
-        - MASTER_MA_120
-        - MASTER_MD_120
-        - MASTER_MS_120
-        - PGRM_MASTER_180_240
-        - MASTER_MA_180_240
-        - MASTER_MD_180_240
-        - MASTER_MS_180_240
-        - MASTER_M1
-        - MASTER_MC
-        - INTERNSHIP
+        - 'AGGREGATION'
+        - 'CERTIFICATE_OF_PARTICIPATION'
+        - 'CERTIFICATE_OF_SUCCESS'
+        - 'CERTIFICATE_OF_HOLDING_CREDITS'
+        - 'BACHELOR'
+        - 'CERTIFICATE'
+        - 'CAPAES'
+        - 'RESEARCH_CERTIFICATE'
+        - 'UNIVERSITY_FIRST_CYCLE_CERTIFICATE'
+        - 'UNIVERSITY_SECOND_CYCLE_CERTIFICATE'
+        - 'ACCESS_CONTEST'
+        - 'LANGUAGE_CLASS'
+        - 'ISOLATED_CLASS'
+        - 'PHD'
+        - 'FORMATION_PHD'
+        - 'JUNIOR_YEAR'
+        - 'PGRM_MASTER_120'
+        - 'MASTER_MA_120'
+        - 'MASTER_MD_120'
+        - 'MASTER_MS_120'
+        - 'PGRM_MASTER_180_240'
+        - 'MASTER_MA_180_240'
+        - 'MASTER_MD_180_240'
+        - 'MASTER_MS_180_240'
+        - 'MASTER_M1'
+        - 'MASTER_MC'
+        - 'INTERNSHIP'
     GroupTypeEnum:
       type: string
       enum:
-        - COMMON_CORE
-        - MINOR_LIST_CHOICE
-        - MAJOR_LIST_CHOICE
-        - OPTION_LIST_CHOICE
-        - FINALITY_120_LIST_CHOICE
-        - FINALITY_180_LIST_CHOICE
-        - MOBILITY_PARTNERSHIP_LIST_CHOICE
-        - COMPLEMENTARY_MODULE
-        - SUB_GROUP
+        - 'COMMON_CORE'
+        - 'MINOR_LIST_CHOICE'
+        - 'MAJOR_LIST_CHOICE'
+        - 'OPTION_LIST_CHOICE'
+        - 'FINALITY_120_LIST_CHOICE'
+        - 'FINALITY_180_LIST_CHOICE'
+        - 'MOBILITY_PARTNERSHIP_LIST_CHOICE'
+        - 'COMPLEMENTARY_MODULE'
+        - 'SUB_GROUP'
     MiniTrainingTypeEnum:
       type: string
       enum:
-        - DEEPENING
-        - SOCIETY_MINOR
-        - ACCESS_MINOR
-        - OPEN_MINOR
-        - DISCIPLINARY_COMPLEMENT_MINOR
-        - FSA_SPECIALITY
-        - OPTION
-        - MOBILITY_PARTNERSHIP
+        - 'DEEPENING'
+        - 'SOCIETY_MINOR'
+        - 'ACCESS_MINOR'
+        - 'OPEN_MINOR'
+        - 'DISCIPLINARY_COMPLEMENT_MINOR'
+        - 'FSA_SPECIALITY'
+        - 'OPTION'
+        - 'MOBILITY_PARTNERSHIP'
     AcademicTypeEnum:
       type: string
       enum:
-        - NON_ACADEMIC
-        - NON_ACADEMIC_CREF
-        - ACADEMIC
+        - 'NON_ACADEMIC'
+        - 'NON_ACADEMIC_CREF'
+        - 'ACADEMIC'
     QuadrimesterEnum:
       type: string
       enum:
-        - Q1
-        - Q2
-        - Q3
-        - Q1and2
-        - Q1or2
+        - 'Q1'
+        - 'Q2'
+        - 'Q3'
+        - 'Q1and2'
+        - 'Q1or2'
     PeriodicityEnum:
       type: string
       enum:
-        - ANNUAL
-        - BIENNIAL_EVEN
-        - BIENNIAL_ODD
+        - 'ANNUAL'
+        - 'BIENNIAL_EVEN'
+        - 'BIENNIAL_ODD'
     ProposalTypeEnum:
       type: string
       enum:
-        - CREATION
-        - MODIFICATION
-        - TRANSFORMATION
-        - SUPPRESSION
-        - TRANSFORMATION_AND_MODIFICATION
+        - 'CREATION'
+        - 'MODIFICATION'
+        - 'TRANSFORMATION'
+        - 'SUPPRESSION'
+        - 'TRANSFORMATION_AND_MODIFICATION'
     Error:
       type: object
       properties:

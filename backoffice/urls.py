@@ -26,10 +26,13 @@
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.i18n import JavaScriptCatalog
 
 from base.views import common
 
-packages = ('assessments', 'base')
+js_info_dict = {
+    'packages': ('assessments',)
+}
 
 urlpatterns = (
     url(r'^login/$', common.login, name='login'),
@@ -39,6 +42,8 @@ urlpatterns = (
     url(r'^' + settings.ADMIN_URL, admin.site.urls),
     url(r'', include('base.urls')),
     url(r'^hijack/', include('hijack.urls', namespace='hijack')),
+    url(r'^jsi18n/', JavaScriptCatalog.as_view(), js_info_dict),
+
 )
 
 if 'assistant' in settings.INSTALLED_APPS:
@@ -63,6 +68,12 @@ if 'partnership' in settings.INSTALLED_APPS:
     )
 if 'continuing_education' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^continuing_education/', include('continuing_education.urls')),)
+if 'admission' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^admissions/', include('admission.urls', namespace='admissions')),
+        # API
+        url(r'^admissions/v1/', include('admission.api.urls_v1', namespace='admission_api_v1')),
+    )
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

@@ -26,6 +26,7 @@
 from distutils.util import strtobool
 
 from django import forms
+from django.core.exceptions import ImproperlyConfigured
 from django.core.validators import RegexValidator
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -95,11 +96,7 @@ class ValidationRuleMixin(WarningFormMixin):
         return result
 
     def field_reference(self, name):
-        return self._field_reference(self._meta.model, name)
-
-    @staticmethod
-    def _field_reference(model, name, *args):
-        return '.'.join([model._meta.db_table, name, *args])
+        raise ImproperlyConfigured('You must define a field reference in order to check for existing validation rules')
 
     def _set_rules_on_fields(self):
         for name, field in self.fields.items():
@@ -116,11 +113,12 @@ class ValidationRuleMixin(WarningFormMixin):
                 else:
                     field.initial = rule.initial_value if rule.initial_value not in ['False', 'True'] else bool(
                         strtobool(
-                            rule.initial_value))
+                            rule.initial_value)
+                    )
 
-                field.validators.append(
-                    RegexValidator(rule.regex_rule, rule.regex_error_message or None)
-                )
+                if rule.regex_rule:
+                    field.validators.append(RegexValidator(rule.regex_rule, rule.regex_error_message or None))
+                    field.widget.attrs.update({"pattern": rule.regex_rule})
 
     @staticmethod
     def change_status(field, rule):
@@ -135,6 +133,7 @@ class ValidationRuleMixin(WarningFormMixin):
 
         elif rule.status_field == ALERT:
             field.warning = True
+            field.widget.attrs["semi-required"] = True
 
         elif rule.status_field == NOT_REQUIRED:
             field.required = False

@@ -26,35 +26,38 @@
 import datetime
 from decimal import Decimal
 
-from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from base.forms.learning_unit import learning_unit_create_2
 from base.forms.learning_unit_proposal import ProposalBaseForm
 from base.forms.proposal import learning_unit_proposal
-from base.models import proposal_learning_unit, academic_year as academic_year_mdl
+from base.models import proposal_learning_unit
+from base.models.academic_year import AcademicYear
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
     learning_unit_year_periodicity, internship_subtypes, learning_unit_year_subtypes
 from base.models.enums.entity_type import SCHOOL
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
+from base.tests.factories.academic_calendar import generate_proposal_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.group import FacultyManagerGroupFactory, CentralManagerGroupFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
+from reference.tests.factories.language import EnglishLanguageFactory, FrenchLanguageFactory
 
 PROPOSAL_TYPE = proposal_type.ProposalType.TRANSFORMATION_AND_MODIFICATION.name
 PROPOSAL_STATE = proposal_state.ProposalState.FACULTY.name
@@ -69,7 +72,7 @@ class TestSave(TestCase):
             AcademicYearFactory(year=cls.current_academic_year.year - 10),
             AcademicYearFactory(year=cls.current_academic_year.year + 10)
         )
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        generate_proposal_calendars(cls.academic_years)
         today = datetime.date.today()
         cls.an_entity = EntityFactory(organization=cls.an_organization)
         cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.FACULTY,
@@ -84,12 +87,12 @@ class TestSave(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=cls.entity_version.entity,
         )
-        cls.language = LanguageFactory(code="EN")
+        cls.language = EnglishLanguageFactory()
         cls.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
                                    is_administration=True)
-        FacultyManagerGroupFactory()
-        CentralManagerGroupFactory()
-        cls.learning_unit_year = LearningUnitYearFakerFactory(
+        cls.faculty_person = FacultyManagerFactory(entity=cls.an_entity, with_child=True).person
+        cls.central_person = CentralManagerFactory(entity=cls.an_entity, with_child=True).person
+        cls.learning_unit_year = LearningUnitYearFactory(
             credits=Decimal(5),
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=cls.current_academic_year,
@@ -136,31 +139,24 @@ class TestSave(TestCase):
             'component-1-planned_classes': 1,
         }
 
-    def setUp(self):
-        self.person = PersonFactory()
-        self.person_entity = PersonEntityFactory(person=self.person, entity=self.an_entity)
-
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):
-        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.fields['state'].disabled)
 
     def test_learning_unit_proposal_form_get_as_central_manager(self):
-        self.person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.central_person, self.learning_unit_year)
         self.assertFalse(form.fields['state'].disabled)
 
     def test_learning_unit_proposal_form_get_as_central_manager_with_instance(self):
-        self.person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year, state=ProposalState.FACULTY.name,
             entity=self.entity_version.entity)
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year, proposal=proposal)
+        form = ProposalBaseForm(self.form_data, self.central_person, self.learning_unit_year, proposal=proposal)
         self.assertFalse(form.fields['state'].disabled)
         self.assertEqual(form.fields['state'].initial, ProposalState.FACULTY.name)
 
     def test_learning_unit_year_update(self):
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
         learning_unit_year = LearningUnitYear.objects.get(pk=self.learning_unit_year.id)
@@ -186,7 +182,7 @@ class TestSave(TestCase):
                          self.form_data['common_title_english'])
 
     def test_learning_container_update(self):
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -198,7 +194,7 @@ class TestSave(TestCase):
         self.assertEqual(learning_container_year.common_title_english, self.form_data['common_title_english'])
 
     def test_requirement_entity(self):
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -208,12 +204,16 @@ class TestSave(TestCase):
 
     def test_with_all_entities_set(self):
         today = datetime.date.today()
-        entity_1 = EntityFactory(organization=OrganizationFactory(type=organization_type.MAIN))
+        entity_1 = EntityFactory(
+            organization=OrganizationFactory(type=organization_type.MAIN),
+        )
         additional_entity_version_1 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
                                                            start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
                                                            entity=entity_1)
-        entity_2 = EntityFactory(organization=OrganizationFactory(type=organization_type.MAIN))
+        entity_2 = EntityFactory(
+            organization=OrganizationFactory(type=organization_type.MAIN),
+        )
         additional_entity_version_2 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
                                                            start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
@@ -222,7 +222,7 @@ class TestSave(TestCase):
         self.form_data["additional_entity_1"] = additional_entity_version_1.id
         self.form_data["additional_entity_2"] = additional_entity_version_2.id
 
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -245,7 +245,7 @@ class TestSave(TestCase):
         self.form_data["container_type"] = learning_container_year_types.INTERNSHIP
         self.form_data["internship_subtype"] = internship_subtypes.TEACHING_INTERNSHIP
 
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -257,7 +257,7 @@ class TestSave(TestCase):
 
     def test_creation_proposal_learning_unit(self):
         self.maxDiff = None
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -265,7 +265,7 @@ class TestSave(TestCase):
 
         self.assertEqual(a_proposal_learning_unt.type, PROPOSAL_TYPE)
         self.assertEqual(a_proposal_learning_unt.state, PROPOSAL_STATE)
-        self.assertEqual(a_proposal_learning_unt.author, self.person)
+        self.assertEqual(a_proposal_learning_unt.author, self.faculty_person)
         self.assertDictEqual(a_proposal_learning_unt.initial_data, self._get_initial_data_expected())
 
     def _get_initial_data_expected(self):
@@ -273,7 +273,7 @@ class TestSave(TestCase):
         initial_data_expected["learning_unit_year"]["credits"] = '5.00'
         initial_data_expected['entities'] = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity.id,
-            entity_container_year_link_type.ALLOCATION_ENTITY: None,
+            entity_container_year_link_type.ALLOCATION_ENTITY: self.entity_version.entity.id,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
         }
@@ -281,7 +281,7 @@ class TestSave(TestCase):
 
     def test_when_setting_additional_entity_to_none(self):
         self.form_data['additional_entity_1'] = None
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -291,47 +291,44 @@ class TestSave(TestCase):
     def test_creation_proposal_learning_unit_with_school_entity(self):
         self.entity_version.entity_type = SCHOOL
         self.entity_version.save()
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        self.assertTrue('entity' in form.errors[0])
+        form = ProposalBaseForm(self.form_data, self.faculty_person, self.learning_unit_year)
+        erroneous_fields = [key for error in form.errors for key in error.keys()]
+        self.assertTrue('entity' in erroneous_fields)
 
     def test_creation_proposal_learning_unit_with_not_linked_entity(self):
-        self.person_entity.entity = self.an_entity_school
-        self.person_entity.save()
-        form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        self.assertTrue('entity' in form.errors[1])
+        person = PersonFactory()
+        form = ProposalBaseForm(self.form_data, person, self.learning_unit_year)
+        erroneous_fields = [key for error in form.errors for key in error.keys()]
+        self.assertTrue('entity' in erroneous_fields)
 
     def test_academic_year_range_creation_proposal_central_manager(self):
-        LanguageFactory(code="FR")
-        central_manager = CentralManagerFactory()
+        FrenchLanguageFactory()
+        central_manager = CentralManagerFactory(entity=self.an_entity).person
         form = learning_unit_create_2.FullForm(
             central_manager,
             self.learning_unit_year.academic_year,
             start_year=self.learning_unit_year.academic_year,
             proposal_type=ProposalType.CREATION.name
         )
+        target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
         self.assertCountEqual(
             list(form.fields['academic_year'].queryset),
-            list(academic_year_mdl.find_academic_years(
-                start_year=self.current_academic_year.year,
-                end_year=self.current_academic_year.year + 6
-            ))
+            list(AcademicYear.objects.filter(year__in=target_years_opened))
         )
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
-        LanguageFactory(code="FR")
-        faculty_manager = FacultyManagerFactory()
+        FrenchLanguageFactory()
+        faculty_manager = FacultyManagerFactory(entity=self.an_entity).person
         form = learning_unit_create_2.FullForm(
             faculty_manager,
             self.learning_unit_year.academic_year,
             start_year=self.learning_unit_year.academic_year,
             proposal_type=ProposalType.CREATION.name
         )
+        target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
         self.assertCountEqual(
             list(form.fields['academic_year'].queryset),
-            list(academic_year_mdl.find_academic_years(
-                start_year=self.current_academic_year.year + 1,
-                end_year=self.current_academic_year.year + 6
-            ))
+            list(AcademicYear.objects.filter(year__in=target_years_opened))
         )
 
 
@@ -339,16 +336,13 @@ def build_initial_data(learning_unit_year, entity):
     initial_data_expected = {
         "learning_container_year": {
             "id": learning_unit_year.learning_container_year.id,
-            "acronym": learning_unit_year.acronym,
+            "acronym": learning_unit_year.learning_container_year.acronym,
             "common_title": learning_unit_year.learning_container_year.common_title,
             "container_type": learning_unit_year.learning_container_year.container_type,
-            "in_charge": learning_unit_year.learning_container_year.in_charge,
             "team": learning_unit_year.learning_container_year.team,
             "common_title_english": learning_unit_year.learning_container_year.common_title_english,
-            "is_vacant": learning_unit_year.learning_container_year.is_vacant,
-            "type_declaration_vacant": learning_unit_year.learning_container_year.type_declaration_vacant,
             "requirement_entity": entity.id,
-            "allocation_entity": None,
+            "allocation_entity": entity.id,
             "additional_entity_1": None,
             "additional_entity_2": None,
         },
@@ -366,13 +360,13 @@ def build_initial_data(learning_unit_year, entity):
             "quadrimester": learning_unit_year.quadrimester,
             "specific_title_english": learning_unit_year.specific_title_english,
             "professional_integration": learning_unit_year.professional_integration,
-            "attribution_procedure": learning_unit_year.attribution_procedure,
+            "other_remark": learning_unit_year.other_remark,
+            'other_remark_english': learning_unit_year.other_remark_english,
+            "faculty_remark": learning_unit_year.faculty_remark,
         },
         "learning_unit": {
             "id": learning_unit_year.learning_unit.id,
             'end_year': learning_unit_year.learning_unit.end_year,
-            "other_remark": learning_unit_year.learning_unit.other_remark,
-            "faculty_remark": learning_unit_year.learning_unit.faculty_remark,
         },
         "learning_component_years": [],
         "volumes": {}
@@ -383,10 +377,22 @@ def build_initial_data(learning_unit_year, entity):
 class TestProposalLearningUnitFilter(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_years = AcademicYearFactory.produce(None, 2, 5)
-        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
+        cls.academic_years = AcademicYearFactory.produce(create_current_academic_year().year, 2, 5)
+        generate_proposal_calendars(cls.academic_years)
+        cls.central_manager = CentralManagerFactory().person
+        cls.faculty_manager = FacultyManagerFactory().person
 
-    def test_initial_value_with_entity_subordinated(self):
+    def test_initial_value_with_entity_subordinated_central_manager(self):
+        self.client.force_login(self.central_manager.user)
+        proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
+        self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
+        self.assertEqual(
+            proposal_filter.form.fields['academic_year'].initial,
+            self.academic_years[3]  # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
+        )
+
+    def test_initial_value_with_entity_subordinated_faculty_manager(self):
+        self.client.force_login(self.faculty_manager.user)
         proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
         self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
         self.assertEqual(

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict
+
 from django.utils.translation import gettext_lazy as _
 
 from assistant.models import tutoring_learning_unit_year
-from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.models import learning_unit_enrollment, learning_unit_year as learn_unit_year_model, \
     academic_year
+from base.models.learning_unit_year import LearningUnitYear
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_type, proposal_state
 from cms.enums import entity_name
@@ -72,29 +74,22 @@ def _check_tutoring_learning_unit_year(tutoring):
 
 
 def _check_group_element_year_deletion(group_element_year):
-    if not group_element_year.parent:
+    if not group_element_year.parent_element:
         return {}
 
     return {
         group_element_year: _('%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s') % {
-            'subtype': _str_partim_or_full(group_element_year.child_leaf),
-            'acronym': group_element_year.child_leaf.acronym,
-            'group': group_element_year.parent.partial_acronym,
-            'year': group_element_year.child_leaf.academic_year
+            'subtype': _str_partim_or_full(group_element_year.child_element.learning_unit_year),
+            'acronym': group_element_year.child_element.learning_unit_year.acronym,
+            'group': group_element_year.parent_element.group_year.partial_acronym,
+            'year': group_element_year.child_element.learning_unit_year.academic_year
         }
-        }
+    }
 
 
-def _check_attribution_deletion(learning_unit_year):
+def _check_attribution_deletion(learning_unit_year: LearningUnitYear) -> Dict[AttributionNew, str]:
     msg = {}
     error_attribution = "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
-
-    for attribution in Attribution.objects.filter(learning_unit_year=learning_unit_year):
-        msg[attribution] = _(error_attribution) % {
-            'subtype': _str_partim_or_full(learning_unit_year),
-            'acronym': learning_unit_year.acronym,
-            'tutor': attribution.tutor,
-            'year': learning_unit_year.academic_year}
 
     for attribution_new in AttributionNew.objects.filter(
             learning_container_year=learning_unit_year.learning_container_year,
@@ -166,9 +161,6 @@ def delete_from_given_learning_unit_year(learning_unit_year):
     if next_year:
         msg.extend(delete_from_given_learning_unit_year(next_year))
 
-    if learning_unit_year.learning_container_year and learning_unit_year.is_full():
-        msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
-
     for component in learning_unit_year.learningcomponentyear_set.all():
         msg.extend(_delete_learning_component_year(component))
 
@@ -176,7 +168,13 @@ def delete_from_given_learning_unit_year(learning_unit_year):
 
     _decrement_end_year_learning_unit(learning_unit_year)
 
+    is_full = learning_unit_year.is_full()
+    has_learning_container_year = learning_unit_year.learning_container_year
+
     learning_unit_year.delete()
+
+    if has_learning_container_year and is_full:
+        msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
 
     msg.append(create_learning_unit_year_deletion_message(learning_unit_year))
     return msg
@@ -192,13 +190,11 @@ def _decrement_end_year_learning_unit(learning_unit_year):
         learning_unit_to_edit.save()
 
 
-def _delete_learning_container_year(learning_unit_container):
+def _delete_learning_container_year(learning_container_year):
     msg = []
-
-    for partim in learning_unit_container.get_partims_related():
+    for partim in learning_container_year.get_partims_related():
         msg.extend(delete_from_given_learning_unit_year(partim))
-    learning_unit_container.delete()
-
+    learning_container_year.delete()
     return msg
 
 

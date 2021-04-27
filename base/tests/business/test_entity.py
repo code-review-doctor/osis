@@ -28,7 +28,7 @@ from datetime import timedelta
 from django.test import TestCase
 
 from base.business.entity import get_entity_calendar, get_entities_ids
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity import EntityFactory
@@ -48,10 +48,10 @@ class EntityTestCase(TestCase):
                                                  end_date=self.current_academic_year.end_date)
         self.assertIsNone(get_entity_calendar(an_entity_version, self.current_academic_year))
 
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year,
                                                        start_date=self.current_academic_year.start_date,
                                                        end_date=self.current_academic_year.end_date,
-                                                       reference=academic_calendar_type.EXAM_ENROLLMENTS)
+                                                       reference=AcademicCalendarTypes.EXAM_ENROLLMENTS.name)
         EntityCalendarFactory(entity=an_entity,
                               academic_calendar=an_academic_calendar,
                               start_date=an_academic_calendar.start_date,
@@ -64,10 +64,10 @@ class EntityTestCase(TestCase):
                                                  start_date=self.current_academic_year.start_date,
                                                  end_date=self.current_academic_year.end_date)
 
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year,
                                                        start_date=self.current_academic_year.start_date,
                                                        end_date=self.current_academic_year.end_date,
-                                                       reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+                                                       reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
         an_entity_calendar = EntityCalendarFactory(entity=an_entity,
                                                    academic_calendar=an_academic_calendar,
                                                    start_date=an_academic_calendar.start_date,
@@ -85,10 +85,10 @@ class EntityTestCase(TestCase):
                                                        end_date=self.current_academic_year.end_date,
                                                        parent=an_entity_parent)
 
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
+        an_academic_calendar = AcademicCalendarFactory(data_year=self.current_academic_year,
                                                        start_date=self.current_academic_year.start_date,
                                                        end_date=self.current_academic_year.end_date,
-                                                       reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+                                                       reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name)
         an_parent_entity_calendar = EntityCalendarFactory(entity=an_entity_parent,
                                                           academic_calendar=an_academic_calendar,
                                                           start_date=an_academic_calendar.start_date,

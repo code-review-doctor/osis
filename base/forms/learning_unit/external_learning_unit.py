@@ -36,7 +36,7 @@ from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementFo
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
     LearningContainerYearModelForm, LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
-from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, LearningUnitPartimModelForm, \
+from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_INHERIT_FIELDS, LearningUnitPartimModelForm, \
     merge_data
 from base.forms.utils.acronym_field import ExternalAcronymField, split_acronym, ExternalPartimAcronymField
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
@@ -44,9 +44,21 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.models.enums.proposal_type import ProposalType
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
+from osis_role.contrib.helper import EntityRoleHelper
 from reference.models.country import Country
 from reference.models.language import Language
 
@@ -73,7 +85,14 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         queryset=Country.objects.all(),
         required=False,
         label=_("Country"),
-        widget=autocomplete.ModelSelect2(url='country-autocomplete')
+        widget=autocomplete.ModelSelect2(
+            url='country-autocomplete',
+            attrs={
+                'onchange': (
+                    'clearAutocomplete("id_campus");'
+                )
+            }
+        )
     )
 
     def __init__(self, *args, instance=None, initial=None, **kwargs):
@@ -99,14 +118,21 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
-                  'professional_integration', 'campus', 'language', 'periodicity')
+                  'professional_integration', 'campus', 'language', 'periodicity', 'other_remark', 'faculty_remark',
+                  'other_remark_english')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
                 url='campus-autocomplete',
-                forward=["country_external_institution"]
+                forward=["country_external_institution"],
+                attrs={
+                    'id': 'id_campus'
+                }
             ),
             'credits': forms.TextInput(),
+            'faculty_remark': forms.Textarea(attrs={'rows': '5'}),
+            'other_remark': forms.Textarea(attrs={'rows': '5'}),
+            'other_remark_english': forms.Textarea(attrs={'rows': '5'})
         }
 
         labels = {
@@ -165,6 +191,32 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['disabled'] = True
             self.learning_unit_year_form.fields['acronym'].required = False
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
+        self._restrict_academic_years_choice(proposal)
+
+    def _restrict_academic_years_choice(self, proposal_type):
+        if proposal_type:
+            self._restrict_academic_years_choice_for_proposal_management(proposal_type)
+        else:
+            self._restrict_academic_years_choice_for_daily_management()
+
+    def _restrict_academic_years_choice_for_proposal_management(self, proposal_type):
+        if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
+            if EntityRoleHelper.has_role(self.person, FacultyManager):
+                target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
+            elif EntityRoleHelper.has_role(self.person, CentralManager):
+                target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
+            else:
+                target_years_opened = []
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+
+    def _restrict_academic_years_choice_for_daily_management(self):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        elif EntityRoleHelper.has_role(self.person, CentralManager):
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        else:
+            target_years_opened = []
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
 
     @property
     def learning_unit_external_form(self):
@@ -230,7 +282,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 # Default language French
                 'language': Language.objects.get(code='FR'),
             },
-            'person': self.person
+            'person': self.person,
+            'subtype': self.subtype
         }
 
     def get_context(self):
@@ -318,8 +371,17 @@ class ExternalPartimForm(LearningUnitBaseForm):
         instances_data = self._build_instance_data(data, inherit_luy_values)
 
         super().__init__(instances_data, *args, **kwargs)
-        self.disable_fields(PARTIM_FORM_READ_ONLY_FIELD)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
+        self._restrict_academic_years_choice_for_daily_management()
+
+    def _restrict_academic_years_choice_for_daily_management(self):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        elif EntityRoleHelper.has_role(self.person, CentralManager):
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        else:
+            target_years_opened = []
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
 
     @property
     def learning_unit_form(self):
@@ -350,7 +412,8 @@ class ExternalPartimForm(LearningUnitBaseForm):
             },
             LearningContainerYearExternalModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
-                'person': self.person
+                'person': self.person,
+                'subtype': self.subtype
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,
@@ -390,7 +453,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
     def _get_inherit_learning_unit_year_full_value(self):
         """This function will return the inherit value come from learning unit year FULL"""
         return {field: value for field, value in self._get_initial_learning_unit_year_form().items()
-                if field in PARTIM_FORM_READ_ONLY_FIELD}
+                if field in PARTIM_FORM_INHERIT_FIELDS}
 
     def _get_initial_learning_unit_year_form(self):
         acronym = self.instance.acronym if self.instance else self.learning_unit_year_full.acronym

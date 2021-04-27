@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
-from django.views.i18n import JavaScriptCatalog
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
@@ -33,12 +32,7 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
     ProgramManagerPersonDeleteView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 
-js_info_dict = {
-    'packages': ('assessments',)
-}
-
 urlpatterns = [
-
     url(r'^scores_encoding/', include([
         url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
         url(r'^outside_period/$',
@@ -59,7 +53,7 @@ urlpatterns = [
             score_encoding.specific_criteria_submission, name='specific_criteria_submission'),
         url(r'^specific_criteria/search/$',
             score_encoding.search_by_specific_criteria, name='search_by_specific_criteria'),
-        url(r'^notes_printing_all(?:/(?P<tutor_id>[0-9]+))?(?:/(?P<offer_id>[0-9]+))?/$',
+        url(r'^notes_printing_all(?:/(?P<tutor_id>[0-9]+))?(?:/(?P<education_group_year_id>[0-9]+))?/$',
             score_encoding.notes_printing_all, name='notes_printing_all'),
         url(r'^notes_printing/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/$',
             score_encoding.notes_printing, name='notes_printing'),
@@ -69,10 +63,8 @@ urlpatterns = [
             upload_xls_utils.upload_scores_file, name='upload_encoding'),
     ])),
 
-    url(r'^jsi18n/', JavaScriptCatalog.as_view(), js_info_dict),
-
     url(r'^offers/', include([
-        url(r'^(?P<offer_year_id>[0-9]+)/', include([
+        url(r'^(?P<education_group_id>[0-9]+)/', include([
             url(r'^score_encoding/$', score_sheet.offer_score_encoding_tab, name='offer_score_encoding_tab'),
             url(r'^score_sheet_address/save/$', score_sheet.save_score_sheet_address, name='save_score_sheet_address'),
         ]))

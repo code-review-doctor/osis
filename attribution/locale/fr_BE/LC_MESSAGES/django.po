@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-04 10:24+0100\n"
+"POT-Creation-Date: 2021-03-25 14:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,6 +55,9 @@ msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
 msgid "Attributions"
 msgstr "Attributions"
 
+msgid "Authority/sabbatical teaching supply"
+msgstr "Suppléance de sabbatique/autorité"
+
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -66,6 +69,12 @@ msgstr "Coordinateur(trice)"
 
 msgid "Courses"
 msgstr "Cours"
+
+msgid "Demand for co-holder"
+msgstr "Demande de cotitulature"
+
+msgid "Demand for discharge"
+msgstr "Demande de décharge"
 
 msgid "Deputy"
 msgstr "Suppléant"
@@ -82,11 +91,11 @@ msgstr "Suppléant temporaire"
 msgid "Description fiche"
 msgstr "Fiche descriptive"
 
-msgid "Description fiche ending"
-msgstr "Fermeture fiches descriptives"
+msgid "Description fiche edition"
+msgstr "Modification des fiches descriptives"
 
-msgid "Description fiche opening"
-msgstr "Ouverture fiches descriptives"
+msgid "Discharge"
+msgstr "Décharge"
 
 msgid "Duration"
 msgstr "Durée"
@@ -96,15 +105,34 @@ msgstr "Modifiable"
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period is ended "
-"since %(end_date)s."
-msgstr "Pour l’année académique %(data_year)s, la période de modification des fiches descriptives est terminée depuis le %(end_date)s."
+"For the academic year %(data_year)s, the summary edition period ended on "
+"%(end_date)s."
+msgstr ""
+"Pour l’année académique %(data_year)s, la période de modification des fiches "
+"descriptives s'est terminée le %(end_date)s."
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period will open "
-"on %(start_date)s."
-msgstr "Pour l’année académique %(data_year)s, la période de modification des fiches descriptives commencera le %(start_date)s."
+"For the academic year %(data_year)s, the summary edition period will open on "
+"%(start_date)s."
+msgstr ""
+"Pour l’année académique %(data_year)s, la période de modification des fiches "
+"descriptives commencera le %(start_date)s."
+
+#, python-format
+msgid ""
+"Force majeure case : Some fields of the description fiche can be edited from "
+"%(start_date)s to %(end_date)s."
+msgstr ""
+"Cas de force majeure : certains champs de la fiche descriptive peuvent être "
+"modifiés du %(start_date)s au %(end_date)s."
+
+msgid "Force majeure case edition"
+msgstr "Modification cas de force majeure"
+
+msgctxt "Du"
+msgid "From"
+msgstr "Du"
 
 msgid "Function"
 msgstr "Fonction"
@@ -142,11 +170,21 @@ msgstr "Aucune attribution n'existe pour l'UE complète"
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
+msgid "Not in period to edit force majeure section."
+msgstr "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
+"force majeure)."
+
+msgid "Part-time teaching supply"
+msgstr "Suppléance partielle"
+
 msgid "Practical exercises"
 msgstr "Partie pratique"
 
 msgid "Professor"
 msgstr "Professeur"
+
+msgid "Program modification"
+msgstr "Modification de programme"
 
 msgid "Publish application to portal"
 msgstr "Publier la candidature sur portal"
@@ -174,6 +212,9 @@ msgstr "Début"
 msgid "Substitute"
 msgstr "Suppléé"
 
+msgid "Teaching supply"
+msgstr "Suppléance"
+
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -189,6 +230,9 @@ msgstr ""
 msgid "Title"
 msgstr "Intitulé"
 
+msgid "To delete"
+msgstr "A supprimer"
+
 msgid "Tutor"
 msgstr "Enseignant·e"
 
@@ -201,5 +245,12 @@ msgstr "Enseignant·e·s"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
+msgid "You are not attributed to this learning unit."
+msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
+
 msgid "delete"
 msgstr "supprimer"
+
+msgctxt "au"
+msgid "to"
+msgstr "au"

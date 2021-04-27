@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Subquery
 
+from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.utils.models import get_object_or_none
@@ -36,11 +37,11 @@ EVALUATION_KEY = 'evaluation'
 CONTACT_INTRO_KEY = 'contact_intro'
 UNIVERSITY_TYPES = ['bachelors_dutch', 'foreign_bachelors', 'others_bachelors_french', 'ucl_bachelors']
 SECOND_DEGREE_TYPES = ['masters', 'graduates']
-ADMISSION_CONDITION_LINE_FIELDS = [
+ACCESS_REQUIREMENTS_LINE_FIELDS = [
     ('university_bachelors', UNIVERSITY_TYPES),
     ('holders_second_university_degree', SECOND_DEGREE_TYPES)
 ]
-ADMISSION_CONDITION_FIELDS = [
+ACCESS_REQUIREMENTS_FIELDS = [
     'admission_enrollment_procedures',
     'non_university_bachelors',
     'holders_non_university_second_degree',
@@ -73,14 +74,19 @@ def get_evaluation_text(education_group_year, language_code):
     return translated_text_label, translated_text.text
 
 
-def get_contacts_intro_text(education_group_year, language_code):
+def get_contacts_intro_text(node, language_code):
     introduction = get_object_or_none(
         TranslatedText,
         text_label__entity=OFFER_YEAR,
         text_label__label=CONTACT_INTRO_KEY,
         language=language_code,
         entity=OFFER_YEAR,
-        reference=education_group_year.id
+        reference=Subquery(
+            EducationGroupYear.objects.filter(
+                academic_year__year=node.year,
+                partial_acronym=node.code
+            ).values('id')[:1]
+        )
     )
     if introduction:
         return introduction.text

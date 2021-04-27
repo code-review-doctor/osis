@@ -46,12 +46,11 @@ from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 NEW_TEXT = "new text begins in  {}"
 EN_CODE_LANGUAGE = 'EN'
@@ -79,10 +78,6 @@ class TestConsolidate(TestCase):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_consolidate_learningunit_proposal"))
-
-        person_entity = PersonEntityFactory(person=cls.person,
-                                            entity=cls.learning_unit_year.learning_container_year.requirement_entity)
-        EntityVersionFactory(entity=person_entity.entity)
         cls.url = reverse("learning_unit_consolidate_proposal",
                           kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
         cls.post_data = {"learning_unit_year_id": cls.learning_unit_year.id}
@@ -134,8 +129,7 @@ class TestConsolidate(TestCase):
         self.assertRedirects(response, expected_redirect_url)
         mock_consolidate.assert_called_once_with([self.proposal], self.person, {})
 
-    @mock.patch("base.business.learning_units.perms.is_eligible_to_consolidate_proposal", return_value=True)
-    def test_creation_proposal_consolidation(self, mock_perms):
+    def test_creation_proposal_consolidation(self):
         creation_proposal = ProposalLearningUnitFactory(
             type=proposal_type.ProposalType.CREATION,
             state=proposal_state.ProposalState.ACCEPTED.name,
@@ -173,11 +167,6 @@ class TestConsolidateDelete(TestCase):
             learning_unit_year__learning_container_year__requirement_entity=self.requirement_entity,
         )
         self.learning_unit_year = self.proposal.learning_unit_year
-
-        person_entity = PersonEntityFactory(person=self.person,
-                                            entity=self.learning_unit_year.learning_container_year.requirement_entity)
-        EntityVersionFactory(entity=person_entity.entity)
-
         self.url = reverse("learning_unit_consolidate_proposal",
                            kwargs={'learning_unit_year_id': self.learning_unit_year.id})
         self.post_data = {"learning_unit_year_id": self.learning_unit_year.id}
@@ -215,8 +204,8 @@ class TestConsolidateDelete(TestCase):
 class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
 
     def setUp(self):
-        self.language_fr = LanguageFactory(code=FR_CODE_LANGUAGE)
-        self.language_en = LanguageFactory(code=EN_CODE_LANGUAGE)
+        self.language_fr = FrenchLanguageFactory()
+        self.language_en = EnglishLanguageFactory()
 
         current_year = get_current_year()
         self.lu = LearningUnitFactory()
@@ -226,16 +215,18 @@ class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
 
         year = current_year - 3
 
-        concerned_cms_labels = \
-            CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
+        concerned_cms_labels = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY +\
+            CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
 
-        self.text_label = TextLabelFactory(label=random.choice(concerned_cms_labels),
-                                           entity='learning_unit_year')
+        self.text_label = LearningUnitYearTextLabelFactory(label=random.choice(concerned_cms_labels))
 
         while year <= current_year + 6:
             ay = AcademicYearFactory(year=year)
-            luy = LearningUnitYearFactory(learning_unit=self.lu, academic_year=ay,
-                                          acronym='LECON2365')
+            luy = LearningUnitYearFactory(
+                learning_unit=self.lu,
+                academic_year=ay,
+                acronym='LECON2365'
+            )
 
             self._create_description_fiche_and_specifications_data(current_year, luy, year)
             year += 1
@@ -244,7 +235,8 @@ class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
     def test_descriptive_fiche_and_achievements_no_update_because_is_past(self, mock__update_descriptive_fiche):
         proposal_in_past = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
-            learning_unit_year=self.luy_past[0])
+            learning_unit_year=self.luy_past[0]
+        )
 
         _descriptive_fiche_and_achievements_update(proposal_in_past.learning_unit_year, self.luy_past[1])
         mock__update_descriptive_fiche.assert_not_called()
@@ -253,7 +245,8 @@ class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
     def test_descriptive_fiche_and_achievements_update_and_report(self):
         proposal = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
-            learning_unit_year=self.learning_unit_year)
+            learning_unit_year=self.learning_unit_year
+        )
 
         _descriptive_fiche_and_achievements_update(proposal.learning_unit_year, self.learning_unit_year_in_future[0])
 
@@ -262,8 +255,13 @@ class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
 
     def _assert_cms_data_update(self, proposal):
         for learning_unit_yr in self.learning_unit_year_in_future:
-            for t in TranslatedText.objects.filter(reference=learning_unit_yr.id, entity='learning_unit_year',
-                                                   language=self.language_fr, text_label=self.text_label):
+            translated_text_qs = TranslatedText.objects.filter(
+                reference=learning_unit_yr.id,
+                entity='learning_unit_year',
+                language=self.language_fr,
+                text_label=self.text_label
+            )
+            for t in translated_text_qs:
                 self.assertEqual(t.text, NEW_TEXT.format(proposal.learning_unit_year.academic_year.year))
 
     def _assert_learning_unit_achievement_update(self, proposal):

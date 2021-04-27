@@ -33,13 +33,17 @@ from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from cms.enums import entity_name
-from cms.models import text_label, translated_text
+from cms.models import translated_text
+from cms.models.text_label import TextLabel
 from osis_common.utils.models import get_object_or_none
 from reference.models.language import EN_CODE_LANGUAGE, Language
 
 
 def update_themes_discussed_changed_field_in_cms(learning_unit_year):
-    txt_label = text_label.get_by_label_or_none('themes_discussed')
+    txt_label = get_object_or_none(
+        TextLabel,
+        label='themes_discussed'
+    )
     if txt_label:
         for lang in settings.LANGUAGES:
             translated_text.update_or_create(
@@ -73,6 +77,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.luy = kwargs.pop('luy', None)
         self.code = kwargs.pop('code', '')
         self.consistency_id = kwargs.pop('consistency_id')
+        self.order = kwargs.pop('order', None)
         self.has_proposal = ProposalLearningUnit.objects.filter(learning_unit_year=self.luy).exists()
         super().__init__(data, initial=initial, **kwargs)
 
@@ -120,7 +125,8 @@ class LearningAchievementEditForm(forms.ModelForm):
             ).get_or_create(
                 learning_unit_year_id=self.luy.id,
                 language=Language.objects.get(code=code[:2].upper()),
-                consistency_id=self.consistency_id
+                consistency_id=self.consistency_id,
+                order=self.order
             )
             self.achievement.code_name = self.cleaned_data.get('code_name')
             self.achievement.text = self.cleaned_data.get('text_{}'.format(code[:2]))

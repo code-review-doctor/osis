@@ -33,6 +33,7 @@ from osis_common.utils.models import get_object_or_none
 
 class LearningAchievementAdmin(VersionAdmin, AbstractAchievementAdmin):
     raw_id_fields = ('learning_unit_year',)
+    list_filter = ('language', 'learning_unit_year__academic_year')
 
     def get_list_display(self, request):
         return ('learning_unit_year',) + super().get_list_display(request)
@@ -53,6 +54,7 @@ class LearningAchievement(AbstractAchievement):
         unique_together = ("consistency_id", "learning_unit_year", "language")
 
     def __str__(self):
+
         return u'{} - {} (order {})'.format(self.learning_unit_year, self.code_name, self.order)
 
 

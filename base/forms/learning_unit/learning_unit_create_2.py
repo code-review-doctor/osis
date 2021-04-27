@@ -27,55 +27,31 @@ from abc import ABCMeta
 from collections import OrderedDict
 
 from django.db import transaction
+from django.db.models import Case, When, Value, IntegerField
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
-from base.business import event_perms
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
-from base.models import academic_year
-from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
+from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
-from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, \
-    LCY_TYPES_WITH_FIXED_ACRONYM
+from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from education_group.calendar.education_group_limited_daily_management import \
+    EducationGroupLimitedDailyManagementCalendar
+from learning_unit.auth.roles.central_manager import CentralManager
+from learning_unit.auth.roles.faculty_manager import FacultyManager
+from learning_unit.calendar.learning_unit_extended_proposal_management import \
+    LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_limited_proposal_management import \
+    LearningUnitLimitedProposalManagementCalendar
+from osis_role.contrib.helper import EntityRoleHelper
 from reference.models.language import Language
-
-FULL_READ_ONLY_FIELDS = {"acronym",
-                         "academic_year",
-                         "container_type",
-                         "type_declaration_vacant",
-                         "is_vacant",
-                         "attribution_procedure"}
-FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year",
-                                  "container_type",
-                                  "type_declaration_vacant",
-                                  "is_vacant",
-                                  "attribution_procedure"}
-PROPOSAL_READ_ONLY_FIELDS = {"container_type",
-                             "type_declaration_vacant",
-                             "is_vacant",
-                             "attribution_procedure"}
-
-FACULTY_OPEN_FIELDS = {
-    'quadrimester',
-    'session',
-    'team',
-    "faculty_remark",
-    "other_remark",
-    'common_title_english',
-    'specific_title_english',
-    "status",
-    "professional_integration",
-    "component-0-hourly_volume_partial_q1",
-    "component-0-hourly_volume_partial_q2",
-    "component-1-hourly_volume_partial_q1",
-    "component-1-hourly_volume_partial_q2",
-}
 
 # This fields can not be disabled.
 PROTECTED_FIELDS = {
@@ -109,7 +85,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             return False
 
         self.learning_unit_year_form.post_clean(self.learning_container_year_form.instance.container_type)
-        self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
+        self._specific_title_post_clean()
         additional_entity_1 = self.learning_container_year_form.additionnal_entity_version_1
         additional_entity_2 = self.learning_container_year_form.additionnal_entity_version_2
 
@@ -134,6 +110,9 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
                     form.add_error("repartition_volume_additional_entity_2", "")
 
         return not self.errors
+
+    def _specific_title_post_clean(self):
+        self.learning_container_year_form.post_clean(self.learning_unit_year_form.cleaned_data["specific_title"])
 
     @staticmethod
     def _additional_entity_is_valid(additional_entity, repartition_volume_additional_entity):
@@ -259,44 +238,14 @@ class FullForm(LearningUnitBaseForm):
 
         instances_data = self._build_instance_data(self.data, academic_year, proposal)
         super().__init__(instances_data, *args, **kwargs)
-        if self.instance:
-            self._disable_fields()
-        else:
+        if not self.instance:
             self._restrict_academic_years_choice(postposal, proposal_type)
 
     def _restrict_academic_years_choice(self, postposal, proposal_type):
         if postposal:
-            starting_academic_year = academic_year.starting_academic_year()
-            end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager \
-                else MAX_ACADEMIC_YEAR_CENTRAL
-
-            self.fields["academic_year"].queryset = AcademicYear.objects.min_max_years(
-                starting_academic_year.year, starting_academic_year.year + end_year_range
-            )
+            self._restrict_academic_years_choice_for_daily_management()
         else:
-            self._restrict_academic_years_choice_for_proposal_creation_suppression(proposal_type)
-
-    def _disable_fields(self):
-        if self.person.is_faculty_manager and not self.person.is_central_manager:
-            self._disable_fields_as_faculty_manager()
-        else:
-            self._disable_fields_as_central_manager()
-
-    def _disable_fields_as_faculty_manager(self):
-        faculty_type_not_restricted = [t[0] for t in LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY]
-        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
-            self.disable_fields(PROPOSAL_READ_ONLY_FIELDS)
-        elif self.instance.learning_container_year and \
-                self.instance.learning_container_year.container_type not in faculty_type_not_restricted:
-            self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
-        else:
-            self.disable_fields(FULL_READ_ONLY_FIELDS)
-
-    def _disable_fields_as_central_manager(self):
-        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
-            self.disable_fields(FULL_PROPOSAL_READ_ONLY_FIELDS)
-        else:
-            self.disable_fields(FULL_READ_ONLY_FIELDS)
+            self._restrict_academic_years_choice_for_proposal_management(proposal_type)
 
     def _build_instance_data(self, data, default_ac_year, proposal):
         return {
@@ -308,13 +257,22 @@ class FullForm(LearningUnitBaseForm):
                 'data': data,
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
-            LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year),
+            LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year, proposal),
             LearningContainerYearModelForm: self._build_instance_data_learning_container_year(data, proposal),
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'proposal': proposal,
                 'queryset': LearningComponentYear.objects.filter(
                     learning_unit_year=self.instance
+                ).annotate(
+                    order_value=Case(
+                        When(type=learning_component_year_type.LECTURING, then=Value(1)),
+                        When(type=learning_component_year_type.PRACTICAL_EXERCISES, then=Value(2)),
+                        default=Value(3),
+                        output_field=IntegerField()
+                    )
+                ).order_by(
+                    "order_value"
                 ) if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person
             }
@@ -330,10 +288,11 @@ class FullForm(LearningUnitBaseForm):
                 # Default campus selected 'Louvain-la-Neuve' if exist
                 'campus': Campus.objects.filter(name='Louvain-la-Neuve').first()
             } if not self.instance else None,
-            'person': self.person
+            'person': self.person,
+            'subtype': self.subtype
         }
 
-    def _build_instance_data_learning_unit_year(self, data, default_ac_year):
+    def _build_instance_data_learning_unit_year(self, data, default_ac_year, proposal):
         return {
             'data': data,
             'instance': self.instance,
@@ -344,7 +303,8 @@ class FullForm(LearningUnitBaseForm):
                 'language': Language.objects.get(code='FR')
             } if not self.instance else None,
             'person': self.person,
-            'subtype': self.subtype
+            'subtype': self.subtype,
+            'proposal': proposal,
         }
 
     def save(self, commit=True):
@@ -376,7 +336,21 @@ class FullForm(LearningUnitBaseForm):
 
         return learning_unit_yr
 
-    def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
+    def _restrict_academic_years_choice_for_proposal_management(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
-            event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
-            self.fields["academic_year"].queryset = event_perm.get_academic_years()
+            if EntityRoleHelper.has_role(self.person, FacultyManager):
+                target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
+            elif EntityRoleHelper.has_role(self.person, CentralManager):
+                target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
+            else:
+                target_years_opened = []
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+
+    def _restrict_academic_years_choice_for_daily_management(self):
+        if EntityRoleHelper.has_role(self.person, FacultyManager):
+            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
+        elif EntityRoleHelper.has_role(self.person, CentralManager):
+            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
+        else:
+            target_years_opened = []
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)

@@ -23,13 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import CannotAttachSameChildToParentException
 
 
-#  Implemented from _check_new_attach_is_not_duplication
 class NodeDuplicationValidator(BusinessValidator):
 
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
@@ -38,7 +37,5 @@ class NodeDuplicationValidator(BusinessValidator):
         self.parent_node = parent_node
 
     def validate(self):
-        if self.node_to_add in self.parent_node.children_as_nodes:
-            self.add_error_message(
-                _("You can not add the same child several times.")
-            )
+        if self.node_to_add in self.parent_node.get_direct_children_as_nodes():
+            raise CannotAttachSameChildToParentException(self.node_to_add)

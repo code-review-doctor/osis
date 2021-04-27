@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,14 +29,18 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Prefetch, Count
 
-from base.business import entity_version as business_entity_version
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 from base.models import learning_unit_year
+from base.models.academic_year import AcademicYear
 from base.models.entity import Entity
+from base.models.entity_version import EntityVersion
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.learning_component_year import LearningComponentYear
+
+
+SERVICE_COURSE = 'SERVICE_COURSE'
 
 
 def get_with_context(**learning_unit_year_data):
@@ -70,23 +74,13 @@ def get_with_context(**learning_unit_year_data):
     return learning_unit_years
 
 
-def append_latest_entities(learning_unit_yr, service_course_search=False):
+def append_latest_entities(learning_unit_yr):
     learning_unit_yr.entities = {}
 
     for link_type in entity_types.ENTITY_TYPE_LIST:
         container = learning_unit_yr.learning_container_year
         entity = container.get_entity_from_type(link_type)
         learning_unit_yr.entities[link_type] = entity.get_latest_entity_version() if entity else None
-
-    requirement_entity_version = learning_unit_yr.entities.get(entity_types.REQUIREMENT_ENTITY)
-    allocation_entity_version = learning_unit_yr.entities.get(entity_types.ALLOCATION_ENTITY)
-
-    if service_course_search:
-        learning_unit_yr.entities[business_entity_version.SERVICE_COURSE] = is_service_course(
-            learning_unit_yr.academic_year,
-            requirement_entity_version,
-            allocation_entity_version
-        )
 
     return learning_unit_yr
 
@@ -110,6 +104,7 @@ def append_components(learning_unit_year):
                 VOLUME_TOTAL: component.hourly_volume_total_annual,
                 VOLUME_Q1: component.hourly_volume_partial_q1,
                 VOLUME_Q2: component.hourly_volume_partial_q2,
+                VOLUME_GLOBAL: component.vol_global,
                 PLANNED_CLASSES: planned_classes,
                 VOLUME_REQUIREMENT_ENTITY: vol_req_entity,
                 VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
@@ -133,22 +128,6 @@ def volume_learning_component_year(learning_component_year):
         VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2: requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
         VOLUME_GLOBAL: learning_component_year.vol_global
     }
-
-
-def is_service_course(academic_year, requirement_entity_version, allocation_entity_version):
-    if not requirement_entity_version or not allocation_entity_version \
-            or requirement_entity_version == allocation_entity_version:
-        return False
-
-    requirement_parent_faculty = requirement_entity_version.find_faculty_version(academic_year)
-
-    if not requirement_parent_faculty:
-        return False
-
-    allocation_parent_faculty = allocation_entity_version.find_faculty_version(academic_year)
-    if not allocation_parent_faculty:
-        return False
-    return requirement_parent_faculty != allocation_parent_faculty
 
 
 def get_learning_component_prefetch():

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,40 +29,49 @@ from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
+from typing import List
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
-from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
-    _get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _add_training_data, \
-    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
-    _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
-    prepare_xls_content_with_attributions
+from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
+    prepare_proposal_legend_ws_data, _get_wrapped_cells, \
+    _get_font_rows, _get_attribution_line, _add_training_data, \
+    get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
+    get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
+    prepare_xls_content_with_attributions, BOLD_FONT, _prepare_titles, HEADER_TEACHERS
 from base.business.learning_unit_xls import _get_col_letter
+from base.business.learning_unit_xls import get_significant_volume
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
+from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 from osis_common.document import xls_build
+from program_management.tests.factories.education_group_version import \
+    ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -70,6 +79,7 @@ PARENT_PARTIAL_ACRONYM = 'LDROI'
 PARENT_ACRONYM = 'LBIR'
 PARENT_TITLE = 'TITLE 1'
 ROOT_ACRONYM = 'DRTI'
+VERSION_ACRONYM = 'CRIM'
 
 
 class TestLearningUnitXls(TestCase):
@@ -79,7 +89,19 @@ class TestLearningUnitXls(TestCase):
         cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
         cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
                                                          learning_container_year=cls.learning_container_luy1,
-                                                         credits=50)
+                                                         credits=10)
+        cls.learning_unit_yr_1_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_1)
+        cls.learning_container_luy_external = LearningContainerYearFactory(academic_year=cls.academic_year)
+        cls.learning_unit_yr_external = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year=cls.learning_container_luy_external,
+            credits=10,
+            campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
+        )
+        cls.external_luy = ExternalLearningUnitYearFactory(learning_unit_year=cls.learning_unit_yr_external,
+                                                           external_credits=15.25)
+        cls.learning_unit_yr_external_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_external)
+
         cls.learning_unit_yr_2 = LearningUnitYearFactory()
 
         cls.proposal_creation_1 = ProposalLearningUnitFactory(
@@ -95,20 +117,24 @@ class TestLearningUnitXls(TestCase):
         cls.an_education_group_parent = EducationGroupYearFactory(academic_year=cls.academic_year,
                                                                   education_group_type=direct_parent_type,
                                                                   acronym=ROOT_ACRONYM)
-        cls.group_element_child = GroupElementYearFactory(
-            parent=cls.an_education_group_parent,
-            child_branch=None,
-            child_leaf=cls.learning_unit_yr_1
+        cls.a_group_year_parent = GroupYearFactory(academic_year=cls.academic_year, acronym=ROOT_ACRONYM)
+        cls.a_group_year_parent_element = ElementFactory(group_year=cls.a_group_year_parent)
+        cls.standard_version = StandardEducationGroupVersionFactory(
+            offer=cls.an_education_group_parent, root_group=cls.a_group_year_parent
         )
-        cls.an_education_group = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                           acronym=PARENT_ACRONYM,
-                                                           title=PARENT_TITLE,
-                                                           partial_acronym=PARENT_PARTIAL_ACRONYM)
 
-        cls.group_element_child2 = GroupElementYearFactory(
-            parent=cls.an_education_group,
-            child_branch=cls.group_element_child.parent,
+        cls.group_element_child = GroupElementYearFactory(
+            parent_element=cls.a_group_year_parent_element,
+            child_element=cls.learning_unit_yr_1_element,
+            relative_credits=cls.learning_unit_yr_1.credits,
         )
+        cls.group_element_child = GroupElementYearFactory(
+            parent_element=cls.a_group_year_parent_element,
+            child_element=cls.learning_unit_yr_external_element,
+            relative_credits=cls.learning_unit_yr_external.credits,
+        )
+        # Particular OF
+        cls.create_version(direct_parent_type)
         cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
         generatorContainer = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
@@ -197,6 +223,31 @@ class TestLearningUnitXls(TestCase):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
+    @classmethod
+    def create_version(cls, direct_parent_type):
+        cls.learning_unit_yr_version = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year=LearningContainerYearFactory(academic_year=cls.academic_year),
+            credits=10
+        )
+        cls.learning_unit_yr_version_element = ElementFactory(learning_unit_year=cls.learning_unit_yr_version)
+        cls.an_education_group_parent_for_particular_version = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type=direct_parent_type,
+            acronym=VERSION_ACRONYM)
+        cls.a_group_year_parent_for_particular_version = GroupYearFactory(academic_year=cls.academic_year,
+                                                                          acronym=VERSION_ACRONYM)
+        cls.a_group_year_parent_element_for_particular_version = ElementFactory(
+            group_year=cls.a_group_year_parent_for_particular_version)
+        cls.particular_education_group_version = ParticularTransitionEducationGroupVersionFactory(
+            offer=cls.an_education_group_parent_for_particular_version,
+            root_group=cls.a_group_year_parent_for_particular_version)
+        cls.group_element_particular = GroupElementYearFactory(
+            parent_element=cls.a_group_year_parent_element_for_particular_version,
+            child_element=cls.learning_unit_yr_version_element,
+            relative_credits=15
+        )
+
     def test_get_wrapped_cells_with_teachers_and_programs(self):
         styles = _get_wrapped_cells([self.learning_unit_yr_1, self.learning_unit_yr_2],
                                     COL_TEACHERS_LETTER,
@@ -223,11 +274,13 @@ class TestLearningUnitXls(TestCase):
         self.assertIsNone(_get_col_letter(titles, 'whatever'))
 
     def test_get_colored_rows(self):
-        self.assertEqual(_get_colored_rows([self.learning_unit_yr_1,
-                                            self.learning_unit_yr_2,
-                                            self.proposal_creation_1.learning_unit_year,
-                                            self.proposal_creation_2.learning_unit_year]),
-                         {PROPOSAL_LINE_STYLES.get(self.proposal_creation_1.type): [3, 4]})
+        self.assertEqual(_get_font_rows([self.learning_unit_yr_1,
+                                         self.learning_unit_yr_2,
+                                         self.proposal_creation_1.learning_unit_year,
+                                         self.proposal_creation_2.learning_unit_year]),
+                         {PROPOSAL_LINE_STYLES.get(self.proposal_creation_1.type): [3, 4],
+                          BOLD_FONT: [0]})
+        # self.assertEqual(param.get(xls_build.FONT_ROWS), {BOLD_FONT: [0]})
 
     def test_get_attributions_line(self):
         a_person = PersonFactory(last_name="Smith", first_name='Aaron')
@@ -254,9 +307,9 @@ class TestLearningUnitXls(TestCase):
         )
 
     def test_get_significant_volume(self):
-        self.assertEqual(_get_significant_volume(10), 10)
-        self.assertEqual(_get_significant_volume(None), '')
-        self.assertEqual(_get_significant_volume(0), '')
+        self.assertEqual(get_significant_volume(10), 10)
+        self.assertEqual(get_significant_volume(None), '')
+        self.assertEqual(get_significant_volume(0), '')
 
     def test_prepare_legend_ws_data(self):
         expected = {
@@ -270,7 +323,7 @@ class TestLearningUnitXls(TestCase):
             ],
             xls_build.WORKSHEET_TITLE_KEY: _('Legend'),
             xls_build.STYLED_CELLS:
-                DEFAULT_LEGEND_STYLES
+                DEFAULT_LEGEND_FILLS
         }
         self.assertEqual(prepare_proposal_legend_ws_data(), expected)
 
@@ -279,15 +332,17 @@ class TestLearningUnitXls(TestCase):
             closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
         ).get()
         formations = _add_training_data(luy_1)
-        expected = "{} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
-                                                "{0:.2f}".format(luy_1.credits),
-                                                self.an_education_group_parent.acronym,
-                                                self.an_education_group_parent.title)
+        expected = "{} ({}) - {} - {}".format(
+            self.a_group_year_parent.partial_acronym,
+            "{0:.2f}".format(self.group_element_child.relative_credits),
+            self.a_group_year_parent.acronym,
+            self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
+        )
         self.assertEqual(formations, expected)
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = _get_data_part1(luy)
+        data = get_data_part1(luy, is_external_ue_list=False)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -295,21 +350,20 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(data[7], _(self.proposal_creation_1.state.title()))
 
     def test_get_parameters_configurable_list(self):
-        user_name = 'Ducon'
-        an_user = UserFactory(username=user_name)
+        an_user = UserFactory()
         titles = ['title1', 'title2']
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
-        self.assertEqual(param.get(xls_build.USER), user_name)
+        self.assertEqual(param.get(xls_build.USER), an_user.username)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: []})
-        self.assertEqual(param.get(xls_build.COLORED_ROWS), {})
+        self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: []})
+        self.assertEqual(param.get(xls_build.FONT_ROWS), {BOLD_FONT: [0]})
 
         titles.append(HEADER_PROGRAMS)
 
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: ['C2', 'C3']})
+        self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: ['C2', 'C3']})
 
     def test_get_data_part2(self):
         learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)
@@ -336,20 +390,36 @@ class TestLearningUnitXls(TestCase):
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        a_tutor = TutorFactory()
+        a_tutor = TutorFactory(person__last_name="Dupuis", person__first_name="Tom", person__email="dupuis@gmail.com")
 
-        an_attribution = AttributionNewFactory(
+        an_attribution_1 = AttributionNewFactory(
             tutor=a_tutor,
             start_year=2017
         )
 
-        attribution_charge_new_lecturing = AttributionChargeNewFactory(learning_component_year=component_lecturing,
-                                                                       attribution=an_attribution,
-                                                                       allocation_charge=15.0)
-        attribution_charge_new_practical = AttributionChargeNewFactory(learning_component_year=component_practical,
-                                                                       attribution=an_attribution,
-                                                                       allocation_charge=5.0)
+        AttributionChargeNewFactory(
+            learning_component_year=component_lecturing,
+            attribution=an_attribution_1,
+        )
+        AttributionChargeNewFactory(
+            learning_component_year=component_practical,
+            attribution=an_attribution_1
+        )
 
+        a_tutor2 = TutorFactory(person__last_name="Tosson", person__first_name="Ivan", person__email="tosson@gmail.com")
+        an_attribution_2 = AttributionNewFactory(
+            tutor=a_tutor2,
+            start_year=2017
+        )
+
+        AttributionChargeNewFactory(
+            learning_component_year=component_lecturing,
+            attribution=an_attribution_2,
+        )
+        AttributionChargeNewFactory(
+            learning_component_year=component_practical,
+            attribution=an_attribution_2
+        )
         # Simulate annotate
         luy = annotate_qs(LearningUnitYear.objects.filter(pk=luy.pk)).first()
         luy.entity_requirement = EntityVersionFactory()
@@ -358,7 +428,7 @@ class TestLearningUnitXls(TestCase):
             luy)
 
         expected_common = [
-            str(_(luy.periodicity.title())),
+            dict(PERIODICITY_TYPES)[luy.periodicity],
             str(_('yes')) if luy.status else str(_('no')),
             component_lecturing.hourly_volume_total_annual,
             component_lecturing.hourly_volume_partial_q1,
@@ -372,11 +442,10 @@ class TestLearningUnitXls(TestCase):
             luy.get_session_display() or '',
             "",
         ]
-        self.assertEqual(_get_data_part2(luy, False), expected_common)
+        self.assertEqual(get_data_part2(luy, False), expected_common)
         self.assertEqual(
-            _get_data_part2(luy, True),
-            expected_attribution_data(
-                attribution_charge_new_lecturing, attribution_charge_new_practical,
+            get_data_part2(luy, True),
+            _expected_attribution_data(
                 expected_common,
                 luy
             )
@@ -405,47 +474,136 @@ class TestLearningUnitXls(TestCase):
             entity_requirement=Subquery(self.entity_requirement),
             entity_allocation=Subquery(self.entity_allocation),
         )
-        result = prepare_xls_content(qs, with_grp=True, with_attributions=True)
+        result = prepare_xls_content(qs, is_external_ue_list=False, with_grp=True, with_attributions=True)
         self.assertEqual(len(result), 1)
 
         luy = annotate_qs(qs).get()
         self.assertListEqual(
             result[0],
-            self._get_luy_expected_data(luy)
+            self._get_luy_expected_data(luy, is_external_ue=False)
         )
 
-    def _get_luy_expected_data(self, luy):
-        return [
+    def test_prepare_xls_content_for_external_ue(self):
+        qs = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_external.pk).annotate(
+            entity_requirement=Subquery(self.entity_requirement),
+            entity_allocation=Subquery(self.entity_allocation),
+        ).select_related(
+            'externallearningunityear')
+        result = prepare_xls_content(qs, is_external_ue_list=True, with_grp=True, with_attributions=True)
+        self.assertEqual(len(result), 1)
+
+        luy = annotate_qs(qs).get()
+        self.assertListEqual(
+            result[0],
+            self._get_luy_expected_data(luy, is_external_ue=True)
+        )
+
+    def test_titles(self):
+        # without grp/attribution
+        # no external
+        titles = _prepare_titles(is_external_ue_list=False, with_grp=False, with_attributions=False)
+
+        self.assertListEqual(titles,
+                             _expected_titles_common_part1() + _expected_titles_for_proposals() +
+                             _expected_titles_common_part2_a() + _expected_titles_common_part2_b())
+        # without grp/attribution
+        # and external
+        titles = _prepare_titles(is_external_ue_list=True, with_grp=False, with_attributions=False)
+
+        self.assertListEqual(titles,
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() +
+                             _expected_titles_common_part2_b() + _expected_titles_for_external())
+        # with grp and without attribution
+        # no external
+        titles = _prepare_titles(is_external_ue_list=False, with_grp=True, with_attributions=False)
+
+        self.assertListEqual(titles,
+                             _expected_titles_common_part1() + _expected_titles_for_proposals() +
+                             _expected_titles_common_part2_a() + _expected_titles_common_part2_b() + [HEADER_PROGRAMS]
+                             )
+        # with grp and without attribution
+        # and external
+        titles = _prepare_titles(is_external_ue_list=True, with_grp=True, with_attributions=False)
+
+        self.assertListEqual(titles,
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() +
+                             _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
+                             )
+        # with grp/attribution
+        # no external
+        titles = _prepare_titles(is_external_ue_list=False, with_grp=True, with_attributions=True)
+
+        self.assertListEqual(titles,
+                             _expected_titles_common_part1() + _expected_titles_for_proposals() +
+                             _expected_titles_common_part2_a() + HEADER_TEACHERS + _expected_titles_common_part2_b() +
+                             [HEADER_PROGRAMS]
+                             )
+        # with grp/attribution
+        # and external
+        titles = _prepare_titles(is_external_ue_list=True, with_grp=True, with_attributions=True)
+
+        self.assertListEqual(titles,
+                             _expected_titles_common_part1() + _expected_titles_common_part2_a() + HEADER_TEACHERS +
+                             _expected_titles_common_part2_b() + [HEADER_PROGRAMS] + _expected_titles_for_external()
+                             )
+
+    def _get_luy_expected_data(self, luy, is_external_ue: bool):
+        common_part1 = [
             luy.acronym,
             luy.academic_year.__str__(),
             luy.complete_title,
             luy.get_container_type_display(),
             luy.get_subtype_display(),
             luy.entity_requirement,
-            '',  # Proposal
-            '',  # Proposal state
+        ]
+        if is_external_ue:
+            proposal_data = []
+        else:
+            proposal_data = [
+                '',  # Proposal
+                '',  # Proposal state
+                ]
+        common_part2 = [
             luy.credits,
             luy.entity_allocation,
             luy.complete_title_english,
             '',
+            '',
+            '',
+            '',
             luy.get_periodicity_display(),
             yesno(luy.status),
-            _get_significant_volume(luy.pm_vol_tot or 0),
-            _get_significant_volume(luy.pm_vol_q1 or 0),
-            _get_significant_volume(luy.pm_vol_q2 or 0),
+            get_significant_volume(luy.pm_vol_tot or 0),
+            get_significant_volume(luy.pm_vol_q1 or 0),
+            get_significant_volume(luy.pm_vol_q2 or 0),
             luy.pm_classes or 0,
-            _get_significant_volume(luy.pp_vol_tot or 0),
-            _get_significant_volume(luy.pp_vol_q1 or 0),
-            _get_significant_volume(luy.pp_vol_q2 or 0),
+            get_significant_volume(luy.pp_vol_tot or 0),
+            get_significant_volume(luy.pp_vol_q1 or 0),
+            get_significant_volume(luy.pp_vol_q2 or 0),
             luy.pp_classes or 0,
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
-            "{} ({}) - {} - {}\n".format(self.an_education_group_parent.partial_acronym,
-                                         "{0:.2f}".format(luy.credits),
-                                         self.an_education_group_parent.acronym,
-                                         self.an_education_group_parent.title)
+            "{} ({}) - {} - {}".format(
+                self.a_group_year_parent.partial_acronym,
+                "{0:.2f}".format(self.group_element_child.relative_credits),
+                self.a_group_year_parent.acronym,
+                self.a_group_year_parent.title_fr + ' [{}]'.format(self.standard_version.title_fr)
+            )
         ]
+        external_data = []
+        if is_external_ue:
+            organization = luy.campus.organization
+            external_data = [
+                organization.country or '',
+                organization.main_address.city if organization.main_address else '',
+                organization.name,
+                self.external_luy.external_acronym,
+                self.external_luy.url,
+                "{0:.2f}".format(self.external_luy.external_credits)
+            ]
+
+        return common_part1 + proposal_data + common_part2 + external_data
 
     def test_get_attribution_detail(self):
         a_person = PersonFactory(last_name="Smith", first_name='Aaron', email='smith@google.com')
@@ -497,25 +655,105 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(first_attribution[30], 15)
         self.assertEqual(first_attribution[31], 5)
 
+    def test_add_training_data_for_version(self):
+        luy = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_version.pk).annotate(
+            closest_trainings=RawSQL(SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, ())
+        ).get()
 
-def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):
-    expected_attribution = None
+        formations = _add_training_data(luy)
+        expected = "{} ({}) - {} - {}".format(
+            self.a_group_year_parent_for_particular_version.partial_acronym,
+            "{0:.2f}".format(self.group_element_particular.relative_credits),
+            "{}[{}-TRANSITION]".format(self.a_group_year_parent_for_particular_version.acronym,
+                                       self.particular_education_group_version.version_name),
+            self.a_group_year_parent_for_particular_version.title_fr + ' [{}]'.format(
+                self.particular_education_group_version.title_fr
+            )
+        )
+        self.assertEqual(expected, formations)
+
+
+def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:
+    expected_attributions = []
+    score_responsibles = []
     for k, v in luy.attribution_charge_news.items():
-        expected_attribution = v
-    expected_attribution = "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
-        expected_attribution.get('person'),
-        _('Function'),
-        Functions[expected_attribution['function']].value,
-        _('Substitute'),
-        '',
-        _('Beg. of attribution'),
-        expected_attribution.get('start_year'),
-        _('Attribution duration'),
-        expected_attribution.get('duration'),
-        _('Attrib. vol1'),
-        attribution_charge_new_lecturing.allocation_charge,
-        _('Attrib. vol2'),
-        attribution_charge_new_practical.allocation_charge, )
-    ex = [expected_attribution]
+        expected_attributions.append(v)
+        if v.get('score_responsible'):
+            score_responsibles.append(v)
+
+    tutors_names_concat = _get_persons_names(expected_attributions)
+    tutors_emails_concat = _get_persons_emails(expected_attributions)
+
+    ex = [tutors_names_concat, tutors_emails_concat]
+
+    score_responsibles_names_concat = _get_persons_names(score_responsibles)
+    score_responsibles_emails_concat = _get_persons_emails(score_responsibles)
+    ex.extend([score_responsibles_names_concat, score_responsibles_emails_concat])
     ex.extend(expected)
     return ex
+
+
+def _expected_titles_common_part1() -> List[str]:
+    return [
+            str(_('Code')),
+            str(_('Ac yr.')),
+            str(_('Title')),
+            str(_('Type')),
+            str(_('Subtype')),
+            str(_('Req. Entity')),
+        ]
+
+
+def _expected_titles_common_part2_a() -> List[str]:
+    return [
+        str(_('Credits')),
+        str(_('Alloc. Ent.')),
+        str(_('Title in English')),
+        ]
+
+
+def _expected_titles_common_part2_b() -> List[str]:
+    return [
+        str(_('Periodicity')),
+        str(_('Active')),
+        "{} - {}".format(_('Lecturing vol.'), _('Annual')),
+        "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
+        "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
+        "{}".format(_('Lecturing planned classes')),
+        "{} - {}".format(_('Practical vol.'), _('Annual')),
+        "{} - {}".format(_('Practical vol.'), _('1st quadri')),
+        "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
+        "{}".format(_('Practical planned classes')),
+        str(_('Quadrimester')),
+        str(_('Session derogation')),
+        str(_('Language')),
+    ]
+
+
+def _expected_titles_for_proposals() -> List[str]:
+    return [
+        str(_('Proposal type')),
+        str(_('Proposal status')),
+    ]
+
+
+def _expected_titles_for_external() -> List[str]:
+    return [
+        str(_('Country')),
+        str(_('City of institution')),
+        str(_('Reference institution')),
+        str(_('External code')),
+        str(_('Url')),
+        str(_('Local credits')),
+    ]
+
+
+def _get_persons_emails(attributions):
+    return ";".join(expected_attribution.get('person').email for expected_attribution in attributions)
+
+
+def _get_persons_names(attributions):
+    return ';'.join("{} {}".format(
+        expected_attribution.get('person').last_name.upper(),
+        expected_attribution.get('person').first_name
+    ) for expected_attribution in attributions)

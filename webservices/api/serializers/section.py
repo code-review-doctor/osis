@@ -27,11 +27,11 @@ from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
 from base.models.enums.education_group_types import TrainingType
+from webservices.api.serializers.access_requirements import AccessRequirementsSerializer, \
+    BachelorAccessRequirementsSerializer, SpecializedMasterAccessRequirementsSerializer, \
+    AggregationAccessRequirementsSerializer, MasterAccessRequirementsSerializer, \
+    ContinuingEducationTrainingAccessRequirementsSerializer
 from webservices.api.serializers.achievement import AchievementsSerializer
-from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
-    BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
-    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer, \
-    ContinuingEducationTrainingAdmissionConditionsSerializer
 from webservices.api.serializers.contacts import ContactsSerializer
 
 
@@ -40,13 +40,6 @@ class SectionSerializer(serializers.Serializer):
     label = serializers.CharField(source='translated_label', read_only=True)
     content = serializers.CharField(source='text', read_only=True, allow_null=True)
 
-    class Meta:
-        fields = (
-            'id',
-            'label',
-            'content',
-        )
-
 
 class AchievementSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
@@ -54,46 +47,45 @@ class AchievementSectionSerializer(serializers.Serializer):
     content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
-        egy = self.context.get('egy')
-        return AchievementsSerializer(egy, context=self.context).data
+        node = self.context.get('root_node')
+        return AchievementsSerializer(node, context=self.context).data
 
 
-class AdmissionConditionSectionSerializer(serializers.Serializer):
+class AccessRequirementsSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     label = serializers.CharField(source='id', read_only=True)
     content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         # FIXME: Bachelor has no admissioncondition
-        admission_condition_serializers = {
-            TrainingType.BACHELOR.name: BachelorAdmissionConditionsSerializer,
-            TrainingType.MASTER_MC.name: SpecializedMasterAdmissionConditionsSerializer,
-            TrainingType.AGGREGATION.name: AggregationAdmissionConditionsSerializer,
-            TrainingType.PGRM_MASTER_120.name: MasterAdmissionConditionsSerializer,
-            TrainingType.PGRM_MASTER_180_240.name: MasterAdmissionConditionsSerializer,
-            TrainingType.MASTER_M1.name: MasterAdmissionConditionsSerializer,
-            TrainingType.CERTIFICATE_OF_PARTICIPATION.name: ContinuingEducationTrainingAdmissionConditionsSerializer,
-            TrainingType.CERTIFICATE_OF_SUCCESS.name: ContinuingEducationTrainingAdmissionConditionsSerializer,
-            TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: ContinuingEducationTrainingAdmissionConditionsSerializer,
+        access_requirements_serializers = {
+            TrainingType.BACHELOR.name: BachelorAccessRequirementsSerializer,
+            TrainingType.MASTER_MC.name: SpecializedMasterAccessRequirementsSerializer,
+            TrainingType.AGGREGATION.name: AggregationAccessRequirementsSerializer,
+            TrainingType.PGRM_MASTER_120.name: MasterAccessRequirementsSerializer,
+            TrainingType.PGRM_MASTER_180_240.name: MasterAccessRequirementsSerializer,
+            TrainingType.MASTER_M1.name: MasterAccessRequirementsSerializer,
+            TrainingType.CERTIFICATE_OF_PARTICIPATION.name: ContinuingEducationTrainingAccessRequirementsSerializer,
+            TrainingType.CERTIFICATE_OF_SUCCESS.name: ContinuingEducationTrainingAccessRequirementsSerializer,
+            TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: ContinuingEducationTrainingAccessRequirementsSerializer,
             TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name:
-                ContinuingEducationTrainingAdmissionConditionsSerializer,
+                ContinuingEducationTrainingAccessRequirementsSerializer,
             TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name:
-                ContinuingEducationTrainingAdmissionConditionsSerializer,
+                ContinuingEducationTrainingAccessRequirementsSerializer,
         }
-        serializer = admission_condition_serializers.get(
-            self.get_education_group_year().education_group_type.name,
-            AdmissionConditionsSerializer,
+        root_node = self.context.get('root_node')
+        serializer = access_requirements_serializers.get(
+            root_node.node_type.name,
+            AccessRequirementsSerializer,
         )
         return serializer(self.get_admission_condition(), context=self.context).data
 
-    def get_education_group_year(self):
-        return self.context['egy']
-
     def get_admission_condition(self):
+        offer = self.context.get('offer')
         try:
-            return self.get_education_group_year().admissioncondition
+            return AdmissionCondition.objects.get(education_group_year_id=offer.id)
         except AdmissionCondition.DoesNotExist:
-            return AdmissionCondition.objects.create(education_group_year=self.get_education_group_year())
+            return AdmissionCondition.objects.create(education_group_year_id=offer.id)
 
 
 class ContactsSectionSerializer(serializers.Serializer):
@@ -102,5 +94,5 @@ class ContactsSectionSerializer(serializers.Serializer):
     content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
-        egy = self.context.get('egy')
-        return ContactsSerializer(egy, context=self.context).data
+        root_node = self.context.get('root_node')
+        return ContactsSerializer(root_node, context=self.context).data

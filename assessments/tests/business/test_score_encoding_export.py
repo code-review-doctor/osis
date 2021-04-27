@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -35,11 +35,16 @@ from assessments.business.enrollment_state import ENROLLED_LATE_COLOR, NOT_ENROL
 from assessments.business.score_encoding_export import _coloring_enrollment_state, FIRST_COL_LEGEND_ENROLLMENT_STATUS, \
     _color_legend, FIRST_ROW_LEGEND_ENROLLMENT_STATUS, _add_header_and_legend_to_file, \
     justification_other_values
+from assessments.models.enums import score_sheet_address_choices
+from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
 from base import models as mdl
 from base.models.enums import exam_enrollment_state as enrollment_states
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityWithVersionFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
@@ -53,9 +58,11 @@ class XlsTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-        cls.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                        academic_year__current=True,
-                                                        reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        cls.academic_calendar = AcademicCalendarFactory(
+            title="Submission of score encoding - 1",
+            data_year__current=True,
+            reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+        )
         cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
                                                                number_session=number_session.ONE)
         learning_unit_yr = LearningUnitYearFactory(learning_container_year__academic_year__current=True)
@@ -116,7 +123,7 @@ class XlsTests(TestCase):
                                                 date_enrollment=self.academic_calendar.start_date)
         ue = exam_enrollment.learning_unit_enrollment.learning_unit_year
 
-        _add_header_and_legend_to_file([exam_enrollment], self.worksheet)
+        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, is_program_manager=True)
         self.assertEqual(
             self.worksheet.cell(row=1, column=1).value,
             str(ue) + " " + ue.complete_title if ue.complete_title else str(ue)
@@ -185,4 +192,33 @@ class XlsTests(TestCase):
             str(_('Decimals authorized for this learning unit'))
             if ue.decimal_scores else
             str(_('Unauthorized decimal for this learning unit'))
+        )
+
+    def test_add_header_for_tutor(self):
+        educ_group_year = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            management_entity=EntityWithVersionFactory(),
+            administration_entity=EntityWithVersionFactory(),
+        )
+        exam_enrollment = ExamEnrollmentFactory(
+            session_exam=self.session_exam,
+            enrollment_state=enrollment_states.ENROLLED,
+            date_enrollment=self.academic_calendar.start_date,
+            learning_unit_enrollment__offer_enrollment__education_group_year=educ_group_year)
+
+        education_group = educ_group_year.education_group
+        score_sheet_adress = ScoreSheetAddressFactory(
+            education_group=education_group,
+            entity_address_choice=score_sheet_address_choices.ENTITY_MANAGEMENT,
+            email='dd@fa.com'
+        )
+        _add_header_and_legend_to_file([exam_enrollment], self.worksheet, is_program_manager=False)
+
+        self.assertEqual(
+            self.worksheet.cell(row=1, column=7).value,
+            str('Contacts')
+        )
+        self.assertEqual(
+            self.worksheet.cell(row=1, column=8).value,
+            score_sheet_adress.email
         )

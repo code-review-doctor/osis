@@ -37,7 +37,7 @@ class SessionExamDeadlineAdmin(OsisModelAdmin):
     list_filter = ('number_session',)
     raw_id_fields = ('offer_enrollment',)
     search_fields = ['offer_enrollment__student__person__first_name', 'offer_enrollment__student__person__last_name',
-                     'offer_enrollment__student__registration_id', 'offer_enrollment__offer_year__acronym']
+                     'offer_enrollment__student__registration_id', 'offer_enrollment__education_group_year__acronym']
 
 
 class SessionExamDeadline(models.Model):
@@ -62,9 +62,7 @@ class SessionExamDeadline(models.Model):
 
     @property
     def deadline_tutor_computed(self):
-        if self.deadline_tutor is not None:
-            return self.deadline - datetime.timedelta(days=self.deadline_tutor)
-        return None
+        return compute_deadline_tutor(self.deadline, self.deadline_tutor)
 
     @property
     def is_deadline_reached(self):
@@ -78,6 +76,12 @@ class SessionExamDeadline(models.Model):
 
     def __str__(self):
         return u"%s-%s" % (self.offer_enrollment, self.number_session)
+
+
+def compute_deadline_tutor(deadline, deadline_tutor):
+    if deadline_tutor is not None:
+        return deadline - datetime.timedelta(days=deadline_tutor)
+    return None
 
 
 def filter_by_nb_session(nb_session):

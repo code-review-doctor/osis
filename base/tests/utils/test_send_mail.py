@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
-from base.tests.models import test_person, test_academic_year, test_offer_year, \
-    test_exam_enrollment
+from base.tests.models import test_person, test_academic_year, test_exam_enrollment
 from base.utils import send_mail
 from osis_common.models import message_template
 
@@ -55,23 +54,37 @@ class TestSendMessage(TestCase):
         cls.persons = [cls.person_1, cls.person_2]
 
         cls.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
+        cls.person_without_language = test_person.create_person(
+            "language", last_name="without", email="personwithoutlang@test.com", language=None
+        )
 
         cls.academic_year = test_academic_year.create_academic_year()
         test_academic_year.create_academic_year(year=cls.academic_year.year - 1)
 
-        cls.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
-                                                         specific_title="Cours de test",
-                                                         academic_year=cls.academic_year)
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym="TEST",
+            specific_title="Cours de test",
+            academic_year=cls.academic_year,
+        )
 
-        cls.offer_year = test_offer_year.create_offer_year("SINF2MA", "Master en Sciences Informatique",
-                                                           cls.academic_year)
+        cls.educ_group_year = EducationGroupYearFactory(
+            acronym="SINF2MA",
+            title="Master en Sciences Informatique",
+            academic_year=cls.academic_year,
+        )
 
-        cls.exam_enrollment_1 = test_exam_enrollment.create_exam_enrollment_with_student(1, "64641200",
-                                                                                         cls.offer_year,
-                                                                                         cls.learning_unit_year)
-        cls.exam_enrollment_2 = test_exam_enrollment.create_exam_enrollment_with_student(2, "60601200",
-                                                                                         cls.offer_year,
-                                                                                         cls.learning_unit_year)
+        cls.exam_enrollment_1 = test_exam_enrollment.create_exam_enrollment_with_student(
+            1,
+            "64641200",
+            cls.educ_group_year,
+            cls.learning_unit_year,
+        )
+        cls.exam_enrollment_2 = test_exam_enrollment.create_exam_enrollment_with_student(
+            2,
+            "60601200",
+            cls.educ_group_year,
+            cls.learning_unit_year,
+        )
 
         cls.msg_list = [
             'The partim TEST_A has been deleted for the year ' + str(cls.academic_year.year),
@@ -138,59 +151,38 @@ class TestSendMessage(TestCase):
         self.assertIsNone(args.get('attachment'))
 
     @patch("osis_common.messaging.send_message.send_messages")
-    def test_send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
-        send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self.statistics_data)
-        args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year, args.get('template_base_data').get('current_academic_year'))
-        self.assertEqual(len(args.get('receivers')), 1)
-        self.assertIsNone(args.get('attachment'))
-
-    @patch("osis_common.messaging.send_message.send_messages")
-    def test_send_mail_after_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
-        edgy_same_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        edgy_not_same_year = EducationGroupYearFactory(academic_year=self.academic_year.past())
-
-        send_mail.send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
-            self.statistics_data,
-            [edgy_same_year, edgy_not_same_year],
-            []
-        )
-        args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year, args.get('template_base_data').get('current_academic_year'))
-        self.assertEqual(len(args.get('receivers')), 1)
-        self.assertIsNone(args.get('attachment'))
-
-        self.assertEqual(args['template_base_data']['egys_postponed'], 2)
-        self.assertCountEqual(args['template_base_data']['egys_postponed_qs'], [edgy_same_year, edgy_not_same_year])
-
-    @patch("osis_common.messaging.send_message.send_messages")
     @patch("osis_common.messaging.message_config.create_table")
     def test_with_one_enrollment(self, mock_create_table, mock_send_messages):
         send_mail.send_message_after_all_encoded_by_manager(
-            self.persons,
+            [self.person_1, self.person_without_language],
             [self.exam_enrollment_1],
             self.learning_unit_year.acronym,
-            self.offer_year.acronym
+            self.educ_group_year.acronym,
+            [self.exam_enrollment_1.id],
+            False
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
-        self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+
         self.assertListEqual(
-            list(args[2][0]),
-            [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
-             self.exam_enrollment_1.session_exam.number_session,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-             self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-             self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-             ])
+            list(args[2]['data'][0]),
+            [
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                self.exam_enrollment_1.session_exam.number_session,
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+                self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+                self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+            ]
+        )
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
-        self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
-        self.assertEqual(len(args.get('receivers')), 2)
-        self.assertEqual(args.get('receivers')[0].get('receiver_lang'), LANGUAGE_CODE_FR)
-        self.assertEqual(args.get('receivers')[1].get('receiver_lang'), LANGUAGE_CODE_EN)
+        self.assertEqual(self.educ_group_year.acronym, args.get('subject_data').get('offer_acronym'))
+        receivers = list(args.get('receivers'))
+        self.assertEqual(len(receivers), 2)
+        self.assertEqual(receivers[0].get('receiver_lang'), LANGUAGE_CODE_FR)
+        self.assertEqual(receivers[1].get('receiver_lang'), LANGUAGE_CODE_FR)
         self.assertIsNotNone(args.get('attachment'))
         self.assertEqual(args.get('html_template_ref'),
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
@@ -218,10 +210,10 @@ class TestSendMessage(TestCase):
             )
             args = mock_create_table.call_args[0]
             self.assertEqual(args[0], 'submitted_enrollments')
-            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers(person.language))
             self.assertListEqual(
                 list(args[2][0]),
-                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                  self.exam_enrollment_1.session_exam.number_session,
                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
@@ -249,6 +241,16 @@ class TestSendMessage(TestCase):
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, True), 'All the scores are encoded.')
         self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, True),
                          'Toutes les notes ont été soumises.')
+
+    def test_check_table_headers_fr_be(self):
+        expected = ['Sigle', 'Session', 'Noma', 'Nom', 'Prénom', 'Note', 'Justification']
+        self.assertListEqual(expected, send_mail.get_enrollment_headers('fr-be'))
+
+    def test_check_table_headers_en(self):
+        expected = [
+            'Program', 'Session number', 'Registration number', 'Last name', 'First name', 'Score', 'Justification'
+        ]
+        self.assertListEqual(expected, send_mail.get_enrollment_headers('en'))
 
 
 def add_message_template_txt():

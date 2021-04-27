@@ -1,7 +1,7 @@
-{% extends "education_group/layout.html" %}
+{% extends "education_group_app/blocks/layout.html" %}
 {% load static %}
 {% load i18n bootstrap3 %}
-{% load waffle_tags %}
+{% load osis_role pagination %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -10,7 +10,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,30 @@
     <div class="page-header">
         <div class="row">
             <div class="col-md-12">
-                <h2>{% trans 'Trainings' %}</h2>
+                <h2 class="d-inline-block">{% trans 'Trainings' %}</h2>
+
+                <!-- Create dropdown -->
+                <div class="btn-group pull-right" style="margin-top:20px;">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                        {% trans 'Actions' %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                        <li>
+                            {% url 'create_element_select_type' enums.GROUP as create_group_url %}
+                            {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
+                        </li>
+                        <li>
+                            {% url 'create_element_select_type' enums.TRAINING as create_training_url %}
+                            {% a_tag_modal_has_perm create_training_url _('New training') 'base.add_training' user %}
+                        </li>
+                        <li>
+                            {% url 'create_element_select_type' enums.MINI_TRAINING as create_mini_training_url %}
+                            {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
+                        </li>
+                    </ul>
+                 </div>
             </div>
         </div>
     </div>
@@ -61,9 +84,12 @@
                         {% bootstrap_label form.partial_acronym.label %}
                         {% bootstrap_field form.partial_acronym show_label=False %}
                     </div>
-                    <div class="col-md-6">
-                        {% bootstrap_label form.title_fr.label %}
-                        {% bootstrap_field form.title_fr show_label=False %}
+                    <div class="col-md-3">
+                        {% bootstrap_label form.full_title_fr.label %}
+                        {% bootstrap_field form.full_title_fr show_label=False %}
+                    </div>
+                    <div class="col-md-3">
+                        {% bootstrap_field form.main_teaching_campus %}
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">
@@ -98,6 +124,24 @@
                 </div>
                 {% bootstrap_field form.ordering %}
                 {{ form.media }}
+                <input type="hidden" id="xls_status" name="xls_status">
+                <input type="hidden" id="xls_order_col" name="xls_order_col">
+                <input type="hidden" id="xls_order" name="xls_order">
+                <input type="hidden" id="hdn_with_validity" name="with_validity">
+                <input type="hidden" id="hdn_with_osis_code" name="with_osis_code">
+                <input type="hidden" id="hdn_with_partial_english_titles" name="with_partial_english_titles">
+                <input type="hidden" id="hdn_with_education_fields" name="with_education_fields">
+                <input type="hidden" id="hdn_with_organization" name="with_organization">
+                <input type="hidden" id="hdn_with_activities" name="with_activities">
+                <input type="hidden" id="hdn_with_responsibles_and_contacts" name="with_responsibles_and_contacts">
+                <input type="hidden" id="hdn_with_diploma_and_certificat" name="with_diploma_and_certificat">
+                <input type="hidden" id="hdn_with_co_graduation_and_partnership" name="with_co_graduation_and_partnership">
+                <input type="hidden" id="hdn_with_ares_code" name="with_ares_code">
+                <input type="hidden" id="hdn_with_enrollment" name="with_enrollment">
+                <input type="hidden" id="hdn_with_funding" name="with_funding">
+                <input type="hidden" id="hdn_with_other_legal_information" name="with_other_legal_information">
+                <input type="hidden" id="hdn_with_additional_info" name="with_additional_info">
+                <input type="hidden" id="hdn_with_keywords" name="with_keywords">
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
@@ -105,22 +149,57 @@
             <div class="row">
                 {% if object_list_count %}
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <strong style="margin-left:10px;color:grey;">
                                 {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
                             </strong>
                         </div>
+                        <div class="col-md-6">
+                            <button id="dLabel" class="btn btn-default pull-right" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    style="margin-right:10px;"
+                                    title="{% trans 'Export' %}">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                                <li>
+                                    <a id="btn_produce_personnalized_xls"
+                                       class="download"
+                                       style="margin-right:10px;"
+                                       data-toggle="modal" data-target="#modalXlsTrainingsListWithParameters"
+                                       title="{% trans 'Produce xls with a list of trainings' %}">
+                                        &nbsp;{% trans 'List of trainings' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="btn_produce_xls_administrative_data"
+                                       class="download"
+                                       style="margin-right:10px;"
+                                       title="{% trans 'Produce xls of trainings with administrative data' %}">
+                                        &nbsp;{% trans 'List of trainings with administrative data' %}
+                                    </a>
+                                </li>
+                            </ul>
+                            <form id="download_xls" action="{{ request.path }}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
+                            </form>
+
+                            <div class="pull-right" style="margin-right: 10px"> {% base_pagination_size_select %} </div>
+                        </div>
                     </div>
 
-                    <table id="table_education_groups" class="table table-striped table-hover">
+                    <table id="table_education_groups" class="table table-striped table-hover" width="99.99%">
                         <thead>
                             <tr>
-                                <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
-                                <th id="th_1_acronym">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
+                                <th id="th_0_academic_year.year" width="4%">{% trans 'Ac yr.' %}</th>
+                                <th id="th_1_acronym" width="10%">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
                                 <th id="th_2_title_fr">{% trans 'Title' %}</th>
-                                <th id="th_3_education_group_type.name">{% trans 'Type' %}</th>
-                                <th id="th_4_management_entity_version.acronym">{% trans 'Entity' %}</th>
-                                <th id="th_5_partial_acronym">{% trans 'Code' %}</th>
+                                <th id="th_3_education_group_type.name" width="15%">{% trans 'Type' %}</th>
+                                <th id="th_4_management_entity_version.acronym" width="4%">{% trans 'Entity' %}</th>
+                                <th id="th_5_main_teaching_campus_name" width="8%">{% trans 'Learning location' %}</th>
+                                <th id="th_6_partial_acronym" width="5%">{% trans 'Code' %}</th>
                             </tr>
                         </thead>
                     </table>
@@ -131,6 +210,7 @@
             </div>
         </div>
     </div>
+    {% include 'education_group/blocks/modal/modal_xls_trainings_list_with_parameters.html' %}
 {% endblock %}
 
 
@@ -148,14 +228,28 @@
                         return outputAnchorOuterHtml(row["url"], data);
                     }
                 },
-                {"name": "title", "targets": 2, "data": "title"},
+                {"name": "full_title_fr", "targets": 2, "data": "full_title_fr"},
                 {"name": "type", "targets": 3,  "data": "education_group_type_text"},
                 {"name": "management_entity", "targets": 4, "data": "management_entity"},
-                {"name": "code", "targets": 5, "data": "code"}
+                {"name": "main_teaching_campus", "targets": 5, "data": "main_teaching_campus"},
+                {"name": "code", "targets": 6, "data": "code"},
             ];
 
             initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
             {{items_per_page}}, "{% url 'version_program' %}", columnDefs);
+        });
+        // FIXME remove xls_order_col / xls_order ==> USE ordering params
+        $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
+            set_order_hidden_fields();
+
+            let action_value;
+            if ($(this).attr('id') === 'btn_produce_xls') {
+                action_value = 'xls';
+            } else if ( $(this).attr('id') === 'btn_produce_xls_administrative_data' ) {
+                action_value = 'xls_administrative';
+            }
+            prepare_xls(e, action_value);
+            reset_order_hidden_fields();
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
@@ -172,6 +266,31 @@
             let $searchfield = $(this).parent().find('.select2-search__field');
             $searchfield.prop('disabled', true);
         });
+
+        $("#btn_xls_with_parameters").click(function(e) {
+            set_order_hidden_fields();
+            prepare_xls(e, 'xls_customized');
+            parameters = ['validity', 'osis_code', 'partial_english_titles', 'education_fields', 'organization',
+                'activities', 'responsibles_and_contacts', 'diploma_and_certificat', 'co_graduation_and_partnership',
+                'ares_code', 'enrollment', 'funding', 'other_legal_information', 'additional_info', 'keywords'];
+            for (i = 0; i < parameters.length; i++) {
+               $("#hdn_with_" + parameters[i]).val('');
+            }
+            reset_order_hidden_fields();
+        });
+
+        function set_order_hidden_fields(){
+            let table = $('#table_education_groups').DataTable();
+            let order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+        }
+
+        function reset_order_hidden_fields() {
+            $("#xls_order").val('');
+            $("#xls_order_col").val('');
+        }
+
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
 {% endblock %}

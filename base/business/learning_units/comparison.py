@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,12 +25,14 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'credits', 'periodicity',
-                                          'status', 'language', 'professional_integration', 'specific_title',
-                                          'specific_title_english', 'quadrimester',
-                                          'session', 'attribution_procedure']
-FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant', 'common_title',
-                                               'common_title_english']
+FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = [
+    'acronym', 'internship_subtype', 'credits', 'periodicity',
+    'status', 'language', 'professional_integration', 'specific_title',
+    'specific_title_english', 'quadrimester', 'session', 'faculty_remark',
+    'other_remark', 'other_remark_english'
+]
+FIELDS_FOR_COMMON_TITLE_COMPARISON = ['common_title', 'common_title_english']
+FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
 DEFAULT_VALUE_FOR_NONE = '-'
 LEARNING_COMPONENT_YEAR = 'learning_component_year'
 
@@ -132,7 +134,7 @@ def _real_classes_is_different(obj_prev, obj_ref):
 
 
 def _is_key_to_compare(key, vol):
-    return not(key == 'PLANNED_CLASSES' or key in vol)
+    return not (key == 'PLANNED_CLASSES' or key in vol)
 
 
 def get_partims_as_str(partim_list):

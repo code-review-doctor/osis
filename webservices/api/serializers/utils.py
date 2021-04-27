@@ -37,7 +37,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(DynamicLanguageFieldsModelSerializer, self).__init__(*args, **kwargs)
-        language = self.context.get('lang')
+        language = self.context.get('language')
 
         is_admission_condition = isinstance(self.instance, AdmissionCondition)
         if language is not None:
@@ -61,7 +61,13 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
         return data
 
     def _get_source(self, field_name, is_admission_condition, language):
-        specific_fields = ['free_text', 'text', 'personalized_access', 'admission_enrollment_procedures']
+        specific_fields = [
+            'free_text',
+            'text',
+            'personalized_access',
+            'admission_enrollment_procedures',
+            'ca_allegement'
+        ]
 
         prefix = 'text_' if is_admission_condition else ''
 

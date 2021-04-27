@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import http
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import ERROR
 from django.core.exceptions import PermissionDenied
@@ -32,7 +33,6 @@ from django.views.decorators.http import require_POST
 from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_proposal as business_proposal
-from base.business.learning_units import perms
 from base.models.enums import proposal_type, proposal_state
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -42,11 +42,11 @@ from base.views.common import display_error_messages, display_messages_by_level
 @waffle_flag('learning_unit_proposal_delete')
 @login_required
 @require_POST
-def consolidate_proposal(request, learning_unit_year_id):
+def consolidate_proposal(request: http.HttpRequest, learning_unit_year_id: int):
     proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year__id=learning_unit_year_id)
     user_person = get_object_or_404(Person, user=request.user)
 
-    if not perms.is_eligible_to_consolidate_proposal(proposal, user_person):
+    if not user_person.user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year):
         raise PermissionDenied("Proposal cannot be consolidated")
 
     messages_by_level = {}

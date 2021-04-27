@@ -34,7 +34,9 @@ from base.models.enums import learning_unit_year_periodicity, learning_unit_year
 from base.tests.factories.academic_calendar import generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import LearningUnitsMixin
-from base.tests.factories.person import CentralManagerFactory
+from education_group.calendar.education_group_extended_daily_management import \
+    EducationGroupExtendedDailyManagementCalendar
+from learning_unit.tests.factories.central_manager import CentralManagerFactory
 
 
 class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
@@ -55,29 +57,36 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             learning_unit_year_subtype=learning_unit_year_subtypes.FULL,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
-        cls.person_central = CentralManagerFactory()
+        cls.person_central = CentralManagerFactory().person
+        cls.partim_learning_unit = cls.setup_learning_unit(
+            start_year=cls.starting_academic_year)
+        cls.partim = cls.setup_learning_unit_year(
+            academic_year=cls.starting_academic_year,
+            learning_unit=cls.partim_learning_unit,
+            learning_container_year=cls.learning_container_year,
+            learning_unit_year_subtype=learning_unit_year_subtypes.PARTIM,
+            periodicity=learning_unit_year_periodicity.ANNUAL
+        )
         generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def test_edit_end_date_send_dates_with_end_date_not_defined(self):
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         form = LearningUnitDailyManagementEndDateForm(
             None, learning_unit_year=self.learning_unit_year, person=self.person_central)
-        self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_academic_years_after_now)
+        self.assertEqual(list(form.fields['academic_year'].queryset),
+                         list(AcademicYear.objects.filter(year__gte=self.learning_unit.start_year.year,
+                                                          year__in=target_years_opened)))
         self.assertFalse(form.fields['academic_year'].required)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
 
     def test_edit_end_date_send_dates_with_end_date_defined(self):
         self.learning_unit.end_year = self.last_academic_year
+        target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         form = LearningUnitDailyManagementEndDateForm(
             None, learning_unit_year=self.learning_unit_year, person=self.person_central)
-        self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_academic_years_after_now)
-        self.assertFalse(form.fields['academic_year'].required)
-        self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
-
-    def test_edit_end_date_send_dates_with_end_date_of_learning_unit_inferior_to_current_academic_year(self):
-        self.learning_unit.end_year = self.oldest_academic_year
-        form = LearningUnitDailyManagementEndDateForm(
-            None, learning_unit_year=self.learning_unit_year, person=self.person_central)
-        self.assertEqual(form.fields['academic_year'].disabled, True)
+        self.assertEqual(list(form.fields['academic_year'].queryset),
+                         list(AcademicYear.objects.filter(year__gte=self.learning_unit.start_year.year,
+                                                          year__in=target_years_opened)))
         self.assertFalse(form.fields['academic_year'].required)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
 
@@ -88,6 +97,17 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
             form_data, learning_unit_year=self.learning_unit_year, person=self.person_central)
         self.assertFalse(form.fields['academic_year'].required)
         self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['academic_year'], self.starting_academic_year)
+        self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
+
+    def test_edit_end_date_from_partim(self):
+        self.partim.end_year = self.last_academic_year
+        form_data = {"academic_year": self.starting_academic_year.pk}
+        form = LearningUnitDailyManagementEndDateForm(
+            form_data, learning_unit_year=self.partim, person=self.person_central)
+        self.assertFalse(form.fields['academic_year'].required)
+        self.assertTrue(form.is_valid())
+        self.assertTrue(form.save())
         self.assertEqual(form.cleaned_data['academic_year'], self.starting_academic_year)
         self.assertEqual(NO_PLANNED_END_DISPLAY, form.fields['academic_year'].empty_label)
 

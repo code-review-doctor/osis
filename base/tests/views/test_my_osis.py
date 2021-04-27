@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,9 +29,7 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from attribution.tests.factories.attribution import AttributionFactory
-from base.models.enums import academic_calendar_type
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory, AttributionNewWithDecisionFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
@@ -53,19 +51,22 @@ class MyOsisViewTestCase(TestCase):
         cls.person = PersonFactory(user=cls.a_superuser,
                                    language=LANGUAGE_CODE_FR)
         academic_year = create_current_academic_year()
-        cls.summary_course_submission_calendar = AcademicCalendarFactory(
-            academic_year=academic_year,
-            start_date=academic_year.start_date,
-            end_date=academic_year.end_date,
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-
         cls.tutor = TutorFactory(person=cls.person)
         # FIXME CHANGE LEARNINGUNITYEARFACTORY FOR AVOID MULTI ACADEMIC YEAR
         cls.learning_container_year = LearningContainerYearFactory(academic_year=academic_year)
         cls.learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
                                                               learning_container_year=cls.learning_container_year)
-        cls.attribution = AttributionFactory(learning_unit_year=cls.learning_unit_year, summary_responsible=True,
-                                             tutor=cls.tutor)
+        cls.attribution = AttributionNewFactory(learning_container_year=cls.learning_container_year,
+                                                tutor=cls.tutor)
+        learning_container_year_2 = LearningContainerYearFactory(academic_year=academic_year)
+        LearningUnitYearFakerFactory(
+            academic_year=academic_year,
+            learning_container_year=learning_container_year_2
+        )
+        cls.attribution_with_decision_making = AttributionNewWithDecisionFactory(
+            learning_container_year=learning_container_year_2,
+            tutor=cls.tutor
+        )
 
     def setUp(self):
         self.client.force_login(self.a_superuser)
@@ -155,6 +156,6 @@ class MyOsisViewTestCase(TestCase):
         self.assertEqual(context['person'], self.person)
         self.assertCountEqual(context['addresses'], [])
         self.assertEqual(context['tutor'], self.tutor)
-        self.assertCountEqual(context['attributions'], [self.attribution])
+        # LUY with decision_making != '' should not appear in learning_unit_years_attributed
+        self.assertCountEqual(context['learning_unit_years_attributed'], [self.learning_unit_year])
         self.assertCountEqual(context['programs'], [])
-        self.assertTrue(context['summary_submission_opened'])

@@ -27,15 +27,14 @@ from collections import OrderedDict
 from operator import itemgetter
 
 from django.db.models import Prefetch, Max
-from django.utils.translation import ugettext_lazy as _
 
-from base import models as mdl_base
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import learning_achievement, academic_year
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
 from cms import models as mdl_cms
@@ -47,6 +46,11 @@ CMS_LABEL_PEDAGOGY_FR_AND_EN = ['resume', 'teaching_methods', 'evaluation_method
                                 'online_resources']
 CMS_LABEL_PEDAGOGY_FR_ONLY = ['bibliography', 'mobility']
 CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
+CMS_LABEL_PEDAGOGY_FORCE_MAJEURE = [
+    'teaching_methods_force_majeure',
+    'evaluation_methods_force_majeure',
+    'other_informations_force_majeure'
+]
 
 CMS_LABEL_SUMMARY = ['resume']
 
@@ -117,10 +121,10 @@ def get_cms_label_data(cms_label, user_language):
     return cms_label_data
 
 
-def _learning_unit_usage(learning_unit_year):
+def _learning_unit_usage(learning_unit_yr):
     return "{} ({})".format(
-        learning_unit_year.acronym,
-        _(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
+        learning_unit_yr.acronym,
+        LearningUnitYearQuadrimester.get_value(learning_unit_yr.quadrimester) if learning_unit_yr.quadrimester else '?'
     )
 
 
@@ -145,13 +149,6 @@ def get_components_identification(learning_unit_yr):
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
     return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
-
-
-def is_summary_submission_opened():
-    current_academic_year = mdl_base.academic_year.starting_academic_year()
-    return mdl_base.academic_calendar. \
-        is_academic_calendar_opened_for_specific_academic_year(current_academic_year,
-                                                               academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 
 
 def compose_components_dict(components, additional_entities):

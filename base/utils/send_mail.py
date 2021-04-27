@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,8 +27,11 @@
 """
 Utility files for mail sending
 """
+from typing import List
 import datetime
+import itertools
 
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR
 from django.db.models import Q
@@ -40,6 +43,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from assessments.business import score_encoding_sheet
 from base.models.enums import proposal_type
 from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
+from base.models.exam_enrollment import ExamEnrollment
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
@@ -53,7 +57,8 @@ ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE = "assessments_scores_submission"
 ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER = "assessments_all_scores_by_pgm_manager"
 
 
-def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enrollments, all_encoded):
+def send_mail_after_scores_submission(persons: List[Person], learning_unit_name: str,
+                                      submitted_enrollments: List[ExamEnrollment], all_encoded: bool):
     """
     Send an email to all the teachers after the scores submission for a learning unit
     :param persons: The list of the teachers of the learning unit
@@ -74,21 +79,26 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
     justifications = dict(JUSTIFICATION_TYPES)
     submitted_enrollments_data = [
         (
-            enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             enrollment.session_exam.number_session,
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final if enrollment.score_final else '',
+            enrollment.score_final if enrollment.score_final is not None else '',
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in submitted_enrollments]
 
-    table = message_config.create_table('submitted_enrollments',
-                                        get_enrollment_headers(),
-                                        submitted_enrollments_data,
-                                        data_translatable=['Justification'])
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+    receivers = [
+        message_config.create_receiver(
+            person.id, person.email, person.language if person.language else settings.LANGUAGE_CODE
+        ) for person in persons
+    ]
+
     for receiver in receivers:
+        table = message_config.create_table('submitted_enrollments',
+                                            get_enrollment_headers(receiver['receiver_lang']),
+                                            submitted_enrollments_data,
+                                            data_translatable=['Justification'])
         template_base_data.update(
             {'encoding_status': _get_encoding_status(receiver['receiver_lang'], all_encoded)
              }
@@ -99,7 +109,7 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
     return None
 
 
-def send_mail_after_the_learning_unit_year_deletion(managers, acronym, academic_year, msg_list):
+def send_mail_after_the_learning_unit_year_deletion(managers, acronym: str, academic_year, msg_list):
     html_template_ref = 'learning_unit_year_deletion_html'
     txt_template_ref = 'learning_unit_year_deletion_txt'
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
@@ -163,62 +173,6 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
-
-
-def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(statistics_context: dict):
-    html_template_ref = 'egy_before_auto_postponement_html'
-    txt_template_ref = 'egy_before_auto_postponement_txt'
-
-    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(
-        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
-    ).distinct()
-    receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {
-        'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past(),
-        'current_academic_year': statistics_context['max_academic_year_to_postpone'],
-
-        # Use len instead of count() (it's buggy when a queryset is built with a difference())
-        'egys_to_postpone': len(statistics_context['to_duplicate']),
-        'egys_already_existing': statistics_context['already_duplicated'].count(),
-        'egys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
-    }
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
-                                                            template_base_data, None, None)
-    return message_service.send_messages(message_content)
-
-
-def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
-        statistics_context: dict, egys_postponed: list, egys_with_errors: list):
-
-    html_template_ref = 'egy_after_auto_postponement_html'
-    txt_template_ref = 'egy_after_auto_postponement_txt'
-
-    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(
-        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
-    ).distinct()
-    receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    template_base_data = {
-        'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past(),
-        'current_academic_year': statistics_context['max_academic_year_to_postpone'],
-        'egys_postponed': len(egys_postponed),
-        'egys_postponed_qs': sorted(egys_postponed, key=__sort_education_group_type),
-        'egys_already_existing': statistics_context['already_duplicated'].count(),
-        'egys_already_existing_qs': statistics_context['already_duplicated'].order_by(
-          'educationgroupyear__education_group_type__name', 'educationgroupyear__acronym'),
-        'egys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
-        'egys_ending_this_year_qs': statistics_context['ending_on_max_academic_year'].order_by(
-          'educationgroupyear__education_group_type__name', 'educationgroupyear__acronym'),
-        'egys_with_errors': egys_with_errors
-    }
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
-                                                            template_base_data, None, None)
-    return message_service.send_messages(message_content)
-
-
-def __sort_education_group_type(egy):
-    return (egy.education_group_type.name, egy.acronym)
 
 
 def send_mail_cancellation_learning_unit_proposals(manager, tuple_proposals_results, research_criteria):
@@ -319,19 +273,30 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     return worksheet_parameters
 
 
-def send_message_after_all_encoded_by_manager(persons, enrollments, learning_unit_acronym, offer_acronym):
+def send_message_after_all_encoded_by_manager(
+        receivers,
+        enrollments,
+        learning_unit_acronym,
+        offer_acronym,
+        updated_enrollments_ids,
+        encoding_already_completed_before_update,
+        cc=None
+):
     """
     Send a message to all tutor from a learning unit when all scores are submitted by program manager
-    :param persons: The list of the tutor (person) of the learning unit
+    :param receivers: The list of the tutor (person) of the learning unit
     :param enrollments: The enrollments that are encoded and submitted
     :param learning_unit_acronym The learning unit encoded
     :param offer_acronym: The offer which is managed
+    :param updated_enrollments_ids: updated enrollments ids
+    :param encoding_already_completed_before_update: Before update encoding was already complete.
+    :param cc: Persons (list) need to be in copy (cc) of the emails sent
     :return: A message if an error occurred, None if it's ok
     """
 
     html_template_ref = '{}_html'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
     txt_template_ref = '{}_txt'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in receivers]
     subject_data = {
         'learning_unit_acronym': learning_unit_acronym,
         'offer_acronym': offer_acronym
@@ -343,23 +308,59 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
     justifications = dict(JUSTIFICATION_TYPES)
     enrollments_data = [
         (
-            enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             enrollment.session_exam.number_session,
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final if enrollment.score_final else '',
+            enrollment.score_final if enrollment.score_final is not None else '',
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    table = message_config.create_table('enrollments', get_enrollment_headers(), enrollments_data,
-                                        data_translatable=['Justification'])
+    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
 
-    attachment = build_scores_sheet_attachment(enrollments)
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
-                                                            [table], receivers, template_base_data, subject_data,
-                                                            attachment)
-    return message_service.send_messages(message_content)
+    rows_styles = _html_format_rows_styles(
+        enrollments, updated_enrollments_ids,
+        encoding_already_completed_before_update
+    )
+    txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
+        enrollments,
+        updated_enrollments_ids,
+        encoding_already_completed_before_update
+    )
+
+    for receiver_lang, receivers in receivers_by_lang:
+        receivers = list(receivers)
+        table = message_config.create_table(
+            'enrollments',
+            get_enrollment_headers(receiver_lang),
+            {
+                "style": rows_styles,
+                "data": enrollments_data,
+                "txt_complementary_first_col": {
+                    "header": _get_txt_complementary_first_col_header(receiver_lang),
+                    "rows_content": txt_complementary_first_col_content_data
+                }
+            },
+            data_translatable=['Justification'],
+        )
+
+        attachment = build_scores_sheet_attachment(enrollments)
+        message_content = message_config.create_message_content(
+            html_template_ref,
+            txt_template_ref,
+            [table],
+            receivers,
+            template_base_data,
+            subject_data,
+            attachment,
+            cc=cc,
+        )
+        message_service.send_messages(message_content)
+
+
+def __order_by_lang(receiver):
+    return receiver['receiver_lang']
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
@@ -367,7 +368,7 @@ def build_scores_sheet_attachment(list_exam_enrollments):
     mimetype = "application/pdf"
     content = paper_sheet.build_pdf(
         score_encoding_sheet.scores_sheet_data(list_exam_enrollments, tutor=None))
-    return (name, content, mimetype)
+    return name, content, mimetype
 
 
 def send_mail_for_educational_information_update(teachers, learning_units_years):
@@ -381,19 +382,64 @@ def send_mail_for_educational_information_update(teachers, learning_units_years)
     return message_service.send_messages(message_content)
 
 
-def get_enrollment_headers():
-    return (
-        'Acronym enrollment header',
-        'Session enrollment header',
-        'Registration number header',
-        'Last name',
-        'First name',
-        'Score',
-        'Justification'
-    )
+def get_enrollment_headers(lang_code):
+    with translation.override(lang_code):
+        return [
+            translation.pgettext('Submission email table header', 'Program'),
+            translation.pgettext('Submission email table header', 'Session number'),
+            translation.pgettext('Submission email table header', 'Registration number'),
+            _('Last name'),
+            _('First name'),
+            _('Score'),
+            _('Justification')
+        ]
 
 
 def _get_encoding_status(language, all_encoded):
     message = 'All the scores are encoded.' if all_encoded else 'It remains notes to encode.'
     with translation.override(language):
         return translation.gettext(message)
+
+
+def _html_format_rows_styles(
+        enrollments: List[ExamEnrollment],
+        updated_enrollments_ids: List[int],
+        encoding_already_completed_before_update: bool
+) -> List[str]:
+    css_style_on_rows = []
+    for enrollment in enrollments:
+        has_to_be_marked = _has_to_be_marked(
+            encoding_already_completed_before_update,
+            enrollment,
+            updated_enrollments_ids
+        )
+        css_style_on_rows.append('background-color: lime;' if has_to_be_marked else '')
+    return css_style_on_rows
+
+
+def _txt_format_complementary_row_content(
+        enrollments: List[ExamEnrollment],
+        updated_enrollments_ids: List[int],
+        encoding_already_completed_before_update: bool
+) -> List[str]:
+    complementary_first_cols_contents = []
+    for enrollment in enrollments:
+        has_to_be_marked = _has_to_be_marked(
+            encoding_already_completed_before_update,
+            enrollment,
+            updated_enrollments_ids
+        )
+        complementary_first_cols_contents.append('*' if has_to_be_marked else '')
+    return complementary_first_cols_contents
+
+
+def _get_txt_complementary_first_col_header(lang_code):
+    with translation.override(lang_code):
+        return _('Updated')
+
+
+def _has_to_be_marked(
+        encoding_already_completed_before_update: bool,
+        enrollment: ExamEnrollment,
+        updated_enrollments_ids: List[int]) -> bool:
+    return not encoding_already_completed_before_update or enrollment.id in updated_enrollments_ids

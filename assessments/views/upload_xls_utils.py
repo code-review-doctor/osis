@@ -32,6 +32,7 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.utils.translation import pgettext_lazy
 from django.views.decorators.http import require_http_methods
 from openpyxl import load_workbook
 
@@ -40,12 +41,14 @@ from assessments.business.score_encoding_export import HEADER
 from assessments.forms.score_file import ScoreFileForm
 from attribution import models as mdl_attr
 from base import models as mdl
+from base.auth.roles import program_manager
+from base.auth.roles import tutor as tutor_mdl
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
 col_academic_year = HEADER.index(_('Academic year'))
 col_session = HEADER.index(_('Session'))
 col_learning_unit = HEADER.index(_('Learning unit'))
-col_offer = HEADER.index(_('Program'))
+col_offer = HEADER.index(pgettext_lazy('encoding', 'Program'))
 col_registration_id = HEADER.index(_('Registration number'))
 col_email = HEADER.index(_('Email'))
 col_score = HEADER.index(_('Numbered scores'))
@@ -146,7 +149,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     worksheet = workbook.active
     new_scores_number = 0
     learning_unit_year = mdl.learning_unit_year.get_by_id(learning_unit_year_id)
-    is_program_manager = mdl.program_manager.is_program_manager(request.user)
+    is_program_manager = program_manager.is_program_manager(request.user)
 
     data_xls = _get_all_data(worksheet)
 
@@ -165,8 +168,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
 
     score_list = _get_score_list_filtered_by_enrolled_state(learning_unit_year_id, request.user)
 
-    offer_acronyms_managed_by_user = {offer_year.acronym for offer_year
-                                      in score_encoding_list.find_related_offer_years(score_list)}
+    offer_acronyms_managed_by_user = {educ_group_year.acronym for educ_group_year
+                                      in score_encoding_list.find_related_education_group_years(score_list)}
     learn_unit_acronyms_managed_by_user = {learning_unit_year.acronym for learning_unit_year
                                             in score_encoding_list.find_related_learning_unit_years(score_list)}
     registration_ids_managed_by_user = score_encoding_list.find_related_registration_ids(score_list)
@@ -195,7 +198,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     _show_error_messages(request, errors_list)
 
     if new_scores_number:
-        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('Score saved')))
+        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('Score(s) saved')))
         if not is_program_manager:
             __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year)
         return True
@@ -358,7 +361,7 @@ def _is_informative_justification(enrollment, xls_justification, is_program_mana
 
 
 def __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year):
-    tutor = mdl.tutor.find_by_user(request.user)
+    tutor = tutor_mdl.find_by_user(request.user)
     if tutor and not mdl_attr.attribution.is_score_responsible(request.user, learning_unit_year):
         messages.add_message(request, messages.SUCCESS,
                              '%s' % _("The scores responsible must still submit the scores"))

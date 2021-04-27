@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,8 +34,9 @@ from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.enums.constraint_type import ConstraintTypeEnum
-from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.templatetags.education_group import register
+from program_management import formatter
 from program_management.ddd.business_types import *
 
 # TODO :: Remove this file and move the code into a Serializer
@@ -69,9 +70,10 @@ CHILD_LEAF = """\
             <img src="{icon_list_1}" height="14" width="17">
             <img src="{icon_list_2}" height="10" width="10">
             <img src="{icon_list_5}" height="10" width="10">
-            {value} <br>
+            {value}
             <img src="{icon_list_3}" height="10" width="10">
             <img src="{icon_list_4}" height="10" width="10">
+            <br>
             {comment}
             {sublist}
         </div>
@@ -111,11 +113,11 @@ BRANCH_CONSTRAINT = """\
 
 
 @register.filter  # TODO :: Remove this tag and move the code into a Serializer
-def pdf_tree_list(value: List['Link']):
-    return mark_safe(list_formatter(value))
+def pdf_tree_list(tree: 'ProgramTree'):
+    return mark_safe(list_formatter(tree, tree.root_node.children))
 
 
-def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
+def list_formatter(tree: 'ProgramTree', links_under_root: List['Link'], tabs=1, depth=None):
     output = []
     depth = depth if depth else 1
     for link in links_under_root:
@@ -123,12 +125,12 @@ def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
         padding = 2 * depth
         if link.child.children:
             sublist = '%s' % (
-                list_formatter(link.child.children, tabs + 1, depth + 1))
-        append_output(link, output, padding, sublist)
+                list_formatter(tree, link.child.children, tabs + 1, depth + 1))
+        append_output(tree, link, output, padding, sublist)
     return '\n'.join(output)
 
 
-def append_output(link: 'Link', output, padding, sublist):
+def append_output(tree: 'ProgramTree', link: 'Link', output, padding, sublist):
     comment = _get_verbose_comment(link)
     if link.is_link_with_learning_unit():
         mandatory_picture = get_mandatory_picture(link)
@@ -138,7 +140,7 @@ def append_output(link: 'Link', output, padding, sublist):
                               icon_list_2=mandatory_picture,
                               icon_list_3=get_status_picture(link.child),
                               icon_list_4=get_biennial_picture(link.child),
-                              icon_list_5=get_prerequis_picture(link.child),
+                              icon_list_5=get_prerequis_picture(tree, link.child),
                               value=force_text(get_verbose_link(link)),
                               comment=comment,
                               sublist=sublist,
@@ -176,14 +178,14 @@ def _get_verbose_comment(link: 'Link'):
     ) if comment_from_lang else ""
 
 
-def get_verbose_remark(node: 'NodeEducationGroupYear'):
+def get_verbose_remark(node: 'NodeGroupYear'):
     remark = node.remark_fr or ""
     if node.remark_en and translation.get_language() == LANGUAGE_CODE_EN:
         remark = node.remark_en
     return remark
 
 
-def get_verbose_constraint(node: 'NodeEducationGroupYear'):
+def get_verbose_constraint(node: 'NodeGroupYear'):
     msg = "from %(min)s to %(max)s credits among" \
         if node.constraint_type == ConstraintTypeEnum.CREDITS else "from %(min)s to %(max)s among"
     return _(msg) % {
@@ -192,15 +194,22 @@ def get_verbose_constraint(node: 'NodeEducationGroupYear'):
     }
 
 
-def get_verbose_title_group(node: 'NodeEducationGroupYear'):
+def get_verbose_title_group(node: 'NodeGroupYear'):
     if node.is_finality():
-        if node.offer_partial_title_en and translation.get_language() == LANGUAGE_CODE_EN:
-            return node.offer_partial_title_en
-        return node.offer_partial_title_fr
+        return format_complete_title_label(node, node.offer_partial_title_en, node.offer_partial_title_fr)
+    if node.is_option():
+        return format_complete_title_label(node, node.offer_title_en, node.offer_title_fr)
     else:
-        if node.offer_title_en and translation.get_language() == LANGUAGE_CODE_EN:
-            return node.offer_title_en
-        return node.offer_title_fr
+        return node.group_title_en \
+            if node.group_title_en and translation.get_language() == LANGUAGE_CODE_EN else node.group_title_fr
+
+
+def format_complete_title_label(node, title_en, title_fr):
+    version_complete_label = formatter.format_version_complete_name(node, translation.get_language())
+    if title_en and translation.get_language() == LANGUAGE_CODE_EN:
+        return "{}{}".format(title_en, version_complete_label)
+    else:
+        return "{}{}".format(title_fr, version_complete_label)
 
 
 def get_verbose_credits(link: 'Link'):
@@ -214,27 +223,11 @@ def get_verbose_credits(link: 'Link'):
 
 
 def get_verbose_title_ue(node: 'NodeLearningUnitYear'):
-    verbose_title_fr = get_verbose_title_fr_ue(node)
-    verbose_title_en = get_verbose_title_en_ue(node)
-    if verbose_title_en and translation.get_language() == 'en':
+    verbose_title_fr = node.full_title_fr
+    verbose_title_en = node.full_title_en
+    if verbose_title_en and translation.get_language() == LANGUAGE_CODE_EN:
         return verbose_title_en
     return verbose_title_fr
-
-
-# Copied from LearningUnitYear.complete_title
-def get_verbose_title_fr_ue(node: 'NodeLearningUnitYear'):
-    complete_title = node.specific_title_fr
-    if node.common_title_fr:
-        complete_title = node.common_title_fr + ' - ' + node.specific_title_fr
-    return complete_title
-
-
-# Copied from LearningUnitYear.complete_title_english
-def get_verbose_title_en_ue(node: 'NodeLearningUnitYear'):
-    complete_title_english = node.specific_title_en
-    if node.common_title_en:
-        complete_title_english = node.common_title_en + ' - ' + node.specific_title_en
-    return complete_title_english
 
 
 def get_verbose_link(link: 'Link'):
@@ -261,9 +254,9 @@ def get_status_picture(node: 'NodeLearningUnitYear'):
 
 
 def get_biennial_picture(node: 'NodeLearningUnitYear'):
-    if node.periodicity == BIENNIAL_EVEN:
+    if node.periodicity == PeriodicityEnum.BIENNIAL_EVEN:
         return BISANNUAL_EVEN
-    elif node.periodicity == BIENNIAL_ODD:
+    elif node.periodicity == PeriodicityEnum.BIENNIAL_ODD:
         return BISANNUAL_ODD
     else:
         return ""
@@ -273,20 +266,20 @@ def get_mandatory_picture(link: 'Link'):
     return MANDATORY_PNG if link.is_mandatory else OPTIONAL_PNG
 
 
-def get_prerequis_picture(node: 'NodeLearningUnitYear'):
-    return PREREQUIS if node.has_prerequisite else None
+def get_prerequis_picture(tree: 'ProgramTree', node: 'NodeLearningUnitYear'):
+    return PREREQUIS if tree.has_prerequisites(node) else None
 
 
 def get_case_picture(node: 'NodeLearningUnitYear'):
     if node.status:
-        if node.periodicity == ANNUAL:
+        if node.periodicity == PeriodicityEnum.ANNUAL:
             return VALIDATE_CASE_JPG
-        elif node.periodicity == BIENNIAL_EVEN and node.academic_year.is_even:
+        elif node.periodicity == PeriodicityEnum.BIENNIAL_EVEN and node.academic_year.is_even:
             return VALIDATE_CASE_JPG
-        elif node.periodicity == BIENNIAL_ODD and node.academic_year.is_odd:
+        elif node.periodicity == PeriodicityEnum.BIENNIAL_ODD and node.academic_year.is_odd:
             return VALIDATE_CASE_JPG
     return INVALIDATE_CASE_JPG
 
 
 def check_block(item, value):
-    return "X" if item.block and value == item.block else ""
+    return "X" if item.block and str(value) in str(item.block) else ""

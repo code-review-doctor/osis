@@ -29,13 +29,14 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.forms.utils.filter_field import filter_field_by_regex
-from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.campus import Campus
+from base.models.entity_version_address import EntityVersionAddress
 from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.models.organization_address import OrganizationAddress
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from reference.models.country import Country
 
 
@@ -44,11 +45,11 @@ class ExternalLearningUnitFilter(FilterSet):
         queryset=AcademicYear.objects.all(),
         required=False,
         label=_('Ac yr.'),
-        empty_label=pgettext_lazy("plural", "All"),
+        empty_label=pgettext_lazy("female plural", "All"),
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr="iregex",
+        method="filter_learning_unit_year_field",
         max_length=40,
         required=False,
         label=_('Code'),
@@ -64,17 +65,17 @@ class ExternalLearningUnitFilter(FilterSet):
         required=False,
         label=_('Status'),
         field_name="status",
-        empty_label=pgettext_lazy("plural", "All")
+        empty_label=pgettext_lazy("male plural", "All")
     )
     country = filters.ModelChoiceFilter(
-        queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
-        field_name="campus__organization__organizationaddress__country",
+        queryset=Country.objects.order_by('name'),
+        method="filter_country_field",
         required=False,
         label=_("Country")
     )
     city = filters.ChoiceFilter(
         choices=BLANK_CHOICE_DASH,
-        field_name="campus__organization__organizationaddress__city",
+        method="filter_city_field",
         required=False,
         label=_("City"),
         help_text=_("Please select a country first")
@@ -119,7 +120,11 @@ class ExternalLearningUnitFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
-        self.form.fields["academic_year"].initial = starting_academic_year()
+        # prendre le basculement event
+        targeted_year_opened = EducationGroupSwitchCalendar().get_target_years_opened()
+        self.form.fields["academic_year"].initial = AcademicYear.objects.filter(
+            year__in=targeted_year_opened
+        ).first() or current_academic_year()
 
         if self.data.get('country'):
             self._init_dropdown_list()
@@ -131,28 +136,15 @@ class ExternalLearningUnitFilter(FilterSet):
             self._init_campus_choices()
 
     def _init_cities_choices(self):
-        cities_choices = OrganizationAddress.objects.filter(
+        self.form.fields['city'].choices = EntityVersionAddress.objects.filter(
             country=self.data["country"]
-        ).distinct(
-            'city'
-        ).order_by(
-            'city'
-        ).values_list('city', 'city')
-
-        self.form.fields['city'].choices = cities_choices
+        ).distinct('city').order_by('city').values_list('city', 'city')
 
     def _init_campus_choices(self):
-        campus_choices = Campus.objects.filter(
-            organization__organizationaddress__city=self.data['city']
-        ).distinct(
-            'organization__name'
-        ).order_by(
-            'organization__name'
-        ).values_list(
-            'pk',
-            'organization__name'
-        )
-        self.form.fields['campus'].choices = campus_choices
+        self.form.fields['campus'].choices = Campus.objects.filter(
+            organization__entity__entityversion__entityversionaddress__city=self.data['city'],
+            organization__entity__entityversion__parent__isnull=True
+        ).distinct('organization__name').order_by('organization__name').values_list('pk', 'organization__name')
 
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
@@ -178,7 +170,13 @@ class ExternalLearningUnitFilter(FilterSet):
             "learningcomponentyear_set"
         ).annotate(
             has_proposal=Exists(has_proposal)
-        ).order_by('academic_year__year', 'acronym')
+        ).order_by(
+            'academic_year__year',
+            'acronym'
+        ).distinct(  # Add distinct to protect against duplicate rows when filtering by country or city as the join with
+            'academic_year__year',  # entity version could create similar rows of different entity versions
+            'acronym'
+        )
 
         qs = LearningUnitYearQuerySet.annotate_full_title_class_method(qs)
         qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
@@ -186,3 +184,19 @@ class ExternalLearningUnitFilter(FilterSet):
 
     def filter_learning_unit_year_field(self, queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
+
+    def filter_country_field(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(
+                campus__organization__entity__entityversion__entityversionaddress__country=value,
+                campus__organization__entity__entityversion__parent__isnull=True
+            )
+        return queryset
+
+    def filter_city_field(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(
+                campus__organization__entity__entityversion__entityversionaddress__city=value,
+                campus__organization__entity__entityversion__parent__isnull=True
+            )
+        return queryset

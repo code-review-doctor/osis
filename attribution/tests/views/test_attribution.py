@@ -104,8 +104,8 @@ class TestViewAttributions(TestCase):
 
         context = response.context
         self.assertQuerysetEqual(context["attributions"], [])
-        self.assertFalse(context["can_manage_charge_repartition"])
-        self.assertFalse(context["can_manage_attribution"])
+        self.assertFalse(context["can_add_charge_repartition"])
+        self.assertFalse(context["can_change_attribution"])
         self.assertEqual(context["learning_unit_year"], self.luy_without_attribution)
 
     def test_when_attributions_for_learning_unit(self):
@@ -223,7 +223,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
 
         msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
         tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
-                                    self.attribution_full.tutor.person.middle_name,
                                     self.attribution_full.tutor.person.last_name)
         tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
         self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "

@@ -24,21 +24,35 @@
 #
 ##############################################################################
 
-from program_management.serializers.node_view import serialize_children
+from django.urls import reverse
+
+from base.utils.urls import reverse_with_get
 from program_management.ddd.business_types import *
+from program_management.serializers.node_view import serialize_children, _format_node_group_text
 
 
-def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
+def program_tree_view_serializer(tree: 'ProgramTree', context: 'NodeViewContext') -> dict:
+    querystring_params = {"path": context.current_path, "redirect_path": context.view_path}
     return {
-        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
+        'text': _format_node_group_text(tree.root_node),
+        'id': context.current_path,
         'icon': None,
         'children': serialize_children(
             children=tree.root_node.children,
-            path=str(tree.root_node.pk),
-            context={'root': tree.root_node}
+            tree=tree,
+            context=context,
         ),
         'a_attr': {
+            'href': reverse('element_identification', args=[tree.root_node.year, tree.root_node.code]),
             'element_id': tree.root_node.pk,
             'element_type': tree.root_node.type.name,
+            'element_code': tree.root_node.code,
+            'element_year': tree.root_node.year,
+            'paste_url': reverse_with_get('tree_paste_node', get=querystring_params),
+            'search_url': reverse_with_get(
+                'quick_search_education_group',
+                args=[tree.root_node.academic_year.year],
+                get=querystring_params
+            ),
         }
     }

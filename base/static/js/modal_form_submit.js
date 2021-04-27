@@ -1,9 +1,13 @@
 function redirect_after_success(modal, xhr) {
+    destroyAllInstances();
     $(modal).modal('toggle');
     if (xhr.hasOwnProperty('partial_reload')) {
         $(xhr["partial_reload"]).load(xhr["success_url"]);
     } else if (xhr.hasOwnProperty('success_url')) {
         window.location.href = xhr["success_url"];
+        if(xhr["force_reload"]){
+            window.location.reload();
+        }
     } else {
         window.location.reload();
     }
@@ -17,6 +21,12 @@ function addDispatchEventOnSubmitAjaxForm(e) {
 
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
+        if ($(this).hasClass("validate")){
+            if (! $(this).parsley().isValid()) {
+                return false;
+            }
+        }
+
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
         addDispatchEventOnSubmitAjaxForm(e);
@@ -27,7 +37,7 @@ var formAjaxSubmit = function (form, modal) {
             context: this,
             success: function (xhr, ajaxOptions, thrownError) {
                 //Stay on the form if there are errors.
-                if ($(xhr).find('.has-error,.alert-danger,.stay_in_modal').length > 0) {
+                if ($(xhr).find('.has-error,.alert-danger:not(#notice-header),.stay_in_modal').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
@@ -35,10 +45,10 @@ var formAjaxSubmit = function (form, modal) {
                     form = $("#"+form.attr('id'));
                     // Binding the new content with submit method.
                     formAjaxSubmit(form, modal);
-                    this.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
+                    document.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));
                 } else {
                     redirect_after_success(modal, xhr);
-                    this.dispatchEvent(new CustomEvent("formAjaxSubmit:success", {}));
+                    document.dispatchEvent(new CustomEvent("formAjaxSubmit:success", {}));
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -49,11 +59,10 @@ var formAjaxSubmit = function (form, modal) {
     });
 };
 
-
-
-
 // CKEDITOR needs to dynamically bind the textareas during an XMLHttpRequest requests
 function bindTextArea() {
+    //clean instances before binding to avoid error on CKEDITOR.replace with same instance id
+    destroyAllInstances();
     $("textarea[data-type='ckeditortype']").each(function () {
         CKEDITOR.replace($(this).attr('id'), $(this).data('config'));
     });
@@ -63,6 +72,13 @@ function bindTextArea() {
 function CKupdate() {
     for (let instance in CKEDITOR.instances)
         CKEDITOR.instances[instance].updateElement();
+}
+
+function submitFormWithPostponement(element){
+    var input = $("<input>")
+        .attr("type", "hidden")
+        .attr("name", "to_postpone").val(1);
+    $(element).closest("form").append(input).submit();
 }
 
 function bind_trigger_modal() {

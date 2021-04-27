@@ -31,19 +31,29 @@ from dateutil.relativedelta import relativedelta
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, TRANSITION_PREFIX
+
+CEMS = 'CEMS'
 
 
 class EducationGroupVersionFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'program_management.EducationGroupVersion'
+        django_get_or_create = ('version_name', 'offer', 'transition_name')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.today() - relativedelta(years=1), datetime.today())
 
-    is_transition = False
-    version_name = factory.fuzzy.FuzzyText(length=10)
+    transition_name = NOT_A_TRANSITION
+    version_name = factory.Sequence(lambda n: 'VERSION%d' % n)
     root_group = factory.SubFactory(GroupYearFactory)
-    offer = factory.SubFactory(EducationGroupYearFactory)
+    offer = factory.SubFactory(
+        EducationGroupYearFactory,
+        partial_acronym=factory.SelfAttribute('..root_group.partial_acronym'),
+        acronym=factory.SelfAttribute('..root_group.acronym'),
+        academic_year=factory.SelfAttribute('..root_group.academic_year'),
+        education_group_type=factory.SelfAttribute('..root_group.education_group_type')
+    )
     title_fr = factory.fuzzy.FuzzyText(length=15)
     title_en = factory.fuzzy.FuzzyText(length=15)
 
@@ -54,9 +64,16 @@ class StandardEducationGroupVersionFactory(EducationGroupVersionFactory):
 
 class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = ''
-    is_transition = True
+    transition_name = TRANSITION_PREFIX
 
 
 class ParticularTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
-    version_name = 'CEMS'
-    is_transition = True
+    version_name = CEMS
+    transition_name = TRANSITION_PREFIX
+
+
+def create_with_version(version_offer=None, **kwargs):
+    group_yr = GroupYearFactory(**kwargs)
+    if version_offer:
+        EducationGroupVersionFactory(offer=version_offer, root_group=group_yr)
+    return group_yr

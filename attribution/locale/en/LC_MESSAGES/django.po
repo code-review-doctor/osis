@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-04 10:24+0100\n"
+"POT-Creation-Date: 2021-03-25 14:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,6 +56,9 @@ msgstr ""
 msgid "Attributions"
 msgstr ""
 
+msgid "Authority/sabbatical teaching supply"
+msgstr ""
+
 msgid "Cancel"
 msgstr ""
 
@@ -66,6 +69,12 @@ msgid "Coordinator"
 msgstr ""
 
 msgid "Courses"
+msgstr ""
+
+msgid "Demand for co-holder"
+msgstr ""
+
+msgid "Demand for discharge"
 msgstr ""
 
 msgid "Deputy"
@@ -83,10 +92,10 @@ msgstr ""
 msgid "Description fiche"
 msgstr ""
 
-msgid "Description fiche ending"
+msgid "Description fiche edition"
 msgstr ""
 
-msgid "Description fiche opening"
+msgid "Discharge"
 msgstr ""
 
 msgid "Duration"
@@ -97,14 +106,27 @@ msgstr ""
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period is ended "
-"since %(end_date)s."
+"For the academic year %(data_year)s, the summary edition period ended on "
+"%(end_date)s."
 msgstr ""
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period will open "
-"on %(start_date)s."
+"For the academic year %(data_year)s, the summary edition period will open on "
+"%(start_date)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Force majeure case : Some fields of the description fiche can be edited from "
+"%(start_date)s to %(end_date)s."
+msgstr ""
+
+msgid "Force majeure case edition"
+msgstr ""
+
+msgctxt "Du"
+msgid "From"
 msgstr ""
 
 msgid "Function"
@@ -143,10 +165,19 @@ msgstr ""
 msgid "Not in period to edit description fiche."
 msgstr ""
 
+msgid "Not in period to edit force majeure section."
+msgstr ""
+
+msgid "Part-time teaching supply"
+msgstr ""
+
 msgid "Practical exercises"
 msgstr ""
 
 msgid "Professor"
+msgstr ""
+
+msgid "Program modification"
 msgstr ""
 
 msgid "Publish application to portal"
@@ -175,6 +206,9 @@ msgstr ""
 msgid "Substitute"
 msgstr ""
 
+msgid "Teaching supply"
+msgstr ""
+
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
@@ -185,6 +219,9 @@ msgid "There is no course for which you can edit description fiche"
 msgstr ""
 
 msgid "Title"
+msgstr ""
+
+msgid "To delete"
 msgstr ""
 
 msgid "Tutor"
@@ -199,5 +236,12 @@ msgstr ""
 msgid "Yes, I confirm."
 msgstr ""
 
+msgid "You are not attributed to this learning unit."
+msgstr ""
+
 msgid "delete"
+msgstr ""
+
+msgctxt "au"
+msgid "to"
 msgstr ""

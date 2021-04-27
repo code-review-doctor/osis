@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404, render
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
@@ -36,15 +37,16 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views.common import display_success_messages, show_error_message_for_form_invalid
-from base.views.learning_units import perms
+from base.views.common import display_success_messages, show_error_message_for_form_invalid, display_warning_messages, \
+    check_formations_impacted_by_update
 from base.views.learning_units.common import get_learning_unit_identification_context
+from learning_unit.views.utils import learning_unit_year_getter
+from osis_role.contrib.views import permission_required
 
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@perms.can_create_modification_proposal
-@permission_required('base.can_propose_learningunit', raise_exception=True)
+@permission_required('base.can_propose_learningunit', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_modification_proposal(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
     return _update_or_create_proposal(request, learning_unit_year)
@@ -52,16 +54,24 @@ def learning_unit_modification_proposal(request, learning_unit_year_id):
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@perms.can_create_modification_proposal
-@permission_required('base.can_propose_learningunit', raise_exception=True)
+@permission_required('base.can_propose_learningunit_end_date', raise_exception=True, fn=learning_unit_year_getter)
 def learning_unit_suppression_proposal(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
+    if LearningUnitYear.objects.filter(
+        learning_unit=learning_unit_year.learning_unit
+    ).order_by("academic_year__year").first() == learning_unit_year:
+        redirect_url = reverse('learning_unit', kwargs={'learning_unit_year_id': learning_unit_year_id})
+        display_warning_messages(
+            request,
+            _("You cannot put in proposal for ending date on the first year of the learning unit.")
+        )
+        return redirect(redirect_url)
     return _update_or_create_suppression_proposal(request, learning_unit_year)
 
 
 @waffle_flag('learning_unit_proposal_update')
 @login_required
-@perms.can_edit_learning_unit_proposal
+@permission_required('base.can_edit_learning_unit_proposal', raise_exception=True, fn=learning_unit_year_getter)
 def update_learning_unit_proposal(request, learning_unit_year_id):
     proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year=learning_unit_year_id)
 
@@ -84,6 +94,9 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
                     'acronym': learning_unit_year.acronym
                 }
             )
+            check_formations_impacted_by_update(learning_unit_year.acronym,
+                                                learning_unit_year.academic_year.year,
+                                                request, None)
             return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
         else:
             show_error_message_for_form_invalid(request)
@@ -139,7 +152,8 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
 
 
 def _get_max_year(learning_unit_year, proposal):
-    return proposal.initial_data.get('end_year') if proposal else learning_unit_year.learning_unit.end_year
+    max_year = proposal.initial_data.get('end_year') if proposal else learning_unit_year.learning_unit.end_year
+    return max_year.year if max_year else None
 
 
 def _get_initial(learning_unit_year, proposal, user_person, proposal_type=ProposalType.TRANSFORMATION.name):

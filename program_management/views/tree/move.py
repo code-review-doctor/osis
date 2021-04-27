@@ -23,111 +23,84 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
+
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.http import HttpRequest
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from waffle.decorators import waffle_flag
 
-from base.models.education_group_year import EducationGroupYear
-from base.models.group_element_year import GroupElementYear
-from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import ElementCache
+import program_management.ddd.service.write.down_link_service
+import program_management.ddd.service.write.up_link_service
 from base.views.common import display_success_messages
-from base.views.education_groups import perms
-from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
-from osis_common.utils.models import get_object_or_none
-from program_management.ddd.repositories import load_tree, persist_tree
-from program_management.ddd.service import order_link_service
-from program_management.models.enums import node_type
-from program_management.models.enums.node_type import NodeType
+from education_group.ddd import command as command_education_group
+from education_group.ddd.domain.exception import GroupNotFoundException
+from education_group.ddd.service.read import get_group_service
+from education_group.models.group_year import GroupYear
+from education_group.templatetags.academic_year_display import display_as_academic_year
+from osis_common.ddd import interface
+from osis_role.contrib.views import permission_required
+from program_management.ddd import command, service
+from program_management.ddd.domain.node import NodeIdentity
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
+
+
+def group_element_year_parent_getter_via_path(request) -> GroupYear:
+    path = request.POST["path"]
+    *_, parent_id, child_id = path.split("|")
+    return get_object_or_404(GroupYear, element__id=parent_id)
 
 
 @login_required
-@waffle_flag("education_group_update")
+@permission_required("base.change_link_data", fn=group_element_year_parent_getter_via_path)
 @require_http_methods(['POST'])
-def up(request, root_id, link_id):
-    return _order_content(request, root_id, link_id, order_link_service.up_link)
-
-
-@login_required
-@waffle_flag("education_group_update")
-@require_http_methods(['POST'])
-def down(request, root_id, link_id):
-    return _order_content(request, root_id, link_id, order_link_service.down_link)
-
-
-def _order_content(
-        request: HttpRequest,
-        root_id: int,
-        link_id: int,
-        order_function
-):
-    # FIXME When perm refactored remove this code so as to use ddd domain objects
-    group_element_year = get_object_or_none(GroupElementYear, pk=link_id)
-    perms.can_change_education_group(request.user, group_element_year.parent)
-
-    child_node_type = node_type.NodeType.EDUCATION_GROUP if isinstance(group_element_year.child, EducationGroupYear) \
-        else node_type.NodeType.LEARNING_UNIT
-    order_function(root_id, group_element_year.parent.id, group_element_year.child.id, child_node_type)
-
-    success_msg = _("The %(acronym)s has been moved") % {'acronym': group_element_year.child.acronym}
+def up(request):
+    path = request.POST["path"]
+    command_up = command.OrderUpLinkCommand(path=path)
+    node_identity_id = service.write.up_link_service.up_link(command_up)
+    success_msg = _("%(node)s has been moved") % {'node': __get_node_str(node_identity_id)}
     display_success_messages(request, success_msg)
 
     http_referer = request.META.get('HTTP_REFERER')
     return redirect(http_referer)
 
 
+@login_required
+@permission_required("base.change_link_data", fn=group_element_year_parent_getter_via_path)
 @require_http_methods(['POST'])
-def copy_to_cache(request):
-    element_id = request.POST['element_id']
-    element_type = request.POST['element_type']
+def down(request):
+    path = request.POST["path"]
+    command_down = command.OrderDownLinkCommand(path=path)
+    node_identity_id = service.write.down_link_service.down_link(command_down)
+    success_msg = _("%(node)s has been moved") % {'node': __get_node_str(node_identity_id)}
+    display_success_messages(request, success_msg)
 
-    element = _get_concerned_object(element_id, element_type)
-
-    return _cache_object(
-        request.user,
-        None,
-        object_to_cache=element,
-        action=ElementCache.ElementCacheAction.COPY
-    )
+    http_referer = request.META.get('HTTP_REFERER')
+    return redirect(http_referer)
 
 
-@require_http_methods(['POST'])
-def cut_to_cache(request):
-    group_element_year_id = request.POST['group_element_year_id']
-    element_id = request.POST['element_id']
-    element_type = request.POST['element_type']
+def __get_node_str(node_identity_id: 'NodeIdentity') -> str:
+    try:
+        cmd = command_education_group.GetGroupCommand(code=node_identity_id.code, year=node_identity_id.year)
+        group_obj = get_group_service.get_group(cmd)
 
-    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
-    element = _get_concerned_object(element_id, element_type)
-
-    return _cache_object(
-        request.user,
-        group_element_year,
-        object_to_cache=element,
-        action=ElementCache.ElementCacheAction.CUT
-    )
-
-
-def _get_concerned_object(element_id: int, element_type: str):
-    if element_type == NodeType.LEARNING_UNIT.name:
-        object_class = LearningUnitYear
-    else:
-        object_class = EducationGroupYear
-
-    return get_object_or_404(object_class, pk=element_id)
+        version_identity = __get_program_tree_version_identity(node_identity_id)
+        return "%(code)s - %(abbreviated_title)s%(version)s - %(year)s" % {
+            "code": group_obj.code,
+            "abbreviated_title": group_obj.abbreviated_title,
+            "version": "[{}]".format(version_identity.version_name)
+            if version_identity and not version_identity.is_standard else "",
+            "year": group_obj.academic_year
+        }
+    except GroupNotFoundException:
+        return "%(code)s - %(year)s" % {
+            "code": node_identity_id.code,
+            "year": display_as_academic_year(node_identity_id.year)
+        }
 
 
-def _cache_object(
-        user: User,
-        group_element_year: GroupElementYear,
-        object_to_cache,
-        action: ElementCache.ElementCacheAction
-):
-    group_element_year_pk = group_element_year.pk if group_element_year else None
-    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action.value)
-    success_msg = get_clipboard_content_display(object_to_cache, action.value)
-    return build_success_json_response(success_msg)
+def __get_program_tree_version_identity(node_identity: 'NodeIdentity') -> Union['ProgramTreeVersionIdentity', None]:
+    try:
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(node_identity)
+    except interface.BusinessException:
+        return None

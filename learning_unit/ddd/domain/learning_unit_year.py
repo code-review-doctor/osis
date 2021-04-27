@@ -24,32 +24,62 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from typing import List
 
+from attribution.ddd.domain.attribution import Attribution
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from learning_unit.ddd.domain.achievement import Achievement
+from learning_unit.ddd.domain.description_fiche import DescriptionFiche, DescriptionFicheForceMajeure
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.ddd.domain.proposal import Proposal
+from learning_unit.ddd.domain.specifications import Specifications
+from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 
 
 class LecturingVolume:
     def __init__(
         self,
         total_annual: Decimal = None,
+        first_quadrimester: Decimal = None,
+        second_quadrimester: Decimal = None,
+        classes_count: int = None,
     ):
         self.total_annual = total_annual
+        self.first_quadrimester = first_quadrimester
+        self.second_quadrimester = second_quadrimester
+        self.classes_count = classes_count
 
 
 class PracticalVolume:
     def __init__(
             self,
             total_annual: Decimal = None,
+            first_quadrimester: Decimal = None,
+            second_quadrimester: Decimal = None,
+            classes_count: int = None,
     ):
         self.total_annual = total_annual
+        self.first_quadrimester = first_quadrimester
+        self.second_quadrimester = second_quadrimester
+        self.classes_count = classes_count
+
+
+class Entities:
+    def __init__(
+            self,
+            requirement_entity_acronym: str = None,
+            allocation_entity_acronym: str = None,
+    ):
+        self.requirement_entity_acronym = requirement_entity_acronym
+        self.allocation_entity_acronym = allocation_entity_acronym
 
 
 class LearningUnitYear:
     def __init__(
             self,
+            entity_id: LearningUnitYearIdentity = None,
             id: int = None,
             year: int = None,
             acronym: str = None,
@@ -60,16 +90,32 @@ class LearningUnitYear:
             specific_title_en: str = '',
             start_year: int = None,
             end_year: int = None,
-            proposal_type: ProposalType = None,
+            proposal: Proposal = None,
             credits: Decimal = None,
             status: bool = None,
             periodicity: PeriodicityEnum = None,
             other_remark: str = None,
+            other_remark_english: str = None,
             quadrimester: DerogationQuadrimester = None,
 
             lecturing_volume: LecturingVolume = None,
             practical_volume: PracticalVolume = None,
+            achievements: List['Achievement'] = None,
+
+            entities: Entities = None,
+
+            description_fiche: DescriptionFiche = None,
+            force_majeure: DescriptionFicheForceMajeure = None,
+            specifications: Specifications = None,
+
+            teaching_materials: List[TeachingMaterial] = None,
+            subtype: str = None,
+            session: str = None,
+            main_language: str = None,
+            attributions: List['Attribution'] = None,
+
     ):
+        self.entity_id = entity_id
         self.id = id
         self.year = year
         self.acronym = acronym
@@ -80,19 +126,39 @@ class LearningUnitYear:
         self.specific_title_en = specific_title_en or ''
         self.start_date = start_year
         self.end_date = end_year
-        self.proposal_type = proposal_type
+        self.proposal = proposal
         self.credits = credits
         self.status = status
         self.periodicity = periodicity
         self.other_remark = other_remark
+        self.other_remark_english = other_remark_english
         self.quadrimester = quadrimester
         self.lecturing_volume = lecturing_volume
         self.practical_volume = practical_volume
+        self.achievements = achievements or []
+        self.entities = entities
+        self.description_fiche = description_fiche
+        self.force_majeure = force_majeure
+        self.specifications = specifications
+        self.teaching_materials = teaching_materials or []
+        self.subtype = subtype
+        self.session = session
+        self.main_language = main_language
+        self.attributions = attributions or []
 
     @property
     def full_title_fr(self):
-        return self.common_title_fr + self.specific_title_fr
+        return _get_full_title(self.common_title_fr, self.specific_title_fr)
 
     @property
     def full_title_en(self):
-        return self.common_title_en + self.specific_title_en
+        return _get_full_title(self.common_title_en, self.specific_title_en)
+
+
+def _get_full_title(common_title, specific_title):
+    specific_title = "{}{}".format(" - " if common_title else '',
+                                   specific_title) if specific_title else ''
+    return "{}{}".format(
+        common_title if common_title else '',
+        specific_title
+    )

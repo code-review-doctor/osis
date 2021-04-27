@@ -33,7 +33,7 @@ from django.test import TestCase
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
-from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, PartimForm, \
+from base.forms.learning_unit.learning_unit_partim import PartimForm, \
     LearningUnitPartimModelForm
 from base.models.enums import learning_unit_year_subtypes, organization_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -156,20 +156,6 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
                                         instance=partim.learning_unit)
         self.assertEqual(partim_form.forms[LearningUnitYearModelForm].initial['acronym'], ['L', 'BIR1200', 'Z'])
 
-    def test_disabled_fields(self):
-        """This function will check if fields is disabled"""
-        partim_form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
-                                        academic_year=self.learning_unit_year_full.academic_year)
-        expected_disabled_fields = {
-            'common_title', 'common_title_english',
-            'requirement_entity', 'allocation_entity',
-            'academic_year', 'container_type', 'internship_subtype',
-            'additional_entity_1', 'additional_entity_2'
-        }
-        all_fields = partim_form.fields.items()
-        self.assertTrue(all(field.disabled == (field_name in expected_disabled_fields)
-                            for field_name, field in all_fields))
-
     def test_form_cls_to_validate(self):
         """This function will ensure that only LearningUnitModelForm/LearningUnitYearModelForm is present
            in form_cls_to_validate"""
@@ -199,7 +185,6 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
         # The form should be valid
         self.assertTrue(form.is_valid(), form.errors)
         # In partim, we can only modify LearningUnitYearModelForm / LearningUnitModelForm
-        self._test_learning_unit_model_form_instance(form, post_data)
         self._test_learning_unit_year_model_form_instance(form, post_data)
         # Inherit instance from learning unit year full
         self._test_learning_container_model_form_instance(form)
@@ -228,15 +213,11 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
         # The form should be valid
         self.assertTrue(form.is_valid(), form.errors)
 
-    def _test_learning_unit_model_form_instance(self, partim_form, post_data):
-        form_instance = partim_form.forms[LearningUnitPartimModelForm]
-        fields_to_validate = ['faculty_remark', 'other_remark']
-        self._assert_equal_values(form_instance.instance, post_data, fields_to_validate)
-
     def _test_learning_unit_year_model_form_instance(self, partim_form, post_data):
         form_instance = partim_form.forms[LearningUnitYearModelForm]
         fields_to_validate = ['specific_title', 'specific_title_english', 'credits',
-                              'session', 'quadrimester', 'status', 'subtype', ]
+                              'session', 'quadrimester', 'status', 'subtype', 'faculty_remark', 'other_remark',
+                              'other_remark_english']
         self._assert_equal_values(form_instance.instance, post_data, fields_to_validate)
         self.assertEqual(form_instance.instance.acronym, FULL_ACRONYM + 'B')
 
@@ -363,13 +344,11 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
             'credits': 2,
             'specific_title': factory.fuzzy.FuzzyText(length=15).fuzz(),
             'specific_title_english': factory.fuzzy.FuzzyText(length=15).fuzz(),
+            'other_remark': factory.fuzzy.FuzzyText(length=15).fuzz(),
+            'other_remark_english': factory.fuzzy.FuzzyText(length=15).fuzz(),
+            'faculty_remark': factory.fuzzy.FuzzyText(length=15).fuzz(),
         }
         post_data.update(update_fields_luy_model)
-        update_fields_lu_model = {
-            'faculty_remark': factory.fuzzy.FuzzyText(length=15).fuzz(),
-            'other_remark': factory.fuzzy.FuzzyText(length=15).fuzz()
-        }
-        post_data.update(update_fields_lu_model)
 
         form = _instanciate_form(
             learning_unit_full=self.learning_unit_year_full.learning_unit,
@@ -386,12 +365,6 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         learning_unit_year_dict = model_to_dict(self.learning_unit_year_partim)
         for field, value in update_fields_luy_model.items():
             self.assertEqual(learning_unit_year_dict[field], value)
-
-        # Check learning unit update
-        self.learning_unit_year_partim.learning_unit.refresh_from_db()
-        learning_unit_dict = model_to_dict(self.learning_unit_year_partim.learning_unit)
-        for field, value in update_fields_lu_model.items():
-            self.assertEqual(learning_unit_dict[field], value)
 
     def test_save_partim_without_container(self):
         post_data = get_valid_form_data(self.learning_unit_year_partim)
@@ -411,15 +384,6 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         self.learning_unit_year_partim.refresh_from_db()
         self.assertEqual(self.learning_unit_year_partim.acronym, partim_acronym)
         self.assertEqual(self.learning_unit_year_partim.learning_container_year.acronym, parent_acronym)
-
-    def test_disable_fields_partim(self):
-        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
-                                 academic_year=self.learning_unit_year_full.academic_year,
-                                 instance=self.learning_unit_year_partim.learning_unit)
-        disabled_fields = {key for key, value in form.fields.items() if value.disabled is True}
-        # acronym_0 and acronym_1 are disabled in the widget, not in the field
-        disabled_fields.update({'acronym_0', 'acronym_1'})
-        self.assertEqual(disabled_fields, PARTIM_FORM_READ_ONLY_FIELD)
 
     def test_save_partim_from_proposal_with_no_end_year_in_original_learning_unit(self):
         proposal = ProposalLearningUnitFactory(
@@ -452,10 +416,9 @@ def get_valid_form_data(learning_unit_year_partim):
         'language': learning_unit_year_partim.language.id,
         'campus': CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN).pk,
         'periodicity': learning_unit_year_partim.periodicity,
-
-        # Learning unit data model form
-        'faculty_remark': learning_unit_year_partim.learning_unit.faculty_remark,
-        'other_remark': learning_unit_year_partim.learning_unit.other_remark,
+        'other_remark': learning_unit_year_partim.other_remark,
+        'other_remark_english': learning_unit_year_partim.other_remark_english,
+        'faculty_remark': learning_unit_year_partim.faculty_remark,
 
         # Learning component year data model form
         'component-TOTAL_FORMS': '2',

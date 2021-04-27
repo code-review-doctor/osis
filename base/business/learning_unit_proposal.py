@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 ##############################################################################
 import functools
 from decimal import Decimal
+from typing import List, Dict, Callable, Any, Tuple
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -36,11 +37,10 @@ from base import models as mdl_base
 from base.business import learning_unit_year_with_context
 from base.business.learning_unit import compose_components_dict
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
-from base.business.learning_units import perms
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
     update_partim_acronym
 from base.business.learning_units.simple import deletion as business_deletion
-from base.models import campus
+from base.models import campus, proposal_learning_unit, person
 from base.models.academic_year import find_academic_year_by_year, AcademicYear
 from base.models.entity import find_by_id, get_by_internal_id
 from base.models.enums import entity_container_year_link_type
@@ -50,7 +50,10 @@ from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils import send_mail as send_mail_util
+from osis_role.errors import get_permission_error
 from reference.models import language
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
@@ -66,17 +69,16 @@ LABEL_ACTIVE = _('Active')
 LABEL_INACTIVE = _('Inactive')
 INITIAL_DATA_FIELDS = {
     'learning_container_year': [
-        "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team", "is_vacant",
-        "type_declaration_vacant",
+        "id", "acronym", "common_title", "container_type", "in_charge", "common_title_english", "team",
         'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
     ],
     'learning_unit': [
-        "id", "end_year", "faculty_remark", "other_remark"
+        "id", "end_year",
     ],
     'learning_unit_year': [
         "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
         "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
-        "attribution_procedure",
+        "faculty_remark", "other_remark", "other_remark_english"
     ],
     'learning_component_year': [
         "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
@@ -99,19 +101,19 @@ def compute_proposal_type(proposal_learning_unit_year, learning_unit_year):
         return ProposalType.MODIFICATION.name
 
 
-def reinitialize_data_before_proposal(learning_unit_proposal):
+def reinitialize_data_before_proposal(learning_unit_proposal: ProposalLearningUnit):
     learning_unit_year = learning_unit_proposal.learning_unit_year
     initial_data = learning_unit_proposal.initial_data
     _reinitialize_model_before_proposal(learning_unit_year, initial_data["learning_unit_year"])
     _reinitialize_model_before_proposal(learning_unit_year.learning_unit, initial_data["learning_unit"])
     _reinitialize_model_before_proposal(learning_unit_year.learning_container_year,
                                         initial_data["learning_container_year"])
-    _reinitialize_components_before_proposal(initial_data.get("learning_component_years") or {})
+    _reinitialize_components_before_proposal(initial_data.get("learning_component_years") or {}, learning_unit_year)
 
 
 def _reinitialize_model_before_proposal(obj_model, attribute_initial_values):
     for attribute_name, attribute_value in attribute_initial_values.items():
-        if attribute_name != "id":
+        if attribute_name != "id" and attribute_name != "in_charge":
             cleaned_initial_value = clean_attribute_initial_value(attribute_name, attribute_value)
             setattr(obj_model, attribute_name, cleaned_initial_value)
     obj_model.save()
@@ -214,8 +216,18 @@ def force_state_of_proposals(proposals, author, new_state):
         _("cannot be changed state"),
         None,
         None,
-        perms.is_eligible_to_edit_proposal
+        can_edit_proposal if new_state != proposal_state.ProposalState.REFUSED.name else can_refused_proposal
     )
+
+
+def can_edit_proposal(proposal, author, raise_exception):
+    perm = 'base.can_edit_learning_unit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
+
+
+def can_refused_proposal(proposal, author, raise_exception):
+    perm = 'base.can_refuse_learning_unit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
 
 
 def modify_proposal_state(new_state, proposal):
@@ -233,11 +245,19 @@ def cancel_proposals_and_send_report(proposals, author, research_criteria):
         _("cannot be canceled"),
         send_mail_util.send_mail_cancellation_learning_unit_proposals,
         research_criteria,
-        perms.is_eligible_for_cancel_of_proposal
+        can_cancel_proposal
     )
 
 
-def consolidate_proposals_and_send_report(proposals, author, research_criteria):
+def can_cancel_proposal(proposal, author, raise_exception):
+    perm = 'base.can_cancel_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
+
+
+def consolidate_proposals_and_send_report(
+        proposals: List[proposal_learning_unit.ProposalLearningUnit],
+        author: person.Person,
+        research_criteria: Dict) -> Dict[str, List[str]]:
     return _apply_action_on_proposals_and_send_report(
         proposals,
         author,
@@ -246,12 +266,24 @@ def consolidate_proposals_and_send_report(proposals, author, research_criteria):
         _('cannot be consolidated'),
         send_mail_util.send_mail_consolidation_learning_unit_proposal,
         research_criteria,
-        perms.is_eligible_to_consolidate_proposal
+        can_consolidate_learningunit_proposal
     )
 
 
-def _apply_action_on_proposals_and_send_report(proposals, author, action_method, success_msg_id, error_msg_id,
-                                               send_mail_method, research_criteria, permission_check):
+def can_consolidate_learningunit_proposal(proposal, author, raise_exception):
+    perm = 'base.can_consolidate_learningunit_proposal'
+    return perm, author.user.has_perm(perm, proposal.learning_unit_year)
+
+
+def _apply_action_on_proposals_and_send_report(
+        proposals: List[proposal_learning_unit.ProposalLearningUnit],
+        author: person.Person,
+        action_method: Callable,
+        success_msg_id: str,
+        error_msg_id: str,
+        send_mail_method: Callable[[person.Person, Any, Dict], None],
+        research_criteria: Dict,
+        permission_check: Callable) -> Dict[str, List[str]]:
     messages_by_level = {SUCCESS: [], ERROR: []}
     proposals_with_results = _apply_action_on_proposals(proposals, action_method, author, permission_check)
 
@@ -277,17 +309,21 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
     return messages_by_level
 
 
-def _apply_action_on_proposals(proposals, action_method, author, permission_check):
+def _apply_action_on_proposals(
+        proposals: List[proposal_learning_unit.ProposalLearningUnit],
+        action_method: Callable,
+        author: person.Person,
+        permission_check: Callable[[proposal_learning_unit.ProposalLearningUnit, person.Person, bool], bool]
+) -> List[Tuple[proposal_learning_unit.ProposalLearningUnit, Dict]]:
     proposals_with_results = []
     for proposal in proposals:
-        proposal_with_result = (proposal, {ERROR: [_("User %(person)s do not have rights on this proposal.") % {
-            "person": str(author)
-        }]})
-        if permission_check(proposal, author):
+        perm, perm_result = permission_check(proposal, author, True)
+        if perm_result:
             proposal_with_result = (proposal, action_method(proposal))
-
+        else:
+            perm_denied_msg = get_permission_error(author.user, perm)
+            proposal_with_result = (proposal, {ERROR: _(str(perm_denied_msg))})
         proposals_with_results.append(proposal_with_result)
-
     return proposals_with_results
 
 
@@ -310,7 +346,7 @@ def cancel_proposal(proposal):
     return results
 
 
-def consolidate_proposal(proposal):
+def consolidate_proposal(proposal: proposal_learning_unit.ProposalLearningUnit) -> Dict[str, List[str]]:
     results = {ERROR: [_("Proposal is neither accepted nor refused.")]}
     if proposal.state == proposal_state.ProposalState.REFUSED.name:
         results = cancel_proposal(proposal)
@@ -321,7 +357,7 @@ def consolidate_proposal(proposal):
     return results
 
 
-def _consolidate_accepted_proposal(proposal):
+def _consolidate_accepted_proposal(proposal: proposal_learning_unit.ProposalLearningUnit) -> Dict[str, List[str]]:
     if proposal.type == proposal_type.ProposalType.CREATION.name:
         return _consolidate_creation_proposal_accepted(proposal)
     elif proposal.type == proposal_type.ProposalType.SUPPRESSION.name:
@@ -348,7 +384,7 @@ def _consolidate_suppression_proposal_accepted(proposal):
     return results
 
 
-def _consolidate_modification_proposal_accepted(proposal):
+def _consolidate_modification_proposal_accepted(proposal: proposal_learning_unit.ProposalLearningUnit) -> Dict:
     update_partim_acronym(proposal.learning_unit_year.acronym, proposal.learning_unit_year)
     next_luy = proposal.learning_unit_year.get_learning_unit_next_year()
     if next_luy:
@@ -423,11 +459,12 @@ def update_or_create_learning_unit_component(obj_model, attribute_initial_values
     obj_model.save()
 
 
-def _reinitialize_components_before_proposal(initial_components):
+def _reinitialize_components_before_proposal(initial_components: dict, luy: LearningUnitYear):
     for initial_data_by_model in initial_components:
         an_id = initial_data_by_model.get('id')
         if an_id:
-            learning_component_year = mdl_base.learning_component_year.LearningComponentYear.objects.get(pk=an_id)
+            learning_component_year, created = mdl_base.learning_component_year.LearningComponentYear.objects.\
+                get_or_create(pk=an_id, defaults={'learning_unit_year': luy})
             update_or_create_learning_unit_component(learning_component_year, initial_data_by_model)
 
 

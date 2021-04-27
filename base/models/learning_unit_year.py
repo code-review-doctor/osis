@@ -37,7 +37,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from program_management.ddd import repositories
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import entity_version
@@ -53,6 +52,8 @@ from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
+from education_group import publisher
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -66,34 +67,39 @@ MAXIMUM_CREDITS = 500
 # through the recursive database structure
 # ! It is a raw SQL : Use it only in last resort !
 # The returned structure is :
-# { id, gs_origin, child_branch_id, child_leaf_id, parent_id, acronym,
+# { id, gs_origin, child_element_id, parent_element_id, acronym,
 #   title, category, name, id (for education_group_type) and level }
 SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS = """\
 WITH RECURSIVE group_element_year_parent AS (
-    SELECT gs.id, gs.id AS gs_origin, child_branch_id, child_leaf_id, parent_id, educ.acronym, educ.title,
-    educ_type.category, educ_type.name, educ_type.id, 0 AS level
-    
+    SELECT gs.id, gs.id AS gs_origin, gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
+    0 AS level, parent_element_id, child_element_id, version.transition_name, version.version_name,
+    version.title_fr AS version_title_fr, gy.management_entity_id as management_entity
     FROM base_groupelementyear AS gs
-    INNER JOIN base_educationgroupyear AS educ ON gs.parent_id = educ.id
-    INNER JOIN base_educationgrouptype AS educ_type on educ.education_group_type_id = educ_type.id
-    WHERE gs.child_leaf_id = "base_learningunityear"."id" 
-    
+    INNER JOIN program_management_element AS element_parent ON gs.parent_element_id = element_parent.id
+    INNER JOIN program_management_element AS element_child ON gs.child_element_id = element_child.id
+    INNER JOIN education_group_groupyear AS gy ON element_parent.group_year_id = gy.id
+    INNER JOIN base_educationgrouptype AS educ_type on gy.education_group_type_id = educ_type.id
+    LEFT JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id
+    LEFT JOIN base_learningunityear bl on element_child.learning_unit_year_id = bl.id
+    WHERE element_child.learning_unit_year_id = "base_learningunityear"."id"
     UNION ALL
-    
-    SELECT parent.id, gs_origin, parent.child_branch_id, parent.child_leaf_id, parent.parent_id, 
-    educ.acronym, educ.title, educ_type.category, educ_type.name, educ_type.id, child.level + 1
-    
+    SELECT parent.id, gs_origin,
+    gy.acronym, gy.title_fr, educ_type.category, educ_type.name,
+    child.level + 1, parent.parent_element_id, parent.child_element_id, version.transition_name, version.version_name,
+    version.title_fr AS version_title_fr, gy.management_entity_id as management_entity
     FROM base_groupelementyear AS parent
-    INNER JOIN base_educationgroupyear AS educ ON parent.parent_id = educ.id
-    INNER JOIN base_educationgrouptype AS educ_type ON educ.education_group_type_id = educ_type.id
-    INNER JOIN base_educationgroupyear AS educ_child ON parent.child_branch_id = educ_child.id
-    INNER JOIN base_educationgrouptype AS educ_type_child ON educ_child.education_group_type_id = educ_type_child.id
-    INNER JOIN group_element_year_parent AS child on parent.child_branch_id = child.parent_id
+    INNER JOIN program_management_element AS element_parent ON parent.parent_element_id = element_parent.id
+    INNER JOIN program_management_element AS element_child ON parent.child_element_id = element_child.id
+    INNER JOIN education_group_groupyear AS gy ON element_parent.group_year_id = gy.id
+    INNER JOIN base_educationgrouptype AS educ_type on gy.education_group_type_id = educ_type.id
+    INNER JOIN education_group_groupyear AS gy_child ON element_child.group_year_id = gy_child.id
+    INNER JOIN base_educationgrouptype AS educ_type_child on gy_child.education_group_type_id = educ_type_child.id
+    INNER JOIN group_element_year_parent AS child on parent.child_element_id = child.parent_element_id
+    left JOIN program_management_educationgroupversion AS version on gy.id = version.root_group_id
     WHERE not(educ_type_child.name != 'OPTION' AND educ_type_child.category IN ('MINI_TRAINING', 'TRAINING'))
 )
-
 SELECT to_jsonb(array_agg(row_to_json(group_element_year_parent))) FROM group_element_year_parent
-WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING') 
+WHERE name != 'OPTION' AND category IN ('MINI_TRAINING', 'TRAINING')
 """
 
 
@@ -109,10 +115,23 @@ def academic_year_validator(value):
 
 
 class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
-                    'status')
+    list_display = (
+        'external_id',
+        'acronym',
+        'specific_title',
+        'academic_year',
+        'credits',
+        'requirement_entity',
+        'status',
+        'changed',
+    )
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
+    search_fields = [
+        'acronym',
+        'learning_container_year__requirement_entity__entityversion__acronym',
+        'external_id',
+        'id'
+    ]
     actions = [
         'resend_messages_to_queue',
     ]
@@ -216,7 +235,6 @@ class LearningUnitYear(SerializableModel):
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
-    structure = models.ForeignKey('Structure', blank=True, null=True, on_delete=models.CASCADE)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -235,7 +253,7 @@ class LearningUnitYear(SerializableModel):
 
     summary_locked = models.BooleanField(default=False, verbose_name=_("blocked update for tutor"))
 
-    professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
+    professional_integration = models.BooleanField(default=False, verbose_name=_('Professional integration'))
 
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
@@ -243,6 +261,17 @@ class LearningUnitYear(SerializableModel):
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
+    other_remark = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark (intended for publication)')
+    )
+    other_remark_english = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_('Other remark in english (intended for publication)')
+    )
+    faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark (unpublished)'))
 
     objects = BaseLearningUnitYearManager()
     objects_with_container = LearningUnitYearWithContainerManager()
@@ -259,6 +288,20 @@ class LearningUnitYear(SerializableModel):
 
     def __str__(self):
         return u"%s - %s" % (self.academic_year, self.acronym)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        publisher.learning_unit_year_created.send(
+            None,
+            learning_unit_identity=LearningUnitYearIdentity(code=self.acronym, year=self.academic_year.year)
+        )
+
+    def delete(self, *args, **kwargs):
+        publisher.learning_unit_year_deleted.send(
+            None,
+            learning_unit_identity=LearningUnitYearIdentity(code=self.acronym, year=self.academic_year.year)
+        )
+        super(LearningUnitYear, self).delete(*args, **kwargs)
 
     @property
     def subdivision(self):
@@ -332,8 +375,11 @@ class LearningUnitYear(SerializableModel):
             return self.learning_container_year.get_partims_related()
         return LearningUnitYear.objects.none()
 
+    # TODO: Change to pass by DDD services
     def find_list_group_element_year(self):
-        return self.child_leaf.filter(child_leaf=self).select_related('parent')
+        return self.element.children_elements.filter(
+            child_element__learning_unit_year=self
+        ).select_related('parent_element')
 
     def get_learning_unit_previous_year(self):
         try:
@@ -391,7 +437,7 @@ class LearningUnitYear(SerializableModel):
     @property
     def periodicity_verbose(self):
         if self.periodicity:
-            return _(self.periodicity)
+            return dict(PERIODICITY_TYPES)[self.periodicity].lower()
         return None
 
     def find_gt_learning_units_year(self):
@@ -515,13 +561,6 @@ class LearningUnitYear(SerializableModel):
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
-        ).exists()
-
-    def has_or_is_prerequisite(self, education_group_year):
-        formations = repositories.find_roots.find_roots([education_group_year])[education_group_year.id]
-        return PrerequisiteItem.objects.filter(
-            Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
-            Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)
         ).exists()
 
     def get_absolute_url(self):
@@ -668,15 +707,6 @@ def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
                                            proposallearningunit__isnull=True) \
         .order_by('academic_year') \
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
-
-
-def find_learning_unit_years_by_academic_year_tutor_attributions(academic_year, tutor):
-    """ In this function, only learning unit year with containers is visible! [no classes] """
-    qs = LearningUnitYear.objects_with_container.filter(
-        academic_year=academic_year,
-        attribution__tutor=tutor,
-    ).distinct().order_by('academic_year__year', 'acronym')
-    return qs
 
 
 def toggle_summary_locked(learning_unit_year_id):

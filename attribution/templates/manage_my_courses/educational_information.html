@@ -9,7 +9,7 @@
  * The core business involves the administration of students, teachers,
  * courses, programs and so on.
  *
- * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,65 +33,73 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="row" style="margin:0 -15px 5px; padding:0;">
-
-    <div class="col-md-10 col-md-offset-1">
-        <h2>{{ learning_unit_year.acronym|default_if_none:'' }} &mdash; {{ learning_unit_year.academic_year }}</h2>
-        <h4 style="margin-top: 0;">{{ learning_unit_year.complete_title }}</h4>
-    </div>
-
-</div>
-
-<br/>
-
-<div class="panel panel-default">
-    <div class="panel-body" id="tabs">
-        {% include "manage_my_courses/blocks/tabs.html" %}
-        <br>
-        <div class="panel panel-default" style="background-color: #f5f5f5">
-            <div class="panel-heading show_collapse">
-                <label style="font-size: larger">{% trans 'Information approved and updatable by the Commission of Program' %}</label>
-                <a
-                        class=" pull-right collapsed a_show_collapse"
-                        data-toggle="collapse"
-                        href="#ue_specifications"
-                        role="button"
-                        aria-expanded="false"
-                        aria-controls="eu_specifications">
-                </a>
-            </div>
-            <div class="panel-body collapse" id="ue_specifications">
-                {% include "learning_unit/specifications_all.html" %}
-            </div>
+    <div class="row" style="margin:0 -15px 5px; padding:0;">
+        <div class="col-md-10 col-md-offset-1">
+            <h2>{{ learning_unit_year.acronym|default_if_none:'' }} &mdash; {{ learning_unit_year.academic_year }}</h2>
+            <h4 style="margin-top: 0;">{{ learning_unit_year.complete_title }}</h4>
         </div>
-        <div class="panel panel-default">
-            <div class="panel-heading"><label style="font-size: larger">{% trans 'Informations updatable by teachers' %}</label></div>
-
-            <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="educational_information">
-                    <br>
-                    {% include "manage_my_courses/blocks/submission_dates.html" %}
-                    <br>
-                    {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
-
-                    {% include "learning_unit/blocks/panel/educational_informations.html" %}
+    </div>
+    <br/>
+    <div class="panel panel-default">
+        <div class="panel-body" id="tabs">
+            {% include 'learning_unit/blocks/visualize_refreshed_publication.html' %}
+            {% include "manage_my_courses/blocks/tabs.html" %}
+            <br>
+            <div class="panel panel-default" style="background-color: #f5f5f5">
+                <div class="panel-heading show_collapse">
+                    <label style="font-size: larger">{% trans 'Information approved and updatable by the Commission of Program' %}</label>
+                    <a class="pull-right collapsed a_show_collapse"
+                       data-toggle="collapse"
+                       href="#ue_specifications"
+                       role="button"
+                       aria-expanded="false"
+                       aria-controls="eu_specifications"></a>
+                </div>
+                <div class="panel-body collapse" id="ue_specifications">
+                    {% include "learning_unit/specifications_all.html" %}
                 </div>
             </div>
+            <div class="panel panel-default">
+                <div class="panel-heading"><label style="font-size: larger">{% trans 'Informations updatable by teachers' %}</label></div>
+
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="educational_information">
+                        <br>
+                        {% include "manage_my_courses/blocks/submission_dates.html" %}
+                        <br>
+                        {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url %}
+
+                        {% include "learning_unit/blocks/panel/educational_informations.html" %}
+                    </div>
+                </div>
+            </div>
+            {% url 'tutor_edit_educational_information_force_majeure' learning_unit_year_id=learning_unit_year.id as force_majeure_update_url %}
+            {% include 'learning_unit/blocks/panel/educational_informations_force_majeure.html' with post_url=force_majeure_update_url %}
         </div>
     </div>
-</div>
-<div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
+
 {% block script %}
     <script>
         function changeOrientation(button) {
             if (button.className == "glyphicon glyphicon-collapse-down") {
-                button.className = "glyphicon glyphicon-expand"
+                button.className = "glyphicon glyphicon-expand";
             }
             else if (button.className == "glyphicon glyphicon-expand") {
-                button.className = "glyphicon glyphicon-collapse-down"
+                button.className = "glyphicon glyphicon-collapse-down";
             }
         }
+
+        {% if can_edit_information or can_edit_force_majeur_section %}
+            function display_refresh_message() {
+                const code = this.dataset.code;
+                const fmts = gettext('The learning unit %(code)s will be published soon.');
+                const success_message = interpolate(fmts, {code: code}, true);
+                displaySuccessMessage(success_message);
+            }
+            btn_visualize_refreshed_publication = document.getElementById("visualize_refreshed_publication_btn");
+            btn_visualize_refreshed_publication.onclick = display_refresh_message;
+        {% endif %}
     </script>
 {% endblock %}
