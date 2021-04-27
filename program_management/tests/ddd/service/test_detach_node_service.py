@@ -58,7 +58,7 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self.node_to_detach = self.link.child
         self.path_to_detach = build_path(self.link.parent, self.link.child)
 
-        self.detach_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=True)
+        self.detach_command = DetachNodeCommandFactory(path=self.path_to_detach, commit=True)
 
         self._patch_persist_tree()
         self._patch_search_tree_identity()
@@ -107,7 +107,7 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
     @patch.object(ProgramTree, 'detach_node')
     def test_should_return_link_identity_and_not_persist_when_valid_and_commit_set_to_false(self, mock_detach_node):
         mock_detach_node.return_value = self.link
-        detach_node_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=False)
+        detach_node_command = DetachNodeCommandFactory(path=self.path_to_detach, commit=False)
         detach_node_service.detach_node(detach_node_command)
         assertion_message = "Should not persist any data into database. " \
                             "It only tests and applies detach action on the in-memory object."
