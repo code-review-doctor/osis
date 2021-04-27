@@ -85,7 +85,10 @@ class PersonRolesSerializer(serializers.ModelSerializer):
                 entity_type=FACULTY
             )
         )
+
         if CentralManager.objects.filter(person=obj).filter(
+                Q(scopes__contains=[Scope.IUFC.name]) | Q(scopes__contains=[Scope.ALL.name])
+        ).exists() | FacultyManager.objects.filter(person=obj).filter(
                 Q(scopes__contains=[Scope.IUFC.name]) | Q(scopes__contains=[Scope.ALL.name])
         ).exists():
             all_faculties.add(Scope.IUFC.name)
