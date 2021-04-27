@@ -26,6 +26,7 @@ from typing import Dict, Optional
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
@@ -33,6 +34,7 @@ from base.forms.utils import choice_field
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models import campus
 from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.enums import active_status, schedule_type as schedule_type_enum, education_group_categories, \
     education_group_types
 from base.models.enums.constraint_type import ConstraintTypeEnum
@@ -202,6 +204,10 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
         self.__init_end_year_field()
         self.__init_management_entity_field()
 
+    @cached_property
+    def __academic_year(self):
+        return AcademicYear.objects.get(year=self.year)
+
     def __init_end_year_field(self):
         initial_academic_year_value = self.initial.get("academic_year", None)
         if initial_academic_year_value:
@@ -211,11 +217,14 @@ class UpdateMiniTrainingForm(PermissionFieldMixin, MiniTrainingForm):
             )
 
     def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.__academic_year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
-            academic_year=AcademicYear.objects.get(year=self.year)
+            academic_year=self.__academic_year,
+            help_text=msg
         )
 
     # PermissionFieldMixin
