@@ -22,7 +22,6 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import attr
-from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.command import GetMiniTrainingCommand

@@ -23,7 +23,6 @@
 # ############################################################################
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
 from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate, \

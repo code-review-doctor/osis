@@ -27,7 +27,6 @@ from unittest import skip
 
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command

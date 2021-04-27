@@ -30,7 +30,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain.exception import CodeAlreadyExistException, AcronymRequired, AcronymAlreadyExist, \
-    StartYearGreaterThanEndYearException, HopsDataShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone, \
+    StartYearGreaterThanEndYearException, HopsFieldsAllOrNone, \
     CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing, \
     AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999

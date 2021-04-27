@@ -24,7 +24,6 @@
 
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd import command
 from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached, \
     CertificateAimsCopyConsistencyException

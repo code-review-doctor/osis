@@ -29,7 +29,7 @@ import mock
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.command import GetMiniTrainingCommand
-from education_group.ddd.domain.exception import TrainingHaveEnrollments, MiniTrainingHaveEnrollments, \
+from education_group.ddd.domain.exception import MiniTrainingHaveEnrollments, \
     MiniTrainingHaveLinkWithEPC
 from education_group.ddd.service.read import get_mini_training_service
 from education_group.tests.factories.mini_training import MiniTrainingFactory

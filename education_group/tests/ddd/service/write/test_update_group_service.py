@@ -23,7 +23,6 @@
 # ############################################################################
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd import command
 from education_group.ddd.domain import group

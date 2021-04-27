@@ -21,7 +21,6 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import contextlib
 import traceback
 import warnings
 from collections import namedtuple
@@ -74,7 +73,6 @@ class _AssertRaisesBusinessException:
 
 
 # FIXME should herit from SimpleTestCase
-# TODO should implement class to assert raises specific business exception
 class DDDTestCase(TestCase):
     starting_academic_year_year = 2020
 

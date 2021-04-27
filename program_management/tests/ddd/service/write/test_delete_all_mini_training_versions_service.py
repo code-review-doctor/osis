@@ -22,11 +22,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import skip
 
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd.command import DeletePermanentlyMiniTrainingStandardVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.service.write import delete_all_mini_training_versions_service

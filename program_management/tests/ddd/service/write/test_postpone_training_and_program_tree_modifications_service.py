@@ -23,10 +23,9 @@
 # ############################################################################
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.command import GetTrainingCommand
 from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing, \
-    AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, HopsFieldsAllOrNone
+    HopsFieldsAllOrNone
 from education_group.ddd.service.read import get_training_service
 from program_management.ddd.command import PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
 from program_management.ddd.domain.exception import Program2MEndDateLowerThanItsFinalitiesException, \

@@ -27,8 +27,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.domain.exception import InvalidBlockException, \
     RelativeCreditShouldBeGreaterOrEqualsThanZero, RelativeCreditShouldBeLowerOrEqualThan999, \
-    ReferenceLinkNotAllowedWithLearningUnitException, ChildTypeNotAuthorizedException, \
-    MinimumChildTypesNotRespectedException
+    ReferenceLinkNotAllowedWithLearningUnitException, ChildTypeNotAuthorizedException
 from program_management.ddd.service.write import update_link_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase

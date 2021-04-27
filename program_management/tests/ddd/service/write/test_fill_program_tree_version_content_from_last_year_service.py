@@ -28,7 +28,6 @@ import attr
 import mock
 from django.test import override_settings
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
     GetProgramTreeVersionCommand
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty, MinimumEditableYearException

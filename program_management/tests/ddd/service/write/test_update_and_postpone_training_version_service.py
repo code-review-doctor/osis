@@ -23,9 +23,7 @@
 # ############################################################################
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintMinimumInvalid, \
-    ContentConstraintTypeMissing
+from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing
 from program_management.ddd.command import UpdateTrainingVersionCommand
 from program_management.ddd.domain.exception import CannotDeleteSpecificVersionDueToTransitionVersionEndDate, \
     Program2MEndDateLowerThanItsFinalitiesException, FinalitiesEndDateGreaterThanTheirMasters2MException, \
