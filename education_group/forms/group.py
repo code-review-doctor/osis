@@ -27,6 +27,7 @@ from typing import Dict
 
 from django import forms
 from django.contrib.auth.models import User
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.common import ValidationRuleMixin
@@ -34,6 +35,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models import campus
 from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
@@ -150,12 +152,15 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         return {'context': self.get_context()}
 
     def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
         academic_year = self.initial.get('academic_year', None)
         if academic_year and not isinstance(academic_year, AcademicYear):
             academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
+        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
-            academic_year=academic_year
+            academic_year=academic_year,
+            help_text=msg
         )
