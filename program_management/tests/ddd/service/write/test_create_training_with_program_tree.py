@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
 
 import attr
 
@@ -35,6 +36,7 @@ from education_group.ddd.domain.exception import CodeAlreadyExistException, Acro
     AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
+from education_group.ddd.validators._hops_validator import TRAINING_TYPES_FOR_WHICH_ARES_GRACA_IS_OPTIONAL
 from education_group.tests.ddd.factories.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
@@ -172,10 +174,10 @@ class TestCreateAndReportTrainingWithProgramTree(DDDTestCase):
         with self.assertRaisesBusinessException(HopsFieldsAllOrNone):
             create_training_with_program_tree.create_and_report_training_with_program_tree(cmd)
 
-    def test_ares_graca_is_optional_for_formation_phd(self):
+    def test_ares_graca_is_optional_for_formation_phd_and_certificates_and_capaes(self):
         cmd = attr.evolve(
             self.cmd,
-            type=TrainingType.FORMATION_PHD.name,
+            type=random.choice(TRAINING_TYPES_FOR_WHICH_ARES_GRACA_IS_OPTIONAL),
             ares_code=10,
             ares_graca=None,
             ares_authorization=10

@@ -11,7 +11,7 @@
 - Un application service représente un service qui effectue une action métier complète
 - Use case : given - when - then facilement identifiable
 - Orchestre les appels dans les différentes couches (Repository, Domaine, DomaineService)
-- Cf. [Couche "use case" (application service)](https://github.com/uclouvain/osis/blob/workshops/.github/CONTRIBUTING.md#dddservice-application-service)
+- Cf. [Couche "use case" (application service)](https://github.com/uclouvain/osis/blob/dev/.github/CONTRIBUTING.md#dddservice-application-service)
 
 
 
