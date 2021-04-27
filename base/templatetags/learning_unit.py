@@ -287,6 +287,7 @@ def th_tooltip(context, key, **kwargs):
         difference=difference, value=_(str(value))
     ))
 
+
 def _is_entity_data_and_inactive(context, key):
     return key.lower() in (
         'requirement_entity',
