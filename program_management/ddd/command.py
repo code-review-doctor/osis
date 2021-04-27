@@ -647,6 +647,12 @@ class FillProgramTreeVersionContentFromProgramTreeVersionCommand(interface.Comma
 
 
 @attr.s(frozen=True, slots=True)
+class FillProgramTreeContentFromLastYearCommand(interface.CommandRequest):
+    to_year = attr.ib(type=int)
+    to_code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class GetProgramTreeVersionCommand(interface.CommandRequest):
     year = attr.ib(type=int)
     acronym = attr.ib(type=str)
