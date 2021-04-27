@@ -58,8 +58,6 @@ from program_management.ddd.validators._prerequisite_expression_syntax import Pr
 from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
 from program_management.ddd.validators._relative_credits import RelativeCreditsValidator
 from program_management.ddd.validators._transition_name_existed import TransitionNameExistedValidator
-from program_management.ddd.validators._transition_name_existed_but_other_transition_version_exists import \
-    TransitionNameExistsInPastButExistenceOfOtherTransitionValidator
 from program_management.ddd.validators._transition_name_exists import TransitionNameExistsValidator
 from program_management.ddd.validators._transition_name_pattern import TransitionNamePatternValidator
 from program_management.ddd.validators._update_check_existence_of_transition import CheckExistenceOfTransition
@@ -340,12 +338,6 @@ class CheckTransitionNameValidatorList(MultipleExceptionBusinessListValidator):
         self.validators = [
             TransitionNamePatternValidator(transition_name=new_transition_name),
             TransitionNameExistsValidator(from_specific_version, new_transition_name, all_versions),
-            TransitionNameExistedValidator(from_specific_version, new_transition_name, all_versions),
-            TransitionNameExistsInPastButExistenceOfOtherTransitionValidator(
-                from_specific_version,
-                new_transition_name,
-                all_versions
-            ),
-
+            TransitionNameExistedValidator(from_specific_version, new_transition_name, all_versions)
         ]
         super().__init__()
