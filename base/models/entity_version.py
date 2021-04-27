@@ -532,7 +532,6 @@ class EntityVersion(SerializableModel):
 
     @classmethod
     def is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> bool:
-        # academic_year = AcademicYear.objects.get(year=self.get_group().year)
         current_clause = (
                 Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
                 Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
