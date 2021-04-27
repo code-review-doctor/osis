@@ -81,16 +81,14 @@ class PersonRolesSerializer(serializers.ModelSerializer):
         all_entities = EntityRoleHelper.get_all_entities(obj, {CentralManager.group_name, FacultyManager.group_name})
         all_faculties = set(
             row.acronym for row in EntityVersion.objects.current(datetime.now()).filter(
-                entity_id__in=all_entities,
-                entity_type=FACULTY
+                entity_id__in=all_entities
+            ).filter(
+                Q(entity_type=FACULTY) | Q(acronym__iexact=Scope.IUFC.name)
             )
         )
 
-        if CentralManager.objects.filter(person=obj).filter(
-                Q(scopes__contains=[Scope.IUFC.name]) | Q(scopes__contains=[Scope.ALL.name])
-        ).exists() | FacultyManager.objects.filter(person=obj).filter(
-                Q(scopes__contains=[Scope.IUFC.name]) | Q(scopes__contains=[Scope.ALL.name])
-        ).exists():
+        if CentralManager.objects.filter(person=obj, scopes__contains=[Scope.IUFC.name]).exists() | \
+                FacultyManager.objects.filter(person=obj, scopes__contains=[Scope.IUFC.name]).exists():
             all_faculties.add(Scope.IUFC.name)
         return all_faculties
 
