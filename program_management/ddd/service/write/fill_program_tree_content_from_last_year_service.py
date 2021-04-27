@@ -58,6 +58,7 @@ def fill_program_tree_content_from_last_year(cmd: 'FillProgramTreeContentFromLas
     existing_nodes = [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
 
     ProgramTreeBuilder().fill_from_last_year_program_tree(last_year_tree, tree, set(existing_nodes))
+    ProgramTreeBuilder().copy_prerequisites_from_program_tree(last_year_tree, tree)
 
     repo.create(tree, copy_group_service=copy_group_service.copy_group)
 
