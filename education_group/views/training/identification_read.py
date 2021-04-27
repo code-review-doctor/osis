@@ -25,13 +25,17 @@
 ##############################################################################
 from typing import List
 
+from django.db.models import Q, Case, When, Value, BooleanField
+from django.utils.functional import cached_property
 from reversion.models import Version
 
+from base.models.academic_year import AcademicYear
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
+from base.models.entity_version import EntityVersion
 from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read.check_training_empty_fields_on_warning_service import \
@@ -50,7 +54,19 @@ class TrainingReadIdentification(TrainingRead):
             **super().get_context_data(**kwargs),
             "permission_object": self.get_permission_object(),
             "history": self.get_related_history(),
-            "fields_warnings": self.get_fields_in_warning()
+            "fields_warnings": self.get_fields_in_warning(),
+            "training_active_management_entity": EntityVersion.is_entity_active(
+                self.training.management_entity.acronym,
+                self.academic_year
+            ),
+            "group_active_management_entity": EntityVersion.is_entity_active(
+                self.group.management_entity.acronym,
+                self.academic_year
+            ),
+            "active_administration_entity": EntityVersion.is_entity_active(
+                self.training.administration_entity.acronym,
+                self.academic_year
+            ),
         }
 
     def get_fields_in_warning(self) -> List[str]:
@@ -61,6 +77,10 @@ class TrainingReadIdentification(TrainingRead):
             except exception.TrainingEmptyFieldException as e:
                 return e.fields
         return []
+
+    @cached_property
+    def academic_year(self):
+        return AcademicYear.objects.get(year=self.node_identity.year)
 
     def get_related_history(self):
         group_year = self.education_group_version.root_group

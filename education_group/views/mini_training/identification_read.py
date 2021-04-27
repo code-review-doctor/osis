@@ -23,13 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import Case, When, Value, BooleanField, Q
+from django.utils.functional import cached_property
 from reversion.models import Version
 
+from base.models.academic_year import AcademicYear
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year_domain import EducationGroupYearDomain
+from base.models.entity_version import EntityVersion
 from education_group.models.group_year import GroupYear
 from education_group.views.mini_training.common_read import MiniTrainingRead, Tab
 from program_management.models.education_group_version import EducationGroupVersion
@@ -43,7 +47,11 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
         return {
             **super().get_context_data(**kwargs),
             "history": self.get_related_history(),
-            "permission_object": self.get_permission_object()
+            "permission_object": self.get_permission_object(),
+            "active_management_entity": EntityVersion.is_entity_active(
+                self.get_group().management_entity.acronym,
+                self.academic_year
+            ),
         }
 
     def get_related_history(self):
@@ -71,3 +79,7 @@ class MiniTrainingReadIdentification(MiniTrainingRead):
         )
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created')
+
+    @cached_property
+    def academic_year(self):
+        return AcademicYear.objects.get(year=self.node_identity.year)
