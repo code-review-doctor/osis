@@ -140,7 +140,7 @@ class TestUpdateRootGroup(TestCase):
     @mock.patch("program_management.ddd.service.write.update_program_tree_version_service.update_program_tree_version")
     @mock.patch("program_management.ddd.service.write.update_and_postpone_group_version_service."
                 "update_and_postpone_group_version")
-    def test_should_call_postponement_service_if_in_past_but_is_extended(
+    def test_should_call_postponement_service_if_in_past_but_end_year_changed(
             self,
             mock_postpone_group_version_service,
             mock_update_tree_version_service,
