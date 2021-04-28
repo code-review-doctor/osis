@@ -25,13 +25,11 @@ from typing import List
 
 from django.db import transaction
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain.exception import BulkUpdateLinkException
-from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.service.write import update_link_service
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 
 
 @transaction.atomic()
@@ -43,8 +41,7 @@ def bulk_update_links(cmd: BulkUpdateLinkCommand) -> List['Link']:
     exceptions = dict()
     for update_cmd in cmd.update_link_cmds:
         try:
-            child_id = NodeIdentity(code=update_cmd.child_node_code, year=update_cmd.child_node_year)
-            link_updated = update_link_service._update_link(child_id, tree, update_cmd)
+            link_updated = tree.update_link(update_cmd)
             links_updated.append(link_updated)
         except MultipleBusinessExceptions as e:
             exceptions[update_cmd] = e
