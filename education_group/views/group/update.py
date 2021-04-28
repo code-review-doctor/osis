@@ -34,7 +34,10 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version, academic_year, campus
-from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
+from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update, \
+    display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
@@ -83,6 +86,11 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             group_id = self.__send_update_group_cmd(group_form)
             if group_form.is_valid():
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+                display_warning_messages(
+                    request,
+                    self.get_warning_msg(group_id, group_form.cleaned_data['management_entity']),
+                    extra_tags='safe'
+                )
                 check_formations_impacted_by_update(self.get_group_obj().code,
                                                     self.get_group_obj().year, request, self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url(group_id))
@@ -157,6 +165,16 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": group_id.code,
             "academic_year": display_as_academic_year(group_id.year),
         }
+
+    def get_warning_msg(self, group_id: 'GroupIdentity', management_entity: str) -> str:
+        academic_year = AcademicYear.objects.get(year=group_id.year)
+        if not EntityVersion.is_entity_active(management_entity, academic_year):
+            return _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an inactive entity") % {
+                "link": self.get_success_url(group_id),
+                "code": group_id.code,
+                "academic_year": display_as_academic_year(group_id.year),
+            }
+        return ''
 
     def get_success_url(self, group_id: 'GroupIdentity') -> str:
         url = reverse('element_identification', kwargs={'code': group_id.code, 'year': group_id.year})

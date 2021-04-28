@@ -138,9 +138,6 @@ class GroupRepository(interface.AbstractRepository):
     def update(cls, group: 'Group', **_) -> 'GroupIdentity':
         warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
-            # management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
-            #     acronym=group.management_entity.acronym,
-            # )
             management_entity = EntityVersionModelDb.objects.only(
                 'entity_id'
             ).filter(

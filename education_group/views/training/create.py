@@ -33,10 +33,11 @@ from django.views.generic.base import View
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.academic_year import starting_academic_year, AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_types import TrainingType
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_error_messages
+from base.views.common import display_success_messages, display_error_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
@@ -182,6 +183,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
             if not training_form.errors:
                 self._display_success_messages(training_ids)
+                self._display_warning_messages(training_ids, create_training_data)
                 return HttpResponseRedirect(self.get_success_url(training_ids[0]))
 
         if training_form.errors and not training_form.confirmed:
@@ -235,6 +237,25 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "acronym": training_id.acronym,
             "academic_year": display_as_academic_year(training_id.year),
         }
+
+    def _display_warning_messages(self, training_ids: List['TrainingIdentity'], create_training_data: dict):
+        warning_messages = [
+            self.get_warning_msg(training_id, create_training_data) for training_id in training_ids
+        ]
+        display_warning_messages(self.request, warning_messages, extra_tags='safe')
+
+    def get_warning_msg(self, training_id: TrainingIdentity, create_training_data: dict):
+        academic_year = AcademicYear.objects.get(year=training_id.year)
+        management_entity = create_training_data['management_entity_acronym']
+        administration_entity = create_training_data['administration_entity_acronym']
+        if not EntityVersion.is_entity_active(management_entity, academic_year) \
+                or not EntityVersion.is_entity_active(administration_entity, academic_year):
+            return _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> has an inactive entity") % {
+                "link": self.get_success_url(training_id),
+                "acronym": training_id.acronym,
+                "academic_year": display_as_academic_year(training_id.year),
+            }
+        return ''
 
     def get_tabs(self) -> List:
         return [

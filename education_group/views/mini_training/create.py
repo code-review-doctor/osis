@@ -33,9 +33,10 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.academic_year import starting_academic_year, AcademicYear
+from base.models.entity_version import EntityVersion
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_error_messages
+from base.views.common import display_success_messages, display_error_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import mini_training, exception
@@ -82,10 +83,15 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                         self._generate_create_command_from_valid_form(form)
                     )
             code = form.cleaned_data["code"]
+            management_entity = form.cleaned_data["management_entity"]
             self.set_success_url(mini_training_identities[0])
             display_success_messages(
                 self.request,
                 self.get_success_msg(mini_training_identities, code),
+                extra_tags='safe')
+            display_warning_messages(
+                self.request,
+                self.get_warning_msg(mini_training_identities, code, management_entity),
                 extra_tags='safe')
             return super().form_valid(form)
 
@@ -169,6 +175,32 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             "code": mini_training_identity.acronym,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
+
+    def get_warning_msg(
+            self,
+            mini_training_identities: List[mini_training.MiniTrainingIdentity],
+            code: str,
+            management_entity: str
+    ) -> List[str]:
+        return [
+            self._get_warning_msg(mini_training_identity, code, management_entity)
+            for mini_training_identity in mini_training_identities
+        ]
+
+    def _get_warning_msg(
+            self,
+            mini_training_identity: mini_training.MiniTrainingIdentity,
+            code: str,
+            management_entity: str
+    ) -> str:
+        academic_year = AcademicYear.objects.get(year=mini_training_identity.year)
+        if not EntityVersion.is_entity_active(management_entity, academic_year):
+            return _("Mini-training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an inactive entity") % {
+                "link": self._generate_success_url(mini_training_identity, code),
+                "code": mini_training_identity.acronym,
+                "academic_year": display_as_academic_year(mini_training_identity.year),
+            }
+        return ''
 
     def get_tabs(self) -> List[FormTab]:
         return [

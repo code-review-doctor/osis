@@ -9,10 +9,11 @@ from django.views.generic.base import View
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import academic_year
-from base.models.academic_year import starting_academic_year
+from base.models.academic_year import starting_academic_year, AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_types import GroupType
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
@@ -126,7 +127,9 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     else:
                         group_form.add_error(None, e.message)
             if not group_form.errors:
+                management_entity = cmd_create.management_entity_acronym
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
+                display_warning_messages(request, self.get_warning_msg(group_id, management_entity), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))
 
         return render(request, self.template_name, {
@@ -150,6 +153,16 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "code": group_id.code,
             "academic_year": display_as_academic_year(group_id.year),
         }
+
+    def get_warning_msg(self, group_id: GroupIdentity, management_entity):
+        academic_year = AcademicYear.objects.get(year=group_id.year)
+        if not EntityVersion.is_entity_active(management_entity, academic_year):
+            return _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an inactive entity") % {
+                "link": self.get_success_url(group_id),
+                "code": group_id.code,
+                "academic_year": display_as_academic_year(group_id.year),
+            }
+        return ''
 
     def get_tabs(self) -> List:
         return [
