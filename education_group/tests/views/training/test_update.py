@@ -154,7 +154,7 @@ class TestTrainingUpdateView(TestCase):
 
     @mock.patch('education_group.views.training.update.TrainingUpdateView.delete_training', return_value=[])
     @mock.patch('education_group.views.training.update.TrainingUpdateView.update_training')
-    @mock.patch('education_group.views.training.update.postpone_certificate_aims_modification')
+    @mock.patch('infrastructure.messages_bus.message_bus_instance.invoke')
     @mock.patch("education_group.views.training.update.TrainingUpdateView.training_form",
                 new_callable=mocks.MockFormValid)
     @mock.patch('education_group.views.training.update.render')
@@ -162,11 +162,11 @@ class TestTrainingUpdateView(TestCase):
             self,
             mock_render,
             mock_form_valid,
-            mock_postpone_certificate_aims_modification,
+            mock_invoke,
             mock_update_training,
             mock_delete_training,
     ):
-        mock_postpone_certificate_aims_modification.side_effect = MaximumCertificateAimType2Reached
+        mock_invoke.side_effect = MaximumCertificateAimType2Reached
         mock_form_valid.changed_data = ['certificate_aims']
         mock_render.return_value = HttpResponse()
 
