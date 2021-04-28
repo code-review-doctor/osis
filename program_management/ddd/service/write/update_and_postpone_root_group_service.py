@@ -30,7 +30,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.command import UpdateGroupCommand
 from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.service.write import update_group_service
-from program_management.ddd.command import UpdateRootGroupCommand, UpdateProgramTreeVersionCommand, \
+from program_management.ddd.command import UpdateAndPostponeRootGroupCommand, UpdateProgramTreeVersionCommand, \
     PostponeGroupVersionCommand, PostponeProgramTreeCommand, PostponeProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
@@ -40,7 +40,7 @@ from program_management.ddd.service.write import update_program_tree_version_ser
 
 
 def update_and_postpone_root_group(
-        command: 'UpdateRootGroupCommand',
+        command: 'UpdateAndPostponeRootGroupCommand',
         academic_year_repository: 'IAcademicYearRepository',
         group_repository: 'GroupRepository'
 ) -> List['ProgramTreeVersionIdentity']:
@@ -109,7 +109,7 @@ def __convert_to_update_group_command(postpone_cmd: 'PostponeGroupVersionCommand
     )
 
 
-def __convert_to_update_tree_version_command(command: 'UpdateRootGroupCommand'):
+def __convert_to_update_tree_version_command(command: 'UpdateAndPostponeRootGroupCommand'):
     return UpdateProgramTreeVersionCommand(
         end_year=command.end_year,
         offer_acronym=command.offer_acronym,
@@ -122,7 +122,7 @@ def __convert_to_update_tree_version_command(command: 'UpdateRootGroupCommand'):
 
 
 def __convert_to_postpone_group_version(
-        cmd: 'UpdateRootGroupCommand',
+        cmd: 'UpdateAndPostponeRootGroupCommand',
         group_identity: 'GroupIdentity'
 ) -> 'PostponeGroupVersionCommand':
     return PostponeGroupVersionCommand(

@@ -32,13 +32,14 @@ from education_group.tests.ddd.factories.group import GroupIdentityFactory
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import update_and_postpone_root_group_service
-from program_management.tests.ddd.factories.commands.update_root_group_command import UpdateRootGroupCommandFactory
+from program_management.tests.ddd.factories.commands.update_and_postpone_root_group_command import \
+    UpdateAndPostponeRootGroupCommandFactory
 
 
 class TestUpdateRootGroup(TestCase):
 
     def setUp(self):
-        self.cmd = UpdateRootGroupCommandFactory()
+        self.cmd = UpdateAndPostponeRootGroupCommandFactory()
         self.identity_expected = ProgramTreeVersionIdentity(
             offer_acronym=self.cmd.offer_acronym,
             year=self.cmd.year,

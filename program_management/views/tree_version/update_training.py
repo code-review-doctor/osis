@@ -27,7 +27,7 @@ from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateRootGroupCommand
+from program_management.ddd.command import UpdateAndPostponeRootGroupCommand
 from program_management.ddd.domain import program_tree_version, exception as program_exception
 from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -140,7 +140,7 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     def update_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
-            update_command = self._convert_form_to_update_root_group_command(self.training_version_form)
+            update_command = self._convert_form_to_update_and_postpone_root_group_command(self.training_version_form)
             return message_bus_instance.invoke(update_command)
         except MultipleBusinessExceptions as multiple_exceptions:
             for e in multiple_exceptions.exceptions:
@@ -351,10 +351,10 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
         }
         return form_initial_values
 
-    def _convert_form_to_update_root_group_command(
+    def _convert_form_to_update_and_postpone_root_group_command(
             self, form: 'version.UpdateTrainingVersionForm'
-    ) -> 'UpdateRootGroupCommand':
-        return UpdateRootGroupCommand(
+    ) -> 'UpdateAndPostponeRootGroupCommand':
+        return UpdateAndPostponeRootGroupCommand(
             offer_acronym=self.get_program_tree_version_obj().entity_id.offer_acronym,
             version_name=self.get_program_tree_version_obj().entity_id.version_name,
             year=self.get_program_tree_version_obj().entity_id.year,

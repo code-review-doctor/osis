@@ -26,7 +26,7 @@ from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateRootGroupCommand
+from program_management.ddd.command import UpdateAndPostponeRootGroupCommand
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import version_label
@@ -116,15 +116,16 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             delete_message = _(
                 "Mini-Training %(offer_acronym)s[%(acronym)s] successfully deleted from %(academic_year)s."
             ) % {
-                "offer_acronym": last_identity.offer_acronym,
-                "acronym": version_label(last_identity, only_label=True),
-                "academic_year": display_as_academic_year(
-                    self.mini_training_version_form.cleaned_data["end_year"] + 1
-                )
-            }
+                                 "offer_acronym": last_identity.offer_acronym,
+                                 "acronym": version_label(last_identity, only_label=True),
+                                 "academic_year": display_as_academic_year(
+                                     self.mini_training_version_form.cleaned_data["end_year"] + 1
+                                 )
+                             }
             display_success_messages(self.request, delete_message, extra_tags='safe')
 
-    def get_url_program_version(self, version_id: 'ProgramTreeVersionIdentity') -> str:
+    @staticmethod
+    def get_url_program_version(version_id: 'ProgramTreeVersionIdentity') -> str:
         node_identity = NodeIdentitySearch().get_from_tree_version_identity(version_id)
         return reverse(
             "element_identification",
@@ -139,7 +140,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     def update_mini_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
-            update_command = self._convert_form_to_update_root_group_command(self.mini_training_version_form)
+            update_command = self._convert_form_to_update_and_postpone_root_group_command(
+                self.mini_training_version_form)
             return message_bus_instance.invoke(update_command)
         except exception_education_group.ContentConstraintTypeMissing as e:
             self.mini_training_version_form.add_error("constraint_type", e.message)
@@ -293,10 +295,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         }
         return form_initial_values
 
-    def _convert_form_to_update_root_group_command(
+    def _convert_form_to_update_and_postpone_root_group_command(
             self, form: 'version.UpdateMiniTrainingVersionForm'
-    ) -> 'UpdateRootGroupCommand':
-        return UpdateRootGroupCommand(
+    ) -> 'UpdateAndPostponeRootGroupCommand':
+        return UpdateAndPostponeRootGroupCommand(
             offer_acronym=self.get_program_tree_version_obj().entity_id.offer_acronym,
             version_name=self.get_program_tree_version_obj().entity_id.version_name,
             year=self.get_program_tree_version_obj().entity_id.year,

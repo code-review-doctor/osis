@@ -41,7 +41,7 @@ from infrastructure.shared_kernel.academic_year.repository.academic_year import 
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import PostponeTrainingAndRootGroupModificationWithProgramTreeCommand, \
-    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateRootGroupCommand
+    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateAndPostponeRootGroupCommand
 from program_management.ddd.service.write.postpone_mini_training_and_program_tree_modifications_service import \
     postpone_mini_training_and_program_tree_modifications
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
@@ -60,7 +60,7 @@ class MessageBus:
             lambda cmd: postpone_training_and_program_tree_modifications(cmd, AcademicYearRepository()),
         PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand:
             lambda cmd: postpone_mini_training_and_program_tree_modifications(cmd, AcademicYearRepository()),
-        UpdateRootGroupCommand:
+        UpdateAndPostponeRootGroupCommand:
             lambda cmd: update_and_postpone_root_group(cmd, AcademicYearRepository(), GroupRepository()),
         PostponeCertificateAimsCommand:
             lambda cmd: postpone_certificate_aims_modification(cmd, AcademicYearRepository())

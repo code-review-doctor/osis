@@ -96,7 +96,7 @@ class ProlongExistingProgramTreeVersionCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class UpdateRootGroupCommand(interface.CommandRequest):
+class UpdateAndPostponeRootGroupCommand(interface.CommandRequest):
     offer_acronym = attr.ib(type=str)
     version_name = attr.ib(type=str)
     year = attr.ib(type=int)
