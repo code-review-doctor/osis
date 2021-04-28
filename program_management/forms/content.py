@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.widgets import CKEditorWidget
 from typing import List
 
 from django import forms
@@ -36,10 +35,10 @@ from base.forms.utils import choice_field
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
+from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.service.write import bulk_update_link_service, update_link_service
 
 
 class LinkForm(forms.Form):
@@ -102,9 +101,16 @@ class LinkForm(forms.Form):
     def save(self):
         if self.is_valid():
             try:
-                return update_link_service.update_link(self.generate_update_link_command())
-            except MultipleBusinessExceptions as e:
-                self.handle_save_exception(e)
+                return message_bus_instance.invoke(
+                    command.BulkUpdateLinkCommand(
+                        parent_node_code=self.parent_obj.code,
+                        parent_node_year=self.parent_obj.year,
+                        update_link_cmds=[self.generate_update_link_command()],
+                    )
+                )[0]
+            except exception.BulkUpdateLinkException as e:
+                multiple_business_exception = e.exceptions[self.generate_update_link_command()]
+                self.handle_save_exception(multiple_business_exception)
         raise InvalidFormException()
 
     def generate_update_link_command(self) -> 'command.UpdateLinkCommand':
@@ -145,8 +151,7 @@ class BaseContentFormSet(BaseFormSet):
     def save(self) -> List['Link']:
         if self.is_valid():
             try:
-                cmd = self.generate_bulk_update_link_command()
-                return bulk_update_link_service.bulk_update_links(cmd)
+                return message_bus_instance.invoke(self.generate_bulk_update_link_command())
             except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
                 for form in self.forms:
                     if e.exceptions.get(form.generate_update_link_command()):

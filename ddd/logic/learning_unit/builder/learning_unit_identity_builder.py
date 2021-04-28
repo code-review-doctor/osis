@@ -47,6 +47,7 @@ class LearningUnitIdentityBuilder(EntityIdentityBuilder):
 
     @classmethod
     def build_from_code_and_year(cls, code: str, year: int) -> 'LearningUnitIdentity':
+        from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
         return LearningUnitIdentity(
             academic_year=AcademicYearIdentityBuilder.build_from_year(year=year),
             code=code,

@@ -30,10 +30,11 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 
+# TODO :: to remove (replace with bulk_update)
 @transaction.atomic()
-def update_link(cmd: UpdateLinkCommand) -> 'Link':
+def update_link(cmd: UpdateLinkCommand, repository: 'ProgramTreeRepository') -> 'Link':
     tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
+    tree = repository.get(tree_id)
     link_updated = tree.update_link(cmd)
-    ProgramTreeRepository.update(tree)
+    repository.update(tree)
     return link_updated

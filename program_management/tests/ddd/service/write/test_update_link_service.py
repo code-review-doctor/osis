@@ -24,16 +24,17 @@
 
 from django.test import TestCase
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain import exception
-from program_management.ddd.service.write import update_link_service
+from program_management.ddd.domain.exception import BulkUpdateLinkException
+from program_management.ddd.service.write import bulk_update_link_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
 from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.program_tree import tree_builder, ProgramTreeFactory
+from program_management.tests.ddd.factories.program_tree import tree_builder
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
 from testing.mocks import MockPatcherMixin
 
@@ -42,10 +43,6 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.tree = ProgramTreeBachelorFactory(2016, 2018)
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
-        self.mock_repo(
-            "program_management.ddd.service.write.update_link_service.ProgramTreeRepository",
-            self.fake_program_tree_repository
-        )
 
     def test_failure_when_block_value_is_not_a_increasing_sequence_of_digits_between_1_and_6(self):
         block_inputs = ["158", "265", "49"]
@@ -57,11 +54,19 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
                 child_node_code=self.tree.root_node.children_as_nodes[0].code,
                 child_node_year=self.tree.root_node.children_as_nodes[0].year,
             )
+            invalid_bulk_update_cmd = BulkUpdateLinkCommand(
+                parent_node_code=self.tree.root_node.code,
+                parent_node_year=self.tree.root_node.year,
+                update_link_cmds=[cmd_with_invalid_block_value]
+            )
 
-            with self.assertRaises(MultipleBusinessExceptions) as e:
-                update_link_service.update_link(cmd_with_invalid_block_value)
+            with self.assertRaises(BulkUpdateLinkException) as e:
+                bulk_update_link_service.bulk_update_links(
+                    invalid_bulk_update_cmd,
+                    self.fake_program_tree_repository
+                )
             self.assertIsInstance(
-                next(iter(e.exception.exceptions)),
+                next(iter(e.exception.exceptions[cmd_with_invalid_block_value].exceptions)),
                 exception.InvalidBlockException
             )
 
@@ -73,29 +78,44 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
+        invalid_bulk_update_cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[cmd_with_invalid_relative_credits_value]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(cmd_with_invalid_relative_credits_value)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(
+                invalid_bulk_update_cmd,
+                self.fake_program_tree_repository
+            )
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[cmd_with_invalid_relative_credits_value].exceptions)),
             exception.RelativeCreditShouldBeGreaterOrEqualsThanZero
         )
 
     def test_failure_when_relative_credits_superior_to_999(self):
         cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
-            relative_credits=1000,
-            parent_node_code=self.tree.root_node.code,
+            relative_credits=1000, parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
+        invalid_bulk_update_cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[cmd_with_invalid_relative_credits_value]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(cmd_with_invalid_relative_credits_value)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(
+                invalid_bulk_update_cmd,
+                self.fake_program_tree_repository
+            )
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[cmd_with_invalid_relative_credits_value].exceptions)),
             exception.RelativeCreditShouldBeLowerOrEqualThan999
         )
 
@@ -107,12 +127,20 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_code=self.tree.root_node.children_as_nodes[2].code,
             child_node_year=self.tree.root_node.children_as_nodes[2].year,
         )
+        invalid_bulk_cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[cmd_with_invalid_reference_link]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(cmd_with_invalid_reference_link)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(
+                invalid_bulk_cmd,
+                self.fake_program_tree_repository
+            )
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[cmd_with_invalid_reference_link].exceptions)),
             exception.ReferenceLinkNotAllowedWithLearningUnitException
         )
 
@@ -126,15 +154,22 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         minor_list_choice_tree = tree_builder(minor_list_choice_tree_data)
         self.fake_program_tree_repository.create(minor_list_choice_tree)
 
-        cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
-            link_type=None,
+        cmd_with_invalid_reference_link = BulkUpdateLinkCommand(
             parent_node_code=minor_list_choice_tree.root_node.code,
             parent_node_year=minor_list_choice_tree.root_node.year,
-            child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
-            child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+            update_link_cmds=[UpdateLinkCommandFactory(
+                link_type=None,
+                parent_node_code=minor_list_choice_tree.root_node.code,
+                parent_node_year=minor_list_choice_tree.root_node.year,
+                child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
+                child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+            )]
         )
 
-        update_link_service.update_link(cmd_with_invalid_reference_link)
+        bulk_update_link_service.bulk_update_links(
+            cmd_with_invalid_reference_link,
+            self.fake_program_tree_repository
+        )
         self.assertEqual(
             minor_list_choice_tree.root_node.children[0].link_type,
             LinkTypes.REFERENCE
@@ -155,15 +190,19 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         minor_list_choice_tree = tree_builder(minor_list_choice_tree_data)
         self.fake_program_tree_repository.create(minor_list_choice_tree)
 
-        cmd = UpdateLinkCommandFactory(
-            link_type=LinkTypes.REFERENCE.name,
+        cmd = BulkUpdateLinkCommand(
             parent_node_code=minor_list_choice_tree.root_node.code,
             parent_node_year=minor_list_choice_tree.root_node.year,
-            child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
-            child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+            update_link_cmds=[UpdateLinkCommandFactory(
+                link_type=LinkTypes.REFERENCE.name,
+                parent_node_code=minor_list_choice_tree.root_node.code,
+                parent_node_year=minor_list_choice_tree.root_node.year,
+                child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
+                child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+            )]
         )
 
-        self.assertTrue(update_link_service.update_link(cmd))
+        self.assertTrue(bulk_update_link_service.bulk_update_links(cmd, self.fake_program_tree_repository))
 
     def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(self):
         cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
@@ -173,12 +212,20 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
+        invalid_bulk_cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[cmd_with_invalid_reference_link]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(cmd_with_invalid_reference_link)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(
+                invalid_bulk_cmd,
+                self.fake_program_tree_repository
+            )
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[cmd_with_invalid_reference_link].exceptions)),
             exception.ChildTypeNotAuthorizedException
         )
 
@@ -201,40 +248,49 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         tree_with_successive_reference_link = tree_builder(successive_reference_link_tree_data)
         self.fake_program_tree_repository.create(tree_with_successive_reference_link)
 
-        invalid_command = UpdateLinkCommandFactory(
+        invalid_update_link_cmd = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=tree_with_successive_reference_link.root_node.code,
             parent_node_year=tree_with_successive_reference_link.root_node.year,
             child_node_code=tree_with_successive_reference_link.root_node.children_as_nodes[0].code,
             child_node_year=tree_with_successive_reference_link.root_node.children_as_nodes[0].year,
         )
+        invalid_bulk_cmd = BulkUpdateLinkCommand(
+            parent_node_code=tree_with_successive_reference_link.root_node.code,
+            parent_node_year=tree_with_successive_reference_link.root_node.year,
+            update_link_cmds=[invalid_update_link_cmd]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(invalid_command)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(invalid_bulk_cmd, self.fake_program_tree_repository)
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[invalid_update_link_cmd].exceptions)),
             exception.ChildTypeNotAuthorizedException
         )
 
     def test_update_link_properties(self):
-        valid_cmd = UpdateLinkCommandFactory(
+        update_link_command = UpdateLinkCommandFactory(
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[1].code,
             child_node_year=self.tree.root_node.children_as_nodes[1].year,
-            comment='Un commentaire',
-            comment_english='This is a comment',
-            relative_credits=5
+            comment='Un commentaire', comment_english='This is a comment',
+            relative_credits=5,
         )
-        result = update_link_service.update_link(valid_cmd)
-        self.assertEqual(result.link_type, valid_cmd.link_type)
-        self.assertEqual(result.access_condition, valid_cmd.access_condition)
-        self.assertEqual(result.is_mandatory, valid_cmd.is_mandatory)
-        self.assertEqual(result.block, valid_cmd.block)
-        self.assertEqual(result.comment, valid_cmd.comment)
-        self.assertEqual(result.comment_english, valid_cmd.comment_english)
-        self.assertEqual(result.relative_credits, valid_cmd.relative_credits)
+        valid_cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[update_link_command]
+        )
+        result = bulk_update_link_service.bulk_update_links(valid_cmd, self.fake_program_tree_repository)[0]
+        self.assertEqual(result.link_type, update_link_command.link_type)
+        self.assertEqual(result.access_condition, update_link_command.access_condition)
+        self.assertEqual(result.is_mandatory, update_link_command.is_mandatory)
+        self.assertEqual(result.block, update_link_command.block)
+        self.assertEqual(result.comment, update_link_command.comment)
+        self.assertEqual(result.comment_english, update_link_command.comment_english)
+        self.assertEqual(result.relative_credits, update_link_command.relative_credits)
 
     def test_failure_if_maximum_children_reached(self):
         tree_data = {
@@ -258,19 +314,24 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
 
         )
 
-        invalid_command = UpdateLinkCommandFactory(
+        invalid_update_link_cmd = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=tree.root_node.code,
             parent_node_year=tree.root_node.year,
             child_node_code=tree.root_node.children_as_nodes[0].code,
             child_node_year=tree.root_node.children_as_nodes[0].year,
         )
+        invalid_bulk_update_cmd = BulkUpdateLinkCommand(
+            parent_node_code=tree.root_node.code,
+            parent_node_year=tree.root_node.year,
+            update_link_cmds=[invalid_update_link_cmd]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(invalid_command)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(invalid_bulk_update_cmd, self.fake_program_tree_repository)
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[invalid_update_link_cmd].exceptions)),
             exception.MaximumChildTypesReachedException
         )
 
@@ -290,18 +351,23 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             )
         )
 
-        cmd = UpdateLinkCommandFactory(
+        update_link_cmd = UpdateLinkCommandFactory(
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
             link_type=LinkTypes.REFERENCE.name,
         )
+        bulk_update_cmd = BulkUpdateLinkCommand(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            update_link_cmds=[update_link_cmd]
+        )
 
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            update_link_service.update_link(cmd)
+        with self.assertRaises(BulkUpdateLinkException) as e:
+            bulk_update_link_service.bulk_update_links(bulk_update_cmd, self.fake_program_tree_repository)
 
         self.assertIsInstance(
-            next(iter(e.exception.exceptions)),
+            next(iter(e.exception.exceptions[update_link_cmd].exceptions)),
             exception.MinimumChildTypesNotRespectedException
         )
