@@ -41,7 +41,8 @@ from program_management.ddd.service.write import update_program_tree_version_ser
 
 def update_and_postpone_root_group(
         command: 'UpdateRootGroupCommand',
-        academic_year_repository: 'IAcademicYearRepository'
+        academic_year_repository: 'IAcademicYearRepository',
+        group_repository: 'GroupRepository'
 ) -> List['ProgramTreeVersionIdentity']:
     is_in_past = IsAcademicYearInPast().is_in_past(command.year, academic_year_repository)
     tree_version_identity = ProgramTreeVersionIdentity(
@@ -51,7 +52,7 @@ def update_and_postpone_root_group(
         offer_acronym=command.offer_acronym
     )
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
-    group = GroupRepository().get(group_identity)
+    group = group_repository.get(group_identity)
     has_end_year_changed = group.end_year != command.end_year
 
     # FIXME: Service appelé uniquement pour remplir les champs EducationGroupVersion du groupement racine

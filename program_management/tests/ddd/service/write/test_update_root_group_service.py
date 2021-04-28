@@ -27,6 +27,7 @@ from django.test import TestCase
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
 from education_group.ddd.factories.group import GroupFactory
+from education_group.ddd.repository.group import GroupRepository
 from education_group.tests.ddd.factories.group import GroupIdentityFactory
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
@@ -52,7 +53,9 @@ class TestUpdateRootGroup(TestCase):
         )
         self.mock_anac_repository.get_current.return_value = current_anac
 
-    @mock.patch("education_group.ddd.repository.group.GroupRepository.get")
+        self.mock_group_repository = mock.create_autospec(GroupRepository)
+        self.mock_group_repository.get.return_value = GroupFactory()
+
     @mock.patch(
         "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
@@ -68,7 +71,6 @@ class TestUpdateRootGroup(TestCase):
             mock_identity_converter,
             mock_postpone_program_tree,
             mock_postpone_program_tree_version,
-            mock_get_group
     ):
         mock_update_tree_version_service.return_value = self.identity_expected
         mock_identity_converter.return_value = GroupIdentityFactory()
@@ -76,7 +78,8 @@ class TestUpdateRootGroup(TestCase):
 
         result = update_and_postpone_root_group_service.update_and_postpone_root_group(
             self.cmd,
-            self.mock_anac_repository
+            self.mock_anac_repository,
+            self.mock_group_repository
         )
 
         self.assertTrue(mock_postpone_group_version_service.called)
@@ -86,7 +89,6 @@ class TestUpdateRootGroup(TestCase):
 
         self.assertEqual(result, [self.identity_expected])
 
-    @mock.patch("education_group.ddd.repository.group.GroupRepository.get")
     @mock.patch("education_group.ddd.service.write.update_group_service.update_group")
     @mock.patch(
         "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
@@ -104,7 +106,6 @@ class TestUpdateRootGroup(TestCase):
             mock_postpone_program_tree,
             mock_postpone_program_tree_version,
             mock_update_group,
-            mock_get_group
     ):
         current_anac = AcademicYear(
             entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.cmd.year + 1),
@@ -115,11 +116,11 @@ class TestUpdateRootGroup(TestCase):
         mock_update_tree_version_service.return_value = self.identity_expected
         mock_identity_converter.return_value = GroupIdentityFactory()
         mock_postpone_group_version_service.return_value = []
-        mock_get_group.return_value = GroupFactory()
 
         result = update_and_postpone_root_group_service.update_and_postpone_root_group(
             self.cmd,
-            self.mock_anac_repository
+            self.mock_anac_repository,
+            self.mock_group_repository
         )
 
         self.assertFalse(mock_postpone_group_version_service.called)
@@ -131,8 +132,6 @@ class TestUpdateRootGroup(TestCase):
 
         self.assertEqual(result, [self.identity_expected])
 
-    @mock.patch("education_group.ddd.repository.group.GroupRepository.get")
-    @mock.patch("education_group.ddd.service.write.update_group_service.update_group")
     @mock.patch(
         "program_management.ddd.service.write.postpone_tree_specific_version_service.postpone_program_tree_version")
     @mock.patch("program_management.ddd.service.write.postpone_program_tree_service.postpone_program_tree")
@@ -148,8 +147,6 @@ class TestUpdateRootGroup(TestCase):
             mock_identity_converter,
             mock_postpone_program_tree,
             mock_postpone_program_tree_version,
-            mock_update_group,
-            mock_get_group
     ):
         current_anac = AcademicYear(
             entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.cmd.year + 1),
@@ -160,11 +157,12 @@ class TestUpdateRootGroup(TestCase):
         mock_update_tree_version_service.return_value = self.identity_expected
         mock_identity_converter.return_value = GroupIdentityFactory()
         mock_postpone_group_version_service.return_value = []
-        mock_get_group.return_value = GroupFactory(end_year=2020)
+        self.mock_group_repository.get.return_value = GroupFactory(end_year=2020)
 
         result = update_and_postpone_root_group_service.update_and_postpone_root_group(
             self.cmd,
-            self.mock_anac_repository
+            self.mock_anac_repository,
+            self.mock_group_repository
         )
 
         self.assertTrue(mock_postpone_group_version_service.called)
