@@ -33,6 +33,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
 from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages, \
@@ -104,7 +106,13 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     updated_aims_trainings,
                     updated_trainings
                 )
+                warning_messages = self.build_warning_messages(
+                    updated_trainings,
+                    self.get_training_obj().management_entity.acronym,
+                    self.get_training_obj().administration_entity.acronym,
+                )
                 display_success_messages(request, success_messages, extra_tags='safe')
+                display_warning_messages(request, warning_messages, extra_tags='safe')
                 check_formations_impacted_by_update(self.get_training_obj().code, self.get_training_obj().year,
                                                     request, self.get_training_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
@@ -127,6 +135,9 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         success_messages += self.get_success_msg_updated_aims_only(updated_aims_trainings)
 
         return success_messages
+
+    def build_warning_messages(self, updated_trainings, management_entity, administration_entity):
+        return self.get_warning_msg_updated_trainings(updated_trainings, management_entity, administration_entity)
 
     # TODO : pull out this in a dedicated view for aims
     def _changed_certificate_aims_only(self):
@@ -296,6 +307,19 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         training_identities = self._sort_by_year(training_identities)
         return [self._get_success_msg_updated_training(identity, with_aims=False) for identity in training_identities]
 
+    def get_warning_msg_updated_trainings(
+            self,
+            training_identities: List["TrainingIdentity"],
+            management_entity: str,
+            administration_entity: str
+    ) -> List[str]:
+        training_identities = self._sort_by_year(training_identities)
+        return [self._get_warning_msg_updated_training(
+            identity,
+            management_entity,
+            administration_entity
+        ) for identity in training_identities]
+
     # TODO : pull out this in a dedicated view for aims
     def get_success_msg_updated_aims_only(self, training_identities: List["TrainingIdentity"]) -> List[str]:
         training_identities = self._sort_by_year(training_identities)
@@ -343,6 +367,19 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "acronym": training_identity.acronym,
             "academic_year": display_as_academic_year(training_identity.year),
         }
+
+    def _get_warning_msg_updated_training(
+            self,
+            training_identity: 'TrainingIdentity',
+            management_entity: str,
+            administration_entity: str
+    ) -> str:
+        academic_year = AcademicYear.objects.get(year=training_identity.year)
+        if not EntityVersion.is_entity_active(management_entity, academic_year)\
+                or not EntityVersion.is_entity_active(administration_entity, academic_year):
+            message = _("Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> has an inactive entity")
+            return self._get_success_msg_updated(training_identity, message)
+        return ''
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
