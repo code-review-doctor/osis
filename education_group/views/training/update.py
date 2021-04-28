@@ -49,8 +49,6 @@ from education_group.ddd.domain.exception import TrainingCopyConsistencyExceptio
     HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_training_service, get_group_service
-from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
-    postpone_certificate_aims_modification
 from education_group.forms import training as training_forms
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -209,9 +207,7 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         try:
             postpone_aims_modification_command = self._convert_form_to_postpone_aims_modification_cmd(
                 self.training_form)
-            updated_aims_training_identities = postpone_certificate_aims_modification(
-                postpone_aims_modification_command
-            )
+            updated_aims_training_identities = message_bus_instance.invoke(postpone_aims_modification_command)
         except MaximumCertificateAimType2Reached as e:
             self.training_form.add_error("certificate_aims", e.message)
         except CertificateAimsCopyConsistencyException as e:

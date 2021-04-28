@@ -31,6 +31,9 @@ from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCom
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from education_group.ddd.command import PostponeCertificateAimsCommand
+from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
+    postpone_certificate_aims_modification
 from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
@@ -63,7 +66,9 @@ class MessageBus:
         UpdateTrainingVersionCommand: lambda cmd: update_and_postpone_training_version(cmd, AcademicYearRepository()),
         UpdateMiniTrainingVersionCommand: lambda cmd: update_and_postpone_mini_training_version(
             cmd, AcademicYearRepository()
-        )
+        ),
+        PostponeCertificateAimsCommand:
+            lambda cmd: postpone_certificate_aims_modification(cmd, AcademicYearRepository())
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

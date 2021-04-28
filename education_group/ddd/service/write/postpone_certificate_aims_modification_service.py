@@ -32,12 +32,15 @@ from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.write import update_certificate_aims_service, copy_certificate_aims_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
+from program_management.ddd.domain.service.is_academic_year_in_past import IsAcademicYearInPast
 
 
 def postpone_certificate_aims_modification(
-        postpone_cmd: command.PostponeCertificateAimsCommand
+        postpone_cmd: command.PostponeCertificateAimsCommand,
+        academic_year_repository: 'IAcademicYearRepository'
 ) -> List['TrainingIdentity']:
     # GIVEN
+    is_in_past = IsAcademicYearInPast().is_in_past(postpone_cmd.postpone_from_year, academic_year_repository)
     from_training_id = TrainingIdentity(
         acronym=postpone_cmd.postpone_from_acronym,
         year=postpone_cmd.postpone_from_year
@@ -54,28 +57,28 @@ def postpone_certificate_aims_modification(
             )
         )
     ]
-
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
-        identity=from_training_id,
-        repository=TrainingRepository()
-    )
-
-    for year in range(from_training_id.year, end_postponement_year):
-        if year + 1 in conflicted_certificate_aims:
-            continue  # Do not copy info from year to N+1 because conflict detected
-
-        identity_next_year = copy_certificate_aims_service.copy_certificate_aims_to_next_year(
-            copy_cmd=command.CopyCertificateAimsToNextYearCommand(
-                acronym=postpone_cmd.postpone_from_acronym,
-                postpone_from_year=year
-            )
+    if not is_in_past:
+        end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_training(
+            identity=from_training_id,
+            repository=TrainingRepository()
         )
 
-        # THEN
-        if identity_next_year:
-            identities_created.append(identity_next_year)
+        for year in range(from_training_id.year, end_postponement_year):
+            if year + 1 in conflicted_certificate_aims:
+                continue  # Do not copy info from year to N+1 because conflict detected
 
-    if conflicted_certificate_aims:
-        first_conflict_year = min(conflicted_certificate_aims)
-        raise CertificateAimsCopyConsistencyException(first_conflict_year, ['certificate_aims'])
+            identity_next_year = copy_certificate_aims_service.copy_certificate_aims_to_next_year(
+                copy_cmd=command.CopyCertificateAimsToNextYearCommand(
+                    acronym=postpone_cmd.postpone_from_acronym,
+                    postpone_from_year=year
+                )
+            )
+
+            if identity_next_year:
+                identities_created.append(identity_next_year)
+        # THEN
+        if conflicted_certificate_aims:
+            first_conflict_year = min(conflicted_certificate_aims)
+            raise CertificateAimsCopyConsistencyException(first_conflict_year, ['certificate_aims'])
+
     return identities_created
