@@ -23,11 +23,14 @@
 #
 ##############################################################################
 import itertools
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Callable
 
 import factory
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
+from education_group.ddd.command import CopyTrainingToNextYearCommand, CopyMiniTrainingToNextYearCommand, \
+    CopyGroupCommand
+from education_group.ddd.service.write import copy_training_service, copy_mini_training_service, copy_group_service
 from education_group.tests.ddd.factories.group import GroupFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
@@ -39,7 +42,8 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
 from program_management.ddd.domain.node import Node, NodeIdentity, NodeLearningUnitYear, NodeGroupYear
 from program_management.ddd.domain.prerequisite import PrerequisiteFactory
 from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, NOT_A_TRANSITION, STANDARD
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, NOT_A_TRANSITION, STANDARD, \
+    ProgramTreeVersionIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository, \
     program_tree_version as program_tree_version_repository, node as node_repository
 from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service, \
@@ -66,95 +70,21 @@ class ProgramTreeVersionBuilder:
         start_year = kwargs.get("start_year", cls.start_year)
         end_year = kwargs.get("end_year", cls.end_year)
 
-        initial_tree_version = build_tree_version(tree_data, year, start_year, end_year)
-        sub_tree_versions = build_sub_trees(initial_tree_version)
-        tree_versions = cls._postpone_tree_versions(initial_tree_version)
-        for tree_version in [initial_tree_version] + sub_tree_versions:
-            cls._postpone_program_tree(tree_version)
-        other_tree_version = itertools.chain.from_iterable(
-            [cls._postpone_tree_versions(tree_version) for tree_version in sub_tree_versions]
-        )
-        all_tree_version = tree_versions + list(other_tree_version)
+        tree_builder = ProgramTreeBuilder(tree_data, year, start_year, end_year)
 
-        cls.__persist_nodes(all_tree_version)
-        trainings = cls.__create_trainings(all_tree_version)
-        cls.__persist_trainings(trainings)
-        mini_trainings = cls.__create_mini_trainings(all_tree_version)
-        cls.__persist_mini_trainings(mini_trainings)
-        groups = cls.__create_groups(all_tree_version)
-        cls.__persist_groups(groups)
+        tree_versions = [build_tree_version(tree) for tree in tree_builder.trees]
+        sub_tree_versions = [
+            build_tree_version(tree)
+            for tree in tree_builder.sub_trees if tree.root_node.is_training() or tree.root_node.is_mini_training()
+        ]
+        cls.__persist_tree_versions(tree_versions + sub_tree_versions)
 
         return tree_versions
 
     @classmethod
-    def _postpone_tree_versions(cls, initial_tree_version: 'ProgramTreeVersion') -> List['ProgramTreeVersion']:
-        identities = [
-            copy_program_version_service.copy_tree_version_to_next_year(
-                command.CopyTreeVersionToNextYearCommand(
-                    from_year=year,
-                    from_offer_acronym=initial_tree_version.entity_id.offer_acronym,
-                    from_offer_code=initial_tree_version.program_tree_identity.code,
-                    from_version_name=initial_tree_version.version_name,
-                    from_transition_name=initial_tree_version.transition_name
-                )
-            )
-            for year in range(initial_tree_version.entity_id.year, initial_tree_version.end_year.year)
-        ]
-        return [initial_tree_version] + [
-            program_tree_version_repository.ProgramTreeVersionRepository.get(identity) for identity in identities
-        ]
-
-    @classmethod
-    def _postpone_program_tree(cls, initial_tree_version: 'ProgramTreeVersion') -> List['ProgramTreeIdentity']:
-        for year in range(initial_tree_version.entity_id.year, initial_tree_version.end_year.year):
-            copy_program_tree_service.copy_program_tree_to_next_year(
-                command.CopyProgramTreeToNextYearCommand(
-                    code=initial_tree_version.program_tree_identity.code,
-                    year=year
-                )
-            )
-
-    @classmethod
-    def __persist_nodes(cls, tree_versions: List['ProgramTreeVersion']) -> List['NodeIdentity']:
-        nodes = itertools.chain.from_iterable(tree_version.get_tree().get_all_nodes() for tree_version in tree_versions)
-        repo = node_repository.NodeRepository()
-        return [repo.create(node) for node in nodes]
-
-    @classmethod
-    def __create_trainings(cls, tree_versions: List['ProgramTreeVersion']) -> List['Training']:
-        training_nodes = itertools.chain.from_iterable(
-            tree_version.get_tree().get_all_nodes(types=set(TrainingType.all())) for tree_version in tree_versions
-        )
-        return [TrainingFactory.from_node(node) for node in training_nodes]
-
-    @classmethod
-    def __persist_trainings(cls, trainings: List['Training']):
-        repo = training_repository.TrainingRepository()
-        return [repo.create(training) for training in trainings]
-
-    @classmethod
-    def __create_mini_trainings(cls, tree_versions: List['ProgramTreeVersion']) -> List['MiniTraining']:
-        mini_training_nodes = itertools.chain.from_iterable(
-            tree_version.get_tree().get_all_nodes(types=set(MiniTrainingType.all())) for tree_version in tree_versions
-        )
-        return [MiniTrainingFactory.from_node(node) for node in mini_training_nodes]
-
-    @classmethod
-    def __persist_mini_trainings(cls, mini_trainings: List['MiniTraining']):
-        repo = mini_trainig_repository.MiniTrainingRepository()
-        return [repo.create(mini_training) for mini_training in mini_trainings]
-
-    @classmethod
-    def __create_groups(cls, tree_versions: List['ProgramTreeVersion']) -> List['Group']:
-        nodes = itertools.chain.from_iterable(
-            tree_version.get_tree().get_all_nodes() for tree_version in tree_versions
-        )
-        return [GroupFactory.from_node(node) for node in nodes if not node.is_learning_unit()]
-
-    @classmethod
-    def __persist_groups(cls, groups: List['Group']):
-        repo = group_repository.GroupRepository()
-        return [repo.create(group) for group in groups]
+    def __persist_tree_versions(cls, tree_versions: List['ProgramTreeVersion']) -> List['ProgramTreeVersionIdentity']:
+        repo = program_tree_version_repository.ProgramTreeVersionRepository()
+        return [repo.create(tree_version) for tree_version in tree_versions]
 
     @classmethod
     def create_specific_version_from_tree_version(
@@ -208,13 +138,127 @@ class ProgramTreeVersionBuilder:
         return tree_versions
 
 
-def build_tree_version(
-        tree_data: Dict,
-        year: int,
-        start_year: int,
-        end_year: Optional[int]
-) -> 'ProgramTreeVersion':
-    return ProgramTreeVersionFactory(tree=build_tree(tree_data, year, start_year, end_year), persist=True)
+class ProgramTreeBuilder:
+
+    def __init__(self, tree_data: Dict, year: int = 2018, start_year: int = 2018, end_year: Optional[int] = 2025):
+        initial_program_tree = build_tree(tree_data, year, start_year, end_year)
+        children_trees = build_children_trees(initial_program_tree)
+
+        all_trees = [initial_program_tree] + children_trees
+
+        self.__persist_trees(all_trees)
+
+        trees = [initial_program_tree] + self._postpone_program_tree(initial_program_tree)
+        sub_trees = list(itertools.chain.from_iterable(self._postpone_program_tree(tree) for tree in children_trees))
+
+        self.__persist_nodes(trees + sub_trees)
+
+        self._create_associated_education_group_objects(all_trees)
+
+        self.trees = trees
+        self.sub_trees = sub_trees + children_trees
+
+    @classmethod
+    def _postpone_program_tree(cls, initial_program_tree: 'ProgramTree') -> List['ProgramTree']:
+        identities = [
+            copy_program_tree_service.copy_program_tree_to_next_year(
+                command.CopyProgramTreeToNextYearCommand(
+                    code=initial_program_tree.entity_id.code,
+                    year=year
+                )
+            ) for year in range(initial_program_tree.entity_id.year, initial_program_tree.root_node.end_date)
+        ]
+        return [
+            program_tree_repository.ProgramTreeRepository.get(identity) for identity in identities
+        ]
+
+    @classmethod
+    def __persist_trees(cls, program_trees: List['ProgramTree']) -> List['ProgramTreeIdentity']:
+        repo = program_tree_repository.ProgramTreeRepository()
+        return [repo.create(tree) for tree in program_trees]
+
+    @classmethod
+    def __persist_nodes(cls, trees: List['ProgramTree']) -> List['NodeIdentity']:
+        nodes = itertools.chain.from_iterable(tree.get_all_nodes() for tree in trees)
+        repo = node_repository.NodeRepository()
+        return [repo.create(node) for node in nodes]
+
+    @classmethod
+    def _create_associated_education_group_objects(cls, program_trees: List['ProgramTree']):
+        groups = cls.__create_groups(program_trees)
+        cls.__persist_groups(groups)
+        [cls.__postpone_groups(group) for group in groups]
+
+        trainings = cls.__create_trainings(program_trees)
+        cls.__persist_trainings(trainings)
+        [cls.__postpone_trainings(training) for training in trainings]
+
+        mini_trainings = cls.__create_mini_trainings(program_trees)
+        cls.__persist_mini_trainings(mini_trainings)
+        [cls.__postpone_mini_trainings(mini_training) for mini_training in mini_trainings]
+
+    @classmethod
+    def __create_groups(cls, trees: List['ProgramTree']) -> List['Group']:
+        nodes = itertools.chain.from_iterable(
+            tree.get_all_nodes() for tree in trees
+        )
+        return [GroupFactory.from_node(node) for node in nodes if not node.is_learning_unit()]
+
+    @classmethod
+    def __postpone_groups(cls, group: 'Group'):
+        return [
+            copy_group_service.copy_group(CopyGroupCommand(from_code=group.entity_id.code, from_year=year))
+            for year in range(group.year, group.end_year)
+        ]
+
+    @classmethod
+    def __persist_groups(cls, groups: List['Group']):
+        repo = group_repository.GroupRepository()
+        return [repo.create(group) for group in groups]
+
+    @classmethod
+    def __create_trainings(cls, trees: List['ProgramTree']) -> List['Training']:
+        training_nodes = itertools.chain.from_iterable(
+            tree.get_all_nodes(types=set(TrainingType.all())) for tree in trees
+        )
+        return [TrainingFactory.from_node(node) for node in training_nodes]
+
+    @classmethod
+    def __postpone_trainings(cls, training: 'Training'):
+        return [
+            copy_training_service.copy_training_to_next_year(
+                CopyTrainingToNextYearCommand(acronym=training.acronym, postpone_from_year=year)
+            ) for year in range(training.year, training.end_year)
+        ]
+
+    @classmethod
+    def __persist_trainings(cls, trainings: List['Training']):
+        repo = training_repository.TrainingRepository()
+        return [repo.create(training) for training in trainings]
+
+    @classmethod
+    def __create_mini_trainings(cls, trees: List['ProgramTree']) -> List['MiniTraining']:
+        mini_training_nodes = itertools.chain.from_iterable(
+            tree.get_all_nodes(types=set(MiniTrainingType.all())) for tree in trees
+        )
+        return [MiniTrainingFactory.from_node(node) for node in mini_training_nodes]
+
+    @classmethod
+    def __postpone_mini_trainings(cls, mini_training: 'MiniTraining'):
+        return [
+            copy_mini_training_service.copy_mini_training_to_next_year(
+                CopyMiniTrainingToNextYearCommand(acronym=mini_training.acronym, postpone_from_year=year)
+            ) for year in range(mini_training.year, mini_training.end_year)
+        ]
+
+    @classmethod
+    def __persist_mini_trainings(cls, mini_trainings: List['MiniTraining']):
+        repo = mini_trainig_repository.MiniTrainingRepository()
+        return [repo.create(mini_training) for mini_training in mini_trainings]
+
+
+def build_tree_version(tree: 'ProgramTree') -> 'ProgramTreeVersion':
+    return ProgramTreeVersionFactory(tree=tree)
 
 
 def build_tree(
@@ -225,32 +269,37 @@ def build_tree(
 ) -> 'ProgramTree':
     root_node = build_node(tree_data, year, start_year, end_year, {})
     authorized_relationships = AuthorizedRelationshipListFactory.load_from_fixture()
-    tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships, persist=True)
+    tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
     tree.prerequisites = build_prerequisites(tree, tree_data.get("prerequisites", []))
     return tree
 
 
-def build_sub_trees(tree_version: 'ProgramTreeVersion') -> List['ProgramTreeVersion']:
+def build_children_trees(program_tree: 'ProgramTree') -> List['ProgramTree']:
+    nodes = program_tree.root_node.get_all_children_as_nodes()
+    rels = program_tree.authorized_relationships
+    return [
+        ProgramTreeFactory(root_node=node, authorized_relationships=rels)
+        for node in nodes if not node.is_learning_unit()
+    ]
+
+
+def build_traning_mini_training_tree_versions(tree_version: 'ProgramTreeVersion') -> List['ProgramTreeVersion']:
+    nodes = tree_version.get_tree().root_node.get_all_children_as_nodes()
+    training_mini_training_nodes = (node for node in nodes if node.is_training() or node.is_mini_training())
+    rels = tree_version.get_tree().authorized_relationships
+    return [
+        ProgramTreeVersionFactory(tree__root_node=node, tree__authorized_relationships=rels)
+        for node in training_mini_training_nodes
+    ]
+
+
+def build_group_program_trees(tree_version: 'ProgramTreeVersion') -> List['ProgramTree']:
     nodes = tree_version.get_tree().root_node.get_all_children_as_nodes()
     group_nodes = (node for node in nodes if node.is_group())
-    training_mini_training_nodes = (node for node in nodes if node.is_training() or node.is_mini_training())
-    trees = [
-        ProgramTreeFactory(
-            root_node=node,
-            authorized_relationships=tree_version.get_tree().authorized_relationships,
-            persist=True
-        ) for node in group_nodes
-    ]
-    return [
-        ProgramTreeVersionFactory(
-            tree__root_node=node,
-            tree__authorized_relationships=tree_version.get_tree().authorized_relationships,
-            tree__persist=True,
-            persist=True
-        ) for node in training_mini_training_nodes
-    ]
-
-
+    rels = tree_version.get_tree().authorized_relationships
+    return [ProgramTreeFactory(root_node=node, authorized_relationships=rels) for node in group_nodes]
+    
+    
 def build_prerequisites(tree: 'ProgramTree', prerequisites_data: List):
     prerequisites = [
         PrerequisiteFactory().from_expression(
@@ -269,21 +318,16 @@ def build_node(node_data: Dict, year: int, start_year: int, end_year: Optional[i
     node = node_factory(node_data, year, start_year, end_year)
     nodes_generated[node.code] = node
 
-    children_node = [
+    children = [
         build_node(child_data, year, start_year, end_year, nodes_generated)
         for child_data in node_data.get("children", [])
     ]
-    children_link = [
-        LinkFactory(parent=node, child=child_node, order=order)
-        for child_node, order in zip(children_node, itertools.count())
-    ]
+    [LinkFactory(parent=node, child=child_node, order=order) for child_node, order in zip(children, itertools.count())]
     return node
 
 
-def get_node_factory(node_type: str):
-    if node_type == NodeType.LEARNING_UNIT:
-        return _build_node_learning_unit_year
-    return _build_node_group_year
+def get_node_factory(node_type: str) -> Callable:
+    return _build_node_learning_unit_year if node_type == NodeType.LEARNING_UNIT else _build_node_group_year
 
 
 def _build_node_learning_unit_year(node_data: Dict, year, start_year, end_year) -> 'NodeLearningUnitYear':

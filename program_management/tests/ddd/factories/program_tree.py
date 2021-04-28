@@ -79,19 +79,6 @@ class ProgramTreeFactory(factory.Factory):
         if extracted:
             program_tree_repository.ProgramTreeRepository.create(obj)
 
-    @classmethod
-    def multiple(cls, n, *args, **kwargs) -> List['ProgramTree']:
-        first_tree = cls(*args, **kwargs)  # type: ProgramTree
-
-        result = [first_tree]
-        for year in range(first_tree.root_node.year, first_tree.root_node.year + n - 1):
-            identity = copy_program_tree_service.copy_program_tree_to_next_year(
-                command.CopyProgramTreeToNextYearCommand(code=first_tree.root_node.code, year=year)
-            )
-            result.append(program_tree_repository.ProgramTreeRepository.get(identity))
-
-        return result
-
 
 def _tree_builder(data: Dict, nodes_generated: Dict, persist: bool = False) -> 'Node':
     _data = data.copy()

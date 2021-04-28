@@ -68,39 +68,6 @@ class ProgramTreeVersionFactory(factory.Factory):
     transition_name = factory.SelfAttribute("tree.root_node.transition_name")
     end_year_of_existence = factory.SelfAttribute("tree.root_node.end_year")
 
-    @factory.post_generation
-    def persist(obj, create, extracted, **kwargs):
-        if extracted:
-            program_tree_version_repository.ProgramTreeVersionRepository.create(obj)
-
-    @classmethod
-    def multiple(cls, n, *args, **kwargs) -> List['ProgramTreeVersion']:
-        first_tree_version = cls(*args, **kwargs)  # type: ProgramTreeVersion
-
-        result = [first_tree_version]
-        for year in range(first_tree_version.entity_id.year, first_tree_version.entity_id.year + n - 1):
-            identity = copy_program_version_service.copy_tree_version_to_next_year(
-                command.CopyTreeVersionToNextYearCommand(
-                    from_year=year,
-                    from_offer_acronym=first_tree_version.entity_id.offer_acronym,
-                    from_offer_code=first_tree_version.program_tree_identity.code,
-                    from_version_name=first_tree_version.version_name,
-                    from_transition_name=first_tree_version.transition_name
-                )
-            )
-            result.append(program_tree_version_repository.ProgramTreeVersionRepository.get(identity))
-
-        for from_tree_version, to_tree_version in zip(result, result[1:]):
-            identity = copy_program_tree_service.copy_program_tree_to_next_year(
-                command.CopyProgramTreeToNextYearCommand(
-                    code=from_tree_version.program_tree_identity.code,
-                    year=from_tree_version.program_tree_identity.year
-                )
-            )
-            to_tree_version.tree = program_tree_repository.ProgramTreeRepository.get(identity)
-
-        return result
-
     class Params:
         transition = factory.Trait(
             tree=factory.SubFactory(
