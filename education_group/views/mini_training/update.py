@@ -266,10 +266,9 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
         academic_year = AcademicYear.objects.get(year=mini_training_identity.year)
         if not EntityVersion.is_entity_active(management_entity, academic_year):
-            return _("Mini-Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
-                     "has an inactive entity.") % {
+            return _("Mini-Training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an inactive entity") % {
                 "link": link,
-                "acronym": mini_training_identity.acronym,
+                "code": mini_training_identity.acronym,
                 "academic_year": display_as_academic_year(mini_training_identity.year),
             }
         return ''
