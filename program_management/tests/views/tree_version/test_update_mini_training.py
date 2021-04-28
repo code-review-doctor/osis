@@ -255,7 +255,7 @@ class TestMiniTrainingVersionUpdatePostView(TestCase):
     @mock.patch("program_management.views.tree_version.update_mini_training.MiniTrainingVersionUpdateView."
                 "display_delete_messages", return_value=None)
     @mock.patch('program_management.views.tree_version.update_mini_training.MiniTrainingVersionUpdateView'
-                '._convert_form_to_update_mini_training_version_command', return_value=None)
+                '._convert_form_to_update_and_postpone_root_group_command', return_value=None)
     @mock.patch('program_management.views.tree_version.update_mini_training.version'
                 '.UpdateMiniTrainingVersionForm.is_valid', return_value=True)
     @mock.patch('program_management.ddd.service.read.get_specific_version_max_end_year_service.'

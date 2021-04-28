@@ -25,11 +25,14 @@ from unittest import mock
 
 from django.test import SimpleTestCase
 
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
 from education_group.ddd.domain.exception import CertificateAimsCopyConsistencyException
 from education_group.ddd.service.write import postpone_certificate_aims_modification_service
 from education_group.tests.ddd.factories.command.postpone_certificacte_aims_command import \
     PostponeCertificateAimsCommandFactory
 from education_group.tests.ddd.factories.training import TrainingIdentityFactory
+from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 
 
 class TestPostponeCertificateAimsModificationService(SimpleTestCase):
@@ -40,6 +43,13 @@ class TestPostponeCertificateAimsModificationService(SimpleTestCase):
             aims=['dummy_aim']
         )
         self.end_postponement_year = self.training_identity.year + 1
+        self.mock_repository = mock.create_autospec(AcademicYearRepository)
+        current_anac = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.cmd.postpone_from_year - 1),
+            start_date=None,
+            end_date=None
+        )
+        self.mock_repository.get_current.return_value = current_anac
 
     @mock.patch('education_group.ddd.service.write.update_certificate_aims_service.update_certificate_aims')
     @mock.patch('program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement.'
@@ -63,7 +73,10 @@ class TestPostponeCertificateAimsModificationService(SimpleTestCase):
         ]
         mock_copy_certificate_aims.side_effect = updated_trainings_in_future
 
-        result = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
+        result = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+            self.cmd,
+            self.mock_repository
+        )
 
         self.assertEqual([self.training_identity] + updated_trainings_in_future, result)
 
@@ -82,4 +95,33 @@ class TestPostponeCertificateAimsModificationService(SimpleTestCase):
         mock_calculate_end_postponement_year.return_value = self.end_postponement_year
 
         with self.assertRaises(CertificateAimsCopyConsistencyException):
-            postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
+            postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+                self.cmd,
+                self.mock_repository
+            )
+
+    @mock.patch('education_group.ddd.service.write.update_certificate_aims_service.update_certificate_aims')
+    @mock.patch('program_management.ddd.domain.service.calculate_end_postponement.CalculateEndPostponement.'
+                'calculate_end_postponement_year_training')
+    @mock.patch('education_group.ddd.domain.service.conflicted_fields.ConflictedFields.get_conflicted_certificate_aims')
+    def test_not_postpone_certificate_aims_if_in_past(
+            self,
+            mock_get_conflicted_fields,
+            mock_calculate_end_postponement_year,
+            mock_update_aims,
+    ):
+        current_anac = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.cmd.postpone_from_year + 1),
+            start_date=None,
+            end_date=None
+        )
+        self.mock_repository.get_current.return_value = current_anac
+        mock_update_aims.return_value = self.training_identity
+        mock_calculate_end_postponement_year.return_value = self.end_postponement_year
+
+        result = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+            self.cmd,
+            self.mock_repository
+        )
+
+        self.assertEqual([self.training_identity], result)
