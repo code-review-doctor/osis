@@ -51,7 +51,7 @@ def update_group(cmd: command.UpdateGroupCommand) -> List['GroupIdentity']:
     conflicted_fields = ConflictedFields.get_group_conflicted_fields(grp.entity_id)
 
     # WHEN
-    grp = _update_group(grp, cmd)
+    grp.update(cmd)
 
     # THEN
     group_repository.GroupRepository.update(grp)
@@ -83,24 +83,3 @@ def _postpone_group(grp, conflicted_fields) -> List['GroupIdentity']:
         first_conflict_year = min(conflicted_fields.keys())
         raise GroupCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
     return identities
-
-
-def _update_group(group_obj: 'Group', cmd: command.UpdateGroupCommand) -> 'Group':
-    group_obj.update(
-        abbreviated_title=cmd.abbreviated_title,
-        titles=Titles(title_fr=cmd.title_fr, title_en=cmd.title_en),
-        credits=cmd.credits,
-        content_constraint=ContentConstraint(
-            type=ConstraintTypeEnum[cmd.constraint_type] if cmd.constraint_type else None,
-            minimum=cmd.min_constraint,
-            maximum=cmd.max_constraint
-        ),
-        management_entity=Entity(acronym=cmd.management_entity_acronym),
-        teaching_campus=Campus(
-            name=cmd.teaching_campus_name,
-            university_name=cmd.organization_name
-        ),
-        remark=Remark(text_fr=cmd.remark_fr, text_en=cmd.remark_en),
-        end_year=cmd.end_year
-    )
-    return group_obj
