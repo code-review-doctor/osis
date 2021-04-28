@@ -76,7 +76,7 @@ def postpone_certificate_aims_modification(
 
             if identity_next_year:
                 identities_created.append(identity_next_year)
-        # THEN
+    # THEN
         if conflicted_certificate_aims:
             first_conflict_year = min(conflicted_certificate_aims)
             raise CertificateAimsCopyConsistencyException(first_conflict_year, ['certificate_aims'])

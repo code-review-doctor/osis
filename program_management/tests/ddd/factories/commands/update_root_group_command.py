@@ -30,9 +30,9 @@ from program_management.ddd import command
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 
 
-class UpdateMiniTrainingVersionCommandFactory(factory.Factory):
+class UpdateRootGroupCommandFactory(factory.Factory):
     class Meta:
-        model = command.UpdateMiniTrainingVersionCommand
+        model = command.UpdateRootGroupCommand
         abstract = False
 
     offer_acronym = "DROI2M"

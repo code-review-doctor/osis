@@ -304,13 +304,15 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             delete_message = _(
                 "Training %(acronym)s successfully deleted from %(academic_year)s."
             ) % {
-                "acronym": last_identity.acronym,
-                "academic_year": display_as_academic_year(self.training_form.cleaned_data["end_year"].year + 1)
-            }
+                                 "acronym": last_identity.acronym,
+                                 "academic_year": display_as_academic_year(
+                                     self.training_form.cleaned_data["end_year"].year + 1)
+                             }
             return [delete_message]
         return []
 
-    def _sort_by_year(self, training_identites: List[TrainingIdentity]):
+    @staticmethod
+    def _sort_by_year(training_identites: List[TrainingIdentity]):
         return sorted(training_identites, key=lambda x: x.year)
 
     def _get_success_msg_updated_training(self, training_identity: 'TrainingIdentity', with_aims: bool) -> str:
@@ -325,7 +327,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     "have been successfully updated.")
         return self._get_success_msg_updated(training_identity, message)
 
-    def _get_success_msg_updated(self, training_identity: 'TrainingIdentity', message: str):
+    @staticmethod
+    def _get_success_msg_updated(training_identity: 'TrainingIdentity', message: str):
         link = reverse_with_get(
             'education_group_read_proxy',
             kwargs={'acronym': training_identity.acronym, 'year': training_identity.year},
@@ -337,7 +340,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "academic_year": display_as_academic_year(training_identity.year),
         }
 
-    def _get_default_error_messages(self) -> str:
+    @staticmethod
+    def _get_default_error_messages() -> str:
         return _("Error(s) in form: The modifications are not saved")
 
     def _get_training_form_initial_values(self) -> Dict:
@@ -421,8 +425,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
 
         return form_initial_values
 
+    @staticmethod
     def _convert_form_to_postpone_modification_cmd(
-            self,
             form: training_forms.UpdateTrainingForm
     ) -> command_program_management.PostponeTrainingAndRootGroupModificationWithProgramTreeCommand:
         cleaned_data = form.cleaned_data
@@ -493,8 +497,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
 
     # TODO : pull out this in a dedicated view for aims
+    @staticmethod
     def _convert_form_to_postpone_aims_modification_cmd(
-            self,
             form: training_forms.UpdateTrainingForm
     ) -> command.PostponeCertificateAimsCommand:
         cleaned_data = form.cleaned_data
@@ -504,8 +508,8 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             aims=[(aim.code, aim.section) for aim in (cleaned_data['certificate_aims'] or [])],
         )
 
+    @staticmethod
     def _convert_form_to_delete_trainings_command(
-            self,
             training_form: training_forms.UpdateTrainingForm
     ) -> command_program_management.DeleteTrainingWithProgramTreeCommand:
         cleaned_data = training_form.cleaned_data

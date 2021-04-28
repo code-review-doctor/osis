@@ -26,7 +26,7 @@ from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateMiniTrainingVersionCommand
+from program_management.ddd.command import UpdateRootGroupCommand
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import version_label
@@ -139,7 +139,7 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
 
     def update_mini_training_version(self) -> List['ProgramTreeVersionIdentity']:
         try:
-            update_command = self._convert_form_to_update_mini_training_version_command(self.mini_training_version_form)
+            update_command = self._convert_form_to_update_root_group_command(self.mini_training_version_form)
             return message_bus_instance.invoke(update_command)
         except exception_education_group.ContentConstraintTypeMissing as e:
             self.mini_training_version_form.add_error("constraint_type", e.message)
@@ -244,7 +244,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             academic_year__year=self.kwargs['year']
         )
 
-    def get_tabs(self) -> List:
+    @staticmethod
+    def get_tabs() -> List:
         return [
             {
                 "text": _("Identification"),
@@ -254,7 +255,8 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
             },
         ]
 
-    def _get_default_error_messages(self) -> str:
+    @staticmethod
+    def _get_default_error_messages() -> str:
         return _("Error(s) in form: The modifications are not saved")
 
     def _get_mini_training_version_form_initial_values(self) -> Dict:
@@ -291,10 +293,10 @@ class MiniTrainingVersionUpdateView(PermissionRequiredMixin, View):
         }
         return form_initial_values
 
-    def _convert_form_to_update_mini_training_version_command(
+    def _convert_form_to_update_root_group_command(
             self, form: 'version.UpdateMiniTrainingVersionForm'
-    ) -> UpdateMiniTrainingVersionCommand:
-        return UpdateMiniTrainingVersionCommand(
+    ) -> 'UpdateRootGroupCommand':
+        return UpdateRootGroupCommand(
             offer_acronym=self.get_program_tree_version_obj().entity_id.offer_acronym,
             version_name=self.get_program_tree_version_obj().entity_id.version_name,
             year=self.get_program_tree_version_obj().entity_id.year,

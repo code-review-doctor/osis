@@ -25,32 +25,43 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from education_group.ddd.business_types import *
 from education_group.ddd.command import UpdateGroupCommand
+from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.service.write import update_group_service
-from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateTrainingVersionCommand, UpdateProgramTreeVersionCommand, \
+from program_management.ddd.command import UpdateRootGroupCommand, UpdateProgramTreeVersionCommand, \
     PostponeGroupVersionCommand, PostponeProgramTreeCommand, PostponeProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.domain.service.identity_search import GroupIdentitySearch
 from program_management.ddd.domain.service.is_academic_year_in_past import IsAcademicYearInPast
 from program_management.ddd.service.write import update_program_tree_version_service, \
     update_and_postpone_group_version_service, postpone_program_tree_service, postpone_tree_specific_version_service
 
 
-def update_and_postpone_training_version(
-        command: 'UpdateTrainingVersionCommand',
+def update_and_postpone_root_group(
+        command: 'UpdateRootGroupCommand',
         academic_year_repository: 'IAcademicYearRepository'
 ) -> List['ProgramTreeVersionIdentity']:
     is_in_past = IsAcademicYearInPast().is_in_past(command.year, academic_year_repository)
-
-    tree_version_identity = update_program_tree_version_service.update_program_tree_version(
-        __convert_to_update_tree_version_command(command)
+    tree_version_identity = ProgramTreeVersionIdentity(
+        version_name=command.version_name,
+        transition_name=command.transition_name,
+        year=command.year,
+        offer_acronym=command.offer_acronym
     )
     group_identity = GroupIdentitySearch().get_from_tree_version_identity(tree_version_identity)
+    group = GroupRepository().get(group_identity)
+    has_end_year_changed = group.end_year != command.end_year
+
+    # FIXME: Service appelé uniquement pour remplir les champs EducationGroupVersion du groupement racine
+    update_program_tree_version_service.update_program_tree_version(
+        __convert_to_update_tree_version_command(command)
+    )
     postpone_cmd = __convert_to_postpone_group_version(command, group_identity)
     postponed_tree_version_identities = []
 
-    if not is_in_past:
+    if not is_in_past or has_end_year_changed:
         postponed_tree_version_identities = update_and_postpone_group_version_service.update_and_postpone_group_version(
             postpone_cmd
         )
@@ -97,7 +108,7 @@ def __convert_to_update_group_command(postpone_cmd: 'PostponeGroupVersionCommand
     )
 
 
-def __convert_to_update_tree_version_command(command: 'UpdateTrainingVersionCommand'):
+def __convert_to_update_tree_version_command(command: 'UpdateRootGroupCommand'):
     return UpdateProgramTreeVersionCommand(
         end_year=command.end_year,
         offer_acronym=command.offer_acronym,
@@ -110,7 +121,7 @@ def __convert_to_update_tree_version_command(command: 'UpdateTrainingVersionComm
 
 
 def __convert_to_postpone_group_version(
-        cmd: 'UpdateTrainingVersionCommand',
+        cmd: 'UpdateRootGroupCommand',
         group_identity: 'GroupIdentity'
 ) -> 'PostponeGroupVersionCommand':
     return PostponeGroupVersionCommand(

@@ -40,16 +40,12 @@ from infrastructure.shared_kernel.academic_year.repository.academic_year import 
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import PostponeTrainingAndRootGroupModificationWithProgramTreeCommand, \
-    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateTrainingVersionCommand, \
-    UpdateMiniTrainingVersionCommand
+    PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateRootGroupCommand
 from program_management.ddd.service.write.postpone_mini_training_and_program_tree_modifications_service import \
     postpone_mini_training_and_program_tree_modifications
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
-from program_management.ddd.service.write.update_and_postpone_mini_training_version_service import \
-    update_and_postpone_mini_training_version
-from program_management.ddd.service.write.update_and_postpone_training_version_service import \
-    update_and_postpone_training_version
+from program_management.ddd.service.write.update_and_postpone_root_group_service import update_and_postpone_root_group
 
 
 class MessageBus:
@@ -63,10 +59,7 @@ class MessageBus:
             lambda cmd: postpone_training_and_program_tree_modifications(cmd, AcademicYearRepository()),
         PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand:
             lambda cmd: postpone_mini_training_and_program_tree_modifications(cmd, AcademicYearRepository()),
-        UpdateTrainingVersionCommand: lambda cmd: update_and_postpone_training_version(cmd, AcademicYearRepository()),
-        UpdateMiniTrainingVersionCommand: lambda cmd: update_and_postpone_mini_training_version(
-            cmd, AcademicYearRepository()
-        ),
+        UpdateRootGroupCommand: lambda cmd: update_and_postpone_root_group(cmd, AcademicYearRepository()),
         PostponeCertificateAimsCommand:
             lambda cmd: postpone_certificate_aims_modification(cmd, AcademicYearRepository())
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
