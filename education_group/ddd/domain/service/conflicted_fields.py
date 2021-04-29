@@ -36,6 +36,9 @@ from education_group.ddd.repository.group import GroupRepository
 from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from osis_common.ddd import interface
+from program_management.ddd.domain.link import Link
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 Year = int
 FieldLabel = str
@@ -119,3 +122,26 @@ class ConflictedFields(interface.DomainService):
                 break
             current_training = next_year_training
         return conflicted_aims
+
+    @classmethod
+    def get_conflicted_links(
+            cls,
+            updated_links: List['Link'],
+            identity_of_tree_containing_links: 'ProgramTreeIdentity',
+            trees_through_years: List['ProgramTree']
+    ) -> Dict[Year, List[FieldLabel]]:
+        ordered_trees_in_future = sorted(
+            [tree for tree in trees_through_years if tree.year > identity_of_tree_containing_links.year],
+            key=lambda t: t.year,
+        )
+        conflicted_fields = {}
+        for current_link in updated_links:
+            for next_year_tree in ordered_trees_in_future:
+                next_year_link_identity = current_link.entity_id.get_next_year_link_identity()
+                next_year_link = next_year_tree.get_link_from_identity(next_year_link_identity)
+                if next_year_link is None:
+                    print()
+                if not current_link.has_same_values_as(next_year_link):
+                    conflicted_fields[next_year_tree.year] = current_link.get_conflicted_fields(next_year_link)
+                current_link = next_year_link
+        return conflicted_fields

@@ -294,6 +294,10 @@ class CertificateAimsCopyConsistencyException(AbstractConsistencyException, Busi
     pass
 
 
+class LinkCopyConsistencyException(AbstractConsistencyException, BusinessException):
+    pass
+
+
 class TrainingEmptyFieldException(BusinessException):
     def __init__(self, empty_fields: Iterable[str], *args, **kwargs):
         self.fields = [str(MAP_FIELDS_TO_NAME.get(field_name, field_name)) for field_name in empty_fields]

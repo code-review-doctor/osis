@@ -36,6 +36,10 @@ from infrastructure.learning_unit.repository.learning_unit import LearningUnitRe
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
+from program_management.ddd.command import BulkUpdateLinkCommand
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.service.write.bulk_update_link_service import bulk_update_links
 
 
 class MessageBus:
@@ -45,6 +49,9 @@ class MessageBus:
         ),
         SearchLanguagesCommand: lambda cmd: search_languages(cmd, LanguageRepository()),
         SearchAcademicYearCommand: lambda cmd: search_academic_years(cmd, AcademicYearRepository()),
+        BulkUpdateLinkCommand: lambda cmd: bulk_update_links(
+            cmd, ProgramTreeRepository(), ProgramTreeVersionRepository()
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

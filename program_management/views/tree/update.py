@@ -72,8 +72,8 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
     def form_valid(self, form: ContentFormSet):
         try:
-            form.save()
-            display_success_messages(self.request, self.get_success_message())
+            links_updated = form.save()
+            display_success_messages(self.request, self.get_success_message(links_updated))
             return super().form_valid(form)
         except InvalidFormException:
             return self.form_invalid(form)
@@ -120,10 +120,13 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
         }]
 
     def get_form_kwargs(self) -> List[Dict]:
-        return [{'parent_obj': self.parent_node, 'child_obj': self.child_node}]
+        return [{'parent_obj': self.parent_node, 'child_obj': self.child_node, 'request': self.request}]
 
-    def get_success_message(self):
-        return _("The link \"%(node)s\" has been updated.") % {"node": self.child_node}
+    def get_success_message(self, links_updated: List['LinkIdentity']) -> List[str]:
+        return [
+            _("The link \"%(link)s\" has been updated.") % {"link": updated_link}
+            for updated_link in links_updated
+        ]
 
     def get_success_url(self):
         return

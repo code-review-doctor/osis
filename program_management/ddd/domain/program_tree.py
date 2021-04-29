@@ -461,6 +461,10 @@ class ProgramTree(interface.RootEntity):
     prerequisites = attr.ib(type='Prerequisites')
     report = attr.ib(type=Optional[Report], default=None)
 
+    @property
+    def year(self) -> int:
+        return self.entity_id.year
+
     @prerequisites.default
     def _default_prerequisite(self) -> 'Prerequisites':
         from program_management.ddd.domain.prerequisite import NullPrerequisites
@@ -680,6 +684,12 @@ class ProgramTree(interface.RootEntity):
     def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
         my_map = self._links_mapped_by_child_and_parent()
         return my_map.get(str(child.entity_id) + str(parent.entity_id))
+
+    def get_link_from_identity(self, link_id: 'LinkIdentity') -> Optional['Link']:
+        return next(
+            filter(lambda link: link.entity_id == link_id, self.get_all_links()),
+            None
+        )
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = copy.deepcopy(self.root_node)

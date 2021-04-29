@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Union
 
 from django import forms
 from django.forms import formset_factory, BaseFormSet
@@ -35,10 +35,13 @@ from base.forms.utils import choice_field
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
+from base.views.common import display_warning_messages
+from education_group.ddd.domain.exception import TrainingCopyConsistencyException, LinkCopyConsistencyException
 from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
+from program_management.ddd.domain.link import LinkIdentity
 
 
 class LinkForm(forms.Form):
@@ -50,9 +53,10 @@ class LinkForm(forms.Form):
     comment_fr = OsisRichTextFormField(config_name='comment_link_only', required=False)
     comment_en = OsisRichTextFormField(config_name='comment_link_only', required=False)
 
-    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', **kwargs):
+    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', request, **kwargs):
         self.parent_obj = parent_obj
         self.child_obj = child_obj
+        self.request = request
         super().__init__(*args, **kwargs)
 
         self.__initialize_fields()
@@ -111,6 +115,17 @@ class LinkForm(forms.Form):
             except exception.BulkUpdateLinkException as e:
                 multiple_business_exception = e.exceptions[self.generate_update_link_command()]
                 self.handle_save_exception(multiple_business_exception)
+            # except LinkCopyConsistencyException as e:
+            #     display_warning_messages(self.request, e.message)
+            #     return [
+            #         LinkIdentity(
+            #             parent_code=self.parent_obj.code,
+            #             parent_year=year,
+            #             child_code=self.child_obj.code,
+            #             child_year=year,
+            #         )
+            #         for year in range(self.child_obj.year, e.conflicted_fields_year)
+            #     ]
         raise InvalidFormException()
 
     def generate_update_link_command(self) -> 'command.UpdateLinkCommand':
@@ -128,18 +143,33 @@ class LinkForm(forms.Form):
             parent_node_year=self.parent_obj.year
         )
 
-    def handle_save_exception(self, business_exceptions: 'MultipleBusinessExceptions'):
-        for e in business_exceptions.exceptions:
-            if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
-                    isinstance(e, exception.ChildTypeNotAuthorizedException) or\
-                    isinstance(e, exception.MaximumChildTypesReachedException) or \
-                    isinstance(e, exception.MinimumChildTypesNotRespectedException):
-                self.add_error("link_type", e.message)
-            elif isinstance(e, exception.InvalidBlockException):
-                self.add_error("block", e.message)
-            elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \
-                    isinstance(e, exception.RelativeCreditShouldBeGreaterOrEqualsThanZero):
-                self.add_error("relative_credits", e.message)
+    def handle_save_exception(
+            self,
+            business_exceptions: Union['MultipleBusinessExceptions', 'LinkCopyConsistencyException']
+    ):
+        if isinstance(business_exceptions, LinkCopyConsistencyException):
+            display_warning_messages(self.request, business_exceptions.message)
+            return [
+                LinkIdentity(
+                    parent_code=self.parent_obj.code,
+                    parent_year=year,
+                    child_code=self.child_obj.code,
+                    child_year=year,
+                )
+                for year in range(self.child_obj.year, business_exceptions.conflicted_fields_year)
+            ]
+        else:
+            for e in business_exceptions.exceptions:
+                if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
+                        isinstance(e, exception.ChildTypeNotAuthorizedException) or\
+                        isinstance(e, exception.MaximumChildTypesReachedException) or \
+                        isinstance(e, exception.MinimumChildTypesNotRespectedException):
+                    self.add_error("link_type", e.message)
+                elif isinstance(e, exception.InvalidBlockException):
+                    self.add_error("block", e.message)
+                elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \
+                        isinstance(e, exception.RelativeCreditShouldBeGreaterOrEqualsThanZero):
+                    self.add_error("relative_credits", e.message)
 
 
 class BaseContentFormSet(BaseFormSet):
@@ -153,9 +183,13 @@ class BaseContentFormSet(BaseFormSet):
             try:
                 return message_bus_instance.invoke(self.generate_bulk_update_link_command())
             except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
+                all_updated_links = []
                 for form in self.forms:
                     if e.exceptions.get(form.generate_update_link_command()):
-                        form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
+                        updated_links = form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
+                        if updated_links:
+                            all_updated_links += updated_links
+                return all_updated_links
 
         raise InvalidFormException()
 
