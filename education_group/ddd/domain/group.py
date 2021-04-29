@@ -159,7 +159,7 @@ class Group(interface.RootEntity):
             minimum=cmd.min_constraint,
             maximum=cmd.max_constraint
         )
-        self.management_entity = Entity(acronym=cmd.management_entity_acronym),
+        self.management_entity = Entity(acronym=cmd.management_entity_acronym)
         self.teaching_campus = Campus(
             name=cmd.teaching_campus_name,
             university_name=cmd.organization_name
