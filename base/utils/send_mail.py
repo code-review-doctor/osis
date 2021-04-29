@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ Utility files for mail sending
 """
 from typing import List
 import datetime
-import itertools
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -307,13 +306,10 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
-
-    for receiver_lang, receivers in receivers_by_lang:
-        receivers = list(receivers)
+    for receiver in receivers:
         table = message_config.create_table(
             'enrollments',
-            get_enrollment_headers(receiver_lang),
+            get_enrollment_headers(receiver['receiver_lang']),
             enrollments_data,
             data_translatable=['Justification'],
         )
