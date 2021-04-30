@@ -66,6 +66,6 @@ class TestBulkUpdateLink(SimpleTestCase):
             parent_node_code=self.parent.code, parent_node_year=self.parent.year,
             update_link_cmds=[UpdateLinkCommandFactory() for _ in range(0, 2)]
         )
-        bulk_update_link_service.bulk_update_links(cmd=command)
+        bulk_update_link_service.bulk_update_and_postpone_links(cmd=command)
         self.assertTrue(mock_update_link.called)
         self.assertTrue(mock_update_tree.called)

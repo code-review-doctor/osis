@@ -38,9 +38,8 @@ from program_management.ddd.domain.report import Report, ReportIdentity
 from program_management.ddd.repositories.report import ReportRepository
 
 
-# TODO :: rename to bulk_update_and_postpone_links
 @transaction.atomic()
-def bulk_update_links(
+def bulk_update_and_postpone_links(
         cmd: BulkUpdateLinkCommand,
         repository: 'ProgramTreeRepository',
         report_repo: 'ReportRepository'

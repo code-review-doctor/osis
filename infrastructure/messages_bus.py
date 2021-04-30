@@ -38,9 +38,8 @@ from infrastructure.shared_kernel.language.repository.language import LanguageRe
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.repositories.report import ReportRepository
-from program_management.ddd.service.write.bulk_update_link_service import bulk_update_links
+from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
 
 class MessageBus:
@@ -50,7 +49,7 @@ class MessageBus:
         ),
         SearchLanguagesCommand: lambda cmd: search_languages(cmd, LanguageRepository()),
         SearchAcademicYearCommand: lambda cmd: search_academic_years(cmd, AcademicYearRepository()),
-        BulkUpdateLinkCommand: lambda cmd: bulk_update_links(
+        BulkUpdateLinkCommand: lambda cmd: bulk_update_and_postpone_links(
             cmd, ProgramTreeRepository(), ReportRepository()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
