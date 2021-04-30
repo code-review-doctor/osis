@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from ddd.logic.score_encoding.dtos import ScoreResponsibleDTO
 from learning_unit.tests.ddd.factories.achievement import AchievementFactory
 from learning_unit.tests.ddd.factories.description_fiche import DescriptionFicheFactory
 from learning_unit.tests.ddd.factories.entities import EntitiesFactory
@@ -353,13 +354,13 @@ class TestContent(TestCase):
     def test_get_optional_required_entity(self):
         optional_data = initialize_optional_data()
         optional_data['has_required_entity'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.entities.requirement_entity_acronym])
 
     def test_get_optional_allocation_entity(self):
         optional_data = initialize_optional_data()
         optional_data['has_allocation_entity'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.entities.allocation_entity_acronym])
 
     def test_get_optional_credits(self):
@@ -367,68 +368,112 @@ class TestContent(TestCase):
         optional_data['has_credits'] = True
 
         self.assertCountEqual(
-            _get_optional_data([], self.luy, optional_data, self.link_1_1),
+            _get_optional_data([], self.luy, optional_data, self.link_1_1, []),
             [self.link_1_1.relative_credits or '-', self.luy.credits.to_integral_value() or '-']
         )
 
     def test_get_optional_has_periodicity(self):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [PeriodicityEnum[self.luy.periodicity.name].value if self.luy.periodicity else ''])
 
     def test_get_optional_has_active(self):
         optional_data = initialize_optional_data()
         optional_data['has_active'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [_('yes')])
 
     def test_get_optional_has_quadrimester(self):
         optional_data = initialize_optional_data()
         optional_data['has_quadrimester'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.quadrimester or ''])
 
     def test_get_optional_has_session_derogation(self):
         optional_data = initialize_optional_data()
         optional_data['has_session_derogation'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.session or ''])
 
     def test_get_optional_has_proposition(self):
         optional_data = initialize_optional_data()
         optional_data['has_proposition'] = True
         luy_without_proposition = DddLearningUnitYearFactory(proposal=None)
-        self.assertCountEqual(_get_optional_data([], luy_without_proposition, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], luy_without_proposition, optional_data, self.link_1_1, []),
                               ['', ''])
         proposal = ProposalFactory()
         self.luy.proposal = proposal
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [ProposalType.get_value(self.luy.proposal.type),
                                ProposalState.get_value(self.luy.proposal.state)])
 
     def test_get_optional_has_english_title(self):
         optional_data = initialize_optional_data()
         optional_data['has_english_title'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.full_title_en])
 
     def test_get_optional_has_language(self):
         optional_data = initialize_optional_data()
         optional_data['has_language'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.main_language])
 
     def test_get_optional_has_teacher_list(self):
         optional_data = initialize_optional_data()
         optional_data['has_teacher_list'] = True
-        teacher_data = _get_optional_data([], self.luy, optional_data, self.link_1_1)
+        teacher_data = _get_optional_data([], self.luy, optional_data, self.link_1_1, [])
+
+        self._assert_teachers_data(teacher_data)
+        self.assertEqual(teacher_data[2], "")
+        self.assertEqual(teacher_data[3], "")
+
+    def _assert_teachers_data(self, teacher_data):
+        self.assertEqual(len(teacher_data), 4)
         self.assertEqual(teacher_data[0], "{} {};{} {}"
                          .format(self.teacher_1.last_name.upper(), self.teacher_1.first_name,
                                  self.teacher_2.last_name.upper(), self.teacher_2.first_name))
         self.assertEqual(teacher_data[1], "{};{}"
                          .format(self.teacher_1.email,
                                  self.teacher_2.email))
+
+    def test_get_optional_has_teacher_with_score_responsible(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_teacher_list'] = True
+        responsible_1 = ScoreResponsibleDTO(
+            last_name="Abba",
+            first_name="Léon",
+            email="abba@gmail.com",
+            code_of_learning_unit=self.luy.acronym,
+            year_of_learning_unit=self.luy.year
+        )
+        responsible_2 = ScoreResponsibleDTO(
+            last_name="Martinot",
+            first_name="Tom",
+            email="martinot.tom@gmail.com",
+            code_of_learning_unit=self.luy.acronym,
+            year_of_learning_unit=self.luy.year
+        )
+        teacher_data = _get_optional_data(
+            [],
+            self.luy,
+            optional_data,
+            self.link_1_1,
+            [
+                responsible_1,
+                responsible_2
+            ]
+        )
+        self._assert_teachers_data(teacher_data)
+        self.assertEqual(teacher_data[2], "{} {};{} {}"
+                         .format(responsible_1.last_name.upper(), responsible_1.first_name,
+                                 responsible_2.last_name.upper(), responsible_2.first_name)
+                         )
+        self.assertEqual(teacher_data[3], "{};{}"
+                         .format(responsible_1.email,
+                                 responsible_2.email)
+                         )
 
     def test_build_validate_html_list_to_string(self):
         self.assertEqual(_build_validate_html_list_to_string(None), "")
