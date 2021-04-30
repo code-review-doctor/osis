@@ -333,7 +333,7 @@ def _get_trainings(academic_yr, entity_list, manager_person, education_group_typ
     qs = EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         management_entity__in={ev.entity_id for ev in entity_list},
-        education_group_type__category=education_group_categories.TRAINING
+        education_group_type__category=education_group_categories.TRAINING,
     )
 
     if education_group_type:
