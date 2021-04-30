@@ -85,12 +85,7 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             if not self.mini_training_form.errors:
                 success_messages = self.get_success_msg_updated_mini_trainings(update_trainings)
                 success_messages += self.get_success_msg_deleted_mini_trainings(update_trainings)
-                warning_messages = self.get_warning_msg_updated_mini_trainings(
-                    update_trainings,
-                    self.mini_training_form.cleaned_data['management_entity']
-                )
                 display_success_messages(request, success_messages, extra_tags='safe')
-                display_warning_messages(request, warning_messages, extra_tags='safe')
                 check_formations_impacted_by_update(self.get_mini_training_obj().code,
                                                     self.get_mini_training_obj().year,
                                                     request, self.get_mini_training_obj().type)
@@ -207,16 +202,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         except exception.TrainingNotFoundException:
             raise Http404
 
-    def get_warning_msg_updated_mini_trainings(
-            self,
-            mini_training_identites: List["MiniTrainingIdentity"],
-            management_entity
-    ) -> List[str]:
-        return [self._get_warning_msg_updated_mini_training(
-            identity,
-            management_entity
-        ) for identity in mini_training_identites]
-
     def get_success_msg_updated_mini_trainings(
             self,
             mini_training_identites: List["MiniTrainingIdentity"]) -> List[str]:
@@ -253,25 +238,6 @@ class MiniTrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "acronym": mini_training_identity.acronym,
             "academic_year": display_as_academic_year(mini_training_identity.year),
         }
-
-    def _get_warning_msg_updated_mini_training(
-            self,
-            mini_training_identity: 'MiniTrainingIdentity',
-            management_entity: str
-    ) -> str:
-        link = reverse_with_get(
-            'education_group_read_proxy',
-            kwargs={'acronym': mini_training_identity.acronym, 'year': mini_training_identity.year},
-            get={"tab": Tab.IDENTIFICATION.value}
-        )
-        academic_year = AcademicYear.objects.get(year=mini_training_identity.year)
-        if not EntityVersion.is_entity_active(management_entity, academic_year):
-            return _("Mini-Training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an inactive entity") % {
-                "link": link,
-                "code": mini_training_identity.acronym,
-                "academic_year": display_as_academic_year(mini_training_identity.year),
-            }
-        return ''
 
     def _get_default_error_messages(self) -> str:
         return _("Error(s) in form: The modifications are not saved")
