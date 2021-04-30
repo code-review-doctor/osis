@@ -42,6 +42,7 @@ from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.service.read import get_group_service, get_training_service
+from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.business_types import *
@@ -51,8 +52,7 @@ from program_management.ddd.domain.program_tree_version import version_label
 from program_management.ddd.domain.report import Report
 from program_management.ddd.domain.service.get_program_tree_version_for_tree import get_program_tree_version_for_tree
 from program_management.ddd.domain.service.identity_search import TrainingIdentitySearch
-from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service, \
-    get_report_service
+from program_management.ddd.service.read import get_program_tree_service, get_program_tree_version_from_node_service
 from program_management.forms import content as content_forms
 
 
@@ -102,7 +102,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         if self.content_formset.is_valid():
             try:
                 cmd, updated_links = self.content_formset.save()
-                report = get_report_service.get_report(GetReportCommand(from_transaction_id=cmd.transaction_id)) # TODO : service bus
+                report = message_bus_instance.invoke(GetReportCommand(from_transaction_id=cmd.transaction_id))
                 if report:
                     self.display_report_warning(report)
                 success_messages = self.get_success_msg_updated_links()
