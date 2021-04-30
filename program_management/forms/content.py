@@ -147,7 +147,7 @@ class LinkForm(forms.Form):
             self,
             business_exceptions: Union['MultipleBusinessExceptions', 'LinkCopyConsistencyException']
     ):
-        if isinstance(business_exceptions, LinkCopyConsistencyException):
+        if isinstance(business_exceptions, LinkCopyConsistencyException):  # FIXME :: to remove - not working because of atomic transaction (raise LinkCopyConsistencyException)
             display_warning_messages(self.request, business_exceptions.message)
             return [
                 LinkIdentity(
@@ -189,7 +189,8 @@ class BaseContentFormSet(BaseFormSet):
                         updated_links = form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
                         if updated_links:
                             all_updated_links += updated_links
-                return all_updated_links
+                if not any(error for error in self.errors if error):  # FIXME :: to remove
+                    return all_updated_links
 
         raise InvalidFormException()
 

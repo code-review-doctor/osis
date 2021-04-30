@@ -29,6 +29,7 @@ from typing import Dict, List
 
 import attr
 
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from education_group.ddd.domain.exception import GroupNotFoundException, TrainingNotFoundException, \
     MiniTrainingNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
@@ -126,22 +127,20 @@ class ConflictedFields(interface.DomainService):
     @classmethod
     def get_conflicted_links(
             cls,
-            updated_links: List['Link'],
-            identity_of_tree_containing_links: 'ProgramTreeIdentity',
+            updated_link: 'Link',
+            working_year: 'AcademicYearIdentity',
             trees_through_years: List['ProgramTree']
     ) -> Dict[Year, List[FieldLabel]]:
         ordered_trees_in_future = sorted(
-            [tree for tree in trees_through_years if tree.year > identity_of_tree_containing_links.year],
+            [tree for tree in trees_through_years if tree.year > working_year.year],
             key=lambda t: t.year,
         )
         conflicted_fields = {}
-        for current_link in updated_links:
-            for next_year_tree in ordered_trees_in_future:
-                next_year_link_identity = current_link.entity_id.get_next_year_link_identity()
-                next_year_link = next_year_tree.get_link_from_identity(next_year_link_identity)
-                if next_year_link is None:
-                    print()
-                if not current_link.has_same_values_as(next_year_link):
-                    conflicted_fields[next_year_tree.year] = current_link.get_conflicted_fields(next_year_link)
-                current_link = next_year_link
+        current_link = updated_link
+        for next_year_tree in ordered_trees_in_future:
+            next_year_link_identity = current_link.entity_id.get_next_year_link_identity()
+            next_year_link = next_year_tree.get_link_from_identity(next_year_link_identity)
+            if not current_link.has_same_values_as(next_year_link):
+                conflicted_fields[next_year_tree.year] = current_link.get_conflicted_fields(next_year_link)
+            current_link = next_year_link
         return conflicted_fields
