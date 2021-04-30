@@ -75,9 +75,9 @@ class GroupRepository(interface.AbstractRepository):
                 'entity_id'
             ).filter(
                 acronym=group.management_entity.acronym,
-            ).order_by(
-                '-start_date'
-            ).first()
+            ).latest(
+                'start_date'
+            )
             teaching_campus = CampusModelDb.objects.only('id').get(
                 name=group.teaching_campus.name,
                 organization__name=group.teaching_campus.university_name
@@ -142,9 +142,9 @@ class GroupRepository(interface.AbstractRepository):
                 'entity_id'
             ).filter(
                 acronym=group.management_entity.acronym,
-            ).order_by(
-                '-start_date'
-            ).first()
+            ).latest(
+                'start_date'
+            )
             teaching_campus = CampusModelDb.objects.only('id').get(
                 name=group.teaching_campus.name,
                 organization__name=group.teaching_campus.university_name
