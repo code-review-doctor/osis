@@ -47,6 +47,7 @@ class LearningUnitIdentityBuilder(EntityIdentityBuilder):
 
     @classmethod
     def build_from_code_and_year(cls, code: str, year: int) -> 'LearningUnitIdentity':
+        # FIXME :: cyclic import : to remove with python 3.6
         from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
         return LearningUnitIdentity(
             academic_year=AcademicYearIdentityBuilder.build_from_year(year=year),
