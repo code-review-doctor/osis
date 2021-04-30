@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Union
+from typing import List, Tuple
 
 from django import forms
 from django.forms import formset_factory, BaseFormSet
@@ -35,13 +35,10 @@ from base.forms.utils import choice_field
 from base.forms.utils.fields import OsisRichTextFormField
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
-from base.views.common import display_warning_messages
-from education_group.ddd.domain.exception import TrainingCopyConsistencyException, LinkCopyConsistencyException
 from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
-from program_management.ddd.domain.link import LinkIdentity
 
 
 class LinkForm(forms.Form):
@@ -53,7 +50,7 @@ class LinkForm(forms.Form):
     comment_fr = OsisRichTextFormField(config_name='comment_link_only', required=False)
     comment_en = OsisRichTextFormField(config_name='comment_link_only', required=False)
 
-    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', request, **kwargs):
+    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', request, **kwargs):  # TODO :: remove request avec remove save() ?
         self.parent_obj = parent_obj
         self.child_obj = child_obj
         self.request = request
@@ -102,32 +99,6 @@ class LinkForm(forms.Form):
     def is_a_child_minor_major_option_list_choice(self):
         return self.child_obj.is_minor_major_option_list_choice()
 
-    def save(self):
-        if self.is_valid():
-            try:
-                return message_bus_instance.invoke(
-                    command.BulkUpdateLinkCommand(
-                        parent_node_code=self.parent_obj.code,
-                        parent_node_year=self.parent_obj.year,
-                        update_link_cmds=[self.generate_update_link_command()],
-                    )
-                )[0]
-            except exception.BulkUpdateLinkException as e:
-                multiple_business_exception = e.exceptions[self.generate_update_link_command()]
-                self.handle_save_exception(multiple_business_exception)
-            # except LinkCopyConsistencyException as e:
-            #     display_warning_messages(self.request, e.message)
-            #     return [
-            #         LinkIdentity(
-            #             parent_code=self.parent_obj.code,
-            #             parent_year=year,
-            #             child_code=self.child_obj.code,
-            #             child_year=year,
-            #         )
-            #         for year in range(self.child_obj.year, e.conflicted_fields_year)
-            #     ]
-        raise InvalidFormException()
-
     def generate_update_link_command(self) -> 'command.UpdateLinkCommand':
         return command.UpdateLinkCommand(
             child_node_code=self.child_obj.code,
@@ -145,52 +116,41 @@ class LinkForm(forms.Form):
 
     def handle_save_exception(
             self,
-            business_exceptions: Union['MultipleBusinessExceptions', 'LinkCopyConsistencyException']
+            business_exceptions: 'MultipleBusinessExceptions'
     ):
-        if isinstance(business_exceptions, LinkCopyConsistencyException):  # FIXME :: to remove - not working because of atomic transaction (raise LinkCopyConsistencyException)
-            display_warning_messages(self.request, business_exceptions.message)
-            return [
-                LinkIdentity(
-                    parent_code=self.parent_obj.code,
-                    parent_year=year,
-                    child_code=self.child_obj.code,
-                    child_year=year,
-                )
-                for year in range(self.child_obj.year, business_exceptions.conflicted_fields_year)
-            ]
-        else:
-            for e in business_exceptions.exceptions:
-                if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
-                        isinstance(e, exception.ChildTypeNotAuthorizedException) or\
-                        isinstance(e, exception.MaximumChildTypesReachedException) or \
-                        isinstance(e, exception.MinimumChildTypesNotRespectedException):
-                    self.add_error("link_type", e.message)
-                elif isinstance(e, exception.InvalidBlockException):
-                    self.add_error("block", e.message)
-                elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \
-                        isinstance(e, exception.RelativeCreditShouldBeGreaterOrEqualsThanZero):
-                    self.add_error("relative_credits", e.message)
+        for e in business_exceptions.exceptions:
+            if isinstance(e, exception.ReferenceLinkNotAllowedException) or \
+                    isinstance(e, exception.ChildTypeNotAuthorizedException) or\
+                    isinstance(e, exception.MaximumChildTypesReachedException) or \
+                    isinstance(e, exception.MinimumChildTypesNotRespectedException):
+                self.add_error("link_type", e.message)
+            elif isinstance(e, exception.InvalidBlockException):
+                self.add_error("block", e.message)
+            elif isinstance(e, exception.RelativeCreditShouldBeLowerOrEqualThan999) or \
+                    isinstance(e, exception.RelativeCreditShouldBeGreaterOrEqualsThanZero):
+                self.add_error("relative_credits", e.message)
 
 
 class BaseContentFormSet(BaseFormSet):
+
+    def __init__(self, *args, **kwargs):
+        super(BaseContentFormSet, self).__init__(*args, **kwargs)
+
     def get_form_kwargs(self, index):
         if self.form_kwargs:
             return self.form_kwargs[index]
         return {}
 
-    def save(self) -> List['Link']:
+    def save(self) -> Tuple[command.BulkUpdateLinkCommand, List['Link']]:
         if self.is_valid():
             try:
-                return message_bus_instance.invoke(self.generate_bulk_update_link_command())
+                cmd = self.generate_bulk_update_link_command()
+                updated_links = message_bus_instance.invoke(cmd)
+                return cmd, updated_links
             except program_management.ddd.domain.exception.BulkUpdateLinkException as e:
-                all_updated_links = []
                 for form in self.forms:
                     if e.exceptions.get(form.generate_update_link_command()):
-                        updated_links = form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
-                        if updated_links:
-                            all_updated_links += updated_links
-                if not any(error for error in self.errors if error):  # FIXME :: to remove
-                    return all_updated_links
+                        form.handle_save_exception(e.exceptions[form.generate_update_link_command()])
 
         raise InvalidFormException()
 

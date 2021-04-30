@@ -32,16 +32,18 @@ from django.views.generic import FormView
 
 from base.forms.exceptions import InvalidFormException
 from base.models.enums.link_type import LinkTypes
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain import node
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.report import Report
 from program_management.ddd.repositories import node as node_repository
-from program_management.ddd.service.read import get_program_tree_service
+from program_management.ddd.service.read import get_program_tree_service, get_report_service
 from program_management.forms.content import ContentFormSet
 
 
@@ -72,7 +74,10 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
     def form_valid(self, form: ContentFormSet):
         try:
-            links_updated = form.save()
+            cmd, links_updated = form.save()
+            report = get_report_service.get_report(GetReportCommand(from_transaction_id=cmd.transaction_id)) # TODO : service bus
+            if report:
+                self.display_report_warning(report)
             display_success_messages(self.request, self.get_success_message(links_updated))
             return super().form_valid(form)
         except InvalidFormException:
@@ -130,3 +135,6 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
     def get_success_url(self):
         return
+
+    def display_report_warning(self, report: 'Report') -> None:
+        display_warning_messages(self.request, list({str(warning) for warning in report.get_warnings()}))

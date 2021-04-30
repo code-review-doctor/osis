@@ -459,7 +459,7 @@ class ProgramTree(interface.RootEntity):
     authorized_relationships = attr.ib(type='AuthorizedRelationshipList', factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
     prerequisites = attr.ib(type='Prerequisites')
-    report = attr.ib(type=Optional[Report], default=None)
+    report = attr.ib(type=Optional[Report], default=None)  # type: Report
 
     @property
     def year(self) -> int:

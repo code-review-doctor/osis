@@ -28,24 +28,28 @@ from django.db import transaction
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
-from education_group.ddd.domain.exception import LinkCopyConsistencyException
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from program_management.ddd.business_types import *
 from program_management.ddd.command import BulkUpdateLinkCommand, UpdateLinkCommand
+from program_management.ddd.domain import report_events
 from program_management.ddd.domain.exception import BulkUpdateLinkException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.report import Report, ReportIdentity
+from program_management.ddd.repositories.report import ReportRepository
 
 
 # TODO :: rename to bulk_update_and_postpone_links
+@transaction.atomic()
 def bulk_update_links(
         cmd: BulkUpdateLinkCommand,
         repository: 'ProgramTreeRepository',
-        version_repo: 'ProgramTreeVersionRepository'
+        report_repo: 'ReportRepository'
 ) -> List['Link']:
     # GIVEN
     working_tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
     trees_through_years = repository.search(code=working_tree_id.code)
     working_tree = next(tree for tree in trees_through_years if tree.entity_id == working_tree_id)
+    working_tree.report = Report(entity_id=ReportIdentity(transaction_id=cmd.transaction_id))
 
     # WHEN
     links_updated = []  # FIXME :: Used in the view to display success messages... should be refactored because it's not the responsibility of the ApplicationService
@@ -63,7 +67,7 @@ def bulk_update_links(
             )
             links_updated += updated_links_in_future
             trees_updated += update_trees_in_future
-        except (MultipleBusinessExceptions, LinkCopyConsistencyException) as e:  # FIXME :: remove LinkCopyConsistencyException and use Report instead
+        except MultipleBusinessExceptions as e:
             exceptions[update_cmd] = e
     if exceptions:
         raise BulkUpdateLinkException(exceptions=exceptions)
@@ -71,6 +75,8 @@ def bulk_update_links(
     # THEN
     for tree in trees_updated:
         repository.update(tree)
+
+    report_repo.create(working_tree.report)
 
     return links_updated
 
@@ -90,7 +96,7 @@ def _postpone_link(
                 filter(lambda t: t.year > working_year.year, trees_through_years),
                 key=lambda t: t.year
             )
-        )  # FIXME :: should be DomainService like SearchTreesInFutureYears? Or Repository.search_trees_in_future_years ? WARNING :: performance !
+        )  # type: List['ProgramTree']  # FIXME :: should be DomainService like SearchTreesInFutureYears? Or Repository.search_trees_in_future_years ? WARNING :: performance !
 
         conflicted_fields = ConflictedFields.get_conflicted_links(
             link_before_update,
@@ -121,5 +127,10 @@ def _postpone_link(
             current_link = next_year_updated_link
         if conflicted_fields:
             first_conflict_year = min(conflicted_fields.keys())
-            raise LinkCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
+            working_tree.report.add_warning(
+                report_events.CannotPostponeLinkToNextYearAsConsistencyError(
+                    first_conflict_year,
+                    conflicted_fields[first_conflict_year]
+                )
+            )
     return updated_links, updated_program_trees
