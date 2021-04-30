@@ -50,10 +50,9 @@ class LinkForm(forms.Form):
     comment_fr = OsisRichTextFormField(config_name='comment_link_only', required=False)
     comment_en = OsisRichTextFormField(config_name='comment_link_only', required=False)
 
-    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', request, **kwargs):  # TODO :: remove request avec remove save() ?
+    def __init__(self, *args, parent_obj: 'Node', child_obj: 'Node', **kwargs):
         self.parent_obj = parent_obj
         self.child_obj = child_obj
-        self.request = request
         super().__init__(*args, **kwargs)
 
         self.__initialize_fields()
