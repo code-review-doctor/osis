@@ -319,7 +319,7 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
             html_template_ref,
             txt_template_ref,
             [table],
-            receivers,
+            [receiver],
             template_base_data,
             subject_data,
             attachment,
