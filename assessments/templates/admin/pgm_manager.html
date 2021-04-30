@@ -129,8 +129,8 @@
                                                            onclick="load_managers()">
                                                 </td>
                                                 <td>{{ pgm.acronym }}</td>
-                                                <td>{{ pgm.education_group_type.get_name_verbose | default_if_none:'' }}</td>
-                                                <td>{{ pgm.management_entity.acronym }}</td>
+                                                <td>{{ pgm.education_group_type }}</td>
+                                                <td>{{ pgm.management_entity }}</td>
                                             </tr>
                                         {% endfor %}
                                     </table>
