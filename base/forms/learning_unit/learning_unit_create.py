@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@ from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import Language
 from rules_management.mixins import PermissionFieldMixin
+
+INACTIVE_ENTITY_CSS_STYLE = 'color:#a94442;'
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
@@ -421,10 +423,12 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             help_text=self._get_entity_status_help_text('additional_entity_2')
         )
 
-    def _get_entity_status_help_text(self, field_name):
-        old_entity = self.initial.get(field_name, None)
-        if old_entity:
-            return EntityVersion.get_message_is_entity_active_by_entity_id(old_entity, self.instance.academic_year)
+    def _get_entity_status_help_text(self, field_name: str) -> str:
+        entity = self.initial.get(field_name, None)
+        if entity:
+            msg = EntityVersion.get_message_is_entity_active_by_entity_id(entity, self.instance.academic_year)
+            if msg:
+                return '<span style="{}">{}</span>'.format(INACTIVE_ENTITY_CSS_STYLE, msg)
         return None
 
     class Meta:
