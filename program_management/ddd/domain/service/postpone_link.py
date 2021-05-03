@@ -25,12 +25,12 @@
 ##############################################################################
 from typing import List, Tuple
 
-from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateLinkCommand
 from program_management.ddd.domain import report_events
+from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
 
 
 class PostponeLink(interface.DomainService):
@@ -41,22 +41,16 @@ class PostponeLink(interface.DomainService):
             working_tree: 'ProgramTree',
             link_before_update: 'Link',
             trees_through_years: List['ProgramTree'],
+            trees_in_future_searcher: 'SearchProgramTreesInFuture',
             conflicted_fields_checker: 'ConflictedFields'
     ) -> Tuple[List['Link'], List['ProgramTree']]:
         updated_links = []
         updated_program_trees = []
         if working_tree.authorized_relationships.is_mandatory_child_type(link_before_update.child.node_type):
-            working_year = AcademicYearIdentityBuilder.build_from_year(working_tree.year)
-            ordered_trees_in_future = list(
-                sorted(
-                    filter(lambda t: t.year > working_year.year, trees_through_years),
-                    key=lambda t: t.year
-                )
-            )  # type: List['ProgramTree']  # FIXME :: should be DomainService like SearchTreesInFutureYears? Or Repository.search_trees_in_future_years ? WARNING :: performance !
+            ordered_trees_in_future = trees_in_future_searcher.search(working_tree.entity_id, trees_through_years)
 
             conflicted_fields_checker = conflicted_fields_checker.get_conflicted_links(
                 link_before_update,
-                working_year,
                 ordered_trees_in_future
             )
 

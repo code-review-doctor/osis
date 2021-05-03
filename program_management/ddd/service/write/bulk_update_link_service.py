@@ -34,6 +34,7 @@ from program_management.ddd.domain.exception import BulkUpdateLinkException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.report import Report, ReportIdentity
 from program_management.ddd.domain.service.postpone_link import PostponeLink
+from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
 from program_management.ddd.repositories.report import ReportRepository
 
 
@@ -55,7 +56,7 @@ def bulk_update_and_postpone_links(
     links_updated = []
     trees_updated = [working_tree]  # Links are updated only in the context of a ProgramTree
     exceptions = dict()
-    for update_cmd in cmd.update_link_cmds:  # FIXME :: Bulk update should be a DomainService like BulkUpateLinksOfSameParentNode ?
+    for update_cmd in cmd.update_link_cmds:
         try:
             link_before_update = copy(working_tree.get_link_from_identity(update_cmd.link_identity))
             link_updated = working_tree.update_link(update_cmd)
@@ -64,6 +65,7 @@ def bulk_update_and_postpone_links(
                 working_tree=working_tree,
                 link_before_update=link_before_update,
                 trees_through_years=trees_through_years,
+                trees_in_future_searcher=SearchProgramTreesInFuture(),
                 conflicted_fields_checker=ConflictedFields()
             )
             links_updated += updated_links_in_future

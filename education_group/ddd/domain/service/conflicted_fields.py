@@ -39,6 +39,7 @@ from education_group.ddd.repository.training import TrainingRepository
 from osis_common.ddd import interface
 from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
+from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 Year = int
@@ -128,13 +129,8 @@ class ConflictedFields(interface.DomainService):
     def get_conflicted_links(
             cls,
             updated_link: 'Link',
-            working_year: 'AcademicYearIdentity',
-            trees_through_years: List['ProgramTree']
+            ordered_trees_in_future: List['ProgramTree']
     ) -> Dict[Year, List[FieldLabel]]:
-        ordered_trees_in_future = sorted(
-            [tree for tree in trees_through_years if tree.year > working_year.year],
-            key=lambda t: t.year,
-        )
         conflicted_fields = {}
         current_link = updated_link
         for next_year_tree in ordered_trees_in_future:
