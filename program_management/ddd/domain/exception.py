@@ -425,7 +425,8 @@ class TransitionNameExistsInPast(BusinessException):
 
 class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessException):
     def __init__(
-            self, offer_acronym: str,
+            self,
+            offer_acronym: str,
             year: int,
             transition_year: int,
             transition_name: str,
@@ -437,7 +438,7 @@ class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessE
         else:
             full_code = offer_acronym + "[" + transition_name + "]"
         message = _(
-            "You can't extend the transition version '{full_code}' in {year} as other transition version exists in "
+            "You can't create/extend the transition version '{full_code}' in {year} as other transition version exists in "
             "{transition_year}"
         ).format(
             full_code=full_code,

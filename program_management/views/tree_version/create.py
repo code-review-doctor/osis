@@ -246,6 +246,7 @@ class CreateProgramTreeTransitionVersion(AjaxPermissionRequiredMixin, AjaxTempla
                     )
             except (program_exception.TransitionNameExistsCurrentYearAndInFuture,
                     exception.MultipleEntitiesFoundException,
+                    program_exception.TransitionNameExistsInPastButExistenceOfOtherTransitionException,
                     MultipleBusinessExceptions) as err:
                 if isinstance(err, MultipleBusinessExceptions):
                     err = next(e for e in err.exceptions)

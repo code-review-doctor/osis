@@ -295,7 +295,13 @@ class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidat
         tree.root_node.end_year = tree_version.end_year_of_existence
         self.validators = [
             CheckEndDateBetweenFinalitiesAndMasters2M(tree, tree_version.program_tree_repository),
-            CheckExistenceOfTransition(tree_version, initial_end_year)
+            CheckExistenceOfTransition(
+                tree_version.end_year_of_existence,
+                initial_end_year,
+                tree_version.entity_id.offer_acronym,
+                tree_version.version_name,
+                tree_version.transition_name
+            )
         ]
         super().__init__()
 
@@ -310,10 +316,11 @@ class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
 
 class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
-    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
+    def __init__(self, end_year: int, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
-            TransitionNamePatternValidator(transition_name=transition_name)
+            TransitionNamePatternValidator(transition_name=transition_name),
+            CheckExistenceOfTransition(end_year, year, offer_acronym, version_name, transition_name)
         ]
         super().__init__()
 
