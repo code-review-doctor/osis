@@ -23,18 +23,10 @@
 # ############################################################################
 from typing import List
 
-from django.db import transaction
-
-from base.models.enums.constraint_type import ConstraintTypeEnum
 from education_group.ddd import command
-from education_group.ddd.domain._campus import Campus
-from education_group.ddd.domain._content_constraint import ContentConstraint
-from education_group.ddd.domain._entity import Entity
-from education_group.ddd.domain._remark import Remark
-from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain.exception import GroupCopyConsistencyException
-from education_group.ddd.domain.group import GroupIdentity, Group
+from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
+from education_group.ddd.domain.service.postpone_group import PostponeOrphanGroup
 from education_group.ddd.repository import group as group_repository
 from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement
@@ -57,29 +49,12 @@ def update_group(cmd: command.UpdateGroupCommand) -> List['GroupIdentity']:
     group_repository.GroupRepository.update(grp)
     updated_identities = [grp.entity_id]
 
-    if authorized_relationships.is_mandatory_child_type(grp.type):
-        # means that this group has been automatically created by the system
-        # behind 'trainings' and 'minitrainings' Nodes/groups in ProgramTree
-        updated_identities = _postpone_group(grp, conflicted_fields)
+    updated_identities += PostponeOrphanGroup.postpone(
+        updated_group=grp,
+        conflicted_fields=conflicted_fields,
+        end_postponement_calculator=CalculateEndPostponement(),
+        copy_group_service=copy_group_service.copy_group,
+        authorized_relationships=authorized_relationships
+    )
 
     return updated_identities
-
-
-# FIXME :: should be a DomainService ?!
-def _postpone_group(grp, conflicted_fields) -> List['GroupIdentity']:
-    identities = []
-    end_postponement_year = CalculateEndPostponement.calculate_end_postponement_year_for_orphan_group(group=grp)
-    for year in range(grp.year, end_postponement_year):
-        if year + 1 in conflicted_fields:
-            break  # Do not copy info from year to N+1 because conflict detected
-        identity_next_year = copy_group_service.copy_group(
-            cmd=command.CopyGroupCommand(
-                from_code=grp.code,
-                from_year=year
-            )
-        )
-        identities.append(identity_next_year)
-    if conflicted_fields:
-        first_conflict_year = min(conflicted_fields.keys())
-        raise GroupCopyConsistencyException(first_conflict_year, conflicted_fields[first_conflict_year])
-    return identities
