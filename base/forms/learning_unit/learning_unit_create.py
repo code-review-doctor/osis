@@ -56,7 +56,7 @@ from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import Language
 from rules_management.mixins import PermissionFieldMixin
-
+from django_filters import OrderingFilter, filters, FilterSet
 INACTIVE_ENTITY_CSS_STYLE = 'color:#a94442;'
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
@@ -338,11 +338,12 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                         'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", true);'
                     ),
                 },
-                forward=['country_requirement_entity'],
+                forward=['country_requirement_entity', 'academic_year'],
             ),
             label=_('Requirement entity'),
             disabled=self.fields['requirement_entity'].disabled,
-            help_text=self._get_entity_status_help_text('requirement_entity')
+            help_text=self._get_entity_status_help_text('requirement_entity'),
+            academic_year=self.instance.academic_year
         )
 
     def __init_allocation_entity_field(self):
@@ -355,12 +356,12 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                     'id': 'allocation_entity',
                     'data-html': True,
                 },
-                forward=['country_allocation_entity']
+                forward=['country_allocation_entity', 'academic_year']
             ),
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled,
-            queryset=entity_version.find_pedagogical_entities_version(),
-            help_text=self._get_entity_status_help_text('allocation_entity')
+            help_text=self._get_entity_status_help_text('allocation_entity'),
+            academic_year=self.instance.academic_year
         )
 
     def __init_additional_entity_1_field(self):
@@ -392,10 +393,11 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 },
                 forward=['country_additional_entity_1']
             ),
-            queryset=find_additional_requirement_entities_choices(),
+            queryset=find_additional_requirement_entities_choices(self.instance.academic_year),
             label=_('Additional requirement entity 1'),
             disabled=self.fields['requirement_entity'].disabled,
-            help_text=self._get_entity_status_help_text('additional_entity_1')
+            help_text=self._get_entity_status_help_text('additional_entity_1'),
+            academic_year=self.instance.academic_year
         )
 
     def __init_additional_entity_2_field(self):
@@ -417,10 +419,11 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 },
                 forward=['country_additional_entity_2']
             ),
-            queryset=find_additional_requirement_entities_choices(),
+            queryset=find_additional_requirement_entities_choices(self.instance.academic_year),
             label=_('Additional requirement entity 2'),
             disabled=self.fields['requirement_entity'].disabled,
-            help_text=self._get_entity_status_help_text('additional_entity_2')
+            help_text=self._get_entity_status_help_text('additional_entity_2'),
+            academic_year=self.instance.academic_year
         )
 
     def _get_entity_status_help_text(self, field_name: str) -> str:
@@ -443,7 +446,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             'requirement_entity',
             'allocation_entity',
             'additional_entity_1',
-            'additional_entity_2',
+            'additional_entity_2'
         )
 
     def post_clean(self, specific_title):
