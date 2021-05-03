@@ -237,7 +237,7 @@ def common_postponement_consistency_message(year_to: int, conflict_fields: List[
     }
 
 
-MAP_FIELDS_TO_NAME = {  # FIXME :: should be part of the domain ?
+MAP_FIELDS_TO_NAME = {
     "credits": _("Credits"),
     "titles": _("Titles"),
     "status": _("Status"),
