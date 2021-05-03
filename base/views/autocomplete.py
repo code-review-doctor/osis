@@ -153,7 +153,9 @@ class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMix
 
     def get_queryset(self):
         academic_yr = self.forwarded.get('academic_year', None)
-        qs = super().get_queryset().active_for_academic_year(AcademicYear.objects.get(id=academic_yr))\
+        if academic_yr:
+            academic_yr = AcademicYear.objects.get(id=academic_yr)
+        qs = super().get_queryset().active_for_academic_year(academic_yr)\
             .pedagogical_entities().order_by('acronym')
         if self.q:
             qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))

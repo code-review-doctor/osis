@@ -581,11 +581,6 @@ class EntityVersion(SerializableModel):
             msg = None
         return msg
 
-    @classmethod
-    def get_message_is_entity_active_by_entity_id(cls, entity_id: int, academic_year: AcademicYear) -> str:
-        acronym_entity = EntityVersion.objects.get(entity__id=entity_id).acronym
-        return cls.get_message_is_entity_active(acronym_entity, academic_year)
-
 
 def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):
     if entity_version.entity_type == parent_type:

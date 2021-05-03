@@ -616,7 +616,7 @@ class TestEntityAutocomplete(TestCase):
     def test_get_only_active_entities(self):
         current_academic_year = create_current_academic_year()
         previous_academic_year = AcademicYearFactory(year=current_academic_year.year - 1,
-                                                     end_date=datetime.date(self.current_academic_year.year, 9, 1))
+                                                     end_date=datetime.date(current_academic_year.year, 9, 1))
         next_academic_year = AcademicYearFactory(year=current_academic_year.year + 1,
                                                  start_date=datetime.date(current_academic_year.year + 1, 10, 1))
         active_entity_version_1 = EntityVersionFactory(
