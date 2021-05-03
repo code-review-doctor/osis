@@ -40,6 +40,7 @@ class PostponeLink(interface.DomainService):
             cls,
             working_tree: 'ProgramTree',
             link_before_update: 'Link',
+            link_after_update: 'Link',
             trees_through_years: List['ProgramTree'],
             trees_in_future_searcher: 'SearchProgramTreesInFuture',
             conflicted_fields_checker: 'ConflictedFields'
@@ -54,7 +55,7 @@ class PostponeLink(interface.DomainService):
                 ordered_trees_in_future
             )
 
-            current_link = link_before_update
+            current_link = link_after_update
             for next_year_tree in ordered_trees_in_future:
                 if next_year_tree.year in conflicted_fields_checker:
                     break  # Do not copy info from year to N+1 because conflict detected

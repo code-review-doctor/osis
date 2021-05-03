@@ -64,6 +64,7 @@ def bulk_update_and_postpone_links(
             updated_links_in_future, update_trees_in_future = PostponeLink.postpone(
                 working_tree=working_tree,
                 link_before_update=link_before_update,
+                link_after_update=link_updated,
                 trees_through_years=trees_through_years,
                 trees_in_future_searcher=SearchProgramTreesInFuture(),
                 conflicted_fields_checker=ConflictedFields()
