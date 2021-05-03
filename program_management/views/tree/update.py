@@ -126,7 +126,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
         }]
 
     def get_form_kwargs(self) -> List[Dict]:
-        return [{'parent_obj': self.parent_node, 'child_obj': self.child_node, 'request': self.request}]
+        return [{'parent_obj': self.parent_node, 'child_obj': self.child_node}]
 
     def get_success_message(self, links_updated: List['LinkIdentity']) -> List[str]:
         return [

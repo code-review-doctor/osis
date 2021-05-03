@@ -132,9 +132,6 @@ class LinkForm(forms.Form):
 
 class BaseContentFormSet(BaseFormSet):
 
-    def __init__(self, *args, **kwargs):
-        super(BaseContentFormSet, self).__init__(*args, **kwargs)
-
     def get_form_kwargs(self, index):
         if self.form_kwargs:
             return self.form_kwargs[index]

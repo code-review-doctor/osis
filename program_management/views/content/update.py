@@ -140,7 +140,7 @@ class ContentUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             self.request.POST or None,
             initial=self._get_content_formset_initial_values(),
             form_kwargs=[
-                {'parent_obj': self.get_program_tree_obj().root_node, 'child_obj': child, 'request': self.request}
+                {'parent_obj': self.get_program_tree_obj().root_node, 'child_obj': child}
                 for child in self.get_children()
             ]
         )

@@ -30,6 +30,7 @@ from base.models.enums.link_type import LinkTypes
 from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.exception import BulkUpdateLinkException
+from program_management.ddd.repositories.report import ReportRepository
 from program_management.ddd.service.write import bulk_update_link_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
@@ -63,7 +64,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             with self.assertRaises(BulkUpdateLinkException) as e:
                 bulk_update_link_service.bulk_update_and_postpone_links(
                     invalid_bulk_update_cmd,
-                    self.fake_program_tree_repository
+                    self.fake_program_tree_repository,
+                    ReportRepository()
                 )
             self.assertIsInstance(
                 next(iter(e.exception.exceptions[cmd_with_invalid_block_value].exceptions)),
@@ -87,7 +89,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         with self.assertRaises(BulkUpdateLinkException) as e:
             bulk_update_link_service.bulk_update_and_postpone_links(
                 invalid_bulk_update_cmd,
-                self.fake_program_tree_repository
+                self.fake_program_tree_repository,
+                ReportRepository()
             )
 
         self.assertIsInstance(
@@ -111,7 +114,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         with self.assertRaises(BulkUpdateLinkException) as e:
             bulk_update_link_service.bulk_update_and_postpone_links(
                 invalid_bulk_update_cmd,
-                self.fake_program_tree_repository
+                self.fake_program_tree_repository,
+                ReportRepository()
             )
 
         self.assertIsInstance(
@@ -136,7 +140,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         with self.assertRaises(BulkUpdateLinkException) as e:
             bulk_update_link_service.bulk_update_and_postpone_links(
                 invalid_bulk_cmd,
-                self.fake_program_tree_repository
+                self.fake_program_tree_repository,
+                ReportRepository()
             )
 
         self.assertIsInstance(
@@ -168,7 +173,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
 
         bulk_update_link_service.bulk_update_and_postpone_links(
             cmd_with_invalid_reference_link,
-            self.fake_program_tree_repository
+            self.fake_program_tree_repository,
+            ReportRepository()
         )
         self.assertEqual(
             minor_list_choice_tree.root_node.children[0].link_type,
@@ -202,7 +208,11 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             )]
         )
 
-        self.assertTrue(bulk_update_link_service.bulk_update_and_postpone_links(cmd, self.fake_program_tree_repository))
+        self.assertTrue(bulk_update_link_service.bulk_update_and_postpone_links(
+            cmd,
+            self.fake_program_tree_repository,
+            ReportRepository()
+        ))
 
     def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(self):
         cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
@@ -221,7 +231,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         with self.assertRaises(BulkUpdateLinkException) as e:
             bulk_update_link_service.bulk_update_and_postpone_links(
                 invalid_bulk_cmd,
-                self.fake_program_tree_repository
+                self.fake_program_tree_repository,
+                ReportRepository()
             )
 
         self.assertIsInstance(
@@ -262,7 +273,11 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         )
 
         with self.assertRaises(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(invalid_bulk_cmd, self.fake_program_tree_repository)
+            bulk_update_link_service.bulk_update_and_postpone_links(
+                invalid_bulk_cmd,
+                self.fake_program_tree_repository,
+                ReportRepository()
+            )
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions[invalid_update_link_cmd].exceptions)),
@@ -283,7 +298,11 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             parent_node_year=self.tree.root_node.year,
             update_link_cmds=[update_link_command]
         )
-        result = bulk_update_link_service.bulk_update_and_postpone_links(valid_cmd, self.fake_program_tree_repository)[0]
+        result = bulk_update_link_service.bulk_update_and_postpone_links(
+            valid_cmd,
+            self.fake_program_tree_repository,
+            ReportRepository()
+        )[0]
         self.assertEqual(result.link_type, update_link_command.link_type)
         self.assertEqual(result.access_condition, update_link_command.access_condition)
         self.assertEqual(result.is_mandatory, update_link_command.is_mandatory)
@@ -328,7 +347,11 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         )
 
         with self.assertRaises(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(invalid_bulk_update_cmd, self.fake_program_tree_repository)
+            bulk_update_link_service.bulk_update_and_postpone_links(
+                invalid_bulk_update_cmd,
+                self.fake_program_tree_repository,
+                ReportRepository()
+            )
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions[invalid_update_link_cmd].exceptions)),
@@ -365,7 +388,11 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         )
 
         with self.assertRaises(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(bulk_update_cmd, self.fake_program_tree_repository)
+            bulk_update_link_service.bulk_update_and_postpone_links(
+                bulk_update_cmd,
+                self.fake_program_tree_repository,
+                ReportRepository()
+            )
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions[update_link_cmd].exceptions)),
