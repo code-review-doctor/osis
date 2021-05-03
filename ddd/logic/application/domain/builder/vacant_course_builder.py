@@ -23,20 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+from ddd.logic.application.domain.builder.vacant_course_identity_builder import VacantCourseIdentityBuilder
+from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
+from osis_common.ddd.interface import RootEntityBuilder
 
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
-from osis_common.ddd import interface
 
-
-class IApplicationRepository(interface.AbstractRepository):
+class VacantCourseBuilder(RootEntityBuilder):
     @classmethod
-    @abc.abstractmethod
-    def search(
+    def build_from_repository_dto(
             cls,
-            entity_ids: Optional[List[ApplicationIdentity]] = None,
-            applicant_id: Optional[ApplicantIdentity] = None, **kwargs
-    ) -> List[Application]:
-        pass
+            dto: VacantCourseFromRepositoryDTO,
+    ) -> VacantCourse:
+        return VacantCourse(
+            entity_id=VacantCourseIdentityBuilder.build_from_repository_dto(dto),
+            title=dto.title,
+            is_in_team=dto.is_in_team,
+            vacant_declaration_type=dto.vacant_declaration_type,
+            entity_allocation=EntityAllocation(dto.entity_allocation),
+            lecturing_volume_available=dto.lecturing_volume_available,
+            practical_volume_available=dto.practical_volume_available,
+        )

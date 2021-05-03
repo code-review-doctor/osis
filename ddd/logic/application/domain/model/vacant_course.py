@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 import attr
 
+from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 
@@ -45,8 +48,12 @@ class VacantCourseIdentity(interface.EntityIdentity):
 @attr.s(slots=True, hash=False, eq=False)
 class VacantCourse(interface.RootEntity):
     entity_id = attr.ib(type=VacantCourseIdentity)
-    lecturing_volume_available = attr.ib(type=int)
-    practical_volume_available = attr.ib(type=int)
+    lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
+    title = attr.ib(type=str)
+    vacant_declaration_type = attr.ib(type=str)
+    is_in_team = attr.ib(type=bool)
+    entity_allocation = attr.ib(type=EntityAllocation)
 
     @property
     def year(self) -> int:

@@ -29,9 +29,10 @@ from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity
-from ddd.logic.application.domain.service.vacant_course_service import IVacantCourseService
+from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
+from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 
 
 @transaction.atomic()
@@ -39,11 +40,13 @@ def apply_on_vacant_course(
         cmd: ApplyOnVacantCourseCommand,
         application_repository: IApplicationRepository,
         applicant_repository: IApplicantRepository,
-        vacant_course_service: IVacantCourseService,
+        vacant_course_repository: IVacantCourseRepository,
 ) -> ApplicationIdentity:
     # GIVEN
     applicant = applicant_repository.get(entity_id=ApplicantIdentity(cmd.global_id))
-    vacant_course = vacant_course_service.get(code=cmd.code, academic_year=cmd.academic_year)
+    vacant_course = vacant_course_repository.get(
+        entity_id=VacantCourseIdentity(code=cmd.code, academic_year=cmd.academic_year)
+    )
     all_existing_applications = application_repository.search(global_id=cmd.global_id)
 
     # WHEN

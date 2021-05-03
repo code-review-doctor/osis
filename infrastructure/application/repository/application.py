@@ -23,13 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import operator
 from typing import List, Optional
+
+from django.db.models import F, Q
 
 from attribution.models.tutor_application import TutorApplication
 from base.auth.roles.tutor import Tutor
 from base.models.learning_container_year import LearningContainerYear
+from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
+from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
+from ddd.logic.application.dtos import ApplicationFromRepositoryDTO
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
+from osis_common.ddd.interface import ApplicationService
 
 
 class ApplicationRepository(IApplicationRepository):
@@ -37,20 +45,39 @@ class ApplicationRepository(IApplicationRepository):
     def search(
             cls,
             entity_ids: Optional[List[ApplicationIdentity]] = None,
-            global_id: Optional[str] = None, **kwargs
+            applicant_id: Optional[ApplicantIdentity] = None, **kwargs
     ) -> List[Application]:
-        pass
+        qs = _application_base_qs()
+
+        if entity_ids is not None:
+            filter_clause = functools.reduce(
+                operator.or_,
+                ((Q(uuid=entity_id.uuid)) for entity_id in entity_ids)
+            )
+            qs = qs.filter(filter_clause)
+        if applicant_id is not None:
+            qs = qs.filter(tutor__person__global_id=applicant_id.global_id)
+
+        results = []
+        for row_as_dict in qs:
+            dto_from_database = ApplicationFromRepositoryDTO(**row_as_dict)
+            results.append(ApplicationBuilder.build_from_repository_dto(dto_from_database))
+        return results
 
     @classmethod
     def get(cls, entity_id: 'ApplicationIdentity') -> 'Application':
-        pass
+        qs = _application_base_qs().filter(uuid=entity_id.uuid)
+
+        obj_as_dict = qs.get()
+        dto_from_database = ApplicationFromRepositoryDTO(**obj_as_dict)
+        return ApplicationBuilder.build_from_repository_dto(dto_from_database)
 
     @classmethod
     def save(cls, application: Application) -> None:
-        tutor_id = Tutor.objects.get(global_id=application.applicant.entity_id.global_id).pk
+        tutor_id = Tutor.objects.get(global_id=application.applicant_id.global_id).pk
         learning_container_year_id = LearningContainerYear.objects.get(
-            acronym=application.course.code,
-            academic_year__year=application.course.year
+            acronym=application.course_id.code,
+            academic_year__year=application.course_id.year
         ).pk
 
         obj, created = TutorApplication.objects.update_or_create(
@@ -64,3 +91,26 @@ class ApplicationRepository(IApplicationRepository):
                 "course_summary": application.course_summary
             }
         )
+
+    @classmethod
+    def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+
+def _application_base_qs():
+    return TutorApplication.objects.annotate(
+        applicant_global_id=F('tutor__person__global_id'),
+        vacant_course_code=F('learning_container_year__acronym'),
+        vacant_course_year=F('learning_container_year__academic_year__year'),
+        lecturing_volume=F('volume_lecturing'),
+        practical_volume=F('volume_pratical_exercice')
+    ).values(
+        'uuid',
+        'applicant_global_id',
+        'vacant_course_code',
+        'vacant_course_year',
+        'lecturing_volume',
+        'practical_volume',
+        'remark',
+        'course_summary'
+    )

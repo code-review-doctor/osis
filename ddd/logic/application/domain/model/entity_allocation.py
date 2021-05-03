@@ -23,20 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+import attr
 
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
 from osis_common.ddd import interface
 
 
-class IApplicationRepository(interface.AbstractRepository):
-    @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[ApplicationIdentity]] = None,
-            applicant_id: Optional[ApplicantIdentity] = None, **kwargs
-    ) -> List[Application]:
-        pass
+@attr.s(frozen=True, slots=True)
+class EntityAllocation(interface.ValueObject):
+    code = attr.ib(type=str)

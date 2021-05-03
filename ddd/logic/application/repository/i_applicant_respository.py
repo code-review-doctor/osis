@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import abc
+from typing import List, Optional
 
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
 class IApplicantRepository(interface.AbstractRepository):
@@ -34,3 +36,16 @@ class IApplicantRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def get(cls, entity_id: ApplicantIdentity) -> Applicant:
         pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List[ApplicantIdentity]] = None, **kwargs) -> List[Applicant]:
+        pass
+
+    @classmethod
+    def delete(cls, entity_id: ApplicantIdentity, **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def save(cls, entity: Applicant) -> None:
+        raise NotImplementedError

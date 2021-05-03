@@ -23,20 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+from django.core.exceptions import ObjectDoesNotExist
+from django.test import TestCase
 
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
-from osis_common.ddd import interface
+from base.tests.factories.tutor import TutorFactory
+from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
+from infrastructure.application.repository.applicant import ApplicantRepository
 
 
-class IApplicationRepository(interface.AbstractRepository):
+class ApplicantRepositoryGet(TestCase):
     @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[ApplicationIdentity]] = None,
-            applicant_id: Optional[ApplicantIdentity] = None, **kwargs
-    ) -> List[Application]:
-        pass
+    def setUpTestData(cls):
+        cls.global_id = '7989898985'
+        cls.tutor_db = TutorFactory(person__global_id=cls.global_id)
+        cls.repository = ApplicantRepository()
+
+    def test_get_assert_return_not_found(self):
+        applicant_id_unknown = ApplicantIdentity(global_id="5656892656")
+        with self.assertRaises(ObjectDoesNotExist):
+            self.repository.get(applicant_id_unknown)
+
+    def test_get_assert_return_instance(self):
+        applicant_id = ApplicantIdentity(global_id=self.global_id)
+        applicant = self.repository.get(applicant_id)
+
+        self.assertIsInstance(applicant, Applicant)
+        self.assertEqual(applicant.entity_id, applicant_id)
+        self.assertEqual(applicant.first_name, self.tutor_db.person.first_name)
+        self.assertEqual(applicant.last_name, self.tutor_db.person.last_name)

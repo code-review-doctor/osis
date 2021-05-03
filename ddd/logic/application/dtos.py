@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 import attr
 
 from osis_common.ddd.interface import DTO
@@ -33,3 +35,27 @@ class ApplicantFromRepositoryDTO(DTO):
     first_name = attr.ib(type=str)
     last_name = attr.ib(type=str)
     global_id = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class VacantCourseFromRepositoryDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title = attr.ib(type=str)
+    is_in_team = attr.ib(type=bool)
+    entity_allocation = attr.ib(type=str)
+    vacant_declaration_type = attr.ib(type=str)
+    lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
+
+
+@attr.s(frozen=True, slots=True)
+class ApplicationFromRepositoryDTO(DTO):
+    uuid = attr.ib(type=str)
+    applicant_global_id = attr.ib(type=str)
+    vacant_course_code = attr.ib(type=str)
+    vacant_course_year = attr.ib(type=int)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
+    remark = attr.ib(type=str)
+    course_summary = attr.ib(type=str)

@@ -25,8 +25,8 @@
 ##############################################################################
 import attr
 
-from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.domain.model.applicant import ApplicantIdentity
+from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from osis_common.ddd import interface
 
 
@@ -38,8 +38,8 @@ class ApplicationIdentity(interface.EntityIdentity):
 @attr.s(slots=True, hash=False, eq=False)
 class Application(interface.RootEntity):
     entity_id = attr.ib(type=ApplicationIdentity)
-    applicant = attr.ib(type=Applicant)
-    course = attr.ib(type=VacantCourse)
+    applicant_id = attr.ib(type=ApplicantIdentity)
+    course_id = attr.ib(type=VacantCourseIdentity)
     lecturing_volume = attr.ib(type=int)
     practical_volume = attr.ib(type=int)
     remark = attr.ib(type=str)

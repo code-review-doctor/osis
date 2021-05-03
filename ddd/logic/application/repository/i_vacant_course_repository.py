@@ -23,10 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.application.domain.model.vacant_course import VacantCourse
+import abc
+from typing import List, Optional
+
+from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-class IVacantCourseService(interface.DomainService):
-    def get(self, code: str, academic_year: int) -> VacantCourse:
+class IVacantCourseRepository(interface.AbstractRepository):
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: VacantCourseIdentity) -> VacantCourse:
         pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
+        pass
+
+    @classmethod
+    def delete(cls, entity_id: VacantCourseIdentity, **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def save(cls, entity: VacantCourse) -> None:
+        raise NotImplementedError

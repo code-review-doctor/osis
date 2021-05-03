@@ -23,20 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+from typing import Union
 
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
-from osis_common.ddd import interface
+from ddd.logic.application.commands import ApplyOnVacantCourseCommand
+from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
+from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+from osis_common.ddd.interface import EntityIdentityBuilder
 
 
-class IApplicationRepository(interface.AbstractRepository):
+class VacantCourseIdentityBuilder(EntityIdentityBuilder):
+
     @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[ApplicationIdentity]] = None,
-            applicant_id: Optional[ApplicantIdentity] = None, **kwargs
-    ) -> List[Application]:
-        pass
+    def build_from_repository_dto(cls, dto_object: VacantCourseFromRepositoryDTO) -> VacantCourseIdentity:
+        academic_year_identity = AcademicYearIdentityBuilder.build_from_year(dto_object.year)
+        return VacantCourseIdentity(code=dto_object.code, academic_year=academic_year_identity)
+
+    @classmethod
+    def build_from_command(cls, cmd: Union[ApplyOnVacantCourseCommand]) -> VacantCourseIdentity:
+        academic_year_identity = AcademicYearIdentityBuilder.build_from_year(cmd.academic_year)
+        return VacantCourseIdentity(code=cmd.code, academic_year=academic_year_identity)
