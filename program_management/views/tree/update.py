@@ -130,7 +130,7 @@ class UpdateLinkView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
 
     def get_success_message(self, links_updated: List['LinkIdentity']) -> List[str]:
         return [
-            _("The link \"%(link)s\" has been updated.") % {"link": updated_link}
+            _("The link \"%(node)s\" has been updated.") % {"node": updated_link}
             for updated_link in links_updated
         ]
 
