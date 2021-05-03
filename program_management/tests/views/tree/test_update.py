@@ -44,7 +44,7 @@ def form_valid_effect(form: LinkForm):
 
 
 def form_save_effect():
-    cmd = BulkUpdateLinkCommand(parent_node_code='LOSIS1111', parent_node_year=2021, update_link_cmds=[])
+    cmd = BulkUpdateLinkCommand(working_tree_code='LOSIS1111', working_tree_year=2021, update_link_cmds=[])
     return cmd, [LinkFactory()]
 
 

@@ -317,8 +317,8 @@ class UpdateLinkCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class BulkUpdateLinkCommand(interface.CommandRequest):
-    parent_node_code = attr.ib(type=str)  # FIXME :: rename to context_tree_code ? or working_tree_code ?
-    parent_node_year = attr.ib(type=int)  # FIXME :: rename to context_tree_year ? pr working_tree_year ?
+    working_tree_code = attr.ib(type=str)
+    working_tree_year = attr.ib(type=int)
 
     update_link_cmds = attr.ib(factory=list, type=UpdateLinkCommand)  # type: List['UpdateLinkCommand']
 

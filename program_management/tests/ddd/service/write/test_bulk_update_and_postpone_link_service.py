@@ -56,8 +56,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
                 child_node_year=self.tree.root_node.children_as_nodes[0].year,
             )
             invalid_bulk_update_cmd = BulkUpdateLinkCommand(
-                parent_node_code=self.tree.root_node.code,
-                parent_node_year=self.tree.root_node.year,
+                working_tree_code=self.tree.root_node.code,
+                working_tree_year=self.tree.root_node.year,
                 update_link_cmds=[cmd_with_invalid_block_value]
             )
 
@@ -81,8 +81,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
         invalid_bulk_update_cmd = BulkUpdateLinkCommand(
-            parent_node_code=self.tree.root_node.code,
-            parent_node_year=self.tree.root_node.year,
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
             update_link_cmds=[cmd_with_invalid_relative_credits_value]
         )
 
@@ -106,8 +106,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
         invalid_bulk_update_cmd = BulkUpdateLinkCommand(
-            parent_node_code=self.tree.root_node.code,
-            parent_node_year=self.tree.root_node.year,
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
             update_link_cmds=[cmd_with_invalid_relative_credits_value]
         )
 
@@ -132,8 +132,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_year=self.tree.root_node.children_as_nodes[2].year,
         )
         invalid_bulk_cmd = BulkUpdateLinkCommand(
-            parent_node_code=self.tree.root_node.code,
-            parent_node_year=self.tree.root_node.year,
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
             update_link_cmds=[cmd_with_invalid_reference_link]
         )
 
@@ -160,8 +160,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.fake_program_tree_repository.create(minor_list_choice_tree)
 
         cmd_with_invalid_reference_link = BulkUpdateLinkCommand(
-            parent_node_code=minor_list_choice_tree.root_node.code,
-            parent_node_year=minor_list_choice_tree.root_node.year,
+            working_tree_code=minor_list_choice_tree.root_node.code,
+            working_tree_year=minor_list_choice_tree.root_node.year,
             update_link_cmds=[UpdateLinkCommandFactory(
                 link_type=None,
                 parent_node_code=minor_list_choice_tree.root_node.code,
@@ -197,8 +197,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.fake_program_tree_repository.create(minor_list_choice_tree)
 
         cmd = BulkUpdateLinkCommand(
-            parent_node_code=minor_list_choice_tree.root_node.code,
-            parent_node_year=minor_list_choice_tree.root_node.year,
+            working_tree_code=minor_list_choice_tree.root_node.code,
+            working_tree_year=minor_list_choice_tree.root_node.year,
             update_link_cmds=[UpdateLinkCommandFactory(
                 link_type=LinkTypes.REFERENCE.name,
                 parent_node_code=minor_list_choice_tree.root_node.code,
@@ -223,8 +223,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
         )
         invalid_bulk_cmd = BulkUpdateLinkCommand(
-            parent_node_code=self.tree.root_node.code,
-            parent_node_year=self.tree.root_node.year,
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
             update_link_cmds=[cmd_with_invalid_reference_link]
         )
 
@@ -267,8 +267,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_year=tree_with_successive_reference_link.root_node.children_as_nodes[0].year,
         )
         invalid_bulk_cmd = BulkUpdateLinkCommand(
-            parent_node_code=tree_with_successive_reference_link.root_node.code,
-            parent_node_year=tree_with_successive_reference_link.root_node.year,
+            working_tree_code=tree_with_successive_reference_link.root_node.code,
+            working_tree_year=tree_with_successive_reference_link.root_node.year,
             update_link_cmds=[invalid_update_link_cmd]
         )
 
@@ -294,8 +294,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             relative_credits=5,
         )
         valid_cmd = BulkUpdateLinkCommand(
-            parent_node_code=self.tree.root_node.code,
-            parent_node_year=self.tree.root_node.year,
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
             update_link_cmds=[update_link_command]
         )
         result = bulk_update_link_service.bulk_update_and_postpone_links(
@@ -341,8 +341,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             child_node_year=tree.root_node.children_as_nodes[0].year,
         )
         invalid_bulk_update_cmd = BulkUpdateLinkCommand(
-            parent_node_code=tree.root_node.code,
-            parent_node_year=tree.root_node.year,
+            working_tree_code=tree.root_node.code,
+            working_tree_year=tree.root_node.year,
             update_link_cmds=[invalid_update_link_cmd]
         )
 
@@ -382,8 +382,8 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             link_type=LinkTypes.REFERENCE.name,
         )
         bulk_update_cmd = BulkUpdateLinkCommand(
-            parent_node_code=self.tree.root_node.code,
-            parent_node_year=self.tree.root_node.year,
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
             update_link_cmds=[update_link_cmd]
         )
 

@@ -155,8 +155,8 @@ class BaseContentFormSet(BaseFormSet):
         update_link_commands = [form.generate_update_link_command() for form in changed_forms]
 
         bulk_command = command.BulkUpdateLinkCommand(
-            parent_node_year=self.forms[0].parent_obj.year,
-            parent_node_code=self.forms[0].parent_obj.code,
+            working_tree_year=self.forms[0].parent_obj.year,
+            working_tree_code=self.forms[0].parent_obj.code,
             update_link_cmds=update_link_commands
         )
         return bulk_command

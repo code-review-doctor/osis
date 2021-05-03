@@ -45,7 +45,7 @@ def bulk_update_and_postpone_links(
         report_repo: 'ReportRepository'
 ) -> List['Link']:
     # GIVEN
-    working_tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
+    working_tree_id = ProgramTreeIdentity(code=cmd.working_tree_code, year=cmd.working_tree_year)
     trees_through_years = repository.search(code=working_tree_id.code)
     working_tree = next(tree for tree in trees_through_years if tree.entity_id == working_tree_id)
     working_tree.report = Report(entity_id=ReportIdentity(transaction_id=cmd.transaction_id))
