@@ -29,7 +29,7 @@ from django.db.models import Q
 
 from base.models import group_element_year
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, Entity
+from osis_common.ddd.interface import EntityIdentity, Entity, RootEntity
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_node
 from program_management.models.element import Element
@@ -39,11 +39,7 @@ from program_management.models.element import Element
 class NodeRepository(interface.AbstractRepository):
 
     @classmethod
-    def create(cls, entity: 'Node', **_) -> EntityIdentity:
-        raise NotImplementedError
-
-    @classmethod
-    def update(cls, entity: 'Node', **_) -> EntityIdentity:
+    def save(cls, entity: RootEntity) -> None:
         raise NotImplementedError
 
     @classmethod
@@ -57,10 +53,20 @@ class NodeRepository(interface.AbstractRepository):
             return search_result[0]
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['NodeIdentity']] = None, **kwargs) -> List['Node']:
+    def search(cls, entity_ids: Optional[List['NodeIdentity']] = None, year: int = None, **kwargs) -> List['Node']:
         if entity_ids:
             return _search_by_entity_ids(entity_ids)
+        if year:
+            return _search_by_year(year)
         return []
+
+
+def _search_by_year(year: int) -> List['Node']:
+    qs_group = Element.objects.filter(group_year__academic_year__year=year)
+    qs_learning_unit = Element.objects.filter(learning_unit_year__academic_year__year=year)
+    qs = qs_group.union(qs_learning_unit)
+
+    return load_node.load_multiple(qs.values_list('pk', flat=True))
 
 
 def _search_by_entity_ids(entity_ids: List['NodeIdentity']) -> List['Node']:

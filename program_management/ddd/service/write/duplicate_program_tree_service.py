@@ -43,7 +43,7 @@ def create_and_fill_from_existing_tree(cmd: command.DuplicateProgramTree) -> 'Pr
     # WHEN
     program_tree = tree_domain.ProgramTreeBuilder().create_and_fill_from_program_tree(
         duplicate_from=existing_tree,
-        duplicate_to_transition=cmd.duplicate_to_transition,
+        transition_name=cmd.duplicate_to_transition,
         override_end_year_to=cmd.override_end_year_to,
         override_start_year_to=cmd.override_start_year_to
     )

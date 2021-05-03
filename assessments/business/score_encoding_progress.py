@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from attribution.models import attribution
-from base.models import exam_enrollment, tutor, education_group_year
+from base.models import exam_enrollment, education_group_year
+from base.auth.roles import tutor
 from base.models.education_group_year import EducationGroupYear
 from base.models.session_exam_deadline import compute_deadline_tutor
 
@@ -139,11 +141,14 @@ def _find_related_attribution(score_encoding_progress_list):
 def _group_by_learning_unit(score_encoding_progress_list):
     group_by_learning_unit = {}
     for score_encoding_progress in score_encoding_progress_list:
+        has_peps = True if score_encoding_progress.has_student_specific_profile else False
         key = score_encoding_progress.learning_unit_year_id
         if key in group_by_learning_unit:
             score_encoding_progress_to_update = group_by_learning_unit[key]
             score_encoding_progress_to_update.increment_progress(score_encoding_progress)
             score_encoding_progress_to_update.increment_remaining_scores_by_deadline(score_encoding_progress)
+            if has_peps:
+                score_encoding_progress_to_update.has_student_specific_profile = True
         else:
             group_by_learning_unit[key] = score_encoding_progress
     return list(group_by_learning_unit.values())
@@ -172,6 +177,7 @@ class ScoreEncodingProgress:
         self.remaining_scores_by_deadline = {
             compute_deadline_tutor(exam_enrol.deadline, exam_enrol.deadline_tutor): self.scores_not_yet_submitted
         }
+        self.has_student_specific_profile = exam_enrol.has_student_specific_profile
 
     @property
     def progress_int(self):

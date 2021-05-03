@@ -23,14 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import mock
 from django.test import TestCase
 
-from base.tests.factories.learning_unit_year import LearningUnitYearPartimFactory
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory, CloseAcademicCalendarFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearPartimFactory, LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
+from learning_unit.auth import predicates
 from learning_unit.auth.predicates import is_learning_unit_container_type_deletable
 
 
-class TestPredicates(TestCase):
+class TestIsLearningUnitContainerTypeDeletableForPartim(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
@@ -38,3 +42,115 @@ class TestPredicates(TestCase):
     def test_is_learning_unit_container_type_deletable_for_partim(self):
         partim_ue = LearningUnitYearPartimFactory()
         self.assertTrue(is_learning_unit_container_type_deletable(self.person.user, partim_ue))
+
+
+class TestIsLearningUnitSummaryEditionCalendarOpen(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.learning_unit_year = LearningUnitYearFactory()
+
+    def setUp(self) -> None:
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_learning_unit_summary_edition_calendar_opened(self):
+        OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=self.learning_unit_year.academic_year
+        )
+
+        self.assertTrue(
+            predicates.is_learning_unit_summary_edition_calendar_open(self.person.user, self.learning_unit_year)
+        )
+
+    def test_learning_unit_summary_edition_calendar_closed(self):
+        CloseAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name,
+            data_year=self.learning_unit_year.academic_year
+        )
+
+        self.assertFalse(
+            predicates.is_learning_unit_summary_edition_calendar_open(self.person.user, self.learning_unit_year)
+        )
+
+
+class TestIsLearningUnitForceMajeurSummaryEditionCalendarOpen(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.learning_unit_year = LearningUnitYearFactory()
+
+    def setUp(self) -> None:
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_learning_unit_summary_force_majeur_edition_calendar_opened(self):
+        OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
+            data_year=self.learning_unit_year.academic_year
+        )
+
+        self.assertTrue(
+            predicates.is_learning_unit_force_majeur_summary_edition_calendar_open(
+                self.person.user, self.learning_unit_year
+            )
+        )
+
+    def test_learning_unit_summary_force_majeur_edition_calendar_closed(self):
+        CloseAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION_FORCE_MAJEURE.name,
+            data_year=self.learning_unit_year.academic_year
+        )
+
+        self.assertFalse(
+            predicates.is_learning_unit_force_majeur_summary_edition_calendar_open(
+                self.person.user,
+                self.learning_unit_year
+            )
+        )
+
+
+class TestIsLearningUnitSummaryEditable(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+
+    def setUp(self) -> None:
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_is_learning_unit_year_summary_editable(self):
+        learning_unit_year = LearningUnitYearFactory(summary_locked=False)
+
+        self.assertTrue(
+            predicates.is_learning_unit_year_summary_editable(self.person.user, learning_unit_year)
+        )
+
+    def test_is_not_learning_unit_year_summary_editable(self):
+        learning_unit_year = LearningUnitYearFactory(summary_locked=True)
+
+        self.assertFalse(
+            predicates.is_learning_unit_year_summary_editable(self.person.user, learning_unit_year)
+        )

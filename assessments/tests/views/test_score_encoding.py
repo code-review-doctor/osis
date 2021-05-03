@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,7 +44,8 @@ from assessments.views.score_encoding import online_encoding_submission
 from assessments.views.upload_xls_utils import UploadValueError, _extract_session_number
 from base.models.enums import exam_enrollment_justification_type
 from base.models.enums import exam_enrollment_state
-from base.models.enums import number_session, academic_calendar_type
+from base.models.enums import number_session
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.exam_enrollment import ExamEnrollment
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -301,12 +302,13 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.client.post(url, data=self.get_form_with_all_students_filled())
 
         self.assertTrue(mock_send_email.called)
-        (persons, enrollments, learning_unit_acronym, offer_acronym), kwargs = mock_send_email.call_args
+        (persons, enrollments, learning_unit_acronym, offer_acronym, enrollment_ids), kwargs = mock_send_email.call_args
         self.assertEqual(persons, [self.tutor.person])
         self.assertEqual(enrollments, [self.enrollments[0]])
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
         education_group_year = self.enrollments[0].learning_unit_enrollment.offer_enrollment.education_group_year
         self.assertEqual(offer_acronym, education_group_year.acronym)
+        self.assertEqual(enrollment_ids[0], self.enrollments[0].id)
 
     @patch("base.utils.send_mail.send_message_after_all_encoded_by_manager")
     def test_email_after_encoding_all_students_for_education_group_year_with_justification(self, mock_send_email):
@@ -316,12 +318,13 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
         self.client.post(url, data=self.get_form_with_all_students_filled_and_one_with_justification_unjustified())
 
         self.assertTrue(mock_send_email.called)
-        (persons, enrollments, learning_unit_acronym, offer_acronym), kwargs = mock_send_email.call_args
+        (persons, enrollments, learning_unit_acronym, offer_acronym, enrollments_id), kwargs = mock_send_email.call_args
         self.assertEqual(persons, [self.tutor.person])
         self.assertEqual(enrollments, [self.enrollments[1]])
         self.assertEqual(learning_unit_acronym, self.learning_unit_year.acronym)
         education_group_year = self.enrollments[1].learning_unit_enrollment.offer_enrollment.education_group_year
         self.assertEqual(offer_acronym, education_group_year.acronym)
+        self.assertEqual(enrollments_id[0], self.enrollments[1].id)
 
     @patch("base.utils.send_mail.send_mail_after_scores_submission")
     def test_online_encoding_submission_not_all_encoded(self, mock_send_mail_after_scores_submission):
@@ -357,9 +360,11 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
 
         # Create context out of range
         self.academic_year = _get_academic_year(2017)
-        self.academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
-                                                         data_year=self.academic_year,
-                                                         reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        self.academic_calendar = AcademicCalendarFactory(
+            title="Submission of score encoding - 1",
+            data_year=self.academic_year,
+            reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+        )
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
         self.mock_session_exam_calendar(current_session_exam=None)
@@ -406,7 +411,7 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
                                            data_year=self.academic_year,
                                            start_date=self.academic_calendar.end_date + timedelta(days=100),
                                            end_date=self.academic_calendar.end_date + timedelta(days=130),
-                                           reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                           reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
         ac.save()
         SessionExamCalendarFactory(academic_calendar=ac, number_session=number_session.TWO)
 
@@ -451,7 +456,7 @@ class GetScoreEncodingViewProgramManagerTest(SessionExamCalendarMockMixin, TestC
         # Create an score submission event - with an session exam
         academic_calendar = AcademicCalendarFactory(title="Submission of score encoding - 1",
                                                     data_year=academic_year,
-                                                    reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                                    reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
         academic_calendar.save()
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=academic_calendar,
                                                                 number_session=number_session.ONE)

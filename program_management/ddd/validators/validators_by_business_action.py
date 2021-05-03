@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import List, Optional, Set
 
 from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessListValidator, MultipleExceptionBusinessListValidator
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.validators._at_least_one_finality_have_transition_version import \
+    AtLeastOneFinalityHaveTransitionVersionValidator
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, DetachAuthorizedRelationshipValidator, \
@@ -38,6 +40,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._cannot_fill_content_of_program_tree_of_type_finality import \
+    CannotFillContentOfProgramTreeOfTypeFinalityValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
@@ -255,7 +259,7 @@ class FillProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidator
     def __init__(self, tree_to_fill_from: 'ProgramTreeVersion', tree_to_fill_to: 'ProgramTreeVersion'):
         self.validators = [
             CheckValidTreeVersionToFillTo(tree_to_fill_to),
-            CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to)
+            CheckValidTreeVersionToFillFrom(tree_to_fill_from, tree_to_fill_to),
         ]
         super().__init__()
 
@@ -284,6 +288,17 @@ class FillProgramTreeValidatorList(MultipleExceptionBusinessListValidator):
     def __init__(self, to_tree: 'ProgramTree'):
         self.validators = [
             EmptyProgramTreeValidator(to_tree),
+            CannotFillContentOfProgramTreeOfTypeFinalityValidator(to_tree),
+        ]
+        super().__init__()
+
+
+class FillTransitionProgramTreeValidatorList(MultipleExceptionBusinessListValidator):
+    def __init__(self, from_tree: 'ProgramTree', to_tree: 'ProgramTree', existing_nodes: Set['Node']):
+        self.validators = [
+            EmptyProgramTreeValidator(to_tree),
+            CannotFillContentOfProgramTreeOfTypeFinalityValidator(to_tree),
+            AtLeastOneFinalityHaveTransitionVersionValidator(from_tree, to_tree, existing_nodes)
         ]
         super().__init__()
 
