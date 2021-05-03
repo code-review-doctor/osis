@@ -106,7 +106,9 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         country = self.forwarded.get('country', None)
-        academic_year = AcademicYear.objects.get(id=self.forwarded.get('academic_year'))
+        academic_year = self.forwarded.get('academic_year', None)
+        if academic_year:
+            academic_year = AcademicYear.objects.get(id=academic_year)
         qs = find_additional_requirement_entities_choices(academic_year)
         if country:
             qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
@@ -151,7 +153,8 @@ class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMix
 
     def get_queryset(self):
         academic_yr = self.forwarded.get('academic_year', None)
-        qs = super().get_queryset().active_for_academic_year(AcademicYear.objects.get(id=academic_yr)).pedagogical_entities().order_by('acronym')
+        qs = super().get_queryset().active_for_academic_year(AcademicYear.objects.get(id=academic_yr))\
+            .pedagogical_entities().order_by('acronym')
         if self.q:
             qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
         return qs

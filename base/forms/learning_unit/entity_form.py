@@ -28,8 +28,7 @@ from django.utils import timezone
 
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory, \
-    find_parent_of_type_into_entity_structure, find_all_current_entities_version, \
-    find_pedagogical_entities_version_for_specific_academic_year, find_pedagogical_entities_version
+    find_parent_of_type_into_entity_structure, find_all_current_entities_version
 from base.models.enums.entity_type import FACULTY
 from base.models.person import Person
 from learning_unit.auth.roles.central_manager import CentralManager
@@ -57,7 +56,7 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
 class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
     entity_version = None
 
-    def __init__(self, person=None, initial=None, academic_year: 'AcademicYear' = None,*args, **kwargs):
+    def __init__(self, person=None, initial=None, academic_year: 'AcademicYear' = None, *args, **kwargs):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial
         self.academic_year = academic_year
@@ -71,20 +70,27 @@ class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
         return obj.verbose_title
 
     def get_queryset(self):
-        if self.academic_year:
-            queryset = find_pedagogical_entities_version_for_specific_academic_year(self.academic_year)
+        qs = super().get_queryset().pedagogical_entities_with_academic_year(self.academic_year).order_by('acronym')
 
-        else:
-            queryset = find_pedagogical_entities_version()
+        if self.initial:
+            date = timezone.now()
+            qs |= EntityVersion.objects.current(date).filter(pk=self.initial)
 
-        return queryset
+        return qs
 
 
 def find_additional_requirement_entities_choices(academic_year: 'AcademicYear' = None):
-    return (
-        EntityVersion.objects.active_for_academic_year(academic_year).of_main_organization
-        | EntityVersion.objects.active_for_academic_year(academic_year).of_academic_partner
-    ).select_related('entity', 'entity__organization').order_by('acronym')
+    if academic_year:
+        return (
+            EntityVersion.objects.active_for_academic_year(academic_year).of_main_organization
+            | EntityVersion.objects.active_for_academic_year(academic_year).of_academic_partner
+        ).select_related('entity', 'entity__organization').order_by('acronym')
+    else:
+        date = timezone.now()
+        return (
+            EntityVersion.objects.current(date).of_main_organization
+            | EntityVersion.objects.current(date).of_academic_partner
+        ).select_related('entity', 'entity__organization').order_by('acronym')
 
 
 def find_attached_faculty_entities_version(person: Person, acronym_exceptions=None):

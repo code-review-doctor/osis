@@ -321,7 +321,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                     learning_unit_year__learning_container_year=self.instance)
                 qs.update(**{attr_name: None})
 
-    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
+    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionals)
     def __init_requirement_entity_field(self):
         self.fields['requirement_entity'] = PedagogicalEntitiesRoleModelChoiceField(
             person=self.user.person,
@@ -343,7 +343,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Requirement entity'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text('requirement_entity'),
-            academic_year=self.instance.academic_year
+            academic_year=self.__get_academic_year()
         )
 
     def __init_allocation_entity_field(self):
@@ -361,7 +361,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text('allocation_entity'),
-            academic_year=self.instance.academic_year
+            academic_year=self.__get_academic_year()
         )
 
     def __init_additional_entity_1_field(self):
@@ -393,11 +393,11 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 },
                 forward=['country_additional_entity_1']
             ),
-            queryset=find_additional_requirement_entities_choices(self.instance.academic_year),
+            queryset=find_additional_requirement_entities_choices(self.__get_academic_year()),
             label=_('Additional requirement entity 1'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text('additional_entity_1'),
-            academic_year=self.instance.academic_year
+            academic_year=self.__get_academic_year()
         )
 
     def __init_additional_entity_2_field(self):
@@ -419,19 +419,25 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 },
                 forward=['country_additional_entity_2']
             ),
-            queryset=find_additional_requirement_entities_choices(self.instance.academic_year),
+            queryset=find_additional_requirement_entities_choices(self.__get_academic_year()),
             label=_('Additional requirement entity 2'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text('additional_entity_2'),
-            academic_year=self.instance.academic_year
+            academic_year=self.__get_academic_year()
         )
 
     def _get_entity_status_help_text(self, field_name: str) -> str:
         entity = self.initial.get(field_name, None)
-        if entity:
-            msg = EntityVersion.get_message_is_entity_active_by_entity_id(entity, self.instance.academic_year)
+        academic_year = self.__get_academic_year()
+        if entity and academic_year:
+            msg = EntityVersion.get_message_is_entity_active_by_entity_id(entity, academic_year)
             if msg:
                 return '<span style="{}">{}</span>'.format(INACTIVE_ENTITY_CSS_STYLE, msg)
+        return None
+
+    def __get_academic_year(self):
+        if self.instance:
+            return getattr(self.instance, "academic_year", None)
         return None
 
     class Meta:
