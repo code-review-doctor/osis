@@ -438,8 +438,8 @@ class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessE
         else:
             full_code = offer_acronym + "[" + transition_name + "]"
         message = _(
-            "You can't create/extend the transition version '{full_code}' in {year} as other transition version exists in "
-            "{transition_year}"
+            "You can't create/extend the transition version '{full_code}' in {year} as other transition version exists "
+            "in {transition_year}"
         ).format(
             full_code=full_code,
             year=year,
