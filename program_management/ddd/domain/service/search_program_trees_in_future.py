@@ -41,7 +41,7 @@ class SearchProgramTreesInFuture(interface.DomainService):
         ordered_trees_in_future = list(
             sorted(
                 filter(
-                    lambda t: t.year > working_year.year and t.code == working_tree_identity.code,
+                    lambda t: t.year > working_year and t.entity_id.code == working_tree_identity.code,
                     trees_through_years
                 ),
                 key=lambda t: t.year

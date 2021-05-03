@@ -27,9 +27,14 @@ from django.test import TestCase
 from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from education_group.ddd.domain.exception import common_postponement_consistency_message
 from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.exception import BulkUpdateLinkException
+from program_management.ddd.domain.program_tree import ProgramTreeBuilder
+from program_management.ddd.domain.report import ReportIdentity
+from program_management.ddd.domain.report_events import CannotPostponeLinkToNextYearAsConsistencyError
+from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
 from program_management.ddd.repositories.report import ReportRepository
 from program_management.ddd.service.write import bulk_update_link_service
 from program_management.models.enums.node_type import NodeType
@@ -398,3 +403,53 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             next(iter(e.exception.exceptions[update_link_cmd].exceptions)),
             exception.MinimumChildTypesNotRespectedException
         )
+
+    def test_postpone_link_with_consistency_errors(self):
+        self.tree.authorized_relationships.update(
+            TrainingType.BACHELOR,
+            GroupType.COMMON_CORE,
+            max_count_authorized=1,
+            min_count_authorized=1,
+        )
+        tree_next_year = ProgramTreeBuilder().copy_to_next_year(self.tree, self.fake_program_tree_repository)
+        self.fake_program_tree_repository.create(tree_next_year)
+
+        common_core_node = self.tree.root_node.children_as_nodes[0]
+        update_link_cmd = UpdateLinkCommandFactory(
+            parent_node_code=self.tree.root_node.code,
+            parent_node_year=self.tree.root_node.year,
+            child_node_code=common_core_node.code,
+            child_node_year=common_core_node.year,
+            is_mandatory=False,
+            block="1234",
+            comment="test postpone conflict",
+            comment_english="test postpone conflict",
+            relative_credits=12,
+        )
+        bulk_update_cmd = BulkUpdateLinkCommand(
+            working_tree_code=self.tree.root_node.code,
+            working_tree_year=self.tree.root_node.year,
+            update_link_cmds=[update_link_cmd]
+        )
+
+        bulk_update_link_service.bulk_update_and_postpone_links(
+            bulk_update_cmd,
+            self.fake_program_tree_repository,
+            ReportRepository()
+        )
+
+        trees_through_years = self.fake_program_tree_repository.search(code=self.tree.entity_id.code)
+        trees_in_future = SearchProgramTreesInFuture.search(self.tree.entity_id, trees_through_years)
+
+        self.assertListEqual(trees_in_future, [tree_next_year])
+
+        conflict_report = ReportRepository().get(ReportIdentity(bulk_update_cmd.transaction_id))
+        self.assertTrue(isinstance(conflict_report.warnings[0], CannotPostponeLinkToNextYearAsConsistencyError))
+        persisted_tree_next_year = trees_in_future[0]
+        link_with_common_core_next_year = persisted_tree_next_year.root_node.children[0]
+
+        self.assertNotEqual(link_with_common_core_next_year.is_mandatory, update_link_cmd.is_mandatory)
+        self.assertNotEqual(link_with_common_core_next_year.block, update_link_cmd.block)
+        self.assertNotEqual(link_with_common_core_next_year.comment, update_link_cmd.comment)
+        self.assertNotEqual(link_with_common_core_next_year.comment_english, update_link_cmd.comment_english)
+        self.assertNotEqual(link_with_common_core_next_year.relative_credits, update_link_cmd.relative_credits)
