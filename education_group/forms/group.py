@@ -156,7 +156,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         academic_year = self.initial.get('academic_year', None)
         if academic_year and not isinstance(academic_year, AcademicYear):
             academic_year = AcademicYear.objects.get(pk=self.initial.get('academic_year'))
-        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),

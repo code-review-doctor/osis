@@ -457,7 +457,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     def __init_management_entity_field(self):
         academic_year = AcademicYear.objects.get(year=self.year)
         old_entity = self.initial.get('management_entity', None)
-        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
@@ -469,7 +469,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     def __init_administration_entity_field(self):
         academic_year = AcademicYear.objects.get(year=self.year)
         old_entity = self.initial.get('administration_entity', None)
-        msg = EntityVersion.get_message_is_entity_active(old_entity, academic_year)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['administration_entity'] = MainEntitiesVersionChoiceField(
             queryset=None,
             to_field_name="acronym",
