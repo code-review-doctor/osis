@@ -37,21 +37,21 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 
 class Tab(Enum):
-    ADMISSION_CONDITION = 0
+    ACCESS_REQUIREMENTS = 0
 
 
-class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
+class CommonMasterAccessRequirements(PermissionRequiredMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
     template_name = "education_group_app/general_information/common_master.html"
 
     def get_context_data(self, **kwargs):
-        object = self.get_object()
+        obj = self.get_object()
         return {
             **super().get_context_data(**kwargs),
-            "object": object,
-            "admission_condition": self.get_admission_condition(),
+            "object": obj,
+            "access_requirements": self.get_admission_condition(),
             "tab_urls": self.get_tab_urls(),
             "can_edit_information": self.request.user.has_perm(
                 "base.change_commonadmissioncondition", self.get_object()
@@ -63,11 +63,11 @@ class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
 
     def get_tab_urls(self):
         return {
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
                 'active': True,
                 'display': True,
-                'url': reverse('common_master_admission_condition', kwargs={'year': self.kwargs['year']})
+                'url': reverse('common_master_access_requirements', kwargs={'year': self.kwargs['year']})
             }
         }
 
@@ -81,11 +81,11 @@ class CommonMasterAdmissionCondition(PermissionRequiredMixin, TemplateView):
             raise Http404
 
     def get_publish_url(self):
-        return reverse('publish_common_master_admission_condition', kwargs={'year': self.kwargs['year']})
+        return reverse('publish_common_master_access_requirements', kwargs={'year': self.kwargs['year']})
 
     def get_update_text_url(self) -> str:
         return reverse(
-            'education_group_year_admission_condition_update_text',
+            'education_group_year_access_requirements_update_text',
             kwargs={
                 'year': self.get_object().academic_year.year,
                 'code': self.get_object().partial_acronym

@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import mock
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.tests.factories.group_year import GroupYearFactory
@@ -63,3 +63,26 @@ class TestGenerateCodeFromParentNode(TestCase):
 
         result = GenerateNodeCode.generate_from_parent_node(parent_node, child_node_type, False)
         self.assertEqual("LDROI201E", result)
+
+
+class TestGenerateTransitionCode(SimpleTestCase):
+    def test_should_replace_first_letter_by_transition_first_letter(self):
+        base_code = "LOSIS100R"
+
+        result = GenerateNodeCode(existing_codes={}).generate_transition_code(base_code)
+
+        self.assertEqual("TOSIS100R", result)
+
+    def test_should_increment_numeric_part_if_code_already_exists(self):
+        base_code = "LOSIS100R"
+
+        result = GenerateNodeCode(existing_codes={"TOSIS100R", "TOSIS101R"}).generate_transition_code(base_code)
+
+        self.assertEqual("TOSIS102R", result)
+
+    def test_should_take_into_account_non_conform_codes(self):
+        base_code = "L107107R"
+
+        result = GenerateNodeCode().generate_transition_code(base_code)
+
+        self.assertEqual("T107107R", result)

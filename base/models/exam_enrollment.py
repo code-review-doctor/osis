@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,19 +27,20 @@ from decimal import *
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery
+from django.db.models import When, Case, Q, Sum, Count, IntegerField, F, OuterRef, Subquery, Exists
 from django.utils.translation import gettext as _
 
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
-    academic_year as academic_yr, tutor, education_group_year
-from base.auth.roles import program_manager
+    academic_year as academic_yr, education_group_year
+from base.auth.roles import program_manager, tutor
 from base.models.enums import exam_enrollment_justification_type as justification_types
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from base.models.student_specific_profile import StudentSpecificProfile
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
 SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
@@ -330,8 +331,14 @@ def get_progress_by_learning_unit_years_and_offer_years(user,
                 offer_enrollment_id=OuterRef('learning_unit_enrollment__offer_enrollment_id'),
                 number_session=session_exam_number,
             ).distinct().values('deadline_tutor')[:1]
-        )
+        ),
+        has_student_specific_profile=Exists(
+            StudentSpecificProfile.objects.filter(
+                student_id=OuterRef('learning_unit_enrollment__offer_enrollment__student_id')
+            )
+        ),
     )
+
     return queryset
 
 

@@ -112,4 +112,4 @@ class TestTrainingReadDiplomaCertificate(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['active'])
-        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['active'])
