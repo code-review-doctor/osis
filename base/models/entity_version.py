@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ from typing import Dict, Iterable, List, Optional
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Q, BooleanField
-from django.db.models.expressions import F, Func, RawSQL, Value, Case, When
+from django.db.models import Q, BooleanField, DateField
+from django.db.models.expressions import F, Func, RawSQL, Value, Case, When, Subquery, OuterRef
 from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -338,6 +338,23 @@ class EntityVersionQuerySet(CTEQuerySet):
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
 
+    def pedagogical_entities_with_academic_year(self, academic_year: AcademicYear = None):
+        qs = self.pedagogical_entities()
+
+        if academic_year:
+            qs = qs.filter(
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                        Q(start_date__lte=academic_year.start_date) &
+                        (
+                                Q(end_date__isnull=True) |
+                                Q(end_date__gte=academic_year.end_date)
+                        )
+                )
+            )
+        return qs
+
     def only_roots(self):
         return self.filter(parent__isnull=True)
 
@@ -531,28 +548,44 @@ class EntityVersion(SerializableModel):
         return nodes[tree[0]['entity_id']].to_json(limit)
 
     @classmethod
-    def is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> bool:
+    def is_entity_active(cls, acronym_entity: str, year: int) -> bool:
+
         current_clause = (
-            Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
-            Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
             (
-                Q(start_date__lte=academic_year.start_date) &
-                (
-                    Q(end_date__isnull=True) |
-                    Q(end_date__gte=academic_year.end_date)
-                )
+                (Q(start_date__lte=OuterRef('start_date')) | Q(start_date__lte=OuterRef('end_date'))) &
+                (Q(end_date__gte=OuterRef('end_date')) | Q(end_date__gte=OuterRef('start_date')))
             )
+            # using max_date because impossible to check OuterRef value is None in clause
+            | (Q(end_date__lte=OuterRef('max_date')) & Q(start_date__gte=OuterRef('start_date')))
         )
+
+        active_entity_subquery = Subquery(
+            AcademicYear.objects.filter(current_clause, year=year).annotate(
+                is_active_entity=Value(True, output_field=BooleanField())
+            ).values('is_active_entity')[:1]
+        )
+
         entity = cls.objects.filter(
             acronym=acronym_entity,
         ).annotate(
-            active_entity_version=Case(
-                When(current_clause, then=Value(True)),
-                default=Value(False),
-                output_field=BooleanField()
-            )
+            max_date=Case(
+                When(end_date__isnull=True, then=Value(datetime.date.max)),
+                output_field=DateField()
+            ),
+            active_entity_version=active_entity_subquery
         ).order_by('-start_date').first()
+
         return entity.active_entity_version if entity else False
+
+    @classmethod
+    def get_message_is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> str:
+        if acronym_entity and not cls.is_entity_active(acronym_entity, academic_year.year):
+            msg = _('The entity %(acronym_entity)s is not active for this academic year') % {
+                'acronym_entity': acronym_entity
+            }
+        else:
+            msg = None
+        return msg
 
 
 def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):
