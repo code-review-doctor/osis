@@ -227,6 +227,7 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
         )
         duplicated_lcy.is_vacant = False
         duplicated_lcy.type_declaration_vacant = None
+        _raise_if_entity_version_does_not_exist(duplicated_lcy, new_academic_year)
         duplicated_lcy.save()
     else:
         duplicated_lcy = queryset.get()
