@@ -207,4 +207,5 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.view_publish_btn': rules.always_allow,
+            'education_group.change_management_entity': rules.always_deny,
         })
