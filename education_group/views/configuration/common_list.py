@@ -94,22 +94,22 @@ class CommonListFilterSerializer(serializers.Serializer):
             return reverse('common_general_information', kwargs={'year': education_group_year.academic_year.year})
         elif education_group_year.education_group_type.name == TrainingType.BACHELOR.name:
             return reverse(
-                'common_bachelor_admission_condition',
+                'common_bachelor_access_requirements',
                 kwargs={'year': education_group_year.academic_year.year}
             )
         elif education_group_year.education_group_type.name == TrainingType.AGGREGATION.name:
             return reverse(
-                'common_aggregate_admission_condition',
+                'common_aggregate_access_requirements',
                 kwargs={'year': education_group_year.academic_year.year}
             )
         elif education_group_year.education_group_type.name == TrainingType.PGRM_MASTER_120.name:
             return reverse(
-                'common_master_admission_condition',
+                'common_master_access_requirements',
                 kwargs={'year': education_group_year.academic_year.year}
             )
         elif education_group_year.education_group_type.name == TrainingType.MASTER_MC.name:
             return reverse(
-                'common_master_specialized_admission_condition',
+                'common_master_specialized_access_requirements',
                 kwargs={'year': education_group_year.academic_year.year}
             )
         return "#"

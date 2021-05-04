@@ -30,7 +30,7 @@ from django.test import TestCase
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base.models.academic_calendar import AcademicCalendar
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 
@@ -44,7 +44,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
     def test_ensure_consistency_until_n_plus_6_assert_default_value(self):
         ScoresExamSubmissionCalendar.ensure_consistency_until_n_plus_6()
 
-        qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        qs = AcademicCalendar.objects.filter(reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name)
 
         self.assertEqual(qs.count(), 21)  # There are 3 sessions (7*3 = 21)
 
@@ -56,7 +56,7 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
             ),
             {
                 "title": "Encodage de notes - Session 1",
-                "reference": academic_calendar_type.SCORES_EXAM_SUBMISSION,
+                "reference": AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name,
                 "data_year": self.current_academic_year.pk,
                 "start_date": datetime.date(self.current_academic_year.year, 12, 15),
                 "end_date": datetime.date(self.current_academic_year.year + 1, 2, 28),
@@ -72,14 +72,42 @@ class TestScoreExamDiffusionCalendarEnsureConsistencyUntilNPlus6(TestCase):
 
         self.assertEqual(
             AcademicCalendar.objects.filter(
-                reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+                reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
             ).count(),
             21
         )
 
         self.assertEqual(
             SessionExamCalendar.objects.filter(
-                academic_calendar__reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+                academic_calendar__reference=AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
             ).count(),
             21
         )
+
+
+class TestClosestSession(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        AcademicYearFactory.produce_in_future(cls.current_academic_year.year)
+        ScoresExamSubmissionCalendar.ensure_consistency_until_n_plus_6()
+
+    def test_when_date_corresponds_to_open_session_should_return_that_session(self):
+        date = datetime.date(self.current_academic_year.year, 12, 15)
+
+        result = ScoresExamSubmissionCalendar().get_closest_academic_event(date=date)
+        self.assertEqual(1, result.session)
+        self.assertEqual(self.current_academic_year.year, result.authorized_target_year)
+
+    def test_should_return_next_session_when_outside_of_sessions(self):
+        date = datetime.date(self.current_academic_year.year+1, 5, 10)
+
+        result = ScoresExamSubmissionCalendar().get_closest_academic_event(date=date)
+        self.assertEqual(2, result.session)
+        self.assertEqual(self.current_academic_year.year, result.authorized_target_year)
+
+    def test_should_return_none_if_outside_of_session_and_next_session_is_first_session(self):
+        date = datetime.date(self.current_academic_year.year, 12, 1)
+
+        result = ScoresExamSubmissionCalendar().get_closest_academic_event(date=date)
+        self.assertIsNone(result)

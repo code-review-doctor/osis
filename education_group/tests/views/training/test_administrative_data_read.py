@@ -125,7 +125,7 @@ class TestTrainingReadAdministrativeData(TestCase):
         response = self.client.get(self.url)
 
         self.assertTrue(response.context['tab_urls'][Tab.ADMINISTRATIVE_DATA]['active'])
-        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['active'])
+        self.assertFalse(response.context['tab_urls'][Tab.ACCESS_REQUIREMENTS]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.IDENTIFICATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.DIPLOMAS_CERTIFICATES]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.CONTENT]['active'])

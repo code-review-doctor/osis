@@ -23,18 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import contextlib
 from typing import List, Tuple
 
 from django.urls import reverse
 
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.service.node_identities_search import NodeIdentitiesSearch
 from program_management.ddd.domain.service.element_id_search import ElementIdByYearSearch
+from program_management.ddd.domain.service.node_identities_search import NodeIdentitiesSearch
 
 
-def get_academic_year_choices(
+def get_academic_year_choices_for_groups(
         node_identity: 'NodeIdentity',
         path: 'Path',
         active_view_name: str,
@@ -47,6 +46,19 @@ def get_academic_year_choices(
 
     result = [
         (_get_href(node_id, _get_path(map_element_id_by_year, element_ids, node_id), active_view_name), node_id.year)
+        for node_id in node_ids
+    ]
+    return result
+
+
+def get_academic_year_choices_for_trainings_and_mini_training(
+        program_tree_version_identity: 'ProgramTreeVersionIdentity',
+        active_view_name: str,
+) -> List[Tuple[str, int]]:
+    node_ids = NodeIdentitiesSearch.search_from_program_tree_version_identity_for_years(program_tree_version_identity)
+
+    result = [
+        (_get_href(node_id, '', active_view_name), node_id.year)
         for node_id in node_ids
     ]
     return result
