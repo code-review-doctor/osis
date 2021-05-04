@@ -97,3 +97,15 @@ class ApplicationRepositorySearch(TestCase):
         self.assertTrue(all([
             application.applicant_id == self.applicant_id for application in filtered_results
         ]))
+
+
+class ApplicationRepositorySave(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.repository = ApplicationRepository()
+
+    def test_save_assert_created_when_new_instance(self):
+        pass
+
+    def test_save_assert_updated_when_instance_exists(self):
+        pass
