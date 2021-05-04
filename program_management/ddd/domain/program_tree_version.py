@@ -200,6 +200,7 @@ class ProgramTreeVersionBuilder:
     ) -> 'ProgramTreeVersion':
         if command.transition_name:
             validator = validators_by_business_action.CreateProgramTreeTransitionVersionValidatorList(
+                command.end_year,
                 command.start_year,
                 command.offer_acronym,
                 command.version_name,

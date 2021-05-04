@@ -57,10 +57,10 @@ class TransitionNameExistsValidator(BusinessValidator):
                 sorted(
                     filter(
                         lambda transition_version:
-                        transition_version.transition_name == transition_version
+                        transition_version.transition_name == self.transition_name
                         and transition_version.version_name == self.from_specific_version.version_name
-                        and transition_version.offer_acronym == self.from_specific_version.offer_acronym
-                        and transition_version.year < self.from_specific_version.year,
+                        and transition_version.entity_identity.offer_acronym == self.from_specific_version.offer_acronym
+                        and transition_version.entity_identity.year >= self.from_specific_version.year,
                         self.all_transition_versions,
                     ),
                     key=lambda transition_version: transition_version.entity_identity.year,

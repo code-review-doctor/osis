@@ -30,6 +30,8 @@ from base.ddd.utils.business_validator import BusinessListValidator, MultipleExc
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd import command
 from program_management.ddd.business_types import *
+from program_management.ddd.validators._at_least_one_finality_have_transition_version import \
+    AtLeastOneFinalityHaveTransitionVersionValidator
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, DetachAuthorizedRelationshipValidator, \
@@ -38,6 +40,8 @@ from program_management.ddd.validators._authorized_relationship_for_all_trees im
     ValidateAuthorizedRelationshipForAllTrees
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
 from program_management.ddd.validators._block_validator import BlockValidator
+from program_management.ddd.validators._cannot_fill_content_of_program_tree_of_type_finality import \
+    CannotFillContentOfProgramTreeOfTypeFinalityValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
@@ -48,11 +52,8 @@ from program_management.ddd.validators._end_date_between_finalities_and_masters 
     CheckEndDateBetweenFinalitiesAndMasters2M
 from program_management.ddd.validators._fill_check_tree_from import CheckValidTreeVersionToFillFrom
 from program_management.ddd.validators._fill_check_tree_to import CheckValidTreeVersionToFillTo
-from program_management.ddd.validators._at_least_one_finality_have_transition_version import \
-    AtLeastOneFinalityHaveTransitionVersionValidator
 from program_management.ddd.validators._has_or_is_prerequisite import IsHasPrerequisiteForAllTreesValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
-from program_management.ddd.validators._cannot_fill_content_of_program_tree_of_type_finality import CannotFillContentOfProgramTreeOfTypeFinalityValidator
 from program_management.ddd.validators._match_version import MatchVersionValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -309,7 +310,13 @@ class UpdateProgramTreeVersionValidatorList(MultipleExceptionBusinessListValidat
         tree.root_node.end_year = tree_version.end_year_of_existence
         self.validators = [
             CheckEndDateBetweenFinalitiesAndMasters2M(tree, tree_version.program_tree_repository),
-            CheckExistenceOfTransition(tree_version, initial_end_year)
+            CheckExistenceOfTransition(
+                tree_version.end_year_of_existence,
+                initial_end_year,
+                tree_version.entity_id.offer_acronym,
+                tree_version.version_name,
+                tree_version.transition_name
+            )
         ]
         super().__init__()
 
@@ -324,10 +331,11 @@ class CreateProgramTreeVersionValidatorList(BusinessListValidator):
 
 
 class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
-    def __init__(self, year: int, offer_acronym: str, version_name: str, transition_name: str):
+    def __init__(self, end_year: int, year: int, offer_acronym: str, version_name: str, transition_name: str):
         self.validators = [
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
-            TransitionNamePatternValidator(transition_name=transition_name)
+            TransitionNamePatternValidator(transition_name=transition_name),
+            CheckExistenceOfTransition(end_year, year, offer_acronym, version_name, transition_name)
         ]
         super().__init__()
 
