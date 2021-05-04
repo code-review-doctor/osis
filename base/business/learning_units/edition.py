@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -227,7 +227,6 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
         )
         duplicated_lcy.is_vacant = False
         duplicated_lcy.type_declaration_vacant = None
-        _raise_if_entity_version_does_not_exist(duplicated_lcy, new_academic_year)
         duplicated_lcy.save()
     else:
         duplicated_lcy = queryset.get()
