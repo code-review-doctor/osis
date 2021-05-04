@@ -61,6 +61,7 @@ from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
 from education_group.ddd.business_types import *
+from education_group.ddd.domain.service.get_entity_active import ActiveEntity
 from education_group.forms import fields
 from education_group.forms.fields import MainEntitiesVersionChoiceField, UpperCaseCharField
 from education_group.forms.widgets import CertificateAimsWidget
@@ -457,7 +458,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     def __init_management_entity_field(self):
         academic_year = AcademicYear.objects.get(year=self.year)
         old_entity = self.initial.get('management_entity', None)
-        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
+        msg = ActiveEntity.get_message_inactive_entity_for_year(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
@@ -469,7 +470,7 @@ class UpdateTrainingForm(PermissionFieldMixin, CreateTrainingForm):
     def __init_administration_entity_field(self):
         academic_year = AcademicYear.objects.get(year=self.year)
         old_entity = self.initial.get('administration_entity', None)
-        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
+        msg = ActiveEntity.get_message_inactive_entity_for_year(old_entity, self.year)
         self.fields['administration_entity'] = MainEntitiesVersionChoiceField(
             queryset=None,
             to_field_name="acronym",

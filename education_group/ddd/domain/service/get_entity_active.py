@@ -34,3 +34,7 @@ class ActiveEntity(interface.DomainService):
     @staticmethod
     def is_entity_active_for_year(acronym_entity: str, year: int) -> bool:
         return EntityVersion.is_entity_active(acronym_entity, year)
+
+    @staticmethod
+    def get_message_inactive_entity_for_year(acronym_entity: str, year: int) -> str:
+        return EntityVersion.get_message_is_entity_active(acronym_entity, year)
