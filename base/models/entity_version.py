@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -345,6 +345,23 @@ class EntityVersionQuerySet(CTEQuerySet):
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
 
+    def pedagogical_entities_with_academic_year(self, academic_year: AcademicYear = None):
+        qs = self.pedagogical_entities()
+
+        if academic_year:
+            qs = qs.filter(
+                Q(start_date__range=[academic_year.start_date, academic_year.end_date]) |
+                Q(end_date__range=[academic_year.start_date, academic_year.end_date]) |
+                (
+                        Q(start_date__lte=academic_year.start_date) &
+                        (
+                                Q(end_date__isnull=True) |
+                                Q(end_date__gte=academic_year.end_date)
+                        )
+                )
+            )
+        return qs
+
     def only_roots(self):
         return self.filter(parent__isnull=True)
 
@@ -566,7 +583,6 @@ class EntityVersion(SerializableModel):
                 When(end_date__isnull=True, then=Value(datetime.date.max)),
                 output_field=DateField()
             ),
-        ).annotate(
             active_entity_version=active_entity_subquery
         ).order_by('-start_date').first()
 

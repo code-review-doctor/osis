@@ -221,6 +221,7 @@ class LearningUnitFilter(FilterSet):
                 output_field=CharField()
             )
         )
+        queryset = LearningUnitYearQuerySet.annotate_entities_status(queryset)
         return queryset
 
     def filter_learning_unit_year_field(self, queryset, name, value):

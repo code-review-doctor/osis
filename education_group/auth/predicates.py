@@ -14,7 +14,6 @@ from education_group.calendar.education_group_extended_daily_management import \
 from education_group.calendar.education_group_limited_daily_management import \
     EducationGroupLimitedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
-from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_role.cache import predicate_cache
