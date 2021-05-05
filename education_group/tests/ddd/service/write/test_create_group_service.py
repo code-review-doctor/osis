@@ -110,6 +110,7 @@ class TestCreateGroup(DDDTestCase):
         self.assertTrue(self.fake_group_repository.get(entity_id_of_created_group))
 
     def test_should_save_code_with_uppercase(self):
+        #  FIXME should be a validation and not a converter
         cmd = attr.evolve(self.cmd, code='LtroNc1')
 
         identity = create_group_service.create_orphan_group(cmd)
