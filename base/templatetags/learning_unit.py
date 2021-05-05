@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
+from html import escape
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -131,7 +132,7 @@ def dl_tooltip(context, instance, key, **kwargs):
                 "style='font-size: 12pt;' data-original-title='{msg_inactive_entity}'></span>".format(
                     value=value or '',
                     url=url,
-                    msg_inactive_entity=_('This entity is not active during this academic year')
+                    msg_inactive_entity=escape(_('This entity is not active during this academic year'), quote=True)
                 )
         else:
             value = "<a href='{url}'>{value}</a>".format(value=value or '', url=url)
