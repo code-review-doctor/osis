@@ -270,6 +270,7 @@ class EntityVersionQuerySet(CTEQuerySet):
         :return: a list of dictionaries returning
             - entityversion_id,
             - acronym,
+            - entity_type,
             - parent_id,
             - entity_id,
             - parents,
@@ -295,6 +296,7 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         cte = self.with_parents(
             'acronym',
+            'entity_type',
             date=date,
             academic_year=academic_year,
             with_expired=with_expired,
@@ -307,12 +309,17 @@ class EntityVersionQuerySet(CTEQuerySet):
         return qs.values(
             'id',
             'acronym',
+            'entity_type',
             'parent_id',
             'entity_id',
             'parents',
             'date',
             'level',
         )
+
+    def get_main_tree(self, *args, **kwargs):
+        root = EntityVersion.objects.get(acronym="UCL", parent=None)
+        return self.get_tree([root.entity], *args, **kwargs)
 
     def with_acronym_path(self, **kwargs):
         cte = self.with_children('start_date', **kwargs)
@@ -472,7 +479,11 @@ class EntityVersion(SerializableModel):
         return EntityVersion.objects.descendants([self.entity], date)
 
     def is_faculty(self) -> bool:
-        return self.entity_type == entity_type.FACULTY or self.acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
+        return self.is_faculty_cls(self.entity_type, self.acronym)
+
+    @classmethod
+    def is_faculty_cls(cls, entity_tpe: str, acronym: str):
+        return entity_tpe == entity_type.FACULTY or acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 
     def find_faculty_version(self, academic_yr):
         if self.entity_type == entity_type.FACULTY or self.acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS:
