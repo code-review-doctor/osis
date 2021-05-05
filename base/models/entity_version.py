@@ -31,7 +31,7 @@ from typing import Dict, Iterable, List, Optional
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Q, BooleanField, DateField
-from django.db.models.expressions import F, Func, RawSQL, Value, Case, When, OuterRef, Subquery
+from django.db.models.expressions import F, Func, RawSQL, Value, Case, When, Subquery, OuterRef
 from django.db.models.functions import Cast
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -572,6 +572,7 @@ class EntityVersion(SerializableModel):
                 When(end_date__isnull=True, then=Value(datetime.date.max)),
                 output_field=DateField()
             ),
+        ).annotate(
             active_entity_version=active_entity_subquery
         ).order_by('-start_date').first()
 

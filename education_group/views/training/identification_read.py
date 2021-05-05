@@ -25,10 +25,8 @@
 ##############################################################################
 from typing import List
 
-from django.utils.functional import cached_property
 from reversion.models import Version
 
-from base.models.academic_year import AcademicYear
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
@@ -60,7 +58,7 @@ class TrainingReadIdentification(TrainingRead):
             ),
             "training_active_management_entity": EntityVersion.is_entity_active(
                 self.training.management_entity.acronym,
-                self.training_identity.year
+                self.training.year
             ),
             "group_active_management_entity": EntityVersion.is_entity_active(
                 self.group.management_entity.acronym,
@@ -68,7 +66,7 @@ class TrainingReadIdentification(TrainingRead):
             ),
             "active_administration_entity": EntityVersion.is_entity_active(
                 self.training.administration_entity.acronym,
-                self.training_identity.year
+                self.training.year
             ),
         }
 
@@ -88,10 +86,6 @@ class TrainingReadIdentification(TrainingRead):
         except exception.TrainingAlertFieldException as e:
             return e.fields
         return []
-
-    @cached_property
-    def academic_year(self):
-        return AcademicYear.objects.get(year=self.node_identity.year)
 
     def get_related_history(self):
         group_year = self.education_group_version.root_group
