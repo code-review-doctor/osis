@@ -28,7 +28,6 @@ import re
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.domain.exception import InvalidTransitionNameException
 
-TRANSITION_NAME_REGEX = r"^[A-Z0-9]*"
 FULL_TRANSITION_NAME_REGEX = r"^TRANSITION(\s[A-Z0-9]+)?"
 
 
@@ -39,5 +38,5 @@ class TransitionNamePatternValidator(BusinessValidator):
         self.transition_name = transition_name
 
     def validate(self):
-        if not bool(re.fullmatch(TRANSITION_NAME_REGEX, self.transition_name.upper())):
+        if not bool(re.fullmatch(FULL_TRANSITION_NAME_REGEX, self.transition_name.upper())):
             raise InvalidTransitionNameException()
