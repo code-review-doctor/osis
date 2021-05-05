@@ -21,13 +21,13 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from unittest.mock import patch
 
 from django.test import TestCase
 
 from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from education_group.ddd.domain.exception import common_postponement_consistency_message
 from program_management.ddd.command import BulkUpdateLinkCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.exception import BulkUpdateLinkException
@@ -45,12 +45,16 @@ from program_management.tests.ddd.factories.repository.fake import get_fake_prog
 from testing.mocks import MockPatcherMixin
 
 
+@patch(
+    "base.business.academic_calendar.AcademicEventCalendarHelper.get_target_years_opened",
+    return_value=[2016]
+)
 class TestUpdateLink(TestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.tree = ProgramTreeBachelorFactory(2016, 2018)
         self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
 
-    def test_failure_when_block_value_is_not_a_increasing_sequence_of_digits_between_1_and_6(self):
+    def test_failure_when_block_value_is_not_a_increasing_sequence_of_digits_between_1_and_6(self, mock_calendar):
         block_inputs = ["158", "265", "49"]
         for block_input in block_inputs:
             cmd_with_invalid_block_value = UpdateLinkCommandFactory(
@@ -77,7 +81,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
                 exception.InvalidBlockException
             )
 
-    def test_failure_when_relative_credits_less_or_equal_to_0(self):
+    def test_failure_when_relative_credits_less_or_equal_to_0(self, mock_calendar):
         cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
             relative_credits=-1,
             parent_node_code=self.tree.root_node.code,
@@ -103,7 +107,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.RelativeCreditShouldBeGreaterOrEqualsThanZero
         )
 
-    def test_failure_when_relative_credits_superior_to_999(self):
+    def test_failure_when_relative_credits_superior_to_999(self, mock_calendar):
         cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
             relative_credits=1000, parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
@@ -128,7 +132,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.RelativeCreditShouldBeLowerOrEqualThan999
         )
 
-    def test_failure_when_reference_link_with_learning_unit_child_node(self):
+    def test_failure_when_reference_link_with_learning_unit_child_node(self, mock_calendar):
         cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=self.tree.root_node.code,
@@ -154,7 +158,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.ReferenceLinkNotAllowedWithLearningUnitException
         )
 
-    def test_always_set_link_type_to_reference_between_minor_list_and_minor(self):
+    def test_always_set_link_type_to_reference_between_minor_list_and_minor(self, mock_calendar):
         minor_list_choice_tree_data = {
             "node_type": GroupType.MINOR_LIST_CHOICE,
             "children": [
@@ -186,7 +190,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             LinkTypes.REFERENCE
         )
 
-    def test_reference_link_always_valid_between_minor_and_list_minor(self):
+    def test_reference_link_always_valid_between_minor_and_list_minor(self, mock_calendar):
         minor_list_choice_tree_data = {
             "node_type": GroupType.MINOR_LIST_CHOICE,
             "children": [
@@ -219,7 +223,10 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             ReportRepository()
         ))
 
-    def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(self):
+    def test_failure_when_reference_but_children_of_node_to_add_are_not_valid_relationships_to_parent(
+            self,
+            mock_calendar
+    ):
         cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=self.tree.root_node.code,
@@ -245,7 +252,10 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.ChildTypeNotAuthorizedException
         )
 
-    def test_failure_when_successive_reference_links_and_reference_children_type_not_valid_for_parent(self):
+    def test_failure_when_successive_reference_links_and_reference_children_type_not_valid_for_parent(
+            self,
+            mock_calendar
+    ):
         successive_reference_link_tree_data = {
             "node_type": GroupType.COMPLEMENTARY_MODULE,
             "children": [
@@ -289,7 +299,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.ChildTypeNotAuthorizedException
         )
 
-    def test_update_link_properties(self):
+    def test_update_link_properties(self, mock_calendar):
         update_link_command = UpdateLinkCommandFactory(
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
@@ -316,7 +326,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         self.assertEqual(result.comment_english, update_link_command.comment_english)
         self.assertEqual(result.relative_credits, update_link_command.relative_credits)
 
-    def test_failure_if_maximum_children_reached(self):
+    def test_failure_if_maximum_children_reached(self, mock_calendar):
         tree_data = {
             "node_type": TrainingType.BACHELOR,
             "end_year": 2018,
@@ -363,7 +373,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.MaximumChildTypesReachedException
         )
 
-    def test_cannot_convert_mandatory_child_link_to_reference(self):
+    def test_cannot_convert_mandatory_child_link_to_reference(self, mock_calendar):
         self.tree.authorized_relationships.update(
             TrainingType.BACHELOR,
             GroupType.COMMON_CORE,
@@ -404,7 +414,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             exception.MinimumChildTypesNotRespectedException
         )
 
-    def test_postpone_link_with_consistency_errors(self):
+    def test_postpone_link_with_consistency_errors(self, mock_calendar):
         self.tree.authorized_relationships.update(
             TrainingType.BACHELOR,
             GroupType.COMMON_CORE,
