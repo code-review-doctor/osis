@@ -37,8 +37,7 @@ from base.business.entity_version import MainEntityStructure
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.entity import Entity
-from base.models.entity_version import find_parent_of_type_into_entity_structure, EntityVersion
-from base.models.enums.entity_type import FACULTY
+from base.models.entity_version import EntityVersion
 from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from education_group.auth.predicates import is_education_group_extended_daily_management_calendar_open
 from education_group.contrib.admin import EducationGroupRoleModelAdmin

@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,20 +22,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
+import contextlib
+from typing import List
 
-from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import InvalidTransitionNameException
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from osis_common.ddd.interface import BusinessException
+from program_management.ddd.business_types import *
+from program_management.ddd.command import FillProgramTreeContentFromLastYearCommand
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
+from program_management.ddd.service.write import fill_program_tree_content_from_last_year_service
 
-FULL_TRANSITION_NAME_REGEX = r"^TRANSITION(\s[A-Z0-9]+)?"
 
-
-class TransitionNamePatternValidator(BusinessValidator):
-
-    def __init__(self, transition_name: str):
-        super().__init__()
-        self.transition_name = transition_name
-
-    def validate(self):
-        if not bool(re.fullmatch(FULL_TRANSITION_NAME_REGEX, self.transition_name.upper())):
-            raise InvalidTransitionNameException()
+def bulk_fill_program_tree_content_from_last_year(
+        cmds: List[FillProgramTreeContentFromLastYearCommand]
+) -> List['ProgramTreeIdentity']:
+    result = []
+    for cmd in cmds:
+        with contextlib.suppress(BusinessException, MultipleBusinessExceptions, ProgramTreeVersionNotFoundException):
+            result.append(
+                fill_program_tree_content_from_last_year_service.fill_program_tree_content_from_last_year(cmd)
+            )
+    return result

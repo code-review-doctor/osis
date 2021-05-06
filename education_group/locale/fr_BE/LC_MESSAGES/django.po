@@ -459,6 +459,9 @@ msgstr "Gestionnaire facultaire"
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
+msgid "Fill program tree content from last year"
+msgstr "Remplir le contenu du programme depuis l'année dernière"
+
 msgid "For all students"
 msgstr "Pour tous les étudiants"
 
@@ -971,6 +974,13 @@ msgstr ""
 
 msgid "Trainings"
 msgstr "Formations"
+
+msgid ""
+"Transition version of finalities must be filled from transition version of "
+"master"
+msgstr ""
+"La version de transition d'une finalité doit être remplie à partir de la "
+"version de transition du master"
 
 msgid "Type of constraint"
 msgstr "Type de contrainte"
