@@ -272,6 +272,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         self.proposal = kwargs.pop('proposal', False)
         self.is_create_form = kwargs['instance'] is None
         self.subtype = kwargs.pop('subtype')
+        self.academic_year = kwargs.pop('academic_year')
+        self.is_the_base_of_postpone = kwargs.pop('is_the_base_of_postpone')
         super().__init__(*args, **kwargs)
         self.prepare_fields()
         self.fields['common_title'].label = _('Common part')
@@ -344,7 +346,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Requirement entity'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.requirement_entity),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def __init_allocation_entity_field(self):
@@ -362,7 +365,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.allocation_entity),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def __init_additional_entity_1_field(self):
@@ -398,7 +402,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Additional requirement entity 1'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.additional_entity_1),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def __init_additional_entity_2_field(self):
@@ -424,7 +429,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Additional requirement entity 2'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.additional_entity_2),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def _get_entity_status_help_text(self, entity: Entity) -> str:
@@ -439,8 +445,10 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         return None
 
     def __get_academic_year(self):
+
         if self.instance:
-            return getattr(self.instance, "academic_year", None)
+            a = getattr(self.instance, "academic_year", None)
+            return a
         return None
 
     class Meta:

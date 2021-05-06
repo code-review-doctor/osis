@@ -200,7 +200,8 @@ class LearningUnitPostponementForm:
         return self._get_learning_unit_base_form(
             luy_to_update.academic_year,
             learning_unit_instance=luy_to_update.learning_unit,
-            data=data_to_postpone
+            data=data_to_postpone,
+            is_the_base_of_postpone=is_first_form(index_form)
         )
 
     @staticmethod
@@ -223,7 +224,7 @@ class LearningUnitPostponementForm:
             data_to_postpone[key] = operator.attrgetter(attr_path)(lunit_year)
         return data_to_postpone
 
-    def _get_learning_unit_base_form(self, ac_year, learning_unit_instance=None, data=None, start_year=None):
+    def _get_learning_unit_base_form(self, ac_year, learning_unit_instance=None, data=None, start_year=None, is_the_base_of_postpone=False):
         form_kwargs = {
             'person': self.person,
             'learning_unit_instance': learning_unit_instance,
@@ -232,7 +233,8 @@ class LearningUnitPostponementForm:
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance,
             'postposal': not data,
-            'start_anac': self.start_postponement if self.subtype == learning_unit_year_subtypes.PARTIM else None
+            'start_anac': self.start_postponement if self.subtype == learning_unit_year_subtypes.PARTIM else None,
+            'is_the_base_of_postpone': is_the_base_of_postpone
         }
         if self.external:
             return ExternalLearningUnitBaseForm(
