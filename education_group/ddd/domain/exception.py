@@ -283,6 +283,7 @@ MAP_FIELDS_TO_NAME = {
     "comment": _('Comment'),
     "comment_english": _('English comment'),
     "is_mandatory": _('Mandatory'),
+    "abbreviated_title": _('Abbreviated title'),
 }
 
 

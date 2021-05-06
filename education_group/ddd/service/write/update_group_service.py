@@ -23,6 +23,7 @@
 # ############################################################################
 from typing import List
 
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.ddd import command
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
@@ -54,7 +55,8 @@ def update_group(cmd: command.UpdateGroupCommand) -> List['GroupIdentity']:
         conflicted_fields=conflicted_fields,
         end_postponement_calculator=CalculateEndPostponement(),
         copy_group_service=copy_group_service.copy_group,
-        authorized_relationships=authorized_relationships
+        authorized_relationships=authorized_relationships,
+        calendar=EducationGroupSwitchCalendar(),
     )
 
     return updated_identities

@@ -26,6 +26,7 @@
 from typing import Dict, List
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupCopyConsistencyException
 from education_group.ddd.domain.group import Group
@@ -43,10 +44,13 @@ class PostponeOrphanGroup(interface.DomainService):
             conflicted_fields: Dict[Year, List[FieldLabel]],
             end_postponement_calculator: 'CalculateEndPostponement',
             copy_group_service: ApplicationService,
-            authorized_relationships: 'AuthorizedRelationshipList'
+            authorized_relationships: 'AuthorizedRelationshipList',
+            calendar: 'EducationGroupSwitchCalendar'
     ):
         identities = []
-        if authorized_relationships.is_mandatory_child_type(updated_group.type):
+        closest_working_year = min(calendar.get_target_years_opened())
+        is_in_past = updated_group.year < closest_working_year
+        if not is_in_past and authorized_relationships.is_mandatory_child_type(updated_group.type):
             # means that this group has been automatically created by the system
             # behind 'trainings' and 'minitrainings' Nodes/groups in ProgramTree
 

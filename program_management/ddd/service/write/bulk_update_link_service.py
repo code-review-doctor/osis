@@ -27,6 +27,7 @@ from typing import List
 from django.db import transaction
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.ddd.domain.service.conflicted_fields import ConflictedFields
 from program_management.ddd.business_types import *
 from program_management.ddd.command import BulkUpdateLinkCommand
@@ -67,7 +68,8 @@ def bulk_update_and_postpone_links(
                 link_after_update=link_updated,
                 trees_through_years=trees_through_years,
                 trees_in_future_searcher=SearchProgramTreesInFuture(),
-                conflicted_fields_checker=ConflictedFields()
+                conflicted_fields_checker=ConflictedFields(),
+                calendar=EducationGroupSwitchCalendar(),
             )
             links_updated += updated_links_in_future
             trees_updated += update_trees_in_future

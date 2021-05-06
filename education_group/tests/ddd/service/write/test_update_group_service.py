@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import datetime
 from unittest.mock import patch
 
 from django.test import TestCase
@@ -37,6 +38,10 @@ from testing.mocks import MockPatcherMixin
     "education_group.ddd.domain.service.conflicted_fields.ConflictedFields.get_group_conflicted_fields",
     return_value={}
 )
+@patch(
+    "base.business.academic_calendar.AcademicEventCalendarHelper.get_target_years_opened",
+    return_value=[datetime.datetime.now().year]
+)
 class TestUpdateGroup(TestCase, MockPatcherMixin):
     @classmethod
     def setUpTestData(cls):
@@ -49,13 +54,13 @@ class TestUpdateGroup(TestCase, MockPatcherMixin):
         self.fake_group_repo = get_fake_group_repository(self.groups)
         self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repo)
 
-    def test_should_return_entity_id_of_updated_group(self, mock_conflicted_fields):
+    def test_should_return_entity_id_of_updated_group(self, *mocks):
         result = update_group_service.update_group(self.cmd)
 
         expected_result = group.GroupIdentity(code=self.cmd.code, year=self.cmd.year)
         self.assertEqual(expected_result, result[0])
 
-    def test_should_update_value_of_group_based_on_command_value(self, mock_conflicted_fields):
+    def test_should_update_value_of_group_based_on_command_value(self, *mocks):
         entity_id = update_group_service.update_group(self.cmd)[0]
 
         group_updated = self.fake_group_repo.get(entity_id)
