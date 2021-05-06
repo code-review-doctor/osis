@@ -234,6 +234,7 @@ class EntityVersionQuerySet(CTEQuerySet):
             """ This function is used for the recursive SQL query """
             # self here is an EntityVersion queryset
             return self.filter(
+                current_clause,
                 **filter_kwargs,
             ).values(
                 'id',

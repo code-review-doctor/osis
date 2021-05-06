@@ -249,7 +249,7 @@ class TestFilterLearningUnitYearAccordingPerson(TestCase):
 
 class SimpleStructure:
     def __init__(self, academic_year):
-        self.root = MainEntityVersionFactory(title='Root', acronym='OSIS', entity_type='', parent=None)
+        self.root = MainEntityVersionFactory(title='Root', acronym='UCL', entity_type='', parent=None)
 
         self.child_1 = MainEntityVersionFactory(
             title='Child 1',
