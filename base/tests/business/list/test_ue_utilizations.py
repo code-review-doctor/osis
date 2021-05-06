@@ -328,7 +328,7 @@ class TestUeUtilization(TestCase):
             training_occurence=2
         )        
         row_colored_because_of_proposal = [
-            'AA1', 'AB1', 'AC1', 'AD1', 'AE1'
+            'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
 
         self.assertListEqual(result[WHITE_FONT], FIRST_ROW_CELLS_WITHOUT_TRAINING_DATA)

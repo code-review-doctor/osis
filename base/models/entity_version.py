@@ -318,9 +318,12 @@ class EntityVersionQuerySet(CTEQuerySet):
             'level',
         )
 
-    def get_main_tree(self, *args, **kwargs):
-        root = EntityVersion.objects.get(acronym="UCL", parent=None)
-        return self.get_tree([root.entity], *args, **kwargs)
+    def get_main_tree(self, *args, **kwargs) -> List:
+        try:
+            root = EntityVersion.objects.get(acronym="UCL", parent=None)
+            return self.get_tree([root.entity], *args, **kwargs)
+        except EntityVersion.DoesNotExist:
+            return []
 
     def with_acronym_path(self, **kwargs):
         cte = self.with_children('start_date', **kwargs)

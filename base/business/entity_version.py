@@ -47,7 +47,6 @@ class MainEntityStructure:
         def is_faculty(self):
             return EntityVersion.is_faculty_cls(self.entity_type, self.acronym)
 
-    root = attr.ib(type='MainEntityStructure.Node')
     nodes = attr.ib(type=Dict[int, 'MainEntityStructure.Node'])
 
     def get_direct_children(self, parent_entity_id: int) -> List['EntityAttributes']:
@@ -95,5 +94,4 @@ def load_main_entity_structure() -> MainEntityStructure:
         )
         for row in tree_rows
     }
-    root = next((value for key, value in nodes.items() if not value.parent_id))
-    return MainEntityStructure(root, nodes)
+    return MainEntityStructure(nodes)
