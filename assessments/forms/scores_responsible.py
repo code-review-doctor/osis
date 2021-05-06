@@ -25,14 +25,13 @@
 ##############################################################################
 import django_filters
 from django import forms
-from django.db.models import Q, Prefetch, Value, CharField, OuterRef, Subquery, When, Case, F
+from django.db.models import Q, Prefetch, Value, CharField, When, Case, F
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
 from attribution.models.attribution import Attribution
 from base.forms.learning_unit.search.simple import filter_by_entities
-from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 
 
