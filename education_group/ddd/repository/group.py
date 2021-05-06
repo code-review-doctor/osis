@@ -68,9 +68,6 @@ class GroupRepository(interface.AbstractRepository):
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
             start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
-            # management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
-            #     acronym=group.management_entity.acronym,
-            # )
             management_entity = EntityVersionModelDb.objects.only(
                 'entity_id'
             ).filter(

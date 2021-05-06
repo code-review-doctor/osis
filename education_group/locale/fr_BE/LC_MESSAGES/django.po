@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-28 16:49+0200\n"
+"POT-Creation-Date: 2021-05-06 08:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -518,14 +518,6 @@ msgstr "Groupe"
 
 #, python-format
 msgid ""
-"Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an inactive "
-"entity"
-msgstr ""
-"Le groupement <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a une "
-"entité inactive"
-
-#, python-format
-msgid ""
 "Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully "
 "created."
 msgstr ""
@@ -644,14 +636,6 @@ msgid ""
 msgstr ""
 "La mini-formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a "
 "été modifiée avec succès"
-
-#, python-format
-msgid ""
-"Mini-Training <a href='%(link)s'> %(code)s (%(academic_year)s) </a> has an "
-"inactive entity"
-msgstr ""
-"La mini-formation <a href='%(link)s'> %(code)s (%(academic_year)s) </a> a "
-"une entité inactive"
 
 #, python-format
 msgid ""
@@ -849,6 +833,10 @@ msgstr ""
 msgid "The following fields are empty: %(fields)s "
 msgstr "Les champs suivants sont vides: %(fields)s"
 
+#, python-format
+msgid "The following fields has issues: %(fields)s "
+msgstr "Les champs suivants ont des problèmes: %(fields)s"
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -955,14 +943,6 @@ msgid "Training %(acronym)s successfully deleted from %(academic_year)s."
 msgstr ""
 "La formation %(acronym)s a été supprimée avec succès à partir de "
 "%(academic_year)s."
-
-#, python-format
-msgid ""
-"Training <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> has an "
-"inactive entity"
-msgstr ""
-"La formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> a une "
-"entité inactive"
 
 #, python-format
 msgid ""
