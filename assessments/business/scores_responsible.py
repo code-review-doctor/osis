@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 
 from django.db.models import QuerySet, Q
 
@@ -31,7 +30,6 @@ from base.auth.roles import program_manager
 from base.auth.roles.entity_manager import EntityManager
 from base.business.entity_version import load_main_entity_structure
 from base.models.person import Person
-from osis_common.utils.datetime import get_tzinfo
 from osis_role.contrib.helper import EntityRoleHelper
 
 
@@ -46,7 +44,7 @@ def filter_learning_unit_year_according_person(queryset: QuerySet, person: Perso
     :param person: Person object
     :return: queryset
     """
-    entities_with_descendants = EntityRoleHelper.get_all_entities(person, {EntityManager.group_name})
+    entities_with_descendants = EntityRoleHelper.get_all_entities(person, {EntityManager.group_name}, with_expired=True)
 
     learning_units_of_prgm_mngr = program_manager.get_learning_unit_years_attached_to_program_managers(
         person.programmanager_set.all(),

@@ -48,6 +48,7 @@ class TestFilterLearningUnitYearAccordingPerson(TestCase):
             LearningUnitYearFactory(learning_container_year__requirement_entity=cls.structure.child_1.entity),
             LearningUnitYearFactory(learning_container_year__requirement_entity=cls.structure.child_1_1.entity),
             LearningUnitYearFactory(learning_container_year__requirement_entity=cls.structure.child_1_2.entity),
+            LearningUnitYearFactory(learning_container_year__requirement_entity=cls.structure.child_3.entity)
         ]
 
         cls.program_sector = EducationGroupYearFactory(
@@ -142,6 +143,22 @@ class TestFilterLearningUnitYearAccordingPerson(TestCase):
         )
 
         entities = [self.structure.child_1.entity, self.structure.child_1_1.entity, self.structure.child_1_2.entity]
+        self.assertQuerysetEqual(
+            result,
+            LearningUnitYear.objects.filter(learning_container_year__requirement_entity__in=entities),
+            transform=lambda obj: obj,
+            ordered=False
+        )
+
+    def test_if_entity_manager_of_inactive_entity_should_return_the_learning_unit_years_linked_to_inactive_entity(self):
+        manager = EntityManagerFactory(entity=self.structure.child_3.entity, with_child=True)
+
+        result = scores_responsible.filter_learning_unit_year_according_person(
+            LearningUnitYear.objects.all(),
+            manager.person
+        )
+
+        entities = [self.structure.child_3.entity]
         self.assertQuerysetEqual(
             result,
             LearningUnitYear.objects.filter(learning_container_year__requirement_entity__in=entities),
