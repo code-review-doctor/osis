@@ -56,7 +56,15 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
 class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
     entity_version = None
 
-    def __init__(self, person=None, initial=None, academic_year: 'AcademicYear' = None, is_the_base_of_postpone: bool = False, *args, **kwargs):
+    def __init__(
+            self,
+            person=None,
+            initial=None,
+            academic_year: 'AcademicYear' = None,
+            is_the_base_of_postpone: bool = False,
+            *args,
+            **kwargs
+    ):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial
         self.academic_year = academic_year

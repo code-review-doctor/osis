@@ -224,7 +224,9 @@ class LearningUnitPostponementForm:
             data_to_postpone[key] = operator.attrgetter(attr_path)(lunit_year)
         return data_to_postpone
 
-    def _get_learning_unit_base_form(self, ac_year, learning_unit_instance=None, data=None, start_year=None, is_the_base_of_postpone=False):
+    def _get_learning_unit_base_form(
+            self, ac_year, learning_unit_instance=None, data=None, start_year=None, is_the_base_of_postpone=False
+    ):
         form_kwargs = {
             'person': self.person,
             'learning_unit_instance': learning_unit_instance,

@@ -259,7 +259,9 @@ class FullForm(LearningUnitBaseForm):
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
             LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year, proposal),
-            LearningContainerYearModelForm: self._build_instance_data_learning_container_year(data, proposal, default_ac_year, self.is_the_base_of_postpone),
+            LearningContainerYearModelForm: self._build_instance_data_learning_container_year(
+                data, proposal, default_ac_year, self.is_the_base_of_postpone
+            ),
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'proposal': proposal,
