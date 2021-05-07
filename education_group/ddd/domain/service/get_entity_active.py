@@ -23,18 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import offer_enrollment
 from base.models.entity_version import EntityVersion
 from osis_common.ddd import interface
-
-from education_group.ddd.business_types import *
 
 
 class ActiveEntity(interface.DomainService):
     @staticmethod
     def is_entity_active_for_year(acronym_entity: str, year: int) -> bool:
         return EntityVersion.is_entity_active(acronym_entity, year)
-
-    @staticmethod
-    def get_message_inactive_entity_for_year(acronym_entity: str, year: int) -> str:
-        return EntityVersion.get_message_is_entity_active(acronym_entity, year)
