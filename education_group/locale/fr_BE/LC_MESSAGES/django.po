@@ -459,6 +459,9 @@ msgstr "Gestionnaire facultaire"
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
+msgid "Fill program tree content from last year"
+msgstr "Remplir le contenu du programme depuis l'année dernière"
+
 msgid "For all students"
 msgstr "Pour tous les étudiants"
 

@@ -440,6 +440,9 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
+msgid "Fill program tree content from last year"
+msgstr ""
+
 msgid "For all students"
 msgstr ""
 
