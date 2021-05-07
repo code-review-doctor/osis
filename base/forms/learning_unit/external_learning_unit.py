@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -182,6 +182,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
         self.person = person
         self.learning_unit_instance = learning_unit_instance
         self.proposal = proposal
+        self.is_the_base_of_postpone = kwargs.get('postposal', False)
         instances_data = self._build_instance_data(data, proposal)
 
         super().__init__(instances_data, *args, **kwargs)
@@ -283,7 +284,9 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 'language': Language.objects.get(code='FR'),
             },
             'person': self.person,
-            'subtype': self.subtype
+            'subtype': self.subtype,
+            'academic_year': self.academic_year,
+            'is_the_base_of_postpone': self.is_the_base_of_postpone
         }
 
     def get_context(self):
@@ -365,7 +368,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
             academic_year=self.academic_year,
             subtype=FULL,
         ).get()
-
+        self.is_the_base_of_postpone = kwargs.get('postposal', False)
         # Inherit values cannot be changed by user
         inherit_luy_values = self._get_inherit_learning_unit_year_full_value()
         instances_data = self._build_instance_data(data, inherit_luy_values)
@@ -413,7 +416,9 @@ class ExternalPartimForm(LearningUnitBaseForm):
             LearningContainerYearExternalModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
                 'person': self.person,
-                'subtype': self.subtype
+                'subtype': self.subtype,
+                'academic_year': self.academic_year,
+                'is_the_base_of_postpone': self.is_the_base_of_postpone
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,
