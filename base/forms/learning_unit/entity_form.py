@@ -56,10 +56,19 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
 class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
     entity_version = None
 
-    def __init__(self, person=None, initial=None, academic_year: 'AcademicYear' = None, *args, **kwargs):
+    def __init__(
+            self,
+            person=None,
+            initial=None,
+            academic_year: 'AcademicYear' = None,
+            is_the_base_of_postpone: bool = False,
+            *args,
+            **kwargs
+    ):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial
         self.academic_year = academic_year
+        self.is_the_base_of_postpone = is_the_base_of_postpone
         super().__init__(
             person=person,
             group_names=group_names,
@@ -70,9 +79,15 @@ class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
         return obj.verbose_title
 
     def get_queryset(self):
-        qs = super().get_queryset().pedagogical_entities_with_academic_year(self.academic_year).order_by('acronym')
 
-        if self.initial:
+        if self.get_person().user.has_perm('learning_unit.change_entity') and self.is_the_base_of_postpone:
+            qs = super().get_queryset().pedagogical_entities_with_academic_year(
+                self.academic_year
+            ).order_by('acronym')
+        else:
+            qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+
+        if self.initial and not self.get_person().user.has_perm('learning_unit.change_entity'):
             date = timezone.now()
             qs |= EntityVersion.objects.current(date).filter(pk=self.initial)
 

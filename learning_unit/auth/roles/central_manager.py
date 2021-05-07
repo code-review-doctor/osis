@@ -142,4 +142,6 @@ class CentralManager(osis_role_models.EntityRoleModel):
                     (predicates.has_learning_unit_no_attribution_this_year &
                      predicates.has_learning_unit_no_application_this_year)
                  ),
+            'learning_unit.change_entity': rules.always_allow,
+
         })

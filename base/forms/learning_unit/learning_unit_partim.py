@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -114,6 +114,7 @@ class PartimForm(LearningUnitBaseForm):
         self.learning_unit_instance = learning_unit_instance
         self.start_anac = start_anac
         self.subtype = PARTIM
+        self.is_the_base_of_postpone = kwargs.get('postposal', False)
 
         self.learning_unit_year_full = self.learning_unit_full_instance.learningunityear_set.filter(
             academic_year=self.academic_year,
@@ -149,7 +150,9 @@ class PartimForm(LearningUnitBaseForm):
             LearningContainerYearModelForm: {
                 'instance': self.learning_unit_year_full.learning_container_year,
                 'person': self.person,
-                'subtype': self.subtype
+                'subtype': self.subtype,
+                'academic_year': self.academic_year,
+                'is_the_base_of_postpone': self.is_the_base_of_postpone
             },
             SimplifiedVolumeManagementForm: {
                 'data': data,

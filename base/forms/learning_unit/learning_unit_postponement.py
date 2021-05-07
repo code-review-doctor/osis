@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -223,7 +223,9 @@ class LearningUnitPostponementForm:
             data_to_postpone[key] = operator.attrgetter(attr_path)(lunit_year)
         return data_to_postpone
 
-    def _get_learning_unit_base_form(self, ac_year, learning_unit_instance=None, data=None, start_year=None):
+    def _get_learning_unit_base_form(
+            self, ac_year, learning_unit_instance=None, data=None, start_year=None
+    ):
         form_kwargs = {
             'person': self.person,
             'learning_unit_instance': learning_unit_instance,

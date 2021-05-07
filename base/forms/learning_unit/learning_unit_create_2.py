@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -235,7 +235,7 @@ class FullForm(LearningUnitBaseForm):
         self.data = data
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
         self.proposal_type = proposal_type
-
+        self.is_the_base_of_postpone = kwargs.get('postposal', False)
         instances_data = self._build_instance_data(self.data, academic_year, proposal)
         super().__init__(instances_data, *args, **kwargs)
         if not self.instance:
@@ -258,7 +258,9 @@ class FullForm(LearningUnitBaseForm):
                 'instance': self.instance.learning_container_year.learning_container if self.instance else None,
             },
             LearningUnitYearModelForm: self._build_instance_data_learning_unit_year(data, default_ac_year, proposal),
-            LearningContainerYearModelForm: self._build_instance_data_learning_container_year(data, proposal),
+            LearningContainerYearModelForm: self._build_instance_data_learning_container_year(
+                data, proposal, default_ac_year, self.is_the_base_of_postpone
+            ),
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'proposal': proposal,
@@ -279,7 +281,7 @@ class FullForm(LearningUnitBaseForm):
 
         }
 
-    def _build_instance_data_learning_container_year(self, data, proposal):
+    def _build_instance_data_learning_container_year(self, data, proposal, default_ac_year, is_the_base_of_postpone):
         return {
             'data': data,
             'instance': self.instance.learning_container_year if self.instance else None,
@@ -289,7 +291,9 @@ class FullForm(LearningUnitBaseForm):
                 'campus': Campus.objects.filter(name='Louvain-la-Neuve').first()
             } if not self.instance else None,
             'person': self.person,
-            'subtype': self.subtype
+            'subtype': self.subtype,
+            'academic_year': default_ac_year,
+            'is_the_base_of_postpone': is_the_base_of_postpone
         }
 
     def _build_instance_data_learning_unit_year(self, data, default_ac_year, proposal):

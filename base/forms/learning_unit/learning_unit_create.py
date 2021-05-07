@@ -37,7 +37,7 @@ from base.forms.learning_unit.entity_form import find_additional_requirement_ent
     PedagogicalEntitiesRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
-from base.models import entity_version
+from base.models.academic_year import AcademicYear
 from base.models.campus import find_main_campuses
 from base.models.entity import Entity
 from base.models.entity_version import get_last_version, EntityVersion
@@ -57,7 +57,7 @@ from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import Language
 from rules_management.mixins import PermissionFieldMixin
-from django_filters import OrderingFilter, filters, FilterSet
+
 INACTIVE_ENTITY_CSS_STYLE = 'color:#a94442;'
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
@@ -272,6 +272,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         self.proposal = kwargs.pop('proposal', False)
         self.is_create_form = kwargs['instance'] is None
         self.subtype = kwargs.pop('subtype')
+        self.academic_year = kwargs.pop('academic_year')
+        self.is_the_base_of_postpone = kwargs.pop('is_the_base_of_postpone')
         super().__init__(*args, **kwargs)
         self.prepare_fields()
         self.fields['common_title'].label = _('Common part')
@@ -282,17 +284,34 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         self.__init_additional_entity_1_field()
         self.__init_additional_entity_2_field()
 
+        can_change_entity = self.person.user.has_perm('learning_unit.change_entity')
         if self.instance.requirement_entity:
-            self.initial['requirement_entity'] = get_last_version(self.instance.requirement_entity).pk
+            self.initial['requirement_entity'] = _get_initial_entity(
+                self.instance.requirement_entity,
+                can_change_entity,
+                self.academic_year
+            )
 
         if self.instance.allocation_entity:
-            self.initial['allocation_entity'] = get_last_version(self.instance.allocation_entity).pk
+            self.initial['allocation_entity'] = _get_initial_entity(
+                self.instance.allocation_entity,
+                can_change_entity,
+                self.academic_year
+            )
 
         if self.instance.additional_entity_1:
-            self.initial['additional_entity_1'] = get_last_version(self.instance.additional_entity_1).pk
+            self.initial['additional_entity_1'] = _get_initial_entity(
+                self.instance.additional_entity_1,
+                can_change_entity,
+                self.academic_year
+            )
 
         if self.instance.additional_entity_2:
-            self.initial['additional_entity_2'] = get_last_version(self.instance.additional_entity_2).pk
+            self.initial['additional_entity_2'] = _get_initial_entity(
+                self.instance.additional_entity_2,
+                can_change_entity,
+                self.academic_year
+            )
 
     def prepare_fields(self):
         self.fields['container_type'].widget.attrs = {'onchange': 'showInternshipSubtype()'}
@@ -344,7 +363,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Requirement entity'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.requirement_entity),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def __init_allocation_entity_field(self):
@@ -362,7 +382,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.allocation_entity),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def __init_additional_entity_1_field(self):
@@ -398,7 +419,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Additional requirement entity 1'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.additional_entity_1),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def __init_additional_entity_2_field(self):
@@ -424,7 +446,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             label=_('Additional requirement entity 2'),
             disabled=self.fields['requirement_entity'].disabled,
             help_text=self._get_entity_status_help_text(self.instance.additional_entity_2),
-            academic_year=self.__get_academic_year()
+            academic_year=self.academic_year,
+            is_the_base_of_postpone=self.is_the_base_of_postpone
         )
 
     def _get_entity_status_help_text(self, entity: Entity) -> str:
@@ -439,8 +462,10 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         return None
 
     def __get_academic_year(self):
+
         if self.instance:
-            return getattr(self.instance, "academic_year", None)
+            a = getattr(self.instance, "academic_year", None)
+            return a
         return None
 
     class Meta:
@@ -497,3 +522,10 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         if self.proposal:
             context.append("PROPOSAL")
         return '.'.join(["LearningContainerYearModelForm", self.get_context(), field_name])
+
+
+def _get_initial_entity(entity: Entity, can_change_entity: bool, academic_year: AcademicYear) -> EntityVersion:
+    if can_change_entity:
+        return EntityVersion.get_entity_if_active(entity, academic_year)
+    else:
+        return get_last_version(entity).pk
