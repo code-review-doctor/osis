@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +5,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,11 +22,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from . import postpone_programs_until_n_plus_6
 
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class Entity(interface.ValueObject):
-    acronym = attr.ib(type=str)
+from celery.schedules import crontab
+from backoffice.celery import app as celery_app
+celery_app.conf.beat_schedule.update({
+    '|Program Management| General postponement of programs until n+6': {
+        'task': 'program_management.tasks.postpone_programs_until_n_plus_6.run',
+        'schedule': crontab(minute=0, hour=0, day_of_month='1', month_of_year='7', day_of_week=0)
+    },
+})
