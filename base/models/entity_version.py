@@ -550,24 +550,20 @@ class EntityVersion(SerializableModel):
     @classmethod
     def is_entity_active(cls, acronym_entity: str, year: int) -> bool:
 
-        current_clause = (
-            (
-                (Q(start_date__lte=OuterRef('start_date')) | Q(start_date__lte=OuterRef('end_date'))) &
-                (Q(end_date__gte=OuterRef('end_date')) | Q(end_date__gte=OuterRef('start_date')))
-            )
-            # using max_date because impossible to check OuterRef value is None in clause
-            | (Q(end_date__lte=OuterRef('max_date')) & Q(start_date__gte=OuterRef('start_date')))
-        )
+        current_clause = cls._get_current_clause()
 
-        active_entity_subquery = Subquery(
-            AcademicYear.objects.filter(current_clause, year=year).annotate(
-                is_active_entity=Value(True, output_field=BooleanField())
-            ).values('is_active_entity')[:1]
-        )
+        active_entity_subquery = cls._get_active_entity_subquery(current_clause, year)
 
         entity = cls.objects.filter(
             acronym=acronym_entity,
-        ).annotate(
+        )
+        entity = EntityVersion._annotate_active_entity_version(active_entity_subquery, entity)
+
+        return entity.active_entity_version if entity else False
+
+    @classmethod
+    def _annotate_active_entity_version(cls, active_entity_subquery, entity):
+        return entity.annotate(
             max_date=Case(
                 When(end_date__isnull=True, then=Value(datetime.date.max)),
                 output_field=DateField()
@@ -576,7 +572,26 @@ class EntityVersion(SerializableModel):
             active_entity_version=active_entity_subquery
         ).order_by('-start_date').first()
 
-        return entity.active_entity_version if entity else False
+    @classmethod
+    def _get_active_entity_subquery(cls, current_clause, year):
+        active_entity_subquery = Subquery(
+            AcademicYear.objects.filter(current_clause, year=year).annotate(
+                is_active_entity=Value(True, output_field=BooleanField())
+            ).values('is_active_entity')[:1]
+        )
+        return active_entity_subquery
+
+    @classmethod
+    def _get_current_clause(cls):
+        current_clause = (
+                (
+                        (Q(start_date__lte=OuterRef('start_date')) | Q(start_date__lte=OuterRef('end_date'))) &
+                        (Q(end_date__gte=OuterRef('end_date')) | Q(end_date__gte=OuterRef('start_date')))
+                )
+                # using max_date because impossible to check OuterRef value is None in clause
+                | (Q(end_date__lte=OuterRef('max_date')) & Q(start_date__gte=OuterRef('start_date')))
+        )
+        return current_clause
 
     @classmethod
     def get_message_is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> str:
@@ -587,6 +602,27 @@ class EntityVersion(SerializableModel):
         else:
             msg = None
         return msg
+
+    @classmethod
+    def find_active_entity_by_entity(cls, entity: Entity, year: int) -> bool:
+
+        current_clause = cls._get_current_clause()
+
+        active_entity_subquery = cls._get_active_entity_subquery(current_clause, year)
+
+        qs = cls.objects.filter(
+            entity=entity,
+        )
+        qs = EntityVersion._annotate_active_entity_version(active_entity_subquery, qs)
+        return qs if qs and qs.active_entity_version else None
+
+    @classmethod
+    def get_entity_if_active(cls, entity: Entity, academic_year: AcademicYear) -> str:
+        current_entity = cls.find_active_entity_by_entity(entity, academic_year.year)
+        if current_entity:
+            return get_last_version(current_entity.entity).pk
+        else:
+            return None
 
 
 def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):

@@ -87,7 +87,7 @@ class PedagogicalEntitiesRoleModelChoiceField(EntityRoleModelChoiceField):
         else:
             qs = super().get_queryset().pedagogical_entities().order_by('acronym')
 
-        if self.initial:
+        if self.initial and not self.get_person().user.has_perm('learning_unit.change_entity'):
             date = timezone.now()
             qs |= EntityVersion.objects.current(date).filter(pk=self.initial)
 

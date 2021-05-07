@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -235,8 +235,7 @@ class FullForm(LearningUnitBaseForm):
         self.data = data
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
         self.proposal_type = proposal_type
-        self.is_the_base_of_postpone = kwargs.pop('is_the_base_of_postpone')
-
+        self.is_the_base_of_postpone = kwargs.get('postposal', False)
         instances_data = self._build_instance_data(self.data, academic_year, proposal)
         super().__init__(instances_data, *args, **kwargs)
         if not self.instance:
