@@ -33,8 +33,6 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.academic_year import AcademicYear
-from base.models.entity_version import EntityVersion
 from base.utils import operator
 from base.utils.urls import reverse_with_get
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages, \

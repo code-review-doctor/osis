@@ -33,10 +33,9 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.academic_year import starting_academic_year, AcademicYear
-from base.models.entity_version import EntityVersion
 from base.utils.cache import RequestCache
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_error_messages, display_warning_messages
+from base.views.common import display_success_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import mini_training, exception

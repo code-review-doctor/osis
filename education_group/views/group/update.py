@@ -33,11 +33,8 @@ from django.views import View
 from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models import entity_version, academic_year, campus
-from base.models.academic_year import AcademicYear
-from base.models.entity_version import EntityVersion
-from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update, \
-    display_warning_messages
+from base.models import academic_year, campus
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
