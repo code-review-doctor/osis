@@ -89,25 +89,16 @@ def __convert_link_type_to_enum(link_data: dict) -> None:
         link_data['link_type'] = LinkTypes[link_type]
 
 
-def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
-    if gey_dict.get('quadrimester_derogation'):
-        gey_dict['quadrimester_derogation'] = DerogationQuadrimester[gey_dict['quadrimester_derogation']]
-
-
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
     group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).values(
         'pk',
         'relative_credits',
-        'min_credits',
-        'max_credits',
         'access_condition',
         'is_mandatory',
         'block',
         'comment',
         'comment_english',
-        'own_comment',
-        'quadrimester_derogation',
         'link_type',
         'parent_element_id',
         'child_element_id',

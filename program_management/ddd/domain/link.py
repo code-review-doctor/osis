@@ -62,15 +62,11 @@ class Link(interface.Entity):
     child = attr.ib(type='Node')  # type: Node
     pk = attr.ib(type=int, default=None)
     relative_credits = attr.ib(type=int, default=None)
-    min_credits = attr.ib(type=int, default=None)
-    max_credits = attr.ib(type=int, default=None)
     is_mandatory = attr.ib(type=bool, default=True)
     block = attr.ib(type=str, default=None)
     access_condition = attr.ib(type=bool, default=False)
     comment = attr.ib(type=str, default=None)
     comment_english = attr.ib(type=str, default=None)
-    own_comment = attr.ib(type=str, default=None)
-    quadrimester_derogation = attr.ib(type=DerogationQuadrimester, default=None)
     link_type = attr.ib(type=LinkTypes, default=None)
     order = attr.ib(type=int, default=None)
 

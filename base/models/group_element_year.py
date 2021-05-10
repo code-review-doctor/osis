@@ -303,18 +303,6 @@ class GroupElementYear(OrderedModel):
         verbose_name=_("relative credits"),
     )
 
-    min_credits = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Min. credits"),
-    )
-
-    max_credits = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Max. credits"),
-    )
-
     is_mandatory = models.BooleanField(
         default=True,
         verbose_name=_("Mandatory"),
@@ -340,14 +328,6 @@ class GroupElementYear(OrderedModel):
         max_length=500,
         blank=True, null=True,
         verbose_name=_("english comment"),
-    )
-
-    own_comment = models.CharField(max_length=500, blank=True, null=True)
-
-    quadrimester_derogation = models.CharField(
-        max_length=10,
-        choices=quadrimesters.DerogationQuadrimester.choices(),
-        blank=True, null=True, verbose_name=_('Quadrimester derogation')
     )
 
     link_type = models.CharField(
