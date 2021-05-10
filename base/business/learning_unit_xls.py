@@ -486,25 +486,24 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                     cells_with_white_font.extend(
                         ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(24)]
                     )
-                    if not learning_unit_yr.active_entity_requirement_version:
-                        cells_strike_with_white_font.append(
-                            "{}{}".format(REQUIREMENT_ENTITY_COL, line - 1)
-                        )
-                    if not learning_unit_yr.active_entity_allocation_version:
-                        cells_strike_with_white_font.append(
-                            "{}{}".format(ALLOCATION_ENTITY_COL, line - 1)
-                        )
+                    cells_strike_with_white_font = _update_strike_font(
+                        cells_strike_with_white_font, learning_unit_yr,
+                        line - 1
+                    )
                 else:
-                    if not learning_unit_yr.active_entity_requirement_version:
-                        cells_strike_with_black_font.append(
-                            "{}{}".format(REQUIREMENT_ENTITY_COL, line - 1)
-                        )
-                    if not learning_unit_yr.active_entity_allocation_version:
-                        cells_strike_with_black_font.append(
-                            "{}{}".format(ALLOCATION_ENTITY_COL, line - 1)
-                        )
+                    cells_strike_with_black_font = _update_strike_font(
+                        cells_strike_with_black_font,
+                        learning_unit_yr,
+                        line - 1
+                    )
+
                 first = False
         else:
+            cells_strike_with_black_font = _update_strike_font(
+                cells_strike_with_black_font,
+                learning_unit_yr,
+                line
+            )
             data.append(lu_data_part1)
             line += 1
 
@@ -638,3 +637,20 @@ def _get_strikethrough_cells_on_entity(idx, luy, strikethrough_cells_param, is_e
         else:
             strikethrough_cells[STRIKETHROUGH_FONT].append("{}{}".format(col, idx))
     return strikethrough_cells
+
+
+def _update_strike_font(
+        list_cells_styles_font_to_update: List[str],
+        learning_unit_yr: LearningUnitYear,
+        line: int
+) -> List[str]:
+    list_cells_styles_font = list_cells_styles_font_to_update
+    if not learning_unit_yr.active_entity_requirement_version:
+        list_cells_styles_font.append(
+            "{}{}".format(REQUIREMENT_ENTITY_COL, line)
+        )
+    if not learning_unit_yr.active_entity_allocation_version:
+        list_cells_styles_font.append(
+            "{}{}".format(ALLOCATION_ENTITY_COL, line)
+        )
+    return list_cells_styles_font

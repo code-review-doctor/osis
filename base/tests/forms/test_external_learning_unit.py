@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory, Lea
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
+from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
@@ -283,11 +284,11 @@ class TestExternalLearningUnitSearchForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-
+        cls.belgium_country = CountryFactory(iso_code="BE")
         cls.organization_1 = OrganizationFactory()
         cls.be_organization_adr_city1 = MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=cls.organization_1,
-            country__iso_code="BE",
+            country=cls.belgium_country,
             city=NAMUR
         )
         cls.external_lu_1 = ExternalLearningUnitYearFactory(
@@ -300,7 +301,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
         cls.organization_2 = OrganizationFactory()
         cls.be_organization_adr_city2 = MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=cls.organization_2,
-            country__iso_code="BE",
+            country=cls.belgium_country,
             city='Bruxelles'
         )
         cls.external_lu_2 = ExternalLearningUnitYearFactory(
