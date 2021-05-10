@@ -110,7 +110,6 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         parent_id = gey_dict.pop('parent_element_id')
         child_id = gey_dict.pop('child_element_id')
         __convert_link_type_to_enum(gey_dict)
-        __convert_quadrimester_to_enum(gey_dict)
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
         tree_links[tree_id] = link_factory.get_link(parent=None, child=None, **gey_dict)
