@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
 from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
@@ -671,6 +672,18 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(first_attribution[29], '')
         self.assertEqual(first_attribution[30], 15)
         self.assertEqual(first_attribution[31], 5)
+
+    @mock.patch('attribution.business.attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict',
+                side_effect=lambda attribution_values: {})
+    def test_prepare_xls_content_with_attributions_when_no_attribution_and_inactive_entities(self, mock_attribution_values):
+        learning_unit_yr = LearningUnitYearFactory()
+        qs = LearningUnitYear.objects.filter(id=learning_unit_yr.id)
+        qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
+        learning_unit_yr.active_entity_requirement_version = False
+        learning_unit_yr.active_entity_allocation_version = False
+        result = prepare_xls_content_with_attributions(qs, 31)
+
+        self.assertCountEqual(result.get('cells_strike_with_black_font'), ['F2', 'J2'])
 
     def test_add_training_data_for_version(self):
         luy = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_version.pk).annotate(
