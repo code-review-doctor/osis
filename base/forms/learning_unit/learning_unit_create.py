@@ -433,7 +433,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         if entity:
             most_recent_acronym = entity.most_recent_acronym
         if most_recent_acronym and academic_year:
-            msg = EntityVersion.get_message_is_entity_active(most_recent_acronym, academic_year)
+            msg = EntityVersion.get_message_is_entity_active(most_recent_acronym, academic_year.year)
             if msg:
                 return '<span style="{}">{}</span>'.format(INACTIVE_ENTITY_CSS_STYLE, msg)
         return None
