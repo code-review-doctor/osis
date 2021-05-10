@@ -6,7 +6,7 @@ from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus
 from base.models.academic_year import AcademicYear
 from base.models.entity_version import find_pedagogical_entities_version, \
-    find_pedagogical_entities_version_for_specific_academic_year
+    find_pedagogical_entities_version_for_specific_academic_year, EntityVersion
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
 from osis_role.contrib.forms.fields import EntityRoleModelChoiceField
@@ -33,11 +33,11 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
         )
 
     def get_queryset(self):
+        qs = super().get_queryset().pedagogical_entities()
         if self.get_person().user.has_perm('education_group.change_management_entity'):
-            return super().get_queryset().pedagogical_entities_with_academic_year(
-                self.academic_year
-            ).order_by('acronym')
-        return super().get_queryset().pedagogical_entities().order_by('acronym')
+            qs |= EntityVersion.objects.pedagogical_entities_with_academic_year(self.academic_year)
+            return qs.order_by('acronym')
+        return EntityVersion.objects.pedagogical_entities().order_by('acronym')
 
     def clean(self, value):
         value = super(forms.ModelChoiceField, self).clean(value)
