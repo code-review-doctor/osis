@@ -447,8 +447,9 @@ msgid "For all students"
 msgstr ""
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -786,6 +787,10 @@ msgstr ""
 
 #, python-format
 msgid "The following fields are empty: %(fields)s "
+msgstr ""
+
+#, python-format
+msgid "The following fields has issues: %(fields)s "
 msgstr ""
 
 #, python-brace-format
