@@ -488,7 +488,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                     )
                     cells_strike_with_white_font = _update_strike_font(
                         cells_strike_with_white_font, learning_unit_yr,
-                        line -1
+                        line - 1
                     )
                 else:
                     cells_strike_with_black_font = _update_strike_font(
