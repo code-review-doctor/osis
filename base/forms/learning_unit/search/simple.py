@@ -166,7 +166,6 @@ class LearningUnitFilter(FilterSet):
             year__in=targeted_year_opened
         ).first() or current_academic_year()
 
-
     def filter_tutor(self, queryset, name, value):
         value = value.replace(' ', '\\s')
         search_value = espace_special_characters(value)

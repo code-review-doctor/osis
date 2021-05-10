@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -630,29 +630,6 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         )
 
         self.assertEqual(len(created_partims), expected_result)
-
-    def test_extend_learning_unit_with_wrong_entity(self):
-        end_year_full, learning_unit_full_annual, learning_unit_years = self._create_full_learning_unit()
-
-        # Add outdated entityversion for requirement entity
-        outdated_entity_version = EntityVersionFactory(end_date=self.starting_academic_year.end_date)
-        LearningContainerYear.objects.filter(
-            id__in=[luy.learning_container_year_id for luy in learning_unit_years]
-        ).update(requirement_entity=outdated_entity_version.entity)
-
-        excepted_end_year = AcademicYearFactory(year=end_year_full.year + 3)
-        with self.assertRaises(IntegrityError) as e:
-            self._edit_lu(learning_unit_full_annual, excepted_end_year.year)
-
-        self.assertEqual(
-            str(e.exception),
-            _(
-                'The entity %(entity_acronym)s does not exist for '
-                'the selected academic year %(academic_year)s') %
-            {
-                'entity_acronym': outdated_entity_version.acronym,
-                'academic_year': academic_year.find_academic_year_by_year(end_year_full.year + 1)
-            })
 
     def test_with_partim_fields_that_are_not_reported(self):
         start_academic_year = AcademicYearFactory(year=self.starting_academic_year.year)
