@@ -208,9 +208,11 @@ class TestSendMessage(TestCase):
              self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
              self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',)
             ]
-        data = {'style': ['background-color: lime;'],
-              'data': enrollment_data,
-              'txt_complementary_first_col': {'header': 'Mis-à-jour', 'rows_content': ['*']}}
+        data = {
+            'style': ['background-color: lime;'],
+            'data': enrollment_data,
+            'txt_complementary_first_col': {'header': 'Mis à jour', 'rows_content': ['*']}
+        }
 
         mock_create_table.assert_has_calls(
             [
