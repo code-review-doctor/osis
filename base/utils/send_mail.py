@@ -29,7 +29,6 @@ Utility files for mail sending
 """
 from typing import List
 import datetime
-import itertools
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -317,8 +316,6 @@ def send_message_after_all_encoded_by_manager(
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
-
     rows_styles = _html_format_rows_styles(
         enrollments, updated_enrollments_ids,
         encoding_already_completed_before_update
@@ -329,16 +326,15 @@ def send_message_after_all_encoded_by_manager(
         encoding_already_completed_before_update
     )
 
-    for receiver_lang, receivers in receivers_by_lang:
-        receivers = list(receivers)
+    for receiver in receivers:
         table = message_config.create_table(
             'enrollments',
-            get_enrollment_headers(receiver_lang),
+            get_enrollment_headers(receiver['receiver_lang']),
             {
                 "style": rows_styles,
                 "data": enrollments_data,
                 "txt_complementary_first_col": {
-                    "header": _get_txt_complementary_first_col_header(receiver_lang),
+                    "header": _get_txt_complementary_first_col_header(receiver['receiver_lang']),
                     "rows_content": txt_complementary_first_col_content_data
                 }
             },
@@ -350,7 +346,7 @@ def send_message_after_all_encoded_by_manager(
             html_template_ref,
             txt_template_ref,
             [table],
-            receivers,
+            [receiver],
             template_base_data,
             subject_data,
             attachment,
