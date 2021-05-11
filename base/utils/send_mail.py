@@ -325,7 +325,6 @@ def send_message_after_all_encoded_by_manager(
         updated_enrollments_ids,
         encoding_already_completed_before_update
     )
-
     for receiver in receivers:
         table = message_config.create_table(
             'enrollments',

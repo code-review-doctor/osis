@@ -152,7 +152,7 @@ class TestSendMessage(TestCase):
 
     @patch("osis_common.messaging.send_message.send_messages")
     @patch("osis_common.messaging.message_config.create_table")
-    def test_with_one_enrollment(self, mock_create_table, mock_send_messages):
+    def test_with_one_enrollment(self, mock_create_table,  mock_send_messages):
         send_mail.send_message_after_all_encoded_by_manager(
             [self.person_1, self.person_without_language],
             [self.exam_enrollment_1],
@@ -182,7 +182,6 @@ class TestSendMessage(TestCase):
         receivers = list(args.get('receivers'))
         self.assertEqual(len(receivers), 1)
         self.assertEqual(receivers[0].get('receiver_lang'), LANGUAGE_CODE_FR)
-
         self.assertIsNotNone(args.get('attachment'))
         self.assertEqual(args.get('html_template_ref'),
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
