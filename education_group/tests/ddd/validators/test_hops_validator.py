@@ -32,7 +32,8 @@ from base.models.enums.education_group_types import TrainingType
 from education_group.ddd.domain.exception import HopsFieldsAllOrNone, \
     AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
-from education_group.ddd.validators._hops_validator import HopsValuesValidator, HopsFields2OrNoneForFormationPhd
+from education_group.ddd.validators._hops_validator import HopsValuesValidator, \
+    HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 from education_group.tests.ddd.factories.hops import HOPSFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
@@ -86,7 +87,7 @@ class TestHopsValidator(SimpleTestCase):
 
         self.assertIsInstance(
             e.exception.exceptions.pop(),
-            HopsFields2OrNoneForFormationPhd
+            HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
         )
 
     def test_validation_ares_code_not_valid(self):

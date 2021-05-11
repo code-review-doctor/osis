@@ -2165,6 +2165,9 @@ msgstr ""
 msgid "Scores responsibles"
 msgstr ""
 
+msgid "Scores responsibles (emails)"
+msgstr ""
+
 msgid "Search for an entity"
 msgstr ""
 
@@ -2666,6 +2669,9 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
+msgid "Tutors (scores responsibles included)"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -2718,6 +2724,9 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Updated"
 msgstr ""
 
 msgid "Url"
