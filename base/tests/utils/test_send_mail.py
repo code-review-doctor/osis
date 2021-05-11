@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
+from unittest.mock import patch, call
 
 from django.test import TestCase
 
@@ -180,14 +180,44 @@ class TestSendMessage(TestCase):
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
         self.assertEqual(self.educ_group_year.acronym, args.get('subject_data').get('offer_acronym'))
         receivers = list(args.get('receivers'))
-        self.assertEqual(len(receivers), 2)
+        self.assertEqual(len(receivers), 1)
         self.assertEqual(receivers[0].get('receiver_lang'), LANGUAGE_CODE_FR)
-        self.assertEqual(receivers[1].get('receiver_lang'), LANGUAGE_CODE_FR)
+
         self.assertIsNotNone(args.get('attachment'))
         self.assertEqual(args.get('html_template_ref'),
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
         self.assertEqual(args.get('txt_template_ref'),
                          "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
+        self.assertEqual(mock_create_table.call_count, 2)
+
+        fr_headers = [
+            'Sigle',
+            'Session',
+            'Noma',
+            'Nom',
+            'Prénom',
+            'Note',
+            'Justification'
+        ]
+        enrollment_data = [
+            (self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+             self.exam_enrollment_1.session_exam.number_session,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+             self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+             self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',)
+            ]
+        data = {'style': ['background-color: lime;'],
+              'data': enrollment_data,
+              'txt_complementary_first_col': {'header': 'Mis-à-jour', 'rows_content': ['*']}}
+
+        mock_create_table.assert_has_calls(
+            [
+                call('enrollments', fr_headers, data, data_translatable=['Justification']),
+                call('enrollments', fr_headers, data, data_translatable=['Justification'])
+            ]
+        )
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_for_educational_information_update(self, mock_send_messages):
