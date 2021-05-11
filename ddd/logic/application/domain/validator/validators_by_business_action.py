@@ -32,7 +32,6 @@ from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApp
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
-from ddd.logic.application.domain.validator._should_fields_be_required import ShouldFieldsBeRequiredValidator
 from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled import \
     ShouldLecturingOrPracticalFilledValidator
 from ddd.logic.application.domain.validator._should_not_have_already_applied_on_vacant_course import \
@@ -48,9 +47,6 @@ class ApplyOnVacantCourseValidatorList(TwoStepsMultipleBusinessExceptionListVali
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldFieldsBeRequiredValidator(self.command, 'code'),
-            ShouldFieldsBeRequiredValidator(self.command, 'academic_year'),
-            ShouldFieldsBeRequiredValidator(self.command, 'global_id'),
             ShouldLecturingOrPracticalFilledValidator(self.command)
         ]
 

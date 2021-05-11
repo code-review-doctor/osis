@@ -29,9 +29,11 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
 from base.models.enums import learning_container_year_types, vacant_declaration_type
+from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
@@ -86,3 +88,64 @@ class VacantCourseRepositoryGet(TestCase):
         self.assertEqual(vacant_course.title, expected_title)
         self.assertEqual(vacant_course.lecturing_volume_available, Decimal(15))
         self.assertEqual(vacant_course.practical_volume_available, Decimal(10))
+
+
+class VacantCourseRepositorySearch(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.ldroi1200_db = LearningUnitYearFactory(
+            acronym='LDROI1200',
+            academic_year__year=2020,
+            learning_container_year__acronym='LDROI1200',
+            learning_container_year__allocation_entity=MainEntityVersionFactory(acronym="DRT").entity,
+            learning_container_year__academic_year__year=2020,
+            learning_container_year__container_type=learning_container_year_types.COURSE,
+            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__team=True
+        )
+        LecturingLearningComponentYearFactory(learning_unit_year=cls.ldroi1200_db, volume_declared_vacant=Decimal(15))
+        PracticalLearningComponentYearFactory(learning_unit_year=cls.ldroi1200_db, volume_declared_vacant=Decimal(10))
+
+        cls.lagro1500_db = LearningUnitYearFactory(
+            acronym='LAGRO1500',
+            academic_year__year=2020,
+            learning_container_year__acronym='LAGRO1500',
+            learning_container_year__allocation_entity=MainEntityVersionFactory(acronym="AGRO").entity,
+            learning_container_year__academic_year__year=2020,
+            learning_container_year__container_type=learning_container_year_types.COURSE,
+            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__team=True
+        )
+        LecturingLearningComponentYearFactory(learning_unit_year=cls.lagro1500_db, volume_declared_vacant=Decimal(30))
+        PracticalLearningComponentYearFactory(learning_unit_year=cls.lagro1500_db, volume_declared_vacant=Decimal(0))
+
+        cls.repository = VacantCourseRepository()
+
+    def test_assert_filter_by_entity_ids(self):
+        entity_ids = [
+            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LAGRO1500'),
+            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI1200')
+        ]
+
+        results = self.repository.search(entity_ids=entity_ids)
+        self.assertEqual(len(results), 2)
+
+    def test_assert_filter_by_code(self):
+        results = self.repository.search(code="LDROI")
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], VacantCourse)
+        self.assertEqual(
+            results[0].entity_id,
+            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI1200')
+        )
+
+    def test_assert_filter_by_entity_allocation_code(self):
+        results = self.repository.search(entity_allocation=EntityAllocation(code="AGRO"))
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], VacantCourse)
+        self.assertEqual(
+            results[0].entity_id,
+            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LAGRO1500'),
+        )

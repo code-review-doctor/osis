@@ -23,36 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+from typing import List
 
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
-from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.application.commands import SearchApplicationByApplicantCommand
+from ddd.logic.application.domain.model.applicant import ApplicantIdentity
+from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 
 
-class IVacantCourseRepository(interface.AbstractRepository):
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, entity_id: VacantCourseIdentity) -> VacantCourse:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[VacantCourseIdentity]] = None,
-            code: str = None,
-            entity_allocation: EntityAllocation = None,
-            **kwargs
-    ) -> List[VacantCourse]:
-        pass
-
-    @classmethod
-    def delete(cls, entity_id: VacantCourseIdentity, **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: VacantCourse) -> None:
-        raise NotImplementedError
+def search_applications_by_applicant(
+        cmd: SearchApplicationByApplicantCommand,
+        application_repository: IApplicationRepository
+) -> List[Application]:
+    applicant_id = ApplicantIdentity(global_id=cmd.global_id)
+    return application_repository.search(applicant_id=applicant_id)

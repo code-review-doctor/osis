@@ -27,12 +27,18 @@ import functools
 import operator
 from typing import Optional, List
 
-from django.db.models import F, QuerySet, OuterRef, Subquery, Q
+from django.contrib.postgres.fields import ArrayField
+from django.db import models
+from django.db.models import F, QuerySet, OuterRef, Subquery, Q, Value
+from django_cte import With
 
+from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types, learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.utils.func import ArrayConcat
 from ddd.logic.application.domain.builder.vacant_course_builder import VacantCourseBuilder
+from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
@@ -40,8 +46,17 @@ from ddd.logic.application.repository.i_vacant_course_repository import IVacantC
 
 class VacantCourseRepository(IVacantCourseRepository):
     @classmethod
-    def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
+    def search(
+            cls,
+            entity_ids: Optional[List[VacantCourseIdentity]] = None,
+            code: str = None,
+            entity_allocation: EntityAllocation = None,
+            with_entity_allocation_children: bool = False,
+            **kwargs
+    ) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
+        if with_entity_allocation_children:
+            qs = _annotate_entity_allocation_parents(qs)
 
         if entity_ids is not None:
             filter_clause = functools.reduce(
@@ -49,6 +64,12 @@ class VacantCourseRepository(IVacantCourseRepository):
                 ((Q(code=entity_id.code) & Q(year=entity_id.year)) for entity_id in entity_ids)
             )
             qs = qs.filter(filter_clause)
+        if code is not None:
+            qs = qs.filter(learning_container_year__acronym__icontains=code)
+        if entity_allocation is not None:
+            qs = qs.filter(
+                Q(entity_allocation=entity_allocation.code) | Q(entity_allocation_parents__in=entity_allocation)
+            )
 
         results = []
         for row_as_dict in qs:
@@ -102,3 +123,37 @@ def _vacant_course_base_qs() -> QuerySet:
             "practical_volume_available",
             "entity_allocation"
         )
+
+
+def _annotate_entity_allocation_parents(qs: QuerySet) -> QuerySet:
+    def parent_entities(cte):
+        return EntityVersion.objects.values(
+                'parent_id',
+                'entity_id',
+                'acronym',
+                parents=Value(
+                    # empty array filled by union
+                    "{}",
+                    output_field=ArrayField(models.CharField())
+                ),
+            ).union(
+                cte.join(EntityVersion, parent_id=cte.col.entity_id).filter(
+                    # Filter end_date/start_date of academic_year
+                ).values(
+                    'parent_id',
+                    'entity_id',
+                    'acronym',
+                    parents=ArrayConcat(
+                        # Append the parent to the array
+                        cte.col.parents, F("acronym"),
+                        output_field=ArrayField(models.CharField()),
+                    ),
+                ),
+                all=True
+            )
+    cte = With.recursive(parent_entities)
+
+    qs = qs.annotate(
+        entity_allocation_parents=''
+    )
+    return qs

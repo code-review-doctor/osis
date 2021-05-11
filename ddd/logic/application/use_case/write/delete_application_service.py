@@ -23,15 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from django.db import transaction
 
-from ddd.logic.application.commands import ApplicationSearchCommand
-from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.commands import DeleteApplicationCommand
+from ddd.logic.application.domain.model.application import ApplicationIdentity
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 
 
-def search_applications(
-        cmd: ApplicationSearchCommand,
-        application_repository: IApplicationRepository
-) -> List[Application]:
-    return application_repository.search(global_id=cmd.global_id)
+@transaction.atomic()
+def delete_application(
+        cmd: DeleteApplicationCommand,
+        application_repository: IApplicationRepository,
+) -> None:
+    # GIVEN
+    application_identity = ApplicationIdentity(uuid=cmd.application_id)
+    application_repository.get(entity_id=application_identity)
+
+    # THEN
+    application_repository.delete(application_identity)

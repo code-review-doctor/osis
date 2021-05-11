@@ -23,17 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 from typing import List
 
 import attr
 
-from ddd.logic.application.domain.model.application import ApplicationIdentity
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class ApplicationSearchCommand(interface.CommandRequest):
+class SearchApplicationByApplicantCommand(interface.CommandRequest):
     global_id = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchVacantCoursesCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    entity_allocation_code = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -41,17 +47,24 @@ class ApplyOnVacantCourseCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     academic_year = attr.ib(type=int)
     global_id = attr.ib(type=str)
-    lecturing_volume = attr.ib(type=int)
-    practical_volume = attr.ib(type=int)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
     course_summary = attr.ib(type=str)
     remark = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
 class UpdateApplicationCommand(interface.CommandRequest):
-    application_id = attr.ib(type=ApplicationIdentity)
-    lecturing_volume = attr.ib(type=int)
-    practical_volume = attr.ib(type=int)
+    application_id = attr.ib(type=str)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
+    course_summary = attr.ib(type=str)
+    remark = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteApplicationCommand(interface.CommandRequest):
+    application_id = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

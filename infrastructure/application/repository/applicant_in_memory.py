@@ -23,36 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List, Optional
 
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
-from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
+from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 
 
-class IVacantCourseRepository(interface.AbstractRepository):
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, entity_id: VacantCourseIdentity) -> VacantCourse:
-        pass
+class ApplicantInMemoryRepository(IApplicantRepository):
+    applicants = []
 
-    @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[VacantCourseIdentity]] = None,
-            code: str = None,
-            entity_allocation: EntityAllocation = None,
-            **kwargs
-    ) -> List[VacantCourse]:
-        pass
+    # TODO remove this and change classmethod to instance method save/search/...
+    def __init__(self, applicants: List[Applicant] = None):
+        ApplicantInMemoryRepository.applicants = applicants or []
 
     @classmethod
-    def delete(cls, entity_id: VacantCourseIdentity, **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+    def search(cls, entity_ids: Optional[List[ApplicantIdentity]] = None, **kwargs) -> List[Applicant]:
+        results = cls.applicants
+        if entity_ids:
+            results = filter(lambda vacant_course: vacant_course.entity_id in entity_ids, results)
+        return list(results)
 
     @classmethod
-    def save(cls, entity: VacantCourse) -> None:
-        raise NotImplementedError
+    def get(cls, entity_id: ApplicantIdentity) -> Applicant:
+        return next(applicant for applicant in cls.applicants if applicant.entity_id == entity_id)

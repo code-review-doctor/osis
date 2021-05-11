@@ -25,20 +25,35 @@
 ##############################################################################
 from typing import List, Optional
 
+from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 
 
 class VacantCourseInMemoryRepository(IVacantCourseRepository):
-    _vacant_courses = []
+    vacant_courses = []
+
+    # TODO remove this and change classmethod to instance method save/search/...
+    def __init__(self, vacant_courses: List[VacantCourse] = None):
+        VacantCourseInMemoryRepository.vacant_courses = vacant_courses or []
 
     @classmethod
-    def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
-        results = cls._vacant_courses
+    def search(
+            cls,
+            entity_ids: Optional[List[VacantCourseIdentity]] = None,
+            code: str = None,
+            entity_allocation: EntityAllocation = None,
+            **kwargs
+    ) -> List[VacantCourse]:
+        results = cls.vacant_courses
         if entity_ids:
             results = filter(lambda vacant_course: vacant_course.entity_id in entity_ids, results)
+        if code is not None:
+            results = filter(lambda vacant_course: code in vacant_course.code, results)
+        if entity_allocation is not None:
+            results = filter(lambda vacant_course: vacant_course.entity_allocation == entity_allocation, results)
         return list(results)
 
     @classmethod
     def get(cls, entity_id: VacantCourseIdentity) -> VacantCourse:
-        return next(vacant_course for vacant_course in cls._vacant_courses if vacant_course.entity_id == entity_id)
+        return next(vacant_course for vacant_course in cls.vacant_courses if vacant_course.entity_id == entity_id)

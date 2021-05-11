@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 import attr
 
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
@@ -40,7 +42,19 @@ class Application(interface.RootEntity):
     entity_id = attr.ib(type=ApplicationIdentity)
     applicant_id = attr.ib(type=ApplicantIdentity)
     course_id = attr.ib(type=VacantCourseIdentity)
-    lecturing_volume = attr.ib(type=int)
-    practical_volume = attr.ib(type=int)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
     remark = attr.ib(type=str)
     course_summary = attr.ib(type=str)
+
+    def update(self, cmd: 'UpdateApplicationCommand'):
+        # FIXME: Replace by setter/getter + validator on setter
+        from ddd.logic.application.domain.validator.validators_by_business_action import UpdateApplicationValidatorList
+        UpdateApplicationValidatorList(
+            command=cmd
+        ).validate()
+
+        self.lecturing_volume = cmd.lecturing_volume
+        self.practical_volume = cmd.practical_volume
+        self.course_summary = cmd.course_summary
+        self.remark = cmd.remark

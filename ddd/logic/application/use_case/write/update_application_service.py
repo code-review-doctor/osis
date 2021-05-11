@@ -40,9 +40,8 @@ def update_application(
     application = application_repository.get(entity_id=application_identity)
 
     # WHEN
-    ## application.update()  (Via domain service ou via method dans model avec injection de commande...)
+    application.update(cmd)
 
     # THEN
     application_repository.save(application)
     return application.entity_id
-

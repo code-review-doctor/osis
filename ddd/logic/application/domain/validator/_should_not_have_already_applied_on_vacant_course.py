@@ -38,5 +38,5 @@ class ShouldNotHaveAlreadyAppliedOnVacantCourse(BusinessValidator):
     all_existing_applications = attr.ib(type=List['Application'])
 
     def validate(self, *args, **kwargs):
-        if self.vacant_course in {application.vacant_course for application in self.all_existing_applications}:
+        if self.vacant_course.entity_id in {application.course_id for application in self.all_existing_applications}:
             raise ApplicationAlreadyExistsException()
