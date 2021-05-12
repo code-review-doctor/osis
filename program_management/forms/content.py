@@ -106,8 +106,8 @@ class LinkForm(forms.Form):
             is_mandatory=self.cleaned_data.get('is_mandatory', False),
             block=self.cleaned_data.get('block'),
             link_type=self.cleaned_data.get('link_type'),
-            comment=self.cleaned_data.get('comment_fr'),
-            comment_english=self.cleaned_data.get('comment_en'),
+            comment=self.cleaned_data.get('comment_fr', ''),
+            comment_english=self.cleaned_data.get('comment_en', ''),
             relative_credits=self.cleaned_data.get('relative_credits'),
             parent_node_code=self.parent_obj.code,
             parent_node_year=self.parent_obj.year
