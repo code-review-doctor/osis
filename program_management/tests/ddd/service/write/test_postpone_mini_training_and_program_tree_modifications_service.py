@@ -119,11 +119,11 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
         self.mock_minitraining_repository.get.return_value = MiniTrainingFactory()
 
     def test_assert_call_multiple_service(self):
-        postpone_mini_training_and_program_tree_modifications_service \
-            .postpone_mini_training_and_program_tree_modifications(
-            self.cmd,
-            self.mock_anac_repository,
-            self.mock_minitraining_repository
+        postpone_mini_training_and_program_tree_modifications_service. \
+            postpone_mini_training_and_program_tree_modifications(
+                self.cmd,
+                self.mock_anac_repository,
+                self.mock_minitraining_repository
         )
 
         self.assertTrue(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
@@ -140,9 +140,9 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
         self.mock_anac_repository.get_current.return_value = current_anac
         postpone_mini_training_and_program_tree_modifications_service. \
             postpone_mini_training_and_program_tree_modifications(
-            self.cmd,
-            self.mock_anac_repository,
-            self.mock_minitraining_repository
+                self.cmd,
+                self.mock_anac_repository,
+                self.mock_minitraining_repository
         )
 
         self.assertFalse(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
@@ -162,9 +162,9 @@ class TestPostponeMiniTrainingAndProgramTreeModifications(TestCase):
         self.mock_minitraining_repository.get.return_value = MiniTrainingFactory(end_year=2025)
         postpone_mini_training_and_program_tree_modifications_service \
             .postpone_mini_training_and_program_tree_modifications(
-            self.cmd,
-            self.mock_anac_repository,
-            self.mock_minitraining_repository
+                self.cmd,
+                self.mock_anac_repository,
+                self.mock_minitraining_repository
         )
 
         self.assertTrue(self.mocked_postpone_mini_training_and_orphan_group_modifications.called)
