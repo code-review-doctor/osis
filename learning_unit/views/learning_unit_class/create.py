@@ -41,8 +41,6 @@ class Create(PermissionRequiredMixin, FormView):
         context.update(
             {
                 'learning_unit_year': get_by_id(self.kwargs['learning_unit_year_id']),
-                'learning_unit_year_form': None,
-                'learning_container_year_form': None,
             }
         )
         return context
