@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:37+0100\n"
+"POT-Creation-Date: 2021-05-14 09:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -84,6 +84,14 @@ msgstr "L'unité d'enseignement est un partim"
 msgid "The learning unit is not a partim"
 msgstr "L'unité d'enseignement n'est pas un partim"
 
+#, , python-format
+msgid ""
+"The learning unit is not eligible to create classe because of its type which "
+"is not among those types: %(types)s"
+msgstr ""
+"L'unité d'enseignement n'est pas éligible pour créer une nouvelle classe en raison de son "
+"type qui n'est pas parmi les types suivants: %(types)s"
+
 msgid "The learning unit is not in proposal state"
 msgstr "L'unité d'enseignement n'est pas en proposition"
 
@@ -98,6 +106,9 @@ msgstr ""
 
 msgid "The proposal is not on this academic year"
 msgstr "La proposition n'est pas sur cette année académique"
+
+msgid "There are enrollments on the learning unit.  You can't create classes anymore."
+msgstr "Il y a déjà des inscriptions sur cette unité d'enseignement. Vous ne pouvez plus créer de classes"
 
 msgid "This learning unit has an application in the future"
 msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
@@ -177,6 +188,19 @@ msgid ""
 msgstr ""
 "Vous pouvez seulement modifier une unité d'enseignement pour laquelle vous "
 "êtes lié à l'entité responsable"
+
+msgid ""
+"You can't create a class on this learning unit because the annual volume of "
+"default component is not > 0 and there is no planned classes."
+msgstr ""
+"Vous ne pouvez pas créer une classe sur cette unité d'enseignement car le volume annuel du composant [PM ou à "
+"défaut PP] n'est pas supérieur à 0 et il n'y a pas de classe prévue."
+
+msgid "You can't create classes on learning unit having partims."
+msgstr "Vous ne pouvez pas créer des classes sur une unité d'enseignement ayant des partims."
+
+msgid "You can't create classes on partims."
+msgstr "Vous ne pouvez pas créer des classes sur des partims"
 
 #, python-format
 msgid ""

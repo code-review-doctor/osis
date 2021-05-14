@@ -61,6 +61,10 @@ from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplet
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
 from education_group import urls as education_group_urls
+# from learning_unit.views.learning_unit_class import create as create_learning_unit_class
+# from learning_unit.views.learning_unit_class import create
+from learning_unit.views.learning_unit_class.create import Create as create_learning_unit_class
+
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -245,6 +249,9 @@ urlpatterns = [
                 name="learning_unit_proposal_comparison"),
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
+            url(r'^learning_unit_class/', include([
+                url(r'^create/$', create_learning_unit_class.as_view(), name="create_class"),
+            ])),
         ])),
         url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
