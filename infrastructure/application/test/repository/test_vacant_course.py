@@ -93,11 +93,16 @@ class VacantCourseRepositoryGet(TestCase):
 class VacantCourseRepositorySearch(TestCase):
     @classmethod
     def setUpTestData(cls):
+        root_entity = MainEntityVersionFactory(acronym="UCL", parent=None)
+
         cls.ldroi1200_db = LearningUnitYearFactory(
             acronym='LDROI1200',
             academic_year__year=2020,
             learning_container_year__acronym='LDROI1200',
-            learning_container_year__allocation_entity=MainEntityVersionFactory(acronym="DRT").entity,
+            learning_container_year__allocation_entity=MainEntityVersionFactory(
+                acronym="DRT",
+                parent_id=root_entity.entity_id
+            ).entity,
             learning_container_year__academic_year__year=2020,
             learning_container_year__container_type=learning_container_year_types.COURSE,
             learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
@@ -110,7 +115,10 @@ class VacantCourseRepositorySearch(TestCase):
             acronym='LAGRO1500',
             academic_year__year=2020,
             learning_container_year__acronym='LAGRO1500',
-            learning_container_year__allocation_entity=MainEntityVersionFactory(acronym="AGRO").entity,
+            learning_container_year__allocation_entity=MainEntityVersionFactory(
+                acronym="AGRO",
+                parent_id=root_entity.entity_id
+            ).entity,
             learning_container_year__academic_year__year=2020,
             learning_container_year__container_type=learning_container_year_types.COURSE,
             learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
@@ -148,4 +156,31 @@ class VacantCourseRepositorySearch(TestCase):
         self.assertEqual(
             results[0].entity_id,
             VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LAGRO1500'),
+        )
+
+    def test_assert_filter_by_entity_allocation_code_and_with_child_set_true(self):
+        # Create a vacant course below DRT entity
+        LearningUnitYearFactory(
+            acronym='LDROI2000',
+            academic_year__year=2020,
+            learning_container_year__acronym='LDROI2000',
+            learning_container_year__allocation_entity=MainEntityVersionFactory(
+                acronym="BUDR",
+                parent_id=self.ldroi1200_db.learning_container_year.allocation_entity_id
+            ).entity,
+            learning_container_year__academic_year__year=2020,
+            learning_container_year__container_type=learning_container_year_types.COURSE,
+            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__team=True
+        )
+
+        results = self.repository.search(
+            entity_allocation=EntityAllocation(code="DRT"),
+            with_entity_allocation_children=True
+        )
+        self.assertEqual(len(results), 2)
+        self.assertIsInstance(results[0], VacantCourse)
+        self.assertIn(
+            VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI2000'),
+            [row.entity_id for row in results]
         )

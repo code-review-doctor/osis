@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import functools
 import operator
 from typing import Optional, List
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import F, QuerySet, OuterRef, Subquery, Q, Value
+from django.db.models import F, QuerySet, OuterRef, Subquery, Q, Value, Case, When
+from django.db.models.expressions import RawSQL
+from django.db.models.functions import Cast
 from django_cte import With
 
 from base.models.entity_version import EntityVersion
@@ -55,7 +58,7 @@ class VacantCourseRepository(IVacantCourseRepository):
             **kwargs
     ) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
-        if with_entity_allocation_children:
+        if entity_allocation and with_entity_allocation_children:
             qs = _annotate_entity_allocation_parents(qs)
 
         if entity_ids is not None:
@@ -66,14 +69,26 @@ class VacantCourseRepository(IVacantCourseRepository):
             qs = qs.filter(filter_clause)
         if code is not None:
             qs = qs.filter(learning_container_year__acronym__icontains=code)
-        if entity_allocation is not None:
+        if entity_allocation and not with_entity_allocation_children:
+            qs = qs.filter(entity_allocation=entity_allocation.code)
+        if entity_allocation and with_entity_allocation_children:
             qs = qs.filter(
-                Q(entity_allocation=entity_allocation.code) | Q(entity_allocation_parents__in=entity_allocation)
+                Q(entity_allocation=entity_allocation.code)
+                | Q(entity_allocation_parents__contains=[entity_allocation.code])
             )
 
         results = []
         for row_as_dict in qs:
-            dto_from_database = VacantCourseFromRepositoryDTO(**row_as_dict)
+            dto_from_database = VacantCourseFromRepositoryDTO(
+                code=row_as_dict['code'],
+                year=row_as_dict['year'],
+                title=row_as_dict['title'],
+                is_in_team=row_as_dict['is_in_team'],
+                entity_allocation=row_as_dict['entity_allocation'],
+                vacant_declaration_type=row_as_dict['vacant_declaration_type'],
+                lecturing_volume_available=row_as_dict['lecturing_volume_available'],
+                practical_volume_available=row_as_dict['practical_volume_available'],
+            )
             results.append(VacantCourseBuilder.build_from_repository_dto(dto_from_database))
         return results
 
@@ -127,33 +142,59 @@ def _vacant_course_base_qs() -> QuerySet:
 
 def _annotate_entity_allocation_parents(qs: QuerySet) -> QuerySet:
     def parent_entities(cte):
-        return EntityVersion.objects.values(
+        return EntityVersion.objects.\
+            filter(parent_id__isnull=True).\
+            annotate(
+                end_date_queryable=Case(
+                    When(end_date__isnull=True, then=Value(datetime.date(2099, 1, 1))),
+                    default=F('end_date')
+                )
+            ).values(
                 'parent_id',
                 'entity_id',
+                'start_date',
+                'end_date_queryable',
                 'acronym',
-                parents=Value(
-                    # empty array filled by union
-                    "{}",
-                    output_field=ArrayField(models.CharField())
-                ),
+                parents=RawSQL(
+                    "array[]::text[]", [],
+                    output_field=ArrayField(models.TextField()),
+                )
             ).union(
-                cte.join(EntityVersion, parent_id=cte.col.entity_id).filter(
-                    # Filter end_date/start_date of academic_year
+                cte.join(
+                    EntityVersion.objects.annotate(
+                        end_date_queryable=Case(
+                            When(end_date__isnull=True, then=Value(datetime.date(2099, 1, 1))),
+                            default=F('end_date')
+                        )
+                    ),
+                    parent_id=cte.col.entity_id,
+                    start_date__gte=cte.col.start_date,
+                    end_date_queryable__lte=cte.col.end_date_queryable
                 ).values(
                     'parent_id',
                     'entity_id',
+                    'start_date',
+                    'end_date_queryable',
                     'acronym',
                     parents=ArrayConcat(
                         # Append the parent to the array
-                        cte.col.parents, F("acronym"),
-                        output_field=ArrayField(models.CharField()),
+                        cte.col.parents,
+                        Cast("acronym", models.TextField()),
+                        output_field=ArrayField(models.TextField()),
                     ),
                 ),
                 all=True
             )
-    cte = With.recursive(parent_entities)
 
+    cte = With.recursive(parent_entities)
     qs = qs.annotate(
-        entity_allocation_parents=''
+        entity_allocation_parents=Subquery(
+            cte.queryset().filter(
+                start_date__lte=OuterRef('learning_container_year__academic_year__start_date'),
+                end_date_queryable__gte=OuterRef('learning_container_year__academic_year__end_date'),
+                entity_id=OuterRef('learning_container_year__allocation_entity_id')
+            ).with_cte(cte).values('parents')[:1],
+            output_field=ArrayField(models.TextField()),
+        )
     )
     return qs
