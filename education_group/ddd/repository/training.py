@@ -29,7 +29,7 @@ import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q
+from django.db.models import Subquery, OuterRef, Prefetch, QuerySet, Q, Max, Exists
 
 from base.models import entity_version
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
@@ -121,6 +121,26 @@ class TrainingRepository(interface.AbstractRepository):
     def search(cls, entity_ids: Optional[List['TrainingIdentity']] = None, **kwargs) -> List['Training']:
         qs = _get_queryset_to_fetch_data_for_training(entity_ids)
         return [_convert_education_group_year_to_training(education_group_year_db) for education_group_year_db in qs]
+
+    @classmethod
+    def search_trainings_last_occurence(cls, from_year: int) -> List['Training']:
+        subquery_max_existing_year_for_training = EducationGroupYear.objects.filter(
+            academic_year__year__gte=from_year,
+            education_group=OuterRef("education_group")
+        ).values(
+            "education_group"
+        ).annotate(
+            max_year=Max("academic_year__year")
+        ).order_by(
+            "education_group"
+        ).values("max_year")
+
+        qs = _get_training_base_queryset().filter(
+            academic_year__year=Subquery(subquery_max_existing_year_for_training[:1])
+        ).exclude(
+            acronym__startswith="common"
+        )
+        return [_convert_education_group_year_to_training(row) for row in qs]
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
@@ -298,9 +318,11 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
         operator.or_,
         ((Q(acronym=entity_id.acronym) & Q(academic_year__year=entity_id.year)) for entity_id in entity_ids)
     )
-    return EducationGroupYearModelDb.objects.filter(
-        filter_clause
-    ).select_related(
+    return _get_training_base_queryset().filter(filter_clause)
+
+
+def _get_training_base_queryset() -> QuerySet:
+    return EducationGroupYearModelDb.objects.select_related(
         'education_group_type',
         'hops',
         'management_entity',
@@ -312,6 +334,8 @@ def _get_queryset_to_fetch_data_for_training(entity_ids: List['TrainingIdentity'
         'education_group__end_year',
         'primary_language',
         'main_domain__decree',
+    ).filter(
+        education_group_type__category=Categories.TRAINING.name
     ).prefetch_related(
         'secondary_domains',
         Prefetch(

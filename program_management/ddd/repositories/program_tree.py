@@ -26,7 +26,7 @@
 import warnings
 from typing import Optional, List, Set, Union
 
-from django.db.models import Q
+from django.db.models import Q, Max, OuterRef, Exists, Subquery
 
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
@@ -145,6 +145,26 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def get_all_identities(cls) -> List['ProgramTreeIdentity']:
         qs = GroupYear.objects.all().values_list("partial_acronym", "academic_year__year")
         return [program_tree.ProgramTreeIdentity(code=row[0], year=row[1]) for row in qs]
+
+    @classmethod
+    def search_last_occurence(cls, from_year: int) -> List['ProgramTree']:
+        subquery_max_existing_year_for_group = GroupYear.objects.filter(
+            academic_year__year__gte=from_year,
+            group=OuterRef("group_year__group"),
+        ).values(
+            "group"
+        ).annotate(
+            max_year=Max("academic_year__year")
+        ).order_by(
+            "group"
+        ).values("max_year")
+
+        qs = Element.objects.filter(
+            group_year__academic_year__year=Subquery(subquery_max_existing_year_for_group[:1])
+        ).values_list(
+            "id", flat=True
+        )
+        return load_tree.load_trees(list(qs))
 
 
 def _delete_node_content(parent_node: 'Node', delete_node_service: interface.ApplicationService) -> None:
