@@ -23,33 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
+from typing import Optional, List
 
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from osis_common.ddd.interface import EntityIdentity, ApplicationService
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
+class EffectiveClassRepository(IEffectiveClassRepository):
+    @classmethod
+    def get(cls, entity_id: EntityIdentity) -> 'EffectiveClass':
+        raise NotImplementedError
 
     @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
+    def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
+        raise NotImplementedError
 
     @classmethod
-    @abc.abstractmethod
-    def has_proposal(cls) -> bool:
-        pass
+    def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
 
     @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls) -> bool:
-        pass
+    def save(cls, entity: 'EffectiveClass') -> None:
+        raise NotImplementedError

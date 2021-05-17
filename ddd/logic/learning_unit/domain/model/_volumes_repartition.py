@@ -50,7 +50,6 @@ class Volumes(interface.ValueObject):
     volume_first_quadrimester = attr.ib(type=Duration)
     volume_second_quadrimester = attr.ib(type=Duration)
     volume_annual = attr.ib(type=Duration)
-    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
 
 
 @attr.s(frozen=True, slots=True)

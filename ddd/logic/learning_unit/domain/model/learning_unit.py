@@ -30,8 +30,10 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._titles import Titles
+from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
@@ -67,8 +69,9 @@ class LearningUnit(interface.RootEntity):
     language_id = attr.ib(type=LanguageIdentity)
     remarks = attr.ib(type=Remarks)
     partims = attr.ib(type=List[Partim])
-    # lecturing_part = attr.ib(type=LecturingPart)
-    # practical_part = attr.ib(type=PracticalPart)
+    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
+    lecturing_part = attr.ib(type=LecturingPart)
+    practical_part = attr.ib(type=PracticalPart)
 
     @property
     def academic_year(self) -> 'AcademicYearIdentity':
@@ -87,6 +90,9 @@ class LearningUnit(interface.RootEntity):
             learning_unit=self,
         )
         self.partims.append(partim)
+
+    def has_partim(self) -> bool:
+        raise NotImplementedError
 
 
 class CourseLearningUnit(LearningUnit):

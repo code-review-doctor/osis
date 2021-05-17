@@ -74,3 +74,15 @@ class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
             SubdivisionShouldContainOnlyOneLetterValidator(self.subdivision),
             SubdivisionShouldNotExistValidator(self.subdivision, self.learning_unit),
         ]
+
+
+@attr.s(frozen=True, slots=True)
+class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+
+    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return []

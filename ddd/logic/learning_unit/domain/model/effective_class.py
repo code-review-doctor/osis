@@ -24,32 +24,41 @@
 #
 ##############################################################################
 import abc
-from typing import List
 
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
+import attr
+
+from base.models.enums.learning_unit_year_session import DerogationSession
+from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
+from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
+from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
+class EffectiveClassCode(str):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        assert len(self) == 1
 
-    @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
 
-    @classmethod
-    @abc.abstractmethod
-    def has_proposal(cls) -> bool:
-        pass
+class EffectiveClassIdentity(interface.EntityIdentity):
+    code = attr.ib(type=EffectiveClassCode)
+    learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls) -> bool:
-        pass
+
+class EffectiveClass(interface.RootEntity, abc.ABC):
+    entity_id = attr.ib(type=EffectiveClassIdentity)
+    titles = attr.ib(type=ClassTitles)
+    teaching_place = attr.ib(type=TeachingPlace)
+    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
+    session_derogation = attr.ib(type=DerogationSession)
+    volumes = attr.ib(type=Volumes)
+
+
+class PracticalEffectiveClass(EffectiveClass):
+    pass
+
+
+class LecturingEffectiveClass(EffectiveClass):
+    pass

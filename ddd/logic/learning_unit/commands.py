@@ -87,3 +87,8 @@ class LearningUnitSearchCommand(interface.CommandRequest):
     type = attr.ib(type=str)
     full_title = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateEffectiveClassCommand(interface.CommandRequest):
+    raise NotImplementedError

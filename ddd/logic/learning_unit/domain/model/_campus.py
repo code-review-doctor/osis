@@ -23,33 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
+import attr
 
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from osis_common.ddd import interface
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
+@attr.s(frozen=True, slots=True, str=False)
+class TeachingPlace(interface.ValueObject):
+    place = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
 
-    @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_proposal(cls) -> bool:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls) -> bool:
-        pass
+    def __str__(self):
+        return "{name} - {university_name}".format(name=self.place, university_name=self.organization_name)

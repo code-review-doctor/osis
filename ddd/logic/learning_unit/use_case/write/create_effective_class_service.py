@@ -23,33 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
+from django.db import transaction
 
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
+@transaction.atomic()
+def create_effective_class(
+        cmd: 'CreateEffectiveClassCommand',
+        class_repository: 'IEffectiveClassRepository',
+        learning_unit_repository: 'ILearningUnitRepository',
+) -> 'EffectiveClassIdentity':
+    # GIVEN
 
-    @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
+    # WHEN
 
-    @classmethod
-    @abc.abstractmethod
-    def has_proposal(cls) -> bool:
-        pass
+    # THEN
 
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls) -> bool:
-        pass
+    raise NotImplementedError

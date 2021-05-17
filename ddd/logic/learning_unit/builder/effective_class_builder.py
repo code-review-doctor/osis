@@ -23,33 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
+from typing import Union
 
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
+from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
+    LecturingEffectiveClass
 from osis_common.ddd import interface
+from osis_common.ddd.interface import DTO, CommandRequest
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
+class EffectiveClassBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> Union['PracticalEffectiveClass', 'LecturingEffectiveClass']:
+        raise NotImplementedError
 
     @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_proposal(cls) -> bool:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls) -> bool:
-        pass
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> Union['PracticalEffectiveClass', 'LecturingEffectiveClass']:
+        raise NotImplementedError
