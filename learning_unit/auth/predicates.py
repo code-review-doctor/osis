@@ -8,7 +8,6 @@ from base.models.enums import learning_container_year_types as container_types, 
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.models.learning_unit_enrollment import find_by_learning_unit_year
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from education_group.calendar.education_group_extended_daily_management import \
     EducationGroupExtendedDailyManagementCalendar
@@ -23,9 +22,6 @@ from learning_unit.calendar.learning_unit_limited_proposal_management import \
 from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
-from base.business.learning_unit_year_with_context import append_components, get_learning_component_prefetch
-from base.models import learning_unit_year as learning_unit_year_model
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_GLOBAL
 
 
 FACULTY_EDITABLE_CONTAINER_TYPES = (
@@ -515,66 +511,3 @@ def is_learning_unit_year_summary_editable(self, user, learning_unit_year):
     if learning_unit_year:
         return not learning_unit_year.summary_locked
     return None
-
-
-@predicate(bind=True)
-@predicate_failed_msg(
-    message=_(
-        "The learning unit is not eligible to create classe because of its type which is not among those types:"
-        " %(types)s"
-    ) % {"types": [type.value for type in CONTAINER_TYPES_TO_CREATE_CLASS]}
-)
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def is_learning_unit_year_container_type_editable_to_create_classe(self, user, learning_unit_year):
-    if learning_unit_year:
-        container = learning_unit_year.learning_container_year
-        return container and container.container_type in [type.name for type in CONTAINER_TYPES_TO_CREATE_CLASS]
-    return None
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_("You can't create classes on partims."))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def check_the_original_learning_unit_a_not_partim(self, user, learning_unit_year):
-    if learning_unit_year:
-        return not learning_unit_year.is_partim()
-    return True
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_("You can't create classes on learning unit having partims."))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def has_no_partim(self, user, learning_unit_year):
-    if learning_unit_year:
-        return False if learning_unit_year.get_partims_related() else True
-    return False
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_(
-    "You can't create a class on this learning unit because the annual volume of default "
-    "component is not > 0 and there is no planned classes."
-))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def has_global_volume_greater_than_0(self, user, learning_unit_year):
-    if learning_unit_year:
-        learning_unit_years = learning_unit_year_model.search(learning_unit_year_id=learning_unit_year.pk)\
-            .prefetch_related(get_learning_component_prefetch())
-        [append_components(learning_unit) for learning_unit in learning_unit_years]
-
-        for luy in learning_unit_years:
-            for component, values in luy.components.items():
-                if values[VOLUME_GLOBAL] > 0:
-                    return True
-    return False
-
-
-@predicate(bind=True)
-@predicate_failed_msg(message=_(
-    "There are enrollments on the learning unit.  You can't create classes anymore."
-))
-@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
-def has_no_enrollment(self, user, learning_unit_year):
-    if learning_unit_year:
-        return False if find_by_learning_unit_year(learning_unit_year) else True
-    return False

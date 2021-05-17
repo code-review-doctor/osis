@@ -27,14 +27,14 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import FormView
 
-from base.models.learning_unit_year import get_by_id
+from base.models.learning_unit_year import get_by_id, LearningUnitYear
 from learning_unit.forms.classes.create import ClasseForm
 
 
 class Create(PermissionRequiredMixin, FormView):
     template_name = "classe/creation.html"
     form_class = ClasseForm
-    permission_required = 'base.can_access_learningunit'
+    permission_required = 'base.can_create_classe'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -44,3 +44,6 @@ class Create(PermissionRequiredMixin, FormView):
             }
         )
         return context
+
+    def get_permission_object(self):
+        return LearningUnitYear.objects.filter(id=self.kwargs['learning_unit_year_id'])

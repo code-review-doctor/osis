@@ -142,11 +142,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                     (predicates.has_learning_unit_no_attribution_this_year &
                      predicates.has_learning_unit_no_application_this_year)
                  ),
-            'base.can_create_class':
-                predicates.is_learning_unit_year_container_type_editable_to_create_classe &
-                predicates.check_the_original_learning_unit_a_not_partim &
-                predicates.has_no_partim &
-                predicates.is_not_in_proposal_state_any_year &
-                predicates.has_global_volume_greater_than_0 &
-                predicates.has_no_enrollment
+            'base.can_create_classe':
+                predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year
         })

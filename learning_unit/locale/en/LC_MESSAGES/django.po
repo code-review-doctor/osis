@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-14 13:51+0200\n"
+"POT-Creation-Date: 2021-05-17 07:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,12 +86,6 @@ msgstr ""
 msgid "The learning unit is not a partim"
 msgstr ""
 
-#, python-format
-msgid ""
-"The learning unit is not eligible to create classe because of its type which "
-"is not among those types: %(types)s"
-msgstr ""
-
 msgid "The learning unit is not in proposal state"
 msgstr ""
 
@@ -103,11 +97,6 @@ msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 msgid "The proposal is not on this academic year"
-msgstr ""
-
-msgid ""
-"There are enrollments on the learning unit.  You can't create classes "
-"anymore."
 msgstr ""
 
 msgid "This learning unit has an application in the future"
@@ -177,17 +166,6 @@ msgstr ""
 msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
-msgstr ""
-
-msgid ""
-"You can't create a class on this learning unit because the annual volume of "
-"default component is not > 0 and there is no planned classes."
-msgstr ""
-
-msgid "You can't create classes on learning unit having partims."
-msgstr ""
-
-msgid "You can't create classes on partims."
 msgstr ""
 
 #, python-format
