@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Union
 
 import attr
 
@@ -70,6 +70,7 @@ class TrainingIdentityThroughYears(interface.ValueObject):
     uuid = attr.ib(type=int)
 
 
+# TODO :: to move into ddd.logic.formation_catalogue.builder.training
 class TrainingBuilder:
 
     def copy_to_next_year(self, training_from: 'Training', training_repository: 'TrainingRepository') -> 'Training':

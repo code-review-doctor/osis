@@ -88,6 +88,7 @@ class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, training: 'Training', **_) -> 'TrainingIdentity':
         warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
+        _save_first_year_bachelor(training)
         education_group_db_obj = _save_education_group(training)
         education_group_year_db_obj = _create_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
@@ -108,6 +109,7 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def get(cls, entity_id: 'TrainingIdentity') -> 'Training':
+        # TODO :: fill in first_year_bachelor
         qs = _get_queryset_to_fetch_data_for_training([entity_id])
 
         try:
@@ -605,3 +607,9 @@ def _is_hops_fields_presence_correct(training: 'Training') -> bool:
         else:
             return training.hops.ares_code and training.hops.ares_graca and training.hops.ares_authorization
     return False
+
+
+def _save_first_year_bachelor(training: 'Training'):
+    if training.is_bachelor():
+        # TODO :: implement creation of first_year_bachelor
+        pass
