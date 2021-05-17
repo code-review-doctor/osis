@@ -69,8 +69,7 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         self.mock_copy_cms()
         self.create_node_next_years()
 
-    def create_node_next_years(self):
-        nodes = self.tree_version_from.tree.root_node.get_all_children_as_nodes()
+    def create_node_next_years(self, nodes):
         for node in nodes:
             if node.is_group():
                 continue
