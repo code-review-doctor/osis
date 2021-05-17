@@ -31,20 +31,19 @@
     </div>
 
     <div class="modal-body">
-        {% blocktrans with obj_repr=object.email %} Are you sure you want to edit order {{ obj_repr }}
-            ?{% endblocktrans %}
+        {% trans "Are you sure you want to modify the order ?" %}
     </div>
 
     {% csrf_token %}
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <button type="submit" class="btn btn-danger">
-            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans "Move" %}
+        <button type="submit" class="btn btn-primary">
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans "Save" %}
         </button>
         {% if can_postpone %}
-            <button type="button" class="btn btn-danger" onclick="submitFormWithPostponement(this)"
-                    title="{% trans "Move and postpone changes on next years" %}">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans "Move and postpone" %}*
+            <button type="button" class="btn btn-primary" onclick="submitFormWithPostponement(this)"
+                    title="{% trans "Save and postpone changes on next years" %}">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans "Save and postpone" %}*
             </button>
             <p class="text-right">
                 <small><strong>*{% trans "Postpone will be apply on all block contact !" %}</strong></small></p>

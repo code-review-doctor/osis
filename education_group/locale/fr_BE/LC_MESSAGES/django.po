@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 13:20+0200\n"
+"POT-Creation-Date: 2021-05-17 14:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,11 +19,6 @@ msgstr ""
 #, python-format
 msgid " Are you sure you want to delete %(obj_repr)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(obj_repr)s?"
-
-msgid ""
-" Are you sure you want to edit order %(obj_repr)s\n"
-"            ?"
-msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre de %(obj_repr)s?"
 
 #, python-format
 msgid " Postpone will be apply on all section block \"%(section)s\" ! "
@@ -674,15 +669,6 @@ msgstr "Modifier l'ordre des acquis"
 
 msgid "Modify order of condition"
 msgstr "Modifier l'ordre d'une condition"
-
-msgid "Move"
-msgstr "Déplacer"
-
-msgid "Move and postpone"
-msgstr "Déplacer et reporter"
-
-msgid "Move and postpone changes on next years"
-msgstr "Déplacer et reporter les changements sur les années futures"
 
 msgid "Move contact"
 msgstr "Déplacer un contact"
