@@ -41,13 +41,13 @@
     <tr id="{{ section_name }}_{{ record.id }}">
 
         <td id="{{ section_name }}_{{ record.id }}_diploma">
-            {{ record.diploma_text|linebreaksbr }}
+            {{ record.diploma_text|safe|linebreaksbr }}
         </td>
         <td id="{{ section_name_text }}_{{ record.id }}_conditions">
             {{ record.conditions_text|safe }}
         </td>
         <td id="{{ section_name }}_{{ record.id }}_access" class="text-right">
-            {{ record.get_access_display|linebreaksbr|safe }}
+            {{ record.get_access_display|safe|linebreaksbr }}
         </td>
         <td id="{{ section_name }}_{{ record.id }}_remarks">
             {{ record.remarks_text|safe }}
