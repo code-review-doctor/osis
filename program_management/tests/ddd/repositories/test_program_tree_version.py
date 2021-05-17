@@ -28,7 +28,6 @@ from unittest.mock import patch
 from django.test import TestCase
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -36,86 +35,108 @@ from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.node import Node
-from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, ProgramTreeVersion
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory, \
     ProgramTreeVersionIdentityFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
-class TestVersionRepositoryCreateMethod(TestCase):
-
+class TestVersionRepositoryUtils:
     @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(current=True)
-        cls.year = cls.academic_year.year
-        cls.type = TrainingEducationGroupTypeFactory()
-        cls.repository = ProgramTreeVersionRepository()
-        cls.new_program_tree = ProgramTreeFactory(
-            root_node__year=cls.year,
-            root_node__start_year=cls.year,
-            root_node__end_year=cls.year,
-            root_node__node_type=TrainingType[cls.type.name],
-        )
-        cls.new_program_tree_version = ProgramTreeVersionFactory(
-            program_tree_identity=cls.new_program_tree.entity_id,
-            tree=cls.new_program_tree,
-            end_year_of_existence=cls.academic_year.year,
-        )
-        cls.entity_identity = cls.new_program_tree_version.entity_identity
-        cls.database_offer = EducationGroupYearFactory(
-            academic_year=cls.academic_year,
-            education_group_type=cls.type,
-            acronym=cls.entity_identity.offer_acronym,
-        )
+    def create_necessary_data(cls, for_tree_version: 'ProgramTreeVersion'):
+        end_year = None
+        if for_tree_version.end_year_of_existence:
+            end_year = AcademicYearFactory(year=for_tree_version.end_year_of_existence)
 
-    @patch.object(Node, '_has_changed', return_value=True)
-    def test_simple_case_creation(self, *mocks):
+        education_group_type = TrainingEducationGroupTypeFactory(
+            name=for_tree_version.get_tree().root_node.node_type.name
+        )
+        EducationGroupYearFactory(
+            education_group__start_year__year=for_tree_version.start_year,
+            education_group__end_year=end_year,
+            academic_year__year=for_tree_version.academic_year.year,
+            education_group_type=education_group_type,
+            acronym=for_tree_version.entity_id.offer_acronym,
+        )
         GroupYearFactory(
-            partial_acronym=self.new_program_tree_version.program_tree_identity.code,
-            academic_year__year=self.year
+            group__start_year__year=for_tree_version.start_year,
+            group__end_year=end_year,
+            academic_year__year=for_tree_version.academic_year.year,
+            partial_acronym=for_tree_version.program_tree_identity.code
         )
 
-        self.repository.create(self.new_program_tree_version)
-
+    def assert_ddd_object_equal_database(self, tree_version: 'ProgramTreeVersion'):
         education_group_year_db_objects = EducationGroupYear.objects.filter(
-            acronym=self.entity_identity.offer_acronym,
-            academic_year__year=self.entity_identity.year,
+            acronym=tree_version.entity_id.offer_acronym,
+            academic_year__year=tree_version.entity_id.year,
         )
 
         education_group_version_db_object = EducationGroupVersion.objects.get(
-            offer__acronym=self.new_program_tree_version.entity_id.offer_acronym,
-            offer__academic_year__year=self.new_program_tree_version.entity_id.year,
-            version_name=self.new_program_tree_version.entity_id.version_name,
-            transition_name=self.new_program_tree_version.entity_id.transition_name,
+            offer__acronym=tree_version.entity_id.offer_acronym,
+            offer__academic_year__year=tree_version.entity_id.year,
+            version_name=tree_version.entity_id.version_name,
+            transition_name=tree_version.entity_id.transition_name,
         )
 
         group_year_db_object = GroupYear.objects.get(
-            partial_acronym=self.new_program_tree.root_node.code,
-            academic_year__year=self.new_program_tree.root_node.year,
+            partial_acronym=tree_version.get_tree().root_node.code,
+            academic_year__year=tree_version.get_tree().root_node.year,
         )
 
         self.assertEqual(len(education_group_year_db_objects), 1)
-        self.assertEqual(education_group_version_db_object.offer_id, self.database_offer.id)
         self.assertEqual(education_group_version_db_object.root_group, group_year_db_object)
-        self.assertEqual(
-            education_group_version_db_object.transition_name, self.new_program_tree_version.transition_name
-        )
-        self.assertEqual(education_group_version_db_object.version_name, self.new_program_tree_version.version_name)
-        self.assertEqual(education_group_version_db_object.title_fr, self.new_program_tree_version.title_fr)
-        self.assertEqual(education_group_version_db_object.title_en, self.new_program_tree_version.title_en)
+        self.assertEqual(education_group_version_db_object.transition_name, tree_version.transition_name)
+        self.assertEqual(education_group_version_db_object.version_name, tree_version.version_name)
+        self.assertEqual(education_group_version_db_object.title_fr, tree_version.title_fr)
+        self.assertEqual(education_group_version_db_object.title_en, tree_version.title_en)
         self.assertEqual(
             education_group_version_db_object.root_group.group.end_year.year,
-            self.new_program_tree_version.end_year_of_existence
+            tree_version.end_year_of_existence
         )
+
+
+class TestVersionRepositoryCreateMethod(TestCase, TestVersionRepositoryUtils):
+
+    def setUp(self) -> None:
+        self.repository = ProgramTreeVersionRepository()
+
+        self.new_program_tree_version = ProgramTreeVersionFactory()
+        self.new_program_tree = self.new_program_tree_version.get_tree()
+
+        self.create_necessary_data(self.new_program_tree_version)
+
+    @patch.object(Node, '_has_changed', return_value=True)
+    def test_simple_case_creation(self, *mocks):
+        self.repository.create(self.new_program_tree_version)
+
+        self.assert_ddd_object_equal_database(self.new_program_tree_version)
 
     def test_assert_raises_training_not_found_exception(self):
         tree_version = ProgramTreeVersionFactory(entity_id__offer_acronym='INEXISTING')
         with self.assertRaises(TrainingNotFoundException):
             self.repository.create(tree_version)
+
+
+class TestProgramTreeVersionRepositoryUpdateMethod(TestCase, TestVersionRepositoryUtils):
+    def setUp(self) -> None:
+        self.repository = ProgramTreeVersionRepository()
+
+        self.new_program_tree_version = ProgramTreeVersionFactory()
+
+        self.create_necessary_data(self.new_program_tree_version)
+
+    def test_should_update(self):
+        self.repository.create(self.new_program_tree_version)
+
+        self.new_program_tree_version.title_fr = "Hello new title"
+        self.new_program_tree_version.title_en = "Hello hello"
+
+        self.repository.update(self.new_program_tree_version)
+
+        self.assert_ddd_object_equal_database(self.new_program_tree_version)
 
 
 class TestProgramTreeVersionRepositoryGetMethod(TestCase):
