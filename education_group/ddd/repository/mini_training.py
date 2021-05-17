@@ -151,7 +151,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
                 operator.or_,
                 ((Q(acronym=entity_id.acronym) & Q(academic_year__year=entity_id.year)) for entity_id in entity_ids)
             )
-            qs = _get_queryset_to_fetch_data_for_mini_training().filter(filter_clause)
+            qs = _get_base_queryset().filter(filter_clause)
             return [_convert_education_group_year_to_mini_training(row) for row in qs]
         return []
 
@@ -168,7 +168,7 @@ class MiniTrainingRepository(interface.AbstractRepository):
             "education_group"
         ).values("max_year")
 
-        qs = _get_queryset_to_fetch_data_for_mini_training().filter(
+        qs = _get_base_queryset().filter(
             academic_year__year=Subquery(subquery_max_existing_year_for_mini_training[:1])
         ).exclude(
             acronym__startswith="common"
@@ -225,7 +225,7 @@ def _update_education_group_year(mini_training_obj: 'mini_training.MiniTraining'
     education_group_year_db_obj.save()
 
 
-def _get_queryset_to_fetch_data_for_mini_training() -> QuerySet:
+def _get_base_queryset() -> QuerySet:
     return EducationGroupYearModelDb.objects.filter(
         education_group_type__category=Categories.MINI_TRAINING.name
     ).select_related(

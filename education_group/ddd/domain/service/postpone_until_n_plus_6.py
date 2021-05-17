@@ -34,7 +34,7 @@ from education_group.ddd.business_types import *
 DEFAULT_YEARS_TO_POSTPONE = 6
 
 
-class PostponeTraining(interface.DomainService):
+class Postpone(interface.DomainService):
     @classmethod
     def postpone_training(
             cls,

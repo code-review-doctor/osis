@@ -29,7 +29,7 @@ from ddd.logic.shared_kernel.academic_year.domain.service.get_current_academic_y
 from infrastructure.shared_kernel.academic_year.repository import academic_year as academic_year_repository
 from program_management.ddd.command import PostponeProgramTreeVersionsUntilNPlus6Command
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service import postpone_trees
+from program_management.ddd.domain.service import postpone_until_n_plus_6
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repo
 
 
@@ -47,7 +47,7 @@ def postpone_program_tree_versions_until_n_plus_6(
 
     result = []
     for tree_version in tree_versions_to_postpone:
-        trees_created = postpone_trees.PostponeTrees().postpone_program_tree_version(
+        trees_created = postpone_until_n_plus_6.Postpone().postpone_program_tree_version(
             current_academic_year,
             tree_version,
             repo

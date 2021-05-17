@@ -34,7 +34,7 @@ from program_management.ddd.repositories.program_tree_version import ProgramTree
 DEFAULT_YEARS_TO_POSTPONE = 6
 
 
-class PostponeTrees(interface.DomainService):
+class Postpone(interface.DomainService):
     @classmethod
     def postpone_program_tree(
             cls,

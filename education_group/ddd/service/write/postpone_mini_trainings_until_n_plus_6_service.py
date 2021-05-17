@@ -28,7 +28,7 @@ from typing import List
 from ddd.logic.shared_kernel.academic_year.domain.service.get_current_academic_year import GetCurrentAcademicYear
 from education_group.ddd.command import PostponeMiniTrainingsUntilNPlus6Command
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.ddd.domain.service import postpone_training
+from education_group.ddd.domain.service import postpone_until_n_plus_6
 from education_group.ddd.repository import mini_training as mini_training_repository
 from infrastructure.shared_kernel.academic_year.repository import academic_year as academic_year_repository
 
@@ -44,7 +44,7 @@ def postpone_minitrainings_until_n_plus_6(cmd: PostponeMiniTrainingsUntilNPlus6C
 
     result = []
     for mini_training in mini_trainings_to_postpone:
-        mini_trainings_created = postpone_training.PostponeTraining().postpone_mini_training(
+        mini_trainings_created = postpone_until_n_plus_6.Postpone().postpone_mini_training(
             current_academic_year,
             mini_training,
             repo
