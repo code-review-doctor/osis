@@ -46,4 +46,5 @@ class Create(PermissionRequiredMixin, FormView):
         return context
 
     def get_permission_object(self):
-        return LearningUnitYear.objects.filter(id=self.kwargs['learning_unit_year_id'])
+        return LearningUnitYear.objects.filter(id=self.kwargs['learning_unit_year_id']).\
+            select_related('learning_container_year', 'academic_year')
