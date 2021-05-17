@@ -49,11 +49,6 @@ class Application(interface.RootEntity):
 
     def update(self, cmd: 'UpdateApplicationCommand'):
         # FIXME: Replace by setter/getter + validator on setter
-        from ddd.logic.application.domain.validator.validators_by_business_action import UpdateApplicationValidatorList
-        UpdateApplicationValidatorList(
-            command=cmd
-        ).validate()
-
         self.lecturing_volume = cmd.lecturing_volume
         self.practical_volume = cmd.practical_volume
         self.course_summary = cmd.course_summary

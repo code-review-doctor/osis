@@ -44,3 +44,9 @@ class ApplicationAlreadyExistsException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("You have already applied on vacant course")
         super().__init__(message, **kwargs)
+
+
+class VolumesAskedShouldBeLowerOrEqualToVolumeAvailable(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Volumes asked should be lower or equal to volume available")
+        super().__init__(message, **kwargs)

@@ -59,7 +59,9 @@ class MessageBus:
         ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
             cmd, ApplicationRepository(), ApplicantRepository(), VacantCourseRepository()
         ),
-        UpdateApplicationCommand: lambda cmd: update_application(cmd, ApplicationRepository()),
+        UpdateApplicationCommand: lambda cmd: update_application(
+            cmd, ApplicationRepository(), VacantCourseRepository()
+        ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
         SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(cmd, ApplicationRepository()),
         SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(cmd, VacantCourseRepository())

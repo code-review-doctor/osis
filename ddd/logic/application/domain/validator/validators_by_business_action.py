@@ -36,6 +36,8 @@ from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled
     ShouldLecturingOrPracticalFilledValidator
 from ddd.logic.application.domain.validator._should_not_have_already_applied_on_vacant_course import \
     ShouldNotHaveAlreadyAppliedOnVacantCourse
+from ddd.logic.application.domain.validator._should_volumes_asked_lower_or_equal_to_available import \
+    ShouldVolumesAskedLowerOrEqualToAvailable
 
 
 @attr.s(frozen=True, slots=True)
@@ -54,12 +56,18 @@ class ApplyOnVacantCourseValidatorList(TwoStepsMultipleBusinessExceptionListVali
         return [
             ShouldNotHaveAlreadyAppliedOnVacantCourse(
                 vacant_course=self.vacant_course, all_existing_applications=self.all_existing_applications
-            )
+            ),
+            ShouldVolumesAskedLowerOrEqualToAvailable(
+                vacant_course=self.vacant_course,
+                lecturing_volume_asked=self.command.lecturing_volume,
+                practical_volume_asked=self.command.practical_volume
+            ),
         ]
 
 
 @attr.s(frozen=True, slots=True)
 class UpdateApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    vacant_course = attr.ib(type=VacantCourse)
     command = attr.ib(type=UpdateApplicationCommand)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -68,4 +76,10 @@ class UpdateApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValida
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
-        return []
+        return [
+            ShouldVolumesAskedLowerOrEqualToAvailable(
+                vacant_course=self.vacant_course,
+                lecturing_volume_asked=self.command.lecturing_volume,
+                practical_volume_asked=self.command.practical_volume
+            ),
+        ]

@@ -23,33 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
+from decimal import Decimal
 
-from ddd.logic.application.commands import UpdateApplicationCommand
-from ddd.logic.application.domain.model.application import ApplicationIdentity
-from ddd.logic.application.domain.service.update_application import UpdateApplication
-from ddd.logic.application.repository.i_application_repository import IApplicationRepository
-from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.domain.validator.exceptions import VolumesAskedShouldBeLowerOrEqualToVolumeAvailable
 
 
-@transaction.atomic()
-def update_application(
-        cmd: UpdateApplicationCommand,
-        application_repository: IApplicationRepository,
-        vacant_course_repository: IVacantCourseRepository,
-) -> ApplicationIdentity:
-    # GIVEN
-    application_identity = ApplicationIdentity(uuid=cmd.application_id)
-    application = application_repository.get(entity_id=application_identity)
-    vacant_course = vacant_course_repository.get(entity_id=application.course_id)
+@attr.s(frozen=True, slots=True)
+class ShouldVolumesAskedLowerOrEqualToAvailable(BusinessValidator):
+    vacant_course = attr.ib(type=VacantCourse)
+    lecturing_volume_asked = attr.ib(type=Decimal)
+    practical_volume_asked = attr.ib(type=Decimal)
 
-    # WHEN
-    application = UpdateApplication.update(
-        vacant_course=vacant_course,
-        cmd=cmd,
-        application=application
-    )
-
-    # THEN
-    application_repository.save(application)
-    return application.entity_id
+    def validate(self, *args, **kwargs):
+        if self.lecturing_volume_asked > self.vacant_course.lecturing_volume_available or \
+           self.practical_volume_asked > self.vacant_course.practical_volume_available:
+            raise VolumesAskedShouldBeLowerOrEqualToVolumeAvailable()

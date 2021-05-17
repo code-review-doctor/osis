@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 import attr
 
+from ddd.logic.application.domain.model.attribution import Attribution
 from osis_common.ddd import interface
 
 
@@ -38,3 +41,4 @@ class Applicant(interface.RootEntity):
     entity_id = attr.ib(type=ApplicantIdentity)
     first_name = attr.ib(type=str)
     last_name = attr.ib(type=str)
+    attributions = attr.ib(type=List[Attribution], default=[])

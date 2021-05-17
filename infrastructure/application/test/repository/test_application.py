@@ -24,13 +24,19 @@
 #
 ##############################################################################
 import uuid
+from decimal import Decimal
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
+from attribution.models.tutor_application import TutorApplication
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.tutor import TutorFactory
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
+from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.application import ApplicationRepository
 
 
@@ -102,10 +108,75 @@ class ApplicationRepositorySearch(TestCase):
 class ApplicationRepositorySave(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.tutor_db = TutorFactory(person__global_id="4567894512")
+        cls.course_db = LearningContainerYearFactory(acronym="LDROI1200", academic_year__year=2020)
+
+        cls.applicant_id = ApplicantIdentity(global_id=cls.tutor_db.person.global_id)
+        cls.vacant_course_id = VacantCourseIdentity(
+            academic_year=AcademicYearIdentity(year=cls.course_db.academic_year.year),
+            code=cls.course_db.acronym
+        )
         cls.repository = ApplicationRepository()
 
     def test_save_assert_created_when_new_instance(self):
-        pass
+        application = Application(
+            entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
+            applicant_id=self.applicant_id,
+            course_id=self.vacant_course_id,
+            lecturing_volume=Decimal(2),
+            practical_volume=Decimal(5),
+            remark="Remarque du prof",
+            course_summary="Cours d'introduction",
+        )
+
+        self.assertEqual(TutorApplication.objects.count(), 0)
+        self.repository.save(application)
+
+        row_inserted = TutorApplication.objects.get(uuid=application.entity_id.uuid)
+        self.assertEqual(row_inserted.tutor_id, self.tutor_db.pk)
+        self.assertEqual(row_inserted.learning_container_year_id, self.course_db.pk)
+        self.assertEqual(row_inserted.volume_lecturing, application.lecturing_volume)
+        self.assertEqual(row_inserted.volume_pratical_exercice, application.practical_volume)
+        self.assertEqual(row_inserted.remark, application.remark)
+        self.assertEqual(row_inserted.course_summary, application.course_summary)
 
     def test_save_assert_updated_when_instance_exists(self):
-        pass
+        application_db = TutorApplicationFactory()
+
+        application = Application(
+            entity_id=ApplicationIdentity(uuid=application_db.uuid),
+            applicant_id=self.applicant_id,
+            course_id=self.vacant_course_id,
+            lecturing_volume=Decimal(10),
+            practical_volume=Decimal(16),
+            remark="Remarque du prof update",
+            course_summary="Cours d'introduction mis à jour",
+        )
+
+        self.assertEqual(TutorApplication.objects.count(), 1)
+        self.repository.save(application)
+        self.assertEqual(TutorApplication.objects.count(), 1)
+
+        row_updated = TutorApplication.objects.get(uuid=application.entity_id.uuid)
+        self.assertEqual(row_updated.tutor_id, self.tutor_db.pk)
+        self.assertEqual(row_updated.learning_container_year_id, self.course_db.pk)
+        self.assertEqual(row_updated.volume_lecturing, application.lecturing_volume)
+        self.assertEqual(row_updated.volume_pratical_exercice, application.practical_volume)
+        self.assertEqual(row_updated.remark, application.remark)
+        self.assertEqual(row_updated.course_summary, application.course_summary)
+
+
+class ApplicationRepositoryDelete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor_application_db = TutorApplicationFactory()
+
+        cls.application_id = ApplicationIdentity(uuid=cls.tutor_application_db.uuid)
+        cls.repository = ApplicationRepository()
+
+    def test_delete_assert_instance_is_remove_from_database(self):
+        self.assertEqual(len(self.repository.search()), 1)
+
+        self.repository.delete(entity_id=self.application_id)
+
+        self.assertEqual(len(self.repository.search()), 0)

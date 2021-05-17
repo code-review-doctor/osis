@@ -23,33 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
-
 from ddd.logic.application.commands import UpdateApplicationCommand
-from ddd.logic.application.domain.model.application import ApplicationIdentity
-from ddd.logic.application.domain.service.update_application import UpdateApplication
-from ddd.logic.application.repository.i_application_repository import IApplicationRepository
-from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
+from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.domain.validator.validators_by_business_action import UpdateApplicationValidatorList
+from osis_common.ddd import interface
 
 
-@transaction.atomic()
-def update_application(
-        cmd: UpdateApplicationCommand,
-        application_repository: IApplicationRepository,
-        vacant_course_repository: IVacantCourseRepository,
-) -> ApplicationIdentity:
-    # GIVEN
-    application_identity = ApplicationIdentity(uuid=cmd.application_id)
-    application = application_repository.get(entity_id=application_identity)
-    vacant_course = vacant_course_repository.get(entity_id=application.course_id)
+class UpdateApplication(interface.DomainService):
 
-    # WHEN
-    application = UpdateApplication.update(
-        vacant_course=vacant_course,
-        cmd=cmd,
-        application=application
-    )
+    @classmethod
+    def update(
+            cls,
+            vacant_course: VacantCourse,
+            cmd: UpdateApplicationCommand,
+            application: Application
+    ) -> Application:
+        UpdateApplicationValidatorList(
+            vacant_course=vacant_course,
+            command=cmd
+        ).validate()
 
-    # THEN
-    application_repository.save(application)
-    return application.entity_id
+        application.update(cmd)
+
+        return application

@@ -74,7 +74,7 @@ class ApplicationRepository(IApplicationRepository):
 
     @classmethod
     def save(cls, application: Application) -> None:
-        tutor_id = Tutor.objects.get(global_id=application.applicant_id.global_id).pk
+        tutor_id = Tutor.objects.get(person__global_id=application.applicant_id.global_id).pk
         learning_container_year_id = LearningContainerYear.objects.get(
             acronym=application.course_id.code,
             academic_year__year=application.course_id.year
@@ -94,7 +94,9 @@ class ApplicationRepository(IApplicationRepository):
 
     @classmethod
     def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+        TutorApplication.objects.filter(
+            uuid=entity_id.uuid
+        ).delete()
 
 
 def _application_base_qs():

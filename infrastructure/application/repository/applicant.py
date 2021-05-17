@@ -27,12 +27,16 @@ import functools
 import operator
 from typing import Optional, List
 
-from django.db.models import F, QuerySet, Q
+from django.db import models
+from django.db.models import F, QuerySet, Q, Subquery, OuterRef
 
+from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
 from base.auth.roles.tutor import Tutor
+from base.models.enums import learning_component_year_type
 from ddd.logic.application.domain.builder.applicant_builder import ApplicantBuilder
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
-from ddd.logic.application.dtos import ApplicantFromRepositoryDTO
+from ddd.logic.application.dtos import ApplicantFromRepositoryDTO, AttributionFromRepositoryDTO
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 
 
@@ -48,9 +52,14 @@ class ApplicantRepository(IApplicantRepository):
             )
             qs = qs.filter(filter_clause)
 
+        attributions_qs = _prefetch_attributions(qs)
         results = []
         for row_as_dict in qs:
-            dto_from_database = ApplicantFromRepositoryDTO(**row_as_dict)
+            attribution_filtered = [
+                attribution for attribution in attributions_qs
+                if attribution.applicant_id_global_id == row_as_dict['global_id']
+            ]
+            dto_from_database = ApplicantFromRepositoryDTO(**row_as_dict, attributions=attribution_filtered)
             results.append(ApplicantBuilder.build_from_repository_dto(dto_from_database))
         return results
 
@@ -59,9 +68,11 @@ class ApplicantRepository(IApplicantRepository):
         qs = _applicant_base_qs().filter(
             global_id=entity_id.global_id
         )
-
         obj_as_dict = qs.get()
-        dto_from_database = ApplicantFromRepositoryDTO(**obj_as_dict)
+        dto_from_database = ApplicantFromRepositoryDTO(
+            **obj_as_dict,
+            attributions=_prefetch_attributions(qs)
+        )
         return ApplicantBuilder.build_from_repository_dto(dto_from_database)
 
 
@@ -75,3 +86,36 @@ def _applicant_base_qs() -> QuerySet:
         'first_name',
         'last_name'
     )
+
+
+def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
+    subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
+
+    attributions_as_dict = AttributionNew.objects.filter(
+        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True)
+    ).annotate(
+        course_id_code=F('learning_container_year__acronym'),
+        course_id_year=F('learning_container_year__academic_year__year'),
+        applicant_id_global_id=F('tutor__person__global_id'),
+        lecturing_volume=Subquery(
+            subqs.filter(
+                learning_component_year__type=learning_component_year_type.LECTURING
+            ).values('allocation_charge')[:1],
+            output_field=models.DecimalField()
+        ),
+        practical_volume=Subquery(
+            subqs.filter(
+                learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
+            ).values('allocation_charge')[:1],
+            output_field=models.DecimalField()
+        )
+    ).values(
+        'course_id_code',
+        'course_id_year',
+        'function',
+        'end_year',
+        'applicant_id_global_id',
+        'lecturing_volume',
+        'practical_volume'
+    )
+    return [AttributionFromRepositoryDTO(**attribution_as_dict) for attribution_as_dict in attributions_as_dict]

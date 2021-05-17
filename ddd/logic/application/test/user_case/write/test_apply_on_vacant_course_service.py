@@ -33,7 +33,7 @@ from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIde
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
 from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalNotFilledException, \
-    ApplicationAlreadyExistsException
+    ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -139,5 +139,47 @@ class TestApplyOnVacantCourseService(TestCase):
             any([
                 exception for exception in exceptions_raised
                 if isinstance(exception, ApplicationAlreadyExistsException)
+            ])
+        )
+
+    def test_case_apply_on_vacant_course_with_practical_volume_greater_than_available_assert_raise_exception(self):
+        cmd = ApplyOnVacantCourseCommand(
+            code='LDROI1200',
+            academic_year=2018,
+            global_id='123456789',
+            lecturing_volume=Decimal(10),
+            practical_volume=Decimal(60),   # Available 50
+            course_summary='Résumé du cours',
+            remark='Remarque personelle',
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as cm:
+            self.message_bus.invoke(cmd)
+        exceptions_raised = cm.exception.exceptions
+        self.assertTrue(
+            any([
+                exception for exception in exceptions_raised
+                if isinstance(exception, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable)
+            ])
+        )
+
+    def test_case_apply_on_vacant_course_with_lecturing_volume_greater_than_available_assert_raise_exception(self):
+        cmd = ApplyOnVacantCourseCommand(
+            code='LDROI1200',
+            academic_year=2018,
+            global_id='123456789',
+            lecturing_volume=Decimal(25),   # Available 10
+            practical_volume=Decimal(0),
+            course_summary='Résumé du cours',
+            remark='Remarque personelle',
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as cm:
+            self.message_bus.invoke(cmd)
+        exceptions_raised = cm.exception.exceptions
+        self.assertTrue(
+            any([
+                exception for exception in exceptions_raised
+                if isinstance(exception, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable)
             ])
         )

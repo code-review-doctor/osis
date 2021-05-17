@@ -29,6 +29,7 @@ from typing import List, Optional
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
 class IApplicationRepository(interface.AbstractRepository):
@@ -39,4 +40,19 @@ class IApplicationRepository(interface.AbstractRepository):
             entity_ids: Optional[List[ApplicationIdentity]] = None,
             applicant_id: Optional[ApplicantIdentity] = None, **kwargs
     ) -> List[Application]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: ApplicationIdentity) -> Application:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, application: Application) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
         pass

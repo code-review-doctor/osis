@@ -24,51 +24,18 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List
 
 import attr
 
-from osis_common.ddd.interface import DTO
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
+from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class AttributionFromRepositoryDTO(DTO):
-    course_id_code = attr.ib(type=str)
-    course_id_year = attr.ib(type=int)
-    applicant_id_global_id = attr.ib(type=str)
+class Attribution(interface.ValueObject):
+    course_id = attr.ib(type=LearningUnitIdentity)
     function = attr.ib(type=str)
-    end_year = attr.ib(type=int)
+    end_year = attr.ib(type=AcademicYear)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
-
-
-@attr.s(frozen=True, slots=True)
-class ApplicantFromRepositoryDTO(DTO):
-    first_name = attr.ib(type=str)
-    last_name = attr.ib(type=str)
-    global_id = attr.ib(type=str)
-    attributions = attr.ib(type=List[AttributionFromRepositoryDTO], default=[])
-
-
-@attr.s(frozen=True, slots=True)
-class VacantCourseFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    title = attr.ib(type=str)
-    is_in_team = attr.ib(type=bool)
-    entity_allocation = attr.ib(type=str)
-    vacant_declaration_type = attr.ib(type=str)
-    lecturing_volume_available = attr.ib(type=Decimal)
-    practical_volume_available = attr.ib(type=Decimal)
-
-
-@attr.s(frozen=True, slots=True)
-class ApplicationFromRepositoryDTO(DTO):
-    uuid = attr.ib(type=str)
-    applicant_global_id = attr.ib(type=str)
-    vacant_course_code = attr.ib(type=str)
-    vacant_course_year = attr.ib(type=int)
-    lecturing_volume = attr.ib(type=Decimal)
-    practical_volume = attr.ib(type=Decimal)
-    remark = attr.ib(type=str)
-    course_summary = attr.ib(type=str)

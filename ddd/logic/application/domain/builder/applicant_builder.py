@@ -24,7 +24,10 @@
 #
 ##############################################################################
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
-from ddd.logic.application.dtos import ApplicantFromRepositoryDTO
+from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.dtos import ApplicantFromRepositoryDTO, AttributionFromRepositoryDTO
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd.interface import RootEntityBuilder
 
 
@@ -37,5 +40,24 @@ class ApplicantBuilder(RootEntityBuilder):
         return Applicant(
             entity_id=ApplicantIdentity(global_id=dto.global_id),
             first_name=dto.first_name,
-            last_name=dto.last_name
+            last_name=dto.last_name,
+            attributions=[
+                cls._build_attribution_from_repository_dto(attribution_dto) for attribution_dto in dto.attributions
+            ]
+        )
+
+    @classmethod
+    def _build_attribution_from_repository_dto(
+            cls,
+            attribution_dto: AttributionFromRepositoryDTO
+    ) -> Attribution:
+        return Attribution(
+            course_id=LearningUnitIdentity(
+                code=attribution_dto.course_id_code,
+                academic_year=AcademicYearIdentity(year=attribution_dto.course_id_year)
+            ),
+            end_year=AcademicYearIdentity(year=attribution_dto.end_year),
+            function=attribution_dto.function,
+            lecturing_volume=attribution_dto.lecturing_volume,
+            practical_volume=attribution_dto.practical_volume
         )
