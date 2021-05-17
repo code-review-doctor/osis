@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Dict, List
 
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
+from openpyxl.styles import Font, Color
 
 from base.business.xls import get_name_or_username
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
+from base.models.learning_unit_year import LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import find_by_learning_unit_year
 from osis_common.document import xls_build
 
@@ -44,6 +48,10 @@ COMPARISON_WORKSHEET_TITLE = _("Proposals comparison")
 XLS_COMPARISON_FILENAME = _('Proposals_comparison')
 XLS_DESCRIPTION_COMPARISON = _("List of comparison between proposals and UE")
 BLANK_VALUE = '-'
+BOLD_FONT = Font(bold=True)
+BLACK_FONT_STRIKETHROUGH = Font(color=Color('00000000'), strikethrough=True)
+REQUIREMENT_ENTITY_COL = 'A'
+ALLOCATION_ENTITY_COL = 'K'
 
 
 def basic_titles_part_1():
@@ -119,24 +127,27 @@ COMPARISON_PROPOSAL_TITLES = \
     components_titles()
 
 
-def prepare_xls_content(proposals):
+def prepare_xls_content(proposals: List):
     return [extract_xls_data_from_proposal(proposal) for proposal in proposals]
 
 
 def extract_xls_data_from_proposal(luy):
     proposal = find_by_learning_unit_year(luy)
-    return [luy.entity_requirement,
-            luy.acronym,
-            luy.complete_title,
-            luy.learning_container_year.get_container_type_display(),
-            proposal.get_type_display(),
-            proposal.get_state_display(),
-            proposal.folder,
-            luy.learning_container_year.get_type_declaration_vacant_display(),
-            dict(PERIODICITY_TYPES)[luy.periodicity],
-            luy.credits,
-            luy.entity_allocation,
-            proposal.date.strftime('%d-%m-%Y')]
+
+    return [
+        luy.ent_requirement_acronym if luy.ent_requirement_acronym else BLANK_VALUE,
+        luy.acronym,
+        luy.complete_title,
+        luy.learning_container_year.get_container_type_display(),
+        proposal.get_type_display(),
+        proposal.get_state_display(),
+        proposal.folder,
+        luy.learning_container_year.get_type_declaration_vacant_display(),
+        dict(PERIODICITY_TYPES)[luy.periodicity],
+        luy.credits,
+        luy.ent_allocation_acronym if luy.ent_allocation_acronym else BLANK_VALUE,
+        proposal.date.strftime('%d-%m-%Y')
+    ]
 
 
 def prepare_xls_parameters_list(user, working_sheets_data):
@@ -151,14 +162,38 @@ def prepare_xls_parameters_list(user, working_sheets_data):
                  ]}
 
 
-def create_xls(user, proposals, filters):
-    ws_data = xls_build.prepare_xls_parameters_list(prepare_xls_content(proposals), configure_parameters(user))
+def create_xls(user, proposals: QuerySet, filters):
+    proposals = LearningUnitYearQuerySet.annotate_entities_status(proposals)
+    ws_data = xls_build.prepare_xls_parameters_list(
+        prepare_xls_content(list(proposals)),
+        configure_parameters(user, list(proposals))
+    )
     return xls_build.generate_xls(ws_data, filters)
 
 
-def configure_parameters(user):
-    return {xls_build.DESCRIPTION: XLS_DESCRIPTION,
-            xls_build.USER: get_name_or_username(user),
-            xls_build.FILENAME: XLS_FILENAME,
-            xls_build.HEADER_TITLES: PROPOSAL_TITLES,
-            xls_build.WS_TITLE: WORKSHEET_TITLE}
+def configure_parameters(user, proposals: List) -> Dict:
+    return {
+        xls_build.DESCRIPTION: XLS_DESCRIPTION,
+        xls_build.USER: get_name_or_username(user),
+        xls_build.FILENAME: XLS_FILENAME,
+        xls_build.HEADER_TITLES: PROPOSAL_TITLES,
+        xls_build.WS_TITLE: WORKSHEET_TITLE,
+        xls_build.FONT_CELLS: {
+            BLACK_FONT_STRIKETHROUGH: _get_font_for_entities_columns(proposals)
+        },
+        xls_build.FONT_ROWS: {BOLD_FONT: [0]}
+    }
+
+
+def _get_font_for_entities_columns(proposals: List) -> List[str]:
+    cells_strike_with_black_font = []
+    for row, learning_unit_yr in enumerate(proposals, start=2):
+        if not learning_unit_yr.active_entity_requirement_version:
+            cells_strike_with_black_font.append(
+                "{}{}".format(REQUIREMENT_ENTITY_COL, row)
+            )
+        if not learning_unit_yr.active_entity_allocation_version:
+            cells_strike_with_black_font.append(
+                "{}{}".format(ALLOCATION_ENTITY_COL, row)
+            )
+    return cells_strike_with_black_font

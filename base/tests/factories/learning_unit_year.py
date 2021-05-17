@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -44,6 +44,9 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from reference.tests.factories.language import LanguageFactory
+
+ENT_REQUIREMENT_ACRONYM = 'DRT'
+ENT_ALLOCATION_ACRONYM = 'BUDR'
 
 fake = Faker()
 
@@ -179,8 +182,8 @@ def simulate_annotate_on_entities(luy_to_complete):
     luy = luy_to_complete
     luy.active_entity_requirement_version = True
     luy.active_entity_allocation_version = True
-    luy.ent_requirement_acronym = 'DRT'
-    luy.ent_allocation_acronym = 'BUDR'
+    luy.ent_requirement_acronym = ENT_REQUIREMENT_ACRONYM
+    luy.ent_allocation_acronym = ENT_ALLOCATION_ACRONYM
     luy.additional_entity_1_acronym = 'AGRO'
     luy.additional_entity_2_acronym = 'ESPO'
     return luy

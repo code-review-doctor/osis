@@ -26,6 +26,7 @@
 import datetime
 from unittest import mock
 
+from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -33,17 +34,21 @@ from base.business import proposal_xls
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.business.learning_units.xls_comparison import prepare_xls_content_for_comparison
 from base.business.proposal_xls import XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE, basic_titles_part_1, \
-    basic_titles_part_2, components_titles, basic_titles
+    basic_titles_part_2, components_titles, basic_titles, BLACK_FONT_STRIKETHROUGH, BOLD_FONT, REQUIREMENT_ENTITY_COL, \
+    ALLOCATION_ENTITY_COL
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.organization_type import MAIN
-from base.tests.factories.academic_year import create_current_academic_year
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, simulate_annotate_on_entities
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, simulate_annotate_on_entities, \
+    ENT_ALLOCATION_ACRONYM, ENT_REQUIREMENT_ACRONYM
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
@@ -69,10 +74,10 @@ class TestProposalXls(TestCase):
                                                    academic_year=self.academic_year,
                                                    subtype=learning_unit_year_subtypes.FULL,
                                                    credits=10)
-        entity_requirement_ver = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
+        entity_requirement_ver = EntityVersionFactory(acronym=ENT_REQUIREMENT_ACRONYM,
                                                       entity=EntityFactory())
         self.l_unit_yr_1.entity_requirement = entity_requirement_ver.acronym
-        entity_allocation_ver = EntityVersionFactory(acronym=ACRONYM_ALLOCATION, entity=EntityFactory())
+        entity_allocation_ver = EntityVersionFactory(acronym=ENT_ALLOCATION_ACRONYM, entity=EntityFactory())
         self.l_unit_yr_1.entity_allocation = entity_allocation_ver.acronym
         entity_vr = EntityVersionFactory(acronym='ESPO')
 
@@ -86,7 +91,8 @@ class TestProposalXls(TestCase):
         self.assertEqual(proposals_data['data'], [])
 
     def test_prepare_xls_content_with_data(self):
-        proposals_data = proposal_xls.prepare_xls_content([self.proposal_1.learning_unit_year])
+        luy = simulate_annotate_on_entities(self.proposal_1.learning_unit_year)
+        proposals_data = proposal_xls.prepare_xls_content([luy])
         self.assertEqual(len(proposals_data), 1)
         self.assertEqual(proposals_data[0], self._get_xls_data())
 
@@ -96,7 +102,7 @@ class TestProposalXls(TestCase):
         self.assertEqual(len(proposals_data['data']), 1)
 
     def test_prepare_xls_comparison_content_with_data_with_initial_data(self):
-        self.proposal_1.initial_data = build_initial_data(self.l_unit_yr_1, self.entity_version.entity)
+        self.proposal_1.initial_data = build_initial_data(self.l_unit_yr_1, self.entity_requirement_version.entity)
         self.proposal_1.save()
         luy = simulate_annotate_on_entities(self.l_unit_yr_1)
         proposals_data = prepare_xls_content_for_comparison([luy])
@@ -177,44 +183,45 @@ class TestProposalXls(TestCase):
         )
 
     def _get_xls_data(self):
-        return [self.l_unit_yr_1.entity_requirement,
-                self.proposal_1.learning_unit_year.acronym,
-                self.proposal_1.learning_unit_year.complete_title,
-                self.proposal_1.learning_unit_year.learning_container_year.get_container_type_display(),
-                self.proposal_1.get_type_display(),
-                self.proposal_1.get_state_display(),
-                self.proposal_1.folder,
-                self.proposal_1.learning_unit_year.learning_container_year.get_type_declaration_vacant_display(),
-                dict(PERIODICITY_TYPES)[self.proposal_1.learning_unit_year.periodicity],
-                self.proposal_1.learning_unit_year.credits,
-                self.l_unit_yr_1.entity_allocation,
-                self.proposal_1.date.strftime('%d-%m-%Y')]
+        return [
+            ENT_REQUIREMENT_ACRONYM,
+            self.proposal_1.learning_unit_year.acronym,
+            self.proposal_1.learning_unit_year.complete_title,
+            self.proposal_1.learning_unit_year.learning_container_year.get_container_type_display(),
+            self.proposal_1.get_type_display(),
+            self.proposal_1.get_state_display(),
+            self.proposal_1.folder,
+            self.proposal_1.learning_unit_year.learning_container_year.get_type_declaration_vacant_display(),
+            dict(PERIODICITY_TYPES)[self.proposal_1.learning_unit_year.periodicity],
+            self.proposal_1.learning_unit_year.credits,
+            ENT_ALLOCATION_ACRONYM,
+            self.proposal_1.date.strftime('%d-%m-%Y')
+        ]
 
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        proposal_xls.create_xls(self.user, [], None)
-        expected_argument = _generate_xls_build_parameter([], self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
+    def test_generate_xls_data_with_a_learning_unit(self):
+        qs = LearningUnitYear.objects.filter(id=self.proposal_1.learning_unit_year.pk)
+        qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
 
-    @mock.patch("osis_common.document.xls_build.generate_xls")
-    def test_generate_xls_data_with_a_learning_unit(self, mock_generate_xls):
-        proposal_xls.create_xls(self.user, [self.proposal_1.learning_unit_year], None)
-        xls_data = [self._get_xls_data()]
-        expected_argument = _generate_xls_build_parameter(xls_data, self.user)
-        mock_generate_xls.assert_called_with(expected_argument, None)
+        parameters_dict = proposal_xls.configure_parameters(self.user, list(qs))
+        self.assertDictEqual(parameters_dict[xls_build.FONT_ROWS], {BOLD_FONT: [0]})
+        self.assertDictEqual(parameters_dict[xls_build.FONT_CELLS], {BLACK_FONT_STRIKETHROUGH: []})
 
     def _set_entities(self):
         today = datetime.date.today()
         an_entity = EntityFactory(organization=OrganizationFactory(type=MAIN))
-        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
-                                                   start_date=today.replace(year=1900),
-                                                   end_date=None)
-
-        self.l_unit_yr_1.learning_container_year.requirement_entity = self.entity_version.entity
-        self.l_unit_yr_1.learning_container_year.allocation_entity = self.entity_version.entity
+        self.entity_requirement_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+                                                               start_date=today.replace(year=1900),
+                                                               end_date=None,
+                                                               acronym=ENT_REQUIREMENT_ACRONYM)
+        self.allocation_entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+                                                              start_date=today.replace(year=1900),
+                                                              end_date=None,
+                                                              acronym=ENT_ALLOCATION_ACRONYM)
+        self.l_unit_yr_1.learning_container_year.requirement_entity = self.entity_requirement_version.entity
+        self.l_unit_yr_1.learning_container_year.allocation_entity = self.allocation_entity_version.entity
         self.l_unit_yr_1.learning_container_year.save()
 
-        append_latest_entities(self.proposal_1.learning_unit_year)
+        # append_latest_entities(self.proposal_1.learning_unit_year)
 
 
 def _generate_xls_build_parameter(xls_data, user):
@@ -227,9 +234,9 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.HEADER_TITLES_KEY: proposal_xls.PROPOSAL_TITLES,
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
-            xls_build.FONT_ROWS: None,
+            xls_build.FONT_ROWS: {BOLD_FONT: [0]},
             xls_build.ROW_HEIGHT: None,
-            xls_build.FONT_CELLS: None,
+            xls_build.FONT_CELLS: {BLACK_FONT_STRIKETHROUGH: []},
             xls_build.BORDER_CELLS: None
         }]
     }
