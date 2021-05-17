@@ -31,13 +31,13 @@
     {% if learning_unit_year.id %}
         <li><a href="{% url 'learning_unit' learning_unit_year.id %}">{{ learning_unit_year.acronym }}</a></li>
     {% endif %}
-    <li class="active">{% trans 'New classe' %}</li>
+    <li class="active">{% trans 'New class' %}</li>
 {% endblock %}
 {% block header_content %}
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% block h2_title %}{% trans 'New classe' %}{% endblock %}</h2>
+        <h2>{% block h2_title %}{% trans 'New class' %}{% endblock %}</h2>
     </div>
 
         <div class="panel panel-default">
