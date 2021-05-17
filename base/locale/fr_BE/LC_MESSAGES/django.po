@@ -1622,7 +1622,7 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
-msgid "New classe"
+msgid "New class"
 msgstr "Nouvelle classe"
 
 msgid "New external learning unit"

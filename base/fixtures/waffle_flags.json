@@ -382,7 +382,7 @@
     "model": "waffle.flag",
     "pk": 21,
     "fields": {
-        "name": "learning_classe_create",
+        "name": "learning_class_create",
         "everyone": null,
         "percent": null,
         "testing": false,

@@ -1582,7 +1582,7 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
-msgid "New classe"
+msgid "New class"
 msgstr ""
 
 msgid "New external learning unit"

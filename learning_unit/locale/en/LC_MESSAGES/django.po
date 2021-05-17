@@ -47,7 +47,7 @@ msgstr ""
 msgid "Learning units"
 msgstr ""
 
-msgid "New classe"
+msgid "New class"
 msgstr ""
 
 msgid "Not in period to edit description fiche."

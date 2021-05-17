@@ -53,11 +53,11 @@
                                         {% trans 'New partim' %}
                                     </a>
                                 </li>
-                                {% if can_create_classe %}
+                                {% if can_create_class %}
                                     {% if not learning_unit_year.learning_container_year.container_type == 'EXTERNAL' %}
                                         <li>
                                             {% url "create_class" learning_unit_year_id=learning_unit_year.id as create_class_url %}
-                                            {% a_tag_has_perm create_class_url _('New classe') 'base.can_create_classe' user learning_unit_year %}
+                                            {% a_tag_has_perm create_class_url _('New class') 'base.can_create_class' user learning_unit_year %}
                                         </li>
                                     {% endif %}
                                 {% endif %}

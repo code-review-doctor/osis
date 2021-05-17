@@ -34,7 +34,7 @@ from learning_unit.forms.classes.create import ClasseForm
 class Create(PermissionRequiredMixin, FormView):
     template_name = "classe/creation.html"
     form_class = ClasseForm
-    permission_required = 'base.can_create_classe'
+    permission_required = 'base.can_create_class'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
