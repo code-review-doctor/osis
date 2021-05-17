@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 09:58+0200\n"
+"POT-Creation-Date: 2021-05-17 13:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,8 +20,9 @@ msgstr ""
 msgid " Are you sure you want to delete %(obj_repr)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(obj_repr)s?"
 
-#, python-format
-msgid " Are you sure you want to edit order %(obj_repr)s ?"
+msgid ""
+" Are you sure you want to edit order %(obj_repr)s\n"
+"            ?"
 msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre de %(obj_repr)s?"
 
 #, python-format
