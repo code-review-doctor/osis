@@ -413,7 +413,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                         ' true);'
                     ),
                 },
-                forward=['country_additional_entity_1']
+                forward=['country_additional_entity_1', 'academic_year']
             ),
             queryset=find_additional_requirement_entities_choices(self.__get_academic_year()),
             label=_('Additional requirement entity 1'),
@@ -440,7 +440,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                         ' "id_component-1-repartition_volume_additional_entity_2", false);'
                     ),
                 },
-                forward=['country_additional_entity_2']
+                forward=['country_additional_entity_2', 'academic_year']
             ),
             queryset=find_additional_requirement_entities_choices(self.__get_academic_year()),
             label=_('Additional requirement entity 2'),
