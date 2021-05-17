@@ -162,7 +162,7 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
     titles_part1 = _prepare_titles(is_external_ue_list, with_attributions, with_grp)
-
+    learning_units = LearningUnitYearQuerySet.annotate_entities_status(learning_units)
     working_sheet_data = prepare_xls_content(
         learning_units,
         is_external_ue_list,
@@ -171,7 +171,7 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
     )
     ws_data = xls_build.prepare_xls_parameters_list(
         working_sheet_data,
-        _get_parameters_configurable_list(learning_units, titles_part1, user)
+        _get_parameters_configurable_list(learning_units, titles_part1, user, is_external_ue_list)
     )
     working_sheets_data = [ws_data.get(xls_build.WORKSHEETS_DATA)[0]]
     if not is_external_ue_list:
@@ -180,7 +180,7 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
     return xls_build.generate_xls(ws_data, filters)
 
 
-def _get_parameters_configurable_list(learning_units, titles, user) -> dict:
+def _get_parameters_configurable_list(learning_units, titles, user, is_external_ue_list: bool) -> dict:
     parameters = {
         xls_build.DESCRIPTION: XLS_DESCRIPTION,
         xls_build.USER: get_name_or_username(user),
@@ -195,7 +195,7 @@ def _get_parameters_configurable_list(learning_units, titles, user) -> dict:
             )
         },
         xls_build.FONT_ROWS: _get_font_rows(learning_units),
-        xls_build.FONT_CELLS: _get_strikethrough_cells(learning_units)
+        xls_build.FONT_CELLS: _get_strikethrough_cells(learning_units, is_external_ue_list)
     }
     return parameters
 
@@ -606,15 +606,22 @@ def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
     return teachers
 
 
-def _get_strikethrough_cells(learning_units):
+def _get_strikethrough_cells(learning_units, is_external_ue_list: bool):
     strikethrough_cells = defaultdict(list)
+    if is_external_ue_list:
+        requirement_entity_column = "F"
+        allocation_entity_column = "H"
+    else:
+        requirement_entity_column = REQUIREMENT_ENTITY_COL
+        allocation_entity_column = ALLOCATION_ENTITY_COL
+
     for idx, luy in enumerate(learning_units, start=2):
         strikethrough_cells = _get_strikethrough_cells_on_entity(
             idx,
             luy,
             strikethrough_cells,
             luy.active_entity_allocation_version,
-            ALLOCATION_ENTITY_COL
+            allocation_entity_column
         )
 
         strikethrough_cells = _get_strikethrough_cells_on_entity(
@@ -622,7 +629,7 @@ def _get_strikethrough_cells(learning_units):
             luy,
             strikethrough_cells,
             luy.active_entity_requirement_version,
-            REQUIREMENT_ENTITY_COL
+            requirement_entity_column
         )
     return strikethrough_cells
 

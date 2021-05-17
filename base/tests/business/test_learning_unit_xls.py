@@ -372,7 +372,7 @@ class TestLearningUnitXls(TestCase):
         self.learning_unit_yr_2.active_entity_requirement_version = True
         self.learning_unit_yr_2.active_entity_allocation_version = True
         learning_units = [self.learning_unit_yr_1, self.learning_unit_yr_2]
-        param = _get_parameters_configurable_list(learning_units, titles, an_user)
+        param = _get_parameters_configurable_list(learning_units, titles, an_user, False)
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
         self.assertEqual(param.get(xls_build.USER), an_user.username)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
@@ -381,7 +381,7 @@ class TestLearningUnitXls(TestCase):
 
         titles.append(HEADER_PROGRAMS)
 
-        param = _get_parameters_configurable_list(learning_units, titles, an_user)
+        param = _get_parameters_configurable_list(learning_units, titles, an_user, False)
         self.assertEqual(param.get(xls_build.ALIGN_CELLS), {WRAP_TEXT_ALIGNMENT: ['C2', 'C3']})
 
     def test_get_data_part2(self):
