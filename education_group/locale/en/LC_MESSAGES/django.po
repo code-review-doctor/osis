@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 07:45+0200\n"
+"POT-Creation-Date: 2021-05-17 13:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,12 @@ msgstr ""
 
 #, python-format
 msgid " Are you sure you want to delete %(obj_repr)s ?"
+msgstr ""
+
+#, python-format
+msgid ""
+" Are you sure you want to edit order %(obj_repr)s\n"
+"            ?"
 msgstr ""
 
 #, python-format
@@ -302,6 +308,12 @@ msgstr ""
 msgid "Contact has been created (without postpone)"
 msgstr ""
 
+msgid "Contact has been moved (with postpone)"
+msgstr ""
+
+msgid "Contact has been moved (without postpone)"
+msgstr ""
+
 msgid "Contact has been removed (with postpone)"
 msgstr ""
 
@@ -447,8 +459,9 @@ msgid "For all students"
 msgstr ""
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -623,6 +636,18 @@ msgid "Modify order achievement"
 msgstr ""
 
 msgid "Modify order of condition"
+msgstr ""
+
+msgid "Move"
+msgstr ""
+
+msgid "Move and postpone"
+msgstr ""
+
+msgid "Move and postpone changes on next years"
+msgstr ""
+
+msgid "Move contact"
 msgstr ""
 
 #, python-brace-format

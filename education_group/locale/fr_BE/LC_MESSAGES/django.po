@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 07:45+0200\n"
+"POT-Creation-Date: 2021-05-17 13:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,11 @@ msgstr ""
 #, python-format
 msgid " Are you sure you want to delete %(obj_repr)s ?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer  %(obj_repr)s?"
+
+msgid ""
+" Are you sure you want to edit order %(obj_repr)s\n"
+"            ?"
+msgstr "Êtes-vous sûr·e de vouloir modifier l'ordre de %(obj_repr)s?"
 
 #, python-format
 msgid " Postpone will be apply on all section block \"%(section)s\" ! "
@@ -320,6 +325,12 @@ msgstr "Un contact a été créé (avec report)"
 msgid "Contact has been created (without postpone)"
 msgstr "Un contact a été créé (sans report)"
 
+msgid "Contact has been moved (with postpone)"
+msgstr "Un contact a été déplacé (avec report)"
+
+msgid "Contact has been moved (without postpone)"
+msgstr "Un contact a été déplacé (sans report)"
+
 msgid "Contact has been removed (with postpone)"
 msgstr "Un contact a été supprimé (avec report)"
 
@@ -466,11 +477,13 @@ msgid "For all students"
 msgstr "Pour tous les étudiants"
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 "Pour les formations de type : doctorale, attestation, certificat et CAPAES; "
-"les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou tous les champs ARES doivent être vides"
+"les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou "
+"tous les champs ARES doivent être vides"
 
 msgid "Foreign Bachelors"
 msgstr "Bacheliers étrangers"
@@ -661,6 +674,18 @@ msgstr "Modifier l'ordre des acquis"
 
 msgid "Modify order of condition"
 msgstr "Modifier l'ordre d'une condition"
+
+msgid "Move"
+msgstr "Déplacer"
+
+msgid "Move and postpone"
+msgstr "Déplacer et reporter"
+
+msgid "Move and postpone changes on next years"
+msgstr "Déplacer et reporter les changements sur les années futures"
+
+msgid "Move contact"
+msgstr "Déplacer un contact"
 
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
