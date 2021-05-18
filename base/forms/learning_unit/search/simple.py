@@ -43,6 +43,7 @@ COMMON_ORDERING_FIELDS = (
     ('type_ordering', 'type'), ('subtype', 'subtype'),
     ('entity_requirement', 'requirement_entity'), ('entity_allocation', 'allocation_entity'),
     ('credits', 'credits'), ('status', 'status'), ('has_proposal', 'has_proposal'),
+    ('ent_requirement_acronym', 'ent_requirement_acronym'), ('ent_allocation_acronym', 'ent_allocation_acronym'),
 )
 
 MOBILITY = 'mobility'
