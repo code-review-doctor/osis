@@ -27,6 +27,7 @@
 """
 Utility files for mail sending
 """
+import itertools
 from typing import List
 import datetime
 
@@ -325,16 +326,16 @@ def send_message_after_all_encoded_by_manager(
         updated_enrollments_ids,
         encoding_already_completed_before_update
     )
-
-    for receiver in receivers:
+    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
+    for receiver_lang, receivers in receivers_by_lang:
         table = message_config.create_table(
             'enrollments',
-            get_enrollment_headers(receiver['receiver_lang']),
+            get_enrollment_headers(receiver_lang),
             {
                 "style": rows_styles,
                 "data": enrollments_data,
                 "txt_complementary_first_col": {
-                    "header": _get_txt_complementary_first_col_header(receiver['receiver_lang']),
+                    "header": _get_txt_complementary_first_col_header(receiver_lang),
                     "rows_content": txt_complementary_first_col_content_data
                 }
             },
@@ -346,7 +347,7 @@ def send_message_after_all_encoded_by_manager(
             html_template_ref,
             txt_template_ref,
             [table],
-            [receiver],
+            receivers,
             template_base_data,
             subject_data,
             attachment,
