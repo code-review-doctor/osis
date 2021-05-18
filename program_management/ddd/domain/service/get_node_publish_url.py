@@ -36,5 +36,12 @@ class GetNodePublishUrl(interface.DomainService):
         if not all([settings.ESB_API_URL, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT]):
             raise ImproperlyConfigured('ESB_API_URL / ESB_REFRESH_PEDAGOGY_ENDPOINT must be set in configuration')
 
-        endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code=node.title)
+        if node.is_minor():
+            endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code="min-" + node.code)
+        elif node.is_deepening():
+            endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code="app-" + node.code)
+        elif node.is_major():
+            endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code="fsa1ba-" + node.code)
+        else:
+            endpoint = settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(year=node.year, code=node.title)
         return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
