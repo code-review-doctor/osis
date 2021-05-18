@@ -109,9 +109,7 @@ class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         if country:
             qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
             if country != "all":
-                qs = qs.filter(
-                    entity__entityversion__entityversionaddress__country_id=country
-                )
+                qs = qs.filter(entityversionaddress__country_id=country)
         else:
             qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:

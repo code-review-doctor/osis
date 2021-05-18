@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-21 13:46+0200\n"
+"POT-Creation-Date: 2021-05-07 11:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2165,6 +2165,9 @@ msgstr ""
 msgid "Scores responsibles"
 msgstr ""
 
+msgid "Scores responsibles (emails)"
+msgstr ""
+
 msgid "Search for an entity"
 msgstr ""
 
@@ -2642,9 +2645,6 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
-msgid "Trainings/gathering"
-msgstr ""
-
 msgid "Transformation"
 msgstr ""
 
@@ -2664,6 +2664,9 @@ msgid "Tutor"
 msgstr ""
 
 msgid "Tutors"
+msgstr ""
+
+msgid "Tutors (scores responsibles included)"
 msgstr ""
 
 msgid "Type"
@@ -2718,6 +2721,9 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Updated"
 msgstr ""
 
 msgid "Url"
