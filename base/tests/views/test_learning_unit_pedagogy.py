@@ -38,8 +38,9 @@ from openpyxl import load_workbook
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
-from base.models.enums import academic_calendar_type, entity_type
+from base.models.enums import entity_type
 from base.models.enums import organization_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -57,6 +58,7 @@ from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, LearningUnitYearTranslatedTextFactory
+from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 
 
@@ -76,7 +78,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -94,6 +96,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         )
         cls.url = reverse('learning_units_summary')
         cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity)
+        TranslatedTextLabelFactory(text_label__label='resume')
 
     def setUp(self):
         self.client.force_login(self.faculty_manager.person.user)
@@ -175,6 +178,21 @@ class LearningUnitPedagogyTestCase(TestCase):
         response = self.client.get(url_tab_active)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
+    def test_learning_unit_pedagogy_read_with_learning_unit_year(self):
+        url = reverse("learning_unit_pedagogy", args=[self.learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(response.context['cms_labels_translated'])
+
+    def test_learning_unit_pedagogy_read_with_code_and_year(self):
+        url = reverse("learning_unit_pedagogy", args=[
+            self.learning_unit_year.acronym,
+            self.learning_unit_year.academic_year.year
+        ])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(response.context['cms_labels_translated'])
+
 
 class LearningUnitPedagogyExportXLSTestCase(TestCase):
     @classmethod
@@ -190,7 +208,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(
@@ -329,7 +347,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             data_year=cls.previous_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
-            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+            reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
         )
 
         cls.requirement_entity_version = EntityVersionFactory(

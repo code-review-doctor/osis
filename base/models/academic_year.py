@@ -106,8 +106,16 @@ class AcademicYear(SerializableModel):
     def next(self):
         return AcademicYear.objects.get(year=self.year + 1)
 
+    @property
+    def nex_year(self) -> int:
+        return self.year + 1
+
     def past(self):
         return AcademicYear.objects.get(year=self.year - 1)
+
+    @property
+    def past_year(self) -> int:
+        return self.year - 1
 
 
 def find_academic_year_by_id(academic_year_id):

@@ -31,7 +31,7 @@ from rest_framework import serializers
 
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
-    SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
+    SKILLS_AND_ACHIEVEMENTS, ACCESS_REQUIREMENTS, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.enums.education_group_types import GroupType
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -40,7 +40,7 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from education_group.ddd import command
 from education_group.ddd.service.read import get_group_service
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
-    AdmissionConditionSectionSerializer, ContactsSectionSerializer
+    AccessRequirementsSectionSerializer, ContactsSectionSerializer
 
 WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
@@ -75,7 +75,7 @@ class GeneralInformationSerializer(serializers.Serializer):
 
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
-            ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
+            ACCESS_REQUIREMENTS: AccessRequirementsSectionSerializer,
             CONTACTS: ContactsSectionSerializer,
         }
         extra_intro_offers = self._get_intro_offers(obj)

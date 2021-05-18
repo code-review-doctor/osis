@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-18 08:39+0100\n"
+"POT-Creation-Date: 2021-05-07 11:24+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -148,6 +148,11 @@ msgstr "Absent"
 msgid "Ac yr."
 msgstr "Anac."
 
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
+msgstr ""
+"Anac, sigle/int.abr, intitulé complet en français, catégorie, type de "
+"formation, nombre de crédits, code"
+
 msgid "Academic"
 msgstr "Académique"
 
@@ -162,6 +167,11 @@ msgstr "Calendrier académique"
 
 msgid "Academic calendar management"
 msgstr "Gestion du calendrier académique"
+
+msgid "Academic nature, category of decree and university certificate"
+msgstr ""
+"Caractère académique (nature), catégorie de décret et certificat "
+"universitaire"
 
 msgid "Academic partner"
 msgstr "Partenaire académique"
@@ -657,12 +667,8 @@ msgstr "Catégorie décret"
 msgid "Deepening"
 msgstr "Approfondissement"
 
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
-msgstr ""
-"Informations par défaut (anac, sigle/int abr, intitulé complet en français, "
-"catégorie, type de formation, nombre de crédits)"
+msgid "Default information"
+msgstr "Informations par défaut"
 
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
@@ -705,6 +711,9 @@ msgstr "Détails autre aménagement"
 
 msgid "Diploma title"
 msgstr "Intitulé du diplôme/du certificat"
+
+msgid "Diploma title, professionnal title and aims"
+msgstr "Intitulé du diplôme, titre professionnel et attendus"
 
 msgid "Diploma/certificat"
 msgstr "Diplôme/certificat"
@@ -858,9 +867,6 @@ msgstr "Inscrit"
 msgid "Enrolled to learning unit"
 msgstr "Inscrits à l'UE"
 
-msgid "Enrollment"
-msgstr "Inscription"
-
 msgid "Enrollment campus"
 msgstr "Lieu d'inscription"
 
@@ -869,6 +875,9 @@ msgstr "Date d'inscription"
 
 msgid "Enrollment enabled"
 msgstr "Inscriptible"
+
+msgid "Enrollment, partial deliberation and admission exam"
+msgstr "Inscription, sous-épreuve et concours"
 
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
@@ -910,6 +919,13 @@ msgstr "Gestionnaire d'entités"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
+
+msgid ""
+"Entity, location, language, duration, schedule and types of activities "
+"present in the training"
+msgstr ""
+"Entité, lieu, langue, durée, horaire et types d'activités présentes dans la "
+"formation"
 
 msgid "Entrepreneur"
 msgstr "Entreprenariat"
@@ -986,6 +1002,9 @@ msgstr "Echec"
 
 msgid "Female"
 msgstr "Féminin"
+
+msgid "Fill this transition version"
+msgstr "Remplir cette version de transition"
 
 msgid "Finality 120 list choice"
 msgstr "Liste au choix de Finalités (120)"
@@ -1070,7 +1089,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "Gathering"
-msgstr "Regroupement"
+msgstr "Groupement"
 
 msgid "Gender"
 msgstr "Genre"
@@ -1078,8 +1097,8 @@ msgstr "Genre"
 msgid "General configuration"
 msgstr "Configuration générale"
 
-msgid "General information and Admission condition"
-msgstr "Informations générales et Conditions d'admission"
+msgid "General information and Access requirements"
+msgstr "Informations générales et Conditions d'accès"
 
 msgid "Generate PDF not available. Please use EPC."
 msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
@@ -1387,6 +1406,9 @@ msgstr "Liste des propositions"
 msgid "Local credits"
 msgstr "Crédits locaux"
 
+msgid "Location, language and types of activities present in the training"
+msgstr "Lieu, langue et types d'activités présentes dans la formation"
+
 msgid "Lock"
 msgstr "Bloquer"
 
@@ -1564,10 +1586,6 @@ msgstr "Liste au choix Partenariat mobilité"
 msgid "Modification"
 msgstr "Modification"
 
-#, python-format
-msgid "Modifications should be made in EPC for year %(year)d"
-msgstr "Les modifications doivent être faites dans EPC pour l'année %(year)d"
-
 msgid "Modified"
 msgstr "Modifié"
 
@@ -1670,14 +1688,6 @@ msgstr "Non défini"
 msgid "Not enrolled"
 msgstr "Pas inscrit"
 
-msgid "Not in period to edit description fiche."
-msgstr "Vous n'êtes pas en période de modification des fiches descriptives."
-
-msgid "Not in period to edit force majeure section."
-msgstr ""
-"Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
-"force majeure)."
-
 msgid "Not modified"
 msgstr "Non modifié"
 
@@ -1741,9 +1751,6 @@ msgstr "Organigramme"
 
 msgid "Organizations"
 msgstr "Organisations"
-
-msgid "Osis code"
-msgstr "Code Osis"
 
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
@@ -2136,6 +2143,9 @@ msgctxt "Submission email table header"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Remarks, comments and constraints"
+msgstr "Remarques, commentaires et contraintes"
+
 msgid "Req. Entities"
 msgstr "Ent. charges"
 
@@ -2213,6 +2223,9 @@ msgstr "Les scores doivent être compris entre 0 et 20"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
+
+msgid "Scores responsibles (emails)"
+msgstr "Responsables de notes (emails)"
 
 msgid "Search for an entity"
 msgstr "Rechercher une entité"
@@ -2517,11 +2530,6 @@ msgstr ""
 "L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
 "effectué lors de la consolidation"
 
-msgid "The learning unit's description fiche is not editable."
-msgstr ""
-"La mise-à-jour des fiches descriptives est bloquée pour cette unité "
-"d'enseignement."
-
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
@@ -2552,6 +2560,10 @@ msgstr "L'UE complète est inactive et au moins un partim est actif"
 
 msgid "The partim"
 msgstr "Le partim"
+
+msgid "The period to edit scores responsibles is not opened yet"
+msgstr ""
+"La période d'édition des responsables de notes n'est pas encore ouverte."
 
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
@@ -2741,9 +2753,6 @@ msgstr "Formation intitulé"
 msgid "Trainings"
 msgstr "Formations"
 
-msgid "Trainings/gathering"
-msgstr "Formations/regroupements"
-
 msgid "Transformation"
 msgstr "Transformation"
 
@@ -2764,6 +2773,9 @@ msgstr "Enseignant·e"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
+
+msgid "Tutors (scores responsibles included)"
+msgstr "Enseignant·e·s (responsables de notes inclus)"
 
 msgid "Type"
 msgstr "Type"
@@ -2820,6 +2832,9 @@ msgstr "Mise-à-jour bloquée pour l'enseignant"
 
 msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
+
+msgid "Updated"
+msgstr "Mis à jour"
 
 msgid "Url"
 msgstr "URL"
@@ -2915,17 +2930,8 @@ msgstr "Oui"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
-msgid "You are not attributed to this learning unit."
-msgstr "Vous n'êtes pas attribué à cette unité d'enseignement."
-
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
-
-#, python-format
-msgid "You can't modify learning unit under year : %(year)d"
-msgstr ""
-"Vous ne pouvez pas modifier une unité d'enseignement dont l'année est "
-"inférieure à %(year)d"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
@@ -2949,17 +2955,6 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas créer une proposition de fin d'enseignement sur la "
 "première année d'organisation de l'UE."
-
-msgid ""
-"You do not have the permission to refresh the publication for this learning "
-"unit"
-msgstr ""
-"Vous n'avez pas la permission d'actualiser la publication pour cette unité "
-"d'enseignement"
-
-msgid "You do not have the permission to refresh the publication for this year"
-msgstr ""
-"Vous n'avez pas la permission d'actualiser la publication pour cette année"
 
 msgid "You have the choice between"
 msgstr "Vous avez le choix entre"

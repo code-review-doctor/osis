@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List, Dict, Any
+import warnings
+from typing import Dict, Any
+from typing import Optional, List
 
 from django.db import transaction
 from django.db.models import Q
@@ -33,7 +35,9 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
+from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
+from osis_common.ddd.interface import RootEntity
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception, program_tree
@@ -41,8 +45,9 @@ from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity
 from program_management.ddd.domain.prerequisite import NullPrerequisites
 from program_management.ddd.repositories import _persist_prerequisite
-from program_management.ddd.repositories import persist_tree, node, load_node, load_authorized_relationship, \
+from program_management.ddd.repositories import load_node, load_authorized_relationship, \
     tree_prerequisites
+from program_management.ddd.repositories import persist_tree, node
 from program_management.models.element import Element
 
 # Typing
@@ -53,6 +58,10 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
 class ProgramTreeRepository(interface.AbstractRepository):
+
+    @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
 
     @classmethod
     def search(
@@ -96,8 +105,10 @@ class ProgramTreeRepository(interface.AbstractRepository):
             create_orphan_group_service: interface.ApplicationService = None,
             copy_group_service: interface.ApplicationService = None,
     ) -> 'ProgramTreeIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         for node in [n for n in program_tree.get_all_nodes() if n._has_changed and not n.is_learning_unit()]:
-            if create_orphan_group_service:
+            # FIXME _is_copied attribute is a dirty fix for the issue of having to know whether to create or copy
+            if create_orphan_group_service and not node._is_copied:
                 create_orphan_group_service(
                     CreateOrphanGroupCommand(
                         code=node.code,
@@ -119,7 +130,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
                         end_year=node.end_year,
                     )
                 )
-            if copy_group_service:
+            elif copy_group_service:
                 copy_group_service(
                     CopyGroupCommand(
                         from_code=node.code,
@@ -132,6 +143,7 @@ class ProgramTreeRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, program_tree: 'ProgramTree', **_) -> 'ProgramTreeIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         cls.__persist(program_tree)
         return program_tree.entity_id
 
@@ -152,6 +164,11 @@ class ProgramTreeRepository(interface.AbstractRepository):
             return _load(tree_root_id)
         except Element.DoesNotExist:
             raise exception.ProgramTreeNotFoundException(code=entity_id.code, year=entity_id.year)
+
+    @classmethod
+    def get_all_identities(cls) -> List['ProgramTreeIdentity']:
+        qs = GroupYear.objects.all().values_list("partial_acronym", "academic_year__year")
+        return [program_tree.ProgramTreeIdentity(code=row[0], year=row[1]) for row in qs]
 
 
 def _load(tree_root_id: int) -> 'ProgramTree':

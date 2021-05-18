@@ -34,6 +34,7 @@ from program_management.ddd.command import CreateProgramTreeSpecificVersionComma
     CreateProgramTreeTransitionVersionCommand, CreateStandardVersionCommand
 from program_management.ddd.domain import exception, academic_year
 from program_management.ddd.domain import program_tree
+from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.validators import validators_by_business_action
 
 STANDARD = ""
@@ -73,6 +74,35 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
         return bool(self.transition_name)
 
 
+class ProgramTreeVersionIdentityBuilder:
+    def build(
+            self,
+            year: int,
+            offer_acronym: str,
+            version_name: str,
+            transition_name: str
+    ) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentity(
+            year=year,
+            offer_acronym=offer_acronym,
+            version_name=version_name,
+            transition_name=transition_name
+        )
+
+    def build_specific_version(
+            self,
+            year: int,
+            offer_acronym: str,
+            version_name: str,
+    ) -> 'ProgramTreeVersionIdentity':
+        return self.build(
+            year=year,
+            offer_acronym=offer_acronym,
+            version_name=version_name,
+            transition_name=NOT_A_TRANSITION
+        )
+
+
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
@@ -80,16 +110,34 @@ class ProgramTreeVersionBuilder:
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
-            existing_learning_unit_nodes: Set['NodeLearningUnitYear'],
-            existing_trees: Set['ProgramTree']
+            existing_nodes: Set['Node'],
+            node_code_generator: 'GenerateNodeCode'
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
-        program_tree.ProgramTreeBuilder().fill_from_program_tree(
+        if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
+            program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_learning_unit_nodes,
-                existing_trees
+                existing_nodes,
             )
+        else:
+            program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
+                from_tree_version.get_tree(),
+                to_tree_version.get_tree(),
+                existing_nodes,
+                node_code_generator
+            )
+        return to_tree_version
+
+    def copy_prerequisites_from_tree_version(
+            self,
+            from_tree_version: 'ProgramTreeVersion',
+            to_tree_version: 'ProgramTreeVersion'
+    ) -> 'ProgramTreeVersion':
+        program_tree.ProgramTreeBuilder().copy_prerequisites_from_program_tree(
+            from_tree_version.get_tree(),
+            to_tree_version.get_tree()
+        )
         return to_tree_version
 
     def copy_to_next_year(
@@ -118,6 +166,7 @@ class ProgramTreeVersionBuilder:
                     copy_from.program_tree_identity,
                     year=copy_from.program_tree_identity.year + 1
                 ),
+                tree=None
             )
         return tree_version_next_year
 
@@ -151,6 +200,7 @@ class ProgramTreeVersionBuilder:
     ) -> 'ProgramTreeVersion':
         if command.transition_name:
             validator = validators_by_business_action.CreateProgramTreeTransitionVersionValidatorList(
+                command.end_year,
                 command.start_year,
                 command.offer_acronym,
                 command.version_name,
@@ -234,6 +284,10 @@ class ProgramTreeVersion(interface.RootEntity):
         return self.entity_id.is_standard
 
     @property
+    def academic_year(self) -> 'academic_year.AcademicYear':
+        return academic_year.AcademicYear(year=self.entity_id.year)
+
+    @property
     def end_year(self):
         return academic_year.AcademicYear(year=self.end_year_of_existence)
 
@@ -264,6 +318,13 @@ class ProgramTreeVersion(interface.RootEntity):
     @property
     def is_standard_transition(self) -> bool:
         return self.entity_id.is_standard_transition
+
+    @property
+    def official_name(self) -> str:
+        return "{acronym}{version_label}".format(
+            acronym=self.entity_id.offer_acronym,
+            version_label=version_label(self.entity_id)
+        )
 
     def update(self, data: UpdateProgramTreeVersiongData) -> 'ProgramTreeVersion':
         data_as_dict = attr.asdict(data, recurse=False)
