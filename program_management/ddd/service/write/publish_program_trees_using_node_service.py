@@ -66,7 +66,7 @@ def _bulk_publish(nodes: List['NodeGroupYear']) -> None:
         try:
             __publish(publish_url)
         except Exception as e:
-            logger.warning("Failed to refresh pedagogy endpoint: " + publish_url + "Error: " + str(e))
+            logger.warning("Failed to refresh pedagogy endpoint: " + publish_url + " Error: " + str(e))
             error_root_nodes_ids.append(node.entity_id)
 
     if error_root_nodes_ids:
