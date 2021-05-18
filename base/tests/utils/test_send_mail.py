@@ -187,7 +187,7 @@ class TestSendMessage(TestCase):
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
         self.assertEqual(args.get('txt_template_ref'),
                          "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
-        self.assertEqual(mock_create_table.call_count, 2)
+        self.assertEqual(mock_create_table.call_count, 1)
 
         fr_headers = [
             'Sigle',
@@ -216,7 +216,6 @@ class TestSendMessage(TestCase):
         mock_create_table.assert_has_calls(
             [
                 call('enrollments', fr_headers, data, data_translatable=['Justification']),
-                call('enrollments', fr_headers, data, data_translatable=['Justification'])
             ]
         )
 
