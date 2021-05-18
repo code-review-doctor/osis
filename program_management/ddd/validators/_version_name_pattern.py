@@ -29,7 +29,7 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.domain.exception import InvalidVersionNameException, \
     InvalidVersionNameWithTransitionException
 
-VERSION_NAME_REGEX = "^[A-Z]{0,15}$"
+VERSION_NAME_REGEX = "^[A-Z0-9]{0,15}$"
 HAVE_NOT_TRANSITION = "^((?!TRANSITION).)*$"
 
 

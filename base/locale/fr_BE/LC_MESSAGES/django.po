@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 14:57+0100\n"
+"POT-Creation-Date: 2021-04-21 13:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -169,7 +169,9 @@ msgid "Academic calendar management"
 msgstr "Gestion du calendrier académique"
 
 msgid "Academic nature, category of decree and university certificate"
-msgstr "Caractère académique (nature), catégorie de décret et certificat universitaire"
+msgstr ""
+"Caractère académique (nature), catégorie de décret et certificat "
+"universitaire"
 
 msgid "Academic partner"
 msgstr "Partenaire académique"
@@ -921,7 +923,9 @@ msgstr "Gestionnaires d'entités"
 msgid ""
 "Entity, location, language, duration, schedule and types of activities "
 "present in the training"
-msgstr "Entité, lieu, langue, durée, horaire et types d'activités présentes dans la formation"
+msgstr ""
+"Entité, lieu, langue, durée, horaire et types d'activités présentes dans la "
+"formation"
 
 msgid "Entrepreneur"
 msgstr "Entreprenariat"
@@ -2220,6 +2224,9 @@ msgstr "Les scores doivent être compris entre 0 et 20"
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
+msgid "Scores responsibles (emails)"
+msgstr "Responsables de notes (emails)"
+
 msgid "Search for an entity"
 msgstr "Rechercher une entité"
 
@@ -2554,6 +2561,9 @@ msgstr "L'UE complète est inactive et au moins un partim est actif"
 msgid "The partim"
 msgstr "Le partim"
 
+msgid "The period to edit scores responsibles is not opened yet"
+msgstr "La période d'édition des responsables de notes n'est pas encore ouverte."
+
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."
@@ -2766,6 +2776,9 @@ msgstr "Enseignant·e"
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
+msgid "Tutors (scores responsibles included)"
+msgstr "Enseignant·e·s (responsables de notes inclus)"
+
 msgid "Type"
 msgstr "Type"
 
@@ -2821,6 +2834,9 @@ msgstr "Mise-à-jour bloquée pour l'enseignant"
 
 msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
+
+msgid "Updated"
+msgstr "Mis à jour"
 
 msgid "Url"
 msgstr "URL"

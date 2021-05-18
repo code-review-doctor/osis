@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 14:57+0100\n"
+"POT-Creation-Date: 2021-04-21 13:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2165,6 +2165,9 @@ msgstr ""
 msgid "Scores responsibles"
 msgstr ""
 
+msgid "Scores responsibles (emails)"
+msgstr ""
+
 msgid "Search for an entity"
 msgstr ""
 
@@ -2474,6 +2477,9 @@ msgstr ""
 msgid "The partim"
 msgstr ""
 
+msgid "The period to edit scores responsibles is not opened yet"
+msgstr ""
+
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr ""
@@ -2663,6 +2669,9 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
+msgid "Tutors (scores responsibles included)"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -2715,6 +2724,9 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Updated"
 msgstr ""
 
 msgid "Url"
