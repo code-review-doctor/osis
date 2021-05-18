@@ -26,7 +26,7 @@
 import django_filters
 from django import forms
 from django.db.models import Q, Prefetch, Value, CharField, When, Case, F
-from django.db.models.functions import Concat
+from django.db.models.functions import Concat, Coalesce
 from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
@@ -67,7 +67,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
     order_by_field = 'ordering'
     ordering = django_filters.OrderingFilter(
         fields=(
-            ('requirement_entity', 'requirement_entity'),
+            ('ordering_entity', 'requirement_entity'),
             ('acronym', 'acronym'),
             ('full_title', 'learning_unit_title'),
         ),
@@ -132,4 +132,6 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         ).annotate(
             requirement_entity=F("entity_requirement"),
             most_recent_requirement_entity=F("most_recent_entity_requirement")
-        )
+        ).annotate(
+            ordering_entity=Coalesce('requirement_entity', 'most_recent_requirement_entity')
+        ).distinct()

@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import render
 
 from base.models.academic_year import current_academic_year
-from base.models.education_group_year import EducationGroupYear
+from base.models.education_group_year import EducationGroupYear, EducationGroupYearQueryset
 from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
 
@@ -60,6 +60,7 @@ def offers_search(request):
         'management_entity',
         'academic_year',
     ).distinct('education_group').order_by('education_group', 'acronym')
+    offer_years = EducationGroupYearQueryset.annotate_entity_management_acronym(offer_years)
 
     return render(request, "offers.html", {'entity_acronym': entity,
                                            'code': acronym,
