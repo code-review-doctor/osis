@@ -55,7 +55,7 @@ class TestGetNodePublishUrl(SimpleTestCase):
         )
 
     def test_assert_minor_publish_url(self):
-        code = "min-" + self.minor.code
+        code = self.minor.title
         expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.minor.year, code=code)
 
         self.assertEqual(
@@ -64,7 +64,7 @@ class TestGetNodePublishUrl(SimpleTestCase):
         )
 
     def test_assert_deepening_publish_url(self):
-        code = "app-" + self.deepening.code
+        code = self.deepening.title
         expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.deepening.year, code=code)
 
         self.assertEqual(
@@ -73,7 +73,7 @@ class TestGetNodePublishUrl(SimpleTestCase):
         )
 
     def test_assert_major_publish_url(self):
-        code = "fsa1ba-" + self.major.code
+        code = self.major.title
         expected_publish_url = "api.esb.com/offer/{year}/{code}/refresh".format(year=self.major.year, code=code)
 
         self.assertEqual(
