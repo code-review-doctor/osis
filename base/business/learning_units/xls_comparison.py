@@ -25,12 +25,12 @@
 ##############################################################################
 from collections import defaultdict
 from decimal import Decimal
-from typing import List, Dict
+from typing import List, Dict, Any
 
 from django.db.models import Case, When
 from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Font
+from openpyxl.styles import Font, Color
 from openpyxl.utils import get_column_letter
 
 from base.business import learning_unit_year_with_context
@@ -46,9 +46,10 @@ from base.business.xls import get_name_or_username
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
-from base.models.academic_year import find_academic_year_by_id
+from base.models.academic_year import find_academic_year_by_id, AcademicYear
 from base.models.campus import find_by_id as find_campus_by_id
 from base.models.entity import find_by_id
+from base.models.entity_version import EntityVersion
 from base.models.enums import entity_container_year_link_type as entity_types, vacant_declaration_type, \
     attribution_procedure
 from base.models.enums import learning_component_year_type
@@ -71,6 +72,7 @@ ACRONYM_COL_NUMBER = 0
 ACADEMIC_COL_NUMBER = 1
 CELLS_MODIFIED_NO_BORDER = 'modifications'
 CELLS_TOP_BORDER = 'border_not_modified'
+CELLS_STYLES = 'styles'
 DATA = 'data'
 
 REQUIREMENT_ENTITY_COL = "P"
@@ -79,6 +81,12 @@ ADDITIONAL_ENTITY_1_COL = "R"
 ADDITIONAL_ENTITY_2_COL = "S"
 STRIKETHROUGH_FONT = Font(strikethrough=True)
 BOLD_FONT = Font(bold=True)
+STYLE_MODIFIED_AND_ENTITY_INACTIVE = Font(color=Color('5CB85C'), strikethrough=True)
+ENTITY_KEYS = ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']
+REQUIREMENT_ENTITY_COLUMN = 17
+ALLOCATION_ENTITY_COLUMN = 18
+ADDITIONAL_ENTITY_1_COLUMN = 19
+ADDITIONAL_ENTITY_2_COLUMN = 20
 
 
 def learning_unit_titles():
@@ -348,6 +356,7 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
     data = []
     top_border = []
     modified_cells_no_border = []
+    cells_font_styles = defaultdict(list)
     for luy_with_proposal in luy_with_proposals:
         top_border.extend(get_border_columns(line_index))
         data_proposal = _get_proposal_data(luy_with_proposal)
@@ -355,26 +364,45 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
 
         proposal = luy_with_proposal.proposallearningunit
         initial_luy_data = proposal.initial_data
-
+        entities_acronym_and_status_for_proposal = get_entities_acronym_and_status_for_proposal(luy_with_proposal)
         if initial_luy_data and initial_luy_data.get('learning_unit'):
-            initial_data = _get_data_from_initial_data(luy_with_proposal.proposallearningunit.initial_data, True)
-            data.append(initial_data)
-            modified_cells_no_border.extend(
-                _check_changes(initial_data,
-                               data_proposal,
-                               line_index + 1))
-            line_index += 2
-        else:
-            line_index += 1
+            initial_data_info = _get_data_from_initial_data(luy_with_proposal, True)
+            initial_data = initial_data_info['data']
+            entities_acronym_and_status_for_initial_data = initial_data_info['entities_acronym_and_status']
 
+            data.append(initial_data)
+            cells_font_styles = _check_changes_in_proposals(
+                initial_data,
+                data_proposal,
+                line_index + 1,
+                entities_acronym_and_status_for_proposal,
+                cells_font_styles
+            )
+            line_index += 2
+            cells_font_styles = _check_entities_status_style_in_initial(
+                cells_font_styles,
+                entities_acronym_and_status_for_initial_data,
+                line_index
+            )
+        else:
+            cells_font_styles = _check_changes_in_proposals(
+                None,
+                data_proposal,
+                line_index + 1,
+                entities_acronym_and_status_for_proposal,
+                cells_font_styles
+            )
+            line_index += 1
     return {
         DATA: data,
         CELLS_TOP_BORDER: top_border or None,
         CELLS_MODIFIED_NO_BORDER: modified_cells_no_border or None,
+        CELLS_STYLES: cells_font_styles
     }
 
 
-def _get_data_from_initial_data(initial_data, proposal_comparison=False):
+def _get_data_from_initial_data(luy_with_proposal: LearningUnitYear, proposal_comparison=False) -> Dict[str, Any]:
+    initial_data = luy_with_proposal.proposallearningunit.initial_data
     luy_initial = initial_data.get('learning_unit_year', {})
     lcy_initial = initial_data.get('learning_container_year', {})
     lu_initial = initial_data.get('learning_unit', {})
@@ -384,10 +412,10 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
     else:
         learning_unit_yr = None
 
-    requirement_entity = find_by_id(lcy_initial.get('requirement_entity'))
-    allocation_entity = find_by_id(lcy_initial.get('allocation_entity'))
-    add1_requirement_entity = find_by_id(lcy_initial.get('additional_entity_1'))
-    add2_requirement_entity = find_by_id(lcy_initial.get('additional_entity_2'))
+    entities_acronym_and_status = get_entities_acronym_and_status_for_initial_data(
+        lcy_initial,
+        luy_with_proposal.academic_year
+    )
     campus = find_campus_by_id(luy_initial.get('campus'))
 
     organization = None
@@ -421,10 +449,10 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         get_representing_string(luy_initial.get('specific_title')),
         get_representing_string(lcy_initial.get('common_title_english')),
         get_representing_string(luy_initial.get('specific_title_english')),
-        requirement_entity.most_recent_acronym if requirement_entity else BLANK_VALUE,
-        allocation_entity.most_recent_acronym if allocation_entity else BLANK_VALUE,
-        add1_requirement_entity.most_recent_acronym if add1_requirement_entity else BLANK_VALUE,
-        add2_requirement_entity.most_recent_acronym if add2_requirement_entity else BLANK_VALUE,
+        entities_acronym_and_status['requirement_entity']['acronym'],
+        entities_acronym_and_status['allocation_entity']['acronym'],
+        entities_acronym_and_status['additional_entity_1']['acronym'],
+        entities_acronym_and_status['additional_entity_2']['acronym'],
         _('Yes') if luy_initial.get('professional_integration') else _('No'),
         organization.name if organization else BLANK_VALUE,
         campus if campus else BLANK_VALUE,
@@ -438,15 +466,10 @@ def _get_data_from_initial_data(initial_data, proposal_comparison=False):
         dict(attribution_procedure.ATTRIBUTION_PROCEDURES)[luy_initial.get('attribution_procedure')] if luy_initial.get(
             'attribution_procedure') else BLANK_VALUE,
     ]
-    return _get_data_from_components_initial_data(data, initial_data)
-
-
-def _check_changes(initial_data, proposal_data, line_index):
-    modifications = []
-    for col_index, obj in enumerate(initial_data[2:]):
-        if str(obj) != str(proposal_data[col_index + 2]):
-            modifications.append('{}{}'.format(get_column_letter(col_index + 2 + 1), line_index))
-    return modifications
+    return {
+        'data': _get_data_from_components_initial_data(data, initial_data),
+        'entities_acronym_and_status': entities_acronym_and_status
+    }
 
 
 def get_representing_string(value):
@@ -459,7 +482,6 @@ def create_xls_proposal_comparison(user, lus_with_proposal, filters):
     data = prepare_xls_content_for_comparison(lus_with_proposal)
 
     working_sheets_data = data.get('data')
-    cells_modified_with_green_font = data.get(CELLS_MODIFIED_NO_BORDER)
     cells_with_top_border = data.get(CELLS_TOP_BORDER)
 
     parameters = {
@@ -470,14 +492,12 @@ def create_xls_proposal_comparison(user, lus_with_proposal, filters):
         xls_build.WS_TITLE: COMPARISON_WORKSHEET_TITLE,
     }
 
-    if cells_modified_with_green_font:
-        parameters[xls_build.FONT_CELLS] = {xls_build.STYLE_MODIFIED: cells_modified_with_green_font}
+    parameters[xls_build.FONT_CELLS] = data.get(CELLS_STYLES, {})
 
     if cells_with_top_border:
         parameters[xls_build.BORDER_CELLS] = {xls_build.BORDER_BOTTOM: cells_with_top_border}
     parameters[xls_build.FONT_ROWS] = {BOLD_FONT: [0]}
-    parameters[xls_build.FONT_CELLS].update(
-        _get_strikethrough_cells_on_entity(lus_with_proposal, cells_modified_with_green_font))
+
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
@@ -580,7 +600,6 @@ def _get_strikethrough_cells_on_entity(luys: QuerySet, cells_modified_with_green
                 "{}{}".format(ADDITIONAL_ENTITY_2_COL, idx)
             )
         )
-
     return strikethrough_cells
 
 
@@ -599,3 +618,107 @@ def _check_strike_cell_because_inactive_entity(
         else:
             strikethrough_cells[STRIKETHROUGH_FONT].append(cell_ref)
     return strikethrough_cells
+
+
+def get_entities_acronym_and_status_for_initial_data(lcy_initial, academic_year):
+    entities_acronym_and_status = {}
+    for entity_key in ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']:
+        acronym = BLANK_VALUE
+        entity = find_by_id(lcy_initial.get(entity_key))
+        if entity:
+            active_entity = EntityVersion.get_entity_if_active(entity, academic_year)
+            if active_entity:
+                acronym = active_entity.acronym
+                active = True
+            else:
+                acronym = entity.most_recent_acronym
+                active = False
+        entities_acronym_and_status.update({entity_key: {'acronym': acronym, 'status': active}})
+    return entities_acronym_and_status
+
+
+def get_entities_acronym_and_status_for_proposal(luy: LearningUnitYear) -> Dict[str, Dict[str, Any]]:
+    entities_acronym_and_status = {}
+
+    for entity_key in ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']:
+        acronym = BLANK_VALUE
+        entity = getattr(luy.learning_container_year, entity_key)
+        if entity:
+            active_entity = EntityVersion.get_entity_if_active(entity, luy.academic_year)
+            if active_entity:
+                acronym = active_entity.acronym
+                active = True
+            else:
+                acronym = entity.most_recent_acronym
+                active = False
+        entities_acronym_and_status.update({entity_key: {'acronym': acronym, 'status': active}})
+    return entities_acronym_and_status
+
+
+def _check_entities_status_style_in_initial(
+        styles_to_update: Dict[Font, str],
+        entities_acronym_and_status: Dict,
+        line_index: int
+) -> Dict[Font, List[str]]:
+    cells_font_styles = styles_to_update.copy()
+    column = REQUIREMENT_ENTITY_COLUMN
+    for key in ENTITY_KEYS:
+        if not entities_acronym_and_status[key]['status']:
+            cells_font_styles[STRIKETHROUGH_FONT].append("{}{}".format(get_column_letter(column), line_index))
+        column += 1
+    return cells_font_styles
+
+
+def _check_changes_in_proposals(
+        initial_data, proposal_data: list, line_index: int, entities_acronym_and_status: Dict, styles: Dict[Font, str]
+) -> Dict[Font, List[str]]:
+
+    if initial_data:
+        for col_index, obj in enumerate(initial_data[2:], start=1):
+            unactive_font = _get_unactive_font_status(col_index+2, entities_acronym_and_status)
+            updated_font = _get_updated_font_status(col_index, obj, proposal_data)
+
+            cell_ref = '{}{}'.format(get_column_letter(col_index+2), line_index)
+            styles = _update_styles_for_cells(cell_ref, styles, unactive_font, updated_font)
+    else:
+        styles = _check_entities_status_style_in_initial(styles, entities_acronym_and_status, line_index)
+
+    return styles
+
+
+def _update_styles_for_cells(
+        cell_ref: str,
+        styles_to_update: Dict[Font, List[str]],
+        unactive_font: bool,
+        updated_font: bool
+) -> Dict[Font, List[str]]:
+    styles = styles_to_update.copy()
+    if unactive_font and updated_font:
+        styles[STYLE_MODIFIED_AND_ENTITY_INACTIVE].append(cell_ref)
+    elif unactive_font:
+        styles[STRIKETHROUGH_FONT].append(cell_ref)
+    elif updated_font:
+        styles[xls_build.STYLE_MODIFIED].append(cell_ref)
+    return styles
+
+
+def _get_updated_font_status(col_index, obj, proposal_data) -> bool:
+    if str(obj) != str(proposal_data[col_index + 1]):
+        return True
+    return False
+
+
+def _get_unactive_font_status(col_index: int, entities_acronym_and_status: Dict[str, Dict]) -> bool:
+    if col_index == REQUIREMENT_ENTITY_COLUMN:
+        if not entities_acronym_and_status['requirement_entity']['status']:
+            return True
+    if col_index == ALLOCATION_ENTITY_COLUMN:
+        if not entities_acronym_and_status['allocation_entity']['status']:
+            return True
+    if col_index == ADDITIONAL_ENTITY_1_COLUMN:
+        if not entities_acronym_and_status['additional_entity_1']['status']:
+            return True
+    if col_index == ADDITIONAL_ENTITY_2_COLUMN:
+        if not entities_acronym_and_status['additional_entity_2']['status']:
+            return True
+    return False

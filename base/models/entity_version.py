@@ -632,10 +632,10 @@ class EntityVersion(SerializableModel):
         return qs if qs and qs.active_entity_version else None
 
     @classmethod
-    def get_entity_if_active(cls, entity: Entity, academic_year: AcademicYear) -> str:
+    def get_entity_if_active(cls, entity: Entity, academic_year: AcademicYear) -> 'EntityVersion':
         current_entity = cls.find_active_entity_by_entity(entity, academic_year.year)
         if current_entity:
-            return get_last_version(current_entity.entity).pk
+            return get_last_version(current_entity.entity)
         else:
             return None
 

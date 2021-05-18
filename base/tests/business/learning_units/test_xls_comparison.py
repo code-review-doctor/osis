@@ -25,6 +25,7 @@
 ##############################################################################
 import copy
 import datetime
+from collections import defaultdict
 from unittest import mock
 
 from django.test import TestCase
@@ -34,7 +35,7 @@ from base.business.learning_unit_proposal import copy_learning_unit_data
 from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _get_learning_unit_yrs_on_2_different_years, translate_status, create_xls_comparison, \
     XLS_FILENAME, XLS_DESCRIPTION, learning_unit_titles, WORKSHEET_TITLE, CELLS_MODIFIED_NO_BORDER, DATA, \
-    _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes, _get_proposal_data, \
+    _check_changes_other_than_code_and_year, CELLS_TOP_BORDER, _check_changes_in_proposals, _get_proposal_data, \
     get_representing_string, _get_data_from_initial_data, BOLD_FONT
 from base.business.proposal_xls import components_titles, basic_titles, BLANK_VALUE
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
@@ -172,6 +173,12 @@ class TestPropositionComparisonXls(TestCase):
             learning_unit_year=cls.learning_unit_year_1,
             initial_data={"learning_unit_year": {"faculty_remark": "First remark"}}
         )
+        cls.entities_acronym_and_status = {
+            'requirement_entity': {'acronym': cls.entity_version_1.acronym, 'status': True},
+            'allocation_entity': {'acronym': cls.entity_version_1.acronym, 'status': True},
+            'additional_entity_1': {'acronym': cls.entity_version_2.acronym, 'status': True},
+            'additional_entity_2': {'acronym': '-', 'status': True},
+        }
 
     def test_get_proposal_data(self):
         practical_component = LearningComponentYear.objects.filter(
@@ -245,9 +252,15 @@ class TestPropositionComparisonXls(TestCase):
     def test_check_changes(self):
         line_number = 0
         # First 2 columns are unmutable
-        self.assertEqual(_check_changes(['elt1', 'elt2', 'elt3', 'elt4'],
-                                        ['elt1', 'elt2 bis', 'elt3 bis', 'elt4'],
-                                        line_number), ['C{}'.format(line_number)])
+        self.assertDictEqual(_check_changes_in_proposals(
+            ['elt1', 'elt2', 'elt3', 'elt4'],
+            ['elt1', 'elt2 bis', 'elt3 bis', 'elt4'],
+            line_number,
+            self.entities_acronym_and_status,
+            defaultdict(list)
+        ),
+            {xls_build.STYLE_MODIFIED: ['C{}'.format(line_number)]}
+        )
 
     def test_get_represen_string(self):
         self.assertEqual(get_representing_string(None), BLANK_VALUE)
@@ -268,8 +281,11 @@ class TestPropositionComparisonXls(TestCase):
         self.learning_unit_year_1.proposallearningunit.initial_data = actual_data
         self.learning_unit_year_1.proposallearningunit.save()
 
-        data = _get_data_from_initial_data(self.learning_unit_year_1.proposallearningunit.initial_data, True)
-
+        data_dict = _get_data_from_initial_data(
+            self.learning_unit_year_1,
+            True
+        )
+        data = data_dict['data']
         to_test = list()
         to_test.append((data[0], _('Initial data')))
         to_test.append((data[1], self.original_learning_unit_year_1.acronym))

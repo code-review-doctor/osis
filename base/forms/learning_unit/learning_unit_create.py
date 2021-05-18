@@ -526,6 +526,6 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
 
 def _get_initial_entity(entity: Entity, can_change_entity: bool, academic_year: AcademicYear) -> EntityVersion:
     if can_change_entity:
-        return EntityVersion.get_entity_if_active(entity, academic_year)
+        return EntityVersion.get_entity_if_active(entity, academic_year).pk
     else:
         return get_last_version(entity).pk
