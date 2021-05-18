@@ -41,7 +41,7 @@
     <tr id="{{ section_name }}_{{ record.id }}">
 
         <td id="{{ section_name }}_{{ record.id }}_diploma">
-            {{ record.diploma_text|safe|linebreaksbr }}
+            {{ record.diploma_text|safe|linebreaks }}
         </td>
         <td id="{{ section_name_text }}_{{ record.id }}_conditions">
             {{ record.conditions_text|safe }}
