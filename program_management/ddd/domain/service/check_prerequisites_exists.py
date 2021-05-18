@@ -37,7 +37,9 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 class CheckIfPrerequisitesExists(interface.DomainService):
 
     @staticmethod
-    def has_or_is_prerequisites(node_identities: List['NodeIdentity']) -> Dict['NodeIdentity', 'ProgramTreeVersionIdentity']:
+    def has_or_is_prerequisites(
+            node_identities: List['NodeIdentity']
+    ) -> Dict['NodeIdentity', 'ProgramTreeVersionIdentity']:
         assert len({n.year for n in node_identities}) == 1, "Impossible to work with prerequisites in different years"
 
         year = node_identities[0].year
