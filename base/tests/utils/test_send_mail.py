@@ -157,21 +157,25 @@ class TestSendMessage(TestCase):
             [self.person_1, self.person_without_language],
             [self.exam_enrollment_1],
             self.learning_unit_year.acronym,
-            self.educ_group_year.acronym
+            self.educ_group_year.acronym,
+            [self.exam_enrollment_1.id],
+            False
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
 
         self.assertListEqual(
-            list(args[2][0]),
-            [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
-             self.exam_enrollment_1.session_exam.number_session,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-             self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-             self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-             ])
+            list(args[2]['data'][0]),
+            [
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                self.exam_enrollment_1.session_exam.number_session,
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+                self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+                self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+                self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+            ]
+        )
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
         self.assertEqual(self.educ_group_year.acronym, args.get('subject_data').get('offer_acronym'))
@@ -183,7 +187,6 @@ class TestSendMessage(TestCase):
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
         self.assertEqual(args.get('txt_template_ref'),
                          "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
-
         self.assertEqual(mock_create_table.call_count, 2)
 
         fr_headers = [
@@ -204,11 +207,16 @@ class TestSendMessage(TestCase):
              self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
              self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',)
             ]
+        data = {
+            'style': ['background-color: lime;'],
+            'data': enrollment_data,
+            'txt_complementary_first_col': {'header': 'Mis à jour', 'rows_content': ['*']}
+        }
 
         mock_create_table.assert_has_calls(
             [
-                call('enrollments', fr_headers, enrollment_data, data_translatable=['Justification']),
-                call('enrollments', fr_headers, enrollment_data, data_translatable=['Justification'])
+                call('enrollments', fr_headers, data, data_translatable=['Justification']),
+                call('enrollments', fr_headers, data, data_translatable=['Justification'])
             ]
         )
 
@@ -270,7 +278,9 @@ class TestSendMessage(TestCase):
         self.assertListEqual(expected, send_mail.get_enrollment_headers('fr-be'))
 
     def test_check_table_headers_en(self):
-        expected = ['Program', 'Session number', 'Registration number', 'Last name', 'First name', 'Score', 'Justification']
+        expected = [
+            'Program', 'Session number', 'Registration number', 'Last name', 'First name', 'Score', 'Justification'
+        ]
         self.assertListEqual(expected, send_mail.get_enrollment_headers('en'))
 
 

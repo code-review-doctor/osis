@@ -25,6 +25,7 @@
 ##############################################################################
 import functools
 import operator
+import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -73,6 +74,7 @@ from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIde
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.training import TrainingIdentityThroughYears
 from osis_common.ddd import interface
+from osis_common.ddd.interface import RootEntity
 from reference.models.domain import Domain as DomainModelDb
 from reference.models.domain_isced import DomainIsced as DomainIscedModelDb
 from reference.models.language import Language as LanguageModelDb
@@ -80,7 +82,12 @@ from reference.models.language import Language as LanguageModelDb
 
 class TrainingRepository(interface.AbstractRepository):
     @classmethod
+    def save(cls, entity: RootEntity) -> None:
+        raise NotImplementedError
+
+    @classmethod
     def create(cls, training: 'Training', **_) -> 'TrainingIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         education_group_db_obj = _save_education_group(training)
         education_group_year_db_obj = _create_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
@@ -89,6 +96,7 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def update(cls, training: 'Training', **_) -> 'TrainingIdentity':
+        warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         education_group_db_obj = _save_education_group(training)
         education_group_year_db_obj = _update_education_group_year(training, education_group_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
@@ -578,8 +586,20 @@ def _delete_certificate_aims(education_group_year_db_obj: EducationGroupYearMode
 
 
 def _is_hops_fields_presence_correct(training: 'Training') -> bool:
+    training_hops_types = [
+        TrainingType.PHD,
+        TrainingType.FORMATION_PHD,
+        TrainingType.CERTIFICATE_OF_PARTICIPATION,
+        TrainingType.CERTIFICATE_OF_SUCCESS,
+        TrainingType.CERTIFICATE_OF_HOLDING_CREDITS,
+        TrainingType.CAPAES,
+        TrainingType.CERTIFICATE,
+        TrainingType.RESEARCH_CERTIFICATE,
+        TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE,
+        TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+    ]
     if training.hops:
-        if training.type in (TrainingType.PHD, TrainingType.FORMATION_PHD) and \
+        if training.type in training_hops_types and \
                 training.hops.ares_code and training.hops.ares_authorization:
             return True
         else:
