@@ -55,7 +55,7 @@ class MiniTrainingReadGeneralInformation(MiniTrainingRead):
             "?path={}".format(self.get_path()),
             "can_edit_information":
                 self.request.user.has_perm(
-                    "base.base.change_minitraining_pedagogyinformation",
+                    "base.change_minitraining_pedagogyinformation",
                     self.get_education_group_version().offer
                 ),
             "show_contacts": self.can_have_contacts(),
