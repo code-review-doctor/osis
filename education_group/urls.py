@@ -276,6 +276,14 @@ urlpatterns = [
             path('delete/<int:publication_contact_id>/',
                  publication_contact.EducationGroupPublicationContactDeleteView.as_view(),
                  name="publication_contact_delete"),
+            path('up/<int:publication_contact_id>',
+                 publication_contact.MoveUpEducationGroupPublicationContactView.as_view(),
+                 name="publication_contact_up"
+                 ),
+            path('down/<int:publication_contact_id>',
+                 publication_contact.MoveDownEducationGroupPublicationContactView.as_view(),
+                 name="publication_contact_down"
+                 ),
         ])),
     ])),
     path('configuration/', include([
