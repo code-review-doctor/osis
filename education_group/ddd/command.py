@@ -542,7 +542,7 @@ class GetUpdateTrainingWarningMessages(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class PublishCommonAdmissionCommand(interface.CommandRequest):
+class PublishCommonAccessRequirementsCommand(interface.CommandRequest):
     year = attr.ib(type=int)
 
 

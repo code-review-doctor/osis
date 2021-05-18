@@ -45,5 +45,4 @@ from base.models import student
 from base.models import student_specific_profile
 from base.models import synchronization
 from base.models import teaching_material
-from base.models import tutor
 from base.models import user_group

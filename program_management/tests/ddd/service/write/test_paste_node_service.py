@@ -572,7 +572,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
         self.mock_check_paste_validator.side_effect = BusinessExceptions(["an error"])
         check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.tree.root_node.node_id,
-            node_to_past_code=self.node_to_paste.code,
+            node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
             path_to_paste=self.path,
             path_to_detach=None
@@ -583,7 +583,7 @@ class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
     def test_should_return_none_when_validator_do_not_raise_exception(self):
         check_command = program_management.ddd.command.CheckPasteNodeCommand(
             root_id=self.tree.root_node.node_id,
-            node_to_past_code=self.node_to_paste.code,
+            node_to_paste_code=self.node_to_paste.code,
             node_to_paste_year=self.node_to_paste.year,
             path_to_paste=self.path,
             path_to_detach=None

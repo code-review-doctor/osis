@@ -83,7 +83,7 @@ class DetachNodeView(GenericGroupElementYearMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
+        detach_node_command = command.DetachNodeCommand(path=self.request.GET.get('path'), commit=False)
         try:
             detach_node_service.detach_node(detach_node_command)
             context['confirmation_message'] = self.get_confirmation_msg()

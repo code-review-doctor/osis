@@ -27,13 +27,11 @@ from collections import OrderedDict
 from operator import itemgetter
 
 from django.db.models import Prefetch, Max
-from django.utils.translation import ugettext_lazy as _
 
-from base import models as mdl_base
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import learning_achievement, academic_year
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.quadrimesters import LearningUnitYearQuadrimester

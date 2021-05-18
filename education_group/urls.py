@@ -2,7 +2,7 @@ from django.urls import include, path, register_converter
 
 from education_group.converters import GroupTypeConverter, TrainingTypeConverter, MiniTrainingTypeConverter, \
     AcronymConverter, MiniTrainingAcronymConverter
-from education_group.views import group, training, mini_training, general_information, admission_condition, \
+from education_group.views import group, training, mini_training, general_information, access_requirements, \
     publication_contact, achievement
 from education_group.views.autocomplete import EducationGroupTypeAutoComplete, CertificateAimAutocomplete
 from education_group.views.configuration.common_list import CommonListView
@@ -86,8 +86,8 @@ urlpatterns = [
             ),
             path(
                 'admission_conditions/',
-                mini_training.MiniTrainingReadAdmissionCondition.as_view(),
-                name='mini_training_admission_condition'
+                mini_training.MiniTrainingReadAccessRequirements.as_view(),
+                name='mini_training_access_requirements'
             ),
         ])),
     ])),
@@ -106,8 +106,8 @@ urlpatterns = [
         ),
         path(
             'admission_conditions/',
-            mini_training.MiniTrainingReadAdmissionCondition.as_view(),
-            name='mini_training_admission_condition'
+            mini_training.MiniTrainingReadAccessRequirements.as_view(),
+            name='mini_training_access_requirements'
         ),
     ])),
     path('trainings/', include([
@@ -160,8 +160,8 @@ urlpatterns = [
             ),
             path(
                 'admission_conditions/',
-                training.TrainingReadAdmissionCondition.as_view(),
-                name='training_admission_condition'
+                training.TrainingReadAccessRequirements.as_view(),
+                name='training_access_requirements'
             ),
         ])),
     ])),
@@ -178,53 +178,53 @@ urlpatterns = [
         path('common-bachelor/', include([
             path(
                 '',
-                general_information.CommonBachelorAdmissionCondition.as_view(),
-                name="common_bachelor_admission_condition"
+                general_information.CommonBachelorAccessRequirements.as_view(),
+                name="common_bachelor_access_requirements"
             ),
             path(
                 'publish',
-                general_information.publish_common_admission_conditions,
-                {'redirect_view': 'common_bachelor_admission_condition'},
-                name="publish_common_bachelor_admission_condition"
+                general_information.publish_common_access_requirements,
+                {'redirect_view': 'common_bachelor_access_requirements'},
+                name="publish_common_bachelor_access_requirements"
             ),
         ])),
         path('common-aggregate/', include([
             path(
                 '',
-                general_information.CommonAggregateAdmissionCondition.as_view(),
-                name="common_aggregate_admission_condition"
+                general_information.CommonAggregateAccessRequirements.as_view(),
+                name="common_aggregate_access_requirements"
             ),
             path(
                 'publish',
-                general_information.publish_common_admission_conditions,
-                {'redirect_view': 'common_aggregate_admission_condition'},
-                name="publish_common_aggregate_admission_condition"
+                general_information.publish_common_access_requirements,
+                {'redirect_view': 'common_aggregate_access_requirements'},
+                name="publish_common_aggregate_access_requirements"
             ),
         ])),
         path('common-master/', include([
             path(
                 '',
-                general_information.CommonMasterAdmissionCondition.as_view(),
-                name="common_master_admission_condition"
+                general_information.CommonMasterAccessRequirements.as_view(),
+                name="common_master_access_requirements"
             ),
             path(
                 'publish',
-                general_information.publish_common_admission_conditions,
-                {'redirect_view': 'common_master_admission_condition'},
-                name="publish_common_master_admission_condition"
+                general_information.publish_common_access_requirements,
+                {'redirect_view': 'common_master_access_requirements'},
+                name="publish_common_master_access_requirements"
             ),
         ])),
         path('common-master-specialized/', include([
             path(
                 '',
-                general_information.CommonMasterSpecializedAdmissionCondition.as_view(),
-                name="common_master_specialized_admission_condition"
+                general_information.CommonMasterSpecializedAccessRequirements.as_view(),
+                name="common_master_specialized_access_requirements"
             ),
             path(
                 'publish',
-                general_information.publish_common_admission_conditions,
-                {'redirect_view': 'common_master_specialized_admission_condition'},
-                name="publish_common_master_specialized_admission_condition"
+                general_information.publish_common_access_requirements,
+                {'redirect_view': 'common_master_specialized_access_requirements'},
+                name="publish_common_master_specialized_access_requirements"
             ),
         ])),
     ])),
@@ -233,38 +233,38 @@ urlpatterns = [
         path('', ReadEducationGroupRedirectView.as_view(), name='education_group_read_proxy'),
         path(
             'admission_conditions/remove_line',
-            admission_condition.DeleteAdmissionConditionLine.as_view(),
-            name='education_group_year_admission_condition_remove_line'),
+            access_requirements.DeleteAccessRequirementsLine.as_view(),
+            name='education_group_year_access_requirements_remove_line'),
 
         path(
             'admission_conditions/update_line',
-            admission_condition.UpdateAdmissionConditionLine.as_view(),
-            name='education_group_year_admission_condition_update_line'),
+            access_requirements.UpdateAccessRequirementsLine.as_view(),
+            name='education_group_year_access_requirements_update_line'),
 
         path(
             'admission_conditions/create_line',
-            admission_condition.CreateAdmissionConditionLine.as_view(),
-            name='education_group_year_admission_condition_create_line'),
+            access_requirements.CreateAccessRequirementsLine.as_view(),
+            name='education_group_year_access_requirements_create_line'),
 
         path(
             'admission_conditions/update_text',
-            admission_condition.UpdateAdmissionCondition.as_view(),
-            name='education_group_year_admission_condition_update_text'),
+            access_requirements.UpdateAccessRequirements.as_view(),
+            name='education_group_year_access_requirements_update_text'),
 
         path(
             'admission_conditions/line/order',
-            admission_condition.OrderAdmissionConditionLine.as_view(),
-            name='education_group_year_admission_condition_line_order'),
+            access_requirements.OrderAccessRequirementsLine.as_view(),
+            name='education_group_year_access_requirements_line_order'),
         path(
             'admission_conditions/lang/edit/<str:language>/',
-            admission_condition.change_language,
+            access_requirements.change_language,
             name='tab_lang_edit'),
         path(
             'publication_contact/<int:education_group_year_id>/',
             include([
                 path('edit_entity/',
-                    publication_contact.UpdateEducationGroupEntityPublicationContactView.as_view(),
-                    name='publication_contact_entity_edit'),
+                     publication_contact.UpdateEducationGroupEntityPublicationContactView.as_view(),
+                     name='publication_contact_entity_edit'),
             ])),
         path('publication_contact/', include([
             path('create/',
@@ -276,6 +276,14 @@ urlpatterns = [
             path('delete/<int:publication_contact_id>/',
                  publication_contact.EducationGroupPublicationContactDeleteView.as_view(),
                  name="publication_contact_delete"),
+            path('up/<int:publication_contact_id>',
+                 publication_contact.MoveUpEducationGroupPublicationContactView.as_view(),
+                 name="publication_contact_up"
+                 ),
+            path('down/<int:publication_contact_id>',
+                 publication_contact.MoveDownEducationGroupPublicationContactView.as_view(),
+                 name="publication_contact_down"
+                 ),
         ])),
     ])),
     path('configuration/', include([

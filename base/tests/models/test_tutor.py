@@ -23,14 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.admin.sites import AdminSite
-from django.contrib.auth.models import Group
-from django.contrib.messages.api import get_messages
-from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import TestCase
 
 from attribution.tests.models import test_attribution
-from base.models import tutor
+from base.auth.roles import tutor
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
@@ -88,40 +84,6 @@ class MockSuperUser:
 
 request = MockRequest()
 request.user = MockSuperUser()
-
-
-class TestTutorAdmin(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        for _ in range(10):
-            user = UserFactory()
-            person = PersonFactory(user=user)
-            TutorFactory(person=person)
-            user.groups.clear()
-
-        cls.site = AdminSite()
-
-    def test_add_to_group(self):
-        setattr(request, 'session', 'session')
-        msg = FallbackStorage(request)
-        setattr(request, '_messages', msg)
-        tutor_admin = tutor.TutorAdmin(tutor.Tutor, self.site)
-        queryset = tutor.Tutor.objects.all()
-        tutor_admin.add_to_group(request, queryset)
-        msg = [m.message for m in get_messages(request)]
-        self.assertIn("{} users added to the group 'tutors'.".format(10), msg)
-
-    def test_add_to_group_no_tutor_group(self):
-        setattr(request, 'session', 'session')
-        msg = FallbackStorage(request)
-        setattr(request, '_messages', msg)
-        for group in Group.objects.all():
-            group.delete()
-        tutor_admin = tutor.TutorAdmin(tutor.Tutor, self.site)
-        queryset = tutor.Tutor.objects.all()
-        tutor_admin.add_to_group(request, queryset)
-        msg = [m.message for m in get_messages(request)]
-        self.assertIn("Group tutors doesn't exist.", msg)
 
 
 class TestSearch(TestCase):

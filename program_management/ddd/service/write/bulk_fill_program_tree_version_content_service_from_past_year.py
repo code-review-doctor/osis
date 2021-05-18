@@ -28,19 +28,21 @@ from typing import List
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.business_types import *
-from program_management.ddd.command import FillTreeVersionContentFromPastYearCommand
-from program_management.ddd.service.write import fill_program_tree_version_content_from_past_year_service
+from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
+from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
+from program_management.ddd.service.write import fill_program_tree_version_content_from_program_tree_version_service
 
 
-def bulk_fill_program_tree_version_content_from_past_year(
-        cmds: List[FillTreeVersionContentFromPastYearCommand]
+def bulk_fill_program_tree_version_content_from_last_year(
+        cmds: List[FillProgramTreeVersionContentFromProgramTreeVersionCommand]
 ) -> List['ProgramTreeVersionIdentity']:
     result = []
     for cmd in cmds:
-        with contextlib.suppress(BusinessException, MultipleBusinessExceptions):
+        with contextlib.suppress(BusinessException, MultipleBusinessExceptions, ProgramTreeVersionNotFoundException):
             result.append(
-                fill_program_tree_version_content_from_past_year_service.
-                fill_program_tree_version_content_from_past_year(cmd)
+                fill_program_tree_version_content_from_program_tree_version_service.
+                fill_program_tree_version_content_from_program_tree_version(
+                    cmd
+                )
             )
-
     return result

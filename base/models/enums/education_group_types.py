@@ -112,7 +112,7 @@ class TrainingType(EducationGroupTypesEnum):
         ]
 
     @classmethod
-    def with_admission_condition(cls):
+    def with_access_requirements(cls):
         return [
             cls.BACHELOR.name,
             cls.MASTER_MC.name,
@@ -194,7 +194,7 @@ class MiniTrainingType(EducationGroupTypesEnum):
         return cls.minors() + [cls.DEEPENING.name, cls.FSA_SPECIALITY.name]
 
     @classmethod
-    def with_admission_condition(cls):
+    def with_access_requirements(cls):
         return [
             cls.DEEPENING.name,
             cls.SOCIETY_MINOR.name,
@@ -206,7 +206,7 @@ class MiniTrainingType(EducationGroupTypesEnum):
 
     @classmethod
     def with_skills_achievements(cls):
-        return cls.with_admission_condition()
+        return cls.with_access_requirements()
 
     @classmethod
     def mini_training_types_enum(cls) -> List[EducationGroupTypesEnum]:

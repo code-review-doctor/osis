@@ -25,11 +25,10 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
 
 from base import models as mdl
-from base.auth.roles import program_manager
+from base.auth.roles import program_manager, tutor
 from osis_common.models.serializable_model import SerializableModel
 from osis_common.models.signals.authentication import user_created_signal, user_updated_signal
 
@@ -49,7 +48,7 @@ def update_person(sender, **kwargs):
 
 def _add_person_to_group(person):
     # Check tutor
-    if mdl.tutor.find_by_person(person):
+    if tutor.find_by_person(person):
         _assign_group(person, "tutors")
     # Check PgmManager
     if program_manager.find_by_person(person):
@@ -109,17 +108,3 @@ def _update_person_if_necessary(person, user, global_id):
     if updated:
         super(SerializableModel, person).save()
     return updated, person
-
-
-@receiver(post_save, sender=mdl.tutor.Tutor)
-def add_to_tutors_group(sender, instance, **kwargs):
-    if kwargs.get('created', True) and instance.person.user:
-        tutors_group = Group.objects.get(name='tutors')
-        instance.person.user.groups.add(tutors_group)
-
-
-@receiver(post_delete, sender=mdl.tutor.Tutor)
-def remove_from_tutor_group(sender, instance, **kwargs):
-    if instance.person.user:
-        tutors_group = Group.objects.get(name='tutors')
-        instance.person.user.groups.remove(tutors_group)
