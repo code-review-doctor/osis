@@ -26,11 +26,12 @@ import datetime
 from typing import List
 
 from ddd.logic.shared_kernel.academic_year.domain.service.get_current_academic_year import GetCurrentAcademicYear
+from education_group.ddd.service.write import copy_group_service
+from infrastructure.shared_kernel.academic_year.repository import academic_year as academic_year_repository
 from program_management.ddd.command import PostponeProgramTreesUntilNPlus6Command
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.domain.service import postpone_until_n_plus_6, copy_tree_cms
+from program_management.ddd.domain.service import postpone_until_n_plus_6
 from program_management.ddd.repositories import program_tree as program_tree_repo
-from infrastructure.shared_kernel.academic_year.repository import academic_year as academic_year_repository
 
 
 def postpone_program_trees_until_n_plus_6(cmd: PostponeProgramTreesUntilNPlus6Command) -> List['ProgramTreeIdentity']:
@@ -47,11 +48,9 @@ def postpone_program_trees_until_n_plus_6(cmd: PostponeProgramTreesUntilNPlus6Co
     for tree in trees_to_postpone:
         trees_created = postpone_until_n_plus_6.Postpone().postpone_program_tree(current_academic_year, tree, repo)
 
-        result += [repo.create(tree_created) for tree_created in trees_created]
-
-        [
-            copy_tree_cms.CopyCms().from_tree(from_tree, to_tree)
-            for from_tree, to_tree in zip([tree] + trees_created, trees_created)
+        result += [
+            repo.create(tree_created, copy_group_service=copy_group_service.copy_group)
+            for tree_created in trees_created
         ]
 
     return result

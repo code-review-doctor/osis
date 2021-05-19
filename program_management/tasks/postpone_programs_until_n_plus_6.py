@@ -36,6 +36,9 @@ from program_management.ddd.service.write import postpone_program_trees_until_n_
 
 @celery_app.task
 def run() -> dict:
+    programs_created = postpone_program_trees_until_n_plus_6_service.postpone_program_trees_until_n_plus_6(
+        PostponeProgramTreesUntilNPlus6Command()
+    )
     groups_created = postpone_groups_until_n_plus_6_service.postpone_groups_until_n_plus_6(
         PostponeGroupsUntilNPlus6Command()
     )
@@ -45,13 +48,11 @@ def run() -> dict:
     mini_trainings_created = postpone_mini_trainings_until_n_plus_6_service.postpone_minitrainings_until_n_plus_6(
         PostponeMiniTrainingsUntilNPlus6Command()
     )
-    programs_created = postpone_program_trees_until_n_plus_6_service.postpone_program_trees_until_n_plus_6(
-        PostponeProgramTreesUntilNPlus6Command()
-    )
-    program_versions_created = postpone_program_tree_versions_until_n_plus_6_service.\
+    program_versions_created = postpone_program_tree_versions_until_n_plus_6_service. \
         postpone_program_tree_versions_until_n_plus_6(
             PostponeProgramTreeVersionsUntilNPlus6Command()
         )
+
     return {
         "groups": [str(group_identity) for group_identity in groups_created],
         "trainings": [str(training_identity) for training_identity in trainings_created],
