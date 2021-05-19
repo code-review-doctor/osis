@@ -38,7 +38,6 @@ from base.models.enums.link_type import LinkTypes
 from base.utils.cache import cached_result
 from education_group.ddd.business_types import *
 from osis_common.ddd import interface
-from osis_common.decorators.deprecated import deprecated
 from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE, UpdateLinkCommand
@@ -227,7 +226,7 @@ class ProgramTreeBuilder:
 
             if self._can_link_child_be_filled(copied_link, to_tree.authorized_relationships):
                 self._fill_node_from_last_year_node(last_year_link.child, child, existing_nodes, to_tree)
-            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) and\
+            elif copied_link.is_reference() and is_empty(copied_link.child, to_tree.authorized_relationships) and \
                     copied_link.child.is_group():
                 to_tree.report.add_warning(
                     report_events.CopyReferenceGroupEvent(node=last_year_link.child)
@@ -400,9 +399,9 @@ class ProgramTreeBuilder:
             transition_name: str
     ) -> Optional['Node']:
         return next((
-                node for node in existing_nodes
-                if not node.is_learning_unit() and node.is_transition_node_equivalent(other_node, transition_name, year)
-            ),
+            node for node in existing_nodes
+            if not node.is_learning_unit() and node.is_transition_node_equivalent(other_node, transition_name, year)
+        ),
             None
         )
 
@@ -454,7 +453,6 @@ class ProgramTreeBuilder:
 
 @attr.s(slots=True, hash=False, eq=False)
 class ProgramTree(interface.RootEntity):
-
     root_node = attr.ib(type=Node)
     authorized_relationships = attr.ib(type='AuthorizedRelationshipList', factory=list)
     entity_id = attr.ib(type=ProgramTreeIdentity)  # FIXME :: pass entity_id as mandatory param !
@@ -583,23 +581,6 @@ class ProgramTree(interface.RootEntity):
         except (StopIteration, IndexError):
             raise NodeNotFoundException
 
-    @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
-    def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
-        """
-        DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
-        Return the corresponding node based on the node_id value with respect to the class.
-        :param node_id: int
-        :param node_type: NodeType
-        :return: Node
-        """
-        return next(
-            (
-                node for node in self.get_all_nodes()
-                if node.node_id == node_id and node.type == node_type
-            ),
-            None
-        )
-
     def get_node_by_code_and_year(self, code: str, year: int) -> 'Node':
         """
         Return the corresponding node based on the code and year.
@@ -677,8 +658,8 @@ class ProgramTree(interface.RootEntity):
 
     def _links_mapped_by_child_and_parent(self) -> Dict:
         return {
-                str(link.child.entity_id) + str(link.parent.entity_id): link
-                for link in self.get_all_links()
+            str(link.child.entity_id) + str(link.parent.entity_id): link
+            for link in self.get_all_links()
         }
 
     def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
