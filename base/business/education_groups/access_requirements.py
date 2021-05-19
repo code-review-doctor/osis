@@ -82,8 +82,8 @@ def bulk_postpone_access_requirements_line(education_group_years_from: List['Edu
 
 
 def postpone_access_requirements_line(
-    education_group_year_from: 'EducationGroupYear',
-    section: Optional['str']
+        education_group_year_from: 'EducationGroupYear',
+        section: Optional['str']
 ) -> None:
     if not can_postpone_access_requirements(education_group_year_from):
         raise PermissionDenied
