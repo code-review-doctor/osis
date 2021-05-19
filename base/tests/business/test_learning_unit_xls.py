@@ -461,12 +461,17 @@ class TestLearningUnitXls(TestCase):
             "",
         ]
         self.assertEqual(get_data_part2(luy, False), expected_common)
-        self.assertEqual(
-            get_data_part2(luy, True),
-            _expected_attribution_data(
-                expected_common,
-                luy
-            )
+        self.assertListEqual(
+            get_data_part2(luy, True)[2:],
+            _expected_attribution_data(expected_common, luy)[2:]
+        )
+        self.assertCountEqual(
+            get_data_part2(luy, True)[0].split(';'),
+            _expected_attribution_data(expected_common, luy)[0].split(';')
+        )
+        self.assertCountEqual(
+            get_data_part2(luy, True)[1].split(';'),
+            _expected_attribution_data(expected_common, luy)[1].split(';')
         )
 
     def test_learning_unit_titles_part1(self):
