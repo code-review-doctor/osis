@@ -263,7 +263,7 @@ class ScoresEncodingList:
         self.academic_year = kwargs.get('academic_year')
         self.number_session = kwargs.get('number_session')
         self.learning_unit_year = kwargs.get('learning_unit_year')
-        self.enrollments = kwargs.get('enrollments')
+        self.enrollments = kwargs.get('enrollments', [])
         self.__init_education_groups_where_scores_completed_before_update()
 
     def __init_education_groups_where_scores_completed_before_update(self):
