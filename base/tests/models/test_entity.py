@@ -97,7 +97,7 @@ class EntityTest(TestCase):
 
     def test_find_descendants_out_date(self):
         entities_with_descendants = EntityVersion.objects.get_tree([self.parent], date=self.date_in_2017)
-        self.assertEqual(len(entities_with_descendants), 1)
+        self.assertEqual(len(entities_with_descendants), 0)
 
     def test_find_descendants_with_multiple_parent(self):
         parent_2 = EntityWithVersionFactory(

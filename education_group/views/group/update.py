@@ -33,14 +33,15 @@ from django.views import View
 from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models import entity_version, academic_year, campus
-from base.views.common import display_success_messages, display_error_messages
+from base.models import academic_year, campus
+from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update, \
+    display_warning_messages
 from education_group.ddd import command
-from education_group.ddd.business_types import *
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \
-    CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid
-from education_group.ddd.domain.group import Group
+    CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid, \
+    GroupCopyConsistencyException
+from education_group.ddd.domain.group import Group, GroupIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import update_group_service
 from education_group.forms.group import GroupUpdateForm
@@ -80,10 +81,10 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
         )
 
         if group_form.is_valid():
-            group_id = self.__send_update_group_cmd(group_form)
+            group_ids = self.__send_update_group_cmd(group_form)
             if group_form.is_valid():
-                display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
-                return HttpResponseRedirect(self.get_success_url(group_id))
+                display_success_messages(request, self.get_success_msg(group_ids), extra_tags='safe')
+                return HttpResponseRedirect(self.get_success_url(self.get_group_obj().entity_id))
         else:
             msg = _("Error(s) in form: The modifications are not saved")
             display_error_messages(request, msg)
@@ -96,7 +97,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             "cancel_url": self.get_cancel_url()
         })
 
-    def __send_update_group_cmd(self, group_form: GroupUpdateForm) -> 'GroupIdentity':
+    def __send_update_group_cmd(self, group_form: GroupUpdateForm) -> List['GroupIdentity']:
         cmd_update = command.UpdateGroupCommand(
             code=self.kwargs['code'],
             year=self.kwargs['year'],
@@ -134,6 +135,13 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     group_form.add_error('max_constraint', e.message)
                 else:
                     group_form.add_error(None, e.message)
+        except GroupCopyConsistencyException as e:
+            display_warning_messages(self.request, e.message)
+            updated_group_identities = [
+                GroupIdentity(code=self.get_group_obj().code, year=year)
+                for year in range(self.get_group_obj().year, e.conflicted_fields_year)
+            ]
+            return updated_group_identities
 
     @functools.lru_cache()
     def get_group_obj(self) -> 'Group':
@@ -149,12 +157,16 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             url += "?path={}".format(self.request.GET.get('path'))
         return url
 
-    def get_success_msg(self, group_id: 'GroupIdentity') -> str:
-        return _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully updated.") % {
-            "link": self.get_success_url(group_id),
-            "code": group_id.code,
-            "academic_year": display_as_academic_year(group_id.year),
-        }
+    def get_success_msg(self, group_ids: List['GroupIdentity']) -> List[str]:
+        messages = []
+        for group_id in group_ids:
+            msg = _("Group <a href='%(link)s'> %(code)s (%(academic_year)s) </a> successfully updated.") % {
+                "link": self.get_success_url(group_id),
+                "code": group_id.code,
+                "academic_year": display_as_academic_year(group_id.year),
+            }
+            messages.append(msg)
+        return messages
 
     def get_success_url(self, group_id: 'GroupIdentity') -> str:
         url = reverse('element_identification', kwargs={'code': group_id.code, 'year': group_id.year})
@@ -174,7 +186,7 @@ class GroupUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             'constraint_type': group_obj.content_constraint.type.name if group_obj.content_constraint.type else None,
             'min_constraint': group_obj.content_constraint.minimum,
             'max_constraint': group_obj.content_constraint.maximum,
-            'management_entity': entity_version.find(group_obj.management_entity.acronym),
+            'management_entity': group_obj.management_entity.acronym,
             'teaching_campus': campus.find_by_name_and_organization_name(
                 name=group_obj.teaching_campus.name,
                 organization_name=group_obj.teaching_campus.university_name

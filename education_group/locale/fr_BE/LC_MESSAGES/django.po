@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-26 07:45+0200\n"
+"POT-Creation-Date: 2021-05-17 14:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,6 +78,9 @@ msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
+
+msgid "Abbreviated title"
+msgstr "Intitulé abrégé"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -262,13 +265,13 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
-msgid "Common access requirements can only be edited by central manager"
-msgstr ""
-"Les conditions d'accès communes peuvent seulement être modifiées par un "
-"gestionnaire en central"
-
 msgid "Common access requirements will be published soon"
 msgstr "Les conditions d'accès communes seront publiées sous peu"
+
+msgid "Common admission conditions can only be edited by central manager"
+msgstr ""
+"Les informations pédagogiques communes peuvent seulement être modifiées par "
+"un gestionnaire en central"
 
 msgid "Common general informations will be published soon"
 msgstr "Les informations générales communes seront publiées sous peu"
@@ -319,6 +322,12 @@ msgstr "Un contact a été créé (avec report)"
 
 msgid "Contact has been created (without postpone)"
 msgstr "Un contact a été créé (sans report)"
+
+msgid "Contact has been moved (with postpone)"
+msgstr "Un contact a été déplacé (avec report)"
+
+msgid "Contact has been moved (without postpone)"
+msgstr "Un contact a été déplacé (sans report)"
 
 msgid "Contact has been removed (with postpone)"
 msgstr "Un contact a été supprimé (avec report)"
@@ -466,11 +475,13 @@ msgid "For all students"
 msgstr "Pour tous les étudiants"
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 "Pour les formations de type : doctorale, attestation, certificat et CAPAES; "
-"les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou tous les champs ARES doivent être vides"
+"les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou "
+"tous les champs ARES doivent être vides"
 
 msgid "Foreign Bachelors"
 msgstr "Bacheliers étrangers"
@@ -662,6 +673,9 @@ msgstr "Modifier l'ordre des acquis"
 msgid "Modify order of condition"
 msgstr "Modifier l'ordre d'une condition"
 
+msgid "Modify order of the contacts"
+msgstr "Modifier l'ordre des contacts"
+
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr "Plusieurs entités '{entity_acronym}' trouvées pour l'année {year}"
@@ -834,6 +848,10 @@ msgstr ""
 msgid "The following fields are empty: %(fields)s "
 msgstr "Les champs suivants sont vides: %(fields)s"
 
+#, python-format
+msgid "The following fields has issues: %(fields)s "
+msgstr "Les champs suivants ont des problèmes: %(fields)s"
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -916,6 +934,9 @@ msgid "This education group is not editable during this period."
 msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
+
+msgid "This entity is not active during this academic year"
+msgstr "Cette entité n'est pas active durant cette année academique"
 
 msgid "Title"
 msgstr "Intitulé"
