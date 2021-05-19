@@ -34,6 +34,11 @@ def can_postpone_publication_contact(education_group_year: 'EducationGroupYear')
     return not education_group_year.academic_year.is_past
 
 
+def bulk_postpone_publication_contact(education_group_years_from: List['EducationGroupYear']) -> None:
+    for egy in education_group_years_from:
+        postpone_publication_contact(egy)
+
+
 def postpone_publication_contact(education_group_year_from: 'EducationGroupYear') -> None:
     if not can_postpone_publication_contact(education_group_year_from):
         raise PermissionDenied
@@ -67,6 +72,11 @@ def _postpone_publication_contact(
         contact.id = None
         contact.education_group_year = education_group_year
         contact.save()
+
+
+def bulk_postpone_publication_entity(education_group_years_from: List['EducationGroupYear']) -> None:
+    for egy in education_group_years_from:
+        postpone_publication_entity(egy)
 
 
 def postpone_publication_entity(education_group_year_from: 'EducationGroupYear') -> None:
