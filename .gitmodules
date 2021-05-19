@@ -1,7 +1,3 @@
-[submodule "osis_common"]
-	path = osis_common
-	url = https://github.com/uclouvain/osis-common.git
-	branch = master
 [submodule "admission"]
 	path = admission
 	url = https://github.com/uclouvain/osis-admission.git
