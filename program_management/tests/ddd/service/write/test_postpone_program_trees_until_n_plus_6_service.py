@@ -46,6 +46,11 @@ class TestPostponeProgramTreesUntilNPlus6(DDDTestCase):
 
         self.cmd = PostponeProgramTreesUntilNPlus6Command()
 
+        self.mock_service(
+            "program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_tree",
+            return_value=None
+        )
+
     def test_should_stop_postponement_before_if_end_date_inferior_to_postponement_year(self):
         tree = ProgramTreeBachelorFactory(current_year=2020, end_year=2025)
         self.add_tree_to_repo(tree)
