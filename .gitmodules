@@ -1,3 +1,0 @@
-[submodule "admission"]
-	path = admission
-	url = https://github.com/uclouvain/osis-admission.git
