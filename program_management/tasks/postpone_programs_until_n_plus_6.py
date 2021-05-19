@@ -35,7 +35,8 @@ from education_group.ddd.command import PostponeGroupsUntilNPlus6Command, Postpo
     PostponeMiniTrainingsUntilNPlus6Command
 from education_group.ddd.service.write import postpone_trainings_until_n_plus_6_service, \
     postpone_groups_until_n_plus_6_service, postpone_mini_trainings_until_n_plus_6_service
-from education_group.cms.postponement import bulk_postpone_cms_for_education_group_year, bulk_postpone_cms_for_group_year
+from education_group.cms.postponement import bulk_postpone_cms_for_education_group_year, \
+    bulk_postpone_cms_for_group_year
 from education_group.models.group_year import GroupYear
 from program_management.ddd.command import PostponeProgramTreesUntilNPlus6Command, \
     PostponeProgramTreeVersionsUntilNPlus6Command
