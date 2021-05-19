@@ -4,7 +4,6 @@ import os.path
 from os import path
 
 branch = "dev"
-# acces_rights = 0o764
 project_dir = os.getcwd()
 
 print('Project Dir : {}'.format(project_dir))
@@ -26,9 +25,9 @@ modules = {
 for module, git_url in modules.items():
     module_dir = os.path.join(project_dir, module)
     if path.exists(module_dir) and path.isdir(module_dir):
+        print('')
         print('Module {} exists in project directory'.format(module))
         print('Updating module {} from branch {}'.format(module, branch))
-        print('')
         checkout_command = 'git checkout {branch}'.format(branch=branch)
         pull_command = 'git pull'
         os.chdir(module_dir)
@@ -36,11 +35,10 @@ for module, git_url in modules.items():
         os.system(pull_command)
         os.chdir(project_dir)
     else:
+        print('')
         print('Module {} not exists in project directory'.format(module))
         print('Cloning module {} from branch {} in directory {}'.format(module, branch, module_dir))
-        print('')
         command = 'git clone {git_url} -b {branch} --single-branch {directory}'.format(branch=branch,
-                                                                                    git_url=git_url,
-                                                                                    directory=module_dir)
-        # os.mkdir(module_dir, acces_rights)
+                                                                                       git_url=git_url,
+                                                                                       directory=module_dir)
         os.system(command)
