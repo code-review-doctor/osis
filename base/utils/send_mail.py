@@ -27,9 +27,9 @@
 """
 Utility files for mail sending
 """
+import itertools
 from typing import List
 import datetime
-import itertools
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -317,8 +317,6 @@ def send_message_after_all_encoded_by_manager(
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
-
     rows_styles = _html_format_rows_styles(
         enrollments, updated_enrollments_ids,
         encoding_already_completed_before_update
@@ -329,8 +327,9 @@ def send_message_after_all_encoded_by_manager(
         encoding_already_completed_before_update
     )
 
+    receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
     for receiver_lang, receivers in receivers_by_lang:
-        receivers = list(receivers)
+
         table = message_config.create_table(
             'enrollments',
             get_enrollment_headers(receiver_lang),

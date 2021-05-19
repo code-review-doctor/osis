@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-29 11:03+0200\n"
+"POT-Creation-Date: 2021-05-17 14:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -320,6 +320,12 @@ msgstr "Un contact a été créé (avec report)"
 msgid "Contact has been created (without postpone)"
 msgstr "Un contact a été créé (sans report)"
 
+msgid "Contact has been moved (with postpone)"
+msgstr "Un contact a été déplacé (avec report)"
+
+msgid "Contact has been moved (without postpone)"
+msgstr "Un contact a été déplacé (sans report)"
+
 msgid "Contact has been removed (with postpone)"
 msgstr "Un contact a été supprimé (avec report)"
 
@@ -459,15 +465,20 @@ msgstr "Gestionnaire facultaire"
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
+msgid "Fill program tree content from last year"
+msgstr "Remplir le contenu du programme depuis l'année dernière"
+
 msgid "For all students"
 msgstr "Pour tous les étudiants"
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 "Pour les formations de type : doctorale, attestation, certificat et CAPAES; "
-"les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou tous les champs ARES doivent être vides"
+"les champs 'Code étude ARES' et 'Habilitation ARES' doivent être remplis ou "
+"tous les champs ARES doivent être vides"
 
 msgid "Foreign Bachelors"
 msgstr "Bacheliers étrangers"
@@ -658,6 +669,9 @@ msgstr "Modifier l'ordre des acquis"
 
 msgid "Modify order of condition"
 msgstr "Modifier l'ordre d'une condition"
+
+msgid "Modify order of the contacts"
+msgstr "Modifier l'ordre des contacts"
 
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
@@ -971,7 +985,9 @@ msgstr "Formations"
 msgid ""
 "Transition version of finalities must be filled from transition version of "
 "master"
-msgstr "La version de transition d'une finalité doit être remplie à partir de la version de transition du master"
+msgstr ""
+"La version de transition d'une finalité doit être remplie à partir de la "
+"version de transition du master"
 
 msgid "Type of constraint"
 msgstr "Type de contrainte"

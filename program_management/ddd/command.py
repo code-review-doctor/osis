@@ -289,6 +289,11 @@ class GetProgramTree(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetProgramTreeFromRootElementIdCommand(interface.CommandRequest):
+    root_element_id = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class UpdateLinkCommand(interface.CommandRequest):
     parent_node_code = attr.ib(type=str)
     parent_node_year = attr.ib(type=int)
@@ -629,9 +634,10 @@ class CheckVersionNameCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class CheckTransitionNameCommand(interface.CommandRequest):
-    year = attr.ib(type=int)
-    offer_acronym = attr.ib(type=str)
-    transition_name = attr.ib(type=str)
+    from_year = attr.ib(type=int)
+    from_offer_acronym = attr.ib(type=str)
+    from_version_name = attr.ib(type=str)
+    new_transition_name = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -644,6 +650,12 @@ class FillProgramTreeVersionContentFromProgramTreeVersionCommand(interface.Comma
     to_offer_acronym = attr.ib(type=str)
     to_version_name = attr.ib(type=str)
     to_transition_name = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class FillProgramTreeContentFromLastYearCommand(interface.CommandRequest):
+    to_year = attr.ib(type=int)
+    to_code = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

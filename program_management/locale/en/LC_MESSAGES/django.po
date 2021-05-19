@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-23 12:56+0200\n"
+"POT-Creation-Date: 2021-05-07 12:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -255,9 +255,6 @@ msgstr ""
 msgid "Diplomas /  Certificates"
 msgstr ""
 
-msgid "Direct gathering"
-msgstr ""
-
 msgid "Dissertation"
 msgstr ""
 
@@ -353,6 +350,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "Gathering"
 msgstr ""
 
 msgid "General informations"
@@ -521,9 +521,6 @@ msgid "List of trainings with administrative data"
 msgstr ""
 
 msgid "Made in"
-msgstr ""
-
-msgid "Main gathering"
 msgstr ""
 
 msgid "Manag. ent."
@@ -1004,6 +1001,12 @@ msgstr ""
 msgid "Transition name"
 msgstr ""
 
+msgid "Transition name {} already exists"
+msgstr ""
+
+msgid "Transition name {} existed"
+msgstr ""
+
 msgid "Tree is finality"
 msgstr ""
 
@@ -1095,6 +1098,12 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
+"You can't create/extend the transition version '{full_code}' in {year} as "
+"other transition version exists in {transition_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
 "You can't delete the specific program tree '{code}' in {year} as transition "
 "versions exists during this year and/or in the future."
 msgstr ""
@@ -1109,12 +1118,6 @@ msgstr ""
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as transition "
 "versions exists during this year and/or in the future."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"You can't extend the program tree '{code}' in {year} as other transition "
-"version exists in {transition_year}"
 msgstr ""
 
 #, python-format
