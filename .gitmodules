@@ -8,9 +8,6 @@
 [submodule "partnership"]
 	path = partnership
 	url = https://github.com/uclouvain/osis-partnership.git
-[submodule "dissertation"]
-	path = dissertation
-	url = https://github.com/uclouvain/osis-dissertation.git
 [submodule "admission"]
 	path = admission
 	url = https://github.com/uclouvain/osis-admission.git
