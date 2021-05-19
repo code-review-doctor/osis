@@ -774,7 +774,3 @@ def _get_count_still_enrolled(enrollments):
         if enrollment.enrollment_state == enrollment_states.ENROLLED:
             nb_enrolled += 1
     return nb_enrolled
-
-
-def _is_encoding_completed_before_update(scores_list_before_update: ScoresEncodingList) -> bool:
-    return scores_list_before_update.enrollment_encoded == scores_list_before_update.enrollments
