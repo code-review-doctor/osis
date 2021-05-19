@@ -118,3 +118,16 @@ fabric.properties
 .idea/encodings.xml
 
 .idea
+
+# Sous module dans le gitignore pour ne jamais les pousser sur le projet osis
+admission
+assistant
+continuing_education
+dissertation
+internship
+osis_common
+osis_history
+osis_mail_template
+partnership
+
+
