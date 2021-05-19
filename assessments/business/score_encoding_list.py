@@ -26,7 +26,7 @@
 import copy
 import unicodedata
 from decimal import Decimal, Context, Inexact
-from typing import List, Dict, Set
+from typing import Set
 
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
@@ -37,7 +37,6 @@ from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import exam_enrollment_justification_type
-from base.models.exam_enrollment import ExamEnrollment
 
 
 def get_scores_encoding_list(user, **kwargs):
@@ -294,11 +293,7 @@ class ScoresEncodingList:
 
     @property
     def enrollment_encoded(self):
-        return self.__filter_enrollments_completed(self.enrollments)
-
-    @classmethod
-    def __filter_enrollments_completed(cls, enrollments) -> List['ExamEnrollment']:
-        return list(filter(lambda e: e.is_final, enrollments))
+        return list(filter(lambda e: e.is_final, self.enrollments))
 
     @classmethod
     def __is_encoding_completed_for_education_group(cls, enrollments, educ_group_year) -> bool:
