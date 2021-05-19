@@ -65,7 +65,6 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     link_type = None
     order = None
     block = factory.LazyFunction(_generate_block_value)
-    quadrimester_derogation = factory.Iterator(DerogationQuadrimester.choices(), getter=operator.itemgetter(0))
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):

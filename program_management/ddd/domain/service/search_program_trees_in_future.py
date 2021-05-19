@@ -23,27 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-import program_management.ddd.command
-from program_management.ddd import command
-from program_management.ddd.domain import node
-from program_management.ddd.repositories import node as node_repository, program_tree, program_tree_version
-from program_management.ddd.service.read import get_program_tree_service
-from program_management.ddd.validators import validators_by_business_action
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 
 
-def check_paste(check_command: program_management.ddd.command.CheckPasteNodeCommand) -> None:
-    node_to_paste = node_repository.NodeRepository.get(
-        node.NodeIdentity(code=check_command.node_to_paste_code, year=check_command.node_to_paste_year)
-    )
-    tree = get_program_tree_service.get_program_tree_from_root_element_id(
-        command.GetProgramTreeFromRootElementIdCommand(root_element_id=check_command.root_id)
-    )
+class SearchProgramTreesInFuture(interface.DomainService):
 
-    validators_by_business_action.CheckPasteNodeValidatorList(
-        tree,
-        node_to_paste,
-        check_command,
-        program_tree.ProgramTreeRepository(),
-        program_tree_version.ProgramTreeVersionRepository()
-    ).validate()
+    @classmethod
+    def search(
+            cls,
+            working_tree_identity: 'ProgramTreeIdentity',
+            trees_through_years: List['ProgramTree']
+    ) -> List['ProgramTree']:
+        working_year = working_tree_identity.year
+        ordered_trees_in_future = list(
+            sorted(
+                filter(
+                    lambda t: t.year > working_year and t.entity_id.code == working_tree_identity.code,
+                    trees_through_years
+                ),
+                key=lambda t: t.year
+            )
+        )  # type: List['ProgramTree']
+        return ordered_trees_in_future
