@@ -91,15 +91,11 @@ def __persist_group_element_year(link: 'Link', elements_by_identity: Dict['NodeI
         child_element_id=elements_by_identity[link.child.entity_id],
         defaults={
             'relative_credits': link.relative_credits,
-            'min_credits': link.min_credits,
-            'max_credits': link.max_credits,
             'is_mandatory': link.is_mandatory,
             'block': link.block,
             'access_condition': link.access_condition,
             'comment': link.comment,
             'comment_english': link.comment_english,
-            'own_comment': link.own_comment,
-            'quadrimester_derogation': link.quadrimester_derogation.name if link.quadrimester_derogation else None,
             # FIXME : Find a rules for enum in order to be consistant
             'link_type': link.link_type.name if isinstance(link.link_type, LinkTypes) else link.link_type,
             'order': link.order,
