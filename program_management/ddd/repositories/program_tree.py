@@ -244,15 +244,11 @@ def _load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).values(
         'pk',
         'relative_credits',
-        'min_credits',
-        'max_credits',
         'access_condition',
         'is_mandatory',
         'block',
         'comment',
         'comment_english',
-        'own_comment',
-        'quadrimester_derogation',
         'link_type',
         'parent_element_id',
         'child_element_id',
@@ -264,7 +260,6 @@ def _load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         parent_id = gey_dict.pop('parent_element_id')
         child_id = gey_dict.pop('child_element_id')
         __convert_link_type_to_enum(gey_dict)
-        __convert_quadrimester_to_enum(gey_dict)
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
         tree_links[tree_id] = link_factory.get_link(parent=None, child=None, **gey_dict)
@@ -275,11 +270,6 @@ def __convert_link_type_to_enum(link_data: dict) -> None:
     link_type = link_data['link_type']
     if link_type:
         link_data['link_type'] = LinkTypes[link_type]
-
-
-def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
-    if gey_dict.get('quadrimester_derogation'):
-        gey_dict['quadrimester_derogation'] = DerogationQuadrimester[gey_dict['quadrimester_derogation']]
 
 
 def _build_tree(
