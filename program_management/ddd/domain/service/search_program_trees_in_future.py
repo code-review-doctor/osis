@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-from openpyxl.utils import get_column_letter
+from typing import List
 
-from base import models as mdl_base
-
-
-def get_name_or_username(a_user):
-    person = mdl_base.person.find_by_user(a_user)
-    return "{}, {}".format(person.last_name, person.first_name) if person else a_user.username
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
 
 
-def convert_boolean(a_boolean_value):
-    return _('yes') if a_boolean_value else _('no')
+class SearchProgramTreesInFuture(interface.DomainService):
 
-
-def _get_all_columns_reference(nb_columns, first_column=1):
-    letters = []
-    nb_col = first_column
-    while nb_col < nb_columns + 1:
-        letters.append(get_column_letter(nb_col))
-        nb_col += 1
-    return letters
-
-
-def get_entity_version_xls_repr(acronym, year):
-    if mdl_base.entity_version.EntityVersion.is_entity_active(acronym, year):
-        return acronym
-    return '\u0336'.join(acronym) + '\u0336' if acronym else ''  # strikethrough styled str
+    @classmethod
+    def search(
+            cls,
+            working_tree_identity: 'ProgramTreeIdentity',
+            trees_through_years: List['ProgramTree']
+    ) -> List['ProgramTree']:
+        working_year = working_tree_identity.year
+        ordered_trees_in_future = list(
+            sorted(
+                filter(
+                    lambda t: t.year > working_year and t.entity_id.code == working_tree_identity.code,
+                    trees_through_years
+                ),
+                key=lambda t: t.year
+            )
+        )  # type: List['ProgramTree']
+        return ordered_trees_in_future

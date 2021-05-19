@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 import re
-from typing import Optional, List
+from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -832,4 +832,4 @@ def find_by_user(user, academic_yr=None):
     return EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         education_group__programmanager__person__user=user,
-    )
+    ).order_by('acronym')

@@ -144,7 +144,7 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                                 training_occurence
                             )
                             if training_occurence == 1:
-                                cells_with_border_top.extend(_add_border_top(len(lines)+1))
+                                cells_with_border_top.extend(_add_border_top(len(lines) + 1))
 
                             training_occurence += 1
         else:
