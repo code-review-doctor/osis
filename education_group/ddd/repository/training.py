@@ -404,11 +404,13 @@ def _create_education_group_year(
         isced_domain=DomainIscedModelDb.objects.get(
             code=training.isced_domain.entity_id.code
         ) if training.isced_domain else None,
-        management_entity_id=entity_version.find_by_acronym(
+        management_entity_id=entity_version.find_by_acronym_and_year(
             acronym=training.management_entity.acronym,
+            year=training.year,
         ).entity_id if training.management_entity else None,
-        administration_entity_id=entity_version.find_by_acronym(
+        administration_entity_id=entity_version.find_by_acronym_and_year(
             acronym=training.administration_entity.acronym,
+            year=training.year,
         ).entity_id if training.administration_entity else None,
         enrollment_campus=CampusModelDb.objects.get(
             name=training.enrollment_campus.name,
@@ -479,11 +481,13 @@ def _update_education_group_year(
             'isced_domain': DomainIscedModelDb.objects.get(
                 code=training.isced_domain.entity_id.code
             ) if training.isced_domain else None,
-            'management_entity_id': entity_version.find_by_acronym(
+            'management_entity_id': entity_version.find_by_acronym_and_year(
                 acronym=training.management_entity.acronym,
+                year=training.year,
             ).entity_id if training.management_entity else None,
-            'administration_entity_id': entity_version.find_by_acronym(
+            'administration_entity_id': entity_version.find_by_acronym_and_year(
                 acronym=training.administration_entity.acronym,
+                year=training.year,
             ).entity_id if training.administration_entity else None,
             'enrollment_campus': CampusModelDb.objects.get(
                 name=training.enrollment_campus.name,
