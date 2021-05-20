@@ -29,12 +29,11 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from openpyxl.styles import Font
 
 from base.business.education_group import ordering_data
-from base.business.xls import get_name_or_username, get_entity_version_xls_repr
+from base.business.xls import get_name_or_username
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.utils.excel import get_html_to_text
 from education_group.ddd import command
 from education_group.ddd.domain._funding import Funding
-from education_group.ddd.domain.group import Group
 from education_group.ddd.domain.mini_training import MiniTraining
 from education_group.ddd.domain.training import Training
 from education_group.ddd.service.read import get_group_service, get_training_service, get_mini_training_service
@@ -356,8 +355,8 @@ def _build_title_fr(offer: Union['Training', 'MiniTraining'],
 
 def management_entity(training: 'Training', group: 'Group', current_version: 'ProgramTreeVersion') -> str:
     if current_version.is_standard:
-        return get_entity_version_xls_repr(training.management_entity.acronym, training.year)
-    return get_entity_version_xls_repr(group.management_entity.acronym, group.year)
+        return training.management_entity.acronym
+    return group.management_entity.acronym
 
 
 def _get_responsibles_and_contacts(group: 'Group') -> str:
@@ -498,24 +497,20 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
     no_activities_data = ['', '', '', '', '', '']
     if training:
         data.append(training.schedule_type.value)
-        management_entity_acronym = training.management_entity.acronym \
+        data.append(
+            training.management_entity.acronym
             if current_version and current_version.is_standard else group.management_entity.acronym
-        data.append(
-            get_entity_version_xls_repr(management_entity_acronym, training.year)
         )
-        data.append(
-            get_entity_version_xls_repr(training.administration_entity.acronym, training.year)
-        )
+        data.append(training.administration_entity.acronym)
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
 
         data.append(_build_duration_data(training))
         data.extend(activities_data(training))
     elif mini_training:
         data.append(mini_training.schedule_type.value)
-        management_entity_acronym = mini_training.management_entity.acronym \
-            if current_version and current_version.is_standard else group.management_entity.acronym
         data.append(
-            get_entity_version_xls_repr(management_entity_acronym, mini_training.year)
+            mini_training.management_entity.acronym
+            if current_version and current_version.is_standard else group.management_entity.acronym
         )
         data.append("")
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
@@ -523,9 +518,7 @@ def _build_organization_data(current_version: 'ProgramTreeVersion', training: 'T
         data.extend(no_activities_data)
     else:
         data.append("")
-        data.append(
-            get_entity_version_xls_repr(group.management_entity.acronym, group.year)
-        )
+        data.append(group.management_entity.acronym)
         data.append("")
         data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
         data.append("")
@@ -620,14 +613,10 @@ def _format_year_to_academic_year(year):
 def _common_training_mini_training_organization_data(current_version, group, offer):
     data = []
     data.append(offer.schedule_type.value)
-    management_entity_acronym = offer.management_entity.acronym \
-        if current_version.is_standard else group.management_entity.acronym
     data.append(
-        get_entity_version_xls_repr(management_entity_acronym, offer.academic_year.year)
+        offer.management_entity.acronym if current_version.is_standard else group.management_entity.acronym
     )
-    data.append(
-        get_entity_version_xls_repr(offer.administration_entity.acronym, offer.academic_year.year)
-    )
+    data.append(offer.administration_entity.acronym)
     data.append("{} - {}".format(group.teaching_campus.name, group.teaching_campus.university_name))
     return data
 

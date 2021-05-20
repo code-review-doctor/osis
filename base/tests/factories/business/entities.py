@@ -39,7 +39,7 @@ def create_entities_hierarchy(root_entity=None, organization_type=MAIN):
     organization = root_entity.organization if root_entity else OrganizationFactory(type=organization_type)
     root_entity = root_entity or EntityFactory(country=country, organization=organization)
     root_entity_version = EntityVersionFactory(entity=root_entity,
-                                               acronym="UCL",
+                                               acronym="ROOT_V",
                                                entity_type=SECTOR,
                                                parent=None,
                                                end_date=None,
@@ -75,8 +75,7 @@ class EntitiesHierarchyFactory:
             entity__country=country,
             entity__organization=org,
             parent=None,
-            entity_type="",
-            acronym='UCL'
+            entity_type=""
         )
 
         self.sector_1 = EntityVersionFactory(
