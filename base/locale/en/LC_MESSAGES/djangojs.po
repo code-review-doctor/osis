@@ -56,9 +56,6 @@ msgstr ""
 msgid "Selection of target files"
 msgstr ""
 
-msgid "This entity is not active during this academic year"
-msgstr ""
-
 msgid "This field is required"
 msgstr ""
 
