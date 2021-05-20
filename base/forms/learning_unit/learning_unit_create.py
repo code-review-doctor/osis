@@ -289,28 +289,31 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             self.initial['requirement_entity'] = _get_initial_entity(
                 self.instance.requirement_entity,
                 can_change_entity,
-                self.academic_year
+                self.academic_year,
+                self.fields['requirement_entity'].disabled
             )
 
         if self.instance.allocation_entity:
             self.initial['allocation_entity'] = _get_initial_entity(
                 self.instance.allocation_entity,
                 can_change_entity,
-                self.academic_year
+                self.academic_year, self.fields['allocation_entity'].disabled
             )
 
         if self.instance.additional_entity_1:
             self.initial['additional_entity_1'] = _get_initial_entity(
                 self.instance.additional_entity_1,
                 can_change_entity,
-                self.academic_year
+                self.academic_year,
+                self.fields['additional_entity_1'].disabled
             )
 
         if self.instance.additional_entity_2:
             self.initial['additional_entity_2'] = _get_initial_entity(
                 self.instance.additional_entity_2,
                 can_change_entity,
-                self.academic_year
+                self.academic_year,
+                self.fields['additional_entity_2'].disabled
             )
 
     def prepare_fields(self):
@@ -524,8 +527,12 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
         return '.'.join(["LearningContainerYearModelForm", self.get_context(), field_name])
 
 
-def _get_initial_entity(entity: Entity, can_change_entity: bool, academic_year: AcademicYear) -> EntityVersion:
-    if can_change_entity:
-        return EntityVersion.get_entity_if_active(entity, academic_year).pk
+def _get_initial_entity(entity: Entity, can_change_entity: bool, academic_year: AcademicYear, disabled) -> int:
+    if can_change_entity and not disabled:
+        active_entity = EntityVersion.get_entity_if_active(entity, academic_year)
+        if active_entity:
+            return active_entity.pk
+        else:
+            return None
     else:
         return get_last_version(entity).pk
