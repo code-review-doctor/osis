@@ -36,6 +36,7 @@ from rest_framework.response import Response
 
 from attribution.api.serializers.attribution import AttributionSerializer
 from attribution.calendar.access_schedule_calendar import AccessScheduleCalendar
+from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from base.models.person import Person
 
@@ -49,7 +50,19 @@ class AttributionListView(generics.ListAPIView):
     name = 'attributions'
 
     def list(self, request, *args, **kwargs):
-        qs = AttributionChargeNew.objects.select_related(
+        attributions = self._get_attributions_charge_new()
+        if self.request.query_params.get('with_classes') == "True":
+            # quick fix to be modified with the correct implementation of classes
+            attributions = list(attributions) + list(self._get_classes_attributions())
+        serializer = AttributionSerializer(
+            attributions,
+            many=True,
+            context=self.get_serializer_context()
+        )
+        return Response(serializer.data)
+
+    def _get_attributions_charge_new(self):
+        return AttributionChargeNew.objects.select_related(
             'attribution',
             'learning_component_year__learning_unit_year__academic_year'
         ).distinct(
@@ -105,8 +118,59 @@ class AttributionListView(generics.ListAPIView):
             start_year=F('attribution__start_year'),
             function=F('attribution__function')
         )
-        serializer = AttributionSerializer(qs, many=True, context=self.get_serializer_context())
-        return Response(serializer.data)
+
+    def _get_classes_attributions(self):
+        return Attribution.objects.select_related(
+            'learning_unit_year__academic_year'
+        ).filter(
+            learning_unit_year__academic_year__year=self.kwargs['year'],
+            tutor__person=self.person,
+            learning_unit_year__learning_container_year__isnull=True
+        ).annotate(
+            # Technical ID for making a match with data in EPC. Remove after refactoring...
+            allocation_id=Replace('external_id', Value('osis.attribution_'), Value('')),
+
+            code=F('learning_unit_year__acronym'),
+            type=Value('COURSE', output_field=CharField()),
+            title_fr=Case(
+                When(
+                    Q(learning_unit_year__learning_container_year__common_title__isnull=True) |
+                    Q(learning_unit_year__learning_container_year__common_title__exact=''),
+                    then='learning_unit_year__specific_title'
+                ),
+                When(
+                    Q(learning_unit_year__specific_title__isnull=True) |
+                    Q(learning_unit_year__specific_title__exact=''),
+                    then='learning_unit_year__learning_container_year__common_title'
+                ),
+                default=Concat(
+                    'learning_unit_year__learning_container_year__common_title',
+                    Value(' - '),
+                    'learning_unit_year__specific_title'
+                ),
+                output_field=CharField(),
+            ),
+            title_en=Case(
+                When(
+                    Q(learning_unit_year__learning_container_year__common_title_english__isnull=True) |  # noqa
+                    Q(learning_unit_year__learning_container_year__common_title_english__exact=''),  # noqa
+                    then='learning_unit_year__specific_title_english'
+                ),
+                When(
+                    Q(learning_unit_year__specific_title_english__isnull=True) |
+                    Q(learning_unit_year__specific_title_english__exact=''),
+                    then='learning_unit_year__learning_container_year__common_title_english'
+                ),
+                default=Concat(
+                    'learning_unit_year__learning_container_year__common_title_english',
+                    Value(' - '),
+                    'learning_unit_year__specific_title_english'
+                ),
+                output_field=CharField(),
+            ),
+            year=F('learning_unit_year__academic_year__year'),
+            credits=F('learning_unit_year__credits'),
+        )
 
     @cached_property
     def person(self) -> Person:
