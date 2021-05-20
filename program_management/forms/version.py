@@ -38,6 +38,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.forms.utils.fields import OsisRichTextFormField
 from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
+from base.models.entity_version import EntityVersion
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
@@ -294,10 +295,14 @@ class UpdateTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, Speci
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=self.year,
+            help_text=msg
         )
 
     # ValidationRuleMixin
@@ -372,10 +377,14 @@ class UpdateMiniTrainingVersionForm(ValidationRuleMixin, PermissionFieldMixin, S
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=self.year,
+            help_text=msg
         )
 
     # ValidationRuleMixin
