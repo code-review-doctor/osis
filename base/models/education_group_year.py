@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 import re
 from typing import Optional
 
@@ -31,7 +30,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, Min, When, Case, Max, Subquery, OuterRef
+from django.db.models import Count, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -107,17 +106,6 @@ class EducationGroupYearQueryset(SerializableQuerySet):
             past=Max(
                 Case(When(academic_year__year__lt=year, then='academic_year__year'))
             )
-        )
-
-    @classmethod
-    def annotate_entity_management_acronym(cls, queryset):
-        entity_requirement = entity_version.EntityVersion.objects.filter(
-            entity=OuterRef('management_entity'),
-        ).current(
-            datetime.date.today()
-        ).values('acronym')[:1]
-        return queryset.annotate(
-            entity_management=Subquery(entity_requirement)
         )
 
 

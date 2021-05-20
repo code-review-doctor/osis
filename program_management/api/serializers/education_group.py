@@ -51,7 +51,6 @@ class EducationGroupSerializer(serializers.Serializer):
     management_entity = serializers.StringRelatedField()
     complete_title_fr = serializers.CharField()
     full_title_fr = serializers.CharField()
-    active_entity_management_version = serializers.BooleanField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -66,8 +65,7 @@ class EducationGroupSerializer(serializers.Serializer):
             'education_group_type_text',
             'academic_year',
             'management_entity',
-            'main_teaching_campus',
-            'active_entity_management_version'
+            'main_teaching_campus'
         )
 
     def get_main_teaching_campus(self, obj):

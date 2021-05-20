@@ -11,7 +11,6 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums import education_group_types
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.person import PersonFactory
@@ -213,7 +212,6 @@ class TestCreateNonOrphanGroupPostMethod(TestCase):
         cls.parent_element = ElementGroupYearFactory(
             group_year__management_entity=cls.central_manager.entity
         )
-        AcademicYearFactory(year=2018)
         OpenAcademicCalendarFactory(
             reference=AcademicCalendarTypes.EDUCATION_GROUP_EXTENDED_DAILY_MANAGEMENT.name,
             data_year__year=cls.parent_element.group_year.academic_year.year
