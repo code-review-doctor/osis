@@ -2648,9 +2648,6 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
-msgid "Trainings/gathering"
-msgstr ""
-
 msgid "Transformation"
 msgstr ""
 

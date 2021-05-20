@@ -43,3 +43,13 @@ class ILearningUnitRepository(interface.AbstractRepository):
             responsible_entity_code: str = None
     ) -> List['LearningUnitSearchDTO']:
         pass
+
+    @classmethod
+    @abc.abstractmethod
+    def has_proposal(cls) -> bool:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def has_enrollments(cls) -> bool:
+        pass

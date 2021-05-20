@@ -46,6 +46,14 @@ from reference.models.language import Language as LanguageDatabase
 class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
+    def has_proposal(cls) -> bool:
+        raise NotImplementedError
+
+    @classmethod
+    def has_enrollments(cls) -> bool:
+        raise NotImplementedError
+
+    @classmethod
     def search_learning_units_dto(
             cls,
             code: str = None,
