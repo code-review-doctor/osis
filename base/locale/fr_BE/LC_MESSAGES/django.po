@@ -1092,7 +1092,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "Gathering"
-msgstr "Regroupement"
+msgstr "Groupement"
 
 msgid "Gender"
 msgstr "Genre"
@@ -2436,6 +2436,10 @@ msgstr ""
 "quadrimestres."
 
 #, python-format
+msgid "The entity %(acronym_entity)s is not active for this academic year"
+msgstr "L'entité %(acronym_entity)s n'est pas active durant cette année académique"
+
+#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2683,6 +2687,9 @@ msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
 
+msgid "This entity is not active during this academic year"
+msgstr "Cette entité n'est pas active durant cette année academique"
+
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
 
@@ -2758,9 +2765,6 @@ msgstr "Formation intitulé"
 
 msgid "Trainings"
 msgstr "Formations"
-
-msgid "Trainings/gathering"
-msgstr "Formations/regroupements"
 
 msgid "Transformation"
 msgstr "Transformation"
