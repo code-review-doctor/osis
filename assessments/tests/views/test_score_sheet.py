@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from unittest import mock
 
 from django.test import TestCase

@@ -30,7 +30,6 @@ from django.utils.translation import gettext_lazy as _
 from education_group.ddd.domain.exception import common_postponement_consistency_message
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.report import ReportEvent
-from program_management.ddd.business_types import *
 
 
 @attr.s(frozen=True, slots=True)

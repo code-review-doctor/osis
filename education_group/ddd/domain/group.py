@@ -35,11 +35,11 @@ from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.command import UpdateGroupCommand
 from education_group.ddd.domain import exception
+from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._content_constraint import ContentConstraint
 from education_group.ddd.domain._entity import Entity
 from education_group.ddd.domain._remark import Remark
 from education_group.ddd.domain._titles import Titles
-from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain.service.enum_converter import EducationGroupTypeConverter
 from education_group.ddd.validators.validators_by_business_action import UpdateGroupValidatorList, \
     CopyGroupValidatorList, CreateGroupValidatorList

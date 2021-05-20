@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import sys
 from typing import List, Set, Union
 
 import attr

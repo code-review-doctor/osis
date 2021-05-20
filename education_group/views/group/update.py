@@ -34,8 +34,7 @@ from rules.contrib.views import LoginRequiredMixin
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import academic_year, campus
-from base.views.common import display_success_messages, display_error_messages, check_formations_impacted_by_update, \
-    display_warning_messages
+from base.views.common import display_success_messages, display_error_messages, display_warning_messages
 from education_group.ddd import command
 from education_group.ddd.domain.exception import GroupNotFoundException, ContentConstraintTypeMissing, \
     ContentConstraintMinimumMaximumMissing, ContentConstraintMaximumShouldBeGreaterOrEqualsThanMinimum, \

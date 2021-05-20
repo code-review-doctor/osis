@@ -24,13 +24,11 @@
 #
 ##############################################################################
 import datetime
-import operator
-import string
 import random
+import string
 
 import factory.fuzzy
 
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 

@@ -32,7 +32,6 @@ from django.db.models import Q
 
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from education_group.models.group_year import GroupYear

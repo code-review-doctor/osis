@@ -43,8 +43,7 @@ from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain import program_tree_version
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.domain.report import Report
-from program_management.ddd.service.read import get_program_tree_version_service, \
-    get_report_service
+from program_management.ddd.service.read import get_program_tree_version_service
 from program_management.forms.fill_content import FillTransitionContentForm
 
 

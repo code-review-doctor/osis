@@ -33,7 +33,6 @@ from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.utils.db import dict_fetchall

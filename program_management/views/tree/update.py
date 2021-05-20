@@ -38,7 +38,6 @@ from education_group.models.group_year import GroupYear
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain import node
 from program_management.ddd.domain.program_tree import ProgramTree

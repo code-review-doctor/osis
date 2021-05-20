@@ -37,7 +37,6 @@ from base.forms.learning_unit.entity_form import find_additional_requirement_ent
     PedagogicalEntitiesRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
-from base.models import entity_version
 from base.models.campus import find_main_campuses
 from base.models.entity import Entity
 from base.models.entity_version import get_last_version, EntityVersion
@@ -57,7 +56,7 @@ from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
 from reference.models.language import Language
 from rules_management.mixins import PermissionFieldMixin
-from django_filters import OrderingFilter, filters, FilterSet
+
 INACTIVE_ENTITY_CSS_STYLE = 'color:#a94442;'
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018

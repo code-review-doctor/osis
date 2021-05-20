@@ -27,7 +27,6 @@ import functools
 import operator
 from typing import Union, List
 
-import attr
 from django.db.models import F, Subquery, Q
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType

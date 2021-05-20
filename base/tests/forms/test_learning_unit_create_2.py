@@ -70,7 +70,6 @@ from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
 
-
 ENTITIES_FIELD_NAMES = ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']
 INACTIVE_ENTITY_ACRONYM = 'DRT'
 

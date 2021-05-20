@@ -48,7 +48,6 @@ from education_group.views.mixin import ElementSelectedClipBoardMixin
 from osis_common.utils.models import get_object_or_none
 from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository

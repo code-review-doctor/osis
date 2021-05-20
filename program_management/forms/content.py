@@ -37,7 +37,6 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
 from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception
 
 
