@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,8 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service.read import search_program_trees_using_node_service
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)

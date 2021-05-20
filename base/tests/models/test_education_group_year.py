@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from django.db import IntegrityError
 from django.test import TestCase, override_settings
 from django.utils.translation import gettext_lazy as _
 
-from base.models.education_group_year import find_with_enrollments_count, find_by_user
+from base.models.education_group_year import find_with_enrollments_count, find_by_user, EducationGroupYear
 from base.models.enums import education_group_categories, duration_unit, offer_enrollment_state, education_group_types
 from base.models.exceptions import ValidationWarning
 from base.models.validation_rule import ValidationRule
@@ -422,4 +422,5 @@ class TestFindByUser(TestCase):
         ProgramManagerFactory(person=self.person_with_user, education_group=educ_group_year_1.education_group)
         ProgramManagerFactory(person=self.person_with_user, education_group=educ_group_year_2.education_group)
         managed_programs = find_by_user(self.person_with_user.user)
-        self.assertCountEqual(managed_programs, [educ_group_year_1, educ_group_year_2])
+        educ_group_year_ordered_by_acronym = EducationGroupYear.objects.all().order_by('acronym')
+        self.assertListEqual(list(managed_programs), list(educ_group_year_ordered_by_acronym))
