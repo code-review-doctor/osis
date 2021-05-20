@@ -265,13 +265,13 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
-msgid "Common access requirements can only be edited by central manager"
-msgstr ""
-"Les conditions d'accès communes peuvent seulement être modifiées par un "
-"gestionnaire en central"
-
 msgid "Common access requirements will be published soon"
 msgstr "Les conditions d'accès communes seront publiées sous peu"
+
+msgid "Common admission conditions can only be edited by central manager"
+msgstr ""
+"Les informations pédagogiques communes peuvent seulement être modifiées par "
+"un gestionnaire en central"
 
 msgid "Common general informations will be published soon"
 msgstr "Les informations générales communes seront publiées sous peu"
@@ -848,6 +848,10 @@ msgstr ""
 msgid "The following fields are empty: %(fields)s "
 msgstr "Les champs suivants sont vides: %(fields)s"
 
+#, python-format
+msgid "The following fields has issues: %(fields)s "
+msgstr "Les champs suivants ont des problèmes: %(fields)s"
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -930,6 +934,9 @@ msgid "This education group is not editable during this period."
 msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
+
+msgid "This entity is not active during this academic year"
+msgstr "Cette entité n'est pas active durant cette année academique"
 
 msgid "Title"
 msgstr "Intitulé"
