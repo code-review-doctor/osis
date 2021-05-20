@@ -31,7 +31,6 @@ from django.db.models import Subquery, OuterRef, Value, CharField
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.person import Person
-from education_group.auth.scope import Scope
 from osis_role import role
 from osis_role.contrib.models import EntityRoleModel
 
@@ -43,7 +42,7 @@ class EntityRoleHelper:
        Utility class to provide role-related static methods
     """
     @staticmethod
-    def get_all_entities(person: Person, group_names: Set[str]) -> List[Entity]:
+    def get_all_entities(person: Person, group_names: Set[str], with_expired: bool = False) -> List[Entity]:
         role_mdls = [
             r for r in role.role_manager.roles if issubclass(r, EntityRoleModel) and r.group_name in group_names
         ]
@@ -51,15 +50,13 @@ class EntityRoleHelper:
 
         for role_mdl in role_mdls:
             subqs = role_mdl.objects.filter(person=person)
-            if hasattr(role_mdl, 'scopes'):
-                subqs = subqs.filter(scopes=[Scope.ALL.value])
             subqs = subqs.values('entity_id', 'with_child')
             if qs is None:
                 qs = subqs
             else:
                 qs = qs.union(subqs)
 
-        return qs.get_entities_ids() if qs else Entity.objects.none()
+        return qs.get_entities_ids(with_expired=with_expired) if qs else Entity.objects.none()
 
     @staticmethod
     def get_all_entities_for_persons(persons: Iterable[Person], group_names: Set[str]) -> Iterable[Row]:
@@ -79,8 +76,6 @@ class EntityRoleHelper:
                     ).order_by('-start_date').values('acronym')[:1]
                 )
             )
-            if hasattr(role_mdl, 'scopes'):
-                subqs = subqs.filter(scopes=[Scope.ALL.value])
             subqs = subqs.values_list(*Row._fields)
             qs = subqs if qs is None else qs.union(subqs)
 

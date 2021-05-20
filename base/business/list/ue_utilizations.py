@@ -49,8 +49,8 @@ CELLS_TO_COLOR = 'cells_to_color'
 XLS_DESCRIPTION = _('List of learning units with one line per training')
 WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
-FIRST_TRAINING_COLUMN = 26
-TOTAL_NB_OF_COLUMNS = 31
+FIRST_TRAINING_COLUMN = 28
+TOTAL_NB_OF_COLUMNS = 33
 HEADER_PROGRAMS = [
     str(_('Gathering')),
     str(_('Training code')),
@@ -144,7 +144,7 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                                 training_occurence
                             )
                             if training_occurence == 1:
-                                cells_with_border_top.extend(_add_border_top(len(lines)+1))
+                                cells_with_border_top.extend(_add_border_top(len(lines) + 1))
 
                             training_occurence += 1
         else:

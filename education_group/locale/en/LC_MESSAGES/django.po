@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-27 11:38+0200\n"
+"POT-Creation-Date: 2021-05-17 14:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Abbreviated title"
 msgstr ""
 
 msgid "Ac yr."
@@ -302,6 +305,12 @@ msgstr ""
 msgid "Contact has been created (without postpone)"
 msgstr ""
 
+msgid "Contact has been moved (with postpone)"
+msgstr ""
+
+msgid "Contact has been moved (without postpone)"
+msgstr ""
+
 msgid "Contact has been removed (with postpone)"
 msgstr ""
 
@@ -440,12 +449,16 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
+msgid "Fill program tree content from last year"
+msgstr ""
+
 msgid "For all students"
 msgstr ""
 
 msgid ""
-"For formation PhD the fields 'ARES study code' and 'ARES ability' have to be "
-"filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -622,6 +635,9 @@ msgstr ""
 msgid "Modify order of condition"
 msgstr ""
 
+msgid "Modify order of the contacts"
+msgstr ""
+
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr ""
@@ -785,6 +801,10 @@ msgstr ""
 msgid "The following fields are empty: %(fields)s "
 msgstr ""
 
+#, python-format
+msgid "The following fields has issues: %(fields)s "
+msgstr ""
+
 #, python-brace-format
 msgid ""
 "The formation you work with doesn't exist (or is not at the same position) "
@@ -855,6 +875,9 @@ msgid "There can only be one type 2 expectation"
 msgstr ""
 
 msgid "This education group is not editable during this period."
+msgstr ""
+
+msgid "This entity is not active during this academic year"
 msgstr ""
 
 msgid "Title"

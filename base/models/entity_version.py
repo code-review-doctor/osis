@@ -609,8 +609,8 @@ class EntityVersion(SerializableModel):
         return current_clause
 
     @classmethod
-    def get_message_is_entity_active(cls, acronym_entity: str, academic_year: AcademicYear) -> str:
-        if acronym_entity and not cls.is_entity_active(acronym_entity, academic_year.year):
+    def get_message_is_entity_active(cls, acronym_entity: str, year: int) -> str:
+        if acronym_entity and not cls.is_entity_active(acronym_entity, year):
             msg = _('The entity %(acronym_entity)s is not active for this academic year') % {
                 'acronym_entity': acronym_entity
             }
@@ -877,3 +877,7 @@ def find_by_acronym_and_year(acronym: str, year: int):
         Q(acronym=acronym, start_date__year__lte=year),
         Q(end_date__isnull=True) | Q(end_date__year__gt=year)
     ).order_by('start_date').last()
+
+
+def find_by_acronym(acronym: str):
+    return EntityVersion.objects.filter(acronym=acronym).order_by('start_date').last()

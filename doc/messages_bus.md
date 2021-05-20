@@ -60,7 +60,7 @@ class CreateOrphanGroupCommand(interface.CommandRequest):
 
 #### Message bus : Implémentation
 
-- Cf. [DisplayExceptionsByFieldNameMixin](https://github.com/uclouvain/osis/blob/workshops-mob-programming/base/utils/mixins_for_forms.py#L35)
+- Cf. [DisplayExceptionsByFieldNameMixin](https://github.com/uclouvain/osis/blob/dev/base/utils/mixins_for_forms.py#L35)
 pour fonctions à redéfinir dans un Form
 
 ```python

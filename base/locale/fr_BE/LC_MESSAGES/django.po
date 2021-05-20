@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-27 14:49+0200\n"
+"POT-Creation-Date: 2021-05-10 14:58+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -739,6 +739,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
+msgid "Dissertations"
+msgstr "Mémoires"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1089,7 +1092,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "Gathering"
-msgstr "Regroupement"
+msgstr "Groupement"
 
 msgid "Gender"
 msgstr "Genre"
@@ -2224,6 +2227,9 @@ msgstr "Les scores doivent être compris entre 0 et 20"
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
 
+msgid "Scores responsibles (emails)"
+msgstr "Responsables de notes (emails)"
+
 msgid "Search for an entity"
 msgstr "Rechercher une entité"
 
@@ -2329,6 +2335,9 @@ msgstr "Parcours de l'étudiant"
 
 msgid "Student search"
 msgstr "Recherche étudiants"
+
+msgid "Student's dissertations management"
+msgstr "Gestion des mémoires des étudiants"
 
 msgid "Students"
 msgstr "Étudiants"
@@ -2562,6 +2571,10 @@ msgstr "L'UE complète est inactive et au moins un partim est actif"
 msgid "The partim"
 msgstr "Le partim"
 
+msgid "The period to edit scores responsibles is not opened yet"
+msgstr ""
+"La période d'édition des responsables de notes n'est pas encore ouverte."
+
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."
@@ -2753,9 +2766,6 @@ msgstr "Formation intitulé"
 msgid "Trainings"
 msgstr "Formations"
 
-msgid "Trainings/gathering"
-msgstr "Formations/regroupements"
-
 msgid "Transformation"
 msgstr "Transformation"
 
@@ -2776,6 +2786,9 @@ msgstr "Enseignant·e"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
+
+msgid "Tutors (scores responsibles included)"
+msgstr "Enseignant·e·s (responsables de notes inclus)"
 
 msgid "Type"
 msgstr "Type"
@@ -2834,7 +2847,7 @@ msgid "Update for teacher unlocked"
 msgstr "Mise-à-jour débloquée pour l'enseignant"
 
 msgid "Updated"
-msgstr "Mis-à-jour"
+msgstr "Mis à jour"
 
 msgid "Url"
 msgstr "URL"

@@ -21,36 +21,26 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-
-from django.db import transaction
-
-from program_management.ddd.business_types import *
-from program_management.ddd.command import UpdateLinkCommand
-from program_management.ddd.domain.node import NodeIdentity
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from education_group.ddd.command import GetGroupIssueFieldsOnWarningCommand
+from education_group.ddd.domain import exception
+from education_group.ddd.domain.group import GroupIdentity
+from education_group.ddd.domain.service import fields_with_alert_when_issue
+from education_group.ddd.domain.service.get_entity_active import ActiveEntity
+from education_group.ddd.repository import group as group_repository
 
 
-@transaction.atomic()
-def update_link(cmd: UpdateLinkCommand) -> 'Link':
-    tree_id = ProgramTreeIdentity(code=cmd.parent_node_code, year=cmd.parent_node_year)
-    tree = ProgramTreeRepository.get(tree_id)
+def check_group_issue_fields_on_warning(cmd: 'GetGroupIssueFieldsOnWarningCommand') -> None:
+    group_identity = GroupIdentity(code=cmd.code, year=cmd.year)
+    group = group_repository.GroupRepository().get(group_identity)
 
-    child_id = NodeIdentity(code=cmd.child_node_code, year=cmd.child_node_year)
-    link_updated = _update_link(child_id, tree, cmd)
-    ProgramTreeRepository.update(tree)
-    return link_updated
-
-
-def _update_link(child_id, tree, update_cmd):
-    return tree.update_link(
-        parent_path=str(tree.root_node.node_id),
-        child_id=child_id,
-        relative_credits=update_cmd.relative_credits,
-        access_condition=update_cmd.access_condition,
-        is_mandatory=update_cmd.is_mandatory,
-        block=update_cmd.block,
-        link_type=update_cmd.link_type,
-        comment=update_cmd.comment,
-        comment_english=update_cmd.comment_english
+    fields_to_check = fields_with_alert_when_issue.get_for_group(group.type)
+    management_entity_active = ActiveEntity.is_entity_active_for_year(
+        group.management_entity.acronym,
+        group_identity.year
     )
+    fields_on_warning = []
+    if "management_entity" in fields_to_check and not management_entity_active:
+        fields_on_warning.append("management_entity")
+
+    if fields_on_warning:
+        raise exception.GroupAlertFieldException(empty_fields=fields_on_warning)
