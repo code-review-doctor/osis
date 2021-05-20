@@ -1,12 +1,11 @@
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus
-from base.models.academic_year import AcademicYear
-from base.models.entity_version import find_pedagogical_entities_version, \
-    find_pedagogical_entities_version_for_specific_academic_year
+from base.models.entity_version import EntityVersion, find_pedagogical_entities_version
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
 from osis_role.contrib.forms.fields import EntityRoleModelChoiceField
@@ -20,10 +19,9 @@ class MainCampusChoiceField(forms.ModelChoiceField):
 
 
 class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
-    def __init__(self, person, initial, academic_year: 'AcademicYear' = None, **kwargs):
+    def __init__(self, person, initial, **kwargs):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial
-        self.academic_year = academic_year
         super().__init__(
             person=person,
             group_names=group_names,
@@ -33,11 +31,11 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
         )
 
     def get_queryset(self):
-        if self.get_person().user.has_perm('education_group.change_management_entity'):
-            return super().get_queryset().pedagogical_entities_with_academic_year(
-                self.academic_year
-            ).order_by('acronym')
-        return super().get_queryset().pedagogical_entities().order_by('acronym')
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
+        if self.initial:
+            date = timezone.now()
+            qs |= EntityVersion.objects.current(date).filter(acronym=self.initial)
+        return qs
 
     def clean(self, value):
         value = super(forms.ModelChoiceField, self).clean(value)
@@ -47,11 +45,8 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
 
 
 class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
-    def __init__(self, queryset, academic_year=None, *args, **kwargs):
-        if academic_year:
-            queryset = find_pedagogical_entities_version_for_specific_academic_year(academic_year)
-        else:
-            queryset = find_pedagogical_entities_version()
+    def __init__(self, queryset, *args, **kwargs):
+        queryset = find_pedagogical_entities_version()
         super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
 
 
