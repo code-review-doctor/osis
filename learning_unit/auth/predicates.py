@@ -493,7 +493,7 @@ def has_learning_unit_no_attribution_now_and_future(self, user, learning_unit_ye
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not AttributionChargeNew.objects.filter(
             learning_component_year__learning_unit_year__learning_container_year__learning_container=learning_container,
-            learning_component_year__academic_year__year__gte=learning_unit_year.academic_year.year
+            learning_component_year__learning_unit_year__academic_year__year__gte=learning_unit_year.academic_year.year
         ).exists()
     return None
 
