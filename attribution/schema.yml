@@ -48,6 +48,11 @@ paths:
           schema:
             description: ''
             type: string
+        - in: query
+          name: with_classes
+          schema:
+            description: 'Query parameter to add classes to attributions results'
+            type: boolean
       responses:
         '200':
           description: OK
@@ -82,6 +87,11 @@ paths:
           schema:
             description: ''
             type: string
+        - in: query
+          name: with_classes
+          schema:
+            description: 'Query parameter to add classes to attributions results'
+            type: boolean
       responses:
         '200':
           description: OK
