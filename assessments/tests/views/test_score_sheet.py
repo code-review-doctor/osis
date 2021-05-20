@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from unittest import mock
 
 from django.test import TestCase
@@ -40,10 +39,7 @@ from base.tests.factories.user import SuperUserFactory
 class OfferScoreSheetTabViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        today = datetime.date.today()
-        cls.academic_year = AcademicYearFactory(start_date=today,
-                                                end_date=today.replace(year=today.year + 1),
-                                                year=today.year)
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.educ_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.COMMON_CONTEXT_KEYS = ['education_group_year', 'countries', 'is_program_manager', 'entity_versions']
         cls.a_superuser = SuperUserFactory()

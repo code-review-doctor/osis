@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-27 13:51+0200\n"
+"POT-Creation-Date: 2021-05-10 14:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -718,6 +718,9 @@ msgid "Dissertation presentation"
 msgstr ""
 
 msgid "Dissertation submission"
+msgstr ""
+
+msgid "Dissertations"
 msgstr ""
 
 msgid "Do not assign"
@@ -2274,6 +2277,9 @@ msgstr ""
 msgid "Student search"
 msgstr ""
 
+msgid "Student's dissertations management"
+msgstr ""
+
 msgid "Students"
 msgstr ""
 
@@ -2575,6 +2581,9 @@ msgstr ""
 msgid "This education group is not editable during this period."
 msgstr ""
 
+msgid "This entity is not active during this academic year"
+msgstr ""
+
 msgid "This feature is in testing phase"
 msgstr ""
 
@@ -2647,9 +2656,6 @@ msgid "Training title"
 msgstr ""
 
 msgid "Trainings"
-msgstr ""
-
-msgid "Trainings/gathering"
 msgstr ""
 
 msgid "Transformation"

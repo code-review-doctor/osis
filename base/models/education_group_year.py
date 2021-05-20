@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import re
-from typing import Optional, List
+from typing import Optional
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.db.models import Count, Min, When, Case, Max, Subquery
+from django.db.models import Count, Min, When, Case, Max, Subquery, OuterRef
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -106,6 +107,17 @@ class EducationGroupYearQueryset(SerializableQuerySet):
             past=Max(
                 Case(When(academic_year__year__lt=year, then='academic_year__year'))
             )
+        )
+
+    @classmethod
+    def annotate_entity_management_acronym(cls, queryset):
+        entity_requirement = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('management_entity'),
+        ).current(
+            datetime.date.today()
+        ).values('acronym')[:1]
+        return queryset.annotate(
+            entity_management=Subquery(entity_requirement)
         )
 
 
@@ -820,4 +832,4 @@ def find_by_user(user, academic_yr=None):
     return EducationGroupYear.objects.filter(
         academic_year=academic_yr,
         education_group__programmanager__person__user=user,
-    )
+    ).order_by('acronym')

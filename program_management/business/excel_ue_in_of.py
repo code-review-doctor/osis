@@ -150,7 +150,7 @@ SpecificationsCols = namedtuple(
         'achievements_fr', 'achievements_en'
     ]
 )
-FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Direct gathering'), _('Main gathering'),
+FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Gathering'), _('Training'),
               _('Block'), _('Mandatory')]
 
 FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title', 'type', 'subtype', 'gathering',

@@ -32,7 +32,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -176,6 +175,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
                 'pk': self.learning_unit_year.pk,
                 'acronym': self.learning_unit_year.acronym,
                 'requirement_entity': 'CHILD_1_V',
+                'most_recent_requirement_entity': "CHILD_1_V",
                 'learning_unit_title': " - ".join([self.learning_unit_year.learning_container_year.common_title,
                                                    self.learning_unit_year.specific_title]),
                 'attributions': [

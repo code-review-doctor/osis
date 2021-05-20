@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ from base.models.entity_version import EntityVersion
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.organization_type import MAIN
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -57,7 +57,7 @@ from base.tests.factories.user import UserFactory
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
@@ -200,6 +200,7 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
         qs = LearningUnitYear.objects.filter(pk=self.l_unit_yr_1.pk).annotate(
             entity_requirement=Subquery(self.entity_requirement)
         )
+        qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
 
         working_sheet_data = prepare_xls_educational_information_and_specifications(
             qs, request)

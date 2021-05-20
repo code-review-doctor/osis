@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-06 08:40+0200\n"
+"POT-Creation-Date: 2021-05-17 14:35+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,6 +78,9 @@ msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
+
+msgid "Abbreviated title"
+msgstr "Intitulé abrégé"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -262,13 +265,13 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
-msgid "Common access requirements can only be edited by central manager"
-msgstr ""
-"Les conditions d'accès communes peuvent seulement être modifiées par un "
-"gestionnaire en central"
-
 msgid "Common access requirements will be published soon"
 msgstr "Les conditions d'accès communes seront publiées sous peu"
+
+msgid "Common admission conditions can only be edited by central manager"
+msgstr ""
+"Les informations pédagogiques communes peuvent seulement être modifiées par "
+"un gestionnaire en central"
 
 msgid "Common general informations will be published soon"
 msgstr "Les informations générales communes seront publiées sous peu"
@@ -319,6 +322,12 @@ msgstr "Un contact a été créé (avec report)"
 
 msgid "Contact has been created (without postpone)"
 msgstr "Un contact a été créé (sans report)"
+
+msgid "Contact has been moved (with postpone)"
+msgstr "Un contact a été déplacé (avec report)"
+
+msgid "Contact has been moved (without postpone)"
+msgstr "Un contact a été déplacé (sans report)"
 
 msgid "Contact has been removed (with postpone)"
 msgstr "Un contact a été supprimé (avec report)"
@@ -663,6 +672,9 @@ msgstr "Modifier l'ordre des acquis"
 
 msgid "Modify order of condition"
 msgstr "Modifier l'ordre d'une condition"
+
+msgid "Modify order of the contacts"
+msgstr "Modifier l'ordre des contacts"
 
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"

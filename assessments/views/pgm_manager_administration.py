@@ -45,7 +45,7 @@ from base.auth.roles.program_manager import ProgramManager
 from base.models import academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
-from base.models.education_group_year import EducationGroupYear
+from base.models.education_group_year import EducationGroupYear, EducationGroupYearQueryset
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory, \
     find_all_current_entities_version
 from base.models.enums import education_group_categories
@@ -335,6 +335,7 @@ def _get_trainings(academic_yr, entity_list, manager_person, education_group_typ
         management_entity__in={ev.entity_id for ev in entity_list},
         education_group_type__category=education_group_categories.TRAINING,
     )
+    qs = EducationGroupYearQueryset.annotate_entity_management_acronym(qs)
 
     if education_group_type:
         qs = qs.filter(education_group_type=education_group_type)

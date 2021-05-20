@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-27 13:51+0200\n"
+"POT-Creation-Date: 2021-05-10 14:58+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -739,6 +739,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
+msgid "Dissertations"
+msgstr "Mémoires"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1089,7 +1092,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "Gathering"
-msgstr "Regroupement"
+msgstr "Groupement"
 
 msgid "Gender"
 msgstr "Genre"
@@ -2333,6 +2336,9 @@ msgstr "Parcours de l'étudiant"
 msgid "Student search"
 msgstr "Recherche étudiants"
 
+msgid "Student's dissertations management"
+msgstr "Gestion des mémoires des étudiants"
+
 msgid "Students"
 msgstr "Étudiants"
 
@@ -2566,7 +2572,8 @@ msgid "The partim"
 msgstr "Le partim"
 
 msgid "The period to edit scores responsibles is not opened yet"
-msgstr "La période d'édition des responsables de notes n'est pas encore ouverte."
+msgstr ""
+"La période d'édition des responsables de notes n'est pas encore ouverte."
 
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
@@ -2680,6 +2687,9 @@ msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
 
+msgid "This entity is not active during this academic year"
+msgstr "Cette entité n'est pas active durant cette année academique"
+
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
 
@@ -2755,9 +2765,6 @@ msgstr "Formation intitulé"
 
 msgid "Trainings"
 msgstr "Formations"
-
-msgid "Trainings/gathering"
-msgstr "Formations/regroupements"
 
 msgid "Transformation"
 msgstr "Transformation"

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,9 +37,9 @@ from base.forms.learning_unit.entity_form import find_additional_requirement_ent
     PedagogicalEntitiesRoleModelChoiceField
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank, add_all
-from base.models import entity_version
 from base.models.campus import find_main_campuses
-from base.models.entity_version import get_last_version
+from base.models.entity import Entity
+from base.models.entity_version import get_last_version, EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, EXTERNAL, \
@@ -57,6 +57,8 @@ from reference.models.country import Country
 from reference.models.language import Language
 from rules_management.mixins import PermissionFieldMixin
 
+INACTIVE_ENTITY_CSS_STYLE = 'color:#a94442;'
+
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
 
@@ -73,9 +75,18 @@ class LearningUnitModelForm(forms.ModelForm):
 
     def save(self, **kwargs):
         self.instance.learning_container = kwargs.pop('learning_container')
-        self.instance.start_year = kwargs.pop('start_year')
-        self.instance.end_year = kwargs.pop('end_year', None)
+        start_year = kwargs.pop('start_year')
+        self.instance.start_year = start_year
+        end_year = kwargs.pop('end_year', None)
+        self.instance.end_year = self._compute_end_year(start_year, end_year)
         return super().save(**kwargs)
+
+    def _compute_end_year(self, start_year, end_year):
+        is_creation = bool(self.instance)
+        is_partim_created_in_past = is_creation and start_year.is_past
+        if is_partim_created_in_past:
+            end_year = start_year
+        return end_year
 
     class Meta:
         model = LearningUnit
@@ -319,7 +330,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                     learning_unit_year__learning_container_year=self.instance)
                 qs.update(**{attr_name: None})
 
-    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionnals)
+    # TODO :: Refactor code redundant code below for entity fields (requirement - allocation - additionals)
     def __init_requirement_entity_field(self):
         self.fields['requirement_entity'] = PedagogicalEntitiesRoleModelChoiceField(
             person=self.user.person,
@@ -336,10 +347,12 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                         'updateAdditionalEntityEditability(this.value, "id_additional_entity_2_country", true);'
                     ),
                 },
-                forward=['country_requirement_entity'],
+                forward=['country_requirement_entity', 'academic_year'],
             ),
             label=_('Requirement entity'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            help_text=self._get_entity_status_help_text(self.instance.requirement_entity),
+            academic_year=self.__get_academic_year()
         )
 
     def __init_allocation_entity_field(self):
@@ -352,11 +365,12 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                     'id': 'allocation_entity',
                     'data-html': True,
                 },
-                forward=['country_allocation_entity']
+                forward=['country_allocation_entity', 'academic_year']
             ),
             label=_('Allocation entity'),
             disabled=self.fields['requirement_entity'].disabled,
-            queryset=entity_version.find_pedagogical_entities_version(),
+            help_text=self._get_entity_status_help_text(self.instance.allocation_entity),
+            academic_year=self.__get_academic_year()
         )
 
     def __init_additional_entity_1_field(self):
@@ -388,9 +402,11 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 },
                 forward=['country_additional_entity_1']
             ),
-            queryset=find_additional_requirement_entities_choices(),
+            queryset=find_additional_requirement_entities_choices(self.__get_academic_year()),
             label=_('Additional requirement entity 1'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            help_text=self._get_entity_status_help_text(self.instance.additional_entity_1),
+            academic_year=self.__get_academic_year()
         )
 
     def __init_additional_entity_2_field(self):
@@ -412,10 +428,28 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
                 },
                 forward=['country_additional_entity_2']
             ),
-            queryset=find_additional_requirement_entities_choices(),
+            queryset=find_additional_requirement_entities_choices(self.__get_academic_year()),
             label=_('Additional requirement entity 2'),
-            disabled=self.fields['requirement_entity'].disabled
+            disabled=self.fields['requirement_entity'].disabled,
+            help_text=self._get_entity_status_help_text(self.instance.additional_entity_2),
+            academic_year=self.__get_academic_year()
         )
+
+    def _get_entity_status_help_text(self, entity: Entity) -> str:
+        most_recent_acronym = None
+        academic_year = self.__get_academic_year()
+        if entity:
+            most_recent_acronym = entity.most_recent_acronym
+        if most_recent_acronym and academic_year:
+            msg = EntityVersion.get_message_is_entity_active(most_recent_acronym, academic_year.year)
+            if msg:
+                return '<span style="{}">{}</span>'.format(INACTIVE_ENTITY_CSS_STYLE, msg)
+        return None
+
+    def __get_academic_year(self):
+        if self.instance:
+            return getattr(self.instance, "academic_year", None)
+        return None
 
     class Meta:
         model = LearningContainerYear
@@ -429,7 +463,7 @@ class LearningContainerYearModelForm(PermissionFieldMixin, ValidationRuleMixin, 
             'requirement_entity',
             'allocation_entity',
             'additional_entity_1',
-            'additional_entity_2',
+            'additional_entity_2'
         )
 
     def post_clean(self, specific_title):
