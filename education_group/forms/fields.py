@@ -1,3 +1,5 @@
+from typing import Union
+
 from ajax_select.fields import AutoCompleteSelectMultipleField
 from django import forms
 from django.utils.translation import gettext_lazy as _
@@ -20,9 +22,11 @@ class MainCampusChoiceField(forms.ModelChoiceField):
 
 
 class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
-    def __init__(self, person, initial, academic_year: 'AcademicYear' = None, **kwargs):
+    def __init__(self, person, initial, academic_year: Union['AcademicYear', int] = None, **kwargs):
         group_names = (FacultyManager.group_name, CentralManager.group_name, )
         self.initial = initial
+        if isinstance(academic_year, int):
+            academic_year = AcademicYear.objects.get(year=academic_year)
         self.academic_year = academic_year
         super().__init__(
             person=person,
@@ -33,11 +37,9 @@ class ManagementEntitiesModelChoiceField(EntityRoleModelChoiceField):
         )
 
     def get_queryset(self):
-        qs = super().get_queryset().pedagogical_entities()
         if self.get_person().user.has_perm('education_group.change_management_entity'):
-            qs |= EntityVersion.objects.pedagogical_entities_with_academic_year(self.academic_year)
-            return qs.order_by('acronym')
-        return EntityVersion.objects.pedagogical_entities().order_by('acronym')
+            return EntityVersion.objects.pedagogical_entities_with_academic_year(self.academic_year).order_by('acronym')
+        return super().get_queryset().pedagogical_entities().order_by('acronym')
 
     def clean(self, value):
         value = super(forms.ModelChoiceField, self).clean(value)
