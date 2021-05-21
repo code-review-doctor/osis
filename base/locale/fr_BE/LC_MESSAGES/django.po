@@ -739,6 +739,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
+msgid "Dissertations"
+msgstr "Mémoires"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -2335,6 +2338,9 @@ msgstr "Parcours de l'étudiant"
 
 msgid "Student search"
 msgstr "Recherche étudiants"
+
+msgid "Student's dissertations management"
+msgstr "Gestion des mémoires des étudiants"
 
 msgid "Students"
 msgstr "Étudiants"
