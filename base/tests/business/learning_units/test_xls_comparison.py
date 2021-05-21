@@ -252,6 +252,7 @@ class TestPropositionComparisonXls(TestCase):
     def test_check_changes(self):
         line_number = 0
         # First 2 columns are unmutable
+        dict_expected = {xls_build.STYLE_MODIFIED: ['C{}'.format(line_number)]}
         self.assertDictEqual(_check_changes_in_proposals(
             ['elt1', 'elt2', 'elt3', 'elt4'],
             ['elt1', 'elt2 bis', 'elt3 bis', 'elt4'],
@@ -259,9 +260,7 @@ class TestPropositionComparisonXls(TestCase):
             self.entities_acronym_and_status,
             defaultdict(list)
         ),
-            {
-                xls_build.STYLE_MODIFIED: ['C{}'.format(line_number)]
-            }
+            dict_expected
         )
 
     def test_get_represen_string(self):
