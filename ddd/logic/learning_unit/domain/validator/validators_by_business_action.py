@@ -88,7 +88,7 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
 
     command = attr.ib(type=CreateEffectiveClassCommand)
     learning_unit = attr.ib(type='LearningUnit')
-    all_existing_class_identities: List['EffectiveClassIdentity']
+    all_existing_class_identities = attr.ib(type=List['EffectiveClassIdentity'])
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
