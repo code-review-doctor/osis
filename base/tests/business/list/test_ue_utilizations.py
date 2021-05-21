@@ -306,7 +306,7 @@ class TestUeUtilization(TestCase):
         dict_to_update = defaultdict(list)
         result = _get_styled_cells(
             styled_cells_to_update=dict_to_update, learning_unit_yr=luy, row_number=1
-        )        
+        )
         row_colored_because_of_proposal = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
             'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
