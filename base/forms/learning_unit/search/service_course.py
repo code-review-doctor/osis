@@ -52,7 +52,8 @@ class ServiceCourseFilter(LearningUnitFilter):
     def filter_queryset(self, queryset):
         qs = super().filter_queryset(queryset)
 
-        entity_structure = load_main_entity_structure()
+        academic_year = self.form.cleaned_data["academic_year"]
+        entity_structure = load_main_entity_structure(academic_year.start_date)
         service_courses_ids = [luy.id for luy in qs if _is_service_course(luy, entity_structure)]
         return qs.filter(pk__in=service_courses_ids)
 

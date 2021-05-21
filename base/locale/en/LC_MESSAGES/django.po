@@ -2372,10 +2372,6 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The entity %(acronym_entity)s is not active for this academic year"
-msgstr ""
-
-#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2579,9 +2575,6 @@ msgid "This code already exists for this learning unit"
 msgstr ""
 
 msgid "This education group is not editable during this period."
-msgstr ""
-
-msgid "This entity is not active during this academic year"
 msgstr ""
 
 msgid "This feature is in testing phase"
