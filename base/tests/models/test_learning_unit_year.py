@@ -864,5 +864,3 @@ class LearningUnitYearAndClassTest(TestCase):
     def test_has_class(self):
         self.assertTrue(self.learning_unit_year_with_class.has_class())
         self.assertFalse(self.luy_without_class.has_class())
-
-
