@@ -23,9 +23,8 @@
 # ############################################################################
 import random
 
-from base.models import person, learning_unit_year
+from base.models import learning_unit_year
 from base.models.academic_year import current_academic_year
-from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_types import GroupType
 from base.models.learning_unit_year import LearningUnitYear
 from program_management.ddd import command

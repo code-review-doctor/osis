@@ -23,13 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
 from typing import Dict, List
 
 import attr
 
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *

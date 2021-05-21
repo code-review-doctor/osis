@@ -66,7 +66,6 @@ from program_management.business.excel_ue_in_of import FIX_TITLES, \
     _build_direct_gathering_label, _build_main_gathering_label, \
     get_explore_parents, _get_xls_title
 from program_management.business.utils import html2text
-from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree_version import version_label
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -361,12 +360,32 @@ class TestContent(TestCase):
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.entities.requirement_entity_acronym])
 
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=False)
+    @mock.patch('program_management.business.excel_ue_in_of._get_requirement_entity_most_recent_acronym')
+    def test_get_optional_requirement_entity_most_recent_when_inactive(self, mock_recent_acronym, mock_entity_is_active):
+        mock_recent_acronym.return_value = 'ILV2'
+        optional_data = initialize_optional_data()
+        optional_data['has_required_entity'] = True
+        self.luy.entities.requirement_entity_acronym = None
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
+                              ['\u0336'.join(mock_recent_acronym.return_value) + '\u0336'])
+
     @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=True)
     def test_get_optional_allocation_entity(self, mock_entity_is_active):
         optional_data = initialize_optional_data()
         optional_data['has_allocation_entity'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
                               [self.luy.entities.allocation_entity_acronym])
+
+    @mock.patch('base.models.entity_version.EntityVersion.is_entity_active', return_value=False)
+    @mock.patch('program_management.business.excel_ue_in_of._get_allocation_entity_most_recent_acronym')
+    def test_get_optional_allocation_entity_most_recent_when_inactive(self, mock_recent_acronym, mock_entity_is_active):
+        mock_recent_acronym.return_value = 'DRT2'
+        optional_data = initialize_optional_data()
+        optional_data['has_allocation_entity'] = True
+        self.luy.entities.allocation_entity_acronym = None
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.link_1_1, []),
+                              ['\u0336'.join(mock_recent_acronym.return_value) + '\u0336'])
 
     def test_get_optional_credits(self):
         optional_data = initialize_optional_data()

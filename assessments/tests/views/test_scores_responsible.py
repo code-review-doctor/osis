@@ -32,7 +32,6 @@ from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from attribution.models.attribution import Attribution
 from attribution.tests.factories.attribution import AttributionFactory
 from base.tests.factories.academic_year import AcademicYearFactory

@@ -27,7 +27,6 @@ import functools
 import operator
 from typing import Union, List
 
-import attr
 from django.db.models import F, Subquery, Q
 
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -38,7 +37,6 @@ from education_group.ddd.domain.service.identity_search import TrainingIdentityS
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
-from program_management.ddd.business_types import *
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity

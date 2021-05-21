@@ -44,10 +44,10 @@ from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_unit_year import simulate_annotate_on_entities
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
-from base.tests.factories.learning_unit_year import simulate_annotate_on_entities
 
 
 class TestComparisonXls(TestCase):

@@ -57,7 +57,7 @@ from base.tests.factories.user import UserFactory
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14

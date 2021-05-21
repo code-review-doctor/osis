@@ -34,7 +34,6 @@ from base.tests.factories.group_element_year import GroupElementYearFactory, Gro
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from program_management.ddd import command
-from program_management.ddd.repositories import persist_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList

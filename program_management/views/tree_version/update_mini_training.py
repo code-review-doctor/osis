@@ -23,7 +23,6 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.command import UpdateMiniTrainingVersionCommand
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain import program_tree_version

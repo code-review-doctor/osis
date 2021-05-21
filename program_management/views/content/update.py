@@ -44,7 +44,6 @@ from education_group.ddd.service.read import get_group_service, get_training_ser
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
-from program_management.ddd.business_types import *
 from program_management.ddd.command import GetReportCommand
 from program_management.ddd.domain import exception as program_exception
 from program_management.ddd.domain.program_tree_version import version_label

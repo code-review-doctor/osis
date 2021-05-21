@@ -235,19 +235,20 @@
                     "targets": 4,
                     "data": "management_entity",
                     "render": function ( data, type, row, meta ) {
-                        if (row['active_entity_management_version'] === true)
-                            return data;
-                        else {
-                            let my_msg = gettext("This entity is not active during this academic year");
-                            return '<del>' + data + '</del>' +
-                                ' <span class="glyphicon glyphicon-question-sign" ' +
-                                'data-toggle="tooltip" ' +
-                                'data-placement="top" ' +
-                                'title="'+ my_msg +'" ' +
-                                'style="font-size: 12pt;"></span>';
+                        if (type === 'display') {
+                            if (row['active_entity_management_version'] === false) {
+                                let my_msg = gettext("This entity is not active during this academic year");
+                                return '<del>' + data + '</del>' +
+                                    ' <span class="glyphicon glyphicon-question-sign" ' +
+                                    'data-toggle="tooltip" ' +
+                                    'data-placement="top" ' +
+                                    'title="' + my_msg + '" ' +
+                                    'style="font-size: 12pt;"></span>';
+                            }
                         }
+                        return data;
                     }
-                    },
+                },
                 {"name": "main_teaching_campus", "targets": 5, "data": "main_teaching_campus"},
                 {"name": "code", "targets": 6, "data": "code"},
             ];

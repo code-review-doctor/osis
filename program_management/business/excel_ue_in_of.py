@@ -62,7 +62,6 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
     STYLED_CELLS, ROW_HEIGHT, FONT_ROWS
 from program_management.business.excel import clean_worksheet_title
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.command import SearchAllVersionsFromRootNodesCommand
 from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
@@ -381,18 +380,18 @@ def _get_optional_data(
         score_responsibles: List[ScoreResponsibleDTO]
 ):
     if optional_data_needed['has_required_entity']:
+        requirement_entity_acronym = luy.entities.requirement_entity_acronym
+        if not requirement_entity_acronym:
+            requirement_entity_acronym = _get_requirement_entity_most_recent_acronym(luy)
         data.append(
-            get_entity_version_xls_repr(
-                luy.entities.requirement_entity_acronym,
-                luy.year
-            )
+            get_entity_version_xls_repr(requirement_entity_acronym, luy.year)
         )
     if optional_data_needed['has_allocation_entity']:
+        allocation_entity_acronym = luy.entities.allocation_entity_acronym
+        if not allocation_entity_acronym:
+            allocation_entity_acronym = _get_allocation_entity_most_recent_acronym(luy)
         data.append(
-            get_entity_version_xls_repr(
-                luy.entities.allocation_entity_acronym,
-                luy.year
-            )
+            get_entity_version_xls_repr(allocation_entity_acronym, luy.year)
         )
     if optional_data_needed['has_credits']:
         data.append(link.relative_credits or '-')
@@ -466,6 +465,20 @@ def _get_optional_data(
             for k, v in zip(force_majeure._fields, force_majeure):
                 data.append(v)
     return data
+
+
+def _get_requirement_entity_most_recent_acronym(luy):
+    return LearningUnitYear.objects.get(
+        acronym=luy.acronym,
+        academic_year__year=luy.year
+    ).requirement_entity.most_recent_acronym
+
+
+def _get_allocation_entity_most_recent_acronym(luy):
+    return LearningUnitYear.objects.get(
+        acronym=luy.acronym,
+        academic_year__year=luy.year
+    ).allocation_entity.most_recent_acronym
 
 
 def _build_force_majeure_cols(luy: 'DddLearningUnitYear'):

@@ -24,13 +24,13 @@
 #
 ##############################################################################
 import datetime
+from typing import List
 from unittest import mock
 
 from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-from typing import List
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR

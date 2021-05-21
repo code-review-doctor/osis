@@ -32,14 +32,12 @@ from django.db.models import Q
 
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception, program_tree
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.domain.link import factory as link_factory, LinkIdentity

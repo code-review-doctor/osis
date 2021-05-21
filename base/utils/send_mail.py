@@ -27,9 +27,9 @@
 """
 Utility files for mail sending
 """
+import datetime
 import itertools
 from typing import List
-import datetime
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
