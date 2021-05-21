@@ -221,7 +221,7 @@ class TestProposalXls(TestCase):
         self.l_unit_yr_1.learning_container_year.allocation_entity = self.allocation_entity_version.entity
         self.l_unit_yr_1.learning_container_year.save()
 
-        # append_latest_entities(self.proposal_1.learning_unit_year)
+        append_latest_entities(self.proposal_1.learning_unit_year)
 
 
 def _generate_xls_build_parameter(xls_data, user):
