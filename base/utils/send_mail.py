@@ -27,9 +27,9 @@
 """
 Utility files for mail sending
 """
-import itertools
-from typing import List
 import datetime
+import itertools
+from typing import List, Set
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -41,6 +41,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import proposal_type
 from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
 from base.models.exam_enrollment import ExamEnrollment
@@ -317,8 +318,9 @@ def send_message_after_all_encoded_by_manager(
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    rows_styles = _html_format_rows_styles(
-        enrollments, updated_enrollments_ids,
+    rows_styles = _underline_updated_scores_in_green(
+        enrollments,
+        updated_enrollments_ids,
         encoding_already_completed_before_update
     )
     txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
@@ -398,10 +400,10 @@ def _get_encoding_status(language, all_encoded):
         return translation.gettext(message)
 
 
-def _html_format_rows_styles(
+def _underline_updated_scores_in_green(
         enrollments: List[ExamEnrollment],
         updated_enrollments_ids: List[int],
-        encoding_already_completed_before_update: bool
+        encoding_already_completed_before_update: List['ExamEnrollment']
 ) -> List[str]:
     css_style_on_rows = []
     for enrollment in enrollments:
@@ -415,9 +417,9 @@ def _html_format_rows_styles(
 
 
 def _txt_format_complementary_row_content(
-        enrollments: List[ExamEnrollment],
+        enrollments: List['ExamEnrollment'],
         updated_enrollments_ids: List[int],
-        encoding_already_completed_before_update: bool
+        encoding_already_completed_before_update: Set['EducationGroupYear']
 ) -> List[str]:
     complementary_first_cols_contents = []
     for enrollment in enrollments:
@@ -436,7 +438,9 @@ def _get_txt_complementary_first_col_header(lang_code):
 
 
 def _has_to_be_marked(
-        encoding_already_completed_before_update: bool,
+        educ_groups_which_encoding_was_complete_before_update: Set['EducationGroupYear'],
         enrollment: ExamEnrollment,
         updated_enrollments_ids: List[int]) -> bool:
-    return not encoding_already_completed_before_update or enrollment.id in updated_enrollments_ids
+    educ_group_year = enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
+    was_encoding_complete_before_update = educ_group_year in educ_groups_which_encoding_was_complete_before_update
+    return not was_encoding_complete_before_update or enrollment.id in updated_enrollments_ids
