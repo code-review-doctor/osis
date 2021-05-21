@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:37+0100\n"
+"POT-Creation-Date: 2021-05-17 12:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,9 @@ msgstr "Gestionnaire facultaire"
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
+msgid "Formation catalogue"
+msgstr "Catalogue des formations"
+
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
 
@@ -42,11 +45,18 @@ msgstr ""
 "L'unité d'enseignement ne peut pas être supprimée car il s'agit soit d'un "
 "cours complet, soit d'un des types suivants: %(types)s"
 
+msgid "Learning units"
+msgstr "Unités d'enseignement"
+
+msgid "New class"
+msgstr "Nouvelle classe"
+
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
 msgid "Not in period to edit force majeure section."
-msgstr "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
+msgstr ""
+"Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
 
 msgid "Only letters are allowed."

@@ -23,6 +23,7 @@ from learning_unit.calendar.learning_unit_summary_edition_calendar import Learni
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
 
+
 FACULTY_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.COURSE,
     LearningContainerYearType.DISSERTATION,
@@ -35,6 +36,15 @@ FACULTY_DATE_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.MASTER_THESIS,
     LearningContainerYearType.EXTERNAL
 )
+
+CONTAINER_TYPES_TO_CREATE_CLASS = [
+    LearningContainerYearType.COURSE,
+    LearningContainerYearType.INTERNSHIP,
+    LearningContainerYearType.DISSERTATION,
+    LearningContainerYearType.OTHER_COLLECTIVE,
+    LearningContainerYearType.OTHER_INDIVIDUAL,
+    LearningContainerYearType.MASTER_THESIS,
+]
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
 
