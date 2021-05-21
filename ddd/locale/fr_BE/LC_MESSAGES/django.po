@@ -1,0 +1,68 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-21 09:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid ""
+"Annual volume should be greater than or equal to 0 and the sum of first/"
+"second quadrimesters volumes should be equal to annual volume"
+msgstr "Le volume annuel doit être >=0. La somme des volumes Q1 et Q2 doit être égales au volume annuel "
+
+msgid "Can't create a learning unit lower than 2019-20"
+msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
+
+msgid "Class can't be neither mobility nor external"
+msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
+
+msgid "Code should be one character A-Z or 0-9"
+msgstr "Le code de la classe doit être alphanumérique"
+
+msgid "Credits should be greather than 0"
+msgstr "Les crédits doivent être > 0"
+
+msgid "Following fields are required : {}"
+msgstr "Les champs suivants sont requis : {}"
+
+msgid "Internship subtype is a mandatory field"
+msgstr "Le sous-type de stage est obligatoire"
+
+msgid "Learning unit {} already exists next year"
+msgstr "L'UE {} existe déjà sur l'année suivante"
+
+msgid "Learning unit {} is used in following programs : {}"
+msgstr "L'UE est utilisée dans les formations suivantes : {}"
+
+msgid "Selected entity {} is not an authorized responsible entity"
+msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée"
+
+#, python-format
+msgid "The code %(code)s already exists for %(ue)s"
+msgstr "Le code %(code)s existe déjà pour l'UE %(ue)s"
+
+msgid "The code {} already exists"
+msgstr "Le code {} existe déjà"
+
+msgid "The code {} is not a valid code"
+msgstr "Le code {} est invalide"
+
+msgid "The subdivision must contain only one letter"
+msgstr "La subdivision ne doit contenir qu'une lettre"
+
+#, python-format
+msgid "The subdivision %(subd)s already exists for %(ue)s"
+msgstr "La subdivision %(subd)s existe déjà pour l'UE %(ue)s"
+

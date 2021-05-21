@@ -109,10 +109,10 @@ class SubdivisionShouldHaveOneLetterException(BusinessException):
 
 class SubdivisionAlreadyExistException(BusinessException):
     def __init__(self, learning_unit_identity: 'LearningUnitIdentity', subdivision: str, *args, **kwargs):
-        message = _("The subdivision {subd} already exists for {ue}").format(
-            subd=subdivision,
-            ue=learning_unit_identity,
-        )
+        message = _("The subdivision %(subd)s already exists for %(ue)s") % {
+            'subd': subdivision,
+            'ue': learning_unit_identity,
+        }
         super().__init__(message, **kwargs)
 
 
@@ -126,10 +126,10 @@ class ShouldBeAlphanumericException(BusinessException):
 
 class CodeClassAlreadyExistForUeException(BusinessException):
     def __init__(self, learning_unit_identity: 'LearningUnitIdentity', code: str, *args, **kwargs):
-        message = _("The code {code} already exists for {ue}").format(
-            subd=code,
-            ue=learning_unit_identity,
-        )
+        message = _("The code %(code)s already exists for %(ue)s") % {
+            'code': code,
+            'ue': learning_unit_identity,
+        }
         super().__init__(message, **kwargs)
 
 
