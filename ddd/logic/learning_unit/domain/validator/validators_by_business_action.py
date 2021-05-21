@@ -18,8 +18,8 @@ from ddd.logic.learning_unit.domain.validator._should_learning_unit_code_respect
     ShouldCodeRespectNamingConventionValidator
 from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_exists_in_next_year import \
     ShouldLearningUnitNotExistNextYearValidator
-from ddd.logic.learning_unit.domain.validator._should_not_be_type_mobility_or_class import \
-    ShouldNotBeTypeMobilityOrClass
+from ddd.logic.learning_unit.domain.validator._should_not_be_type_mobility_or_external import \
+    ShouldNotBeTypeMobilityOrExternal
 from ddd.logic.learning_unit.domain.validator._subdivision_code_should_be_unique_for_UE import \
     SubdivisionCodeShouldBeUniqueForUE
 from ddd.logic.learning_unit.domain.validator._subdivision_should_contain_only_one_letter import \
@@ -102,7 +102,7 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
                 self.learning_unit.entity_id,
                 self.all_existing_class_identities
             ),
-            ShouldNotBeTypeMobilityOrClass(self.learning_unit),
+            ShouldNotBeTypeMobilityOrExternal(self.learning_unit),
             CheckClassVolumes(
                 Volumes(
                     volume_first_quadrimester=Duration(

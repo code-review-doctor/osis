@@ -31,10 +31,9 @@ from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalid
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldNotBeTypeMobilityOrClass(BusinessValidator):
+class ShouldNotBeTypeMobilityOrExternal(BusinessValidator):
     learning_unit_type = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        if self.learning_unit_type == LearningContainerYearType.EXTERNAL.name:  # ???-LV Mobility how to determine?
+        if self.learning_unit_type == LearningContainerYearType.EXTERNAL.name:
             raise ClassTypeInvalidException()
-
