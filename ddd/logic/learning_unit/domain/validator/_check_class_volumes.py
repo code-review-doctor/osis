@@ -37,6 +37,6 @@ class CheckClassVolumes(BusinessValidator):
 
     def validate(self, *args, **kwargs):
         annual_vol = self.volumes.volume_annual.quantity_in_hours
-        sum_q1_q2 = self.volumes.volume_first_quadrimester + self.volumes.volume_second_quadrimester
+        sum_q1_q2 = self.volumes.volume_first_quadrimester.quantity_in_hours + self.volumes.volume_second_quadrimester.quantity_in_hours
         if annual_vol < 0 or sum_q1_q2 != annual_vol:
             raise AnnualVolumeInvalidException()

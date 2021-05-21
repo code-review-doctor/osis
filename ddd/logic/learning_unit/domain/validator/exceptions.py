@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
@@ -117,7 +119,7 @@ class SubdivisionAlreadyExistException(BusinessException):
 
 
 class ShouldBeAlphanumericException(BusinessException):
-    def __init__(self, *args, **kwargs):
+    def validate(self, *args, **kwargs):
         message = _(
             "Code should be one character A-Z or 0-9"
         )

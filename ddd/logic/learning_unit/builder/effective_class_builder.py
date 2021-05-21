@@ -27,6 +27,7 @@ from typing import Type, Union, List
 
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
@@ -47,27 +48,42 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             all_existing_class_identities: List['EffectiveClassIdentity']
     ) -> Union['PracticalEffectiveClass', 'LecturingEffectiveClass']:
         learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+
         CreateEffectiveClassValidatorList(
             command=cmd,
             learning_unit=learning_unit,
             all_existing_class_identities=all_existing_class_identities
         ).validate()
+
+        # effective_class_identity = EffectiveClassIdentity()
+        # effective_class_identity.code = cmd.code
+        # effective_class_identity.learning_unit_identity = learning_unit_identity
+        effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
+        titles = ClassTitles()
+        titles.fr = cmd.title_fr
+        titles.en = cmd.title_en
+
+        teaching_place = TeachingPlace(place=cmd.place, organization_name=cmd.organization_name)
+        # TODO
+        # teaching_place.place = cmd.place
+        # teaching_place.organization_name = cmd.organization_name
+
         return _get_effective_class_by_type(learning_unit)(
-            entity_id=EffectiveClassIdentity(code=cmd.code, learning_unit_identity=learning_unit_identity),
-            titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
-            teaching_place=TeachingPlace(place=cmd.place, organization_name=cmd.organization_name),
-            derogation_quadrimester=DerogationQuadrimester(cmd),
+            entity_id=effective_class_identity,
+            titles=titles,
+            teaching_place=teaching_place,
+            derogation_quadrimester=DerogationQuadrimester(cmd.derogation_quadrimester),
             session_derogation=DerogationSession(cmd.session_derogation),
             volumes=Volumes(
-                volume_first_quadrimester=Duration(
+                volume_first_quadrimester=_build_duration(
                     hours=cmd.volume_first_quadrimester_hours,
                     minutes=cmd.volume_first_quadrimester_minutes
                 ),
-                volume_second_quadrimester=Duration(
+                volume_second_quadrimester=_build_duration(
                     hours=cmd.volume_second_quadrimester_hours,
                     minutes=cmd.volume_second_quadrimester_minutes
                 ),
-                volume_annual=Duration(
+                volume_annual=_build_duration(
                     hours=cmd.volume_annual_quadrimester_hours,
                     minutes=cmd.volume_annual_quadrimester_minutes
                 )
@@ -96,3 +112,10 @@ def _get_effective_class_by_type(learning_unit: LearningUnit) -> Type[EffectiveC
         return PracticalEffectiveClass
 
     return None
+
+
+def _build_duration(hours: int, minutes: int) -> Duration:
+    duration = Duration(hours=0, minutes=0)
+    duration.hours = hours
+    duration.minutes = minutes
+    return duration
