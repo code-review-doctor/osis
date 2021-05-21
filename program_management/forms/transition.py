@@ -37,6 +37,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE
 from base.forms.utils.fields import OsisRichTextFormField
 from base.forms.utils.validations import set_remote_validation
 from base.models.certificate_aim import CertificateAim
+from base.models.entity_version import EntityVersion
 from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
@@ -56,23 +57,25 @@ class TransitionVersionForm(forms.Form):
         max_length=28,
         required=False,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     transition_name = forms.CharField(
         max_length=14,
         required=False,
         label=_('Acronym/Short title'),
-        widget=TextInput(attrs={'style': "text-transform: uppercase;"}),
+        widget=TextInput(attrs={'style': "text-transform: uppercase;", 'autocomplete': "off"}),
     )
     version_title_fr = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the french version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     version_title_en = forms.CharField(
         max_length=100,
         required=False,
         label=_('Full title of the english version'),
+        widget=TextInput(attrs={'autocomplete': "off"}),
     )
     end_year = forms.ChoiceField(
         required=False,
@@ -83,7 +86,7 @@ class TransitionVersionForm(forms.Form):
         self.tree_version_identity = tree_version_identity
         super().__init__(*args, **kwargs)
         self._init_academic_year_choices()
-        self._set_remote_validation_on_version_name()
+        self._set_remote_validation_on_transition_name()
 
     def _init_academic_year_choices(self):
         max_year = get_transition_version_max_end_year_service.calculate_transition_version_max_end_year(
@@ -102,13 +105,28 @@ class TransitionVersionForm(forms.Form):
         if not self.fields["end_year"].initial:
             self.fields["end_year"].initial = choices_years[0]
 
-    def _set_remote_validation_on_version_name(self):
-        set_remote_validation(
-            self.fields["transition_name"],
-            reverse(
+    def _set_remote_validation_on_transition_name(self):
+        if self.tree_version_identity.version_name:
+            check_url = reverse(
+                "check_transition_name",
+                args=[
+                    self.tree_version_identity.year,
+                    self.tree_version_identity.offer_acronym,
+                    self.tree_version_identity.version_name
+                ]
+            )
+
+        else:
+            check_url = reverse(
                 "check_transition_name",
                 args=[self.tree_version_identity.year, self.tree_version_identity.offer_acronym]
             )
+
+        set_remote_validation(
+            self.fields["transition_name"],
+            check_url,
+            validate_if_empty=True,
+            validate_on_load=True
         )
 
     def clean_end_year(self):
@@ -300,10 +318,14 @@ class UpdateTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFieldMi
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
+        old_entity = self.initial.get('management_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=self.year,
+            help_text=msg
         )
 
     # ValidationRuleMixin
@@ -385,10 +407,14 @@ class UpdateMiniTrainingTransitionVersionForm(ValidationRuleMixin, PermissionFie
         self.__init_management_entity_field()
 
     def __init_management_entity_field(self):
+        old_entity = self.initial.get('administration_entity', None)
+        msg = EntityVersion.get_message_is_entity_active(old_entity, self.year)
         self.fields['management_entity'] = fields.ManagementEntitiesModelChoiceField(
             person=self.user.person,
             initial=self.initial.get('management_entity'),
             disabled=self.fields['management_entity'].disabled,
+            academic_year=self.year,
+            help_text=msg
         )
 
     # ValidationRuleMixin

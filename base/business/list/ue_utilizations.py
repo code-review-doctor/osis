@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict, List
 from collections import defaultdict
+from typing import Dict, List
+
+from django.db.models import Q
 from django.db.models import QuerySet
 from django.db.models.expressions import RawSQL
+from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Color, Font
 
 from base.business.learning_unit_xls import HEADER_TEACHERS, \
@@ -35,13 +38,11 @@ from base.business.learning_unit_xls import HEADER_TEACHERS, \
     acronym_with_version_label, BOLD_FONT, get_name_or_username, \
     WRAP_TEXT_ALIGNMENT, _get_col_letter, PROPOSAL_LINE_STYLES
 from base.business.xls import _get_all_columns_reference
+from base.models.academic_year import AcademicYear
+from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear, \
     LearningUnitYearQuerySet
 from osis_common.document import xls_build
-from django.utils.translation import gettext_lazy as _
-from django.db.models import Q
-from base.models.entity_version import EntityVersion
-from base.models.academic_year import AcademicYear
 
 XLS_FILENAME = _('LearningUnitsTrainingsList')
 CELLS_WITH_BORDER_TOP = 'cells_with_border_top'
@@ -49,8 +50,8 @@ CELLS_TO_COLOR = 'cells_to_color'
 XLS_DESCRIPTION = _('List of learning units with one line per training')
 WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
-FIRST_TRAINING_COLUMN = 26
-TOTAL_NB_OF_COLUMNS = 31
+FIRST_TRAINING_COLUMN = 28
+TOTAL_NB_OF_COLUMNS = 33
 HEADER_PROGRAMS = [
     str(_('Gathering')),
     str(_('Training code')),
@@ -144,7 +145,7 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                                 training_occurence
                             )
                             if training_occurence == 1:
-                                cells_with_border_top.extend(_add_border_top(len(lines)+1))
+                                cells_with_border_top.extend(_add_border_top(len(lines) + 1))
 
                             training_occurence += 1
         else:

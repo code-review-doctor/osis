@@ -28,10 +28,6 @@ from typing import Optional, List
 
 from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef, Q, ProtectedError
-from django.utils import timezone
-
-from education_group import publisher
-from education_group.ddd.business_types import *
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
 from base.models.campus import Campus as CampusModelDb
@@ -39,6 +35,7 @@ from base.models.education_group_type import EducationGroupType as EducationGrou
 from base.models.entity import Entity as EntityModelDb
 from base.models.entity_version import EntityVersion as EntityVersionModelDb
 from base.models.enums.constraint_type import ConstraintTypeEnum
+from education_group import publisher
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception, group
 from education_group.ddd.domain._campus import Campus
@@ -68,8 +65,12 @@ class GroupRepository(interface.AbstractRepository):
             academic_year = AcademicYearModelDb.objects.only('id').get(year=group.year)
             start_year = AcademicYearModelDb.objects.only('id').get(year=group.start_year)
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=group.type.name)
-            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+            management_entity = EntityVersionModelDb.objects.only(
+                'entity_id'
+            ).filter(
                 acronym=group.management_entity.acronym,
+            ).latest(
+                'start_date'
             )
             teaching_campus = CampusModelDb.objects.only('id').get(
                 name=group.teaching_campus.name,
@@ -131,8 +132,12 @@ class GroupRepository(interface.AbstractRepository):
     def update(cls, group: 'Group', **_) -> 'GroupIdentity':
         warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         try:
-            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+            management_entity = EntityVersionModelDb.objects.only(
+                'entity_id'
+            ).filter(
                 acronym=group.management_entity.acronym,
+            ).latest(
+                'start_date'
             )
             teaching_campus = CampusModelDb.objects.only('id').get(
                 name=group.teaching_campus.name,

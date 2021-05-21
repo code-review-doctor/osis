@@ -11,21 +11,21 @@
     - [Commits](#commits)
     - [Pull requests](#pull-requests)
     - [Performance](#performance)
-    - [Sécurité](#scurit)
+    - [Sécurité](#sécurité)
 - [Onion Architecture](https://dev.to/barrymcauley/onion-architecture-3fgl)
 - [Arborescence des packages](#arborescence-des-packages)
 - [Couche Django app](#couche-django-app)
     - [API](#api)
     - Calendar (événements académiques) - Documentation/guidelines à développer
     - [Forms (Django)](#formulaire-django-forms)
-    - [Model (Django)](#modle-django-model)
+    - [Model (Django)](#modèle-django-model)
     - [Views (Django)](#vue-django-view)
     - [Templates (Django)](#gabarit-django-templates)
     - [Template Tags (Django)](#filtres-de-gabarits-django-template-tags)
     - Tests (unit tests) - Documentation/guidelines à développer
 - [Couche DDD : Domain Driven Design](#domain-driven-design)
-    - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/workshops-mob-programming/ddd)
-    - [Conventions générales](#conventions-gnrales)
+    - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/dev/ddd/logic)
+    - [Conventions générales](#conventions-générales)
     - [Builder (factory)](#dddbuilder)
     - [Domain](#ddddomain)
         - Model
@@ -44,11 +44,11 @@
     - [Commande (commands.py)](#dddcommandpy)
     - [DTOs (dtos.py)](#dto--data-transfer-object)
 - [Couche Infrastructure](#couche-infrastructure)
-    - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/workshops-mob-programming/infrastructure)
-    - [Repository (implémentation)](#repository-implmentation)
-- [Gestion des permissions](#permissions)
+    - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/dev/infrastructure)
+    - [Repository (implémentation)](#repository-implémentation)
 - [Droits de merge et reviews](#droits-de-merge-et-reviews)
 - [Emails](#emails)
+- [Gestion des permissions](#permissions)
 - [PDF](#pdf)
 - [FAQ : questions - réponses](faq.md)
 - [Références](references.md)
@@ -150,7 +150,7 @@ def my_function(arg1: str,
 
 
 ## Traductions
-- Voir https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization
+- Voir [manuel technique](https://github.com/uclouvain/osis/blob/dev/doc/technical-manual.adoc#internationalization)
 - Supprimer les `Fuzzy` après avoir vérifié la traduction
 
 
@@ -349,9 +349,9 @@ Osis (racine projet git)
     - Champs requis
     - Énumérations (ChoiceField)
     - Toutes ces validations sont **dupliquées** dans notre domaine ([couche Validators](#dddvalidator))
-    - Cf. [doc sur "two steps validation"](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md)
+    - Cf. [doc sur "two steps validation"](https://github.com/uclouvain/osis/blob/dev/doc/two_steps_validation.md)
 - Doit hériter de `DisplayExceptionsByFieldNameMixin`
-    - Fournit `field_name_by_exception` et `get_command()` - Cf. [doc sur "two steps validation"](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md)
+    - Fournit `field_name_by_exception` et `get_command()` - Cf. [doc sur "two steps validation"](https://github.com/uclouvain/osis/blob/dev/doc/two_steps_validation.md)
 
 - Accès :
   - [couche Commands](#dddcommandpy)
@@ -714,7 +714,7 @@ class GenerateSequenceId(interface.DomainService):
 
 ## ddd/validator list
 - Regroupe le listing des règles métier à respecter par action métier
-- Doit hériter de [TwoStepsMultipleBusinessExceptionListValidator](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md)
+- Doit hériter de [TwoStepsMultipleBusinessExceptionListValidator](https://github.com/uclouvain/osis/blob/dev/doc/two_steps_validation.md)
 - Visibilité : `protected` (accessibles uniquement par le Domain)
 - 1 fichier pour toutes les règles par action : `validators_by_business_action.py`
 - Accès : 
@@ -819,10 +819,10 @@ class CannotDeleteDueToExistingStudentsEnrolled(BusinessException):
 - Regroupe les **interfaces** qui déclarent les fonctions de liaison entre le stockage des données et nos objets du domaine
 - Chargée de persister et charger les données
 - Hérite de `AbstractRepository`
-- Persiste uniquement des RootEntity qui sont [complets](https://github.com/uclouvain/osis/blob/workshops/doc/domain_purity_and_completeness.md)
-    - Évite les risque d'inconsistance dans les vérifications des invariants métier (cf. [validation avant ou après?](https://github.com/uclouvain/osis/blob/workshops/doc/two_steps_validation.md#appliquer-les-validateurs-avant-ou-apr%C3%A8s-ex%C3%A9cution-dune-action-m%C3%A9tier-de-lobjet-du-domaine-))
-- Peut déclarer des fonctions qui renvoient des [DTOs](https://github.com/uclouvain/osis/blob/workshops/doc/dto.md) 
-dans des cas spécifiques relatifs à la consultation (cf. [quand utiliser des DTO ?](https://github.com/uclouvain/osis/blob/workshops/doc/dto.md#quand-utiliser-un-dto-))
+- Persiste uniquement des RootEntity qui sont [complets](https://github.com/uclouvain/osis/blob/dev/doc/domain_purity_and_completeness.md)
+    - Évite les risque d'inconsistance dans les vérifications des invariants métier (cf. [validation avant ou après?](https://github.com/uclouvain/osis/blob/dev/doc/two_steps_validation.md#appliquer-les-validateurs-avant-ou-apr%C3%A8s-ex%C3%A9cution-dune-action-m%C3%A9tier-de-lobjet-du-domaine-))
+- Peut déclarer des fonctions qui renvoient des [DTOs](https://github.com/uclouvain/osis/blob/dev/doc/dto.md) 
+dans des cas spécifiques relatifs à la consultation (cf. [quand utiliser des DTO ?](https://github.com/uclouvain/osis/blob/dev/doc/dto.md#quand-utiliser-un-dto-))
 - Nommage des fichiers : i_<objet_métier>.py
 - Nommage des objets : <ObjetMetier>IRepository
 - Cf. [interface.AbstractRepository](https://github.com/uclouvain/osis-common/blob/master/ddd/interface.py#L53)
@@ -900,7 +900,7 @@ def detach_node(command_request_params: interface.CommandRequest) -> interface.E
 - Séparé en read/write ([CQS](CQS_command_query_separation.md))
 - Doit obligatoirement hériter de l'objet CommandRequest
 - Pas d'héritage d'une autre commande, 1 commande = 1 action métier = 1 application service (use case)
-    - Cf. [message bus](https://github.com/uclouvain/osis/blob/workshops/doc/messages_bus.md)
+    - Cf. [message bus](https://github.com/uclouvain/osis/blob/dev/doc/messages_bus.md)
 - Nommage des classes de commande : <ActionMetier>Command
 
 Exemple : 
@@ -934,7 +934,7 @@ class UpdateTrainingCommand(interface.CommandRequest):
 - "Contrat de données" qui nous aide à atteindre la compatibilité entre les différentes couches d'une application
 - Enlève l'interdépendance entre couches
     - Facilite le refactoring
-- Cf. [quand utiliser un DTO ?](https://github.com/uclouvain/osis/blob/workshops/doc/dto.md#quand-utiliser-un-dto-)    
+- Cf. [quand utiliser un DTO ?](https://github.com/uclouvain/osis/blob/dev/doc/dto.md#quand-utiliser-un-dto-)    
 
 
 <br/><br/><br/><br/><br/><br/><br/><br/>

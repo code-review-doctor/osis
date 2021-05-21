@@ -24,13 +24,11 @@
 #
 ##############################################################################
 import datetime
-import operator
-import string
 import random
+import string
 
 import factory.fuzzy
 
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
@@ -65,7 +63,6 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     link_type = None
     order = None
     block = factory.LazyFunction(_generate_block_value)
-    quadrimester_derogation = factory.Iterator(DerogationQuadrimester.choices(), getter=operator.itemgetter(0))
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):

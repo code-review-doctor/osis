@@ -35,6 +35,7 @@ from openpyxl.styles import Alignment, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
+from attribution.models.attribution import search as search_attributions
 from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -67,7 +68,9 @@ BOLD_FONT = Font(bold=True)
 SPACES = '  '
 HEADER_TEACHERS = [
     str(_('List of teachers')),
-    str(_('List of teachers (email)'))
+    str(_('List of teachers (email)')),
+    str(_('Scores responsibles')),
+    str(_('Scores responsibles (emails)')),
 ]
 HEADER_PROGRAMS = _('Trainings')
 PROPOSAL_LINE_STYLES = {
@@ -313,6 +316,9 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) 
         teachers = _get_teachers(learning_unit_yr)
         lu_data_part2.append(';'.join(_build_complete_name(person) for person in teachers))
         lu_data_part2.append(';'.join(person.email if person.email else '-' for person in teachers))
+        score_responsibles = _get_score_responsibles(learning_unit_yr)
+        lu_data_part2.append(';'.join(_build_complete_name(person) for person in score_responsibles))
+        lu_data_part2.append(';'.join(person.email if person.email else '-' for person in score_responsibles))
 
     lu_data_part2.append(learning_unit_yr.get_periodicity_display())
     lu_data_part2.append(yesno(learning_unit_yr.status))
@@ -480,7 +486,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             learning_unit_yr).values()
         if attributions_values:
             for value in attributions_values:
-                data.append(lu_data_part1+_get_attribution_detail(value))
+                data.append(lu_data_part1 + _get_attribution_detail(value))
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
@@ -604,6 +610,14 @@ def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
         if attribution.get('person'):
             teachers.add(attribution.get('person'))
     return teachers
+
+
+def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
+    attributions = search_attributions(score_responsible=True, learning_unit_year=learning_unit_yr)
+    score_responsibles = set()
+    for attribution in attributions:
+        score_responsibles.add(attribution.tutor.person)
+    return score_responsibles
 
 
 def _get_strikethrough_cells(learning_units, is_external_ue_list: bool):

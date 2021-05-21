@@ -32,6 +32,7 @@ from django.utils.translation import gettext_lazy as _
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
+from base.auth.roles.tutor import Tutor
 from base.business.learning_unit_xls import WRAP_TEXT_ALIGNMENT, annotate_qs, PROPOSAL_LINE_STYLES, \
     get_significant_volume
 from base.business.list.ue_utilizations import _get_parameters, CELLS_WITH_BORDER_TOP, \
@@ -44,8 +45,7 @@ from base.models.enums import entity_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type
 from base.models.enums import proposal_type
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.auth.roles.tutor import Tutor
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -66,9 +66,9 @@ from program_management.tests.factories.education_group_version import \
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 
-TRAINING_TITLE_COLUMN = 28
-TRAINING_CODE_COLUMN = 27
-GATHERING_COLUMN = 26
+TRAINING_TITLE_COLUMN = 30
+TRAINING_CODE_COLUMN = 29
+GATHERING_COLUMN = 28
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -76,6 +76,7 @@ FIRST_ROW_CELLS_WITHOUT_TRAINING_DATA = [
     'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
     'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1'
 ]
+
 
 class TestUeUtilization(TestCase):
     @classmethod
@@ -186,6 +187,8 @@ class TestUeUtilization(TestCase):
                                  str(_('Title in English')),
                                  str(_('List of teachers')),
                                  str(_('List of teachers (email)')),
+                                 str(_('Scores responsibles')),
+                                 str(_('Scores responsibles (emails)')),
                                  str(_('Periodicity')),
                                  str(_('Active')),
                                  "{} - {}".format(_('Lecturing vol.'), _('Annual')),
@@ -244,12 +247,12 @@ class TestUeUtilization(TestCase):
         res1 = "{} ({})".format(
             self.a_group_year_parent.partial_acronym,
             "{0:.2f}".format(self.group_element_child_1.relative_credits),
-            )
+        )
 
         res2 = "{} ({})".format(
             self.a_group_year_parent_2.partial_acronym,
             "{0:.2f}".format(self.group_element_child_2.relative_credits),
-            )
+        )
         results = [res1, res2]
         self.assertCountEqual(
             results,
@@ -306,11 +309,11 @@ class TestUeUtilization(TestCase):
         )        
         row_colored_because_of_proposal = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(self.proposal.type)], row_colored_because_of_proposal)
 
-    def test_colored_cells_because_of_proposal_on_second_training_usage(self):    
+    def test_colored_cells_because_of_proposal_on_second_training_usage(self):
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_yr_1,
             type=proposal_type.ProposalType.MODIFICATION.name,
@@ -323,9 +326,9 @@ class TestUeUtilization(TestCase):
             learning_unit_yr=luy,
             row_number=1,
             training_occurence=2
-        )        
+        )
         row_colored_because_of_proposal = [
-            'AA1', 'AB1', 'AC1', 'AD1', 'AE1'
+            'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
         ]
 
         self.assertListEqual(result[WHITE_FONT], FIRST_ROW_CELLS_WITHOUT_TRAINING_DATA)
@@ -392,6 +395,8 @@ class TestUeUtilization(TestCase):
             luy.complete_title_english,
             '{} {}'.format(a_tutor.person.last_name.upper(), a_tutor.person.first_name),
             a_tutor.person.email,
+            '',
+            '',
             luy.get_periodicity_display(),
             yesno(luy.status),
             get_significant_volume(luy.pm_vol_tot or 0),

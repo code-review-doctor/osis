@@ -25,9 +25,7 @@ from typing import List, Type, Optional, Set
 
 from osis_common.ddd import interface
 from program_management.ddd import command
-from program_management.ddd.business_types import *
 from program_management.ddd.domain import exception, program_tree
-from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from testing.mocks import FakeRepository
 
 
@@ -117,10 +115,17 @@ def _delete_program_tree(
 
 
 @classmethod
-def _search_program_trees(cls, entity_ids: List['ProgramTreeIdentity'] = None, **kwargs) -> List['ProgramTree']:
+def _search_program_trees(
+        cls,
+        entity_ids: List['ProgramTreeIdentity'] = None,
+        code: str = None,
+        **kwargs
+) -> List['ProgramTree']:
     result = []
     if entity_ids:
         return [root_entity for root_entity in cls.root_entities if root_entity.entity_id in entity_ids]
+    if code:
+        return [root_entity for root_entity in cls.root_entities if code in root_entity.entity_id.code]
     return result
 
 

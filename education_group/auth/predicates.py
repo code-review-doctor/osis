@@ -113,6 +113,13 @@ def is_education_group_year_older_or_equals_than_limit_settings_year(
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not allowed to create/modify this type of education group"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_user_attached_to_all_scopes(self, user: User, obj: GroupYear = None):
+    return any(Scope.ALL.name in role.scopes for role in self.context['role_qs'] if hasattr(role, 'scopes'))
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("The user is not allowed to create/modify this type of education group"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_education_group_type_authorized_according_to_user_scope(
         self,
         user: User,
@@ -232,6 +239,15 @@ def is_user_linked_to_all_scopes_of_management_entity(self, user, obj: Union['Gr
             for entity_id in self.context['role_qs'].filter(pk=role.pk).get_entities_ids()
         }
         return user_scopes.get(obj.management_entity_id) == Scope.ALL.value
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Transition version of finalities must be filled from transition version of master"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_education_group_type_eligible_to_be_filled(self, user, obj: Union['GroupYear', 'EducationGroupYear']):
+    if obj:
+        return obj.education_group_type.name not in TrainingType.finality_types()
     return None
 
 

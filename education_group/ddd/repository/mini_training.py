@@ -26,10 +26,8 @@ from typing import Optional, List
 
 from django.db import IntegrityError
 from django.db.models import Prefetch, Subquery, OuterRef, ProtectedError
-from django.utils import timezone
 
 from base.models.academic_year import AcademicYear as AcademicYearModelDb
-from base.models.campus import Campus as CampusModelDb
 from base.models.education_group import EducationGroup as EducationGroupModelDb
 from base.models.education_group_type import EducationGroupType as EducationGroupTypeModelDb
 from base.models.education_group_year import EducationGroupYear as EducationGroupYearModelDb
@@ -39,7 +37,6 @@ from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_types import MiniTrainingType
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain import mini_training, exception
-from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
@@ -60,9 +57,13 @@ class MiniTrainingRepository(interface.AbstractRepository):
             end_year = AcademicYearModelDb.objects.get(year=mini_training_obj.end_year) \
                 if mini_training_obj.end_year else None
             education_group_type = EducationGroupTypeModelDb.objects.only('id').get(name=mini_training_obj.type.name)
-            management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+            management_entity = EntityVersionModelDb.objects.only(
+                'entity_id'
+            ).filter(
                 acronym=mini_training_obj.management_entity.acronym,
-            )
+            ).order_by(
+                '-start_date'
+            ).first()
         except AcademicYearModelDb.DoesNotExist:
             raise exception.AcademicYearNotFound
         except EducationGroupTypeModelDb.DoesNotExist:
@@ -197,9 +198,13 @@ def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
 
 
 def _update_education_group_year(mini_training_obj: 'mini_training.MiniTraining'):
-    management_entity = EntityVersionModelDb.objects.current(timezone.now()).only('entity_id').get(
+    management_entity = EntityVersionModelDb.objects.only(
+        'entity_id'
+    ).filter(
         acronym=mini_training_obj.management_entity.acronym,
-    )
+    ).order_by(
+        '-start_date'
+    ).first()
     education_group_year_db_obj = EducationGroupYearModelDb.objects.get(
         acronym=mini_training_obj.acronym,
         academic_year__year=mini_training_obj.year

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import re
+from collections import Iterable
 
 from ckeditor.fields import RichTextField
 from django.core.exceptions import ValidationError
@@ -32,7 +33,6 @@ from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.utils.db import dict_fetchall
@@ -74,7 +74,7 @@ def validate_block_value(value: int):
 
 class GroupElementYearManager(models.Manager):
     def get_adjacency_list(self, root_elements_ids):
-        if not isinstance(root_elements_ids, list):
+        if not isinstance(root_elements_ids, Iterable):
             raise Exception('root_elements_ids must be an instance of list')
         if not root_elements_ids:
             return []
@@ -302,18 +302,6 @@ class GroupElementYear(OrderedModel):
         verbose_name=_("relative credits"),
     )
 
-    min_credits = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Min. credits"),
-    )
-
-    max_credits = models.IntegerField(
-        blank=True,
-        null=True,
-        verbose_name=_("Max. credits"),
-    )
-
     is_mandatory = models.BooleanField(
         default=True,
         verbose_name=_("Mandatory"),
@@ -339,14 +327,6 @@ class GroupElementYear(OrderedModel):
         max_length=500,
         blank=True, null=True,
         verbose_name=_("english comment"),
-    )
-
-    own_comment = models.CharField(max_length=500, blank=True, null=True)
-
-    quadrimester_derogation = models.CharField(
-        max_length=10,
-        choices=quadrimesters.DerogationQuadrimester.choices(),
-        blank=True, null=True, verbose_name=_('Quadrimester derogation')
     )
 
     link_type = models.CharField(

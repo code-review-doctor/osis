@@ -202,6 +202,15 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
         )
 
     @classmethod
+    def annotate_most_recent_requirement_acronym(cls, queryset):
+        entity_requirement = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).order_by("-start_date").values('acronym')[:1]
+        return queryset.annotate(
+            most_recent_entity_requirement=Subquery(entity_requirement)
+        )
+
+    @classmethod
     def annotate_entities_status(cls, queryset):
         allocation_entity = entity_version.EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__allocation_entity'),

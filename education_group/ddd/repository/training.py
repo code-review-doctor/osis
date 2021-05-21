@@ -402,13 +402,11 @@ def _create_education_group_year(
         isced_domain=DomainIscedModelDb.objects.get(
             code=training.isced_domain.entity_id.code
         ) if training.isced_domain else None,
-        management_entity_id=entity_version.find_by_acronym_and_year(
+        management_entity_id=entity_version.find_by_acronym(
             acronym=training.management_entity.acronym,
-            year=training.year,
         ).entity_id if training.management_entity else None,
-        administration_entity_id=entity_version.find_by_acronym_and_year(
+        administration_entity_id=entity_version.find_by_acronym(
             acronym=training.administration_entity.acronym,
-            year=training.year,
         ).entity_id if training.administration_entity else None,
         enrollment_campus=CampusModelDb.objects.get(
             name=training.enrollment_campus.name,
@@ -479,13 +477,11 @@ def _update_education_group_year(
             'isced_domain': DomainIscedModelDb.objects.get(
                 code=training.isced_domain.entity_id.code
             ) if training.isced_domain else None,
-            'management_entity_id': entity_version.find_by_acronym_and_year(
+            'management_entity_id': entity_version.find_by_acronym(
                 acronym=training.management_entity.acronym,
-                year=training.year,
             ).entity_id if training.management_entity else None,
-            'administration_entity_id': entity_version.find_by_acronym_and_year(
+            'administration_entity_id': entity_version.find_by_acronym(
                 acronym=training.administration_entity.acronym,
-                year=training.year,
             ).entity_id if training.administration_entity else None,
             'enrollment_campus': CampusModelDb.objects.get(
                 name=training.enrollment_campus.name,
@@ -586,8 +582,20 @@ def _delete_certificate_aims(education_group_year_db_obj: EducationGroupYearMode
 
 
 def _is_hops_fields_presence_correct(training: 'Training') -> bool:
+    training_hops_types = [
+        TrainingType.PHD,
+        TrainingType.FORMATION_PHD,
+        TrainingType.CERTIFICATE_OF_PARTICIPATION,
+        TrainingType.CERTIFICATE_OF_SUCCESS,
+        TrainingType.CERTIFICATE_OF_HOLDING_CREDITS,
+        TrainingType.CAPAES,
+        TrainingType.CERTIFICATE,
+        TrainingType.RESEARCH_CERTIFICATE,
+        TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE,
+        TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+    ]
     if training.hops:
-        if training.type in (TrainingType.PHD, TrainingType.FORMATION_PHD) and \
+        if training.type in training_hops_types and \
                 training.hops.ares_code and training.hops.ares_authorization:
             return True
         else:
