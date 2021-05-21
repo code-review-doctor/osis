@@ -99,7 +99,7 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
         return [
             SubdivisionCodeShouldBeUniqueForUE(
                 self.command.learning_unit_code,
-                self.learning_unit,
+                self.learning_unit.entity_id,
                 self.all_existing_class_identities
             ),
             ShouldNotBeTypeMobilityOrClass(self.learning_unit),

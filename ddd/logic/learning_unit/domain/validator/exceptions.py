@@ -136,7 +136,7 @@ class CodeClassAlreadyExistForUeException(BusinessException):
 class ClassTypeInvalidException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(
-            "Class can't be neither mobility nor external"  # ???-LV Mobility how to determine?
+            "Class can't be neither mobility nor external"
         )
         super().__init__(message, **kwargs)
 

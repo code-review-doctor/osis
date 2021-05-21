@@ -29,19 +29,14 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.learning_unit.domain.validator.exceptions import CodeClassAlreadyExistForUeException
-from ddd.logic.learning_unit.domain.validator.exceptions import SubdivisionAlreadyExistException
 
 
 @attr.s(frozen=True, slots=True)
 class SubdivisionCodeShouldBeUniqueForUE(BusinessValidator):
     code = attr.ib(type=str)
-    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
+    learning_unit_id = attr.ib(type='LearningUnitIdentity')  # type: LearningUnitIdentity
     all_existing_class_identities = attr.ib(type=List['EffectiveClassIdentity'])  # type: List['EffectiveClassIdentity']
 
     def validate(self, *args, **kwargs):
-        if self.learning_unit.contains_partim_subdivision(self.code):
-            raise SubdivisionAlreadyExistException(self.learning_unit.entity_id, self.code)
         if self.all_existing_class_identities:
-            raise CodeClassAlreadyExistForUeException(self.learning_unit.entity_id, self.code)
-
-
+            raise CodeClassAlreadyExistForUeException(self.learning_unit_id, self.code)
