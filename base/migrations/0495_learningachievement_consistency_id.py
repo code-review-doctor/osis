@@ -16,6 +16,7 @@ class Migration(migrations.Migration):
         ),
         migrations.RunSQL(
             sql='UPDATE base_learningachievement SET consistency_id=base_learningachievement.order+1',
-            reverse_sql=migrations.RunSQL.noop
+            reverse_sql=migrations.RunSQL.noop,
+            elidable=True
         ),
     ]

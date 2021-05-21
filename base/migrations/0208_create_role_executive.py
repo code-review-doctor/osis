@@ -25,5 +25,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_executive_group),
+        migrations.RunPython(add_executive_group, elidable=True),
     ]

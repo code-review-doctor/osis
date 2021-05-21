@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_duplicate_permission_code_name),
-        migrations.RunPython(add_central_manager_group),
-        migrations.RunPython(add_faculty_manager_group),
+        migrations.RunPython(remove_duplicate_permission_code_name, elidable=True),
+        migrations.RunPython(add_central_manager_group, elidable=True),
+        migrations.RunPython(add_faculty_manager_group, elidable=True),
     ]
