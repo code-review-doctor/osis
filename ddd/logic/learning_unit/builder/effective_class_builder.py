@@ -37,6 +37,7 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from osis_common.ddd import interface
 from osis_common.ddd.interface import DTO
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 
 
 class EffectiveClassBuilder(interface.RootEntityBuilder):
@@ -84,8 +85,8 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
 
 
 def _get_effective_class_by_type(effective_class_type: str) -> Type[EffectiveClass]:
-    if effective_class_type == 'PM':
+    if effective_class_type == LECTURING:
         return LecturingEffectiveClass
-    elif effective_class_type == 'PP':
+    elif effective_class_type == PRACTICAL_EXERCISES:
         return PracticalEffectiveClass
     return None

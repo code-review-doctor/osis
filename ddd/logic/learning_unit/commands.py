@@ -106,4 +106,4 @@ class CreateEffectiveClassCommand(interface.CommandRequest):
     volume_second_quadrimester_minutes = attr.ib(type=int)
     volume_annual_quadrimester_hours = attr.ib(type=int)
     volume_annual_quadrimester_minutes = attr.ib(type=int)
-    type = attr.ib(type=str)  # ???-LV on considère que ce sera un valeur PP ou PM
+    type = attr.ib(type=str)
