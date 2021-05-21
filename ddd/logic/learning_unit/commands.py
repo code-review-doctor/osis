@@ -91,4 +91,19 @@ class LearningUnitSearchCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class CreateEffectiveClassCommand(interface.CommandRequest):
-    raise NotImplementedError
+    code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    place = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
+    derogation_quadrimester = attr.ib(type=str)
+    session_derogation = attr.ib(type=str)
+    volume_first_quadrimester_hours = attr.ib(type=int)
+    volume_first_quadrimester_minutes = attr.ib(type=int)
+    volume_second_quadrimester_hours = attr.ib(type=int)
+    volume_second_quadrimester_minutes = attr.ib(type=int)
+    volume_annual_quadrimester_hours = attr.ib(type=int)
+    volume_annual_quadrimester_minutes = attr.ib(type=int)
+    type = attr.ib(type=str)  # ???-LV on considère que ce sera un valeur PP ou PM

@@ -26,8 +26,11 @@
 from typing import Optional, List
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import EntityIdentity, ApplicationService
+from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 
 
 class EffectiveClassRepository(IEffectiveClassRepository):
@@ -46,3 +49,23 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     @classmethod
     def save(cls, entity: 'EffectiveClass') -> None:
         raise NotImplementedError
+
+    def get_identities(self) -> List['EffectiveClassIdentity']:
+        all_learn_unit_years = LearningClassYearDatabase.objects.all().values(
+            "acronym"
+            "learning_component_year__learning_unit_year__acronym",
+            "learning_component_year__learning_unit_year__academic_year__year",
+        )
+
+        return [
+            EffectiveClassIdentity(
+                code=learning_unit['acronym'],
+                learning_unit_identity=LearningUnitIdentity(
+                    code=learning_unit['learning_component_year__learning_unit_year__acronym'],
+                    academic_year=AcademicYearIdentityBuilder.build_from_year(
+                        year=learning_unit['learning_component_year__learning_unit_year__academic_year__year']
+                    )
+                )
+            )
+            for learning_unit in all_learn_unit_years
+        ]

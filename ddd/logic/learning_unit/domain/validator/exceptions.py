@@ -114,3 +114,37 @@ class SubdivisionAlreadyExistException(BusinessException):
             ue=learning_unit_identity,
         )
         super().__init__(message, **kwargs)
+
+
+class ShouldBeAlphanumericException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Code should be one character A-Z or 0-9"
+        )
+        super().__init__(message, **kwargs)
+
+
+class CodeClassAlreadyExistForUeException(BusinessException):
+    def __init__(self, learning_unit_identity: 'LearningUnitIdentity', code: str, *args, **kwargs):
+        message = _("The code {code} already exists for {ue}").format(
+            subd=code,
+            ue=learning_unit_identity,
+        )
+        super().__init__(message, **kwargs)
+
+
+class ClassTypeInvalidException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be neither mobility nor external"  # ???-LV Mobility how to determine?
+        )
+        super().__init__(message, **kwargs)
+
+
+class AnnualVolumeInvalidException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Annual volume should be greater than or equal to 0 "
+            "and the sum of first/second quadrimesters volumes should be equal to annual volume"
+        )
+        super().__init__(message, **kwargs)
