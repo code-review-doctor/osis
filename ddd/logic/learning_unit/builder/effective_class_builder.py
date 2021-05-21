@@ -68,7 +68,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         # teaching_place.place = cmd.place
         # teaching_place.organization_name = cmd.organization_name
 
-        return _get_effective_class_by_type(learning_unit)(
+        return _define_effective_class_type(learning_unit)(
             entity_id=effective_class_identity,
             titles=titles,
             teaching_place=teaching_place,
@@ -99,7 +99,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         raise NotImplementedError
 
 
-def _get_effective_class_by_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
+def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
 
     lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual.quantity_in_hours
     practical_annual_volume = learning_unit.practical_part.volumes.volume_annual.quantity_in_hours
