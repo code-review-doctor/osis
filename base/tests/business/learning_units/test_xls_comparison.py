@@ -259,7 +259,9 @@ class TestPropositionComparisonXls(TestCase):
             self.entities_acronym_and_status,
             defaultdict(list)
         ),
-            {xls_build.STYLE_MODIFIED: ['C{}'.format(line_number)]}
+            {
+                xls_build.STYLE_MODIFIED: ['C{}'.format(line_number)]
+            }
         )
 
     def test_get_represen_string(self):
