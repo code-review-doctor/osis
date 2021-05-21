@@ -37,7 +37,6 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from osis_common.ddd import interface
 from osis_common.ddd.interface import DTO
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 
 
 class EffectiveClassBuilder(interface.RootEntityBuilder):
@@ -53,7 +52,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             learning_unit=learning_unit,
             all_existing_class_identities=all_existing_class_identities
         ).validate()
-        return _get_effective_class_by_type(cmd.type)(
+        return _get_effective_class_by_type(learning_unit)(
             entity_id=EffectiveClassIdentity(code=cmd.code, learning_unit_identity=learning_unit_identity),
             titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
             teaching_place=TeachingPlace(place=cmd.place, organization_name=cmd.organization_name),
@@ -84,9 +83,16 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         raise NotImplementedError
 
 
-def _get_effective_class_by_type(effective_class_type: str) -> Type[EffectiveClass]:
-    if effective_class_type == LECTURING:
+def _get_effective_class_by_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
+
+    lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual.quantity_in_hours
+    practical_annual_volume = learning_unit.practical_part.volumes.volume_annual.quantity_in_hours
+
+    if lecturing_annual_volume > 0 and practical_annual_volume > 0:
         return LecturingEffectiveClass
-    elif effective_class_type == PRACTICAL_EXERCISES:
+    elif lecturing_annual_volume > 0:
+        return LecturingEffectiveClass
+    elif lecturing_annual_volume > 0:
         return PracticalEffectiveClass
+
     return None
