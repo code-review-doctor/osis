@@ -861,6 +861,6 @@ class LearningUnitYearAndClassTest(TestCase):
         cls.learning_unit_year_with_class = luy_class.learning_component_year.learning_unit_year
         cls.luy_without_class = LearningUnitYearFactory()
 
-    def test_has_class(self):
+    def test_has_classes(self):
         self.assertTrue(self.learning_unit_year_with_class.has_class())
         self.assertFalse(self.luy_without_class.has_class())
