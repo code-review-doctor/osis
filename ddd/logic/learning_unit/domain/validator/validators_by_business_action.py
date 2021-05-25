@@ -104,19 +104,11 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
             ),
             ShouldNotBeTypeMobilityOrExternal(self.learning_unit),
             CheckClassVolumes(
-                Volumes(
-                    volume_first_quadrimester=Duration(
-                        hours=self.command.volume_first_quadrimester_hours,
-                        minutes=self.command.volume_first_quadrimester_minutes
-                    ),
-                    volume_second_quadrimester=Duration(
-                        hours=self.command.volume_second_quadrimester_hours,
-                        minutes=self.command.volume_second_quadrimester_minutes
-                    ),
-                    volume_annual=Duration(
-                        hours=self.command.volume_annual_quadrimester_hours,
-                        minutes=self.command.volume_annual_quadrimester_minutes
-                    )
-                )
+                self.command.volume_first_quadrimester_hours,
+                self.command.volume_first_quadrimester_minutes,
+                self.command.volume_second_quadrimester_hours,
+                self.command.volume_second_quadrimester_minutes,
+                self.command.volume_annual_quadrimester_hours,
+                self.command.volume_annual_quadrimester_minutes
             )
         ]
