@@ -54,6 +54,7 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -565,6 +566,9 @@ class LearningUnitYear(SerializableModel):
 
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
+
+    def has_class(self):
+        return LearningClassYear.objects.filter(learning_component_year__learning_unit_year=self).exists()
 
 
 def get_by_id(learning_unit_year_id):
