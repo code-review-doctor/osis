@@ -44,7 +44,7 @@ class LearningClassYearManager(models.Manager):
         )
 
 
-only_alphanumeric_validator = RegexValidator(r'^[a-zA-Z0-9]*$', _('Only alphanumeric characters are allowed.'))
+only_alphanumeric_validator = RegexValidator(r'^[a-zA-Z0-9]$', _('Only alphanumeric characters are allowed.'))
 
 
 class LearningClassYear(models.Model):
@@ -54,7 +54,7 @@ class LearningClassYear(models.Model):
         'base.LearningComponentYear',
         on_delete=models.CASCADE
     )
-    acronym = models.CharField(max_length=3, validators=[only_alphanumeric_validator])
+    acronym = models.CharField(max_length=1, validators=[only_alphanumeric_validator])
     description = models.CharField(max_length=100, blank=True)  # FIXME: to delete when classes development finished
 
     title_fr = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Title in French'))
