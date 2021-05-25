@@ -128,12 +128,14 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         group_form.add_error('max_constraint', e.message)
                     else:
                         group_form.add_error(None, e.message)
+            except CodePatternException as e:
+                group_form.add_error('code', e.message)
             if not group_form.errors:
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))
 
         return render(request, self.template_name, {
-            "group_form": group_form,
+            "group_form": group_fortraining_formm,
             "tabs": self.get_tabs(),
             "type_text": GroupType.get_value(self.kwargs['type']),
             "cancel_url": self.get_cancel_url()

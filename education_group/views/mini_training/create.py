@@ -94,8 +94,6 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, exception.CodeAlreadyExistException):
                     form.add_error("code", e.message)
-                elif isinstance(e, CodePatternException):
-                    form.add_error('code', e.message)
                 elif isinstance(e, exception.AcronymAlreadyExist):
                     form.add_error('abbreviated_title', e.message)
                 elif isinstance(e, exception.ContentConstraintTypeMissing):
@@ -113,6 +111,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
                     form.add_error('academic_year', '')
                 else:
                     form.add_error(None, e.message)
+        except CodePatternException as e:
+            form.add_error('code', e.message)
 
         return self.form_invalid(form)
 
