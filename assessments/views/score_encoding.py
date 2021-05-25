@@ -44,7 +44,6 @@ from psycopg2._psycopg import OperationalError as PsycopOperationalError, Interf
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
-from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
@@ -258,7 +257,8 @@ def online_encoding_form(request, learning_unit_year_id=None):
                 is_program_manager=context["is_program_manager"],
                 updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=scores_list_before_update.educ_groups_which_encoding_was_complete_before_update
+                encoding_already_completed_before_update=
+                scores_list_before_update.educ_groups_which_encoding_was_complete_before_update
             )
     else:
         context = _get_common_encoding_context(request, learning_unit_year_id)
@@ -395,7 +395,8 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
                 is_program_manager=is_program_manager,
                 updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=scores_list_before_update.educ_groups_which_encoding_was_complete_before_update
+                encoding_already_completed_before_update=
+                scores_list_before_update.educ_groups_which_encoding_was_complete_before_update
             )
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
@@ -589,7 +590,8 @@ def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollme
                 is_program_manager=is_program_manager,
                 updated_enrollments=updated_enrollments,
                 pgm_manager=pgm_manager,
-                encoding_already_completed_before_update=scores_list_before_update.educ_groups_which_encoding_was_complete_before_update
+                encoding_already_completed_before_update=
+                scores_list_before_update.educ_groups_which_encoding_was_complete_before_update
             )
             mail_already_sent_by_learning_unit.add(learning_unit_year)
 
