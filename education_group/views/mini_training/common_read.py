@@ -41,16 +41,20 @@ from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.urls import reverse_with_get
 from base.views.common import display_warning_messages
 from education_group.ddd import command
+from education_group.ddd.domain.group import Group
+from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
 from education_group.ddd.domain.service.identity_search import MiniTrainingIdentitySearch
 from education_group.ddd.service.read import get_group_service, get_mini_training_service
-from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.forms.academic_year_choices import get_academic_year_choices_for_trainings_and_mini_training
 from education_group.forms.tree_version_choices import get_tree_versions_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_program_management
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
-from program_management.ddd.domain.program_tree_version import version_label
+from program_management.ddd.domain.program_tree import Path
+from program_management.ddd.domain.program_tree_version import version_label, ProgramTreeVersionIdentity, \
+    ProgramTreeVersion
 from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.ddd.service.read import node_identity_service
@@ -166,9 +170,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "tree_root_id": self.get_root_id(),
             "form_xls_custom": CustomXlsForm(year=self.get_group().year, code=self.get_group().code),
             "education_group_version": self.get_education_group_version(),
-            "academic_year_choices": get_academic_year_choices(
-                self.node_identity,
-                self.get_path(),
+            "academic_year_choices": get_academic_year_choices_for_trainings_and_mini_training(
+                self.program_tree_version_identity,
                 _get_view_name_from_tab(self.active_tab),
             ) if self.is_root_node() else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
@@ -198,6 +201,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "delete_permanently_tree_version_url": self.get_delete_permanently_tree_version_url(),
             "delete_permanently_tree_version_permission_name":
                 self.get_delete_permanently_tree_version_permission_name(),
+            "fill_transition_version_content_permission_name":
+                self.get_fill_transition_version_content_permission_name(),
+            "fill_transition_version_content_url": self.get_fill_transition_version_content_url(),
             "create_specific_version_url": self.get_create_specific_version_url(),
             "create_transition_version_url": self.get_create_transition_version_url(),
             "create_version_permission_name": self.get_create_version_permission_name(),
@@ -250,6 +256,21 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             return "base.change_minitraining"
         return "program_management.change_minitraining_version"
 
+    def get_fill_transition_version_content_permission_name(self) -> str:
+        return "base.fill_minitraining_version"
+
+    def get_fill_transition_version_content_url(self):
+        if self.is_root_node and self.program_tree_version_identity.is_transition:
+            return reverse(
+                "fill_transition_version_content",
+                kwargs={
+                    'year': self.current_version.entity_id.year,
+                    'acronym': self.current_version.entity_id.offer_acronym,
+                    'transition_name': self.current_version.entity_id.transition_name,
+                    'version_name': self.current_version.entity_id.version_name,
+                }
+            )
+
     def get_create_specific_version_url(self):
         if self.is_root_node() and self.program_tree_version_identity.is_official_standard:
             return reverse(
@@ -264,10 +285,12 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 kwargs={'year': self.node_identity.year, 'code': self.node_identity.code}
             ) + "?path={}".format(self.get_path())
 
-    def get_create_version_permission_name(self) -> str:
+    @staticmethod
+    def get_create_version_permission_name() -> str:
         return "base.add_minitraining_version"
 
-    def get_create_transition_version_permission_name(self) -> str:
+    @staticmethod
+    def get_create_transition_version_permission_name() -> str:
         return "base.add_minitraining_transition_version"
 
     def get_delete_permanently_tree_version_url(self):
@@ -280,7 +303,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 }
             )
 
-    def get_delete_permanently_tree_version_permission_name(self):
+    @staticmethod
+    def get_delete_permanently_tree_version_permission_name():
         return "program_management.delete_permanently_minitraining_version"
 
     def get_delete_permanently_mini_training_url(self):
@@ -322,11 +346,11 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 'display': self.have_skills_and_achievements_tab(),
                 'url': get_tab_urls(Tab.SKILLS_ACHIEVEMENTS, self.node_identity, self.get_path()),
             },
-            Tab.ADMISSION_CONDITION: {
+            Tab.ACCESS_REQUIREMENTS: {
                 'text': _('Conditions'),
-                'active': Tab.ADMISSION_CONDITION == self.active_tab,
-                'display': self.have_admission_condition_tab(),
-                'url': get_tab_urls(Tab.ADMISSION_CONDITION, self.node_identity, self.get_path()),
+                'active': Tab.ACCESS_REQUIREMENTS == self.active_tab,
+                'display': self.have_access_requirements_tab(),
+                'url': get_tab_urls(Tab.ACCESS_REQUIREMENTS, self.node_identity, self.get_path()),
             },
         })
 
@@ -340,9 +364,9 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
         return self.current_version.is_official_standard and \
                self.get_group().type.name in MiniTrainingType.with_skills_achievements()
 
-    def have_admission_condition_tab(self):
+    def have_access_requirements_tab(self):
         return self.current_version.is_official_standard and \
-               self.get_group().type.name in MiniTrainingType.with_admission_condition()
+               self.get_group().type.name in MiniTrainingType.with_access_requirements()
 
     def get_publish_url(self):
         return reverse('publish_general_information', args=[
@@ -358,7 +382,7 @@ def _get_view_name_from_tab(tab: Tab):
         Tab.UTILIZATION: 'mini_training_utilization',
         Tab.GENERAL_INFO: 'mini_training_general_information',
         Tab.SKILLS_ACHIEVEMENTS: 'mini_training_skills_achievements',
-        Tab.ADMISSION_CONDITION: 'mini_training_admission_condition',
+        Tab.ACCESS_REQUIREMENTS: 'mini_training_access_requirements',
     }[tab]
 
 

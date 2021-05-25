@@ -15,8 +15,11 @@ from education_group.calendar.education_group_limited_daily_management import \
     EducationGroupLimitedDailyManagementCalendar
 from learning_unit.calendar.learning_unit_extended_proposal_management import \
     LearningUnitExtendedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_force_majeur_summary_edition import \
+    LearningUnitForceMajeurSummaryEditionCalendar
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
     LearningUnitLimitedProposalManagementCalendar
+from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
 
@@ -211,6 +214,26 @@ def is_proposal_extended_management_calendar_open(self, user, group_year: 'Group
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("Not in period to edit description fiche."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_summary_edition_calendar_open(self, user, learning_unit_year):
+    calendar = LearningUnitSummaryEditionCalendar()
+    if learning_unit_year:
+        return calendar.is_target_year_authorized(target_year=learning_unit_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("Not in period to edit force majeure section."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_force_majeur_summary_edition_calendar_open(self, user, learning_unit_year):
+    calendar = LearningUnitForceMajeurSummaryEditionCalendar()
+    if learning_unit_year:
+        return calendar.is_target_year_authorized(target_year=learning_unit_year.academic_year.year)
+    return bool(calendar.get_target_years_opened())
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("Learning unit is not full"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_year_full(self, user, learning_unit_year):
@@ -360,10 +383,20 @@ def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
 @predicate_failed_msg(message=_("This learning unit has application"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_application_all_years(self, user, learning_unit_year):
-    if learning_unit_year:
+    if learning_unit_year and learning_unit_year.is_full():
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not TutorApplication.objects.filter(
             learning_container_year__learning_container=learning_container
+        ).exists()
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has teachers"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_partim_no_application_all_years(self, user, learning_unit_year):
+    if learning_unit_year and learning_unit_year.is_partim():
+        return not AttributionChargeNew.objects.filter(
+            learning_component_year__learning_unit_year__learning_unit=learning_unit_year.learning_unit,
         ).exists()
 
 
@@ -458,4 +491,13 @@ def has_learning_unit_no_attribution_all_years(self, user, learning_unit_year):
 def is_not_proposal_of_type_suppression(self, user, learning_unit_year):
     if learning_unit_year and hasattr(learning_unit_year, 'proposallearningunit'):
         return learning_unit_year.proposallearningunit.type != ProposalType.SUPPRESSION.name
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("The learning unit's description fiche is not editable."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_year_summary_editable(self, user, learning_unit_year):
+    if learning_unit_year:
+        return not learning_unit_year.summary_locked
     return None

@@ -53,7 +53,6 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import AdministrativeManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
@@ -381,8 +380,6 @@ class LearningUnitYearDeletion(TestCase):
         entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
                                               start_date=datetime.date(year=1990, month=1, day=1),
                                               end_date=None)
-        PersonEntityFactory(person=manager, entity=entity_version.entity, with_child=True)
-
         # Cannot remove FULL COURSE
         self.assertFalse(manager.user.has_perm('base.can_delete_learningunit', self.luy1))
 
@@ -395,9 +392,16 @@ class LearningUnitYearDeletion(TestCase):
 
     @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
     def test_cannot_delete_if_has_application_same_year(self, mock_is_linked):
-        luy = LearningUnitYearFactory()
+        luy = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL)
         manager = CentralManagerFactory(entity=luy.requirement_entity)
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+        self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', luy))
+
+    @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
+    def test_cannot_delete_partim_if_has_application(self, mock_is_linked):
+        luy = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.PARTIM)
+        manager = CentralManagerFactory(entity=luy.requirement_entity)
+        AttributionChargeNewFactory(learning_component_year__learning_unit_year=luy)
         self.assertFalse(manager.person.user.has_perm('base.can_delete_learningunit', luy))
 
     @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)

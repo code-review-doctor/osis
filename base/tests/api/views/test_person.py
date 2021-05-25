@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -32,8 +31,8 @@ from base.api.serializers.person import PersonRolesSerializer
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class GetPersonRolesTestCase(APITestCase):
@@ -43,7 +42,7 @@ class GetPersonRolesTestCase(APITestCase):
         for _ in range(2):
             entity = EntityFactory()
             EntityVersionFactory(entity=entity)
-            PersonEntityFactory(
+            CentralManagerFactory(
                 person=cls.person,
                 entity=entity
             )
@@ -71,10 +70,7 @@ class GetPersonRolesTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = PersonRolesSerializer(
-            self.person,
-            context={'request': RequestFactory().get(self.url)},
-        )
+        serializer = PersonRolesSerializer(self.person)
         self.assertEqual(response.data, serializer.data)
 
     def test_get_invalid_person_case_not_found(self):

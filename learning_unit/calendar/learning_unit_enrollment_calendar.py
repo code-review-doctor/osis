@@ -25,14 +25,14 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventCalendarHelper
+from base.business.academic_calendar import AcademicEventCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 
 
 class LearningUnitEnrollmentCalendar(AcademicEventCalendarHelper):
-    event_reference = academic_calendar_type.COURSE_ENROLLMENT
+    event_reference = AcademicCalendarTypes.COURSE_ENROLLMENT.name
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):
@@ -47,6 +47,5 @@ class LearningUnitEnrollmentCalendar(AcademicEventCalendarHelper):
                     "title": "Inscription aux cours",
                     "start_date": datetime.date(ac_year.year, 9, 1),
                     "end_date": datetime.date(ac_year.year, 10, 31),
-                    "academic_year": ac_year  # To remove after refactoring
                 }
             )
