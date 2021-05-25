@@ -65,6 +65,6 @@ class Migration(migrations.Migration):
             model_name='learningclassyear',
             name='acronym',
             field=models.CharField(max_length=1, validators=[
-                django.core.validators.RegexValidator('^[a-zA-Z0-9]*$', 'Only alphanumeric characters are allowed.')]),
+                django.core.validators.RegexValidator('^[a-zA-Z0-9]$', 'Only alphanumeric characters are allowed.')]),
         ),
     ]
