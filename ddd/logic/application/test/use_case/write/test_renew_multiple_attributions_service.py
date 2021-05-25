@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import copy
-from datetime import datetime
+import datetime
 from decimal import Decimal
 
 import mock
@@ -35,6 +35,7 @@ from base.models.enums import vacant_declaration_type
 from ddd.logic.application.commands import RenewMultipleAttributionsCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
@@ -43,6 +44,7 @@ from ddd.logic.application.domain.validator.exceptions import AttributionAboutTo
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
+from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
 from infrastructure.application.repository.vacant_course_in_memory import VacantCourseInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -51,11 +53,17 @@ from infrastructure.messages_bus import message_bus_instance
 class TestRenewMultipleAttributionsService(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_year = datetime.now().year  # FIXME : Use event calendar with data_year
+        today = datetime.date.today()
+        cls.application_calendar = ApplicationCalendar(
+            entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
+            authorized_target_year=AcademicYearIdentity(year=2019),
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=10),
+        )
         cls.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
             function=function.HOLDER,
-            end_year=AcademicYearIdentity(cls.current_year),
+            end_year=cls.application_calendar.authorized_target_year,
             lecturing_volume=Decimal(5),
             practical_volume=None,
         )
@@ -70,7 +78,7 @@ class TestRenewMultipleAttributionsService(TestCase):
         cls.vacant_course = VacantCourse(
             entity_id=VacantCourseIdentity(
                 code='LDROI1200',
-                academic_year=AcademicYearIdentity(year=cls.current_year + 1)
+                academic_year=AcademicYearIdentity(year=cls.application_calendar.authorized_target_year.year + 1)
             ),
             lecturing_volume_available=Decimal(10),
             practical_volume_available=Decimal(50),
@@ -82,6 +90,7 @@ class TestRenewMultipleAttributionsService(TestCase):
 
     def setUp(self) -> None:
         self.applicant_repository = ApplicantInMemoryRepository([self.applicant])
+        self.application_calendar_repository = ApplicationCalendarInMemoryRepository([self.application_calendar])
         self.vacant_course_repository = VacantCourseInMemoryRepository([self.vacant_course])
         self.application_repository = ApplicationInMemoryRepository([])
 
@@ -89,7 +98,8 @@ class TestRenewMultipleAttributionsService(TestCase):
             'infrastructure.messages_bus',
             ApplicationRepository=lambda: self.application_repository,
             ApplicantRepository=lambda: self.applicant_repository,
-            VacantCourseRepository=lambda: self.vacant_course_repository
+            VacantCourseRepository=lambda: self.vacant_course_repository,
+            ApplicationCalendarRepository=lambda: self.application_calendar_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)

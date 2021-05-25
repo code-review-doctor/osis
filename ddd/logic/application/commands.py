@@ -45,7 +45,6 @@ class SearchVacantCoursesCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class ApplyOnVacantCourseCommand(interface.CommandRequest):
     code = attr.ib(type=str)
-    academic_year = attr.ib(type=int)
     global_id = attr.ib(type=str)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)

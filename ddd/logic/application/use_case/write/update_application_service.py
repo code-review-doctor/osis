@@ -41,7 +41,7 @@ def update_application(
     # GIVEN
     application_identity = ApplicationIdentity(uuid=cmd.application_id)
     application = application_repository.get(entity_id=application_identity)
-    vacant_course = vacant_course_repository.get(entity_id=application.course_id)
+    vacant_course = vacant_course_repository.get(entity_id=application.vacant_course_id)
 
     # WHEN
     application = UpdateApplication.update(

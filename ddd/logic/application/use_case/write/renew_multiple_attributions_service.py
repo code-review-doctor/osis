@@ -32,6 +32,7 @@ from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity
 from ddd.logic.application.domain.service.renew_application import Renew
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
+from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 
@@ -40,10 +41,12 @@ from ddd.logic.application.repository.i_vacant_course_repository import IVacantC
 def renew_multiple_attributions(
         cmd: RenewMultipleAttributionsCommand,
         application_repository: IApplicationRepository,
+        application_calendar_repository: IApplicationCalendarRepository,
         applicant_repository: IApplicantRepository,
         vacant_course_repository: IVacantCourseRepository,
 ) -> List[ApplicationIdentity]:
     # GIVEN
+    application_calendar = application_calendar_repository.get_current_application_calendar()
     applicant = applicant_repository.get(entity_id=ApplicantIdentity(cmd.global_id))
     all_existing_applications = application_repository.search(global_id=cmd.global_id)
 
@@ -52,6 +55,7 @@ def renew_multiple_attributions(
     for code in cmd.renew_codes:
         application_renewed = Renew.renew_from_attribution_about_to_expire(
             code=code,
+            application_calendar=application_calendar,
             applicant=applicant,
             all_existing_applications=all_existing_applications,
             vacant_course_repository=vacant_course_repository

@@ -21,21 +21,25 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import datetime
 from decimal import Decimal
 
 import mock
+import uuid
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums import vacant_declaration_type
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
 from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalNotFilledException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
+from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
 from infrastructure.application.repository.vacant_course_in_memory import VacantCourseInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -49,6 +53,13 @@ class TestApplyOnVacantCourseService(TestCase):
             first_name="Thomas",
             last_name="Durant"
         )
+        today = datetime.date.today()
+        cls.application_calendar = ApplicationCalendar(
+            entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
+            authorized_target_year=AcademicYearIdentity(year=2018),
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=10),
+        )
         cls.vacant_course = VacantCourse(
             entity_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
             lecturing_volume_available=Decimal(10),
@@ -60,6 +71,7 @@ class TestApplyOnVacantCourseService(TestCase):
         )
 
         cls.applicant_repository = ApplicantInMemoryRepository([cls.applicant])
+        cls.application_calendar_repository = ApplicationCalendarInMemoryRepository([cls.application_calendar])
         cls.vacant_course_repository = VacantCourseInMemoryRepository([cls.vacant_course])
         cls.application_repository = ApplicationInMemoryRepository([])
 
@@ -68,7 +80,8 @@ class TestApplyOnVacantCourseService(TestCase):
             'infrastructure.messages_bus',
             ApplicationRepository=lambda: self.application_repository,
             ApplicantRepository=lambda: self.applicant_repository,
-            VacantCourseRepository=lambda: self.vacant_course_repository
+            VacantCourseRepository=lambda: self.vacant_course_repository,
+            ApplicationCalendarRepository=lambda: self.application_calendar_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -78,7 +91,6 @@ class TestApplyOnVacantCourseService(TestCase):
     def test_case_both_volume_not_provided_in_command_assert_not_filled_exception_raised(self):
         cmd = ApplyOnVacantCourseCommand(
             code='LDROI1200',
-            academic_year=2018,
             global_id='123456789',
             lecturing_volume=None,
             practical_volume=None,
@@ -100,7 +112,6 @@ class TestApplyOnVacantCourseService(TestCase):
     def test_case_both_volume_set_to_zero_in_command_assert_not_filled_exception_raised(self):
         cmd = ApplyOnVacantCourseCommand(
             code='LDROI1200',
-            academic_year=2018,
             global_id='123456789',
             lecturing_volume=Decimal(0),
             practical_volume=Decimal(0),
@@ -121,7 +132,6 @@ class TestApplyOnVacantCourseService(TestCase):
     def test_case_apply_on_vacant_course_which_have_been_already_applied_assert_raise_exception(self):
         cmd = ApplyOnVacantCourseCommand(
             code='LDROI1200',
-            academic_year=2018,
             global_id='123456789',
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(0),
@@ -145,7 +155,6 @@ class TestApplyOnVacantCourseService(TestCase):
     def test_case_apply_on_vacant_course_with_practical_volume_greater_than_available_assert_raise_exception(self):
         cmd = ApplyOnVacantCourseCommand(
             code='LDROI1200',
-            academic_year=2018,
             global_id='123456789',
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(60),   # Available 50
@@ -166,7 +175,6 @@ class TestApplyOnVacantCourseService(TestCase):
     def test_case_apply_on_vacant_course_with_lecturing_volume_greater_than_available_assert_raise_exception(self):
         cmd = ApplyOnVacantCourseCommand(
             code='LDROI1200',
-            academic_year=2018,
             global_id='123456789',
             lecturing_volume=Decimal(25),   # Available 10
             practical_volume=Decimal(0),

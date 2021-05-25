@@ -43,6 +43,7 @@ from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
+from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -59,13 +60,15 @@ class MessageBus:
         SearchLanguagesCommand: lambda cmd: search_languages(cmd, LanguageRepository()),
         SearchAcademicYearCommand: lambda cmd: search_academic_years(cmd, AcademicYearRepository()),
         ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
-            cmd, ApplicationRepository(), ApplicantRepository(), VacantCourseRepository()
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
         ),
         UpdateApplicationCommand: lambda cmd: update_application(
             cmd, ApplicationRepository(), VacantCourseRepository()
         ),
         RenewMultipleAttributionsCommand: lambda cmd: renew_multiple_attributions(
-            cmd, ApplicationRepository(), ApplicantRepository(), VacantCourseRepository()
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
         ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
         SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(cmd, ApplicationRepository()),

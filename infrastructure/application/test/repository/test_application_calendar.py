@@ -24,23 +24,35 @@
 #
 ##############################################################################
 from django.core.exceptions import ObjectDoesNotExist
+from django.test import TestCase
 
-from attribution.calendar.application_courses_calendar import ApplicationCoursesCalendar
-from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
-from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 
 
-class ApplicationCalendarRepository(IApplicationCalendarRepository):
+class ApplicationCalendarRepositoryGetCurrentCalendar(TestCase):
     @classmethod
-    def get_current_application_calendar(cls) -> ApplicationCalendar:
-        academic_events = ApplicationCoursesCalendar().get_opened_academic_events()
-        academic_event = academic_events[0] if academic_events else None
-        if academic_event:
-            return ApplicationCalendar(
-                entity_id=ApplicationCalendarIdentity(uuid=academic_event.id),
-                authorized_target_year=AcademicYearIdentity(year=academic_event.authorized_target_year),
-                start_date=academic_event.start_date,
-                end_date=academic_event.end_date,
-            )
-        raise ObjectDoesNotExist
+    def setUpTestData(cls):
+        cls.repository = ApplicationCalendarRepository()
+
+    def test_get_assert_return_not_found(self):
+        with self.assertRaises(ObjectDoesNotExist):
+            self.repository.get_current_application_calendar()
+
+    def test_get_assert_return_instance(self):
+        academic_calendar_db = OpenAcademicCalendarFactory(
+            reference=AcademicCalendarTypes.TEACHING_CHARGE_APPLICATION.name
+        )
+
+        application_calendar = self.repository.get_current_application_calendar()
+
+        self.assertIsInstance(application_calendar, ApplicationCalendar)
+        self.assertEqual(application_calendar.start_date, academic_calendar_db.start_date)
+        self.assertEqual(application_calendar.end_date,  academic_calendar_db.end_date)
+        self.assertEqual(
+            application_calendar.authorized_target_year,
+            AcademicYearIdentity(year=academic_calendar_db.data_year.year)
+        )

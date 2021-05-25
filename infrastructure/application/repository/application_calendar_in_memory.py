@@ -43,5 +43,5 @@ class ApplicationCalendarInMemoryRepository(IApplicationCalendarRepository):
 
         return next(
             application_calendar for application_calendar in cls.application_calendars if
-            application_calendar.start_date < today <= application_calendar
+            application_calendar.start_date < today <= application_calendar.end_date
         )

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import datetime
 from typing import List
 
 from attribution.models.enums import function
@@ -31,6 +30,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
@@ -46,20 +46,22 @@ class Renew(interface.DomainService):
     def renew_from_attribution_about_to_expire(
             cls,
             code: str,
+            application_calendar: ApplicationCalendar,
             applicant: Applicant,
             all_existing_applications: List[Application],
             vacant_course_repository: IVacantCourseRepository
     ) -> Application:
         attributions_about_to_expire = applicant.get_attributions_about_to_expire(
-            AcademicYearIdentity(year=datetime.now().year)
+            application_calendar.authorized_target_year
         )
         attributions_filtered = _filter_attribution_by_code(attributions_about_to_expire, code)
         attributions_filtered = _filter_attribution_by_functions(attributions_filtered)
         attribution_about_to_expire = attributions_filtered[0]
 
+        # Lookup course on next year
         vacant_course_next_year = vacant_course_repository.get(
             VacantCourseIdentity(
-                academic_year=AcademicYearIdentity(year=attribution_about_to_expire.end_year.year + 1),
+                academic_year=AcademicYearIdentity(year=application_calendar.authorized_target_year.year + 1),
                 code=code
             )
         )

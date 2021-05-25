@@ -23,9 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
-
-from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -38,8 +35,3 @@ class VacantCourseIdentityBuilder(EntityIdentityBuilder):
     def build_from_repository_dto(cls, dto_object: VacantCourseFromRepositoryDTO) -> VacantCourseIdentity:
         academic_year_identity = AcademicYearIdentityBuilder.build_from_year(dto_object.year)
         return VacantCourseIdentity(code=dto_object.code, academic_year=academic_year_identity)
-
-    @classmethod
-    def build_from_command(cls, cmd: Union[ApplyOnVacantCourseCommand]) -> VacantCourseIdentity:
-        academic_year_identity = AcademicYearIdentityBuilder.build_from_year(cmd.academic_year)
-        return VacantCourseIdentity(code=cmd.code, academic_year=academic_year_identity)
