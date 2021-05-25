@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import Union, Type
 
-from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
@@ -61,7 +60,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
                 organization_name=dto_object.teaching_organization
             ),
             derogation_quadrimester=DerogationQuadrimester(dto_object.derogation_quadrimester),
-            session_derogation=DerogationSession(dto_object.session_derogation),
+            session_derogation=dto_object.session_derogation,
             volumes=Volumes(
                 volume_first_quadrimester=dto_object.volume_q1,
                 volume_second_quadrimester=dto_object.volume_q2,

@@ -36,14 +36,14 @@ class EffectiveClassRepositoryTestCase(TestCase):
             teaching_place=campus.name,
             teaching_organization=campus.organization.name,
             derogation_quadrimester=DerogationQuadrimester.Q1.name,
-            session_derogation=DerogationSession.SESSION_123,
-            volume_q1=Decimal(1.5),
-            volume_q2=Decimal(2.6),
-            volume_annual=Decimal(4.8)
+            session_derogation=DerogationSession.SESSION_123.name,
+            volume_q1=Decimal('1.5'),
+            volume_q2=Decimal('2.6'),
+            volume_annual=Decimal('4.1')  # We cannot make an invalid object
         )
         self.effective_class = EffectiveClassBuilder.build_from_repository_dto(self.dto_object)
 
-    def test_truc(self):
+    def test_save_and_get_make_correct_mapping(self):
         self.class_repository.save(self.effective_class)
         effective_class = self.class_repository.get(entity_id=self.effective_class.entity_id)
         self.assertEqual(effective_class, self.effective_class)
