@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.entity_version import EntityVersion
-from osis_common.ddd import interface
+
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.views.generic import FormView
+
+from base.models.learning_unit_year import get_by_id, LearningUnitYear
+from learning_unit.forms.classes.create import ClassForm
 
 
-class ActiveEntity(interface.DomainService):
-    @staticmethod
-    def is_entity_active_for_year(acronym_entity: str, year: int) -> bool:
-        return EntityVersion.is_entity_active(acronym_entity, year)
+class Create(PermissionRequiredMixin, FormView):
+    template_name = "class/creation.html"
+    form_class = ClassForm
+    permission_required = 'base.can_create_class'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                'learning_unit_year': get_by_id(self.kwargs['learning_unit_year_id']),
+            }
+        )
+        return context
+
+    def get_permission_object(self):
+        return LearningUnitYear.objects.filter(id=self.kwargs['learning_unit_year_id']).\
+            select_related('learning_container_year', 'academic_year')

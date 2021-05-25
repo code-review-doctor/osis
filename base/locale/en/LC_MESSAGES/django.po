@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-10 14:58+0200\n"
+"POT-Creation-Date: 2021-05-25 09:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,10 +83,31 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr ""
 
+msgid "1"
+msgstr ""
+
+msgid "12"
+msgstr ""
+
+msgid "123"
+msgstr ""
+
+msgid "13"
+msgstr ""
+
 msgid "1st quadri"
 msgstr ""
 
+msgid "2"
+msgstr ""
+
+msgid "23"
+msgstr ""
+
 msgid "2nd quadri"
+msgstr ""
+
+msgid "3"
 msgstr ""
 
 msgid "<b>create</b> a new learning unit using that acronym"
@@ -1498,9 +1519,6 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
 msgid "Maximum number of permitted relationships"
 msgstr ""
 
@@ -1511,9 +1529,6 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method not allowed"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Minerval complete"
@@ -1583,6 +1598,9 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "New class"
 msgstr ""
 
 msgid "New external learning unit"
@@ -1749,6 +1767,9 @@ msgid "Own components"
 msgstr ""
 
 msgid "P."
+msgstr ""
+
+msgid "P23"
 msgstr ""
 
 msgid "Page not found."
@@ -2048,9 +2069,6 @@ msgid "Quadri"
 msgstr ""
 
 msgid "Quadrimester"
-msgstr ""
-
-msgid "Quadrimester derogation"
 msgstr ""
 
 msgid "Rate code"
@@ -2372,10 +2390,6 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "The entity %(acronym_entity)s is not active for this academic year"
-msgstr ""
-
-#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2579,9 +2593,6 @@ msgid "This code already exists for this learning unit"
 msgstr ""
 
 msgid "This education group is not editable during this period."
-msgstr ""
-
-msgid "This entity is not active during this academic year"
 msgstr ""
 
 msgid "This feature is in testing phase"

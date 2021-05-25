@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-10 14:58+0200\n"
+"POT-Creation-Date: 2021-05-25 09:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -94,11 +94,32 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
+msgid "1"
+msgstr "1"
+
+msgid "12"
+msgstr "12"
+
+msgid "123"
+msgstr "123"
+
+msgid "13"
+msgstr "13"
+
 msgid "1st quadri"
 msgstr "1er quadri"
 
+msgid "2"
+msgstr "2"
+
+msgid "23"
+msgstr "23"
+
 msgid "2nd quadri"
 msgstr "2e quadri"
+
+msgid "3"
+msgstr "3"
 
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
@@ -1538,9 +1559,6 @@ msgstr "Master de spécialisation"
 msgid "Masters"
 msgstr "Masters"
 
-msgid "Max. credits"
-msgstr "Créd. max."
-
 msgid "Maximum number of permitted relationships"
 msgstr "Nombre maximum de relations autorisées"
 
@@ -1552,9 +1570,6 @@ msgstr "Messages"
 
 msgid "Method not allowed"
 msgstr "Methode non autorisée"
-
-msgid "Min. credits"
-msgstr "Créd. min."
 
 msgid "Minerval complete"
 msgstr "Minerval complet"
@@ -1624,6 +1639,9 @@ msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
+
+msgid "New class"
+msgstr "Nouvelle classe"
 
 msgid "New external learning unit"
 msgstr "Nouvelle unité d'enseignement externe"
@@ -1790,6 +1808,9 @@ msgstr "Composants propres"
 
 msgid "P."
 msgstr "P."
+
+msgid "P23"
+msgstr "P23"
 
 msgid "Page not found."
 msgstr "Page inexistante."
@@ -2108,9 +2129,6 @@ msgstr "Quadri"
 
 msgid "Quadrimester"
 msgstr "Quadrimestre"
-
-msgid "Quadrimester derogation"
-msgstr "Quadrimestre dérogation"
 
 msgid "Rate code"
 msgstr "Code tarif"
@@ -2436,10 +2454,6 @@ msgstr ""
 "quadrimestres."
 
 #, python-format
-msgid "The entity %(acronym_entity)s is not active for this academic year"
-msgstr "L'entité %(acronym_entity)s n'est pas active durant cette année académique"
-
-#, python-format
 msgid ""
 "The entity %(entity_acronym)s does not exist for the selected academic year "
 "%(academic_year)s"
@@ -2686,9 +2700,6 @@ msgid "This education group is not editable during this period."
 msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
-
-msgid "This entity is not active during this academic year"
-msgstr "Cette entité n'est pas active durant cette année academique"
 
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
