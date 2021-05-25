@@ -94,6 +94,9 @@ class LearningUnit(interface.RootEntity):
     def has_partim(self) -> bool:
         raise NotImplementedError
 
+    def is_external(self) -> bool:
+        return isinstance(self, ExternalLearningUnit)
+
 
 class CourseLearningUnit(LearningUnit):
     type = LearningContainerYearType.COURSE

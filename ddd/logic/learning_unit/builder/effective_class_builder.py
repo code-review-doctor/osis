@@ -42,7 +42,8 @@ from osis_common.ddd.interface import DTO
 class EffectiveClassBuilder(interface.RootEntityBuilder):
     @classmethod
     def build_from_command(
-            cls, cmd: 'CreateEffectiveClassCommand',
+            cls,
+            cmd: 'CreateEffectiveClassCommand',
             learning_unit: LearningUnit,
             all_existing_class_identities: List['EffectiveClassIdentity']
     ) -> Union['PracticalEffectiveClass', 'LecturingEffectiveClass']:

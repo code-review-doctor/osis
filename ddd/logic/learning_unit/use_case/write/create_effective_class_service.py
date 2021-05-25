@@ -44,7 +44,7 @@ def create_effective_class(
     learning_unit = learning_unit_repository.get(
         entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
     )
-    all_existing_class_identities = class_repository.get_identities()
+    all_existing_class_identities = class_repository.get_all_identities()
 
     # When
     effective_class = EffectiveClassBuilder.build_from_command(
@@ -54,4 +54,4 @@ def create_effective_class(
     )
 
     # Then
-    return effective_class
+    return effective_class.entity_id

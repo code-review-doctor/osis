@@ -34,6 +34,5 @@ class ShouldNotBeTypeMobilityOrExternal(BusinessValidator):
     learning_unit = attr.ib(type='LearningUnit')
 
     def validate(self, *args, **kwargs):
-        from ddd.logic.learning_unit.domain.model.learning_unit import ExternalLearningUnit
-        if isinstance(self.learning_unit, ExternalLearningUnit):
+        if self.learning_unit.is_external():
             raise ClassTypeInvalidException()

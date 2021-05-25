@@ -23,9 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from osis_common.ddd import interface
 
 
 class IEffectiveClassRepository(interface.AbstractRepository):
-    pass
+
+    @classmethod
+    def get_all_identities(self) -> List['EffectiveClassIdentity']:
+        pass
+

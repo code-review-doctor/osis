@@ -29,6 +29,7 @@ from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.learning_unit_year_session import SESSION_123
+from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._titles import Titles
@@ -80,28 +81,34 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
         self.effective_class_repository = EffectiveClassRepository()
 
     def test_effective_class_type_lecturing(self):
-        effective_class = create_effective_class(
+        effective_class_id = create_effective_class(
             _build_command(learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code, class_code='A'),
             self.learning_unit_repository,
             self.effective_class_repository
         )
-        self.assertIsInstance(effective_class, LecturingEffectiveClass)
+        #  TODO ne fonctionne pas
+        #  Je ne vois pas comment valider l'instance.  comment récupérer effectiv_class créée
+        self.assertIsInstance(self.effective_class_repository.get(effective_class_id), LecturingEffectiveClass)
 
     def test_effective_class_type_practical(self):
-        effective_class = create_effective_class(
+        effective_class_id = create_effective_class(
             _build_command(learning_unit_code=self.ue_with_practical_volumes_only.code, class_code='C'),
             self.learning_unit_repository,
             self.effective_class_repository
         )
-        self.assertIsInstance(effective_class, PracticalEffectiveClass)
+        # TODO ne fonctionne pas
+        #  Je ne vois pas comment valider l'instance.  comment récupérer effectiv_class créée
+        self.assertIsInstance(effective_class_id, PracticalEffectiveClass)
 
     def test_effective_class_type_lecturing_only(self):
-        effective_class = create_effective_class(
+        effective_class_id = create_effective_class(
             _build_command(learning_unit_code=self.ue_with_lecturing_volumes_only.code, class_code='B'),
             self.learning_unit_repository,
             self.effective_class_repository
         )
-        self.assertIsInstance(effective_class, LecturingEffectiveClass)
+        # TODO ne fonctionne pas
+        #  Je ne vois pas comment valider l'instance.  comment récupérer effectiv_class créée
+        self.assertIsInstance(effective_class_id, LecturingEffectiveClass)
 
 
 class TestCreateClassServiceValidator(TestCase):
@@ -233,8 +240,9 @@ def _create_lu(
         practical_part: PracticalPart,
         credits: float = 20
 ):
+    #  TODO remplacer par le builder
     return ue_type(
-        entity_id=LearningUnitIdentity(code=learning_unit_code, academic_year=AcademicYearIdentity(year=YEAR)),
+        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(learning_unit_code, year=YEAR),
         titles=Titles(
             common_fr='Common fr',
             specific_fr='specific fr',

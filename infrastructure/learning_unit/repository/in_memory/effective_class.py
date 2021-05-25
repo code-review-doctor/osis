@@ -28,5 +28,6 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     def save(cls, entity: EffectiveClass) -> None:
         pass
 
-    def get_identities(self) -> List['EffectiveClassIdentity']:
+    @classmethod
+    def get_all_identities(self) -> List['EffectiveClassIdentity']:
         return [effective_class.entity_id for effective_class in self.effective_classes]
