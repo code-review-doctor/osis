@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-12 15:28+0100\n"
+"POT-Creation-Date: 2021-05-04 09:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -44,6 +44,10 @@ msgstr ""
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
+msgstr ""
+
+#, python-format
+msgid "%(title)s in %(year)s has been filled"
 msgstr ""
 
 msgid "1st quadri"
@@ -171,10 +175,8 @@ msgstr ""
 msgid "Cannot attach a node %(node)s to himself."
 msgstr ""
 
-#, fuzzy
-#| msgid "Prerequisite"
 msgid "Cannot copy prerequisite"
-msgstr "Prerequisite"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -289,6 +291,30 @@ msgstr ""
 msgid "Export"
 msgstr ""
 
+#, python-format
+msgid "Fill %(title)s in %(year)s"
+msgstr ""
+
+#, python-format
+msgid "Fill from specific official of last year: %(title)s in %(year)s"
+msgstr ""
+
+#, python-format
+msgid "Fill from specific official of this year: %(title)s in %(year)s"
+msgstr ""
+
+#, python-format
+msgid "Fill from standard version of last year: %(title)s in %(year)s"
+msgstr ""
+
+#, python-format
+msgid "Fill from standard version of this year: %(title)s in %(year)s"
+msgstr ""
+
+#, python-format
+msgid "Fill from transition version of last year: %(title)s in %(year)s"
+msgstr ""
+
 msgid "Fill program tree content from last year"
 msgstr ""
 
@@ -350,6 +376,12 @@ msgstr ""
 msgid "Impossible to put end date to %(end_year)s: %(msg)s"
 msgstr ""
 
+msgid ""
+"In the context of a Master, this action fill the content of the transition "
+"version of the Master but also of its finalities if the corresponding "
+"transition versions exist."
+msgstr ""
+
 msgid "Include subordinate entities"
 msgstr ""
 
@@ -382,6 +414,11 @@ msgid ""
 "%(parent_type)s"
 msgstr ""
 
+msgid ""
+"It is necessary to create the desired transition version of the finalities "
+"before executing this action."
+msgstr ""
+
 #, python-format
 msgid ""
 "It is prohibited to attach a %(child_node)s to an element of another "
@@ -392,6 +429,12 @@ msgid "Jury members"
 msgstr ""
 
 msgid "Keywords"
+msgstr ""
+
+#, python-format
+msgid ""
+"LU %(code)s does not exist in %(copy_year)s. LU is copied with %(year)s as "
+"year of reference."
 msgstr ""
 
 msgid "Language"
@@ -525,6 +568,11 @@ msgstr ""
 msgid "Name of the teacher responsible"
 msgstr ""
 
+msgid ""
+"Name version cannot contain TRANSITION. Please create a transition version "
+"if necessary"
+msgstr ""
+
 msgid "New Education Group"
 msgstr ""
 
@@ -622,6 +670,12 @@ msgid "Periodic courses taught during"
 msgstr ""
 
 msgid "Periodicity"
+msgstr ""
+
+#, python-format
+msgid ""
+"Please create at least a transition version [%(transition_name)s] for one of "
+"the finalities %(finalities)s in %(academic_year)s."
 msgstr ""
 
 msgid "Please cut or copy an item before paste"
@@ -731,6 +785,12 @@ msgstr ""
 msgid "Schedule type"
 msgstr ""
 
+msgid "Scores responsibles"
+msgstr ""
+
+msgid "Scores responsibles (emails)"
+msgstr ""
+
 msgid "Search"
 msgstr ""
 
@@ -789,6 +849,12 @@ msgid ""
 msgstr ""
 
 #, python-format
+msgid ""
+"The element %(title)s has already been copied in %(copy_year)s in the "
+"context of an other training.Its content may have changed."
+msgstr ""
+
+#, python-format
 msgid "The end date of %(acronym)s must be higher or equal to its finalities"
 msgstr ""
 
@@ -828,6 +894,13 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The prerequisite of %(prerequisite_code)s is not copied in %(copy_year)s: "
+"%(learning_unit_code)s does not exist anymore in %(training_title)s in "
+"%(copy_year)s."
+msgstr ""
+
+#, python-format
+msgid ""
 "The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
 "are not inside the selected training %(root)s"
 msgstr ""
@@ -841,7 +914,23 @@ msgid ""
 "The program tree version %(offer_acronym)s%(version_name)s has been deleted."
 msgstr ""
 
+#, python-format
+msgid "The reference element %(title)s is still empty."
+msgstr ""
+
+#, python-format
+msgid ""
+"The reference group %(title)s has not yet been copied. Its content is still "
+"empty."
+msgstr ""
+
 msgid "The registration form is available at the Secretariat of"
+msgstr ""
+
+#, python-format
+msgid ""
+"The transition version [%(version)s] of the training %(title)s does not "
+"exist in %(academic_year)s"
 msgstr ""
 
 msgid "Themes discussed"
@@ -888,6 +977,18 @@ msgid ""
 "(%(academic_year)s) </a> successfully updated."
 msgstr ""
 
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is closed in %(end_year)s. This training/"
+"mini-training is not copied in %(copy_year)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Training/Mini-Training %(title)s is inconsistent.This training/mini-training "
+"is not copied in %(copy_year)s."
+msgstr ""
+
 msgid "Trainings"
 msgstr ""
 
@@ -903,7 +1004,16 @@ msgstr ""
 msgid "Transition name"
 msgstr ""
 
-msgid "Tutors"
+msgid "Transition name {} already exists"
+msgstr ""
+
+msgid "Transition name {} existed"
+msgstr ""
+
+msgid "Tree is finality"
+msgstr ""
+
+msgid "Tutors (scores responsibles included)"
 msgstr ""
 
 msgid "Type"
@@ -991,6 +1101,12 @@ msgstr ""
 
 #, python-brace-format
 msgid ""
+"You can't create/extend the transition version '{full_code}' in {year} as "
+"other transition version exists in {transition_year}"
+msgstr ""
+
+#, python-brace-format
+msgid ""
 "You can't delete the specific program tree '{code}' in {year} as transition "
 "versions exists during this year and/or in the future."
 msgstr ""
@@ -1005,12 +1121,6 @@ msgstr ""
 msgid ""
 "You can't delete the standard program tree '{code}' in {year} as transition "
 "versions exists during this year and/or in the future."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"You can't extend the program tree '{code}' in {year} as other transition "
-"version exists in {transition_year}"
 msgstr ""
 
 #, python-format

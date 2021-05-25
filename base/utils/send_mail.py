@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,9 +27,11 @@
 """
 Utility files for mail sending
 """
+import itertools
 from typing import List
 import datetime
 import itertools
+from typing import List, Set
 
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -41,6 +43,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import proposal_type
 from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
 from base.models.exam_enrollment import ExamEnrollment
@@ -79,7 +82,7 @@ def send_mail_after_scores_submission(persons: List[Person], learning_unit_name:
     justifications = dict(JUSTIFICATION_TYPES)
     submitted_enrollments_data = [
         (
-            enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             enrollment.session_exam.number_session,
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
@@ -273,13 +276,23 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     return worksheet_parameters
 
 
-def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_unit_acronym, offer_acronym, cc=None):
+def send_message_after_all_encoded_by_manager(
+        receivers,
+        enrollments,
+        learning_unit_acronym,
+        offer_acronym,
+        updated_enrollments_ids,
+        encoding_already_completed_before_update,
+        cc=None
+):
     """
     Send a message to all tutor from a learning unit when all scores are submitted by program manager
     :param receivers: The list of the tutor (person) of the learning unit
     :param enrollments: The enrollments that are encoded and submitted
     :param learning_unit_acronym The learning unit encoded
     :param offer_acronym: The offer which is managed
+    :param updated_enrollments_ids: updated enrollments ids
+    :param encoding_already_completed_before_update: Before update encoding was already complete.
     :param cc: Persons (list) need to be in copy (cc) of the emails sent
     :return: A message if an error occurred, None if it's ok
     """
@@ -298,7 +311,7 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
     justifications = dict(JUSTIFICATION_TYPES)
     enrollments_data = [
         (
-            enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+            enrollment.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             enrollment.session_exam.number_session,
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
@@ -307,14 +320,29 @@ def send_message_after_all_encoded_by_manager(receivers, enrollments, learning_u
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
+    rows_styles = _underline_updated_scores_in_green(
+        enrollments,
+        updated_enrollments_ids,
+        encoding_already_completed_before_update
+    )
+    txt_complementary_first_col_content_data = _txt_format_complementary_row_content(
+        enrollments,
+        updated_enrollments_ids,
+        encoding_already_completed_before_update
+    )
     receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
-
     for receiver_lang, receivers in receivers_by_lang:
-        receivers = list(receivers)
         table = message_config.create_table(
             'enrollments',
             get_enrollment_headers(receiver_lang),
-            enrollments_data,
+            {
+                "style": rows_styles,
+                "data": enrollments_data,
+                "txt_complementary_first_col": {
+                    "header": _get_txt_complementary_first_col_header(receiver_lang),
+                    "rows_content": txt_complementary_first_col_content_data
+                }
+            },
             data_translatable=['Justification'],
         )
 
@@ -341,7 +369,7 @@ def build_scores_sheet_attachment(list_exam_enrollments):
     mimetype = "application/pdf"
     content = paper_sheet.build_pdf(
         score_encoding_sheet.scores_sheet_data(list_exam_enrollments, tutor=None))
-    return (name, content, mimetype)
+    return name, content, mimetype
 
 
 def send_mail_for_educational_information_update(teachers, learning_units_years):
@@ -372,3 +400,49 @@ def _get_encoding_status(language, all_encoded):
     message = 'All the scores are encoded.' if all_encoded else 'It remains notes to encode.'
     with translation.override(language):
         return translation.gettext(message)
+
+
+def _underline_updated_scores_in_green(
+        enrollments: List[ExamEnrollment],
+        updated_enrollments_ids: List[int],
+        encoding_already_completed_before_update: List['ExamEnrollment']
+) -> List[str]:
+    css_style_on_rows = []
+    for enrollment in enrollments:
+        has_to_be_marked = _has_to_be_marked(
+            encoding_already_completed_before_update,
+            enrollment,
+            updated_enrollments_ids
+        )
+        css_style_on_rows.append('background-color: lime;' if has_to_be_marked else '')
+    return css_style_on_rows
+
+
+def _txt_format_complementary_row_content(
+        enrollments: List['ExamEnrollment'],
+        updated_enrollments_ids: List[int],
+        encoding_already_completed_before_update: Set['EducationGroupYear']
+) -> List[str]:
+    complementary_first_cols_contents = []
+    for enrollment in enrollments:
+        has_to_be_marked = _has_to_be_marked(
+            encoding_already_completed_before_update,
+            enrollment,
+            updated_enrollments_ids
+        )
+        complementary_first_cols_contents.append('*' if has_to_be_marked else '')
+    return complementary_first_cols_contents
+
+
+def _get_txt_complementary_first_col_header(lang_code):
+    with translation.override(lang_code):
+        return _('Updated')
+
+
+def _has_to_be_marked(
+        educ_groups_which_encoding_was_complete_before_update: Set['EducationGroupYear'],
+        enrollment: ExamEnrollment,
+        updated_enrollments_ids: List[int]) -> bool:
+    educ_group_year = enrollment.learning_unit_enrollment.offer_enrollment.education_group_year
+    was_encoding_complete_before_update = educ_group_year in educ_groups_which_encoding_was_complete_before_update
+    return not was_encoding_complete_before_update or enrollment.id in updated_enrollments_ids

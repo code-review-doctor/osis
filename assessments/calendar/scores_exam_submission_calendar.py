@@ -24,16 +24,29 @@
 #
 ##############################################################################
 import datetime
+from typing import Optional
 
-from base.business.event_perms import AcademicEventSessionCalendarHelper
+from base.business.academic_calendar import AcademicEventSessionCalendarHelper, AcademicSessionEvent
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
+
+FIRST_SESSION = 1
 
 
 class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
-    event_reference = academic_calendar_type.SCORES_EXAM_SUBMISSION
+    event_reference = AcademicCalendarTypes.SCORES_EXAM_SUBMISSION.name
+
+    def get_closest_academic_event(self, date=None) -> Optional[AcademicSessionEvent]:
+        opened_academic_events = self.get_opened_academic_events(date)
+        if opened_academic_events:
+            return opened_academic_events[0]
+
+        next_academic_event = self.get_next_academic_event(date)
+        if next_academic_event and next_academic_event.session != FIRST_SESSION:
+            return next_academic_event
+        return None
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):
@@ -60,7 +73,6 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Encodage de notes - Session 1",
                 start_date=datetime.date(academic_year.year, 12, 15),
                 end_date=datetime.date(academic_year.year + 1, 2, 28),
-                academic_year=academic_year  # To remove after refactoring
             )
             SessionExamCalendar.objects.create(number_session=1, academic_calendar=academic_calendar)
 
@@ -79,7 +91,6 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Encodage de notes - Session 2",
                 start_date=datetime.date(academic_year.year + 1, 5, 20),
                 end_date=datetime.date(academic_year.year + 1, 7, 10),
-                academic_year=academic_year  # To remove after refactoring
             )
             SessionExamCalendar.objects.create(number_session=2, academic_calendar=academic_calendar)
 
@@ -97,7 +108,5 @@ class ScoresExamSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Encodage de notes - Session 3",
                 start_date=datetime.date(academic_year.year + 1, 8, 10),
                 end_date=datetime.date(academic_year.year + 1, 9, 15),
-                academic_year=academic_year  # To remove after refactoring
-
             )
             SessionExamCalendar.objects.create(number_session=3, academic_calendar=academic_calendar)

@@ -170,7 +170,13 @@ class ExternalLearningUnitFilter(FilterSet):
             "learningcomponentyear_set"
         ).annotate(
             has_proposal=Exists(has_proposal)
-        ).order_by('academic_year__year', 'acronym')
+        ).order_by(
+            'academic_year__year',
+            'acronym'
+        ).distinct(  # Add distinct to protect against duplicate rows when filtering by country or city as the join with
+            'academic_year__year',  # entity version could create similar rows of different entity versions
+            'acronym'
+        )
 
         qs = LearningUnitYearQuerySet.annotate_full_title_class_method(qs)
         qs = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(qs)
