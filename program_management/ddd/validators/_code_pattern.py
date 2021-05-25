@@ -40,4 +40,3 @@ class CodePatternValidator(business_validator.BusinessValidator):
     def validate(self, *args, **kwargs):
         if self.training_type != GroupType.SUB_GROUP.name and not bool(re.match(CODE_REGEX, self.code.upper())):
             raise CodePatternException(self.code.upper())
-
