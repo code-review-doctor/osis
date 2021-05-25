@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-18 11:12+0200\n"
+"POT-Creation-Date: 2021-05-10 14:58+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -739,6 +739,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
+msgid "Dissertations"
+msgstr "Mémoires"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1089,7 +1092,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "Gathering"
-msgstr "Regroupement"
+msgstr "Groupement"
 
 msgid "Gender"
 msgstr "Genre"
@@ -2333,6 +2336,9 @@ msgstr "Parcours de l'étudiant"
 msgid "Student search"
 msgstr "Recherche étudiants"
 
+msgid "Student's dissertations management"
+msgstr "Gestion des mémoires des étudiants"
+
 msgid "Students"
 msgstr "Étudiants"
 
@@ -2752,9 +2758,6 @@ msgstr "Formation intitulé"
 
 msgid "Trainings"
 msgstr "Formations"
-
-msgid "Trainings/gathering"
-msgstr "Formations/regroupements"
 
 msgid "Transformation"
 msgstr "Transformation"

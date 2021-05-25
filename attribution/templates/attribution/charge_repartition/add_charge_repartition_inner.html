@@ -32,7 +32,7 @@
             {% if not learning_unit_year.is_partim %}
                 <th>{% trans 'Tutor' %}</th>
             {% else %}
-                <th>{% trans 'Tutor for UE full' %}</th>
+                <th>{% trans 'Tutor for UE ' %}{% if learning_unit_year.parent.subtype %}({{ learning_unit_year.parent.get_subtype_display }}){% endif %}</th>
             {% endif %}
             <th>{% trans 'Function' %}</th>
             {% if not learning_unit_year.is_partim %}
