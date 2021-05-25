@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.test import TestCase
 
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
@@ -27,8 +28,9 @@ class EffectiveClassRepositoryTestCase(TestCase):
         campus = self.learning_unit_year.campus
 
         self.class_repository = EffectiveClassRepository()
+        # FIXME: Use Command from Leila
         self.dto_object = EffectiveClassFromRepositoryDTO(
-            code='X',
+            class_code='X',
             learning_unit_code=self.learning_unit_year.acronym,
             learning_unit_year=self.learning_unit_year.academic_year.year,
             title_fr='Titre en francais',
@@ -39,11 +41,16 @@ class EffectiveClassRepositoryTestCase(TestCase):
             session_derogation=DerogationSession.SESSION_123.name,
             volume_q1=Decimal('1.5'),
             volume_q2=Decimal('2.6'),
-            volume_annual=Decimal('4.1')  # We cannot make an invalid object
+            volume_annual=Decimal('4.1'),
+            class_type=LECTURING
         )
         self.effective_class = EffectiveClassBuilder.build_from_repository_dto(self.dto_object)
 
     def test_save_and_get_make_correct_mapping(self):
         self.class_repository.save(self.effective_class)
         effective_class = self.class_repository.get(entity_id=self.effective_class.entity_id)
+
         self.assertEqual(effective_class, self.effective_class)
+        fields = ['titles', 'volumes', 'session_derogation', 'derogation_quadrimester', 'teaching_place']
+        for field in fields:
+            self.assertEqual(getattr(effective_class, field), getattr(self.effective_class, field), field)

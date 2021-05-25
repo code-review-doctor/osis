@@ -67,7 +67,7 @@ class UclEntityDataDTO(DTO):
 
 @attr.s(frozen=True, slots=True)
 class EffectiveClassFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
+    class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
     title_fr = attr.ib(type=str)
@@ -79,3 +79,4 @@ class EffectiveClassFromRepositoryDTO(DTO):
     volume_q1 = attr.ib(type=Decimal)
     volume_q2 = attr.ib(type=Decimal)
     volume_annual = attr.ib(type=Decimal)
+    class_type = attr.ib(type=str)

@@ -99,7 +99,7 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
 
 def _annotate_queryset(qs: QuerySet) -> QuerySet:
     return qs.annotate(
-        code=F('acronym'),
+        class_code=F('acronym'),
         learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
         learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
         teaching_place=F('campus__name'),
@@ -108,13 +108,14 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
         volume_q2=F('hourly_volume_partial_q2'),
-        volume_annual=F('hourly_volume_total_annual')
+        volume_annual=F('hourly_volume_total_annual'),
+        class_type=F('learning_component_year__type')
     )
 
 
 def _values_queryset(qs: QuerySet) -> QuerySet:
     return qs.values(
-        'code',
+        'class_code',
         'learning_unit_code',
         'learning_unit_year',
         'title_fr',
@@ -126,4 +127,5 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'volume_q1',
         'volume_q2',
         'volume_annual',
+        'class_type'
     )

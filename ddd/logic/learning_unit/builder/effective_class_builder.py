@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Union, Type
 
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
@@ -45,7 +46,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'EffectiveClassFromRepositoryDTO') -> 'EffectiveClass':
         class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            code=dto_object.code,
+            code=dto_object.class_code,
             learning_unit_code=dto_object.learning_unit_code,
             learning_unit_year=dto_object.learning_unit_year
         )
@@ -72,5 +73,4 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
 def _get_effective_class_type_with_dto(
         dto_object: 'EffectiveClassFromRepositoryDTO'
 ) -> Type['EffectiveClass']:
-    return PracticalEffectiveClass if dto_object.volume_q2 > 0 and not dto_object.volume_q1 > 0 \
-        else LecturingEffectiveClass
+    return PracticalEffectiveClass if dto_object.class_type == PRACTICAL_EXERCISES else LecturingEffectiveClass
