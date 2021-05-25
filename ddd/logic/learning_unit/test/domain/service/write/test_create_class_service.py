@@ -226,7 +226,13 @@ def _build_command(learning_unit_code: str, class_code: str, credits: float = 20
     return cmd
 
 
-def _create_lu(ue_type: Type, learning_unit_code: str, lecturing_part: LecturingPart, practical_part: PracticalPart, credits: float = 20):
+def _create_lu(
+        ue_type: Type,
+        learning_unit_code: str,
+        lecturing_part: LecturingPart,
+        practical_part: PracticalPart,
+        credits: float = 20
+):
     return ue_type(
         entity_id=LearningUnitIdentity(code=learning_unit_code, academic_year=AcademicYearIdentity(year=YEAR)),
         titles=Titles(
