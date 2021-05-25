@@ -159,7 +159,7 @@ class TestSendMessage(TestCase):
             self.learning_unit_year.acronym,
             self.educ_group_year.acronym,
             [self.exam_enrollment_1.id],
-            False
+            {self.educ_group_year}
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
@@ -187,6 +187,7 @@ class TestSendMessage(TestCase):
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
         self.assertEqual(args.get('txt_template_ref'),
                          "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
+
         self.assertEqual(mock_create_table.call_count, 1)
 
         fr_headers = [

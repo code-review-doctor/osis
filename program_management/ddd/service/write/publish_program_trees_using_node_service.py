@@ -43,6 +43,9 @@ from program_management.ddd.service.read import search_program_trees_using_node_
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
 @transaction.atomic()
 def publish_program_trees_using_node(cmd: PublishProgramTreesVersionUsingNodeCommand) -> List['ProgramTreeIdentity']:
     cmd = GetProgramTreesFromNodeCommand(code=cmd.code, year=cmd.year)
