@@ -25,43 +25,32 @@
 ##############################################################################
 from typing import List
 
-from django.db import transaction
-
-from ddd.logic.application.commands import RenewMultipleAttributionsCommand
+from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.model.application import ApplicationIdentity
 from ddd.logic.application.domain.service.renew import Renew
+from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 
 
-@transaction.atomic()
-def renew_multiple_attributions(
-        cmd: RenewMultipleAttributionsCommand,
+def get_attributions_about_to_expire(
+        cmd: GetAttributionsAboutToExpireCommand,
         application_repository: IApplicationRepository,
         application_calendar_repository: IApplicationCalendarRepository,
         applicant_repository: IApplicantRepository,
         vacant_course_repository: IVacantCourseRepository,
-) -> List[ApplicationIdentity]:
-    # GIVEN
+) -> List[AttributionAboutToExpireDTO]:
+    # Given
     application_calendar = application_calendar_repository.get_current_application_calendar()
-    applicant = applicant_repository.get(entity_id=ApplicantIdentity(cmd.global_id))
+    applicant_id = ApplicantIdentity(global_id=cmd.global_id)
+    applicant = applicant_repository.get(applicant_id)
     all_existing_applications = application_repository.search(global_id=cmd.global_id)
 
-    # WHEN
-    applications_renewed = []
-    for code in cmd.renew_codes:
-        application_renewed = Renew.renew_from_attribution_about_to_expire(
-            code=code,
-            application_calendar=application_calendar,
-            applicant=applicant,
-            all_existing_applications=all_existing_applications,
-            vacant_course_repository=vacant_course_repository
-        )
-        applications_renewed.append(application_renewed)
-
-    # THEN
-    [application_repository.save(application_renewed) for application_renewed in applications_renewed]
-    return [application_renewed.entity_id for application_renewed in applications_renewed]
+    return Renew.get_attributions_about_to_expires(
+        application_calendar,
+        applicant,
+        all_existing_applications,
+        vacant_course_repository
+    )

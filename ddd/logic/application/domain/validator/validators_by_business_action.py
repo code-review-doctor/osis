@@ -29,7 +29,6 @@ import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand
-from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
@@ -37,6 +36,8 @@ from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled
     ShouldLecturingOrPracticalFilledValidator
 from ddd.logic.application.domain.validator._should_not_have_already_applied_on_vacant_course import \
     ShouldNotHaveAlreadyAppliedOnVacantCourse
+from ddd.logic.application.domain.validator._should_vacant_course_application_not_managed_in_team import \
+    ShouldVacantCourseApplicationNotManagedInTeam
 from ddd.logic.application.domain.validator._should_volumes_asked_lower_or_equal_to_available import \
     ShouldVolumesAskedLowerOrEqualToAvailable
 
@@ -45,7 +46,6 @@ from ddd.logic.application.domain.validator._should_volumes_asked_lower_or_equal
 class ApplyOnVacantCourseValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     command = attr.ib(type=ApplyOnVacantCourseCommand)
     all_existing_applications = attr.ib(type=List[Application])
-    applicant = attr.ib(type=Applicant)
     vacant_course = attr.ib(type=VacantCourse)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -63,6 +63,9 @@ class ApplyOnVacantCourseValidatorList(TwoStepsMultipleBusinessExceptionListVali
                 lecturing_volume_asked=self.command.lecturing_volume,
                 practical_volume_asked=self.command.practical_volume
             ),
+            ShouldVacantCourseApplicationNotManagedInTeam(
+                vacant_course=self.vacant_course
+            )
         ]
 
 
@@ -89,7 +92,6 @@ class UpdateApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValida
 @attr.s(frozen=True, slots=True)
 class RenewApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     vacant_course = attr.ib(type=VacantCourse)
-    applicant = attr.ib(type=Applicant)
     attribution_about_to_expire = attr.ib(type=Attribution)
     all_existing_applications = attr.ib(type=List[Application])
 
@@ -106,4 +108,7 @@ class RenewApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidat
                 lecturing_volume_asked=self.attribution_about_to_expire.lecturing_volume,
                 practical_volume_asked=self.attribution_about_to_expire.practical_volume
             ),
+            ShouldVacantCourseApplicationNotManagedInTeam(
+                vacant_course=self.vacant_course
+            )
         ]

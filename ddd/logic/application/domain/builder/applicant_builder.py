@@ -57,6 +57,7 @@ class ApplicantBuilder(RootEntityBuilder):
                 academic_year=AcademicYearIdentity(year=attribution_dto.course_id_year)
             ),
             end_year=AcademicYearIdentity(year=attribution_dto.end_year),
+            start_year=AcademicYearIdentity(year=attribution_dto.start_year),
             function=attribution_dto.function,
             lecturing_volume=attribution_dto.lecturing_volume,
             practical_volume=attribution_dto.practical_volume

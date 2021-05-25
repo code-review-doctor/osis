@@ -38,6 +38,7 @@ class AttributionFromRepositoryDTO(DTO):
     applicant_id_global_id = attr.ib(type=str)
     function = attr.ib(type=str)
     end_year = attr.ib(type=int)
+    start_year = attr.ib(type=int)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
 
@@ -58,7 +59,9 @@ class VacantCourseFromRepositoryDTO(DTO):
     is_in_team = attr.ib(type=bool)
     entity_allocation = attr.ib(type=str)
     vacant_declaration_type = attr.ib(type=str)
+    lecturing_volume_total = attr.ib(type=Decimal)
     lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_total = attr.ib(type=Decimal)
     practical_volume_available = attr.ib(type=Decimal)
 
 
@@ -72,3 +75,21 @@ class ApplicationFromRepositoryDTO(DTO):
     practical_volume = attr.ib(type=Decimal)
     remark = attr.ib(type=str)
     course_summary = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class AttributionAboutToExpireDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title = attr.ib(type=str)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
+    function = attr.ib(type=str)
+    end_year = attr.ib(type=int)
+    start_year = attr.ib(type=int)
+    total_lecturing_volume_course = attr.ib(type=Decimal)
+    total_practical_volume_course = attr.ib(type=Decimal)
+    lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
+    unavailable_renewal_reason = attr.ib(type=str)
+    is_renewable = attr.ib(type=bool)

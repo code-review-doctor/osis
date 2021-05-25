@@ -53,7 +53,9 @@ class TestUpdateApplicationService(TestCase):
         )
         cls.vacant_course = VacantCourse(
             entity_id=VacantCourseIdentity(code='LAGRO1500', academic_year=AcademicYearIdentity(year=2018)),
+            lecturing_volume_total=Decimal(10),
             lecturing_volume_available=Decimal(10),
+            practical_volume_total=Decimal(50),
             practical_volume_available=Decimal(50),
             title='Introduction',
             vacant_declaration_type=vacant_declaration_type.RESEVED_FOR_INTERNS,

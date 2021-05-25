@@ -80,6 +80,7 @@ class ApplicantRepositoryGet(TestCase):
             course_id=LearningUnitIdentity(code="LDROI1200", academic_year=AcademicYearIdentity(year=2018)),
             function=self.attribution_practical_ldroi1200.attribution.function,
             end_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.end_year),
+            start_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.start_year),
             lecturing_volume=None,
             practical_volume=self.attribution_practical_ldroi1200.allocation_charge
         )

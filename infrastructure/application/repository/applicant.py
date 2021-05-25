@@ -114,6 +114,7 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
         'course_id_year',
         'function',
         'end_year',
+        'start_year',
         'applicant_id_global_id',
         'lecturing_volume',
         'practical_volume'

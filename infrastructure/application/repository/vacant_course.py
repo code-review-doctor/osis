@@ -87,7 +87,9 @@ class VacantCourseRepository(IVacantCourseRepository):
                 entity_allocation=row_as_dict['entity_allocation'],
                 vacant_declaration_type=row_as_dict['vacant_declaration_type'],
                 lecturing_volume_available=row_as_dict['lecturing_volume_available'],
+                lecturing_volume_total=row_as_dict['lecturing_volume_total'],
                 practical_volume_available=row_as_dict['practical_volume_available'],
+                practical_volume_total=row_as_dict['practical_volume_total'],
             )
             results.append(VacantCourseBuilder.build_from_repository_dto(dto_from_database))
         return results
@@ -122,8 +124,16 @@ def _vacant_course_base_qs() -> QuerySet:
             title=F('full_title'),
             is_in_team=F('learning_container_year__team'),
             vacant_declaration_type=F('learning_container_year__type_declaration_vacant'),
+            lecturing_volume_total=Subquery(
+                subqs.filter(type=learning_component_year_type.LECTURING).values('hourly_volume_total_annual')[:1]
+            ),
             lecturing_volume_available=Subquery(
                 subqs.filter(type=learning_component_year_type.LECTURING).values('volume_declared_vacant')[:1]
+            ),
+            practical_volume_total=Subquery(
+                subqs.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('hourly_volume_total_annual')[:1]
             ),
             practical_volume_available=Subquery(
                 subqs.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).values('volume_declared_vacant')[:1]
@@ -134,7 +144,9 @@ def _vacant_course_base_qs() -> QuerySet:
             "title",
             "is_in_team",
             "vacant_declaration_type",
+            "lecturing_volume_total",
             "lecturing_volume_available",
+            "practical_volume_total",
             "practical_volume_available",
             "entity_allocation"
         )

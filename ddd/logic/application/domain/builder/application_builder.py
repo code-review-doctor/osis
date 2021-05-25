@@ -49,7 +49,6 @@ class ApplicationBuilder(RootEntityBuilder):
     ) -> 'Application':
         ApplyOnVacantCourseValidatorList(
             command=cmd,
-            applicant=applicant,
             vacant_course=vacant_course,
             all_existing_applications=all_existing_applications
         ).validate()
@@ -89,7 +88,6 @@ class ApplicationBuilder(RootEntityBuilder):
             all_existing_applications: List[Application]
     ):
         RenewApplicationValidatorList(
-            applicant=applicant,
             vacant_course=vacant_course,
             attribution_about_to_expire=attribution_about_to_expire,
             all_existing_applications=all_existing_applications

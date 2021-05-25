@@ -27,7 +27,9 @@ from typing import Dict, Callable, List
 
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
-    RenewMultipleAttributionsCommand
+    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand
+from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
+    get_attributions_about_to_expire
 from ddd.logic.application.use_case.read.search_applications_by_applicant_service import \
     search_applications_by_applicant
 from ddd.logic.application.use_case.read.search_vacant_courses_service import search_vacant_courses
@@ -81,7 +83,11 @@ class MessageBus:
         ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
         SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(cmd, ApplicationRepository()),
-        SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(cmd, VacantCourseRepository())
+        SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(cmd, VacantCourseRepository()),
+        GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

@@ -42,6 +42,8 @@ class VacantCourseBuilder(RootEntityBuilder):
             is_in_team=dto.is_in_team,
             vacant_declaration_type=dto.vacant_declaration_type,
             entity_allocation=EntityAllocation(dto.entity_allocation),
+            lecturing_volume_total=dto.lecturing_volume_total,
             lecturing_volume_available=dto.lecturing_volume_available,
+            practical_volume_total=dto.practical_volume_total,
             practical_volume_available=dto.practical_volume_available,
         )

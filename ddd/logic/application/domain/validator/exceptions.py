@@ -46,6 +46,12 @@ class ApplicationAlreadyExistsException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class VacantCourseApplicationManagedInTeamException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("This course is team-managed. The application to this activity is based on a paper transmission.")
+        super().__init__(message, **kwargs)
+
+
 class VolumesAskedShouldBeLowerOrEqualToVolumeAvailable(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Volumes asked should be lower or equal to volume available")

@@ -23,44 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-
 import attr
 
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException
 
 
 @attr.s(frozen=True, slots=True)
-class VacantCourseIdentity(interface.EntityIdentity):
-    academic_year = attr.ib(type=AcademicYearIdentity)
-    code = attr.ib(type=str)
+class ShouldVacantCourseApplicationNotManagedInTeam(BusinessValidator):
+    vacant_course = attr.ib(type=VacantCourse)
 
-    def __str__(self):
-        return "{} - ({})".format(self.code, self.academic_year)
-
-    @property
-    def year(self) -> int:
-        return self.academic_year.year
-
-
-@attr.s(slots=True, hash=False, eq=False)
-class VacantCourse(interface.RootEntity):
-    entity_id = attr.ib(type=VacantCourseIdentity)
-    lecturing_volume_total = attr.ib(type=Decimal)
-    practical_volume_total = attr.ib(type=Decimal)
-    lecturing_volume_available = attr.ib(type=Decimal)
-    practical_volume_available = attr.ib(type=Decimal)
-    title = attr.ib(type=str)
-    vacant_declaration_type = attr.ib(type=str)
-    is_in_team = attr.ib(type=bool)
-    entity_allocation = attr.ib(type=EntityAllocation)
-
-    @property
-    def year(self) -> int:
-        return self.entity_id.year
-
-    @property
-    def code(self) -> str:
-        return self.entity_id.code
+    def validate(self, *args, **kwargs):
+        if self.vacant_course.is_in_team:
+            raise VacantCourseApplicationManagedInTeamException()

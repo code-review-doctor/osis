@@ -37,5 +37,6 @@ class Attribution(interface.ValueObject):
     course_id = attr.ib(type=LearningUnitIdentity)
     function = attr.ib(type=str)
     end_year = attr.ib(type=AcademicYearIdentity)
+    start_year = attr.ib(type=AcademicYearIdentity)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)

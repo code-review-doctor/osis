@@ -64,6 +64,7 @@ class TestRenewMultipleAttributionsService(TestCase):
             course_id=LearningUnitIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
             function=function.HOLDER,
             end_year=cls.application_calendar.authorized_target_year,
+            start_year=AcademicYearIdentity(year=2017),
             lecturing_volume=Decimal(5),
             practical_volume=None,
         )
@@ -80,7 +81,9 @@ class TestRenewMultipleAttributionsService(TestCase):
                 code='LDROI1200',
                 academic_year=AcademicYearIdentity(year=cls.application_calendar.authorized_target_year.year + 1)
             ),
+            lecturing_volume_total=Decimal(10),
             lecturing_volume_available=Decimal(10),
+            practical_volume_total=Decimal(50),
             practical_volume_available=Decimal(50),
             title='Introduction au droit',
             vacant_declaration_type=vacant_declaration_type.RESEVED_FOR_INTERNS,
