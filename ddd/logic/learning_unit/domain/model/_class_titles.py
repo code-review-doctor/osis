@@ -28,6 +28,7 @@ import attr
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class ClassTitles(interface.ValueObject):
     fr = attr.ib(type=str)
     en = attr.ib(type=str)

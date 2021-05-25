@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClassCode
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO, CommandRequest
 
 
@@ -35,3 +36,16 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EffectiveClassIdentity':
         raise NotImplementedError
+
+    @classmethod
+    def build_from_code_and_learning_unit_identity_data(
+            cls,
+            code: EffectiveClassCode,
+            learning_unit_code: str,
+            learning_unit_year: int
+    ) -> 'EffectiveClassIdentity':
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=learning_unit_code,
+            year=learning_unit_year
+        )
+        return EffectiveClassIdentity(code=code, learning_unit_identity=learning_unit_identity)
