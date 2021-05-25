@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -38,7 +37,7 @@ from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_version import get_by_entity_and_date
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_warning_messages, add_to_session
@@ -89,7 +88,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return current_academic_year()
 
     def get_queryset(self):
-        qs = super().get_queryset().select_related(
+        return super().get_queryset().select_related(
             'learning_container_year__academic_year',
             'academic_year', 'learning_unit',
             'campus__organization', 'externallearningunityear',
@@ -103,9 +102,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
                 queryset=LearningUnitYear.objects.select_related('academic_year')
             )
         )
-        qs = LearningUnitYearQuerySet.annotate_entities_status(qs)
-        qs = LearningUnitYearQuerySet.annotate_additional_entities_status(qs)
-        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -137,16 +133,11 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context["versions"] = self.get_versions()
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
         context["tab_active"] = "learning_unit"  # Corresponds to url_name
-        context['active_requirement_entity'] = self.object.active_entity_requirement_version
-        context['active_allocation_entity'] = self.object.active_entity_allocation_version
-        context['active_additional_requirement_entity_1'] = self.object.active_additional_entity_1_version
-        context['active_additional_requirement_entity_2'] = self.object.active_additional_entity_2_version
 
         return context
 
     def get_context_permission(self, proposal):
         obj = self.object
-
         context = {
             'can_create_partim': self.person.user.has_perm('base.can_create_partim', obj),
             'can_manage_volume': self.person.user.has_perm('base.can_edit_learningunit', obj),
@@ -156,7 +147,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
             'can_delete': self.person.user.has_perm('base.can_delete_learningunit', obj),
             'can_cancel_proposal': self.person.user.has_perm('base.can_cancel_proposal', obj),
             'can_edit_learning_unit_proposal': self.person.user.has_perm('base.can_edit_learning_unit_proposal', obj),
-            'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj)
+            'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj),
         }
 
         return context

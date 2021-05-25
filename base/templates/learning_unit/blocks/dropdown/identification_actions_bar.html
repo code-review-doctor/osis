@@ -12,7 +12,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,14 @@
                                         {% trans 'New partim' %}
                                     </a>
                                 </li>
+                                {% flag "learning_class_create" %}
+                                    {% if not learning_unit_year.learning_container_year.container_type == 'EXTERNAL' %}
+                                        <li>
+                                            {% url "create_class" learning_unit_year_id=learning_unit_year.id as create_class_url %}
+                                            {% a_tag_has_perm create_class_url _('New class') 'base.can_create_class' user learning_unit_year %}
+                                        </li>
+                                    {% endif %}
+                                {% endflag %}
                                 <li class="divider"></li>
                             {% endif %}
                         {% endflag %}

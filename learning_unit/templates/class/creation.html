@@ -1,0 +1,106 @@
+{% extends "learning_unit/layout_detail.html" %}
+{% load static i18n %}
+{% load static bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+    {% if learning_unit_year.id %}
+        <li><a href="{% url 'learning_unit' learning_unit_year.id %}">{{ learning_unit_year.acronym }}</a></li>
+    {% endif %}
+    <li class="active">{% trans 'New class' %}</li>
+{% endblock %}
+{% block header_content %}
+{% endblock %}
+{% block content %}
+    <div class="page-header">
+        <h2>{% block h2_title %}{% trans 'New class' %}{% endblock %}</h2>
+    </div>
+
+        <div class="panel panel-default">
+        <form method="post" id="LearningUnitYearForm" >
+            <div class="panel-heading">
+                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+            </div>
+            <div class="panel-body">
+
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>TO BE CONTINUED</h3>
+                        {% block learning_unit_identification %}
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+
+                                    <div class="row">
+
+                                    </div>
+                                    <div class="row">
+
+                                    </div>
+                                    <br>
+                                    <div class="row">
+
+                                    </div>
+                                    <br>
+                                    {% block titles %}
+
+                                    {% endblock titles %}
+                                </div>
+                            </div>
+                        {% endblock learning_unit_identification %}
+
+
+
+                        {% block remarks %}
+
+                        {% endblock remarks %}
+
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {% block institution %}
+
+                        {% endblock %}
+                        {% block create_proposal %}{% endblock %}
+                    </div>
+                </div>
+                <br>
+
+            </div>
+            <div class="panel-footer">
+                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

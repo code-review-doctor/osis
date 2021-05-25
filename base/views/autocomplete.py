@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import datetime
 from typing import Set
 
 from dal import autocomplete
@@ -33,9 +34,8 @@ from django.http import JsonResponse
 from django.utils.html import format_html
 
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
-from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
-from base.models.entity_version import find_pedagogical_entities_version_for_specific_academic_year
+from base.models.entity_version import find_pedagogical_entities_version, EntityVersion
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.organization import Organization
@@ -106,16 +106,13 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 class EntityAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
         country = self.forwarded.get('country', None)
-        academic_year = self.forwarded.get('academic_year', None)
-        if academic_year:
-            academic_year = AcademicYear.objects.get(id=academic_year)
-        qs = find_additional_requirement_entities_choices(academic_year)
+        qs = find_additional_requirement_entities_choices()
         if country:
             qs = qs.exclude(entity__organization__type=MAIN).order_by('title')
             if country != "all":
                 qs = qs.filter(entityversionaddress__country_id=country)
         else:
-            qs = find_pedagogical_entities_version_for_specific_academic_year(academic_year).order_by('acronym')
+            qs = find_pedagogical_entities_version().order_by('acronym')
         if self.q:
             qs = qs.filter(Q(title__icontains=self.q) | Q(acronym__icontains=self.q))
         return qs
@@ -150,11 +147,7 @@ class EntityRequirementAutocomplete(LoginRequiredMixin, EntityRoleChoiceFieldMix
         return {FacultyManager.group_name, CentralManager.group_name}
 
     def get_queryset(self):
-        academic_yr = self.forwarded.get('academic_year', None)
-        if academic_yr:
-            academic_yr = AcademicYear.objects.get(id=academic_yr)
-        qs = super().get_queryset().active_for_academic_year(academic_yr)\
-            .pedagogical_entities().order_by('acronym')
+        qs = super().get_queryset().pedagogical_entities().order_by('acronym')
         if self.q:
             qs = qs.filter(Q(acronym__icontains=self.q) | Q(title__icontains=self.q))
         return qs

@@ -25,13 +25,14 @@
 ##############################################################################
 import django_filters
 from django import forms
-from django.db.models import Q, Prefetch, Value, CharField, When, Case, F
-from django.db.models.functions import Concat, Coalesce
+from django.db.models import Q, Prefetch, Value, CharField, OuterRef, Subquery, When, Case
+from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
 from attribution.models.attribution import Attribution
 from base.forms.learning_unit.search.simple import filter_by_entities
+from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 
 
@@ -67,7 +68,7 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
     order_by_field = 'ordering'
     ordering = django_filters.OrderingFilter(
         fields=(
-            ('ordering_entity', 'requirement_entity'),
+            ('requirement_entity', 'requirement_entity'),
             ('acronym', 'acronym'),
             ('full_title', 'learning_unit_title'),
         ),
@@ -118,8 +119,12 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
         )
         queryset = super().filter_queryset(queryset)
 
+        entity_requirement = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
-        queryset = LearningUnitYearQuerySet.annotate_most_recent_requirement_acronym(queryset)
         return queryset.select_related('learning_container_year').prefetch_related(
             Prefetch(
                 'attribution_set',
@@ -130,8 +135,5 @@ class ScoresResponsibleFilter(django_filters.FilterSet):
                 )
             )
         ).annotate(
-            requirement_entity=F("entity_requirement"),
-            most_recent_requirement_entity=F("most_recent_entity_requirement")
-        ).annotate(
-            ordering_entity=Coalesce('requirement_entity', 'most_recent_requirement_entity')
-        ).distinct()
+            requirement_entity=Subquery(entity_requirement)
+        )
