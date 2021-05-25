@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import operator
+import string
 
 import factory.fuzzy
 
@@ -37,7 +38,8 @@ class LearningClassYearFactory(factory.django.DjangoModelFactory):
         model = "learning_unit.LearningClassYear"
 
     learning_component_year = factory.SubFactory(LearningComponentYearFactory)
-    acronym = factory.fuzzy.FuzzyInteger(99)
+    acronym = factory.fuzzy.FuzzyText(length=1,
+                                      chars=string.ascii_uppercase + string.digits)
     hourly_volume_total_annual = factory.LazyAttribute(
         lambda obj: obj.hourly_volume_partial_q1 + obj.hourly_volume_partial_q2
     )
