@@ -32,11 +32,13 @@ from ddd.logic.learning_unit.domain.validator.exceptions import CodeClassAlready
 
 
 @attr.s(frozen=True, slots=True)
-class SubdivisionCodeShouldBeUniqueForUE(BusinessValidator):
-    code = attr.ib(type=str)
+class ClassCodeShouldBeUniqueForUE(BusinessValidator):
+    class_code = attr.ib(type=str)
     learning_unit_id = attr.ib(type='LearningUnitIdentity')  # type: LearningUnitIdentity
     all_existing_class_identities = attr.ib(type=List['EffectiveClassIdentity'])  # type: List['EffectiveClassIdentity']
 
     def validate(self, *args, **kwargs):
         if self.all_existing_class_identities:
-            raise CodeClassAlreadyExistForUeException(self.learning_unit_id, self.code)
+            for id in self.all_existing_class_identities:
+                if id.learning_unit_identity == self.learning_unit_id and id.class_code == self.class_code:
+                    raise CodeClassAlreadyExistForUeException(self.learning_unit_id, self.class_code)

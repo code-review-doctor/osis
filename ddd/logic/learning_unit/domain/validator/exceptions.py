@@ -119,7 +119,7 @@ class SubdivisionAlreadyExistException(BusinessException):
 
 
 class ShouldBeAlphanumericException(BusinessException):
-    def validate(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         message = _(
             "Code should be one character A-Z or 0-9"
         )

@@ -34,9 +34,9 @@ from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanum
 @attr.s(frozen=True, slots=True)
 class ShouldBeAlphanumericValidator(BusinessValidator):
 
-    code = attr.ib(type=str)
+    class_code = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
         alphanumeric_regex = r"^\w+$"
-        if not re.fullmatch(alphanumeric_regex, self.code):
+        if not re.fullmatch(alphanumeric_regex, self.class_code):
             raise ShouldBeAlphanumericException()

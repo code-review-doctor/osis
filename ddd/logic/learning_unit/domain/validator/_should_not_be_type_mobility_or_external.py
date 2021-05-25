@@ -26,14 +26,14 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from base.models.enums.learning_container_year_types import LearningContainerYearType
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldNotBeTypeMobilityOrExternal(BusinessValidator):
-    learning_unit_type = attr.ib(type=str)
+    learning_unit = attr.ib(type='LearningUnit')
 
     def validate(self, *args, **kwargs):
-        if self.learning_unit_type == LearningContainerYearType.EXTERNAL.name:
+        from ddd.logic.learning_unit.domain.model.learning_unit import ExternalLearningUnit
+        if isinstance(self.learning_unit, ExternalLearningUnit):
             raise ClassTypeInvalidException()

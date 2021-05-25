@@ -43,7 +43,7 @@ class EffectiveClassCode(str):
 
 
 class EffectiveClassIdentity(interface.EntityIdentity):
-    code = attr.ib(type=EffectiveClassCode)
+    class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
 

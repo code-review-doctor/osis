@@ -8,6 +8,7 @@ from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes, D
 from ddd.logic.learning_unit.domain.validator._check_class_volumes import CheckClassVolumes
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
+from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ShouldBeAlphanumericValidator
 from ddd.logic.learning_unit.domain.validator._should_code_not_exist import ShouldCodeAlreadyExistsValidator
 from ddd.logic.learning_unit.domain.validator._should_credits_respect_minimum_value import \
     ShouldCreditsRespectMinimumValueValidator
@@ -21,7 +22,7 @@ from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_exists_i
 from ddd.logic.learning_unit.domain.validator._should_not_be_type_mobility_or_external import \
     ShouldNotBeTypeMobilityOrExternal
 from ddd.logic.learning_unit.domain.validator._subdivision_code_should_be_unique_for_UE import \
-    SubdivisionCodeShouldBeUniqueForUE
+    ClassCodeShouldBeUniqueForUE
 from ddd.logic.learning_unit.domain.validator._subdivision_should_contain_only_one_letter import \
     SubdivisionShouldContainOnlyOneLetterValidator
 from ddd.logic.learning_unit.domain.validator._subdivision_should_not_exist import SubdivisionShouldNotExistValidator
@@ -92,13 +93,13 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldBeAlphanumericException(self.command.class_code)
+            ShouldBeAlphanumericValidator(self.command.class_code)
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            SubdivisionCodeShouldBeUniqueForUE(
-                self.command.learning_unit_code,
+            ClassCodeShouldBeUniqueForUE(
+                self.command.class_code,
                 self.learning_unit.entity_id,
                 self.all_existing_class_identities
             ),
