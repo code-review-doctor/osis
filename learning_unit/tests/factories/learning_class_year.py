@@ -23,8 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import operator
+
 import factory.fuzzy
 
+from base.models.enums import learning_unit_year_session, quadrimesters
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 
 
@@ -34,3 +38,14 @@ class LearningClassYearFactory(factory.django.DjangoModelFactory):
 
     learning_component_year = factory.SubFactory(LearningComponentYearFactory)
     acronym = factory.fuzzy.FuzzyInteger(99)
+    hourly_volume_total_annual = factory.LazyAttribute(
+        lambda obj: obj.hourly_volume_partial_q1 + obj.hourly_volume_partial_q2
+    )
+    hourly_volume_partial_q1 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
+    hourly_volume_partial_q2 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
+    session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
+    quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
+                                    getter=operator.itemgetter(0))
+    campus = factory.SubFactory(CampusFactory)
+    title_fr = factory.Sequence(lambda n: 'Learning class year - %d' % n)
+    title_en = factory.Sequence(lambda n: 'Learning class year english - %d' % n)
