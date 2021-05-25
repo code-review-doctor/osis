@@ -52,7 +52,10 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         )
         return _get_effective_class_type_with_dto(dto_object)(
             entity_id=class_identity,
-            titles=ClassTitles(fr=dto_object.title_fr, en=dto_object.title_en),
+            titles=ClassTitles(
+                fr=dto_object.title_fr,
+                en=dto_object.title_en
+            ),
             teaching_place=TeachingPlace(
                 place=dto_object.teaching_place,
                 organization_name=dto_object.teaching_organization

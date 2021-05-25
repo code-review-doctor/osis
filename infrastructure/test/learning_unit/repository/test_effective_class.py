@@ -4,33 +4,46 @@ from django.test import TestCase
 
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
-from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
-from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
+    PracticalLearningComponentYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 
 
 class EffectiveClassRepositoryTestCase(TestCase):
     def setUp(self):
-        self.class_repository = EffectiveClassRepository()
-        self.anac = AcademicYear(entity_id=AcademicYearIdentity(year=2021), start_date=None, end_date=None)
-        self.learning_unit_identity = LearningUnitIdentity(code='LTEST2021', academic_year=self.anac)
-        self.class_identity = EffectiveClassIdentity(code='X', learning_unit_identity=self.learning_unit_identity)
-        self.effective_class = LecturingEffectiveClass(
-            entity_id=self.class_identity,
-            titles=ClassTitles(fr='Title Fr', en='Title En'),
-            teaching_place=TeachingPlace(place='Place', organization_name='Organization'),
-            derogation_quadrimester=DerogationQuadrimester.Q1.name,
-            session_derogation=DerogationSession.SESSION_1XX.name,
-            volumes=Volumes(
-                volume_first_quadrimester=Decimal(1.0),
-                volume_second_quadrimester=Decimal(2.0),
-                volume_annual=Decimal(3.0)
-            )
+        self.learning_unit_year = LearningUnitYearFactory(
+            academic_year__current=True
+        )
+        self.lecturing = LecturingLearningComponentYearFactory(
+            learning_unit_year=self.learning_unit_year
+        )
+        self.practical = PracticalLearningComponentYearFactory(
+            learning_unit_year=self.learning_unit_year
         )
 
+        campus = self.learning_unit_year.campus
+
+        self.class_repository = EffectiveClassRepository()
+        self.dto_object = EffectiveClassFromRepositoryDTO(
+            code='X',
+            learning_unit_code=self.learning_unit_year.acronym,
+            learning_unit_year=self.learning_unit_year.academic_year.year,
+            title_fr='Titre en francais',
+            title_en='TItle in english',
+            teaching_place=campus.name,
+            teaching_organization=campus.organization.name,
+            derogation_quadrimester=DerogationQuadrimester.Q1.name,
+            session_derogation=DerogationSession.SESSION_123,
+            volume_q1=Decimal(1.5),
+            volume_q2=Decimal(2.6),
+            volume_annual=Decimal(4.8)
+        )
+        self.effective_class = EffectiveClassBuilder.build_from_repository_dto(self.dto_object)
+
     def test_truc(self):
-        pass
+        self.class_repository.save(self.effective_class)
+        effective_class = self.class_repository.get(entity_id=self.effective_class.entity_id)
+        self.assertEqual(effective_class, self.effective_class)

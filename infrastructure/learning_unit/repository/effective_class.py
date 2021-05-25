@@ -97,11 +97,11 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
     return learning_component_year_id
 
 
-def _annotate_queryset(qs: QuerySet['LearningClassYearDb']) -> QuerySet['LearningClassYearDb']:
+def _annotate_queryset(qs: QuerySet) -> QuerySet:
     return qs.annotate(
         code=F('acronym'),
-        learning_unit_code=F('learning_unit_year__acronym'),
-        learning_unit_year=F('learning_unit_year__academic_year__year'),
+        learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
+        learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
         teaching_place=F('campus__name'),
         teaching_organization=F('campus__organization__name'),
         derogation_quadrimester=F('quadrimester'),
@@ -112,14 +112,13 @@ def _annotate_queryset(qs: QuerySet['LearningClassYearDb']) -> QuerySet['Learnin
     )
 
 
-def _values_queryset(qs: QuerySet['LearningClassYearDb']) -> QuerySet['LearningClassYearDb']:
+def _values_queryset(qs: QuerySet) -> QuerySet:
     return qs.values(
         'code',
         'learning_unit_code',
         'learning_unit_year',
         'title_fr',
         'title_en',
-        'inherit_from_learning_unit',
         'teaching_place',
         'teaching_organization',
         'derogation_quadrimester',

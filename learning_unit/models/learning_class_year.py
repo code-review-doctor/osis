@@ -38,7 +38,7 @@ class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
 
 class LearningClassYearManager(models.Manager):
     def get_queryset(self):
-        return self.get_queryset().select_related(
+        return super().get_queryset().select_related(
             'learning_component_year',
             'learning_component_year__learning_unit_year'
         )
