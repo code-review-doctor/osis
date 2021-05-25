@@ -4,7 +4,6 @@ import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes, Duration
 from ddd.logic.learning_unit.domain.validator._check_class_volumes import CheckClassVolumes
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
@@ -105,11 +104,8 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
             ),
             ShouldNotBeTypeMobilityOrExternal(self.learning_unit),
             CheckClassVolumes(
-                self.command.volume_first_quadrimester_hours,
-                self.command.volume_first_quadrimester_minutes,
-                self.command.volume_second_quadrimester_hours,
-                self.command.volume_second_quadrimester_minutes,
-                self.command.volume_annual_quadrimester_hours,
-                self.command.volume_annual_quadrimester_minutes
+                self.command.volume_first_quadrimester,
+                self.command.volume_second_quadrimester,
+                self.command.volume_annual
             )
         ]

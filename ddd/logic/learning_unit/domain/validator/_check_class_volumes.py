@@ -26,34 +26,18 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes, Duration
 from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInvalidException
 
 
 @attr.s(frozen=True, slots=True)
 class CheckClassVolumes(BusinessValidator):
 
-    volume_first_quadrimester_hours = attr.ib(type=int)
-    volume_first_quadrimester_minutes = attr.ib(type=int)
-    volume_second_quadrimester_hours = attr.ib(type=int)
-    volume_second_quadrimester_minutes = attr.ib(type=int)
-    volume_annual_quadrimester_hours = attr.ib(type=int)
-    volume_annual_quadrimester_minutes = attr.ib(type=int)
+    volume_first_quadrimester = attr.ib(type=float)
+    volume_second_quadrimester = attr.ib(type=float)
+    volume_annual = attr.ib(type=float)
 
     def validate(self, *args, **kwargs):
-        volume_annual = Duration(
-            hours=self.volume_annual_quadrimester_hours,
-            minutes=self.volume_annual_quadrimester_minutes
-        )
-        annual_vol_in_hours = volume_annual.quantity_in_hours
-        volume_first_quadrimester = Duration(
-            hours=self.volume_first_quadrimester_hours,
-            minutes=self.volume_first_quadrimester_minutes
-        )
-        volume_second_quadrimester = Duration(
-            hours=self.volume_second_quadrimester_hours,
-            minutes=self.volume_second_quadrimester_minutes
-        )
-        sum_q1_q2 = volume_first_quadrimester.quantity_in_hours + volume_second_quadrimester.quantity_in_hours
-        if annual_vol_in_hours < 0 or sum_q1_q2 != annual_vol_in_hours:
+        sum_q1_q2 = self.volume_first_quadrimester + self.volume_second_quadrimester
+
+        if self.volume_annual <= 0 or sum_q1_q2 != self.volume_annual:
             raise AnnualVolumeInvalidException()

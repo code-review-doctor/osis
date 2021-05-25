@@ -30,7 +30,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes, Duration
+from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
     LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -62,21 +62,11 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             derogation_quadrimester=DerogationQuadrimester(cmd.derogation_quadrimester),
             session_derogation=DerogationSession(cmd.session_derogation),
             volumes=Volumes(
-                volume_first_quadrimester=Duration(
-                    hours=cmd.volume_first_quadrimester_hours,
-                    minutes=cmd.volume_first_quadrimester_minutes
-                ),
-                volume_second_quadrimester=Duration(
-                    hours=cmd.volume_second_quadrimester_hours,
-                    minutes=cmd.volume_second_quadrimester_minutes
-                ),
-                volume_annual=Duration(
-                    hours=cmd.volume_annual_quadrimester_hours,
-                    minutes=cmd.volume_annual_quadrimester_minutes
+                volume_first_quadrimester=cmd.volume_first_quadrimester,
+                volume_second_quadrimester=cmd.volume_second_quadrimester,
+                volume_annual=cmd.volume_annual
                 )
-            ),
-
-        )
+            )
 
     @classmethod
     def build_from_repository_dto(
@@ -88,8 +78,8 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
 
 def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
 
-    lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual.quantity_in_hours
-    practical_annual_volume = learning_unit.practical_part.volumes.volume_annual.quantity_in_hours
+    lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual
+    practical_annual_volume = learning_unit.practical_part.volumes.volume_annual
 
     if lecturing_annual_volume > 0 and practical_annual_volume > 0:
         return LecturingEffectiveClass

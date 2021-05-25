@@ -32,7 +32,7 @@ from base.models.enums.learning_unit_year_session import SESSION_123
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, Volumes, PracticalPart, Duration
+from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, Volumes, PracticalPart
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
     EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit, ExternalLearningUnit
@@ -123,7 +123,8 @@ class TestCreateClassServiceValidator(TestCase):
             ue_type=LearningUnit,
             learning_unit_code="LPSP8002",
             lecturing_part=LecturingPart(volumes=_build_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_zero_volumes())
+            practical_part=PracticalPart(volumes=_build_zero_volumes()),
+            credits=0
         )
         self.learning_unit_repository.learning_units.extend([
             self.ue_with_lecturing_and_practical_volumes,
@@ -194,7 +195,7 @@ class TestCreateClassServiceValidator(TestCase):
         )
 
     def test_raise_check_volumes_exception(self):
-        cmd = _build_command(learning_unit_code=self.ue_no_volumes.code, class_code='C')
+        cmd = _build_command(learning_unit_code=self.ue_no_volumes.code, class_code='C', credits=0)
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
@@ -207,17 +208,14 @@ class TestCreateClassServiceValidator(TestCase):
         )
 
 
-def _build_command(learning_unit_code: str, class_code: str) -> CreateEffectiveClassCommand:
+def _build_command(learning_unit_code: str, class_code: str, credits: float = 20) -> CreateEffectiveClassCommand:
     cmd = CreateEffectiveClassCommand(
         class_code=class_code,
         learning_unit_code=learning_unit_code,
         year=YEAR,
-        volume_first_quadrimester_hours=10,
-        volume_first_quadrimester_minutes=0,
-        volume_second_quadrimester_hours=10,
-        volume_second_quadrimester_minutes=20,
-        volume_annual_quadrimester_hours=20,
-        volume_annual_quadrimester_minutes=20,
+        volume_first_quadrimester=10,
+        volume_second_quadrimester=10,
+        volume_annual=credits,
         title_fr='Fr',
         title_en='en',
         place=None,
@@ -228,7 +226,7 @@ def _build_command(learning_unit_code: str, class_code: str) -> CreateEffectiveC
     return cmd
 
 
-def _create_lu(ue_type: Type, learning_unit_code: str, lecturing_part: LecturingPart, practical_part: PracticalPart):
+def _create_lu(ue_type: Type, learning_unit_code: str, lecturing_part: LecturingPart, practical_part: PracticalPart, credits: float = 20):
     return ue_type(
         entity_id=LearningUnitIdentity(code=learning_unit_code, academic_year=AcademicYearIdentity(year=YEAR)),
         titles=Titles(
@@ -236,14 +234,14 @@ def _create_lu(ue_type: Type, learning_unit_code: str, lecturing_part: Lecturing
             specific_fr='specific fr',
             common_en="common_en",
             specific_en="speci en"),
-        credits=20,
+        credits=credits,
         internship_subtype=None,
         responsible_entity_identity=None,
         periodicity=None,
         language_id=None,
         remarks=None,
         partims=list(),
-        derogation_quadrimester=None,
+        derogation_quadrimester='Q1',
         lecturing_part=lecturing_part,
         practical_part=practical_part
     )
@@ -251,15 +249,15 @@ def _create_lu(ue_type: Type, learning_unit_code: str, lecturing_part: Lecturing
 
 def _build_zero_volumes():
     return Volumes(
-        volume_first_quadrimester=Duration(hours=0, minutes=0),
-        volume_second_quadrimester=Duration(hours=0, minutes=0),
-        volume_annual=Duration(hours=0, minutes=0)
+        volume_first_quadrimester=0,
+        volume_second_quadrimester=0,
+        volume_annual=0
     )
 
 
 def _build_not_zero_volumes():
     return Volumes(
-        volume_first_quadrimester=Duration(hours=10, minutes=0),
-        volume_second_quadrimester=Duration(hours=10, minutes=0),
-        volume_annual=Duration(hours=20, minutes=0)
+        volume_first_quadrimester=10,
+        volume_second_quadrimester=10,
+        volume_annual=20
     )
