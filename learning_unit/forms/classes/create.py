@@ -1,5 +1,5 @@
 from django import forms
 
 
-class ClasseForm(forms.Form):
+class ClassForm(forms.Form):
     pass

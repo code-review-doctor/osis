@@ -91,4 +91,4 @@ class LearningUnitSearchCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class CreateEffectiveClassCommand(interface.CommandRequest):
-    raise NotImplementedError
+    pass
