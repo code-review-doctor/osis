@@ -47,6 +47,7 @@ class EffectiveClassIdentity(interface.EntityIdentity):
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
 
+@attr.s(slots=True, hash=False, eq=False)
 class EffectiveClass(interface.RootEntity, abc.ABC):
     entity_id = attr.ib(type=EffectiveClassIdentity)
     titles = attr.ib(type=ClassTitles)
