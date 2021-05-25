@@ -54,4 +54,5 @@ def create_effective_class(
     )
 
     # Then
+    class_repository.save(effective_class)
     return effective_class.entity_id

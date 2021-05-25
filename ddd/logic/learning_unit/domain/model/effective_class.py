@@ -42,6 +42,7 @@ class EffectiveClassCode(str):
         assert len(self) == 1
 
 
+@attr.s(frozen=True, slots=True)
 class EffectiveClassIdentity(interface.EntityIdentity):
     class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)

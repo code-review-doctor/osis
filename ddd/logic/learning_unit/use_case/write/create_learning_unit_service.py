@@ -40,7 +40,7 @@ def create_learning_unit(
         entity_repository: IUclEntityRepository,
 ) -> LearningUnitIdentity:
     # GIVEN
-    all_existing_identities = learning_unit_repository.get_identities()
+    all_existing_identities = learning_unit_repository.get_all_identities()
     entity = entity_repository.get(
         entity_id=UclEntityIdentityBuilder.build_from_code(cmd.responsible_entity_code),
     )

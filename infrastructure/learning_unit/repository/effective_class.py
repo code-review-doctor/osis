@@ -50,7 +50,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         raise NotImplementedError
 
     @classmethod
-    def get_all_identities(self) -> List['EffectiveClassIdentity']:
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
         all_learn_unit_years = LearningClassYearDatabase.objects.all().values(
             "acronym"
             "learning_component_year__learning_unit_year__acronym",
@@ -59,7 +59,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
         return [
             EffectiveClassIdentity(
-                code=learning_unit['acronym'],
+                class_code=learning_unit['acronym'],
                 learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
                     learning_unit['learning_component_year__learning_unit_year__acronym'],
                     learning_unit['learning_component_year__learning_unit_year__academic_year__year']

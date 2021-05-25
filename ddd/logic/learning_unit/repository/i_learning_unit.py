@@ -24,13 +24,34 @@
 #
 ##############################################################################
 import abc
-from typing import List
+from typing import List, Optional
 
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
 class ILearningUnitRepository(interface.AbstractRepository):
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List['LearningUnitIdentity']] = None, **kwargs) -> List['LearningUnit']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: 'LearningUnitIdentity', **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: 'LearningUnit') -> None:
+        pass
 
     @classmethod
     @abc.abstractmethod
@@ -52,4 +73,9 @@ class ILearningUnitRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def has_enrollments(cls) -> bool:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_all_identities(cls) -> List['LearningUnitIdentity']:
         pass
