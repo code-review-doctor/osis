@@ -50,3 +50,15 @@ class VolumesAskedShouldBeLowerOrEqualToVolumeAvailable(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Volumes asked should be lower or equal to volume available")
         super().__init__(message, **kwargs)
+
+
+class AttributionAboutToExpireNotFound(BusinessException):
+    def __init__(self, *args, code: str, **kwargs):
+        message = _("Cannot found attribution about to expire with code: {}".format(code))
+        super().__init__(message, **kwargs)
+
+
+class AttributionAboutToExpireFunctionException(BusinessException):
+    def __init__(self, *args,  **kwargs):
+        message = _("Cannot renew an attribution with a function different from holder or coholder")
+        super().__init__(message, **kwargs)

@@ -31,6 +31,7 @@ from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionL
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
 from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled import \
     ShouldLecturingOrPracticalFilledValidator
@@ -81,5 +82,28 @@ class UpdateApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValida
                 vacant_course=self.vacant_course,
                 lecturing_volume_asked=self.command.lecturing_volume,
                 practical_volume_asked=self.command.practical_volume
+            ),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
+class RenewApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    vacant_course = attr.ib(type=VacantCourse)
+    applicant = attr.ib(type=Applicant)
+    attribution_about_to_expire = attr.ib(type=Attribution)
+    all_existing_applications = attr.ib(type=List[Application])
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldNotHaveAlreadyAppliedOnVacantCourse(
+                vacant_course=self.vacant_course, all_existing_applications=self.all_existing_applications
+            ),
+            ShouldVolumesAskedLowerOrEqualToAvailable(
+                vacant_course=self.vacant_course,
+                lecturing_volume_asked=self.attribution_about_to_expire.lecturing_volume,
+                practical_volume_asked=self.attribution_about_to_expire.practical_volume
             ),
         ]

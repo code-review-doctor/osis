@@ -76,8 +76,8 @@ class ApplicationRepository(IApplicationRepository):
     def save(cls, application: Application) -> None:
         tutor_id = Tutor.objects.get(person__global_id=application.applicant_id.global_id).pk
         learning_container_year_id = LearningContainerYear.objects.get(
-            acronym=application.course_id.code,
-            academic_year__year=application.course_id.year
+            acronym=application.vacant_course_id.code,
+            academic_year__year=application.vacant_course_id.year
         ).pk
 
         obj, created = TutorApplication.objects.update_or_create(

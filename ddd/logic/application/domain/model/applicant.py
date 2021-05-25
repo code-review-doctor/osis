@@ -28,6 +28,7 @@ from typing import List
 import attr
 
 from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 
 
@@ -42,3 +43,8 @@ class Applicant(interface.RootEntity):
     first_name = attr.ib(type=str)
     last_name = attr.ib(type=str)
     attributions = attr.ib(type=List[Attribution], default=[])
+
+    def get_attributions_about_to_expire(self, academic_year_identity: AcademicYearIdentity):
+        return [
+            attribution for attribution in self.attributions if attribution.end_year == academic_year_identity
+        ]

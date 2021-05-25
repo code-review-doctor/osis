@@ -23,22 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import abc
+from typing import List, Optional
 
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.model.vacant_course import VacantCourse
-from ddd.logic.application.domain.validator.exceptions import ApplicationAlreadyExistsException
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendarIdentity, ApplicationCalendar
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldNotHaveAlreadyAppliedOnVacantCourse(BusinessValidator):
-    vacant_course = attr.ib(type=VacantCourse)
-    all_existing_applications = attr.ib(type=List['Application'])
+class IApplicationCalendarRepository(interface.AbstractRepository):
+    @classmethod
+    def get(cls, entity_id: ApplicationCalendarIdentity) -> ApplicationCalendar:
+        raise NotImplementedError
 
-    def validate(self, *args, **kwargs):
-        if self.vacant_course.entity_id in {
-            application.vacant_course_id for application in self.all_existing_applications
-        }:
-            raise ApplicationAlreadyExistsException()
+    @classmethod
+    @abc.abstractmethod
+    def get_current_application_calendar(cls) -> ApplicationCalendar:
+        pass
+
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List[ApplicationCalendarIdentity]] = None,
+            **kwargs
+    ) -> List[ApplicationCalendar]:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: ApplicationCalendarIdentity, **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def save(cls, entity: ApplicationCalendar) -> None:
+        raise NotImplementedError

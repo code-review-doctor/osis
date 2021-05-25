@@ -61,7 +61,7 @@ class TestDeleteApplicationService(TestCase):
         cls.application = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=cls.applicant.entity_id,
-            course_id=cls.vacant_course.entity_id,
+            vacant_course_id=cls.vacant_course.entity_id,
             lecturing_volume=Decimal(5),
             practical_volume=Decimal(15),
             remark='',

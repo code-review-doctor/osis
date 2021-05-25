@@ -43,7 +43,7 @@ class TestSearchApplicationByApplicantService(TestCase):
         cls.application = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=cls.applicant_id,
-            course_id=VacantCourseIdentity(code='LAGRO1200', academic_year=AcademicYearIdentity(year=2018)),
+            vacant_course_id=VacantCourseIdentity(code='LAGRO1200', academic_year=AcademicYearIdentity(year=2018)),
             lecturing_volume=Decimal(5),
             practical_volume=Decimal(15),
             remark='',
@@ -52,7 +52,7 @@ class TestSearchApplicationByApplicantService(TestCase):
         cls.application_2 = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=ApplicantIdentity(global_id='9846567895'),
-            course_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
+            vacant_course_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
             lecturing_volume=Decimal(25),
             practical_volume=Decimal(50),
             remark='',
@@ -61,7 +61,7 @@ class TestSearchApplicationByApplicantService(TestCase):
         cls.application_3 = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=cls.applicant_id,
-            course_id=VacantCourseIdentity(code='LDROI1500', academic_year=AcademicYearIdentity(year=2018)),
+            vacant_course_id=VacantCourseIdentity(code='LDROI1500', academic_year=AcademicYearIdentity(year=2018)),
             lecturing_volume=Decimal(0),
             practical_volume=Decimal(5),
             remark='',

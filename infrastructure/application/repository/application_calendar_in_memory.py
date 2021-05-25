@@ -23,18 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from typing import List
 
-from django.db import transaction
-
-from ddd.logic.application.commands import RenewMultipleApplicationsCommand
-from ddd.logic.application.domain.model.application import ApplicationIdentity
-from ddd.logic.application.repository.i_application_repository import IApplicationRepository
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
+from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 
 
-@transaction.atomic()
-def renew_multiple_applications(
-        cmd: RenewMultipleApplicationsCommand,
-        application_repository: IApplicationRepository,
-) -> List[ApplicationIdentity]:
-    pass
+class ApplicationCalendarInMemoryRepository(IApplicationCalendarRepository):
+    application_calendars = []
+
+    # TODO remove this and change classmethod to instance method save/search/...
+    def __init__(self, application_calendars: List[ApplicationCalendar] = None):
+        ApplicationCalendarInMemoryRepository.application_calendars = application_calendars or []
+
+    @classmethod
+    def get_current_application_calendar(cls) -> ApplicationCalendar:
+        today = datetime.date.today()
+
+        return next(
+            application_calendar for application_calendar in cls.application_calendars if
+            application_calendar.start_date < today <= application_calendar
+        )

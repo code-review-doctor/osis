@@ -68,12 +68,6 @@ class DeleteApplicationCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class RenewApplicationCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
-    academic_year = attr.ib(type=int)
+class RenewMultipleAttributionsCommand(interface.CommandRequest):
     global_id = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class RenewMultipleApplicationsCommand(interface.CommandRequest):
-    applications = attr.ib(type=List[RenewApplicationCommand])
+    renew_codes = attr.ib(type=List[str])

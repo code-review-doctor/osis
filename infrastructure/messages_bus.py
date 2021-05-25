@@ -26,12 +26,14 @@
 from typing import Dict, Callable, List
 
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
-    DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand
+    DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
+    RenewMultipleAttributionsCommand
 from ddd.logic.application.use_case.read.search_applications_by_applicant_service import \
     search_applications_by_applicant
 from ddd.logic.application.use_case.read.search_vacant_courses_service import search_vacant_courses
 from ddd.logic.application.use_case.write.apply_on_vacant_course_service import apply_on_vacant_course
 from ddd.logic.application.use_case.write.delete_application_service import delete_application
+from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -61,6 +63,9 @@ class MessageBus:
         ),
         UpdateApplicationCommand: lambda cmd: update_application(
             cmd, ApplicationRepository(), VacantCourseRepository()
+        ),
+        RenewMultipleAttributionsCommand: lambda cmd: renew_multiple_attributions(
+            cmd, ApplicationRepository(), ApplicantRepository(), VacantCourseRepository()
         ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
         SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(cmd, ApplicationRepository()),

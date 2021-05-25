@@ -39,6 +39,8 @@ class ShouldVolumesAskedLowerOrEqualToAvailable(BusinessValidator):
     practical_volume_asked = attr.ib(type=Decimal)
 
     def validate(self, *args, **kwargs):
-        if self.lecturing_volume_asked > self.vacant_course.lecturing_volume_available or \
-           self.practical_volume_asked > self.vacant_course.practical_volume_available:
+        if (self.lecturing_volume_asked and
+            self.lecturing_volume_asked > self.vacant_course.lecturing_volume_available) or \
+                (self.practical_volume_asked and
+                 self.practical_volume_asked > self.vacant_course.practical_volume_available):
             raise VolumesAskedShouldBeLowerOrEqualToVolumeAvailable()

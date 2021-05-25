@@ -41,7 +41,7 @@ class ApplicationIdentity(interface.EntityIdentity):
 class Application(interface.RootEntity):
     entity_id = attr.ib(type=ApplicationIdentity)
     applicant_id = attr.ib(type=ApplicantIdentity)
-    course_id = attr.ib(type=VacantCourseIdentity)
+    vacant_course_id = attr.ib(type=VacantCourseIdentity)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
     remark = attr.ib(type=str)

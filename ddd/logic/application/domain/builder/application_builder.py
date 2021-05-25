@@ -29,8 +29,10 @@ from typing import List
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
+from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
-from ddd.logic.application.domain.validator.validators_by_business_action import ApplyOnVacantCourseValidatorList
+from ddd.logic.application.domain.validator.validators_by_business_action import ApplyOnVacantCourseValidatorList, \
+    RenewApplicationValidatorList
 from ddd.logic.application.dtos import ApplicationFromRepositoryDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd.interface import RootEntityBuilder
@@ -44,7 +46,7 @@ class ApplicationBuilder(RootEntityBuilder):
             vacant_course: VacantCourse,
             cmd: ApplyOnVacantCourseCommand,
             all_existing_applications: List[Application]
-    ) -> 'RootEntity':
+    ) -> 'Application':
         ApplyOnVacantCourseValidatorList(
             command=cmd,
             applicant=applicant,
@@ -55,7 +57,7 @@ class ApplicationBuilder(RootEntityBuilder):
         return Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=applicant.entity_id,
-            course_id=vacant_course.entity_id,
+            vacant_course_id=vacant_course.entity_id,
             lecturing_volume=cmd.lecturing_volume,
             practical_volume=cmd.practical_volume,
             course_summary=cmd.course_summary,
@@ -71,9 +73,34 @@ class ApplicationBuilder(RootEntityBuilder):
         return Application(
             entity_id=ApplicationIdentity(uuid=dto.uuid),
             applicant_id=ApplicantIdentity(global_id=dto.applicant_global_id),
-            course_id=VacantCourseIdentity(code=dto.vacant_course_code, academic_year=vacant_course_academic_year_id),
+            vacant_course_id=VacantCourseIdentity(code=dto.vacant_course_code, academic_year=vacant_course_academic_year_id),
             lecturing_volume=dto.lecturing_volume,
             practical_volume=dto.practical_volume,
             course_summary=dto.course_summary,
             remark=dto.remark
+        )
+
+    @classmethod
+    def build_from_attribution_about_to_expire(
+            cls,
+            applicant: Applicant,
+            vacant_course: VacantCourse,
+            attribution_about_to_expire: Attribution,
+            all_existing_applications: List[Application]
+    ):
+        RenewApplicationValidatorList(
+            applicant=applicant,
+            vacant_course=vacant_course,
+            attribution_about_to_expire=attribution_about_to_expire,
+            all_existing_applications=all_existing_applications
+        ).validate()
+
+        return Application(
+            entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
+            applicant_id=applicant.entity_id,
+            vacant_course_id=vacant_course.entity_id,
+            lecturing_volume=attribution_about_to_expire.lecturing_volume,
+            practical_volume=attribution_about_to_expire.practical_volume,
+            course_summary='',
+            remark=''
         )

@@ -28,7 +28,7 @@ from decimal import Decimal
 import attr
 
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 
 
@@ -36,6 +36,6 @@ from osis_common.ddd import interface
 class Attribution(interface.ValueObject):
     course_id = attr.ib(type=LearningUnitIdentity)
     function = attr.ib(type=str)
-    end_year = attr.ib(type=AcademicYear)
+    end_year = attr.ib(type=AcademicYearIdentity)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)

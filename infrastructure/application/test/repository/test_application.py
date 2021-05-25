@@ -122,7 +122,7 @@ class ApplicationRepositorySave(TestCase):
         application = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=self.applicant_id,
-            course_id=self.vacant_course_id,
+            vacant_course_id=self.vacant_course_id,
             lecturing_volume=Decimal(2),
             practical_volume=Decimal(5),
             remark="Remarque du prof",
@@ -146,7 +146,7 @@ class ApplicationRepositorySave(TestCase):
         application = Application(
             entity_id=ApplicationIdentity(uuid=application_db.uuid),
             applicant_id=self.applicant_id,
-            course_id=self.vacant_course_id,
+            vacant_course_id=self.vacant_course_id,
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(16),
             remark="Remarque du prof update",

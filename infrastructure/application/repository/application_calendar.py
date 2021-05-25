@@ -23,22 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.model.vacant_course import VacantCourse
-from ddd.logic.application.domain.validator.exceptions import ApplicationAlreadyExistsException
+from attribution.calendar.application_courses_calendar import ApplicationCoursesCalendar
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
+from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldNotHaveAlreadyAppliedOnVacantCourse(BusinessValidator):
-    vacant_course = attr.ib(type=VacantCourse)
-    all_existing_applications = attr.ib(type=List['Application'])
-
-    def validate(self, *args, **kwargs):
-        if self.vacant_course.entity_id in {
-            application.vacant_course_id for application in self.all_existing_applications
-        }:
-            raise ApplicationAlreadyExistsException()
+class ApplicationCalendarRepository(IApplicationCalendarRepository):
+    @classmethod
+    def get_current_application_calendar(cls) -> ApplicationCalendar:
+        academic_events = ApplicationCoursesCalendar().get_opened_academic_events()
+        academic_event = academic_events[0] if academic_events else None
+        if academic_event:
+            return ApplicationCalendar(
+                entity_id=ApplicationCalendarIdentity(uuid=academic_event.id),
+                authorized_target_year=academic_event.authorized_target_year,
+                start_date='',
+                end_date='',
+            )
+        return None
