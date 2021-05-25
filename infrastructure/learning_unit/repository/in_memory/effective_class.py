@@ -1,6 +1,5 @@
 from typing import Optional, List
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from osis_common.ddd.interface import ApplicationService
@@ -26,7 +25,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def save(cls, entity: EffectiveClass) -> None:
-        pass
+        cls.effective_classes.append(entity)
 
     @classmethod
     def get_all_identities(self) -> List['EffectiveClassIdentity']:
