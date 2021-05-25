@@ -91,7 +91,7 @@ class LearningUnitSearchCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class CreateEffectiveClassCommand(interface.CommandRequest):
-    code = attr.ib(type=str)
+    class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     year = attr.ib(type=int)
     title_fr = attr.ib(type=str)

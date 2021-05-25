@@ -92,7 +92,7 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldBeAlphanumericException(self.command.code)
+            ShouldBeAlphanumericException(self.command.class_code)
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:

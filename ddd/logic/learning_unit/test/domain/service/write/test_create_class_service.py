@@ -97,7 +97,7 @@ class TestCreateClassService(TestCase):
 
 def _build_command(code: str) -> CreateEffectiveClassCommand:
     cmd = CreateEffectiveClassCommand(
-        code="A",
+        class_code="A",
         learning_unit_code=code,
         year=YEAR,
         volume_first_quadrimester_hours=10,

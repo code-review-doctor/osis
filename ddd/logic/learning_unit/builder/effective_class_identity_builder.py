@@ -32,7 +32,7 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_command(cls, cmd: 'CreateEffectiveClassCommand') -> 'EffectiveClassIdentity':
         effective_class_identity = EffectiveClassIdentity()
-        effective_class_identity.code = cmd.code
+        effective_class_identity.code = cmd.class_code
         effective_class_identity.learning_unit_identity = \
             LearningUnitIdentityBuilder.build_from_code_and_year(code=cmd.learning_unit_code, year=cmd.year)
         return effective_class_identity
