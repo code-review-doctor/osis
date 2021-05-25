@@ -194,7 +194,7 @@ class TestCreateClassServiceValidator(TestCase):
             ClassTypeInvalidException
         )
 
-    def test_raise_check_volumes_exception(self):
+    def test_raise_check_class_volumes_consistency_exception(self):
         cmd = _build_command(learning_unit_code=self.ue_no_volumes.code, class_code='C', credits=0)
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(

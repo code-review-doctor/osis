@@ -4,7 +4,7 @@ import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.validator._check_class_volumes import CheckClassVolumes
+from ddd.logic.learning_unit.domain.validator._check_class_volumes import CheckClassVolumeAnnualConsistency
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
 from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ShouldBeAlphanumericValidator
@@ -20,7 +20,7 @@ from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_exists_i
     ShouldLearningUnitNotExistNextYearValidator
 from ddd.logic.learning_unit.domain.validator._should_not_be_type_mobility_or_external import \
     ShouldNotBeTypeMobilityOrExternal
-from ddd.logic.learning_unit.domain.validator._subdivision_code_should_be_unique_for_UE import \
+from ddd.logic.learning_unit.domain.validator._class_code_code_should_be_unique_for_UE import \
     ClassCodeShouldBeUniqueForUE
 from ddd.logic.learning_unit.domain.validator._subdivision_should_contain_only_one_letter import \
     SubdivisionShouldContainOnlyOneLetterValidator
@@ -103,7 +103,7 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
                 self.all_existing_class_identities
             ),
             ShouldNotBeTypeMobilityOrExternal(self.learning_unit),
-            CheckClassVolumes(
+            CheckClassVolumeAnnualConsistency(
                 self.command.volume_first_quadrimester,
                 self.command.volume_second_quadrimester,
                 self.command.volume_annual

@@ -30,7 +30,7 @@ from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInva
 
 
 @attr.s(frozen=True, slots=True)
-class CheckClassVolumes(BusinessValidator):
+class CheckClassVolumeAnnualConsistency(BusinessValidator):
 
     volume_first_quadrimester = attr.ib(type=float)
     volume_second_quadrimester = attr.ib(type=float)
