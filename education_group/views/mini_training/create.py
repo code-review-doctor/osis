@@ -46,6 +46,7 @@ from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
 from program_management.ddd.service.read import node_identity_service
@@ -93,6 +94,8 @@ class MiniTrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, FormVi
             for e in multiple_exceptions.exceptions:
                 if isinstance(e, exception.CodeAlreadyExistException):
                     form.add_error("code", e.message)
+                elif isinstance(e, CodePatternException):
+                    form.add_error('code', e.message)
                 elif isinstance(e, exception.AcronymAlreadyExist):
                     form.add_error('abbreviated_title', e.message)
                 elif isinstance(e, exception.ContentConstraintTypeMissing):

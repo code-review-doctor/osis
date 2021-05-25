@@ -31,6 +31,7 @@ from typing import List, Set, Optional, Dict
 
 import attr
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
@@ -43,6 +44,7 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception, report_events
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.prerequisite import Prerequisites, \
@@ -51,7 +53,10 @@ from program_management.ddd.domain.report import Report
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
+from program_management.ddd.validators._code_pattern import CodePatternValidator
 from program_management.ddd.validators._path_validator import PathValidator
+from program_management.ddd.validators.validators_by_business_action import \
+    CreateProgramTreeStandardVersionValidatorList
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
@@ -436,6 +441,7 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         root_node = node_repository.get(NodeIdentity(code=orphan_group_as_root.code, year=orphan_group_as_root.year))
         program_tree = ProgramTree(root_node=root_node, authorized_relationships=load_authorized_relationship.load())
+        CreateProgramTreeStandardVersionValidatorList(program_tree).validate()
         self._generate_mandatory_direct_children(program_tree=program_tree)
         return program_tree
 

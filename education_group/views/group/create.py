@@ -25,6 +25,7 @@ from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.service.read import node_identity_service
@@ -112,6 +113,8 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
             except MultipleBusinessExceptions as multiple_exceptions:
                 for e in multiple_exceptions.exceptions:
                     if isinstance(e, CodeAlreadyExistException):
+                        group_form.add_error('code', e.message)
+                    elif isinstance(e, CodePatternException):
                         group_form.add_error('code', e.message)
                     elif isinstance(e, ContentConstraintTypeMissing):
                         group_form.add_error('constraint_type', e.message)
