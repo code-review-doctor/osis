@@ -19,17 +19,18 @@ print('Module Branch : {}'.format(module_branch))
 print('')
 
 modules = {
-    "admission": "https://github.com/uclouvain/osis-admission.git",
-    "assistant": "https://github.com/uclouvain/osis-assistant.git",
-    "continuing_education": "https://github.com/uclouvain/osis-continuing-education.git",
-    "dissertation": "https://github.com/uclouvain/osis-dissertation.git",
-    "internship": "https://github.com/uclouvain/osis-internship.git",
-    "osis_common": "https://github.com/uclouvain/osis-common.git",
-    "osis_history": "https://github.com/uclouvain/osis-history.git",
-    "osis_mail_template": "https://github.com/uclouvain/osis-mail-template.git",
-    "partnership": "https://github.com/uclouvain/osis-partnership.git"
+    "admission": "git@github.com:uclouvain/osis-admission.git",
+    "assistant": "git@github.com:uclouvain/osis-assistant.git",
+    "continuing_education": "git@github.com:uclouvain/osis-continuing-education.git",
+    "dissertation": "git@github.com:uclouvain/osis-dissertation.git",
+    "internship": "git@github.com:uclouvain/osis-internship.git",
+    "osis_common": "git@github.com:uclouvain/osis-common.git",
+    "osis_history": "git@github.com:uclouvain/osis-history.git",
+    "osis_mail_template": "git@github.com:uclouvain/osis-mail-template.git",
+    "partnership": "git@github.com:uclouvain/osis-partnership.git",
 }
 
+# TODO :: ajouter un 2e param "nom_du_submodule" pour faciliter le déploiement par branche pour chaque submodule + adapter config travis
 for module, git_url in modules.items():
     module_dir = os.path.join(project_dir, module)
     if path.exists(module_dir) and path.isdir(module_dir):
