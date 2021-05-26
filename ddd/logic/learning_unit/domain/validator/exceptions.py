@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
+from ddd.logic.learning_unit.business_types import *
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from ddd.logic.learning_unit.business_types import *
 
 
 class AcademicYearLowerThan2019Exception(BusinessException):
@@ -139,6 +138,14 @@ class ClassTypeInvalidException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(
             "Class can't be neither mobility nor external"
+        )
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitHasPartimException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be created on learning unit having partim"
         )
         super().__init__(message, **kwargs)
 

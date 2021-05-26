@@ -36,11 +36,13 @@ from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBu
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.model._partim import Partim, PartimIdentity
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
     EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
-    CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException
+    CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
+    LearningUnitHasPartimException
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
@@ -177,6 +179,32 @@ class TestCreateClassServiceValidator(TestCase):
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             ClassTypeInvalidException
+        )
+
+    def test_raise_should_learning_unit_not_have_partim_exception(self):
+        command = attr.evolve(self.command, code='LPART2021')
+        partim = Partim(
+            entity_id=PartimIdentity(subdivision='T'),
+            title_fr='Partim FR',
+            title_en='Partim EN',
+            credits=20,
+            periodicity=PeriodicityEnum.ANNUAL.name,
+            language_id='fr-be',
+            remarks='Remark',
+        )
+        ue_with_partims = _create_lu(command=command)
+        ue_with_partims.partims.append(partim)
+        self.learning_unit_repository.save(ue_with_partims)
+        cmd = _build_create_effective_class_command(learning_unit_code=ue_with_partims.code, class_code='B')
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            LearningUnitHasPartimException
         )
 
     def test_raise_check_class_volumes_consistency_exception(self):

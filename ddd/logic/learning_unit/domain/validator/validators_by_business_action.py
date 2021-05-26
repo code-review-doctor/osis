@@ -20,6 +20,8 @@ from ddd.logic.learning_unit.domain.validator._should_learning_unit_code_respect
     ShouldCodeRespectNamingConventionValidator
 from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_exists_in_next_year import \
     ShouldLearningUnitNotExistNextYearValidator
+from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_have_partims import \
+    ShouldLearningUnitNotHavePartim
 from ddd.logic.learning_unit.domain.validator._should_not_be_type_mobility_or_external import \
     ShouldNotBeTypeMobilityOrExternal
 from ddd.logic.learning_unit.domain.validator._subdivision_should_contain_only_one_letter import \
@@ -102,6 +104,7 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
                 self.all_existing_class_identities
             ),
             ShouldNotBeTypeMobilityOrExternal(self.learning_unit),
+            ShouldLearningUnitNotHavePartim(self.learning_unit),
             CheckClassVolumeConsistency(
                 self.command.volume_first_quadrimester,
                 self.command.volume_second_quadrimester,
