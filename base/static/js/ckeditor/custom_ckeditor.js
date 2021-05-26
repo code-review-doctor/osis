@@ -15,6 +15,12 @@ CKEDITOR.on('instanceReady', function(e) {
     e.editor.dataProcessor.writer.setRules('br', {
         breakAfterOpen: false
     })
+    e.editor.dataProcessor.writer.setRules('p', {
+        breakAfterOpen: false,
+        breakBeforeOpen: false,
+        breakBeforeClose: false,
+        breakAfterClose: false
+    })
 
 });
 
