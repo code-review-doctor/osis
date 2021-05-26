@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningclassyear',
             name='campus',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.PROTECT, to='base.Campus',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='base.Campus',
                                     verbose_name='Learning location'),
         ),
         migrations.AddField(
@@ -33,15 +33,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningclassyear',
             name='hourly_volume_total_annual',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=6, null=True,
+            field=models.DecimalField(blank=True, decimal_places=2, max_digits=6,
                                       verbose_name='hourly volume total annual'),
         ),
         migrations.AddField(
             model_name='learningclassyear',
             name='quadrimester',
-            field=models.CharField(blank=True,
+            field=models.CharField(blank=True, null=True,
                                    choices=[('Q1', 'Q1'), ('Q2', 'Q2'), ('Q3', 'Q3'), ('Q1and2', 'Q1 and Q2'),
-                                            ('Q1or2', 'Q1 or Q2')], max_length=9, null=True,
+                                            ('Q1or2', 'Q1 or Q2')], max_length=9,
                                    verbose_name='Quadrimester'),
         ),
         migrations.AddField(
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
             name='session',
             field=models.CharField(blank=True, choices=[('1', '1'), ('2', '2'), ('3', '3'), ('12', '12'), ('13', '13'),
                                                         ('23', '23'), ('123', '123'), ('P23', 'P23')], max_length=50,
-                                   null=True, verbose_name='Session derogation'),
+                                   verbose_name='Session derogation', null=True,),
         ),
         migrations.AddField(
             model_name='learningclassyear',
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningclassyear',
             name='title_fr',
-            field=models.CharField(blank=True, max_length=255, null=True, verbose_name='Title in French'),
+            field=models.CharField(blank=True, max_length=255, verbose_name='Title in French'),
         ),
         migrations.AlterField(
             model_name='learningclassyear',

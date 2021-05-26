@@ -58,22 +58,22 @@ class LearningClassYear(models.Model):
     acronym = models.CharField(max_length=1, validators=[only_alphanumeric_validator])
     description = models.CharField(max_length=100, blank=True)  # FIXME: to delete when classes development finished
 
-    title_fr = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Title in French'))
+    title_fr = models.CharField(max_length=255, blank=True, verbose_name=_('Title in French'))
     title_en = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Title in English'))
 
-    hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
+    hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
                                                      verbose_name=_("hourly volume total annual"))
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q1"))
     hourly_volume_partial_q2 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q2"))
-    quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('Quadrimester'),
+    quadrimester = models.CharField(max_length=9, blank=True, verbose_name=_('Quadrimester'), null=True,
                                     choices=quadrimesters.DerogationQuadrimester.choices())
     session = models.CharField(max_length=50, blank=True, null=True,
                                choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
                                verbose_name=_('Session derogation'))
 
-    campus = models.ForeignKey('base.Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
+    campus = models.ForeignKey('base.Campus', verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
     objects = LearningClassYearManager()
 
