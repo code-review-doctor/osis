@@ -36,7 +36,6 @@ from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBu
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
     EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -204,7 +203,6 @@ class TestCreateClassServiceValidator(TestCase):
 def _build_create_effective_class_command(
         learning_unit_code: str,
         class_code: str,
-        credits: float = 20
 ) -> 'CreateEffectiveClassCommand':
     cmd = CreateEffectiveClassCommand(
         class_code=class_code,
@@ -212,7 +210,6 @@ def _build_create_effective_class_command(
         year=YEAR,
         volume_first_quadrimester=10,
         volume_second_quadrimester=10,
-        volume_annual=credits,
         title_fr='Fr',
         title_en='en',
         place=None,
@@ -255,20 +252,4 @@ def _build_create_learning_unit_command() -> 'CreateLearningUnitCommand':
         lecturing_volume_q2=10.0,
         lecturing_volume_annual=10.0,
         derogation_quadrimester=DerogationQuadrimester.Q1.name
-    )
-
-
-def _build_zero_volumes() -> 'Volumes':
-    return Volumes(
-        volume_first_quadrimester=0.0,
-        volume_second_quadrimester=0.0,
-        volume_annual=0.0
-    )
-
-
-def _build_not_zero_volumes() -> 'Volumes':
-    return Volumes(
-        volume_first_quadrimester=10.0,
-        volume_second_quadrimester=10.0,
-        volume_annual=20.0
     )

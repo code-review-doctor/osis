@@ -28,9 +28,10 @@ from typing import Type, Union, List
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
+from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
     LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -44,9 +45,9 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
     def build_from_command(
             cls,
             cmd: 'CreateEffectiveClassCommand',
-            learning_unit: LearningUnit,
+            learning_unit: 'LearningUnit',
             all_existing_class_identities: List['EffectiveClassIdentity']
-    ) -> Union['PracticalEffectiveClass', 'LecturingEffectiveClass']:
+    ) -> 'EffectiveClass':
         CreateEffectiveClassValidatorList(
             command=cmd,
             learning_unit=learning_unit,
@@ -61,12 +62,11 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             teaching_place=TeachingPlace(place=cmd.place, organization_name=cmd.organization_name),
             derogation_quadrimester=DerogationQuadrimester(cmd.derogation_quadrimester),
             session_derogation=DerogationSession(cmd.session_derogation),
-            volumes=Volumes(
+            volumes=ClassVolumes(
                 volume_first_quadrimester=cmd.volume_first_quadrimester,
                 volume_second_quadrimester=cmd.volume_second_quadrimester,
-                volume_annual=cmd.volume_annual
-                )
             )
+        )
 
     @classmethod
     def build_from_repository_dto(

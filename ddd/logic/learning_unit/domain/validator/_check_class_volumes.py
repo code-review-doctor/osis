@@ -26,18 +26,27 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInvalidException
 
 
 @attr.s(frozen=True, slots=True)
-class CheckClassVolumeAnnualConsistency(BusinessValidator):
-
+class CheckClassVolumeConsistency(BusinessValidator):
     volume_first_quadrimester = attr.ib(type=float)
     volume_second_quadrimester = attr.ib(type=float)
-    volume_annual = attr.ib(type=float)
+    learning_unit = attr.ib(type=LearningUnit)
 
     def validate(self, *args, **kwargs):
         sum_q1_q2 = self.volume_first_quadrimester + self.volume_second_quadrimester
-
-        if self.volume_annual <= 0 or sum_q1_q2 != self.volume_annual:
+        volume_annual = self._get_volume_annual()
+        if volume_annual <= 0 or sum_q1_q2 != volume_annual:
             raise AnnualVolumeInvalidException()
+
+    def _get_volume_annual(self):
+        practical_volumes = self.learning_unit.practical_part.volumes
+        lecturing_volumes = self.learning_unit.lecturing_part.volumes
+        if practical_volumes.volume_annual > 0 and not lecturing_volumes.volume_annual > 0:
+            volume_annual = practical_volumes.volume_annual
+        else:
+            volume_annual = lecturing_volumes.volume_annual
+        return volume_annual

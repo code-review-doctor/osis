@@ -111,4 +111,3 @@ class CreateEffectiveClassCommand(interface.CommandRequest):
     session_derogation = attr.ib(type=str)
     volume_first_quadrimester = attr.ib(type=float)
     volume_second_quadrimester = attr.ib(type=float)
-    volume_annual = attr.ib(type=float)
