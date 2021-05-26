@@ -72,7 +72,9 @@ class ApplicationBuilder(RootEntityBuilder):
         return Application(
             entity_id=ApplicationIdentity(uuid=dto.uuid),
             applicant_id=ApplicantIdentity(global_id=dto.applicant_global_id),
-            vacant_course_id=VacantCourseIdentity(code=dto.vacant_course_code, academic_year=vacant_course_academic_year_id),
+            vacant_course_id=VacantCourseIdentity(
+                code=dto.vacant_course_code, academic_year=vacant_course_academic_year_id
+            ),
             lecturing_volume=dto.lecturing_volume,
             practical_volume=dto.practical_volume,
             course_summary=dto.course_summary,
