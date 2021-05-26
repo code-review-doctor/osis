@@ -30,6 +30,7 @@ from django.db.models.functions import Concat
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from base.models.entity_version import EntityVersion as EntityVersionDatabase
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES, LECTURING
 from base.models.learning_component_year import LearningComponentYear as LearningComponentYearDatabase
 from base.models.learning_container import LearningContainer as LearningContainerDatabase
@@ -175,7 +176,8 @@ class LearningUnitRepository(ILearningUnitRepository):
             faculty_remark=entity.remarks.faculty,
             other_remark=entity.remarks.publication_fr,
             other_remark_english=entity.remarks.publication_en,
-            quadrimester=entity.derogation_quadrimester.name
+            quadrimester=entity.derogation_quadrimester.name,
+            subtype=learning_unit_year_subtypes.FULL
         )
 
         LearningComponentYearDatabase.objects.create(
@@ -217,7 +219,9 @@ class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
     def get_all_identities(cls) -> List['LearningUnitIdentity']:
-        all_learn_unit_years = LearningUnitYearDatabase.objects.all().values(
+        all_learn_unit_years = LearningUnitYearDatabase.objects.filter(
+            subtype=learning_unit_year_subtypes.FULL
+        ).values(
             "acronym",
             "academic_year__year",
         )
@@ -294,4 +298,6 @@ def _values_queryset(queryset):
 
 
 def _get_common_queryset():
-    return LearningUnitYearDatabase.objects.all()
+    return LearningUnitYearDatabase.objects.filter(
+        subtype=learning_unit_year_subtypes.FULL
+    )
