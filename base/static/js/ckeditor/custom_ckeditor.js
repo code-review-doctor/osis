@@ -12,6 +12,10 @@ CKEDITOR.on('instanceReady', function(e) {
         buttonPasteFromWord[0].onclick = handleOnclickPasteFromWord;
     }
 
+    e.editor.dataProcessor.writer.setRules('br', {
+        breakAfterOpen: false
+    })
+
 });
 
 function destroyAllInstances() {
