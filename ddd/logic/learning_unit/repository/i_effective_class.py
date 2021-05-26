@@ -25,12 +25,12 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
 class IEffectiveClassRepository(interface.AbstractRepository):
 
     @classmethod
-    def get_all_identities(self) -> List['EffectiveClassIdentity']:
-        pass
-
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+        raise NotImplementedError
