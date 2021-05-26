@@ -62,6 +62,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             ),
             derogation_quadrimester=DerogationQuadrimester(dto_object.derogation_quadrimester),
             session_derogation=dto_object.session_derogation,
+            # TODO: Use ClassVolumes from leila
             volumes=Volumes(
                 volume_first_quadrimester=dto_object.volume_q1,
                 volume_second_quadrimester=dto_object.volume_q2,
