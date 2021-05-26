@@ -195,7 +195,8 @@ class LearningUnitRepository(ILearningUnitRepository):
         )
         obj.delete()
 
-    def get_identities(self) -> List['LearningUnitIdentity']:
+    @classmethod
+    def get_all_identities(cls) -> List['LearningUnitIdentity']:
         all_learn_unit_years = LearningUnitYearDatabase.objects.all().values(
             "acronym",
             "academic_year__year",

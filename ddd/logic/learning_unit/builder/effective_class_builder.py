@@ -88,5 +88,4 @@ def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveC
         return LecturingEffectiveClass
     elif practical_annual_volume > 0:
         return PracticalEffectiveClass
-
     return None

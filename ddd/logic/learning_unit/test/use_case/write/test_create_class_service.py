@@ -29,18 +29,16 @@ from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.learning_unit_year_session import SESSION_123
-from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, Volumes, PracticalPart
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
     EffectiveClass, EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit, ExternalLearningUnit
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, ExternalLearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
@@ -75,8 +73,7 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
             self.ue_with_lecturing_and_practical_volumes,
             self.ue_with_practical_volumes_only,
             self.ue_with_lecturing_volumes_only
-            ]
-        )
+        ])
 
         self.effective_class_repository = EffectiveClassRepository()
 
@@ -86,9 +83,8 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
             self.learning_unit_repository,
             self.effective_class_repository
         )
-        #  TODO ne fonctionne pas
-        #  Je ne vois pas comment valider l'instance.  comment récupérer effectiv_class créée
-        self.assertIsInstance(self.effective_class_repository.get(effective_class_id), LecturingEffectiveClass)
+        effective_class = self.effective_class_repository.get(effective_class_id)
+        self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
     def test_effective_class_type_practical(self):
         effective_class_id = create_effective_class(
@@ -96,9 +92,8 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
             self.learning_unit_repository,
             self.effective_class_repository
         )
-        # TODO ne fonctionne pas
-        #  Je ne vois pas comment valider l'instance.  comment récupérer effectiv_class créée
-        self.assertIsInstance(effective_class_id, PracticalEffectiveClass)
+        effective_class = self.effective_class_repository.get(effective_class_id)
+        self.assertIsInstance(effective_class, PracticalEffectiveClass)
 
     def test_effective_class_type_lecturing_only(self):
         effective_class_id = create_effective_class(
@@ -106,9 +101,8 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
             self.learning_unit_repository,
             self.effective_class_repository
         )
-        # TODO ne fonctionne pas
-        #  Je ne vois pas comment valider l'instance.  comment récupérer effectiv_class créée
-        self.assertIsInstance(effective_class_id, LecturingEffectiveClass)
+        effective_class = self.effective_class_repository.get(effective_class_id)
+        self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
 
 class TestCreateClassServiceValidator(TestCase):
@@ -137,17 +131,17 @@ class TestCreateClassServiceValidator(TestCase):
             self.ue_with_lecturing_and_practical_volumes,
             self.ue_external,
             self.ue_no_volumes
-            ]
-        )
+        ])
 
         self.effective_class_repository = EffectiveClassRepository()
-        effective_class_identity = EffectiveClassIdentity()
-        effective_class_identity.class_code = 'A'
-        effective_class_identity.learning_unit_identity = \
-            LearningUnitIdentityBuilder.build_from_code_and_year(
+        effective_class_identity = EffectiveClassIdentity(
+            class_code='A',
+            learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
                 code=self.ue_with_lecturing_and_practical_volumes.code,
                 year=YEAR
             )
+        )
+
         self.effective_class = EffectiveClass(
             entity_id=effective_class_identity,
             titles=None,
@@ -263,15 +257,15 @@ def _create_lu(
 
 def _build_zero_volumes():
     return Volumes(
-        volume_first_quadrimester=0,
-        volume_second_quadrimester=0,
-        volume_annual=0
+        volume_first_quadrimester=0.0,
+        volume_second_quadrimester=0.0,
+        volume_annual=0.0
     )
 
 
 def _build_not_zero_volumes():
     return Volumes(
-        volume_first_quadrimester=10,
-        volume_second_quadrimester=10,
-        volume_annual=20
+        volume_first_quadrimester=10.0,
+        volume_second_quadrimester=10.0,
+        volume_annual=20.0
     )
