@@ -639,15 +639,15 @@ class ProgramTree(interface.RootEntity):
         return list(sorted(nodes_permitted, key=lambda n: n.code))
 
     def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:
-        return list(set(
+        return list(
             sorted(
                 (
-                    node_obj for node_obj in self.get_all_learning_unit_nodes()
+                    node_obj for node_obj in set(self.get_all_learning_unit_nodes())
                     if self.has_prerequisites(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
             )
-        ))
+        )
 
     def get_nodes_that_are_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
         return list(
