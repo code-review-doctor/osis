@@ -636,7 +636,7 @@ class ProgramTree(interface.RootEntity):
         return list(
             sorted(
                 (
-                    node_obj for node_obj in self.get_all_learning_unit_nodes()
+                    node_obj for node_obj in set(self.get_all_learning_unit_nodes())
                     if self.has_prerequisites(node_obj)
                 ),
                 key=lambda node_obj: node_obj.code
