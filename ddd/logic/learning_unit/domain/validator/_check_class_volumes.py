@@ -26,7 +26,6 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInvalidException
 
 
@@ -34,7 +33,7 @@ from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInva
 class CheckClassVolumeConsistency(BusinessValidator):
     volume_first_quadrimester = attr.ib(type=float)
     volume_second_quadrimester = attr.ib(type=float)
-    learning_unit = attr.ib(type=LearningUnit)
+    learning_unit = attr.ib(type='LearningUnit')
 
     def validate(self, *args, **kwargs):
         sum_q1_q2 = self.volume_first_quadrimester + self.volume_second_quadrimester

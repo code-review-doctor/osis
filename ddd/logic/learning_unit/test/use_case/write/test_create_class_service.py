@@ -183,11 +183,12 @@ class TestCreateClassServiceValidator(TestCase):
         command = attr.evolve(
             self.command,
             lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=0.0,
-            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0
+            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
+            code='LTEST2025'
         )
         ue_no_volumes = _create_lu(command)
-        cmd = _build_create_effective_class_command(learning_unit_code=ue_no_volumes.code, class_code='C',
-                                                    credits=0)
+        self.learning_unit_repository.save(ue_no_volumes)
+        cmd = _build_create_effective_class_command(learning_unit_code=ue_no_volumes.code, class_code='C')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
@@ -247,9 +248,9 @@ def _build_create_learning_unit_command() -> 'CreateLearningUnitCommand':
         remark_publication_en=None,
         practical_volume_q1=10.0,
         practical_volume_q2=10.0,
-        practical_volume_annual=10.0,
+        practical_volume_annual=20.0,
         lecturing_volume_q1=10.0,
         lecturing_volume_q2=10.0,
-        lecturing_volume_annual=10.0,
+        lecturing_volume_annual=20.0,
         derogation_quadrimester=DerogationQuadrimester.Q1.name
     )

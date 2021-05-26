@@ -38,7 +38,7 @@ from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntit
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import PracticalPart, LecturingPart, ClassVolumes
+from ddd.logic.learning_unit.domain.model._volumes_repartition import PracticalPart, LecturingPart, Volumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
@@ -197,9 +197,10 @@ def _build_part(
         volume_q2: Decimal,
         volume_annual: Decimal
 ) -> Union['LecturingPart', 'PracticalPart']:
-    volumes = ClassVolumes(
+    volumes = Volumes(
         volume_first_quadrimester=volume_q1,
         volume_second_quadrimester=volume_q2,
+        volume_annual=volume_annual
     )
     if part_type == LECTURING:
         return LecturingPart(volumes=volumes)
