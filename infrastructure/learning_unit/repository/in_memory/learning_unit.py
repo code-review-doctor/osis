@@ -27,5 +27,6 @@ class LearningUnitRepository(IEffectiveClassRepository):
     def save(cls, entity: LearningUnit) -> None:
         pass
 
-    def get_identities(self) -> List['LearningUnitIdentity']:
-        return [lu.entity_id for lu in self.learning_units]
+    @classmethod
+    def get_all_identities(cls) -> List['LearningUnitIdentity']:
+        return [lu.entity_id for lu in cls.learning_units]

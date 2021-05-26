@@ -103,7 +103,6 @@ class LearningUnitBuilder(RootEntityBuilder):
     ) -> 'LearningUnit':
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
-            type=LearningContainerYearType[dto.type],
             titles=_build_titles(
                 dto.common_title_fr,
                 dto.specific_title_fr,
@@ -111,7 +110,7 @@ class LearningUnitBuilder(RootEntityBuilder):
                 dto.specific_title_en
             ),
             credits=dto.credits,
-            internship_subtype=InternshipSubtype[dto.internship_subtype],
+            internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
@@ -128,7 +127,8 @@ class LearningUnitBuilder(RootEntityBuilder):
                 volume_q2=dto.practical_volume_q2,
                 volume_annual=dto.practical_volume_annual
             ),
-            derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
+            derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester]
+            if dto.derogation_quadrimester else None,
             partims=[]
         )
 

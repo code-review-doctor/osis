@@ -145,7 +145,10 @@ class LearningUnitRepository(ILearningUnitRepository):
             year=entity.academic_year.year
         ).values_list('pk', flat=True).get()
 
+        learning_container = LearningContainerDatabase.objects.create()
+
         learning_container_year = LearningContainerYearDatabase.objects.create(
+            learning_container=learning_container,
             acronym=entity.code,
             academic_year_id=academic_year_id,
             container_type=entity.type.name,
@@ -155,7 +158,7 @@ class LearningUnitRepository(ILearningUnitRepository):
         )
 
         language_id = LanguageDatabase.objects.filter(
-            code=entity.language.iso_code
+            code=entity.language_id.code_iso
         ).values_list('pk', flat=True).get()
 
         learn_unit_year = LearningUnitYearDatabase.objects.create(
@@ -165,15 +168,30 @@ class LearningUnitRepository(ILearningUnitRepository):
             acronym=entity.code,  # FIXME :: Is this correct ? Duplicated with container.acronym ?
             specific_title=entity.titles.specific_fr,
             specific_title_english=entity.titles.specific_en,
-            credits=entity.titles.credits,
-            internship_subtype=entity.internship_subtype.name,
+            credits=entity.credits,
+            internship_subtype=entity.internship_subtype.name if entity.internship_subtype else None,
             periodicity=entity.periodicity.name,
             language_id=language_id,
             faculty_remark=entity.remarks.faculty,
             other_remark=entity.remarks.publication_fr,
             other_remark_english=entity.remarks.publication_en,
+            quadrimester=entity.derogation_quadrimester.name
         )
 
+        LearningComponentYearDatabase.objects.create(
+            type=LECTURING,
+            learning_unit_year=learn_unit_year,
+            hourly_volume_partial_q1=entity.lecturing_part.volumes.volume_first_quadrimester,
+            hourly_volume_partial_q2=entity.lecturing_part.volumes.volume_second_quadrimester,
+            hourly_volume_total_annual=entity.lecturing_part.volumes.volume_annual,
+        )
+        LearningComponentYearDatabase.objects.create(
+            type=PRACTICAL_EXERCISES,
+            learning_unit_year=learn_unit_year,
+            hourly_volume_partial_q1=entity.practical_part.volumes.volume_first_quadrimester,
+            hourly_volume_partial_q2=entity.practical_part.volumes.volume_second_quadrimester,
+            hourly_volume_total_annual=entity.practical_part.volumes.volume_annual,
+        )
         return entity.entity_id
 
     @classmethod
@@ -227,7 +245,7 @@ def _annotate_queryset(queryset):
         specific_title_en=F('specific_title_english'),
         responsible_entity_code=Subquery(
             EntityVersionDatabase.objects.filter(
-                entity__id=OuterRef('requirement_entity_id')
+                entity__id=OuterRef('learning_container_year__requirement_entity_id')
             ).order_by('-start_date').values('acronym')[:1]
         ),
         iso_code=F('language__code'),
