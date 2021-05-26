@@ -40,6 +40,7 @@ class SearchApplicationByApplicantCommand(interface.CommandRequest):
 class SearchVacantCoursesCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     entity_allocation_code = attr.ib(type=str)
+    vacant_declaration_types = attr.ib(type=List[str])
 
 
 @attr.s(frozen=True, slots=True)

@@ -23,28 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+import attr
 
-from base.models.utils.utils import ChoiceEnum
-
-RESEVED_FOR_INTERNS = "RESEVED_FOR_INTERNS"
-OPEN_FOR_EXTERNS = "OPEN_FOR_EXTERNS"
-EXCEPTIONAL_PROCEDURE = "EXCEPTIONAL_PROCEDURE"
-VACANT_NOT_PUBLISH = "VACANT_NOT_PUBLISH"
-DO_NOT_ASSIGN = "DO_NOT_ASSIGN"
-
-DECLARATION_TYPE = (
-    (RESEVED_FOR_INTERNS, _("Reserved for interns")),
-    (OPEN_FOR_EXTERNS, _("Open for externs")),
-    (EXCEPTIONAL_PROCEDURE, _("Exceptional procedure")),
-    (VACANT_NOT_PUBLISH, _("Vacant not publish")),
-    (DO_NOT_ASSIGN, _("Do not assign"))
-)
+from base.ddd.utils.business_validator import BusinessValidator
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
+from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.domain.validator.exceptions import VacantCourseNotAllowedDeclarationType
 
 
-class VacantDeclarationType(ChoiceEnum):
-    RESEVED_FOR_INTERNS = _("Reserved for interns")
-    OPEN_FOR_EXTERNS = _("Open for externs")
-    EXCEPTIONAL_PROCEDURE = _("Exceptional procedure")
-    VACANT_NOT_PUBLISH = _("Vacant not publish")
-    DO_NOT_ASSIGN = _("Do not assign")
+@attr.s(frozen=True, slots=True)
+class ShouldVacantCourseAllowableDeclarationType(BusinessValidator):
+    vacant_course = attr.ib(type=VacantCourse)
+
+    def validate(self, *args, **kwargs):
+        if self.vacant_course.vacant_declaration_type not in {VacantDeclarationType.RESEVED_FOR_INTERNS,
+                                                              VacantDeclarationType.OPEN_FOR_EXTERNS}:
+            raise VacantCourseNotAllowedDeclarationType()

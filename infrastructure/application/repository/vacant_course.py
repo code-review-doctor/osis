@@ -37,6 +37,7 @@ from django_cte import With
 
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types, learning_component_year_type
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.utils.func import ArrayConcat
@@ -45,6 +46,7 @@ from ddd.logic.application.domain.model.entity_allocation import EntityAllocatio
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
 
 class VacantCourseRepository(IVacantCourseRepository):
@@ -53,8 +55,10 @@ class VacantCourseRepository(IVacantCourseRepository):
             cls,
             entity_ids: Optional[List[VacantCourseIdentity]] = None,
             code: str = None,
+            academic_year_id: AcademicYearIdentity = None,
             entity_allocation: EntityAllocation = None,
             with_entity_allocation_children: bool = False,
+            vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
     ) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
@@ -69,6 +73,12 @@ class VacantCourseRepository(IVacantCourseRepository):
             qs = qs.filter(filter_clause)
         if code is not None:
             qs = qs.filter(learning_container_year__acronym__icontains=code)
+        if academic_year_id is not None:
+            qs = qs.filter(learning_container_year__academic_year__year=academic_year_id.year)
+        if vacant_declaration_types is not None:
+            qs = qs.filter(
+                learning_container_year__type_declaration_vacant__in=[enum.name for enum in vacant_declaration_types]
+            )
         if entity_allocation and not with_entity_allocation_children:
             qs = qs.filter(entity_allocation=entity_allocation.code)
         if entity_allocation and with_entity_allocation_children:

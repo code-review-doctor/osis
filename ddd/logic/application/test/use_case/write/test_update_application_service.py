@@ -28,7 +28,7 @@ import uuid
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums import vacant_declaration_type
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import UpdateApplicationCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
@@ -58,7 +58,7 @@ class TestUpdateApplicationService(TestCase):
             practical_volume_total=Decimal(50),
             practical_volume_available=Decimal(50),
             title='Introduction',
-            vacant_declaration_type=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
             entity_allocation=EntityAllocation(code='AGRO')
         )

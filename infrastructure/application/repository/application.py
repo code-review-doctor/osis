@@ -37,6 +37,7 @@ from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
 from ddd.logic.application.dtos import ApplicationFromRepositoryDTO
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd.interface import ApplicationService
 
 
@@ -45,7 +46,9 @@ class ApplicationRepository(IApplicationRepository):
     def search(
             cls,
             entity_ids: Optional[List[ApplicationIdentity]] = None,
-            applicant_id: Optional[ApplicantIdentity] = None, **kwargs
+            applicant_id: Optional[ApplicantIdentity] = None,
+            academic_year_id: AcademicYearIdentity = None,
+            **kwargs
     ) -> List[Application]:
         qs = _application_base_qs()
 
@@ -57,6 +60,8 @@ class ApplicationRepository(IApplicationRepository):
             qs = qs.filter(filter_clause)
         if applicant_id is not None:
             qs = qs.filter(tutor__person__global_id=applicant_id.global_id)
+        if academic_year_id is not None:
+            qs = qs.filter(learning_container_year__academic_year__year=academic_year_id.year)
 
         results = []
         for row_as_dict in qs:

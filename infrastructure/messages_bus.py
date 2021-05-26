@@ -82,8 +82,12 @@ class MessageBus:
             ApplicantRepository(), VacantCourseRepository()
         ),
         DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
-        SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(cmd, ApplicationRepository()),
-        SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(cmd, VacantCourseRepository()),
+        SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository()
+        ),
+        SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(
+            cmd, ApplicationCalendarRepository(), VacantCourseRepository()
+        ),
         GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
             ApplicantRepository(), VacantCourseRepository()

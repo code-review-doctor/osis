@@ -36,6 +36,8 @@ from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled
     ShouldLecturingOrPracticalFilledValidator
 from ddd.logic.application.domain.validator._should_not_have_already_applied_on_vacant_course import \
     ShouldNotHaveAlreadyAppliedOnVacantCourse
+from ddd.logic.application.domain.validator._should_vacant_course_allowable_declaration_type import \
+    ShouldVacantCourseAllowableDeclarationType
 from ddd.logic.application.domain.validator._should_vacant_course_application_not_managed_in_team import \
     ShouldVacantCourseApplicationNotManagedInTeam
 from ddd.logic.application.domain.validator._should_volumes_asked_lower_or_equal_to_available import \
@@ -55,6 +57,7 @@ class ApplyOnVacantCourseValidatorList(TwoStepsMultipleBusinessExceptionListVali
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
+            ShouldVacantCourseAllowableDeclarationType(vacant_course=self.vacant_course),
             ShouldNotHaveAlreadyAppliedOnVacantCourse(
                 vacant_course=self.vacant_course, all_existing_applications=self.all_existing_applications
             ),
@@ -100,6 +103,7 @@ class RenewApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidat
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
+            ShouldVacantCourseAllowableDeclarationType(vacant_course=self.vacant_course),
             ShouldNotHaveAlreadyAppliedOnVacantCourse(
                 vacant_course=self.vacant_course, all_existing_applications=self.all_existing_applications
             ),

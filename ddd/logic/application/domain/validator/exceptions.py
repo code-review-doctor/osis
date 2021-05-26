@@ -46,6 +46,18 @@ class ApplicationAlreadyExistsException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class VacantCourseNotFound(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("No vacant corresponding activity")
+        super().__init__(message, **kwargs)
+
+
+class VacantCourseNotAllowedDeclarationType(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _("Application on this vacant course is not reserved for interns/open for extern")
+        super().__init__(message, **kwargs)
+
+
 class VacantCourseApplicationManagedInTeamException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("This course is team-managed. The application to this activity is based on a paper transmission.")

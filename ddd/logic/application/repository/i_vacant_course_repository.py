@@ -26,8 +26,10 @@
 import abc
 from typing import List, Optional
 
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -44,7 +46,10 @@ class IVacantCourseRepository(interface.AbstractRepository):
             cls,
             entity_ids: Optional[List[VacantCourseIdentity]] = None,
             code: str = None,
+            academic_year_id: AcademicYearIdentity = None,
             entity_allocation: EntityAllocation = None,
+            with_entity_allocation_children: bool = False,
+            vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
     ) -> List[VacantCourse]:
         pass

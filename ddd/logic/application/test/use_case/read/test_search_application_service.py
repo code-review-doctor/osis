@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import datetime
 from decimal import Decimal
 
 import mock
@@ -30,8 +31,10 @@ from django.test import TestCase
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
@@ -39,11 +42,22 @@ from infrastructure.messages_bus import message_bus_instance
 class TestSearchApplicationByApplicantService(TestCase):
     @classmethod
     def setUpTestData(cls):
+        today = datetime.date.today()
+        cls.application_calendar = ApplicationCalendar(
+            entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
+            authorized_target_year=AcademicYearIdentity(year=2018),
+            start_date=today - datetime.timedelta(days=5),
+            end_date=today + datetime.timedelta(days=10),
+        )
+
         cls.applicant_id = ApplicantIdentity(global_id='123456789')
         cls.application = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=cls.applicant_id,
-            vacant_course_id=VacantCourseIdentity(code='LAGRO1200', academic_year=AcademicYearIdentity(year=2018)),
+            vacant_course_id=VacantCourseIdentity(
+                code='LAGRO1200',
+                academic_year=cls.application_calendar.authorized_target_year
+            ),
             lecturing_volume=Decimal(5),
             practical_volume=Decimal(15),
             remark='',
@@ -52,7 +66,10 @@ class TestSearchApplicationByApplicantService(TestCase):
         cls.application_2 = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=ApplicantIdentity(global_id='9846567895'),
-            vacant_course_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
+            vacant_course_id=VacantCourseIdentity(
+                code='LDROI1200',
+                academic_year=cls.application_calendar.authorized_target_year
+            ),
             lecturing_volume=Decimal(25),
             practical_volume=Decimal(50),
             remark='',
@@ -61,13 +78,17 @@ class TestSearchApplicationByApplicantService(TestCase):
         cls.application_3 = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=cls.applicant_id,
-            vacant_course_id=VacantCourseIdentity(code='LDROI1500', academic_year=AcademicYearIdentity(year=2018)),
+            vacant_course_id=VacantCourseIdentity(
+                code='LDROI1500',
+                academic_year=cls.application_calendar.authorized_target_year
+            ),
             lecturing_volume=Decimal(0),
             practical_volume=Decimal(5),
             remark='',
             course_summary=''
         )
 
+        cls.application_calendar_repository = ApplicationCalendarInMemoryRepository([cls.application_calendar])
         cls.application_repository = ApplicationInMemoryRepository([
             cls.application, cls.application_2, cls.application_3
         ])
@@ -76,6 +97,7 @@ class TestSearchApplicationByApplicantService(TestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             ApplicationRepository=lambda: self.application_repository,
+            ApplicationCalendarRepository=lambda: self.application_calendar_repository
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)

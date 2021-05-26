@@ -28,12 +28,20 @@ import mock
 import uuid
 from django.test import TestCase
 
-from base.models.enums import vacant_declaration_type
+from attribution.models.enums.function import Functions
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
+from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
+from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
+    ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
+    VacantCourseNotAllowedDeclarationType, VacantCourseNotFound
+from ddd.logic.application.dtos import AttributionAboutToExpireDTO
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
@@ -43,47 +51,58 @@ from infrastructure.messages_bus import message_bus_instance
 
 
 class TestGetAttributionsAboutToExpireService(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.global_id = '123456789'
-        cls.applicant = Applicant(
-            entity_id=ApplicantIdentity(global_id=cls.global_id),
-            first_name="Thomas",
-            last_name="Durant",
-            attributions=[]
-        )
+
+    def setUp(self) -> None:
         today = datetime.date.today()
-        cls.application_calendar = ApplicationCalendar(
+        self.application_calendar = ApplicationCalendar(
             entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
             authorized_target_year=AcademicYearIdentity(year=2018),
             start_date=today - datetime.timedelta(days=5),
             end_date=today + datetime.timedelta(days=10),
         )
 
-        cls.vacant_course_ldroi1200 = VacantCourse(
-            entity_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
+        self.attribution_about_to_expire = Attribution(
+            course_id=LearningUnitIdentity(
+                code="LDROI1200",
+                academic_year=AcademicYearIdentity(year=2018)
+            ),
+            function=Functions.CO_HOLDER.name,
+            end_year=self.application_calendar.authorized_target_year,
+            start_year=AcademicYearIdentity(year=2016),
+            lecturing_volume=Decimal(10),
+            practical_volume=Decimal(15),
+        )
+        self.global_id = '123456789'
+        self.applicant = Applicant(
+            entity_id=ApplicantIdentity(global_id=self.global_id),
+            first_name="Thomas",
+            last_name="Durant",
+            attributions=[self.attribution_about_to_expire]
+        )
+
+        self.vacant_course_ldroi1200 = VacantCourse(
+            entity_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2019)),
             lecturing_volume_available=Decimal(10),
             lecturing_volume_total=Decimal(30),
             practical_volume_available=Decimal(50),
             practical_volume_total=Decimal(50),
             title='Introduction au droit',
-            vacant_declaration_type=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
             entity_allocation=EntityAllocation(code='DRT')
         )
-        cls.vacant_course_lagro1510 = VacantCourse(
-            entity_id=VacantCourseIdentity(code='LAGRO1510', academic_year=AcademicYearIdentity(year=2018)),
+        self.vacant_course_lagro1510 = VacantCourse(
+            entity_id=VacantCourseIdentity(code='LAGRO1510', academic_year=AcademicYearIdentity(year=2019)),
             lecturing_volume_available=Decimal(50),
             lecturing_volume_total=Decimal(50),
             practical_volume_available=Decimal(25),
             practical_volume_total=Decimal(25),
             title='Introduction en agro',
-            vacant_declaration_type=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
             entity_allocation=EntityAllocation(code='AGRO')
         )
 
-    def setUp(self) -> None:
         self.applicant_repository = ApplicantInMemoryRepository([self.applicant])
         self.application_calendar_repository = ApplicationCalendarInMemoryRepository([self.application_calendar])
         self.vacant_course_repository = VacantCourseInMemoryRepository([
@@ -110,3 +129,107 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         results = self.message_bus.invoke(cmd)
 
         self.assertListEqual(results, [])
+
+    def test_assert_unavailable_renewal_reason_case_no_corresponding_vacant_course_next_year(self):
+        self.applicant.attributions = [Attribution(
+            course_id=LearningUnitIdentity(
+                code="LAGRO1200",
+                academic_year=AcademicYearIdentity(year=2020)
+            ),
+            function=Functions.CO_HOLDER.name,
+            end_year=self.application_calendar.authorized_target_year,
+            start_year=AcademicYearIdentity(year=2016),
+            lecturing_volume=Decimal(10),
+            practical_volume=Decimal(15),
+        )]
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(results[0].unavailable_renewal_reason, VacantCourseNotFound().message)
+
+        self.assertEqual(results[0].code, "LAGRO1200")
+        self.assertEqual(results[0].year, 2020)
+        self.assertEqual(results[0].lecturing_volume, Decimal(10))
+        self.assertEqual(results[0].practical_volume, Decimal(15))
+        self.assertEqual(results[0].function, Functions.CO_HOLDER.name)
+        self.assertEqual(results[0].end_year, self.application_calendar.authorized_target_year.year)
+        self.assertEqual(results[0].start_year, 2016)
+        self.assertIsNone(results[0].title)
+        self.assertIsNone(results[0].total_lecturing_volume_course)
+        self.assertIsNone(results[0].total_practical_volume_course)
+        self.assertIsNone(results[0].lecturing_volume_available)
+        self.assertIsNone(results[0].practical_volume_available)
+
+    def test_assert_unavailable_renewal_reason_case_vacant_course_next_year_organized_in_team(self):
+        self.vacant_course_ldroi1200.is_in_team = True
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(results[0].unavailable_renewal_reason, VacantCourseApplicationManagedInTeamException().message)
+
+    def test_assert_unavailable_renewal_reason_case_have_already_applied_on_vacant_course_next_year(self):
+        self.application_repository = ApplicationInMemoryRepository([
+            Application(
+                entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
+                applicant_id=self.applicant.entity_id,
+                vacant_course_id=self.vacant_course_ldroi1200.entity_id,
+                lecturing_volume=Decimal(5),
+                practical_volume=None,
+                remark='',
+                course_summary='',
+            )
+        ])
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(results[0].unavailable_renewal_reason, ApplicationAlreadyExistsException().message)
+
+    def test_assert_unavailable_renewal_reason_case_volume_on_vacant_course_next_year_lower_than_asked(self):
+        self.vacant_course_ldroi1200.lecturing_volume_available = \
+            self.attribution_about_to_expire.lecturing_volume - Decimal(2)
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(
+            results[0].unavailable_renewal_reason,
+            VolumesAskedShouldBeLowerOrEqualToVolumeAvailable().message
+        )
+
+    def test_assert_unavailable_renewal_reason_case_declaration_type_disallowed(self):
+        self.vacant_course_ldroi1200.vacant_declaration_type = VacantDeclarationType.VACANT_NOT_PUBLISH.name
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(
+            results[0].unavailable_renewal_reason,
+            VacantCourseNotAllowedDeclarationType().message
+        )
+
+    def test_assert_renewal_because_no_unavailable_renewal_reason(self):
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertTrue(results[0].is_renewable)
+        self.assertIsNone(results[0].unavailable_renewal_reason)

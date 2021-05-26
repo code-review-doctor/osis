@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
 from ddd.logic.application.domain.model.applicant import Applicant
@@ -34,7 +34,7 @@ from ddd.logic.application.domain.model.application_calendar import ApplicationC
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
-    AttributionAboutToExpireFunctionException
+    AttributionAboutToExpireFunctionException, VacantCourseNotFound
 from ddd.logic.application.domain.validator.validators_by_business_action import RenewApplicationValidatorList
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
@@ -80,16 +80,16 @@ class Renew(interface.DomainService):
             attribution_dto = AttributionAboutToExpireDTO(
                 code=attribution_about_to_expire.course_id.code,
                 year=attribution_about_to_expire.course_id.year,
-                title=vacant_course_next_year.title,
                 lecturing_volume=attribution_about_to_expire.lecturing_volume,
                 practical_volume=attribution_about_to_expire.practical_volume,
                 function=attribution_about_to_expire.function,
-                end_year=attribution_about_to_expire.end_year,
-                start_year=attribution_about_to_expire.start_year,
-                total_lecturing_volume_course=vacant_course_next_year.lecturing_volume_total,
-                total_practical_volume_course=vacant_course_next_year.practical_volume_total,
-                lecturing_volume_available=vacant_course_next_year.lecturing_volume_available,
-                practical_volume_available=vacant_course_next_year.practical_volume_available,
+                end_year=attribution_about_to_expire.end_year.year,
+                start_year=attribution_about_to_expire.start_year.year,
+                title=getattr(vacant_course_next_year, 'title', None),
+                total_lecturing_volume_course=getattr(vacant_course_next_year, 'lecturing_volume_total', None),
+                total_practical_volume_course=getattr(vacant_course_next_year, 'practical_volume_total', None),
+                lecturing_volume_available=getattr(vacant_course_next_year, 'lecturing_volume_available', None),
+                practical_volume_available=getattr(vacant_course_next_year, 'practical_volume_available', None),
                 unavailable_renewal_reason=unavailable_renewal_reason,
                 is_renewable=unavailable_renewal_reason is None,
             )
@@ -144,7 +144,7 @@ def _filter_attribution_by_code(attributions_about_to_expire: List[Attribution],
 def _filter_attribution_by_renewable_functions(attributions_about_to_expire: List[Attribution]):
     return [
         attribution_about_to_expire for attribution_about_to_expire in attributions_about_to_expire
-        if attribution_about_to_expire.function in (function.CO_HOLDER, function.HOLDER)
+        if attribution_about_to_expire.function in (Functions.CO_HOLDER.name, Functions.HOLDER.name)
     ]
 
 
@@ -157,7 +157,7 @@ def _get_unavailable_renewal_reason(
         attribution_about_to_expire.course_id.code, vacant_courses_next_year
     )
     if vacant_course_next_year is None:
-        return "No vacant corresponding activity"
+        return VacantCourseNotFound().message
 
     try:
         RenewApplicationValidatorList(

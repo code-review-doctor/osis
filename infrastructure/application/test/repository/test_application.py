@@ -65,9 +65,13 @@ class ApplicationRepositorySearch(TestCase):
 
         cls.applicant_id = ApplicantIdentity(global_id=global_id)
         cls.tutor_application_dbs = [
-            TutorApplicationFactory(tutor__person__global_id=global_id),
-            TutorApplicationFactory(tutor__person__global_id=global_id),
-            TutorApplicationFactory(),
+            TutorApplicationFactory(
+                tutor__person__global_id=global_id, learning_container_year__academic_year__year=2018
+            ),
+            TutorApplicationFactory(
+                tutor__person__global_id=global_id, learning_container_year__academic_year__year=2016
+            ),
+            TutorApplicationFactory(learning_container_year__academic_year__year=2015),
         ]
         cls.repository = ApplicationRepository()
 
@@ -103,6 +107,12 @@ class ApplicationRepositorySearch(TestCase):
         self.assertTrue(all([
             application.applicant_id == self.applicant_id for application in filtered_results
         ]))
+
+    def test_search_assert_return_filtered_by_academic_year_identity(self):
+        filtered_results = self.repository.search(academic_year_id=AcademicYearIdentity(year=2018))
+
+        self.assertEqual(len(filtered_results), 1)
+        self.assertEqual(filtered_results[0].vacant_course_id.year, 2018)
 
 
 class ApplicationRepositorySave(TestCase):

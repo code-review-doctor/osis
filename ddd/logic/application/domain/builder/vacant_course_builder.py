@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.builder.vacant_course_identity_builder import VacantCourseIdentityBuilder
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
@@ -40,7 +41,8 @@ class VacantCourseBuilder(RootEntityBuilder):
             entity_id=VacantCourseIdentityBuilder.build_from_repository_dto(dto),
             title=dto.title,
             is_in_team=dto.is_in_team,
-            vacant_declaration_type=dto.vacant_declaration_type,
+            vacant_declaration_type=VacantDeclarationType[dto.vacant_declaration_type]
+            if dto.vacant_declaration_type else None,
             entity_allocation=EntityAllocation(dto.entity_allocation),
             lecturing_volume_total=dto.lecturing_volume_total,
             lecturing_volume_available=dto.lecturing_volume_available,

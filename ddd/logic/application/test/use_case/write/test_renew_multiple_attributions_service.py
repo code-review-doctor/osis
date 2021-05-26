@@ -29,9 +29,9 @@ import mock
 import uuid
 from django.test import TestCase
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums import vacant_declaration_type
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import RenewMultipleAttributionsCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
@@ -62,7 +62,7 @@ class TestRenewMultipleAttributionsService(TestCase):
         )
         cls.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
-            function=function.HOLDER,
+            function=Functions.HOLDER.name,
             end_year=cls.application_calendar.authorized_target_year,
             start_year=AcademicYearIdentity(year=2017),
             lecturing_volume=Decimal(5),
@@ -86,7 +86,7 @@ class TestRenewMultipleAttributionsService(TestCase):
             practical_volume_total=Decimal(50),
             practical_volume_available=Decimal(50),
             title='Introduction au droit',
-            vacant_declaration_type=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
             entity_allocation=EntityAllocation(code='DRT')
         )

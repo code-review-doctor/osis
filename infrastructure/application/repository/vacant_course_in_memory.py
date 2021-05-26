@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import List, Optional
 
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
 
 class VacantCourseInMemoryRepository(IVacantCourseRepository):
@@ -42,7 +44,10 @@ class VacantCourseInMemoryRepository(IVacantCourseRepository):
             cls,
             entity_ids: Optional[List[VacantCourseIdentity]] = None,
             code: str = None,
+            academic_year_id: AcademicYearIdentity = None,
             entity_allocation: EntityAllocation = None,
+            with_entity_allocation_children: bool = False,
+            vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
     ) -> List[VacantCourse]:
         results = cls.vacant_courses
@@ -50,8 +55,14 @@ class VacantCourseInMemoryRepository(IVacantCourseRepository):
             results = filter(lambda vacant_course: vacant_course.entity_id in entity_ids, results)
         if code is not None:
             results = filter(lambda vacant_course: code in vacant_course.code, results)
+        if academic_year_id is not None:
+            results = filter(lambda vacant_course: academic_year_id.year == vacant_course.year, results)
         if entity_allocation is not None:
             results = filter(lambda vacant_course: vacant_course.entity_allocation == entity_allocation, results)
+        if vacant_declaration_types is not None:
+            results = filter(
+                lambda vacant_course: vacant_course.vacant_declaration_type in vacant_declaration_types, results
+            )
         return list(results)
 
     @classmethod

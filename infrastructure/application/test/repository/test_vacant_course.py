@@ -29,6 +29,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
 from base.models.enums import learning_container_year_types, vacant_declaration_type
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
@@ -48,7 +49,7 @@ class VacantCourseRepositoryGet(TestCase):
             learning_container_year__acronym='LDROI1200',
             learning_container_year__academic_year__year=2020,
             learning_container_year__container_type=learning_container_year_types.COURSE,
-            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__type_declaration_vacant=VacantDeclarationType.RESEVED_FOR_INTERNS.name,
             learning_container_year__team=True
         )
         LecturingLearningComponentYearFactory(
@@ -80,7 +81,7 @@ class VacantCourseRepositoryGet(TestCase):
 
         self.assertEqual(vacant_course.entity_id, vacant_course_id)
         self.assertTrue(vacant_course.is_in_team)
-        self.assertEqual(vacant_course.vacant_declaration_type, vacant_declaration_type.RESEVED_FOR_INTERNS)
+        self.assertEqual(vacant_course.vacant_declaration_type, VacantDeclarationType.RESEVED_FOR_INTERNS)
         expected_title = "{} - {}".format(
             self.learning_unit_year_db.learning_container_year.common_title,
             self.learning_unit_year_db.specific_title
@@ -105,7 +106,7 @@ class VacantCourseRepositorySearch(TestCase):
             ).entity,
             learning_container_year__academic_year__year=2020,
             learning_container_year__container_type=learning_container_year_types.COURSE,
-            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__type_declaration_vacant=VacantDeclarationType.RESEVED_FOR_INTERNS.name,
             learning_container_year__team=True
         )
         LecturingLearningComponentYearFactory(learning_unit_year=cls.ldroi1200_db, volume_declared_vacant=Decimal(15))
@@ -121,7 +122,7 @@ class VacantCourseRepositorySearch(TestCase):
             ).entity,
             learning_container_year__academic_year__year=2020,
             learning_container_year__container_type=learning_container_year_types.COURSE,
-            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__type_declaration_vacant=VacantDeclarationType.RESEVED_FOR_INTERNS.name,
             learning_container_year__team=True
         )
         LecturingLearningComponentYearFactory(learning_unit_year=cls.lagro1500_db, volume_declared_vacant=Decimal(30))
@@ -170,7 +171,7 @@ class VacantCourseRepositorySearch(TestCase):
             ).entity,
             learning_container_year__academic_year__year=2020,
             learning_container_year__container_type=learning_container_year_types.COURSE,
-            learning_container_year__type_declaration_vacant=vacant_declaration_type.RESEVED_FOR_INTERNS,
+            learning_container_year__type_declaration_vacant=VacantDeclarationType.RESEVED_FOR_INTERNS.name,
             learning_container_year__team=True
         )
 
@@ -184,3 +185,40 @@ class VacantCourseRepositorySearch(TestCase):
             VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI2000'),
             [row.entity_id for row in results]
         )
+
+    def test_search_assert_filtered_by_academic_year_identity(self):
+        ldroi1300_db = LearningUnitYearFactory(
+            acronym='LDROI1300',
+            academic_year__year=2018,
+            learning_container_year__acronym='LDROI1300',
+            learning_container_year__academic_year__year=2018,
+            learning_container_year__container_type=learning_container_year_types.COURSE,
+            learning_container_year__type_declaration_vacant=VacantDeclarationType.RESEVED_FOR_INTERNS.name,
+        )
+        LecturingLearningComponentYearFactory(learning_unit_year=ldroi1300_db, volume_declared_vacant=Decimal(15))
+
+        filtered_results = self.repository.search(academic_year_id=AcademicYearIdentity(year=2018))
+
+        self.assertEqual(len(filtered_results), 1)
+        self.assertEqual(
+            filtered_results[0].entity_id,
+            VacantCourseIdentity(code=ldroi1300_db.acronym, academic_year=AcademicYearIdentity(year=2018))
+        )
+
+    def test_search_assert_filtered_by_multiple_vacant_declaration_types(self):
+        ldroi1300_db = LearningUnitYearFactory(
+            acronym='LDROI1300',
+            academic_year__year=2018,
+            learning_container_year__acronym='LDROI1300',
+            learning_container_year__academic_year__year=2018,
+            learning_container_year__container_type=learning_container_year_types.COURSE,
+            learning_container_year__type_declaration_vacant=VacantDeclarationType.OPEN_FOR_EXTERNS.name,
+        )
+        LecturingLearningComponentYearFactory(learning_unit_year=ldroi1300_db, volume_declared_vacant=Decimal(15))
+
+        filtered_results = self.repository.search(
+            vacant_declaration_types=[
+                VacantDeclarationType.OPEN_FOR_EXTERNS, VacantDeclarationType.RESEVED_FOR_INTERNS
+            ]
+        )
+        self.assertEqual(len(filtered_results), 3)
