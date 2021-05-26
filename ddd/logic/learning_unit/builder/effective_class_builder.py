@@ -47,7 +47,6 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             learning_unit: LearningUnit,
             all_existing_class_identities: List['EffectiveClassIdentity']
     ) -> Union['PracticalEffectiveClass', 'LecturingEffectiveClass']:
-
         CreateEffectiveClassValidatorList(
             command=cmd,
             learning_unit=learning_unit,
@@ -78,14 +77,13 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
 
 
 def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
-
+    class_type = None
     lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual
     practical_annual_volume = learning_unit.practical_part.volumes.volume_annual
-
-    if lecturing_annual_volume > 0 and practical_annual_volume > 0:
-        return LecturingEffectiveClass
-    elif lecturing_annual_volume > 0:
-        return LecturingEffectiveClass
-    elif practical_annual_volume > 0:
-        return PracticalEffectiveClass
-    return None
+    if lecturing_annual_volume > 0.0 and practical_annual_volume > 0.0:
+        class_type = LecturingEffectiveClass
+    elif lecturing_annual_volume > 0.0:
+        class_type = LecturingEffectiveClass
+    elif practical_annual_volume > 0.0:
+        class_type = PracticalEffectiveClass
+    return class_type

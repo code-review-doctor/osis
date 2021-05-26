@@ -24,6 +24,7 @@
 #
 ##############################################################################
 
+import attr
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -35,7 +36,7 @@ from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBu
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, Volumes, PracticalPart
+from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
     EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -52,38 +53,17 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
 
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
-        self.ue_with_lecturing_and_practical_volumes = _create_lu(
-            ue_type=LearningContainerYearType.COURSE.name,
-            learning_unit_code="LCOMU1012",
-            lecturing_part=LecturingPart(volumes=_build_not_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_not_zero_volumes())
-        )
-        self.ue_with_practical_volumes_only = _create_lu(
-            ue_type=LearningContainerYearType.COURSE.name,
-            learning_unit_code='LDRT1012',
-            lecturing_part=LecturingPart(volumes=_build_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_not_zero_volumes())
-        )
-
-        self.ue_with_lecturing_volumes_only = _create_lu(
-            ue_type=LearningContainerYearType.COURSE.name,
-            learning_unit_code='LPOIO1256',
-            lecturing_part=LecturingPart(volumes=_build_not_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_zero_volumes())
-        )
-
-        self.learning_unit_repository.learning_units.extend([
-            self.ue_with_lecturing_and_practical_volumes,
-            self.ue_with_practical_volumes_only,
-            self.ue_with_lecturing_volumes_only
-        ])
-
         self.effective_class_repository = EffectiveClassRepository()
+        self.command = _build_create_learning_unit_command()
 
     def test_effective_class_type_lecturing(self):
+        ue_with_lecturing_and_practical_volumes = _create_lu(self.command)
+        self.learning_unit_repository.save(ue_with_lecturing_and_practical_volumes)
         effective_class_id = create_effective_class(
-            _build_create_effective_class_command(learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-                                                  class_code='A'),
+            _build_create_effective_class_command(
+                learning_unit_code=ue_with_lecturing_and_practical_volumes.code,
+                class_code='A'
+            ),
             self.learning_unit_repository,
             self.effective_class_repository
         )
@@ -91,9 +71,17 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
         self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
     def test_effective_class_type_practical(self):
+        command = attr.evolve(
+            self.command,
+            lecturing_volume_annual=0.0, lecturing_volume_q2=0.0, lecturing_volume_q1=0.0, code='LTEST2022'
+        )
+        ue_with_practical_volumes_only = _create_lu(command)
+        self.learning_unit_repository.save(ue_with_practical_volumes_only)
         effective_class_id = create_effective_class(
-            _build_create_effective_class_command(learning_unit_code=self.ue_with_practical_volumes_only.code,
-                                                  class_code='C'),
+            _build_create_effective_class_command(
+                learning_unit_code=ue_with_practical_volumes_only.code,
+                class_code='C'
+            ),
             self.learning_unit_repository,
             self.effective_class_repository
         )
@@ -101,9 +89,17 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
         self.assertIsInstance(effective_class, PracticalEffectiveClass)
 
     def test_effective_class_type_lecturing_only(self):
+        command = attr.evolve(
+            self.command,
+            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0, code='LTEST2023'
+        )
+        ue_with_lecturing_volumes_only = _create_lu(command)
+        self.learning_unit_repository.save(ue_with_lecturing_volumes_only)
         effective_class_id = create_effective_class(
-            _build_create_effective_class_command(learning_unit_code=self.ue_with_lecturing_volumes_only.code,
-                                                  class_code='B'),
+            _build_create_effective_class_command(
+                learning_unit_code=ue_with_lecturing_volumes_only.code,
+                class_code='B'
+            ),
             self.learning_unit_repository,
             self.effective_class_repository
         )
@@ -114,29 +110,9 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
 class TestCreateClassServiceValidator(TestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
-        self.ue_with_lecturing_and_practical_volumes = _create_lu(
-            ue_type=LearningContainerYearType.COURSE.name,
-            learning_unit_code="LCOMU1012",
-            lecturing_part=LecturingPart(volumes=_build_not_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_not_zero_volumes())
-        )
-        self.ue_external = _create_lu(
-            ue_type=LearningContainerYearType.EXTERNAL.name,
-            learning_unit_code="ECOMU1002",
-            lecturing_part=LecturingPart(volumes=_build_not_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_not_zero_volumes())
-        )
-        self.ue_no_volumes = _create_lu(
-            ue_type=LearningContainerYearType.COURSE.name,
-            learning_unit_code="LPSP8002",
-            lecturing_part=LecturingPart(volumes=_build_zero_volumes()),
-            practical_part=PracticalPart(volumes=_build_zero_volumes()),
-        )
-        self.learning_unit_repository.learning_units.extend([
-            self.ue_with_lecturing_and_practical_volumes,
-            self.ue_external,
-            self.ue_no_volumes
-        ])
+        self.command = _build_create_learning_unit_command()
+        self.ue_with_lecturing_and_practical_volumes = _create_lu(self.command)
+        self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
 
         self.effective_class_repository = EffectiveClassRepository()
         effective_class_identity = EffectiveClassIdentity(
@@ -146,7 +122,6 @@ class TestCreateClassServiceValidator(TestCase):
                 year=YEAR
             )
         )
-
         self.effective_class = EffectiveClass(
             entity_id=effective_class_identity,
             titles=None,
@@ -155,13 +130,12 @@ class TestCreateClassServiceValidator(TestCase):
             session_derogation=None,
             volumes=None
         )
-        self.effective_class_repository.save(
-            self.effective_class
-        )
+        self.effective_class_repository.save(self.effective_class)
 
     def test_class_code_raise_should_be_alphanumeric_exception(self):
         cmd = _build_create_effective_class_command(
-            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code, class_code='*')
+            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code, class_code='*'
+        )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
@@ -177,7 +151,8 @@ class TestCreateClassServiceValidator(TestCase):
         already_existing_class_code = self.effective_class.entity_id.class_code
         cmd = _build_create_effective_class_command(
             learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-            class_code=already_existing_class_code)
+            class_code=already_existing_class_code
+        )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
@@ -190,7 +165,10 @@ class TestCreateClassServiceValidator(TestCase):
         )
 
     def test_raise_should_not_be_type_mobility_or_external_exception(self):
-        cmd = _build_create_effective_class_command(learning_unit_code=self.ue_external.code, class_code='B')
+        command = attr.evolve(self.command, type=LearningContainerYearType.EXTERNAL.name, code='LEXTE2021')
+        ue_external = _create_lu(command=command)
+        self.learning_unit_repository.save(ue_external)
+        cmd = _build_create_effective_class_command(learning_unit_code=ue_external.code, class_code='B')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
@@ -203,7 +181,13 @@ class TestCreateClassServiceValidator(TestCase):
         )
 
     def test_raise_check_class_volumes_consistency_exception(self):
-        cmd = _build_create_effective_class_command(learning_unit_code=self.ue_no_volumes.code, class_code='C',
+        command = attr.evolve(
+            self.command,
+            lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=0.0,
+            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0
+        )
+        ue_no_volumes = _create_lu(command)
+        cmd = _build_create_effective_class_command(learning_unit_code=ue_no_volumes.code, class_code='C',
                                                     credits=0)
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
@@ -239,36 +223,24 @@ def _build_create_effective_class_command(
     return cmd
 
 
-def _create_lu(
-        ue_type: str,
-        learning_unit_code: str,
-        lecturing_part: 'LecturingPart',
-        practical_part: 'PracticalPart',
-        credits: float = 20
-) -> 'LearningUnit':
+def _create_lu(command) -> 'LearningUnit':
     return LearningUnitBuilder.build_from_command(
-        cmd=_build_create_learning_unit_command(credits, learning_unit_code, lecturing_part, practical_part, ue_type),
+        cmd=command,
         all_existing_identities=[],
         responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(code='UCL')
     )
 
 
-def _build_create_learning_unit_command(
-        credits: float,
-        learning_unit_code: str,
-        lecturing_part: 'LecturingPart',
-        practical_part: 'PracticalPart',
-        ue_type: str
-) -> 'CreateLearningUnitCommand':
+def _build_create_learning_unit_command() -> 'CreateLearningUnitCommand':
     return CreateLearningUnitCommand(
-        code=learning_unit_code,
+        code='LTEST2021',
         academic_year=YEAR,
-        type=ue_type,
+        type=LearningContainerYearType.COURSE.name,
         common_title_fr='Common FR',
         specific_title_fr='Specific FR',
         common_title_en='Common EN',
         specific_title_en='Specific EN',
-        credits=credits,
+        credits=20,
         internship_subtype=None,
         responsible_entity_code='DRT',
         periodicity=PeriodicityEnum.ANNUAL.name,
@@ -276,12 +248,12 @@ def _build_create_learning_unit_command(
         remark_faculty=None,
         remark_publication_fr=None,
         remark_publication_en=None,
-        practical_volume_q1=practical_part.volumes.volume_first_quadrimester,
-        practical_volume_q2=practical_part.volumes.volume_second_quadrimester,
-        practical_volume_annual=practical_part.volumes.volume_annual,
-        lecturing_volume_q1=lecturing_part.volumes.volume_first_quadrimester,
-        lecturing_volume_q2=lecturing_part.volumes.volume_second_quadrimester,
-        lecturing_volume_annual=lecturing_part.volumes.volume_annual,
+        practical_volume_q1=10.0,
+        practical_volume_q2=10.0,
+        practical_volume_annual=10.0,
+        lecturing_volume_q1=10.0,
+        lecturing_volume_q2=10.0,
+        lecturing_volume_annual=10.0,
         derogation_quadrimester=DerogationQuadrimester.Q1.name
     )
 
