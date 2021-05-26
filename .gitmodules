@@ -26,3 +26,6 @@
 [submodule "osis_mail_template"]
 	path = osis_mail_template
 	url = https://github.com/uclouvain/osis-mail-template.git
+[submodule "osis_notification"]
+	path = osis_notification
+	url = https://github.com/uclouvain/osis-notification
