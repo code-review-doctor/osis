@@ -152,4 +152,11 @@ class LearningUnitCreateForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             remark_faculty=self.cleaned_data['remark_faculty'],
             remark_publication_fr=self.cleaned_data['remark_publication_fr'],
             remark_publication_en=self.cleaned_data['remark_publication_en'],
+            lecturing_volume_q1=None,
+            lecturing_volume_q2=None,
+            lecturing_volume_annual=None,
+            practical_volume_q1=None,
+            practical_volume_q2=None,
+            practical_volume_annual=None,
+            derogation_quadrimester=None
         )

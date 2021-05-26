@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 import attr
 
 from osis_common.ddd import interface
@@ -45,6 +47,13 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     remark_faculty = attr.ib(type=str)
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
+    practical_volume_q1 = attr.ib(type=Decimal)
+    practical_volume_q2 = attr.ib(type=Decimal)
+    practical_volume_annual = attr.ib(type=Decimal)
+    lecturing_volume_q1 = attr.ib(type=Decimal)
+    lecturing_volume_q2 = attr.ib(type=Decimal)
+    lecturing_volume_annual = attr.ib(type=Decimal)
+    derogation_quadrimester = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

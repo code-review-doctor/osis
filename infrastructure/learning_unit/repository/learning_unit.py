@@ -30,6 +30,8 @@ from django.db.models.functions import Concat
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from base.models.entity_version import EntityVersion as EntityVersionDatabase
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES, LECTURING
+from base.models.learning_component_year import LearningComponentYear as LearningComponentYearDatabase
 from base.models.learning_container import LearningContainer as LearningContainerDatabase
 from base.models.learning_container_year import LearningContainerYear as LearningContainerYearDatabase
 from base.models.learning_unit import LearningUnit as LearningUnitDatabase
@@ -212,6 +214,9 @@ class LearningUnitRepository(ILearningUnitRepository):
 
 
 def _annotate_queryset(queryset):
+    components = LearningComponentYearDatabase.objects.filter(
+        learning_unit_year_id=OuterRef('pk')
+    )
     queryset = queryset.annotate(
         code=F('acronym'),
         year=F('academic_year__year'),
@@ -229,6 +234,15 @@ def _annotate_queryset(queryset):
         remark_faculty=F('faculty_remark'),
         remark_publication_fr=F('other_remark'),
         remark_publication_en=F('other_remark_english'),
+        lecturing_volume_q1=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q1')),
+        lecturing_volume_q2=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q2')),
+        lecturing_volume_annual=Subquery(components.filter(type=LECTURING).values('hourly_volume_total_annual')),
+        practical_volume_q1=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_partial_q1')),
+        practical_volume_q2=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_partial_q2')),
+        practical_volume_annual=Subquery(
+            components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_total_annual')
+        ),
+        derogation_quadrimester=F('quadrimester')
     )
     return queryset
 
@@ -250,6 +264,13 @@ def _values_queryset(queryset):
         'remark_faculty',
         'remark_publication_fr',
         'remark_publication_en',
+        'lecturing_volume_q1',
+        'lecturing_volume_q2',
+        'lecturing_volume_annual',
+        'practical_volume_q1',
+        'practical_volume_q2',
+        'practical_volume_annual',
+        'derogation_quadrimester'
     )
     return queryset
 
