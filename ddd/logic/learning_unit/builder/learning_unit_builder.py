@@ -36,6 +36,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.model._partim import PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import PracticalPart, LecturingPart, Volumes
@@ -129,7 +130,9 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester]
             if dto.derogation_quadrimester else None,
-            partims=dto.partims
+            partims=[
+                PartimBuilder.build_from_dto(partim_dto) for partim_dto in dto.partims
+            ]
         )
 
     @classmethod

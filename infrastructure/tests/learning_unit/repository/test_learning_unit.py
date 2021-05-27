@@ -5,7 +5,10 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, \
+    LearningUnitYearPartimFactory
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -59,3 +62,27 @@ class LearningUnitRepositoryTestCase(TestCase):
         ]
         for field in fields:
             self.assertEqual(getattr(learning_unit, field), getattr(self.learning_unit, field), field)
+
+    def test_get_learning_unit_with_partims(self):
+        luy_db = LearningUnitYearFullFactory(academic_year__current=True)
+        partim_db = LearningUnitYearPartimFactory(
+            learning_container_year=luy_db.learning_container_year,
+            acronym='LTEST1212X',
+            academic_year=luy_db.academic_year
+        )
+        learning_unit = self.learning_unit_repository.get(
+            entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(
+                code=luy_db.acronym,
+                year=luy_db.academic_year.year
+            )
+        )
+        partim = learning_unit.partims[0]
+        self.assertEqual(partim.subdivision, partim_db.acronym[-1:], 'subdivision')
+        self.assertEqual(partim.language_id.code_iso, partim_db.language.code, 'iso_code')
+        self.assertEqual(partim.title_en, partim_db.specific_title_english, 'title_en')
+        self.assertEqual(partim.title_fr, partim_db.specific_title, 'title_fr')
+        self.assertEqual(partim.remarks.faculty, partim_db.faculty_remark, 'remark_faculty')
+        self.assertEqual(partim.remarks.publication_en, partim_db.other_remark_english, 'remark_publication_en')
+        self.assertEqual(partim.remarks.publication_fr, partim_db.other_remark, 'remark_publication_fr')
+        self.assertEqual(partim.credits, partim_db.credits, 'credits')
+        self.assertEqual(partim.periodicity.name, partim_db.periodicity, 'periodicity')
