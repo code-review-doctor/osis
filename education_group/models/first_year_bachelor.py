@@ -37,7 +37,8 @@ class FirstYearBachelor(models.Model):
         'base.EducationGroupYear',
         verbose_name=_("Training"),
         on_delete=models.CASCADE,
-        db_index=True
+        db_index=True,
+        primary_key=True
     )
 
     administration_entity = models.ForeignKey(
@@ -45,6 +46,6 @@ class FirstYearBachelor(models.Model):
         null=True,
         blank=True,
         verbose_name=_("Administration entity"),
-        related_name='administration_entity',
+        related_name='first_year_administration_entity',
         on_delete=models.PROTECT
     )

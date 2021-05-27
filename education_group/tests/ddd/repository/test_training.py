@@ -32,18 +32,20 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory as CampusModelDbFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory as CertificateAimModelDbFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
-from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
+from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
+    BachelorEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
+from education_group.models.first_year_bachelor import FirstYearBachelor as FirstYearBachelorModelDb
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
 from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
-from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory
+from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
 from reference.models.domain import Domain
 from reference.tests.factories.domain import DomainFactory as DomainModelDbFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory as DomainIscedFactoryModelDb
@@ -57,6 +59,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
 
         cls.repository = TrainingRepository()
 
+        BachelorEducationGroupTypeFactory()
         cls.education_group_type = TrainingEducationGroupTypeFactory()
         cls.language = LanguageModelDbFactory()
         cls.study_domain = DomainModelDbFactory()
@@ -87,6 +90,22 @@ class TestTrainingRepositoryCreateMethod(TestCase):
                 StudyDomainFactory(entity_id=study_domain_identity)
             ],
         )
+        cls.my_bac = BachelorFactory(
+            entity_id=training_identity,
+            entity_identity=training_identity,
+            start_year=cls.year,
+            end_year=cls.year,
+            main_language__name=cls.language.name,
+            main_domain__entity_id=study_domain_identity,
+            isced_domain__entity_id=IscedDomainIdentityFactory(code=cls.isced_domain.code),
+            management_entity__acronym=cls.entity_version.acronym,
+            administration_entity__acronym=cls.entity_version.acronym,
+            enrollment_campus=campus_identity,
+            secondary_domains=[
+                StudyDomainFactory(entity_id=study_domain_identity)
+            ],
+            first_year_bachelor__administration_entity__acronym=cls.entity_version.acronym
+        )
 
     def test_fields_mapping(self):
         entity_id = self.repository.create(self.training)
@@ -113,6 +132,17 @@ class TestTrainingRepositoryCreateMethod(TestCase):
                 decree__name=self.training.secondary_domains[0].entity_id.decree_name
             )
         )
+
+    def test_first_year_bachelor_created(self):
+        entity_id = self.repository.create(self.my_bac)
+
+        education_group_year = EducationGroupYearModelDb.objects.get(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year,
+        )
+
+        first_year_bachelor = FirstYearBachelorModelDb.objects.get(education_group_year=education_group_year)
+        self.assertTrue(first_year_bachelor)
 
 
 class TestTrainingRepositoryUpdateMethod(TestCase):

@@ -619,7 +619,10 @@ def _save_first_year_bachelor(
         obj, created = FirstYearBachelorModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
             defaults={
-                'administration_entity': training.first_year_bachelor.administration_entity,
+                'administration_entity_id': entity_version.find_by_acronym_and_year(
+                    acronym=training.first_year_bachelor.administration_entity.acronym,
+                    year=training.year
+                ).entity_id if training.first_year_bachelor.administration_entity else None,
             }
         )
         return obj
