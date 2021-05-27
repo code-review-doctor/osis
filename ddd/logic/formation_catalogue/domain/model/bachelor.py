@@ -33,5 +33,5 @@ from education_group.ddd.domain.training import Training
 
 @attr.s(slots=True, hash=False, eq=False)
 class Bachelor(Training):
-    first_year_bachelor = attr.ib(type=FirstYearBachelor)
+    first_year_bachelor = attr.ib(type=FirstYearBachelor, kw_only=True)
     type = TrainingType.BACHELOR

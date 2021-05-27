@@ -23,22 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 import attr
 
-from base.models.enums.internship_subtypes import InternshipSubtype
-from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
-from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
-from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from education_group.ddd.domain._entity import Entity
 from osis_common.ddd import interface
-from ddd.logic.learning_unit.commands import CreatePartimCommand
-from ddd.logic.learning_unit.domain.model._remarks import Remarks
 
 
 @attr.s(frozen=True, slots=True)
@@ -49,4 +38,4 @@ class FirstYearBachelorIdentity(interface.EntityIdentity):
 @attr.s(slots=True, hash=False, eq=False)
 class FirstYearBachelor(interface.Entity):
     entity_id = attr.ib(type=FirstYearBachelorIdentity)
-    administration_entity = attr.ib(type=Entity)
+    administration_entity = attr.ib(type=Entity, default=None)

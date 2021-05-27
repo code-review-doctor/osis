@@ -73,6 +73,7 @@ from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.training import TrainingIdentityThroughYears
+from education_group.models.first_year_bachelor import FirstYearBachelor as FirstYearBachelorModelDb
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
 from reference.models.domain import Domain as DomainModelDb
@@ -88,9 +89,9 @@ class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def create(cls, training: 'Training', **_) -> 'TrainingIdentity':
         warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
-        _save_first_year_bachelor(training)
         education_group_db_obj = _save_education_group(training)
         education_group_year_db_obj = _create_education_group_year(training, education_group_db_obj)
+        _save_first_year_bachelor(training, education_group_year_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
         return training.entity_id
@@ -100,6 +101,7 @@ class TrainingRepository(interface.AbstractRepository):
         warnings.warn("DEPRECATED : use .save() function instead", DeprecationWarning, stacklevel=2)
         education_group_db_obj = _save_education_group(training)
         education_group_year_db_obj = _update_education_group_year(training, education_group_db_obj)
+        _save_first_year_bachelor(training, education_group_year_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
         # FIXME : certificate aims should be handled in another domain
@@ -609,7 +611,19 @@ def _is_hops_fields_presence_correct(training: 'Training') -> bool:
     return False
 
 
-def _save_first_year_bachelor(training: 'Training'):
+def _save_first_year_bachelor(
+        training: 'Training',
+        education_group_year_db_obj: EducationGroupYearModelDb
+) -> FirstYearBachelorModelDb:
     if training.is_bachelor():
-        # TODO :: implement creation of first_year_bachelor
-        pass
+        obj, created = FirstYearBachelorModelDb.objects.update_or_create(
+            education_group_year=education_group_year_db_obj,
+            defaults={
+                'administration_entity_id': entity_version.find_by_acronym_and_year(
+                    acronym=training.first_year_bachelor.administration_entity.acronym,
+                    year=training.year
+                ).entity_id if training.first_year_bachelor.administration_entity else None,
+            }
+        )
+        return obj
+    return None
