@@ -30,7 +30,7 @@ from django.db import transaction
 from ddd.logic.application.commands import RenewMultipleAttributionsCommand
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity
-from ddd.logic.application.domain.service.attributionabouttoexpirerenew import AttributionAboutToExpireRenew
+from ddd.logic.application.domain.service.attribution_about_to_expire_renew import AttributionAboutToExpireRenew
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository

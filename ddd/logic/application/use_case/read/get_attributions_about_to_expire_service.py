@@ -27,7 +27,7 @@ from typing import List
 
 from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.service.attributionabouttoexpirerenew import AttributionAboutToExpireRenew
+from ddd.logic.application.domain.service.attribution_about_to_expire_renew import AttributionAboutToExpireRenew
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
