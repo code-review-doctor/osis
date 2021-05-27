@@ -27,6 +27,7 @@ import datetime
 
 import attr
 
+from ddd.logic.shared_kernel.academic_year.commands import CreateAcademicYearCommand
 from osis_common.ddd import interface
 
 
@@ -40,6 +41,16 @@ class AcademicYearIdentity(interface.EntityIdentity):
     @staticmethod
     def get_verbose_year(year: int) -> str:
         return u"%s-%s" % (year, str(year + 1)[-2:])
+
+
+class AcademicYearBuilder:
+    @classmethod
+    def build_from_command(cls, cmd: 'CreateAcademicYearCommand') -> 'AcademicYear':
+        return AcademicYear(
+            entity_id=AcademicYearIdentity(year=cmd.year),
+            start_date=cmd.start_date,
+            end_date=cmd.start_date,
+        )
 
 
 @attr.s(slots=True, hash=False, eq=False)

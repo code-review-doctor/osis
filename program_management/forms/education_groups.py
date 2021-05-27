@@ -40,8 +40,10 @@ from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
+from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
 
 PARTICULAR = "PARTICULAR"
@@ -54,8 +56,7 @@ VERSION_CHOICES = (
 
 
 class GroupFilter(FilterSet):
-    academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+    academic_year = filters.ChoiceFilter(
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
@@ -160,12 +161,18 @@ class GroupFilter(FilterSet):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
-        self.form.fields['academic_year'].initial = AcademicYear.objects.filter(
-            year__in=EducationGroupSwitchCalendar().get_target_years_opened()
-        ).first()
+        self.__init_academic_year_field()
         self.form.fields['category'].initial = education_group_categories.TRAINING
         self.form.fields["with_entity_subordinated"].initial = kwargs.pop('with_entity_subordinated', True)
         self.form.fields["version"].initial = kwargs.pop('version', None)
+
+    def __init_academic_year_field(self):
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand())
+        choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
+        self.form.fields['academic_year'].choices = choices
+        self.form.fields['academic_year'].initial = AcademicYear.objects.filter(
+            year__in=EducationGroupSwitchCalendar().get_target_years_opened()
+        ).first()
 
     def filter_with_entity_subordinated(self, queryset, name, value):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']

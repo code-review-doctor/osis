@@ -39,8 +39,15 @@ class AcademicYearRepository(IAcademicYearRepository):
         raise NotImplementedError
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['AcademicYearIdentity']] = None, **kwargs) -> List['AcademicYear']:
-        objects_as_dict = _get_common_queryset().values(
+    def search(
+            cls,
+            min_year: Optional[int] = None,
+            **kwargs
+    ) -> List['AcademicYear']:
+        objects = _get_common_queryset()
+        if min_year:
+            objects = _get_common_queryset().filter(year__gte=min_year)
+        objects_as_dict = objects.values(
             'year',
             'start_date',
             'end_date',

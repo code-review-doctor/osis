@@ -23,11 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+from typing import Optional
+
 import attr
 
+from backoffice.settings.base import MINIMUM_SELECTABLE_YEAR
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
 class SearchAcademicYearCommand(interface.CommandRequest):
-    pass  # Filters can ba added later when it's needed
+    early_limit_year = attr.ib(type=Optional[int], default=MINIMUM_SELECTABLE_YEAR)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateAcademicYearCommand(interface.CommandRequest):
+    year = attr.ib(type=int)
+    start_date = attr.ib(type=datetime.date)
+    end_date = attr.ib(type=datetime.date)
