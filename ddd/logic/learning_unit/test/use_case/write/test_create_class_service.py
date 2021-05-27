@@ -32,13 +32,12 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import SESSION_123
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.model._partim import Partim, PartimIdentity
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, CreateLearningUnitCommand, CreatePartimCommand
 from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
-    EffectiveClass, EffectiveClassIdentity
+    EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
@@ -116,13 +115,12 @@ class TestCreateClassServiceValidator(TestCase):
         self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
 
         self.effective_class_repository = EffectiveClassRepository()
-        effective_class_identity = EffectiveClassIdentity(
+        effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
             class_code='A',
-            learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
-                code=self.ue_with_lecturing_and_practical_volumes.code,
-                year=YEAR
-            )
+            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
+            learning_unit_year=YEAR
         )
+
         self.effective_class = EffectiveClass(
             entity_id=effective_class_identity,
             titles=None,
@@ -183,17 +181,22 @@ class TestCreateClassServiceValidator(TestCase):
 
     def test_raise_should_learning_unit_not_have_partim_exception(self):
         command = attr.evolve(self.command, code='LPART2021')
-        partim = Partim(
-            entity_id=PartimIdentity(subdivision='T'),
+        ue_with_partims = _create_lu(command=command)
+
+        partim_cmd = CreatePartimCommand(
+            learning_unit_code=ue_with_partims.code,
+            learning_unit_year=ue_with_partims.academic_year.year,
+            subdivision='T',
             title_fr='Partim FR',
             title_en='Partim EN',
             credits=20,
             periodicity=PeriodicityEnum.ANNUAL.name,
-            language_id='fr-be',
-            remarks='Remark',
+            iso_code='fr-be',
+            remark_faculty='Remark Fac',
+            remark_publication_fr='Remark FR',
+            remark_publication_en='Remark EN',
         )
-        ue_with_partims = _create_lu(command=command)
-        ue_with_partims.partims.append(partim)
+        ue_with_partims.create_partim(partim_cmd)
         self.learning_unit_repository.save(ue_with_partims)
         cmd = _build_create_effective_class_command(learning_unit_code=ue_with_partims.code, class_code='B')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:

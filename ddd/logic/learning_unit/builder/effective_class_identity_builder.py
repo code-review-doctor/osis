@@ -55,4 +55,4 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
             code=learning_unit_code,
             year=learning_unit_year
         )
-        return EffectiveClassIdentity(class_code=code, learning_unit_identity=learning_unit_identity)
+        return EffectiveClassIdentity(class_code=class_code, learning_unit_identity=learning_unit_identity)
