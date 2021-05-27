@@ -34,9 +34,10 @@ from base.tests.factories.certificate_aim import CertificateAimFactory as Certif
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
     BachelorEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
+from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
@@ -46,6 +47,7 @@ from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, Diplo
 from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
 from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
+from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
 from reference.models.domain import Domain
 from reference.tests.factories.domain import DomainFactory as DomainModelDbFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory as DomainIscedFactoryModelDb
@@ -256,6 +258,17 @@ class TestTrainingRepositoryGetMethod(TestCase):
         for idx, aims in enumerate(expected_order):
             self.assertEqual(result.diploma.aims[idx].section, aims.section)
             self.assertEqual(result.diploma.aims[idx].code, aims.code)
+
+    def test_get_bachelor(self):
+        egy = EducationGroupYearBachelorFactory()
+        ev = EntityVersionModelDbFactory()
+        FirstYearBachelorFactory(education_group_year=egy, administration_entity=ev.entity)
+
+        training_identity = generate_training_identity_from_education_group_year(egy)
+
+        result = TrainingRepository.get(training_identity)
+        self.assertIsInstance(result, Bachelor)
+        self.assertEqual(result.first_year_bachelor.administration_entity.acronym, ev.acronym)
 
 
 class TestTrainingRepositorySearchMethod(TestCase):

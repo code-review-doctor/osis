@@ -26,6 +26,7 @@
 import functools
 import operator
 import warnings
+from collections import namedtuple
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -57,6 +58,9 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.hops import Hops as HopsModelDb
+from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
+from ddd.logic.formation_catalogue.dtos import TrainingDto, _SecondaryDomainDTO, _CoorganizationDTO, _CertificateAimDTO, \
+    BachelorDto
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
 from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity
@@ -119,7 +123,8 @@ class TrainingRepository(interface.AbstractRepository):
         except EducationGroupYearModelDb.DoesNotExist:
             raise exception.TrainingNotFoundException()
 
-        return _convert_education_group_year_to_training(education_group_year_db)
+        dto = _convert_education_group_year_to_dto(education_group_year_db)
+        return TrainingBuilder.build_from_repository_dto(dto)
 
     @classmethod
     def search(cls, entity_ids: Optional[List['TrainingIdentity']] = None, **kwargs) -> List['Training']:
@@ -133,6 +138,96 @@ class TrainingRepository(interface.AbstractRepository):
             academic_year__year=entity_id.year,
             education_group_type__category=Categories.TRAINING.name
         ).delete()
+
+
+def _convert_education_group_year_to_dto(
+        obj: EducationGroupYearModelDb
+) -> 'TrainingDto':
+    secondary_domains = [
+        _SecondaryDomainDTO(domain.decree.name, domain.code, domain.name)
+        for domain in obj.secondary_domains.all()
+    ]
+    coorganizations = [
+        _CoorganizationDTO(
+            coorg.organization.name,
+            coorg.organization.name,
+            coorg.organization.main_address.country.name if coorg.organization.main_address else None,
+            coorg.organization.main_address.city if coorg.organization.main_address else None,
+            coorg.organization.logo.url if coorg.organization.logo else None,
+            coorg.all_students, coorg.enrollment_place, coorg.diploma, coorg.is_producing_cerfificate,
+            coorg.is_producing_annexe
+        )
+        for coorg in obj.educationgrouporganization_set.all()
+    ]
+    certificate_aims = [
+        _CertificateAimDTO(aim.certificate_aim.section, aim.certificate_aim.code, aim.certificate_aim.description)
+        for aim in obj.educationgroupcertificateaim_set.all()
+    ]
+    datas = {
+        'acronym': obj.acronym,
+        'year': obj.academic_year.year,
+        'code': obj.partial_acronym,
+        'uuid': obj.education_group_id,
+        'type': obj.education_group_type.name,
+        'credits': obj.credits,
+        'schedule_type': obj.schedule_type,
+        'duration': obj.duration,
+        'start_year': obj.education_group.start_year.year,
+        'title_fr': obj.title,
+        'partial_title_fr': obj.partial_title,
+        'title_en': obj.title_english,
+        'partial_title_en': obj.partial_title_english,
+        'status': obj.active,
+        'keywords': obj.keywords,
+        'internship_presence': obj.internship,
+        'is_enrollment_enabled': obj.enrollment_enabled,
+        'has_online_re_registration': obj.web_re_registration,
+        'has_partial_deliberation': obj.partial_deliberation,
+        'has_admission_exam': obj.admission_exam,
+        'has_dissertation': obj.dissertation,
+        'produce_university_certificate': obj.university_certificate,
+        'decree_category': obj.decree_category,
+        'rate_code': obj.rate_code,
+        'main_language_name': obj.primary_language.name,
+        'english_activities': obj.english_activities,
+        'other_language_activities': obj.other_language_activities,
+        'internal_comment': obj.internal_comment,
+        'main_domain_decree_name': obj.main_domain.decree.name if obj.main_domain else None,
+        'main_domain_code': obj.main_domain.code if obj.main_domain else None,
+        'main_domain_name': obj.main_domain.name if obj.main_domain else None,
+        'secondary_domains': secondary_domains,
+        'isced_domain_code': obj.isced_domain.code if obj.isced_domain else None,
+        'isced_domain_title_fr': obj.isced_domain.title_fr if obj.isced_domain else None,
+        'isced_domain_title_en': obj.isced_domain.title_en if obj.isced_domain else None,
+        'management_entity_acronym': obj.management_entity.most_recent_acronym,
+        'administration_entity_acronym': obj.administration_entity.most_recent_acronym,
+        'end_year': obj.education_group.end_year.year if obj.education_group.end_year else None,
+        'enrollment_campus_name': obj.enrollment_campus.name,
+        'enrollment_campus_university_name': obj.enrollment_campus.organization.name,
+        'other_campus_activities': obj.other_campus_activities,
+        'funding_can_be_funded': obj.funding,
+        'funding_orientation': obj.funding_direction,
+        'funding_can_be_international_funded': obj.funding_cud,
+        'funding_international_funding_orientation': obj.funding_direction_cud,
+        'ares_code': obj.hops.ares_study if hasattr(obj, 'hops') else None,
+        'ares_graca': obj.hops.ares_graca if hasattr(obj, 'hops') else None,
+        'ares_authorization': obj.hops.ares_ability if hasattr(obj, 'hops') else None,
+        'co_graduation_code_inter_cfb': obj.co_graduation,
+        'co_graduation_coefficient': obj.co_graduation_coefficient,
+        'co_organizations': coorganizations,
+        'academic_type': obj.academic_type,
+        'duration_unit': obj.duration_unit,
+        'diploma_leads_to_diploma': obj.joint_diploma,
+        'diploma_printing_title': obj.diploma_printing_title,
+        'diploma_professional_title': obj.professional_title,
+        'diploma_aims': certificate_aims,
+    }
+    if obj.is_bachelor:
+        return BachelorDto(
+            first_year_bachelor_administration_entity_acronym=obj.firstyearbachelor.administration_entity.most_recent_acronym if obj.firstyearbachelor.administration_entity else None,
+            **datas
+        )
+    return TrainingDto(**datas)
 
 
 def _convert_education_group_year_to_training(
