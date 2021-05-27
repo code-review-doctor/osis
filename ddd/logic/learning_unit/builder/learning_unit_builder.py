@@ -93,7 +93,7 @@ class LearningUnitBuilder(RootEntityBuilder):
                 volume_annual=dto.practical_volume_annual
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
-            partims=[]  # TODO: To implement
+            partims=[]
         )
 
     @classmethod
@@ -129,7 +129,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester]
             if dto.derogation_quadrimester else None,
-            partims=[]  # TODO: To implement
+            partims=dto.partims
         )
 
     @classmethod
