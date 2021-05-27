@@ -25,8 +25,26 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
+from osis_common.models.osis_model_admin import OsisModelAdmin
+
+
+class FirstYearBachelorAdmin(VersionAdmin, OsisModelAdmin):
+    list_display = (
+        'education_group_year',
+        'administration_entity',
+        'changed'
+    )
+    list_filter = ('education_group_year__academic_year',)
+    search_fields = [
+        'education_group_year__acronym',
+        'education_group_year__partial_acronym'
+    ]
+    raw_id_fields = (
+        'education_group_year', 'administration_entity'
+    )
 
 
 class FirstYearBachelor(models.Model):
