@@ -37,12 +37,12 @@ from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIde
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.attribution import Attribution
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
     VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, ApplicationAlreadyExistsException
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -56,15 +56,18 @@ class TestRenewMultipleAttributionsService(TestCase):
         today = datetime.date.today()
         cls.application_calendar = ApplicationCalendar(
             entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
-            authorized_target_year=AcademicYearIdentity(year=2019),
+            authorized_target_year=AcademicYearIdentityBuilder.build_from_year(year=2019),
             start_date=today - datetime.timedelta(days=5),
             end_date=today + datetime.timedelta(days=10),
         )
         cls.attribution_about_to_expire = Attribution(
-            course_id=LearningUnitIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
-            function=Functions.HOLDER.name,
+            course_id=LearningUnitIdentity(
+                code='LDROI1200',
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
+            ),
+            function=Functions.HOLDER,
             end_year=cls.application_calendar.authorized_target_year,
-            start_year=AcademicYearIdentity(year=2017),
+            start_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             lecturing_volume=Decimal(5),
             practical_volume=None,
         )
@@ -79,7 +82,9 @@ class TestRenewMultipleAttributionsService(TestCase):
         cls.vacant_course = VacantCourse(
             entity_id=VacantCourseIdentity(
                 code='LDROI1200',
-                academic_year=AcademicYearIdentity(year=cls.application_calendar.authorized_target_year.year + 1)
+                academic_year=AcademicYearIdentityBuilder.build_from_year(
+                    year=cls.application_calendar.authorized_target_year.year + 1
+                )
             ),
             lecturing_volume_total=Decimal(10),
             lecturing_volume_available=Decimal(10),
@@ -88,7 +93,7 @@ class TestRenewMultipleAttributionsService(TestCase):
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='DRT')
+            allocation_entity=AllocationEntity(code='DRT')
         )
 
     def setUp(self) -> None:

@@ -38,14 +38,14 @@ from ddd.logic.application.domain.validator.exceptions import AttributionAboutTo
 from ddd.logic.application.domain.validator.validators_by_business_action import RenewApplicationValidatorList
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd import interface
 
 
-class Renew(interface.DomainService):
+class AttributionAboutToExpireRenew(interface.DomainService):
 
     @classmethod
-    def get_attributions_about_to_expires(
+    def get_list_with_renewal_availability(
             cls,
             application_calendar: ApplicationCalendar,
             applicant: Applicant,
@@ -60,7 +60,9 @@ class Renew(interface.DomainService):
         # Lookup vacant course on next year for current attribution
         vacant_course_ids = [
             VacantCourseIdentity(
-                academic_year=AcademicYearIdentity(year=application_calendar.authorized_target_year.year + 1),
+                academic_year=AcademicYearIdentityBuilder.build_from_year(
+                    year=application_calendar.authorized_target_year.year + 1
+                ),
                 code=attribution.course_id.code
             ) for attribution in attributions_filtered
         ]
@@ -98,9 +100,9 @@ class Renew(interface.DomainService):
         return attributions_about_to_expire_dto
 
     @classmethod
-    def renew_from_attribution_about_to_expire(
+    def renew(
             cls,
-            code: str,
+            learning_unit_code: str,
             application_calendar: ApplicationCalendar,
             applicant: Applicant,
             all_existing_applications: List[Application],
@@ -109,7 +111,7 @@ class Renew(interface.DomainService):
         attributions_about_to_expire = applicant.get_attributions_about_to_expire(
             application_calendar.authorized_target_year
         )
-        attributions_filtered = _filter_attribution_by_code(attributions_about_to_expire, code)
+        attributions_filtered = _filter_attribution_by_code(attributions_about_to_expire, learning_unit_code)
         attributions_filtered = _filter_attribution_by_renewable_functions(attributions_filtered)
         if not attributions_filtered:
             raise MultipleBusinessExceptions(exceptions={AttributionAboutToExpireFunctionException()})
@@ -118,8 +120,10 @@ class Renew(interface.DomainService):
         # Lookup vacant course on next year
         vacant_course_next_year = vacant_course_repository.get(
             VacantCourseIdentity(
-                academic_year=AcademicYearIdentity(year=application_calendar.authorized_target_year.year + 1),
-                code=code
+                academic_year=AcademicYearIdentityBuilder.build_from_year(
+                    year=application_calendar.authorized_target_year.year + 1
+                ),
+                code=learning_unit_code
             )
         )
 
@@ -144,7 +148,7 @@ def _filter_attribution_by_code(attributions_about_to_expire: List[Attribution],
 def _filter_attribution_by_renewable_functions(attributions_about_to_expire: List[Attribution]):
     return [
         attribution_about_to_expire for attribution_about_to_expire in attributions_about_to_expire
-        if attribution_about_to_expire.function in (Functions.CO_HOLDER.name, Functions.HOLDER.name)
+        if attribution_about_to_expire.function in (Functions.CO_HOLDER, Functions.HOLDER)
     ]
 
 

@@ -28,7 +28,7 @@ from decimal import Decimal
 import attr
 
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 
@@ -56,7 +56,7 @@ class VacantCourse(interface.RootEntity):
     title = attr.ib(type=str)
     vacant_declaration_type = attr.ib(type=VacantDeclarationType)
     is_in_team = attr.ib(type=bool)
-    entity_allocation = attr.ib(type=EntityAllocation)
+    allocation_entity = attr.ib(type=AllocationEntity)
 
     @property
     def year(self) -> int:

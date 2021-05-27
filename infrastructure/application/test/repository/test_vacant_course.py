@@ -28,13 +28,13 @@ from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
-from base.models.enums import learning_container_year_types, vacant_declaration_type
+from base.models.enums import learning_container_year_types
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
@@ -149,8 +149,8 @@ class VacantCourseRepositorySearch(TestCase):
             VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LDROI1200')
         )
 
-    def test_assert_filter_by_entity_allocation_code(self):
-        results = self.repository.search(entity_allocation=EntityAllocation(code="AGRO"))
+    def test_assert_filter_by_allocation_entity_code(self):
+        results = self.repository.search(allocation_entity=AllocationEntity(code="AGRO"))
 
         self.assertEqual(len(results), 1)
         self.assertIsInstance(results[0], VacantCourse)
@@ -159,7 +159,7 @@ class VacantCourseRepositorySearch(TestCase):
             VacantCourseIdentity(academic_year=AcademicYearIdentity(year=2020), code='LAGRO1500'),
         )
 
-    def test_assert_filter_by_entity_allocation_code_and_with_child_set_true(self):
+    def test_assert_filter_by_allocation_entity_code_and_with_child_set_true(self):
         # Create a vacant course below DRT entity
         LearningUnitYearFactory(
             acronym='LDROI2000',
@@ -176,8 +176,8 @@ class VacantCourseRepositorySearch(TestCase):
         )
 
         results = self.repository.search(
-            entity_allocation=EntityAllocation(code="DRT"),
-            with_entity_allocation_children=True
+            allocation_entity=AllocationEntity(code="DRT"),
+            with_allocation_entity_children=True
         )
         self.assertEqual(len(results), 2)
         self.assertIsInstance(results[0], VacantCourse)

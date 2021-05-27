@@ -30,7 +30,7 @@ from django.db import transaction
 from ddd.logic.application.commands import RenewMultipleAttributionsCommand
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity
-from ddd.logic.application.domain.service.renew import Renew
+from ddd.logic.application.domain.service.attributionabouttoexpirerenew import AttributionAboutToExpireRenew
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
@@ -53,8 +53,8 @@ def renew_multiple_attributions(
     # WHEN
     applications_renewed = []
     for code in cmd.renew_codes:
-        application_renewed = Renew.renew_from_attribution_about_to_expire(
-            code=code,
+        application_renewed = AttributionAboutToExpireRenew.renew(
+            learning_unit_code=code,
             application_calendar=application_calendar,
             applicant=applicant,
             all_existing_applications=all_existing_applications,
@@ -63,5 +63,7 @@ def renew_multiple_attributions(
         applications_renewed.append(application_renewed)
 
     # THEN
-    [application_repository.save(application_renewed) for application_renewed in applications_renewed]
+    for application_renewed in applications_renewed:
+        application_repository.save(application_renewed)
+
     return [application_renewed.entity_id for application_renewed in applications_renewed]

@@ -34,7 +34,7 @@ from ddd.logic.application.domain.model.vacant_course import VacantCourse, Vacan
 from ddd.logic.application.domain.validator.validators_by_business_action import ApplyOnVacantCourseValidatorList, \
     RenewApplicationValidatorList
 from ddd.logic.application.dtos import ApplicationFromRepositoryDTO
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import RootEntityBuilder
 
 
@@ -68,7 +68,7 @@ class ApplicationBuilder(RootEntityBuilder):
             cls,
             dto: ApplicationFromRepositoryDTO,
     ) -> Application:
-        vacant_course_academic_year_id = AcademicYearIdentity(year=dto.vacant_course_year)
+        vacant_course_academic_year_id = AcademicYearIdentityBuilder.build_from_year(year=dto.vacant_course_year)
         return Application(
             entity_id=ApplicationIdentity(uuid=dto.uuid),
             applicant_id=ApplicantIdentity(global_id=dto.applicant_global_id),

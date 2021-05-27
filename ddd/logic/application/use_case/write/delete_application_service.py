@@ -36,7 +36,7 @@ def delete_application(
         application_repository: IApplicationRepository,
 ) -> None:
     # GIVEN
-    application_identity = ApplicationIdentity(uuid=cmd.application_id)
+    application_identity = ApplicationIdentity(uuid=cmd.application_uuid)
     application_repository.get(entity_id=application_identity)
 
     # THEN

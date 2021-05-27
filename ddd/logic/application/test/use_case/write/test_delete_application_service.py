@@ -31,9 +31,9 @@ from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import DeleteApplicationCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
 from infrastructure.application.repository.vacant_course_in_memory import VacantCourseInMemoryRepository
@@ -49,7 +49,10 @@ class TestDeleteApplicationService(TestCase):
             last_name="Durant"
         )
         cls.vacant_course = VacantCourse(
-            entity_id=VacantCourseIdentity(code='LAGRO1500', academic_year=AcademicYearIdentity(year=2018)),
+            entity_id=VacantCourseIdentity(
+                code='LAGRO1500',
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
+            ),
             lecturing_volume_available=Decimal(10),
             lecturing_volume_total=Decimal(10),
             practical_volume_available=Decimal(50),
@@ -57,7 +60,7 @@ class TestDeleteApplicationService(TestCase):
             title='Introduction',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='AGRO')
+            allocation_entity=AllocationEntity(code='AGRO')
         )
 
         cls.application = Application(
@@ -87,7 +90,7 @@ class TestDeleteApplicationService(TestCase):
         self.message_bus = message_bus_instance
 
     def test_assert_delete_on_repository(self):
-        cmd = DeleteApplicationCommand(application_id=self.application.entity_id.uuid)
+        cmd = DeleteApplicationCommand(application_uuid=self.application.entity_id.uuid)
 
         self.assertEqual(len(self.application_repository.applications), 1)
 

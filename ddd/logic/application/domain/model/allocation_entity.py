@@ -29,5 +29,5 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class EntityAllocation(interface.ValueObject):
+class AllocationEntity(interface.ValueObject):
     code = attr.ib(type=str)

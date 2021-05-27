@@ -34,7 +34,7 @@ class EmptyRequiredFieldException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class LecturingAndPracticalNotFilledException(BusinessException):
+class LecturingAndPracticalChargeNotFilledException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Lecturing charge or practical charge must be filled")
         super().__init__(message, **kwargs)

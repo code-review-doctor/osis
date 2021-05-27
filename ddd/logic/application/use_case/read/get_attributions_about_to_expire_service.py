@@ -27,7 +27,7 @@ from typing import List
 
 from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
-from ddd.logic.application.domain.service.renew import Renew
+from ddd.logic.application.domain.service.attributionabouttoexpirerenew import AttributionAboutToExpireRenew
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
@@ -48,7 +48,7 @@ def get_attributions_about_to_expire(
     applicant = applicant_repository.get(applicant_id)
     all_existing_applications = application_repository.search(global_id=cmd.global_id)
 
-    return Renew.get_attributions_about_to_expires(
+    return AttributionAboutToExpireRenew.get_list_with_renewal_availability(
         application_calendar,
         applicant,
         all_existing_applications,

@@ -39,7 +39,7 @@ def update_application(
         vacant_course_repository: IVacantCourseRepository,
 ) -> ApplicationIdentity:
     # GIVEN
-    application_identity = ApplicationIdentity(uuid=cmd.application_id)
+    application_identity = ApplicationIdentity(uuid=cmd.application_uuid)
     application = application_repository.get(entity_id=application_identity)
     vacant_course = vacant_course_repository.get(entity_id=application.vacant_course_id)
 

@@ -33,7 +33,7 @@ from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -45,7 +45,7 @@ class TestSearchApplicationByApplicantService(TestCase):
         today = datetime.date.today()
         cls.application_calendar = ApplicationCalendar(
             entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
-            authorized_target_year=AcademicYearIdentity(year=2018),
+            authorized_target_year=AcademicYearIdentityBuilder.build_from_year(year=2018),
             start_date=today - datetime.timedelta(days=5),
             end_date=today + datetime.timedelta(days=10),
         )

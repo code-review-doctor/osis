@@ -31,9 +31,9 @@ from django.test import TestCase
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import SearchVacantCoursesCommand
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.vacant_course_in_memory import VacantCourseInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -45,7 +45,7 @@ class TestSearchVacantCourseService(TestCase):
         today = datetime.date.today()
         cls.application_calendar = ApplicationCalendar(
             entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
-            authorized_target_year=AcademicYearIdentity(year=2018),
+            authorized_target_year=AcademicYearIdentityBuilder.build_from_year(year=2018),
             start_date=today - datetime.timedelta(days=5),
             end_date=today + datetime.timedelta(days=10),
         )
@@ -62,7 +62,7 @@ class TestSearchVacantCourseService(TestCase):
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='DRT')
+            allocation_entity=AllocationEntity(code='DRT')
         )
         cls.vacant_course_lagro1510 = VacantCourse(
             entity_id=VacantCourseIdentity(
@@ -76,7 +76,7 @@ class TestSearchVacantCourseService(TestCase):
             title='Introduction en agro',
             vacant_declaration_type=VacantDeclarationType.OPEN_FOR_EXTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='AGRO')
+            allocation_entity=AllocationEntity(code='AGRO')
         )
 
         cls.application_calendar_repository = ApplicationCalendarInMemoryRepository([cls.application_calendar])
@@ -96,13 +96,13 @@ class TestSearchVacantCourseService(TestCase):
         self.message_bus = message_bus_instance
 
     def test_assert_search_return_result_filtered_by_code(self):
-        cmd = SearchVacantCoursesCommand(code="LDR", entity_allocation_code=None, vacant_declaration_types=None)
+        cmd = SearchVacantCoursesCommand(code="LDR", allocation_entity_code=None, vacant_declaration_types=None)
 
         results = self.message_bus.invoke(cmd)
         self.assertListEqual(results, [self.vacant_course_ldroi1200])
 
-    def test_assert_search_return_result_filtered_by_entity_allocation(self):
-        cmd = SearchVacantCoursesCommand(code=None, entity_allocation_code="AGRO", vacant_declaration_types=None)
+    def test_assert_search_return_result_filtered_by_allocation_entity(self):
+        cmd = SearchVacantCoursesCommand(code=None, allocation_entity_code="AGRO", vacant_declaration_types=None)
 
         results = self.message_bus.invoke(cmd)
         self.assertListEqual(results, [self.vacant_course_lagro1510])
@@ -110,7 +110,7 @@ class TestSearchVacantCourseService(TestCase):
     def test_assert_search_return_result_filtered_by_vacant_declaration_types(self):
         cmd = SearchVacantCoursesCommand(
             code=None,
-            entity_allocation_code=None,
+            allocation_entity_code=None,
             vacant_declaration_types=[VacantDeclarationType.OPEN_FOR_EXTERNS.name]
         )
 

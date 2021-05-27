@@ -35,14 +35,14 @@ from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIde
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.attribution import Attribution
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     VacantCourseNotAllowedDeclarationType, VacantCourseNotFound
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -56,7 +56,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         today = datetime.date.today()
         self.application_calendar = ApplicationCalendar(
             entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
-            authorized_target_year=AcademicYearIdentity(year=2018),
+            authorized_target_year=AcademicYearIdentityBuilder.build_from_year(year=2018),
             start_date=today - datetime.timedelta(days=5),
             end_date=today + datetime.timedelta(days=10),
         )
@@ -64,11 +64,11 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(
                 code="LDROI1200",
-                academic_year=AcademicYearIdentity(year=2018)
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
             ),
-            function=Functions.CO_HOLDER.name,
+            function=Functions.CO_HOLDER,
             end_year=self.application_calendar.authorized_target_year,
-            start_year=AcademicYearIdentity(year=2016),
+            start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(15),
         )
@@ -81,7 +81,10 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         )
 
         self.vacant_course_ldroi1200 = VacantCourse(
-            entity_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2019)),
+            entity_id=VacantCourseIdentity(
+                code='LDROI1200',
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2019)
+            ),
             lecturing_volume_available=Decimal(10),
             lecturing_volume_total=Decimal(30),
             practical_volume_available=Decimal(50),
@@ -89,10 +92,13 @@ class TestGetAttributionsAboutToExpireService(TestCase):
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='DRT')
+            allocation_entity=AllocationEntity(code='DRT')
         )
         self.vacant_course_lagro1510 = VacantCourse(
-            entity_id=VacantCourseIdentity(code='LAGRO1510', academic_year=AcademicYearIdentity(year=2019)),
+            entity_id=VacantCourseIdentity(
+                code='LAGRO1510',
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2019)
+            ),
             lecturing_volume_available=Decimal(50),
             lecturing_volume_total=Decimal(50),
             practical_volume_available=Decimal(25),
@@ -100,7 +106,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
             title='Introduction en agro',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='AGRO')
+            allocation_entity=AllocationEntity(code='AGRO')
         )
 
         self.applicant_repository = ApplicantInMemoryRepository([self.applicant])
@@ -134,11 +140,11 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.applicant.attributions = [Attribution(
             course_id=LearningUnitIdentity(
                 code="LAGRO1200",
-                academic_year=AcademicYearIdentity(year=2020)
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2020)
             ),
-            function=Functions.CO_HOLDER.name,
+            function=Functions.CO_HOLDER,
             end_year=self.application_calendar.authorized_target_year,
-            start_year=AcademicYearIdentity(year=2016),
+            start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(15),
         )]
@@ -155,7 +161,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertEqual(results[0].year, 2020)
         self.assertEqual(results[0].lecturing_volume, Decimal(10))
         self.assertEqual(results[0].practical_volume, Decimal(15))
-        self.assertEqual(results[0].function, Functions.CO_HOLDER.name)
+        self.assertEqual(results[0].function, Functions.CO_HOLDER)
         self.assertEqual(results[0].end_year, self.application_calendar.authorized_target_year.year)
         self.assertEqual(results[0].start_year, 2016)
         self.assertIsNone(results[0].title)

@@ -142,13 +142,14 @@ class ApplicationRepositorySave(TestCase):
         self.assertEqual(TutorApplication.objects.count(), 0)
         self.repository.save(application)
 
-        row_inserted = TutorApplication.objects.get(uuid=application.entity_id.uuid)
-        self.assertEqual(row_inserted.tutor_id, self.tutor_db.pk)
-        self.assertEqual(row_inserted.learning_container_year_id, self.course_db.pk)
-        self.assertEqual(row_inserted.volume_lecturing, application.lecturing_volume)
-        self.assertEqual(row_inserted.volume_pratical_exercice, application.practical_volume)
-        self.assertEqual(row_inserted.remark, application.remark)
-        self.assertEqual(row_inserted.course_summary, application.course_summary)
+        persisted_obj = self.repository.get(application.entity_id)
+        self.assertEqual(application.entity_id, persisted_obj.entity_id)
+        self.assertEqual(application.applicant_id, persisted_obj.applicant_id)
+        self.assertEqual(application.vacant_course_id, persisted_obj.vacant_course_id)
+        self.assertEqual(application.lecturing_volume, persisted_obj.lecturing_volume)
+        self.assertEqual(application.practical_volume, persisted_obj.practical_volume)
+        self.assertEqual(application.remark, persisted_obj.remark)
+        self.assertEqual(application.course_summary, persisted_obj.course_summary)
 
     def test_save_assert_updated_when_instance_exists(self):
         application_db = TutorApplicationFactory()
@@ -167,13 +168,14 @@ class ApplicationRepositorySave(TestCase):
         self.repository.save(application)
         self.assertEqual(TutorApplication.objects.count(), 1)
 
-        row_updated = TutorApplication.objects.get(uuid=application.entity_id.uuid)
-        self.assertEqual(row_updated.tutor_id, self.tutor_db.pk)
-        self.assertEqual(row_updated.learning_container_year_id, self.course_db.pk)
-        self.assertEqual(row_updated.volume_lecturing, application.lecturing_volume)
-        self.assertEqual(row_updated.volume_pratical_exercice, application.practical_volume)
-        self.assertEqual(row_updated.remark, application.remark)
-        self.assertEqual(row_updated.course_summary, application.course_summary)
+        persisted_obj = self.repository.get(application.entity_id)
+        self.assertEqual(application.entity_id, persisted_obj.entity_id)
+        self.assertEqual(application.applicant_id, persisted_obj.applicant_id)
+        self.assertEqual(application.vacant_course_id, persisted_obj.vacant_course_id)
+        self.assertEqual(application.lecturing_volume, persisted_obj.lecturing_volume)
+        self.assertEqual(application.practical_volume, persisted_obj.practical_volume)
+        self.assertEqual(application.remark, persisted_obj.remark)
+        self.assertEqual(application.course_summary, persisted_obj.course_summary)
 
 
 class ApplicationRepositoryDelete(TestCase):

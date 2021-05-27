@@ -26,7 +26,7 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalNotFilledException
+from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalChargeNotFilledException
 from osis_common.ddd import interface
 
 
@@ -39,4 +39,4 @@ class ShouldLecturingOrPracticalFilledValidator(BusinessValidator):
         lecturing_value = getattr(self.command, 'lecturing_volume', None)
 
         if not any([pratical_value, lecturing_value]):
-            raise LecturingAndPracticalNotFilledException()
+            raise LecturingAndPracticalChargeNotFilledException()

@@ -42,7 +42,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.utils.func import ArrayConcat
 from ddd.logic.application.domain.builder.vacant_course_builder import VacantCourseBuilder
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
@@ -56,14 +56,14 @@ class VacantCourseRepository(IVacantCourseRepository):
             entity_ids: Optional[List[VacantCourseIdentity]] = None,
             code: str = None,
             academic_year_id: AcademicYearIdentity = None,
-            entity_allocation: EntityAllocation = None,
-            with_entity_allocation_children: bool = False,
+            allocation_entity: AllocationEntity = None,
+            with_allocation_entity_children: bool = False,
             vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
     ) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
-        if entity_allocation and with_entity_allocation_children:
-            qs = _annotate_entity_allocation_parents(qs)
+        if allocation_entity and with_allocation_entity_children:
+            qs = _annotate_allocation_entity_parents(qs)
 
         if entity_ids is not None:
             filter_clause = functools.reduce(
@@ -79,12 +79,12 @@ class VacantCourseRepository(IVacantCourseRepository):
             qs = qs.filter(
                 learning_container_year__type_declaration_vacant__in=[enum.name for enum in vacant_declaration_types]
             )
-        if entity_allocation and not with_entity_allocation_children:
-            qs = qs.filter(entity_allocation=entity_allocation.code)
-        if entity_allocation and with_entity_allocation_children:
+        if allocation_entity and not with_allocation_entity_children:
+            qs = qs.filter(allocation_entity=allocation_entity.code)
+        if allocation_entity and with_allocation_entity_children:
             qs = qs.filter(
-                Q(entity_allocation=entity_allocation.code)
-                | Q(entity_allocation_parents__contains=[entity_allocation.code])
+                Q(allocation_entity=allocation_entity.code)
+                | Q(allocation_entity_parents__contains=[allocation_entity.code])
             )
 
         results = []
@@ -94,7 +94,7 @@ class VacantCourseRepository(IVacantCourseRepository):
                 year=row_as_dict['year'],
                 title=row_as_dict['title'],
                 is_in_team=row_as_dict['is_in_team'],
-                entity_allocation=row_as_dict['entity_allocation'],
+                allocation_entity=row_as_dict['allocation_entity'],
                 vacant_declaration_type=row_as_dict['vacant_declaration_type'],
                 lecturing_volume_available=row_as_dict['lecturing_volume_available'],
                 lecturing_volume_total=row_as_dict['lecturing_volume_total'],
@@ -134,6 +134,7 @@ def _vacant_course_base_qs() -> QuerySet:
             title=F('full_title'),
             is_in_team=F('learning_container_year__team'),
             vacant_declaration_type=F('learning_container_year__type_declaration_vacant'),
+            allocation_entity=F('entity_allocation'),
             lecturing_volume_total=Subquery(
                 subqs.filter(type=learning_component_year_type.LECTURING).values('hourly_volume_total_annual')[:1]
             ),
@@ -158,11 +159,11 @@ def _vacant_course_base_qs() -> QuerySet:
             "lecturing_volume_available",
             "practical_volume_total",
             "practical_volume_available",
-            "entity_allocation"
+            "allocation_entity"
         )
 
 
-def _annotate_entity_allocation_parents(qs: QuerySet) -> QuerySet:
+def _annotate_allocation_entity_parents(qs: QuerySet) -> QuerySet:
     def parent_entities(cte):
         return EntityVersion.objects.\
             filter(parent_id__isnull=True).\
@@ -210,7 +211,7 @@ def _annotate_entity_allocation_parents(qs: QuerySet) -> QuerySet:
 
     cte = With.recursive(parent_entities)
     qs = qs.annotate(
-        entity_allocation_parents=Subquery(
+        allocation_entity_parents=Subquery(
             cte.queryset().filter(
                 start_date__lte=OuterRef('learning_container_year__academic_year__start_date'),
                 end_date_queryable__gte=OuterRef('learning_container_year__academic_year__end_date'),

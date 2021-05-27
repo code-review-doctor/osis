@@ -28,6 +28,7 @@ from decimal import Decimal
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 
+from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_component_year_type
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -78,7 +79,7 @@ class ApplicantRepositoryGet(TestCase):
         self.assertEqual(len(applicant.attributions), 1)
         expected_attribution = Attribution(
             course_id=LearningUnitIdentity(code="LDROI1200", academic_year=AcademicYearIdentity(year=2018)),
-            function=self.attribution_practical_ldroi1200.attribution.function,
+            function=Functions[self.attribution_practical_ldroi1200.attribution.function],
             end_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.end_year),
             start_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.start_year),
             lecturing_volume=None,

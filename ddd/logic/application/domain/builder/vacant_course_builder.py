@@ -25,7 +25,7 @@
 ##############################################################################
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.builder.vacant_course_identity_builder import VacantCourseIdentityBuilder
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
 from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
 from osis_common.ddd.interface import RootEntityBuilder
@@ -43,7 +43,7 @@ class VacantCourseBuilder(RootEntityBuilder):
             is_in_team=dto.is_in_team,
             vacant_declaration_type=VacantDeclarationType[dto.vacant_declaration_type]
             if dto.vacant_declaration_type else None,
-            entity_allocation=EntityAllocation(dto.entity_allocation),
+            allocation_entity=AllocationEntity(dto.allocation_entity),
             lecturing_volume_total=dto.lecturing_volume_total,
             lecturing_volume_available=dto.lecturing_volume_available,
             practical_volume_total=dto.practical_volume_total,

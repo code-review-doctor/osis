@@ -27,6 +27,7 @@ from decimal import Decimal
 
 import attr
 
+from attribution.models.enums.function import Functions
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
@@ -35,7 +36,7 @@ from osis_common.ddd import interface
 @attr.s(frozen=True, slots=True)
 class Attribution(interface.ValueObject):
     course_id = attr.ib(type=LearningUnitIdentity)
-    function = attr.ib(type=str)
+    function = attr.ib(type=Functions)
     end_year = attr.ib(type=AcademicYearIdentity)
     start_year = attr.ib(type=AcademicYearIdentity)
     lecturing_volume = attr.ib(type=Decimal)

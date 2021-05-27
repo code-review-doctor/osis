@@ -33,11 +33,11 @@ from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
-from ddd.logic.application.domain.model.entity_allocation import EntityAllocation
+from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
-from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalNotFilledException, \
+from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalChargeNotFilledException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -56,12 +56,15 @@ class TestApplyOnVacantCourseService(TestCase):
         today = datetime.date.today()
         cls.application_calendar = ApplicationCalendar(
             entity_id=ApplicationCalendarIdentity(uuid=uuid.uuid4()),
-            authorized_target_year=AcademicYearIdentity(year=2018),
+            authorized_target_year=AcademicYearIdentityBuilder.build_from_year(year=2018),
             start_date=today - datetime.timedelta(days=5),
             end_date=today + datetime.timedelta(days=10),
         )
         cls.vacant_course = VacantCourse(
-            entity_id=VacantCourseIdentity(code='LDROI1200', academic_year=AcademicYearIdentity(year=2018)),
+            entity_id=VacantCourseIdentity(
+                code='LDROI1200',
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
+            ),
             lecturing_volume_available=Decimal(10),
             lecturing_volume_total=Decimal(10),
             practical_volume_available=Decimal(50),
@@ -69,7 +72,7 @@ class TestApplyOnVacantCourseService(TestCase):
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
-            entity_allocation=EntityAllocation(code='DRT')
+            allocation_entity=AllocationEntity(code='DRT')
         )
 
         cls.applicant_repository = ApplicantInMemoryRepository([cls.applicant])
@@ -107,7 +110,7 @@ class TestApplyOnVacantCourseService(TestCase):
         self.assertTrue(
             any([
                 exception for exception in exceptions_raised
-                if isinstance(exception, LecturingAndPracticalNotFilledException)
+                if isinstance(exception, LecturingAndPracticalChargeNotFilledException)
             ])
         )
 
@@ -127,7 +130,7 @@ class TestApplyOnVacantCourseService(TestCase):
         self.assertTrue(
             any([
                 exception for exception in exceptions_raised
-                if isinstance(exception, LecturingAndPracticalNotFilledException)
+                if isinstance(exception, LecturingAndPracticalChargeNotFilledException)
             ])
         )
 

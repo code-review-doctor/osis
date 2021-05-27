@@ -39,7 +39,7 @@ class SearchApplicationByApplicantCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SearchVacantCoursesCommand(interface.CommandRequest):
     code = attr.ib(type=str)
-    entity_allocation_code = attr.ib(type=str)
+    allocation_entity_code = attr.ib(type=str)
     vacant_declaration_types = attr.ib(type=List[str])
 
 
@@ -60,7 +60,7 @@ class ApplyOnVacantCourseCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class UpdateApplicationCommand(interface.CommandRequest):
-    application_id = attr.ib(type=str)
+    application_uuid = attr.ib(type=str)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
     course_summary = attr.ib(type=str)
@@ -69,7 +69,7 @@ class UpdateApplicationCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class DeleteApplicationCommand(interface.CommandRequest):
-    application_id = attr.ib(type=str)
+    application_uuid = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

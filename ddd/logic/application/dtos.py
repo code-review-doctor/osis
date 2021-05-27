@@ -57,7 +57,7 @@ class VacantCourseFromRepositoryDTO(DTO):
     year = attr.ib(type=int)
     title = attr.ib(type=str)
     is_in_team = attr.ib(type=bool)
-    entity_allocation = attr.ib(type=str)
+    allocation_entity = attr.ib(type=str)
     vacant_declaration_type = attr.ib(type=str)
     lecturing_volume_total = attr.ib(type=Decimal)
     lecturing_volume_available = attr.ib(type=Decimal)

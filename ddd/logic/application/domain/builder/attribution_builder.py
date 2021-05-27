@@ -23,23 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.application.domain.builder.attribution_builder import AttributionBuilder
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
-from ddd.logic.application.dtos import ApplicantFromRepositoryDTO
+from attribution.models.enums.function import Functions
+from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.dtos import AttributionFromRepositoryDTO
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import RootEntityBuilder
 
 
-class ApplicantBuilder(RootEntityBuilder):
+class AttributionBuilder(RootEntityBuilder):
     @classmethod
     def build_from_repository_dto(
             cls,
-            dto: ApplicantFromRepositoryDTO,
-    ) -> Applicant:
-        return Applicant(
-            entity_id=ApplicantIdentity(global_id=dto.global_id),
-            first_name=dto.first_name,
-            last_name=dto.last_name,
-            attributions=[
-                AttributionBuilder.build_from_repository_dto(attribution_dto) for attribution_dto in dto.attributions
-            ]
+            dto: AttributionFromRepositoryDTO,
+    ) -> Attribution:
+        return Attribution(
+            course_id=LearningUnitIdentity(
+                code=dto.course_id_code,
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=dto.course_id_year)
+            ),
+            end_year=AcademicYearIdentityBuilder.build_from_year(year=dto.end_year),
+            start_year=AcademicYearIdentityBuilder.build_from_year(year=dto.start_year),
+            function=Functions[dto.function] if dto.function else None,
+            lecturing_volume=dto.lecturing_volume,
+            practical_volume=dto.practical_volume
         )
