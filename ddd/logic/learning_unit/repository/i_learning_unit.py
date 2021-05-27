@@ -26,7 +26,7 @@
 import abc
 from typing import List
 
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from osis_common.ddd import interface
 
@@ -46,12 +46,12 @@ class ILearningUnitRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def has_proposal(cls) -> bool:
+    def has_proposal(cls, learning_unit: 'LearningUnit') -> bool:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def has_enrollments(cls) -> bool:
+    def has_enrollments(cls, learning_unit: 'LearningUnit') -> bool:
         pass
 
     @classmethod

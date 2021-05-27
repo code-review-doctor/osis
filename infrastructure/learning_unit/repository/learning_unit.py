@@ -36,7 +36,9 @@ from base.models.learning_component_year import LearningComponentYear as Learnin
 from base.models.learning_container import LearningContainer as LearningContainerDatabase
 from base.models.learning_container_year import LearningContainerYear as LearningContainerYearDatabase
 from base.models.learning_unit import LearningUnit as LearningUnitDatabase
+from base.models.learning_unit_enrollment import LearningUnitEnrollment as LearningUnitEnrollmentDatabase
 from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
+from base.models.proposal_learning_unit import ProposalLearningUnit as ProposalLearningUnitDatabase
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, LearningUnitSearchDTO, PartimFromRepositoryDTO
@@ -49,12 +51,18 @@ from reference.models.language import Language as LanguageDatabase
 class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
-    def has_proposal(cls) -> bool:
-        raise NotImplementedError
+    def has_proposal(cls, learning_unit: 'LearningUnit') -> bool:
+        return ProposalLearningUnitDatabase.objects.filter(
+            learning_unit_year__acronym=learning_unit.entity_id.code,
+            learning_unit_year__academic_year__year=learning_unit.entity_id.year
+        ).exists()
 
     @classmethod
-    def has_enrollments(cls) -> bool:
-        raise NotImplementedError
+    def has_enrollments(cls, learning_unit: 'LearningUnit') -> bool:
+        return LearningUnitEnrollmentDatabase.objects.filter(
+            learning_unit_year__acronym=learning_unit.entity_id.code,
+            learning_unit_year__academic_year__year=learning_unit.entity_id.year
+        ).exists()
 
     @classmethod
     def search_learning_units_dto(
