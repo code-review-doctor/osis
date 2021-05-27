@@ -34,8 +34,8 @@ from osis_common.ddd.interface import DTO
 @attr.s(frozen=True, slots=True)
 class PartimFromRepositoryDTO(DTO):
     subdivision = attr.ib(type=str)
-    specific_title_fr = attr.ib(type=str)
-    specific_title_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
