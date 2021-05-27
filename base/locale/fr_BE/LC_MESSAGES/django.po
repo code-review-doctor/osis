@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-10 14:58+0200\n"
+"POT-Creation-Date: 2021-05-27 09:29+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -691,6 +691,9 @@ msgstr "Supprimer cette version définitivement"
 msgid "Deliberation"
 msgstr "Délibération"
 
+msgid "Derogation's session"
+msgstr "Session de dérogation"
+
 msgid "Description"
 msgstr "Description"
 
@@ -1242,9 +1245,6 @@ msgstr "Justification"
 msgid "Keywords"
 msgstr "Mots clés"
 
-msgid "LU"
-msgstr "UE"
-
 msgid "Language"
 msgstr "Langue"
 
@@ -1538,9 +1538,6 @@ msgstr "Master de spécialisation"
 msgid "Masters"
 msgstr "Masters"
 
-msgid "Max. credits"
-msgstr "Créd. max."
-
 msgid "Maximum number of permitted relationships"
 msgstr "Nombre maximum de relations autorisées"
 
@@ -1552,9 +1549,6 @@ msgstr "Messages"
 
 msgid "Method not allowed"
 msgstr "Methode non autorisée"
-
-msgid "Min. credits"
-msgstr "Créd. min."
 
 msgid "Minerval complete"
 msgstr "Minerval complet"
@@ -2108,9 +2102,6 @@ msgstr "Quadri"
 
 msgid "Quadrimester"
 msgstr "Quadrimestre"
-
-msgid "Quadrimester derogation"
-msgstr "Quadrimestre dérogation"
 
 msgid "Rate code"
 msgstr "Code tarif"
@@ -2794,9 +2785,6 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
-
-msgid "UE full"
-msgstr "UE complète"
 
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"

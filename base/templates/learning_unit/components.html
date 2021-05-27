@@ -43,7 +43,8 @@
             <thead class="components">
             <tr>
                 <th></th>
-                <th>{% trans 'LU' %}</th>
+                <th>{% trans 'Code' %}</th>
+                <th>{% trans 'Title' %}</th>
                 <th>{% trans 'Components' %}</th>
                 <th>{% trans 'Code' %}</th>
                 <th>{% trans 'Vol. Q1' %}</th>
@@ -64,6 +65,9 @@
                 {% block additional_entities_titles %}
                     {% include "learning_unit/blocks/additional_entities_titles.html" %}
                 {% endblock %}
+                <th>{% trans 'Quadrimester' %}</th>
+                <th>{% trans "Derogation's session" %}</th>
+                <th>{% trans 'Learning location' %}</th>
                 <th></th>
             </tr>
             </thead>
@@ -93,7 +97,8 @@
                         </a>
                     {% endif %}
                 </td>
-                <td>{{ component.learning_unit_usage }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.acronym }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.learning_container_year.common_title }} - {{ component.learning_component_year.learning_unit_year.specific_title }}</td>
                 <td>{% if component.learning_component_year.type %}
                     {{ component.learning_component_year.get_type_display }}
                 {% endif %}
@@ -121,28 +126,43 @@
                 {% block additional_requirement_entity_volumes %}
                     {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
                 {% endblock %}
-                <td></td>
+                <td>{{ component.learning_component_year.learning_unit_year.quadrimester | default_if_none:'' }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.session | default_if_none:'' }}</td>
+                <td>{% if component.learning_component_year.learning_unit_year.campus %}{{ component.learning_component_year.learning_unit_year.campus.name }}{% endif %}</td>
             </tr>
             {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
-                <tr class="class_year class_year_head collapse collapse_classes{{ component_number }}">
-                    <td rowspan="{{ classes_count }}"></td>
-                    <td rowspan="{{ classes_count }}">{% trans 'Classes' %}</td>
-                    <td colspan="1">{% trans 'LU' %}</td>
-                    <td colspan="2">{% trans 'code' %}</td>
-                    <td colspan="6">{% trans 'Description' %}</td>
-                </tr>
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
                     <tr class="class_year collapse collapse_classes{{ component_number }}">
-                        <td colspan="1">{{ learning_class_year.used_by_learning_units_year }}</td>
-                        <td colspan="2">
-                            /{% if component.learning_component_year.type_letter_acronym %}
-                            {{ component.learning_component_year.type_letter_acronym }}
+                        {% if forloop.first%}
+                            <td><strong>{% trans 'Classes' %}</strong></td>
+                        {% else %}
+                            <td></td>
                         {% endif %}
-                            - {{ learning_class_year.acronym }}
+                        <td colspan="1">
+                            {{ learning_class_year.used_by_learning_units_year }}{% if  component.learning_component_year.type == 'LECTURING'%}-{% else %}_{% endif %}{{ learning_class_year.acronym }}
                         </td>
-                        <td colspan="6">
-                            {{ learning_class_year.description|default_if_none:'' }}
+                        <td>
+                            {{ learning_class_year.title_fr }}
                         </td>
+                        <td></td>
+                        <td></td>
+                        <td>{{ learning_class_year.hourly_volume_partial_q1 | default_if_none:'' }}</td>
+                        <td>{{ learning_class_year.hourly_volume_partial_q2 | default_if_none:''}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        {% if REQUIREMENT_ENTITY %}
+                            <td></td>
+                        {% endif %}
+                        {% if ADDITIONAL_REQUIREMENT_ENTITY_1 %}
+                            <td></td>
+                        {% endif %}
+                        {% if ADDITIONAL_REQUIREMENT_ENTITY_2 %}
+                            <td></td>
+                        {% endif %}
+                        <td>{{ learning_class_year.quadrimester | default_if_none:'' }}</td>
+                        <td>{{ learning_class_year.session | default_if_none:'' }}</td>
+                        <td>{% if learning_class_year.campus %}{{ learning_class_year.campus.name }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             {% endwith %}

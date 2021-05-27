@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-10 14:58+0200\n"
+"POT-Creation-Date: 2021-05-27 09:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -672,6 +672,9 @@ msgstr ""
 msgid "Deliberation"
 msgstr ""
 
+msgid "Derogation's session"
+msgstr ""
+
 msgid "Description"
 msgstr ""
 
@@ -1212,9 +1215,6 @@ msgstr ""
 msgid "Keywords"
 msgstr ""
 
-msgid "LU"
-msgstr ""
-
 msgid "Language"
 msgstr ""
 
@@ -1498,9 +1498,6 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
 msgid "Maximum number of permitted relationships"
 msgstr ""
 
@@ -1511,9 +1508,6 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method not allowed"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Minerval complete"
@@ -2048,9 +2042,6 @@ msgid "Quadri"
 msgstr ""
 
 msgid "Quadrimester"
-msgstr ""
-
-msgid "Quadrimester derogation"
 msgstr ""
 
 msgid "Rate code"
@@ -2685,9 +2676,6 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
-msgstr ""
-
-msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
