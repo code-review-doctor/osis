@@ -56,10 +56,7 @@ class LearningUnitRepositoryTestCase(TestCase):
         learning_unit = self.learning_unit_repository.get(entity_id=self.learning_unit.entity_id)
 
         self.assertEqual(learning_unit, self.learning_unit)
-        fields = [
-            'titles', 'credits', 'internship_subtype', 'responsible_entity_identity', 'periodicity', 'language_id',
-            'remarks', 'partims', 'derogation_quadrimester', 'lecturing_part', 'practical_part'
-        ]
+        fields = vars(self.learning_unit)
         for field in fields:
             self.assertEqual(getattr(learning_unit, field), getattr(self.learning_unit, field), field)
 
