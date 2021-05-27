@@ -53,10 +53,8 @@ msgstr ""
 "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
 
-#, fuzzy
-#| msgid "Only letters are allowed."
 msgid "Only alphanumeric characters are allowed."
-msgstr "Seulement des lettres sont acceptées."
+msgstr "Uniquement des caractères alphanumériques sont autorisés."
 
 msgid "Only letters are allowed."
 msgstr "Seulement des lettres sont acceptées."
