@@ -244,7 +244,7 @@ def _get_partims(qs: QuerySet) -> QuerySet:
         subtype=learning_unit_year_subtypes.PARTIM,
         learning_container_year_id=Subquery(qs.values('learning_container_year_id'))
     ).annotate(
-        subdivision=Substr('acronym', Length('acronym') - 1, output_field=CharField()),
+        subdivision=Substr('acronym', Length('acronym'), output_field=CharField()),
         title_fr=F('specific_title'),
         title_en=F('specific_title_english'),  # Is that correct?
         iso_code=F('language__code'),
