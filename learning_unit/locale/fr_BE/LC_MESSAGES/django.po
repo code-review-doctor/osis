@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:37+0100\n"
+"POT-Creation-Date: 2021-05-27 09:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,6 +28,9 @@ msgstr "Gestionnaire facultaire"
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
 
+msgid "Learning location"
+msgstr "Lieu d'enseignement"
+
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
 
@@ -46,8 +49,12 @@ msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
 msgid "Not in period to edit force majeure section."
-msgstr "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
+msgstr ""
+"Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
+
+msgid "Only alphanumeric characters are allowed."
+msgstr "Uniquement des caractères alphanumériques sont autorisés."
 
 msgid "Only letters are allowed."
 msgstr "Seulement des lettres sont acceptées."
@@ -60,6 +67,12 @@ msgstr "La proposition est une proposition de modification"
 
 msgid "Proposal not in eligible state for consolidation"
 msgstr "La proposition n'est pas dans un état éligible à la consolidation"
+
+msgid "Quadrimester"
+msgstr "Quadrimestre"
+
+msgid "Session derogation"
+msgstr "Session dérogation"
 
 #, python-format
 msgid ""
@@ -146,6 +159,12 @@ msgstr ""
 "Cette unité d'enseignement n'est pas éligible en raison de son type qui "
 "n'est pas parmi les types suivants: %(types)s"
 
+msgid "Title in English"
+msgstr "Intitulé en anglais"
+
+msgid "Title in French"
+msgstr "Intitulé en français"
+
 msgid "You are not allowed to create proposal during this academic year"
 msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"
 
@@ -199,3 +218,12 @@ msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
 msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
+
+msgid "hourly volume partial q1"
+msgstr "volume horaire partiel q1"
+
+msgid "hourly volume partial q2"
+msgstr "volume horaire partiel q2"
+
+msgid "hourly volume total annual"
+msgstr "volume horaire total annuel"
