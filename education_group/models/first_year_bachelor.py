@@ -74,7 +74,7 @@ class FirstYearBachelor(models.Model):
         verbose_name = _("First year bachelor")
         constraints = [
             CheckConstraint(
-                check=Q(education_group_year__education_group_type__name=TrainingType.BACHELOR),
+                check=Q(education_group_year__education_group_type__name=TrainingType.BACHELOR.name),
                 name='bachelor_type'
             )
         ]
