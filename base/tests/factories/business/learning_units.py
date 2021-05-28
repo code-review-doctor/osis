@@ -421,7 +421,14 @@ def _setup_learning_component_year(learning_unit_year, component_type):
 
 def _setup_classes(learning_component_year, number_classes=5):
     for _ in range(number_classes):
-        LearningClassYearFactory(learning_component_year=learning_component_year)
+        LearningClassYearFactory(
+            learning_component_year=learning_component_year,
+            session=learning_component_year.learning_unit_year.session,
+            quadrimester=learning_component_year.learning_unit_year.quadrimester,
+            hourly_volume_partial_q1=learning_component_year.hourly_volume_partial_q1,
+            hourly_volume_partial_q2=learning_component_year.hourly_volume_partial_q2,
+            hourly_volume_total_annual=learning_component_year.hourly_volume_total_annual
+        )
 
 
 def _create_fixed_educational_information_for_luy(luy):

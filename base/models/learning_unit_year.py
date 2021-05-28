@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, Prefetch
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -37,6 +38,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from attribution.models.attribution_charge_new import AttributionChargeNew
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import entity_version
@@ -56,6 +58,7 @@ from education_group import publisher
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
+from base.models.enums.component_type import PRACTICAL_EXERCISES, LECTURING
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -538,12 +541,15 @@ class LearningUnitYear(SerializableModel):
         components_queryset = LearningComponentYear.objects.filter(
             learning_unit_year__learning_container_year=self.learning_container_year
         )
+
         all_components = components_queryset.order_by('acronym') \
-            .select_related('learning_unit_year')
+            .select_related('learning_unit_year') \
+            .prefetch_related(models.Prefetch('learningclassyear_set', to_attr="classes"))
+
         for learning_component_year in all_components:
             if not self.is_partim() or learning_component_year.learning_unit_year == self:
                 _warnings.extend(learning_component_year.warnings)
-
+        _warnings.extend(self._check_classes(list(all_components)))
         return _warnings
 
     def _check_learning_container_year_warnings(self):
@@ -565,6 +571,193 @@ class LearningUnitYear(SerializableModel):
 
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
+
+    def _check_classes(self, all_components: List[LearningComponentYear]) -> List[str]:
+        _warnings = []
+        _warnings.extend(_check_classes_volumes(all_components))
+        if self.quadrimester:
+            _warnings.extend(_check_classes_quadrimester(self.quadrimester, all_components))
+        if self.session:
+            _warnings.extend(_check_classes_session(self.session, all_components))
+        _warnings.extend(_check_number_of_classes(all_components))
+        return _warnings
+
+
+def _check_classes_quadrimester(ue_quadrimester, all_components: List[LearningComponentYear]) -> List[str]:
+    quadrimester_check = {
+        quadrimesters.LearningUnitYearQuadrimester.Q1.name: {
+            'correct_values': [
+                None,
+                quadrimesters.LearningUnitYearQuadrimester.Q1.name
+            ],
+            'available_values_str': 'Q1'
+        },
+        quadrimesters.LearningUnitYearQuadrimester.Q2.name: {
+            'correct_values': [
+                None,
+                quadrimesters.LearningUnitYearQuadrimester.Q2.name
+            ],
+            'available_values_str': 'Q2'
+        },
+        quadrimesters.LearningUnitYearQuadrimester.Q1and2.name: {
+            'correct_values': [
+                quadrimesters.LearningUnitYearQuadrimester.Q1.name,
+                quadrimesters.LearningUnitYearQuadrimester.Q2.name,
+                quadrimesters.LearningUnitYearQuadrimester.Q1and2.name,
+                quadrimesters.LearningUnitYearQuadrimester.Q1or2.name
+            ],
+            'available_values_str': 'Q1 {}/{} Q2'.format(_('and'), _('or'))
+        },
+        quadrimesters.LearningUnitYearQuadrimester.Q1or2.name: {
+            'correct_values': [
+                quadrimesters.LearningUnitYearQuadrimester.Q1.name,
+                quadrimesters.LearningUnitYearQuadrimester.Q2.name,
+                quadrimesters.LearningUnitYearQuadrimester.Q1or2.name
+            ],
+            'available_values_str': 'Q1 {} Q2'.format(_('or'))
+        },
+        quadrimesters.LearningUnitYearQuadrimester.Q3.name: {
+            'correct_values': [
+                None,
+                quadrimesters.LearningUnitYearQuadrimester.Q3.name,
+                ],
+            'available_values_str': 'Q3'
+        }
+    }
+    _warnings = []
+    message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '
+                '(should be %(should_be_values)s)')
+
+    for learning_component_year in all_components:
+        for effective_class in learning_component_year.classes:
+            if ue_quadrimester and effective_class.quadrimester:
+                if effective_class.quadrimester \
+                        not in quadrimester_check[ue_quadrimester]['correct_values']:
+                    _warnings.append(message % {
+                        'code_class': effective_class.effective_class_complete_acronym,
+                        'should_be_values': quadrimester_check[ue_quadrimester]['available_values_str']
+                    })
+    return _warnings
+
+
+def _check_classes_session(ue_session, all_components: List[LearningComponentYear]) -> List[str]:
+
+    correct_values_23 = [
+        None,
+        learning_unit_year_session.SESSION_X2X,
+        learning_unit_year_session.SESSION_XX3,
+        learning_unit_year_session.SESSION_X23,
+        learning_unit_year_session.SESSION_P23
+    ]
+    available_values_str_23 = "2, 3, 23 {} P23".format(_('or'))
+    session_check = {
+        learning_unit_year_session.SESSION_1XX: {
+            'correct_values': [
+                None,
+                learning_unit_year_session.SESSION_1XX
+            ],
+            'available_values_str': '1'
+        },
+        learning_unit_year_session.SESSION_X2X: {
+            'correct_values': [
+                None,
+                learning_unit_year_session.SESSION_X2X
+            ],
+            'available_values_str': '2'
+        },
+        learning_unit_year_session.SESSION_XX3: {
+            'correct_values': [
+                None,
+                learning_unit_year_session.SESSION_XX3
+            ],
+            'available_values_str': '3'
+        },
+
+        learning_unit_year_session.SESSION_12X: {
+            'correct_values': [
+                None,
+                learning_unit_year_session.SESSION_1XX,
+                learning_unit_year_session.SESSION_X2X,
+                learning_unit_year_session.SESSION_12X
+            ],
+            'available_values_str': '1, 2 {} 12'.format(_('or'))
+        },
+        learning_unit_year_session.SESSION_1X3: {
+            'correct_values': [
+                None,
+                learning_unit_year_session.SESSION_1XX,
+                learning_unit_year_session.SESSION_XX3,
+                learning_unit_year_session.SESSION_1X3
+            ],
+            'available_values_str': '1, 3 {} 13'.format(_('or'))
+        },
+        learning_unit_year_session.SESSION_X23: {
+            'correct_values': correct_values_23,
+            'available_values_str': available_values_str_23
+        },
+        learning_unit_year_session.SESSION_P23: {
+            'correct_values': correct_values_23,
+            'available_values_str': available_values_str_23
+        },
+    }
+    _warnings = []
+    message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
+                '(should be %(should_be_values)s)')
+
+    for learning_component_year in all_components:
+        for effective_class in learning_component_year.classes:
+            if ue_session and effective_class.session:
+                if effective_class.session \
+                        not in session_check[ue_session]['correct_values']:
+                    _warnings.append(message % {
+                        'code_class': effective_class.effective_class_complete_acronym,
+                        'should_be_values': session_check[ue_session]['available_values_str']
+                    })
+    return _warnings
+
+
+def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[str]:
+    _warnings = []
+    for learning_component_yr in all_components:
+        for effective_class in learning_component_yr.classes:
+
+            inconsistent_msg = _('Volumes of {} are inconsistent').format(
+                effective_class.effective_class_complete_acronym
+            )
+            if effective_class.hourly_volume_partial_q1 > learning_component_yr.hourly_volume_partial_q1 or \
+                    effective_class.hourly_volume_partial_q2 > learning_component_yr.hourly_volume_partial_q2:
+                _warnings.append("{} ({}) ".format(
+                    inconsistent_msg,
+                    _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') % {
+                        'sub_type': learning_component_yr.learning_unit_year.get_subtype_display().lower()
+                    }
+                    )
+                )
+
+            class_sum_q1_q2 = effective_class.hourly_volume_partial_q1 + effective_class.hourly_volume_partial_q2
+            if class_sum_q1_q2 > learning_component_yr.hourly_volume_total_annual:
+                _warnings.append(
+                    "{} ({}) ".format(
+                        inconsistent_msg,
+                        _('the annual volume must be equal to the sum of the volumes Q1 and Q2')
+                    )
+                )
+
+    return _warnings
+
+
+def _check_number_of_classes(all_components) -> List[str]:
+    _warnings = []
+    for learning_component_year in all_components:
+        if learning_component_year.planned_classes != len(learning_component_year.classes):
+            _warnings.append(
+                _('The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
+                  'is not consistent') % {
+                    'code_ue': learning_component_year.learning_unit_year.acronym,
+                    'component_code': 'PP' if learning_component_year.type == PRACTICAL_EXERCISES else 'PM'
+                }
+            )
+    return _warnings
 
 
 def get_by_id(learning_unit_year_id):

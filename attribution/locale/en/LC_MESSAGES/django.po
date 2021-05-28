@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:35+0100\n"
+"POT-Creation-Date: 2021-05-28 09:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -207,6 +207,12 @@ msgid "Substitute"
 msgstr ""
 
 msgid "Teaching supply"
+msgstr ""
+
+#, python-format
+msgid ""
+"The sum of volumes for the classes for professor %(tutor)s is superior to "
+"the volume of UE(%(ue_type)s) for this professor"
 msgstr ""
 
 #, python-format

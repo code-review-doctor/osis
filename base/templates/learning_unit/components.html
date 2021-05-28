@@ -98,7 +98,7 @@
                     {% endif %}
                 </td>
                 <td>{{ component.learning_component_year.learning_unit_year.acronym }}</td>
-                <td>{{ component.learning_component_year.learning_unit_year.learning_container_year.common_title }} - {{ component.learning_component_year.learning_unit_year.specific_title }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.learning_container_year.common_title }} - {{ component.learning_component_year.learning_unit_year.specific_title | default_if_none:'' }}</td>
                 <td>{% if component.learning_component_year.type %}
                     {{ component.learning_component_year.get_type_display }}
                 {% endif %}
