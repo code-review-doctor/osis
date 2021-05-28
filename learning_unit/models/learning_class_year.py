@@ -29,7 +29,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import quadrimesters, learning_unit_year_session
 from osis_common.models import osis_model_admin
-from base.models.enums.learning_component_year_type import LECTURING
 
 
 class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
@@ -45,8 +44,8 @@ class LearningClassYearManager(models.Manager):
         )
 
 
-# FIXME: Use same validator as Leila
-only_alphanumeric_validator = RegexValidator(r'^[a-zA-Z0-9]$', _('Only alphanumeric characters are allowed.'))
+ALPHANUMERIC_REGEX = r'^[a-zA-Z0-9]$'
+only_alphanumeric_validator = RegexValidator(ALPHANUMERIC_REGEX, _('Only alphanumeric characters are allowed.'))
 
 
 class LearningClassYear(models.Model):
@@ -62,8 +61,6 @@ class LearningClassYear(models.Model):
     title_fr = models.CharField(max_length=255, blank=True, verbose_name=_('Title in French'))
     title_en = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Title in English'))
 
-    hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
-                                                     verbose_name=_("hourly volume total annual"))
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q1"))
     hourly_volume_partial_q2 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
@@ -83,12 +80,4 @@ class LearningClassYear(models.Model):
             self.learning_component_year.learning_unit_year.acronym,
             self.acronym,
             self.learning_component_year.get_type_display()
-        )
-
-    @property
-    def effective_class_complete_acronym(self):
-        return "{}{}{}".format(
-            self.learning_component_year.learning_unit_year.acronym,
-            '-' if self.learning_component_year.type == LECTURING else '_',
-            self.acronym
         )

@@ -32,12 +32,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='learningclassyear',
-            name='hourly_volume_total_annual',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=6,
-                                      verbose_name='hourly volume total annual'),
-        ),
-        migrations.AddField(
-            model_name='learningclassyear',
             name='quadrimester',
             field=models.CharField(blank=True, null=True,
                                    choices=[('Q1', 'Q1'), ('Q2', 'Q2'), ('Q3', 'Q3'), ('Q1and2', 'Q1 and Q2'),
