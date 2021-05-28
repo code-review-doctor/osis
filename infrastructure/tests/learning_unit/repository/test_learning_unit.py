@@ -3,6 +3,7 @@ from django.test import TestCase
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, \
@@ -83,3 +84,20 @@ class LearningUnitRepositoryTestCase(TestCase):
         self.assertEqual(partim.remarks.publication_fr, partim_db.other_remark, 'remark_publication_fr')
         self.assertEqual(partim.credits, partim_db.credits, 'credits')
         self.assertEqual(partim.periodicity.name, partim_db.periodicity, 'periodicity')
+
+    def test_assert_learning_unit_domain_object_is_not_a_partim(self):
+        luy_db = LearningUnitYearFullFactory(academic_year__current=True)
+        partim_db = LearningUnitYearPartimFactory(
+            learning_container_year=luy_db.learning_container_year,
+            acronym='LTEST1212X',
+            academic_year=luy_db.academic_year
+        )
+        partim_acronym = partim_db.acronym
+        self.assertTrue(LearningUnitYear.objects.filter(acronym=partim_acronym).exists())
+        with self.assertRaises(LearningUnitYear.DoesNotExist):
+            self.learning_unit_repository.get(
+                entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(
+                    code=partim_acronym,
+                    year=partim_db.academic_year.year
+                )
+            )
