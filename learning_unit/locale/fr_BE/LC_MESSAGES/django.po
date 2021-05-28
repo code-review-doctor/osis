@@ -63,7 +63,7 @@ msgstr ""
 "force majeure)."
 
 msgid "Only alphanumeric characters are allowed."
-msgstr "Seulement des carractères alphanumériques sont acceptés."
+msgstr "Seuls les caractères alphanumériques sont acceptés."
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
