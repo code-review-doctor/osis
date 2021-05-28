@@ -300,7 +300,7 @@ class ScoresEncodingList:
         if any(
                 enrol for enrol in enrollments
                 if enrol.learning_unit_enrollment.offer_enrollment.education_group_year == educ_group_year
-                   and not enrol.is_final
+                and not enrol.is_final
         ):
             return False
         return True
@@ -316,6 +316,7 @@ def sort_encodings(exam_enrollments):
     :param exam_enrollments: List of examEnrollments to sort
     :return:
     """
+
     def _sort(key):
         learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         off_enroll = key.learning_unit_enrollment.offer_enrollment
