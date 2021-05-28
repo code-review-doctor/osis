@@ -28,6 +28,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import quadrimesters, learning_unit_year_session
+from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ALPHANUMERIC_REGEX
 from osis_common.models import osis_model_admin
 
 
@@ -45,7 +46,7 @@ class LearningClassYearManager(models.Manager):
 
 
 # FIXME: Use same validator as Leila
-only_alphanumeric_validator = RegexValidator(r'^[a-zA-Z0-9]$', _('Only alphanumeric characters are allowed.'))
+only_alphanumeric_validator = RegexValidator(ALPHANUMERIC_REGEX, _('Only alphanumeric characters are allowed.'))
 
 
 class LearningClassYear(models.Model):
