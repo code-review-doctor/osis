@@ -27,6 +27,7 @@
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
@@ -41,11 +42,18 @@ class ClassIdentitificationView(PermissionRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
+                'learning_unit_year_id': self.get_learning_unit_year_id(),
                 'learning_unit': self.get_learning_unit(),
                 # 'effective_class': self.get_effective_class() TODO: after 5880
             }
         )
         return context
+
+    def get_learning_unit_year_id(self):
+        return LearningUnitYear.objects.get(
+            acronym=self.kwargs['learning_unit_code'],
+            academic_year__year=self.kwargs['learning_unit_year']
+        ).pk
 
     def get_permission_object(self):
         return LearningClassYear.objects.filter(
