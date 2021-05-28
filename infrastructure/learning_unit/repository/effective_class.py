@@ -61,7 +61,12 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+        obj = LearningClassYearDb.objects.get(
+            acronym=entity_id.class_code,
+            learning_component_year__learning_unit_year__academic_year__year=entity_id.learning_unit_identity.year,
+            learning_component_year__learning_unit_year__acronym=entity_id.learning_unit_identity.code
+        )
+        obj.delete()
 
     @classmethod
     def save(cls, entity: 'EffectiveClass') -> None:
