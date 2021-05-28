@@ -260,9 +260,8 @@ class TestTrainingRepositoryGetMethod(TestCase):
             self.assertEqual(result.diploma.aims[idx].code, aims.code)
 
     def test_get_bachelor(self):
-        egy = EducationGroupYearBachelorFactory()
         ev = EntityVersionModelDbFactory()
-        FirstYearBachelorFactory(education_group_year=egy, administration_entity=ev.entity)
+        egy = EducationGroupYearBachelorFactory(gen_first_year_bachelor__administration_entity=ev.entity)
 
         training_identity = generate_training_identity_from_education_group_year(egy)
 

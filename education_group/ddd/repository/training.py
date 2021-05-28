@@ -224,7 +224,7 @@ def _convert_education_group_year_to_dto(
     }
     if obj.is_bachelor:
         first_year_administration_entity = obj.firstyearbachelor.administration_entity.most_recent_acronym \
-            if obj.firstyearbachelor.administration_entity else None,
+            if obj.firstyearbachelor.administration_entity else None
         return BachelorDto(
             first_year_bachelor_administration_entity_acronym=first_year_administration_entity,
             **datas

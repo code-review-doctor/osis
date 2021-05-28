@@ -107,6 +107,12 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
         except KeyError:
             self.partial_acronym = generate_partial_acronym()
 
+    @factory.post_generation
+    def gen_first_year_bachelor(self, create, extracted, **kwargs):
+        if self.is_bachelor:
+            from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
+            FirstYearBachelorFactory(education_group_year=self, **kwargs)
+
     @classmethod
     def next_year_from(cls, from_obj: 'EducationGroupYear'):
         return cls(
