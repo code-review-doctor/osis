@@ -87,3 +87,9 @@ class LearningUnitSearchCommand(interface.CommandRequest):
     type = attr.ib(type=str)
     full_title = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetLearningUnitCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)

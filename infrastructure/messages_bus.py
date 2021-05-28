@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand
+from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
@@ -54,6 +55,7 @@ class MessageBus:
         BulkUpdateLinkCommand: lambda cmd: bulk_update_and_postpone_links(
             cmd, ProgramTreeRepository(), ReportRepository()
         ),
+        GetLearningUnitCommand: lambda cmd: get_learning_unit(cmd, LearningUnitRepository())
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
