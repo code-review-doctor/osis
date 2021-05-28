@@ -109,7 +109,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def gen_first_year_bachelor(self, create, extracted, **kwargs):
-        if self.is_bachelor:
+        if self.is_bachelor and create:
             from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
             FirstYearBachelorFactory(education_group_year=self, **kwargs)
 
