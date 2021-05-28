@@ -23,24 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import path, include
+from rest_framework import views
+from rest_framework.response import Response
 
-from attribution.api.views.application import ApplicationUpdateDeleteView, ApplicationListCreateView, \
-    RenewAttributionsAboutToExpire
-from attribution.api.views.vacant_course import VacantCourseListView
-from attribution.api.views.attribution import AttributionListView, MyAttributionListView
-from attribution.api.views.calendar import ApplicationCoursesCalendarListView
+from attribution.api.serializers.vacant_course import VacantCourseFilterSerializer, VacantCourseGetSerializer
+from base.models.enums.vacant_declaration_type import VacantDeclarationType
+from ddd.logic.application.commands import SearchVacantCoursesCommand
+from infrastructure.messages_bus import message_bus_instance
 
-app_name = "attribution"
-urlpatterns = [
-    path('application/', include([
-        path('calendars', ApplicationCoursesCalendarListView.as_view(), name=ApplicationCoursesCalendarListView.name),
-        path('vacant_courses', VacantCourseListView.as_view(), name=VacantCourseListView.name),
-        path('renewal', RenewAttributionsAboutToExpire.as_view(), name=RenewAttributionsAboutToExpire.name),
-        path('<str:application_uuid>/', ApplicationUpdateDeleteView.as_view(), name=ApplicationUpdateDeleteView.name),
-        path('', ApplicationListCreateView.as_view(), name=ApplicationListCreateView.name),
-    ])),
 
-    path('<int:year>/me/', MyAttributionListView.as_view(), name=MyAttributionListView.name),
-    path('<int:year>/<str:global_id>/', AttributionListView.as_view(), name=AttributionListView.name),
-]
+class VacantCourseListView(views.APIView):
+    """
+       Return vacant courses available filtered by criteria
+    """
+    name = 'vacant_courses_list'
+
+    def get(self, request, *args, **kwargs):
+        serializer = VacantCourseFilterSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+
+        cmd = SearchVacantCoursesCommand(
+            code=serializer.validated_data['code'],
+            allocation_entity_code=serializer.validated_data['allocation_faculty'],
+            vacant_declaration_types=[
+                VacantDeclarationType.OPEN_FOR_EXTERNS.name, VacantDeclarationType.RESEVED_FOR_INTERNS.name
+            ],
+        )
+        vacant_courses = message_bus_instance.invoke(cmd)
+
+        serializer = VacantCourseGetSerializer(vacant_courses, many=True)
+        return Response(serializer.data)

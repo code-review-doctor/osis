@@ -60,7 +60,7 @@ class ApplyOnVacantCourseCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class UpdateApplicationCommand(interface.CommandRequest):
-    application_uuid = attr.ib(type=str)
+    application_uuid = attr.ib(type=str)  # FIX ME: Add global_id in order to ensure that
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
     course_summary = attr.ib(type=str)
@@ -69,7 +69,7 @@ class UpdateApplicationCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class DeleteApplicationCommand(interface.CommandRequest):
-    application_uuid = attr.ib(type=str)
+    application_uuid = attr.ib(type=str)   # FIX ME: Add global_id in order to ensure that
 
 
 @attr.s(frozen=True, slots=True)
