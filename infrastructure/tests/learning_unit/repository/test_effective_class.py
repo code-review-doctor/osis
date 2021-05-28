@@ -33,7 +33,7 @@ class EffectiveClassRepositoryTestCase(TestCase):
         self.class_repository = EffectiveClassRepository()
 
     def test_save_and_get_make_correct_mapping(self):
-        self.dto_object = EffectiveClassFromRepositoryDTO(
+        dto_object = EffectiveClassFromRepositoryDTO(
             class_code='X',
             learning_unit_code=self.learning_unit_year.acronym,
             learning_unit_year=self.learning_unit_year.academic_year.year,
@@ -47,14 +47,14 @@ class EffectiveClassRepositoryTestCase(TestCase):
             volume_q2=Decimal('2.6'),
             class_type=LECTURING
         )
-        self.effective_class = EffectiveClassBuilder.build_from_repository_dto(self.dto_object)
-        self.class_repository.save(self.effective_class)
-        effective_class = self.class_repository.get(entity_id=self.effective_class.entity_id)
+        effective_class_to_persist = EffectiveClassBuilder.build_from_repository_dto(dto_object)
+        self.class_repository.save(effective_class_to_persist)
+        effective_class = self.class_repository.get(entity_id=effective_class_to_persist.entity_id)
 
-        self.assertEqual(effective_class, self.effective_class)
-        fields = vars(self.effective_class)
+        self.assertEqual(effective_class, effective_class_to_persist)
+        fields = vars(effective_class)
         for field in fields:
-            self.assertEqual(getattr(effective_class, field), getattr(self.effective_class, field), field)
+            self.assertEqual(getattr(effective_class, field), getattr(effective_class_to_persist, field), field)
 
     def test_delete(self):
         class_db = LearningClassYearFactory()
