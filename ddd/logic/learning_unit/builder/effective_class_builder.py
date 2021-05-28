@@ -35,7 +35,9 @@ from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolum
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
     LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.domain.service.can_create_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 from osis_common.ddd.interface import DTO
 
@@ -46,13 +48,18 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             cls,
             cmd: 'CreateEffectiveClassCommand',
             learning_unit: 'LearningUnit',
-            all_existing_class_identities: List['EffectiveClassIdentity']
+            all_existing_class_identities: List['EffectiveClassIdentity'],
+            learning_unit_repository: 'ILearningUnitRepository'
     ) -> 'EffectiveClass':
         CreateEffectiveClassValidatorList(
             command=cmd,
-            learning_unit=learning_unit,
-            all_existing_class_identities=all_existing_class_identities
         ).validate()
+        CanCreateEffectiveClass().check(
+            learning_unit=learning_unit,
+            all_existing_class_identities=all_existing_class_identities,
+            cmd=cmd,
+            learning_unit_repository=learning_unit_repository
+        )
 
         effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
 

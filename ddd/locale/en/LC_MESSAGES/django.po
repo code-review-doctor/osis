@@ -26,7 +26,13 @@ msgstr ""
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr ""
 
+msgid "Class can't be created on learning unit having enrollment"
+msgstr ""
+
 msgid "Class can't be created on learning unit having partim"
+msgstr ""
+
+msgid "Class can't be created on learning unit having proposal"
 msgstr ""
 
 msgid "Class can't be neither mobility nor external"

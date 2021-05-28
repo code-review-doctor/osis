@@ -4,9 +4,6 @@ import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.validator._check_class_volumes import CheckClassVolumeConsistency
-from ddd.logic.learning_unit.domain.validator._class_code_code_should_be_unique_for_UE import \
-    ClassCodeShouldBeUniqueForUE
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
 from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ShouldBeAlphanumericValidator
@@ -20,10 +17,6 @@ from ddd.logic.learning_unit.domain.validator._should_learning_unit_code_respect
     ShouldCodeRespectNamingConventionValidator
 from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_exists_in_next_year import \
     ShouldLearningUnitNotExistNextYearValidator
-from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_have_partims import \
-    ShouldLearningUnitNotHavePartim
-from ddd.logic.learning_unit.domain.validator._should_not_be_type_mobility_or_external import \
-    ShouldNotBeTypeMobilityOrExternal
 from ddd.logic.learning_unit.domain.validator._subdivision_should_contain_only_one_letter import \
     SubdivisionShouldContainOnlyOneLetterValidator
 from ddd.logic.learning_unit.domain.validator._subdivision_should_not_exist import SubdivisionShouldNotExistValidator
@@ -71,7 +64,7 @@ class CopyLearningUnitToNextYearValidatorList(TwoStepsMultipleBusinessExceptionL
 @attr.s(frozen=True, slots=True)
 class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
+    learning_unit = attr.ib(type='LearningUnit')  # type: 'LearningUnit'
     subdivision = attr.ib(type=str)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -88,8 +81,6 @@ class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
     command = attr.ib(type=CreateEffectiveClassCommand)
-    learning_unit = attr.ib(type='LearningUnit')
-    all_existing_class_identities = attr.ib(type=List['EffectiveClassIdentity'])
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
@@ -97,17 +88,4 @@ class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListVal
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
-        return [
-            ClassCodeShouldBeUniqueForUE(
-                self.command.class_code,
-                self.learning_unit.entity_id,
-                self.all_existing_class_identities
-            ),
-            ShouldNotBeTypeMobilityOrExternal(self.learning_unit),
-            ShouldLearningUnitNotHavePartim(self.learning_unit),
-            CheckClassVolumeConsistency(
-                self.command.volume_first_quadrimester,
-                self.command.volume_second_quadrimester,
-                self.learning_unit
-            )
-        ]
+        return []

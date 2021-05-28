@@ -25,8 +25,14 @@ msgstr "Le volume annuel doit être >=0. La somme des volumes Q1 et Q2 doit êtr
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
 
+msgid "Class can't be created on learning unit having enrollment"
+msgstr "L'unité d'enseignement ne peut avoir d'inscription"
+
 msgid "Class can't be created on learning unit having partim"
 msgstr "L'unité d'enseignement ne peut avoir de partim"
+
+msgid "Class can't be created on learning unit having proposal"
+msgstr "L'unité d'enseignement ne peut être en proposition"
 
 msgid "Class can't be neither mobility nor external"
 msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"

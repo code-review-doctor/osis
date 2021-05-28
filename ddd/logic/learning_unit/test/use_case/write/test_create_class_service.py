@@ -41,7 +41,7 @@ from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffect
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
-    LearningUnitHasPartimException
+    LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
@@ -177,6 +177,42 @@ class TestCreateClassServiceValidator(TestCase):
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             ClassTypeInvalidException
+        )
+
+    def test_raise_should_learning_unit_not_have_proposal_exception(self):
+        learning_unit_repository = LearningUnitRepository()
+        learning_unit_repository.has_proposal = lambda *args, **kwargs: True
+        cmd = _build_create_effective_class_command(
+            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
+            class_code='Z'
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(
+                cmd,
+                learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            LearningUnitHasProposalException
+        )
+
+    def test_raise_should_learning_unit_not_have_enrollment_exception(self):
+        learning_unit_repository = LearningUnitRepository()
+        learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
+        cmd = _build_create_effective_class_command(
+            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
+            class_code='Z'
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(
+                cmd,
+                learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            LearningUnitHasEnrollmentException
         )
 
     def test_raise_should_learning_unit_not_have_partim_exception(self):

@@ -50,7 +50,8 @@ def create_effective_class(
     effective_class = EffectiveClassBuilder.build_from_command(
         cmd,
         learning_unit,
-        all_existing_class_identities
+        all_existing_class_identities,
+        learning_unit_repository
     )
 
     # Then

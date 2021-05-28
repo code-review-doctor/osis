@@ -254,7 +254,7 @@ def _get_partims(qs: QuerySet) -> QuerySet:
     ).annotate(
         subdivision=Substr('acronym', Length('acronym'), output_field=CharField()),
         title_fr=F('specific_title'),
-        title_en=F('specific_title_english'),  # Is that correct?
+        title_en=F('specific_title_english'),
         iso_code=F('language__code'),
         remark_faculty=F('faculty_remark'),
         remark_publication_fr=F('other_remark'),

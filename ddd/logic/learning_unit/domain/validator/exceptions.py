@@ -150,6 +150,22 @@ class LearningUnitHasPartimException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class LearningUnitHasProposalException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be created on learning unit having proposal"
+        )
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitHasEnrollmentException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be created on learning unit having enrollment"
+        )
+        super().__init__(message, **kwargs)
+
+
 class AnnualVolumeInvalidException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(
