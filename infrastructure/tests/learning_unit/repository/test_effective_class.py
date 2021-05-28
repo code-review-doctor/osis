@@ -9,8 +9,11 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
+from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class EffectiveClassRepositoryTestCase(TestCase):
@@ -52,3 +55,14 @@ class EffectiveClassRepositoryTestCase(TestCase):
         fields = vars(self.effective_class)
         for field in fields:
             self.assertEqual(getattr(effective_class, field), getattr(self.effective_class, field), field)
+
+    def test_delete(self):
+        class_db = LearningClassYearFactory()
+        class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+            class_code=class_db.acronym,
+            learning_unit_year=class_db.learning_component_year.learning_unit_year.academic_year.year,
+            learning_unit_code=class_db.learning_component_year.learning_unit_year.acronym
+        )
+        self.assertEqual(LearningClassYearDb.objects.all().count(), 1)
+        self.class_repository.delete(class_identity)
+        self.assertEqual(LearningClassYearDb.objects.all().count(), 0)
