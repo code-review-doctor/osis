@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import AcademicYearBuilder
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
 from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
@@ -41,12 +42,12 @@ class AcademicYearRepository(IAcademicYearRepository):
     @classmethod
     def search(
             cls,
-            min_year: Optional[int] = None,
+            cmd: SearchAcademicYearCommand,
             **kwargs
     ) -> List['AcademicYear']:
         objects = _get_common_queryset()
-        if min_year:
-            objects = _get_common_queryset().filter(year__gte=min_year)
+        if cmd.early_limit_year:
+            objects = _get_common_queryset().filter(year__gte=cmd.early_limit_year)
         objects_as_dict = objects.values(
             'year',
             'start_date',

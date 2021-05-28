@@ -24,8 +24,9 @@
 #
 ##############################################################################
 from abc import abstractmethod
-from typing import Optional, List
+from typing import List
 
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
@@ -41,8 +42,7 @@ class IAcademicYearRepository(interface.AbstractRepository):
     @abstractmethod
     def search(
             cls,
-            entity_ids: Optional[List['AcademicYearIdentity']] = None,
-            min_year: Optional[int] = None,
+            cmd: SearchAcademicYearCommand,
             **kwargs
     ) -> List['AcademicYear']:
         pass
