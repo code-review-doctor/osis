@@ -31,6 +31,7 @@ from base.tests.factories.entity import EntityFactory
 class FirstYearBachelorFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "education_group.FirstYearBachelor"
+        django_get_or_create = ('education_group_year', )
 
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     administration_entity = factory.SubFactory(EntityFactory)
