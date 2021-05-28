@@ -46,6 +46,7 @@ from education_group.ddd.domain._campus import Campus
 from education_group.ddd.domain._co_graduation import CoGraduation
 from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
 from education_group.ddd.domain._diploma import Diploma, DiplomaAim, DiplomaAimIdentity
+from education_group.ddd.domain._entity import Entity as EntityValueObject, Entity
 from education_group.ddd.domain._funding import Funding
 from education_group.ddd.domain._hops import HOPS
 from education_group.ddd.domain._isced_domain import IscedDomain, IscedDomainIdentity
@@ -54,7 +55,6 @@ from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIde
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
-from education_group.ddd.domain._entity import Entity as EntityValueObject, Entity
 from education_group.ddd.validators.validators_by_business_action import CopyTrainingValidatorList, \
     CreateTrainingValidatorList
 from osis_common.ddd import interface
@@ -319,13 +319,14 @@ class TrainingBuilder(RootEntityBuilder):
             ),
         }
 
-        # todo REMOVE cyclic import
         if datas['type'] == TrainingType.BACHELOR:
-            from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
-            from ddd.logic.formation_catalogue.domain.model._first_year_bachelor import FirstYearBachelor, \
-                FirstYearBachelorIdentity
-
-            training = Bachelor(first_year_bachelor=FirstYearBachelor(entity_id=FirstYearBachelorIdentity(), administration_entity=None), **datas)
+            training = Bachelor(
+                first_year_bachelor=FirstYearBachelor(
+                    entity_id=FirstYearBachelorIdentity(),
+                    administration_entity=None
+                ),
+                **datas
+            )
         else:
             training = Training(**datas)
         CreateTrainingValidatorList(training).validate()
