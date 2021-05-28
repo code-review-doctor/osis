@@ -67,3 +67,6 @@ class FirstYearBachelor(models.Model):
         related_name='first_year_administration_entity',
         on_delete=models.PROTECT
     )
+
+    class Meta:
+        verbose_name = _("First year bachelor")
