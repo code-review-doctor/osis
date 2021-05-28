@@ -160,12 +160,10 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
         cls.bachelor_mdl = EducationGroupYearBachelorFactory(
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
-            academic_year__current=True
+            academic_year__current=True,
+            gen_first_year_bachelor__administration_entity=cls.entity_version.entity
         )
-        cls.fyb = FirstYearBachelorFactory(
-            education_group_year=cls.bachelor_mdl,
-            administration_entity=cls.entity_version.entity
-        )
+        cls.fyb = FirstYearBachelorModelDb.objects.get(education_group_year=cls.bachelor_mdl)
 
         cls.bachelor = TrainingRepository.get(
             TrainingIdentityFactory(
