@@ -47,7 +47,6 @@ from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, Diplo
 from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
 from education_group.tests.ddd.factories.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
 from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
-from education_group.tests.factories.first_year_bachelor import FirstYearBachelorFactory
 from reference.models.domain import Domain
 from reference.tests.factories.domain import DomainFactory as DomainModelDbFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory as DomainIscedFactoryModelDb

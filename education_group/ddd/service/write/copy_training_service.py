@@ -27,7 +27,8 @@ from django.db import transaction
 
 from education_group.ddd import command
 from education_group.ddd.domain import exception
-from education_group.ddd.domain.training import TrainingBuilder, TrainingIdentity
+from education_group.ddd.domain.training import TrainingIdentity
+from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
 from education_group.ddd.repository import training as training_repository
 
 
