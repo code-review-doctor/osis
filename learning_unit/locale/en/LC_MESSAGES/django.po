@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 12:00+0200\n"
+"POT-Creation-Date: 2021-05-28 13:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,9 @@ msgid "Faculty managers"
 msgstr ""
 
 msgid "Formation catalogue"
+msgstr ""
+
+msgid "Learning location"
 msgstr ""
 
 msgid "Learning unit is not full"
@@ -56,7 +59,7 @@ msgstr ""
 msgid "Not in period to edit force majeure section."
 msgstr ""
 
-msgid "Only letters are allowed."
+msgid "Only alphanumeric characters are allowed."
 msgstr ""
 
 msgid "Person not in accordance with proposal state"
@@ -66,6 +69,12 @@ msgid "Proposal is of modification type"
 msgstr ""
 
 msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+msgid "Quadrimester"
+msgstr ""
+
+msgid "Session derogation"
 msgstr ""
 
 #, python-format
@@ -144,6 +153,12 @@ msgid ""
 "is not among those types: %(types)s"
 msgstr ""
 
+msgid "Title in English"
+msgstr ""
+
+msgid "Title in French"
+msgstr ""
+
 msgid "You are not allowed to create proposal during this academic year"
 msgstr ""
 
@@ -183,4 +198,10 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "hourly volume partial q1"
+msgstr ""
+
+msgid "hourly volume partial q2"
 msgstr ""

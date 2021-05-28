@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 12:00+0200\n"
+"POT-Creation-Date: 2021-05-28 13:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,9 @@ msgstr "Gestionnaires facultaires"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
+
+msgid "Learning location"
+msgstr "Lieu d'enseignement"
 
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
@@ -59,8 +62,8 @@ msgstr ""
 "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
 
-msgid "Only letters are allowed."
-msgstr "Seulement des lettres sont acceptées."
+msgid "Only alphanumeric characters are allowed."
+msgstr "Seulement des carractères alphanumériques sont acceptés."
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
@@ -70,6 +73,12 @@ msgstr "La proposition est une proposition de modification"
 
 msgid "Proposal not in eligible state for consolidation"
 msgstr "La proposition n'est pas dans un état éligible à la consolidation"
+
+msgid "Quadrimester"
+msgstr "Quadrimestre"
+
+msgid "Session derogation"
+msgstr "Session dérogation"
 
 #, python-format
 msgid ""
@@ -156,6 +165,12 @@ msgstr ""
 "Cette unité d'enseignement n'est pas éligible en raison de son type qui "
 "n'est pas parmi les types suivants: %(types)s"
 
+msgid "Title in English"
+msgstr "Titre en anglais"
+
+msgid "Title in French"
+msgstr "Titre en français"
+
 msgid "You are not allowed to create proposal during this academic year"
 msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"
 
@@ -209,3 +224,9 @@ msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
 msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
+
+msgid "hourly volume partial q1"
+msgstr "volume horaire partiel q1"
+
+msgid "hourly volume partial q2"
+msgstr "volume horaire partiel q2"
