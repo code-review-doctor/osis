@@ -7,7 +7,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, \
-    LearningUnitYearPartimFactory
+    LearningUnitYearPartimFactory, LearningUnitYearFactory
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
@@ -101,3 +101,13 @@ class LearningUnitRepositoryTestCase(TestCase):
                     year=partim_db.academic_year.year
                 )
             )
+
+    def test_delete(self):
+        learning_unit_db = LearningUnitYearFactory()
+        class_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            year=learning_unit_db.academic_year.year,
+            code=learning_unit_db.acronym
+        )
+        self.assertEqual(LearningUnitYear.objects.all().count(), 1)
+        self.learning_unit_repository.delete(class_identity)
+        self.assertEqual(LearningUnitYear.objects.all().count(), 0)

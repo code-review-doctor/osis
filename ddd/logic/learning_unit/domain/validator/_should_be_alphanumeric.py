@@ -29,14 +29,14 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException
+from learning_unit.models.learning_class_year import ALPHANUMERIC_REGEX
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldBeAlphanumericValidator(BusinessValidator):
-
     class_code = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        alphanumeric_regex = r"^\w+$"
+        alphanumeric_regex = ALPHANUMERIC_REGEX
         if not re.fullmatch(alphanumeric_regex, self.class_code):
             raise ShouldBeAlphanumericException()

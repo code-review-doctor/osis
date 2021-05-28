@@ -31,7 +31,7 @@ from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCom
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
-from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
+from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository

@@ -85,3 +85,19 @@ class LearningUnitSearchDTO(DTO):
 class UclEntityDataDTO(DTO):
     code = attr.ib(type=str)
     type = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class EffectiveClassFromRepositoryDTO(DTO):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    teaching_place = attr.ib(type=str)
+    teaching_organization = attr.ib(type=str)
+    derogation_quadrimester = attr.ib(type=str)
+    session_derogation = attr.ib(type=str)
+    volume_q1 = attr.ib(type=Decimal)
+    volume_q2 = attr.ib(type=Decimal)
+    class_type = attr.ib(type=str)
