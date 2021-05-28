@@ -48,7 +48,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         qs = LearningClassYearDb.objects.filter(
             learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
             learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
-            acronym=entity_id.code,
+            acronym=entity_id.class_code,
         )
         qs = _annotate_queryset(qs)
         qs = _values_queryset(qs)
@@ -131,7 +131,6 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
         volume_q2=F('hourly_volume_partial_q2'),
-        volume_annual=F('hourly_volume_total_annual'),
         class_type=F('learning_component_year__type')
     )
 
@@ -149,6 +148,5 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'session_derogation',
         'volume_q1',
         'volume_q2',
-        'volume_annual',
         'class_type'
     )

@@ -25,17 +25,19 @@ class EffectiveClassRepositoryTestCase(TestCase):
             learning_unit_year=self.learning_unit_year
         )
 
-        campus = self.learning_unit_year.campus
+        self.campus = self.learning_unit_year.campus
 
         self.class_repository = EffectiveClassRepository()
+
+    def test_save_and_get_make_correct_mapping(self):
         self.dto_object = EffectiveClassFromRepositoryDTO(
             class_code='X',
             learning_unit_code=self.learning_unit_year.acronym,
             learning_unit_year=self.learning_unit_year.academic_year.year,
             title_fr='Titre en francais',
             title_en='TItle in english',
-            teaching_place=campus.name,
-            teaching_organization=campus.organization.name,
+            teaching_place=self.campus.name,
+            teaching_organization=self.campus.organization.name,
             derogation_quadrimester=DerogationQuadrimester.Q1.name,
             session_derogation=DerogationSession.SESSION_123.name,
             volume_q1=Decimal('1.5'),
@@ -43,8 +45,6 @@ class EffectiveClassRepositoryTestCase(TestCase):
             class_type=LECTURING
         )
         self.effective_class = EffectiveClassBuilder.build_from_repository_dto(self.dto_object)
-
-    def test_save_and_get_make_correct_mapping(self):
         self.class_repository.save(self.effective_class)
         effective_class = self.class_repository.get(entity_id=self.effective_class.entity_id)
 
