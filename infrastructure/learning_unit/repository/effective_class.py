@@ -31,10 +31,12 @@ from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
 from base.models.learning_component_year import LearningComponentYear as LearningComponentYearDb
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
 from osis_common.ddd.interface import ApplicationService
 
@@ -85,6 +87,26 @@ class EffectiveClassRepository(IEffectiveClassRepository):
                 'hourly_volume_total_annual': entity.volumes.volume_annual
             }
         )
+
+    @classmethod
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+        all_classes = LearningClassYearDatabase.objects.all().annotate(
+            class_code=F('acronym'),
+            learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
+            learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year')
+        ).values(
+            "class_code"
+            "learning_unit_code",
+            "learning_unit_year",
+        )
+        return [
+            EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+                class_code=learning_class.classs_code,
+                learning_unit_code=learning_class.learning_unit_code,
+                learning_unit_year=learning_class.learning_unit_year
+            )
+            for learning_class in all_classes
+        ]
 
 
 def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int:

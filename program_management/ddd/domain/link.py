@@ -23,14 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import copy
 from typing import Dict, List
 
 import attr
 
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimester
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
@@ -44,6 +41,7 @@ class LinkIdentity(interface.EntityIdentity):
     child_year = attr.ib(type=int)
 
     def __str__(self):
+        from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
         return "{parent_code} ({verbose_parent_year}) - {child_code} ({verbose_child_year})".format(
             parent_code=self.parent_code,
             verbose_parent_year=AcademicYearIdentity.get_verbose_year(self.parent_year),

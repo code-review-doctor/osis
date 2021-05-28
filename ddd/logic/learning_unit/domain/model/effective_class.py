@@ -31,7 +31,7 @@ from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
+from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
@@ -44,18 +44,18 @@ class EffectiveClassCode(str):
 
 @attr.s(frozen=True, slots=True)
 class EffectiveClassIdentity(interface.EntityIdentity):
-    code = attr.ib(type=EffectiveClassCode)
+    class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
 
-@attr.s(slots=True, eq=False)
+@attr.s(slots=True, hash=False, eq=False)
 class EffectiveClass(interface.RootEntity, abc.ABC):
     entity_id = attr.ib(type=EffectiveClassIdentity)
     titles = attr.ib(type=ClassTitles)
     teaching_place = attr.ib(type=TeachingPlace)
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
     session_derogation = attr.ib(type=DerogationSession)
-    volumes = attr.ib(type=Volumes)
+    volumes = attr.ib(type=ClassVolumes)
 
 
 class PracticalEffectiveClass(EffectiveClass):

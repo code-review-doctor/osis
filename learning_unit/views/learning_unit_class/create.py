@@ -28,12 +28,12 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import FormView
 
 from base.models.learning_unit_year import get_by_id, LearningUnitYear
-from learning_unit.forms.classes.create import ClasseForm
+from learning_unit.forms.classes.create import ClassForm
 
 
 class Create(PermissionRequiredMixin, FormView):
-    template_name = "classe/creation.html"
-    form_class = ClasseForm
+    template_name = "class/creation.html"
+    form_class = ClassForm
     permission_required = 'base.can_create_class'
 
     def get_context_data(self, **kwargs):

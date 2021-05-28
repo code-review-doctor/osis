@@ -25,6 +25,8 @@
 ##############################################################################
 from django.db import transaction
 
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
@@ -34,13 +36,24 @@ from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepo
 @transaction.atomic()
 def create_effective_class(
         cmd: 'CreateEffectiveClassCommand',
-        class_repository: 'IEffectiveClassRepository',
         learning_unit_repository: 'ILearningUnitRepository',
+        class_repository: 'IEffectiveClassRepository'
+
 ) -> 'EffectiveClassIdentity':
-    # GIVEN
+    # Given
+    learning_unit = learning_unit_repository.get(
+        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+    )
+    all_existing_class_identities = class_repository.get_all_identities()
 
-    # WHEN
+    # When
+    effective_class = EffectiveClassBuilder.build_from_command(
+        cmd,
+        learning_unit,
+        all_existing_class_identities,
+        learning_unit_repository
+    )
 
-    # THEN
-
-    raise NotImplementedError
+    # Then
+    class_repository.save(effective_class)
+    return effective_class.entity_id

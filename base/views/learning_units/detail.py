@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-import waffle
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -149,7 +148,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
             'can_cancel_proposal': self.person.user.has_perm('base.can_cancel_proposal', obj),
             'can_edit_learning_unit_proposal': self.person.user.has_perm('base.can_edit_learning_unit_proposal', obj),
             'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj),
-            'can_create_class': self.can_create_class(obj),
         }
 
         return context
@@ -168,10 +166,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created'
                                                                      ).select_related('revision__user__person')
-
-    def can_create_class(self, obj):
-        return self.person.user.has_perm('base.can_create_class', obj) and \
-               waffle.flag_is_active(self.request, 'learning_class_create')
 
 
 class DetailLearningUnitYearViewBySlug(DetailLearningUnitYearView):

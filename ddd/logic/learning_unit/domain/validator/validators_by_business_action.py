@@ -3,9 +3,10 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
+from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ShouldBeAlphanumericValidator
 from ddd.logic.learning_unit.domain.validator._should_code_not_exist import ShouldCodeAlreadyExistsValidator
 from ddd.logic.learning_unit.domain.validator._should_credits_respect_minimum_value import \
     ShouldCreditsRespectMinimumValueValidator
@@ -62,8 +63,7 @@ class CopyLearningUnitToNextYearValidatorList(TwoStepsMultipleBusinessExceptionL
 
 @attr.s(frozen=True, slots=True)
 class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-
-    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
+    learning_unit = attr.ib(type='LearningUnit')  # type: 'LearningUnit'
     subdivision = attr.ib(type=str)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -78,11 +78,12 @@ class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
 @attr.s(frozen=True, slots=True)
 class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-
-    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
+    command = attr.ib(type=CreateEffectiveClassCommand)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
-        return []
+        return [
+            ShouldBeAlphanumericValidator(self.command.class_code)
+        ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return []

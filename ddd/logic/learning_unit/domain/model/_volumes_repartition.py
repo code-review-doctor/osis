@@ -33,6 +33,12 @@ DurationUnit = Decimal
 
 
 @attr.s(frozen=True, slots=True)
+class ClassVolumes(interface.ValueObject):
+    volume_first_quadrimester = attr.ib(type=DurationUnit)
+    volume_second_quadrimester = attr.ib(type=DurationUnit)
+
+
+@attr.s(frozen=True, slots=True)
 class Volumes(interface.ValueObject):
     volume_first_quadrimester = attr.ib(type=DurationUnit)
     volume_second_quadrimester = attr.ib(type=DurationUnit)
