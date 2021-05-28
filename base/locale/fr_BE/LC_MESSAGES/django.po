@@ -3166,7 +3166,7 @@ msgid "optional"
 msgstr "optionnel"
 
 msgid "or"
-msgstr ""
+msgstr "ou"
 
 msgid "parameters"
 msgstr "paramètres"

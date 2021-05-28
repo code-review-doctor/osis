@@ -917,7 +917,8 @@ class LearningUnitYearCheckNumberOfClassesWarnings(TestCase):
 
     def _build_check_number_of_classes_message(self):
         return _('The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
-                 'is not consistent') % {
+                 'is not consistent') % \
+               {
                    'code_ue': self.learning_unit_year.acronym,
                    'component_code': 'PM'
                }

@@ -141,7 +141,8 @@ def _get_classes_charge_repartition_warning_messages(learning_unit_year: Learnin
     all_components = components_queryset.order_by('acronym') \
         .select_related('learning_unit_year') \
         .prefetch_related(models.Prefetch('learningclassyear_set', to_attr="classes"))
-
+    msg_warning = _("The sum of volumes for the classes for professor %(tutor)s is superior to the volume of "
+                    "UE(%(ue_type)s) for this professor")
     for component in all_components:
         volume_total_of_classes = _get_component_volume_total_of_classes(component)
 
@@ -150,12 +151,12 @@ def _get_classes_charge_repartition_warning_messages(learning_unit_year: Learnin
             for charge in charges:
                 if charge['learning_component_year__pk'] == component.pk:
                     if volume_total_of_classes > charge['total_volume']:
-                        msg = _("The sum of volumes for the classes for professor %(tutor)s is superior to the "
-                                "volume of UE(%(ue_type)s) for this professor") % {
-                            "tutor": _get_tutor_name_with_function(charges[0]),
-                            "ue_type": learning_unit_year.get_subtype_display().lower()
-                        }
-                        msgs.append(msg)
+                        msgs.append(
+                            msg_warning % {
+                                "tutor": _get_tutor_name_with_function(charges[0]),
+                                "ue_type": learning_unit_year.get_subtype_display().lower()
+                            }
+                        )
 
     return msgs
 

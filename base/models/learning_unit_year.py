@@ -726,11 +726,11 @@ def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[
             )
             if effective_class.hourly_volume_partial_q1 > learning_component_yr.hourly_volume_partial_q1 or \
                     effective_class.hourly_volume_partial_q2 > learning_component_yr.hourly_volume_partial_q2:
-                _warnings.append("{} ({}) ".format(
-                    inconsistent_msg,
-                    _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') % {
-                        'sub_type': learning_component_yr.learning_unit_year.get_subtype_display().lower()
-                    }
+                _warnings.append(
+                    "{} ({}) ".format(
+                        inconsistent_msg,
+                        _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') %
+                        {'sub_type': learning_component_yr.learning_unit_year.get_subtype_display().lower()}
                     )
                 )
 
