@@ -36,7 +36,6 @@ from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass,
     LecturingEffectiveClass
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
-from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
 from osis_common.ddd.interface import ApplicationService
 
@@ -45,7 +44,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     @classmethod
     def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
         learning_unit_id = entity_id.learning_unit_identity
-        qs = LearningClassYearDb.objects.filter(
+        qs = _get_common_queryset().filter(
             learning_component_year__learning_unit_year__acronym=learning_unit_id.code,
             learning_component_year__learning_unit_year__academic_year__year=learning_unit_id.year,
             acronym=entity_id.class_code,
@@ -89,7 +88,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def get_all_identities(cls) -> List['EffectiveClassIdentity']:
-        all_classes = LearningClassYearDatabase.objects.all().annotate(
+        all_classes = _get_common_queryset().annotate(
             class_code=F('acronym'),
             learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
             learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year')
@@ -112,7 +111,10 @@ def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int
     learning_unit_identity = entity.entity_id.learning_unit_identity
     component_type = learning_component_year_type.LECTURING if isinstance(entity, LecturingEffectiveClass) \
         else learning_component_year_type.PRACTICAL_EXERCISES
-    learning_component_year_id = LearningComponentYearDb.objects.filter(
+    learning_component_year_id = LearningComponentYearDb.objects.select_related(
+        'learning_unit_year',
+        'learning_unit_year__academic_year'
+    ).filter(
         type=component_type,
         learning_unit_year__academic_year__year=learning_unit_identity.year,
         learning_unit_year__acronym=learning_unit_identity.code
@@ -149,4 +151,12 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'volume_q1',
         'volume_q2',
         'class_type'
+    )
+
+
+def _get_common_queryset() -> QuerySet:
+    return LearningClassYearDb.objects.all().select_related(
+        'learning_component_year',
+        'learning_component_year__learning_unit_year',
+        'learning_component_year__learning_unit_year__academic_year'
     )
