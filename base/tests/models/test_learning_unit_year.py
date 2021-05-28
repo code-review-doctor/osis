@@ -1076,7 +1076,10 @@ class LearningUnitYearCheckClassesSessionWarnings(TestCase):
 
         messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '1, 2 {} 12'.format(_('or'))))
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '1, 2 {} 12'.format(_('or')))
+        )
 
     def test_check_with_ue_session_1x3(self):
         wrong_values = ALL_SESSION_VALUES.copy()
@@ -1095,7 +1098,10 @@ class LearningUnitYearCheckClassesSessionWarnings(TestCase):
 
         messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '1, 3 {} 13'.format(_('or'))))
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '1, 3 {} 13'.format(_('or')))
+        )
 
     def test_check_with_ue_session_x23(self):
         wrong_values = ALL_SESSION_VALUES.copy()
@@ -1115,7 +1121,10 @@ class LearningUnitYearCheckClassesSessionWarnings(TestCase):
 
         messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '2, 3, 23 {} P23'.format(_('or'))))
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '2, 3, 23 {} P23'.format(_('or')))
+        )
 
     def test_check_with_ue_session_p23(self):
         wrong_values = ALL_SESSION_VALUES.copy()
@@ -1135,7 +1144,10 @@ class LearningUnitYearCheckClassesSessionWarnings(TestCase):
 
         messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '2, 3, 23 {} P23'.format(_('or'))))
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '2, 3, 23 {} P23'.format(_('or')))
+        )
 
     def test_check_with_ue_session_correct(self):
         luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_1XX)
@@ -1171,7 +1183,10 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
             quadrimester=random.choice(wrong_values)
         )
 
-        messages = learning_unit_year._check_classes_quadrimester(luy.quadrimester, list(_get_components_with_classes()))
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q1'))
 
@@ -1189,7 +1204,10 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
             quadrimester=random.choice(wrong_values)
         )
 
-        messages = learning_unit_year._check_classes_quadrimester(luy.quadrimester, list(_get_components_with_classes()))
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q2'))
 
@@ -1207,7 +1225,10 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
             quadrimester=random.choice(wrong_values)
         )
 
-        messages = learning_unit_year._check_classes_quadrimester(luy.quadrimester, list(_get_components_with_classes()))
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q3'))
 
@@ -1223,7 +1244,10 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
             quadrimester=random.choice(wrong_values)
         )
 
-        messages = learning_unit_year._check_classes_quadrimester(luy.quadrimester, list(_get_components_with_classes()))
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             messages[0],
@@ -1246,9 +1270,15 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
             quadrimester=random.choice(wrong_values)
         )
 
-        messages = learning_unit_year._check_classes_quadrimester(luy.quadrimester, list(_get_components_with_classes()))
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q1 {} Q2'.format(_('or'))))
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, 'Q1 {} Q2'.format(_('or')))
+        )
 
 
 def _build_expected_message(message, effective_class, should_be_values_str):

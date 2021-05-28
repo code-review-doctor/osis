@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 09:51+0200\n"
+"POT-Creation-Date: 2021-05-28 14:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2893,6 +2893,9 @@ msgstr ""
 msgid "aim number"
 msgstr ""
 
+msgid "and"
+msgstr ""
+
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr ""
@@ -3026,6 +3029,9 @@ msgid "online resources"
 msgstr ""
 
 msgid "optional"
+msgstr ""
+
+msgid "or"
 msgstr ""
 
 msgid "parameters"
