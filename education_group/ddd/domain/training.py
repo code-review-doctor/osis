@@ -108,59 +108,58 @@ class TrainingBuilder:
                     domain_name=None,
                 )
             )
-
-        training = Training(
-            entity_identity=training_identity,
-            entity_id=training_identity,
-            code=command.code,
-            type=utils.get_enum_from_str(command.type, TrainingType),
-            credits=command.credits,
-            schedule_type=utils.get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
-            duration=command.duration,
-            duration_unit=utils.get_enum_from_str(command.duration_unit, DurationUnitsEnum),
-            start_year=command.start_year,
-            titles=Titles(
+        datas = {
+            'entity_identity': training_identity,
+            'entity_id': training_identity,
+            'code': command.code,
+            'type': utils.get_enum_from_str(command.type, TrainingType),
+            'credits': command.credits,
+            'schedule_type': utils.get_enum_from_str(command.schedule_type, ScheduleTypeEnum),
+            'duration': command.duration,
+            'duration_unit': utils.get_enum_from_str(command.duration_unit, DurationUnitsEnum),
+            'start_year': command.start_year,
+            'titles': Titles(
                 title_fr=command.title_fr,
                 partial_title_fr=command.partial_title_fr,
                 title_en=command.title_en,
                 partial_title_en=command.partial_title_en,
             ),
-            status=utils.get_enum_from_str(command.status, ActiveStatusEnum),
-            keywords=command.keywords,
-            internship_presence=utils.get_enum_from_str(command.internship_presence, InternshipPresence),
-            is_enrollment_enabled=command.is_enrollment_enabled,
-            has_online_re_registration=command.has_online_re_registration,
-            has_partial_deliberation=command.has_partial_deliberation,
-            has_admission_exam=command.has_admission_exam,
-            has_dissertation=command.has_dissertation,
-            produce_university_certificate=command.produce_university_certificate,
-            decree_category=utils.get_enum_from_str(command.decree_category, DecreeCategories),
-            rate_code=utils.get_enum_from_str(command.rate_code, RateCode),
-            main_language=Language(command.main_language) if command.main_language else None,
-            english_activities=utils.get_enum_from_str(command.english_activities, ActivityPresence),
-            other_language_activities=utils.get_enum_from_str(
+            'status': utils.get_enum_from_str(command.status, ActiveStatusEnum),
+            'keywords': command.keywords,
+            'internship_presence': utils.get_enum_from_str(command.internship_presence, InternshipPresence),
+            'is_enrollment_enabled': command.is_enrollment_enabled,
+            'has_online_re_registration': command.has_online_re_registration,
+            'has_partial_deliberation': command.has_partial_deliberation,
+            'has_admission_exam': command.has_admission_exam,
+            'has_dissertation': command.has_dissertation,
+            'produce_university_certificate': command.produce_university_certificate,
+            'decree_category': utils.get_enum_from_str(command.decree_category, DecreeCategories),
+            'rate_code': utils.get_enum_from_str(command.rate_code, RateCode),
+            'main_language': Language(command.main_language) if command.main_language else None,
+            'english_activities': utils.get_enum_from_str(command.english_activities, ActivityPresence),
+            'other_language_activities': utils.get_enum_from_str(
                 command.other_language_activities, ActivityPresence
             ),
-            internal_comment=command.internal_comment,
-            main_domain=StudyDomain(
+            'internal_comment': command.internal_comment,
+            'main_domain': StudyDomain(
                 entity_id=StudyDomainIdentity(decree_name=command.main_domain_decree, code=command.main_domain_code),
                 domain_name=None,
             ) if command.main_domain_code else None,
-            secondary_domains=secondary_domains,
-            isced_domain=IscedDomain(
+            'secondary_domains': secondary_domains,
+            'isced_domain': IscedDomain(
                 entity_id=IscedDomainIdentity(command.isced_domain_code),
                 title_fr=None,
                 title_en=None,
             ) if command.isced_domain_code else None,
-            management_entity=Entity(acronym=command.management_entity_acronym),
-            administration_entity=Entity(acronym=command.administration_entity_acronym),
-            end_year=command.end_year,
-            enrollment_campus=Campus(
+            'management_entity': Entity(acronym=command.management_entity_acronym),
+            'administration_entity': Entity(acronym=command.administration_entity_acronym),
+            'end_year': command.end_year,
+            'enrollment_campus': Campus(
                 name=command.enrollment_campus_name,
                 university_name=command.enrollment_campus_organization_name,
             ),
-            other_campus_activities=utils.get_enum_from_str(command.other_campus_activities, ActivityPresence),
-            funding=Funding(
+            'other_campus_activities': utils.get_enum_from_str(command.other_campus_activities, ActivityPresence),
+            'funding': Funding(
                 can_be_funded=command.can_be_funded,
                 funding_orientation=FundingCodes[
                     command.funding_orientation
@@ -170,23 +169,33 @@ class TrainingBuilder:
                     command.international_funding_orientation
                 ] if command.international_funding_orientation else None,
             ),
-            hops=HOPS(
+            'hops': HOPS(
                 ares_code=command.ares_code,
                 ares_graca=command.ares_graca,
                 ares_authorization=command.ares_authorization,
             ),
-            co_graduation=CoGraduation(
+            'co_graduation': CoGraduation(
                 code_inter_cfb=command.code_inter_cfb,
                 coefficient=command.coefficient,
             ),
-            academic_type=utils.get_enum_from_str(command.academic_type, AcademicTypes),
-            diploma=Diploma(
+            'academic_type': utils.get_enum_from_str(command.academic_type, AcademicTypes),
+            'diploma': Diploma(
                 aims=None,
                 leads_to_diploma=command.leads_to_diploma,
                 printing_title=command.printing_title,
                 professional_title=command.professional_title,
             ),
-        )
+        }
+
+        # todo REMOVE cyclic import
+        if datas['type'] == TrainingType.BACHELOR:
+            from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
+            from ddd.logic.formation_catalogue.domain.model._first_year_bachelor import FirstYearBachelor, \
+                FirstYearBachelorIdentity
+
+            training = Bachelor(first_year_bachelor=FirstYearBachelor(entity_id=FirstYearBachelorIdentity(), administration_entity=None), **datas)
+        else:
+            training = Training(**datas)
         CreateTrainingValidatorList(training).validate()
         return training
 

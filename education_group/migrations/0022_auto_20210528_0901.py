@@ -24,8 +24,4 @@ class Migration(migrations.Migration):
                 'verbose_name': 'First year bachelor',
             },
         ),
-        migrations.AddConstraint(
-            model_name='firstyearbachelor',
-            constraint=models.CheckConstraint(check=models.Q(education_group_year__education_group_type__name='BACHELOR'), name='bachelor_type'),
-        ),
     ]
