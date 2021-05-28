@@ -100,5 +100,4 @@ class EffectiveClassFromRepositoryDTO(DTO):
     session_derogation = attr.ib(type=str)
     volume_q1 = attr.ib(type=Decimal)
     volume_q2 = attr.ib(type=Decimal)
-    volume_annual = attr.ib(type=Decimal)
     class_type = attr.ib(type=str)

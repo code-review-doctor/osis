@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.test import TestCase
 
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import LECTURING
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
@@ -28,7 +28,6 @@ class EffectiveClassRepositoryTestCase(TestCase):
         campus = self.learning_unit_year.campus
 
         self.class_repository = EffectiveClassRepository()
-        # FIXME: Use Command from Leila
         self.dto_object = EffectiveClassFromRepositoryDTO(
             class_code='X',
             learning_unit_code=self.learning_unit_year.acronym,
@@ -41,7 +40,6 @@ class EffectiveClassRepositoryTestCase(TestCase):
             session_derogation=DerogationSession.SESSION_123.name,
             volume_q1=Decimal('1.5'),
             volume_q2=Decimal('2.6'),
-            volume_annual=Decimal('4.1'),
             class_type=LECTURING
         )
         self.effective_class = EffectiveClassBuilder.build_from_repository_dto(self.dto_object)

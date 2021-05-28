@@ -61,8 +61,6 @@ class LearningClassYear(models.Model):
     title_fr = models.CharField(max_length=255, blank=True, verbose_name=_('Title in French'))
     title_en = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Title in English'))
 
-    hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True,
-                                                     verbose_name=_("hourly volume total annual"))
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q1"))
     hourly_volume_partial_q2 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,

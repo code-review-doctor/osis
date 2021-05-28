@@ -80,7 +80,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'EffectiveClassFromRepositoryDTO') -> 'EffectiveClass':
         class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            code=dto_object.class_code,
+            class_code=dto_object.class_code,
             learning_unit_code=dto_object.learning_unit_code,
             learning_unit_year=dto_object.learning_unit_year
         )

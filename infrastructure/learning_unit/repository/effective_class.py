@@ -75,7 +75,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
         LearningClassYearDb.objects.update_or_create(
             learning_component_year_id=learning_component_year_id,
-            acronym=entity.entity_id.code,
+            acronym=entity.entity_id.class_code,
             defaults={
                 'title_fr': entity.titles.fr,
                 'title_en': entity.titles.en,
@@ -84,7 +84,6 @@ class EffectiveClassRepository(IEffectiveClassRepository):
                 'session': entity.session_derogation,
                 'hourly_volume_partial_q1': entity.volumes.volume_first_quadrimester,
                 'hourly_volume_partial_q2': entity.volumes.volume_second_quadrimester,
-                'hourly_volume_total_annual': entity.volumes.volume_annual
             }
         )
 
