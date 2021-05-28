@@ -40,9 +40,7 @@ class LearningClassYearFactory(factory.django.DjangoModelFactory):
     learning_component_year = factory.SubFactory(LearningComponentYearFactory)
     acronym = factory.fuzzy.FuzzyText(length=1,
                                       chars=string.ascii_uppercase + string.digits)
-    hourly_volume_total_annual = factory.LazyAttribute(
-        lambda obj: obj.hourly_volume_partial_q1 + obj.hourly_volume_partial_q2
-    )
+
     hourly_volume_partial_q1 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
     hourly_volume_partial_q2 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
