@@ -49,6 +49,6 @@ class EffectiveClassRepositoryTestCase(TestCase):
         effective_class = self.class_repository.get(entity_id=self.effective_class.entity_id)
 
         self.assertEqual(effective_class, self.effective_class)
-        fields = ['titles', 'volumes', 'session_derogation', 'derogation_quadrimester', 'teaching_place']
+        fields = vars(self.effective_class)
         for field in fields:
             self.assertEqual(getattr(effective_class, field), getattr(self.effective_class, field), field)

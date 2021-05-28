@@ -29,8 +29,7 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException
-
-ALPHANUMERIC_REGEX = r'^[a-zA-Z0-9]$'
+from learning_unit.models.learning_class_year import ALPHANUMERIC_REGEX
 
 
 @attr.s(frozen=True, slots=True)
