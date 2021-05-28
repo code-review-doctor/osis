@@ -23,9 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
 class IEffectiveClassRepository(interface.AbstractRepository):
-    pass
+
+    @classmethod
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+        raise NotImplementedError

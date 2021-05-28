@@ -23,9 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+from typing import List
+
 import attr
 
 from osis_common.ddd.interface import DTO
+
+
+@attr.s(frozen=True, slots=True)
+class PartimFromRepositoryDTO(DTO):
+    subdivision = attr.ib(type=str)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    credits = attr.ib(type=int)
+    periodicity = attr.ib(type=str)
+    iso_code = attr.ib(type=str)
+    remark_faculty = attr.ib(type=str)
+    remark_publication_fr = attr.ib(type=str)
+    remark_publication_en = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -45,6 +61,14 @@ class LearningUnitFromRepositoryDTO(DTO):
     remark_faculty = attr.ib(type=str)
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
+    practical_volume_q1 = attr.ib(type=Decimal)
+    practical_volume_q2 = attr.ib(type=Decimal)
+    practical_volume_annual = attr.ib(type=Decimal)
+    lecturing_volume_q1 = attr.ib(type=Decimal)
+    lecturing_volume_q2 = attr.ib(type=Decimal)
+    lecturing_volume_annual = attr.ib(type=Decimal)
+    derogation_quadrimester = attr.ib(type=str)
+    partims = attr.ib(type=List[PartimFromRepositoryDTO])
 
 
 @attr.s(frozen=True, slots=True)

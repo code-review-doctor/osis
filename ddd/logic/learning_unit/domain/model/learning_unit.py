@@ -31,15 +31,15 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
+from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd import interface
-from ddd.logic.learning_unit.commands import CreatePartimCommand
-from ddd.logic.learning_unit.domain.model._remarks import Remarks
 
 
 @attr.s(frozen=True, slots=True)
@@ -92,7 +92,10 @@ class LearningUnit(interface.RootEntity):
         self.partims.append(partim)
 
     def has_partim(self) -> bool:
-        raise NotImplementedError
+        return len(self.partims) > 0
+
+    def is_external(self) -> bool:
+        return isinstance(self, ExternalLearningUnit)
 
 
 class CourseLearningUnit(LearningUnit):

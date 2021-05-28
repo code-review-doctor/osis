@@ -23,18 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Type
+from decimal import Decimal
+from typing import List, Type, Union
 
 import attr
 
 from base.models.enums.internship_subtypes import InternshipSubtype
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.model._partim import PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
+from ddd.logic.learning_unit.domain.model._volumes_repartition import PracticalPart, LecturingPart, Volumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     InternshipLearningUnit, DissertationLearningUnit, OtherCollectiveLearningUnit, OtherIndividualLearningUnit, \
     MasterThesisLearningUnit, ExternalLearningUnit
@@ -44,6 +49,7 @@ from ddd.logic.learning_unit.domain.validator.validators_by_business_action impo
     CreateLearningUnitValidatorList
 from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO
 from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
+from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd.interface import RootEntityBuilder
 
 
@@ -70,11 +76,25 @@ class LearningUnitBuilder(RootEntityBuilder):
                 dto.specific_title_en
             ),
             credits=dto.credits,
-            internship_subtype=InternshipSubtype[dto.internship_subtype],
+            internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=responsible_entity_identity,
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
+            lecturing_part=_build_part(
+                part_type=LECTURING,
+                volume_q1=dto.lecturing_volume_q1,
+                volume_q2=dto.lecturing_volume_q2,
+                volume_annual=dto.lecturing_volume_annual
+            ),
+            practical_part=_build_part(
+                part_type=PRACTICAL_EXERCISES,
+                volume_q1=dto.practical_volume_q1,
+                volume_q2=dto.practical_volume_q2,
+                volume_annual=dto.practical_volume_annual
+            ),
+            derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
+            partims=[]
         )
 
     @classmethod
@@ -84,7 +104,6 @@ class LearningUnitBuilder(RootEntityBuilder):
     ) -> 'LearningUnit':
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
-            type=LearningContainerYearType[dto.type],
             titles=_build_titles(
                 dto.common_title_fr,
                 dto.specific_title_fr,
@@ -92,11 +111,28 @@ class LearningUnitBuilder(RootEntityBuilder):
                 dto.specific_title_en
             ),
             credits=dto.credits,
-            internship_subtype=InternshipSubtype[dto.internship_subtype],
+            internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
+            lecturing_part=_build_part(
+                part_type=LECTURING,
+                volume_q1=dto.lecturing_volume_q1,
+                volume_q2=dto.lecturing_volume_q2,
+                volume_annual=dto.lecturing_volume_annual
+            ),
+            practical_part=_build_part(
+                part_type=PRACTICAL_EXERCISES,
+                volume_q1=dto.practical_volume_q1,
+                volume_q2=dto.practical_volume_q2,
+                volume_annual=dto.practical_volume_annual
+            ),
+            derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester]
+            if dto.derogation_quadrimester else None,
+            partims=[
+                PartimBuilder.build_from_dto(partim_dto) for partim_dto in dto.partims
+            ]
         )
 
     @classmethod
@@ -132,7 +168,7 @@ def _get_learning_unit_class(type: str) -> Type[LearningUnit]:
     return subclass
 
 
-def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publication_en: str):
+def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publication_en: str) -> 'Remarks':
     return Remarks(
         faculty=remark_faculty,
         publication_fr=remark_publication_fr,
@@ -140,14 +176,35 @@ def _build_remarks(remark_faculty: str, remark_publication_fr: str, remark_publi
     )
 
 
-def _build_language(iso_code: str):
+def _build_language(iso_code: str) -> 'LanguageIdentity':
     return LanguageIdentityBuilder.build_from_code_iso(iso_code)
 
 
-def _build_titles(common_title_fr: str, specific_title_fr: str, common_title_en: str, specific_title_en: str):
+def _build_titles(
+        common_title_fr: str,
+        specific_title_fr: str,
+        common_title_en: str,
+        specific_title_en: str
+) -> 'Titles':
     return Titles(
         common_fr=common_title_fr,
         specific_fr=specific_title_fr,
         common_en=common_title_en,
         specific_en=specific_title_en,
     )
+
+
+def _build_part(
+        part_type: str,
+        volume_q1: Decimal,
+        volume_q2: Decimal,
+        volume_annual: Decimal
+) -> Union['LecturingPart', 'PracticalPart']:
+    volumes = Volumes(
+        volume_first_quadrimester=volume_q1,
+        volume_second_quadrimester=volume_q2,
+        volume_annual=volume_annual
+    )
+    if part_type == LECTURING:
+        return LecturingPart(volumes=volumes)
+    return PracticalPart(volumes=volumes)

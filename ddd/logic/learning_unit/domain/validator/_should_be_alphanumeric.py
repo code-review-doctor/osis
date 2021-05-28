@@ -23,27 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
 
-from django.db import transaction
+import attr
 
-from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException
 
 
-@transaction.atomic()
-def copy_learning_unit_to_next_year(cmd: CopyLearningUnitToNextYearCommand) -> 'LearningUnitIdentity':
-    # GIVEN
-    repository = LearningUnitRepository()
-    learning_unit = repository.get(entity_id=LearningUnitIdentityBuilder.build_from_command(cmd))
-    all_existing_learning_unit_identities = repository.get_all_identities()
+@attr.s(frozen=True, slots=True)
+class ShouldBeAlphanumericValidator(BusinessValidator):
 
-    # WHEN
-    learning_unit_net_year = LearningUnitBuilder.copy_to_next_year(learning_unit, all_existing_learning_unit_identities)
+    class_code = attr.ib(type=str)
 
-    # THEN
-    repository.save(learning_unit_net_year)
-
-    return learning_unit.entity_id
+    def validate(self, *args, **kwargs):
+        alphanumeric_regex = r"^\w+$"
+        if not re.fullmatch(alphanumeric_regex, self.class_code):
+            raise ShouldBeAlphanumericException()

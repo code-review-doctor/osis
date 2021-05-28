@@ -25,8 +25,12 @@
 ##############################################################################
 from typing import Optional, List
 
+from django.db.models import F
+
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 from osis_common.ddd.interface import EntityIdentity, ApplicationService
 
 
@@ -46,3 +50,23 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     @classmethod
     def save(cls, entity: 'EffectiveClass') -> None:
         raise NotImplementedError
+
+    @classmethod
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+        all_classes = LearningClassYearDatabase.objects.all().annotate(
+            class_code=F('acronym'),
+            learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
+            learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year')
+        ).values(
+            "class_code"
+            "learning_unit_code",
+            "learning_unit_year",
+        )
+        return [
+            EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+                class_code=learning_class.classs_code,
+                learning_unit_code=learning_class.learning_unit_code,
+                learning_unit_year=learning_class.learning_unit_year
+            )
+            for learning_class in all_classes
+        ]

@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
+from ddd.logic.learning_unit.business_types import *
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
-from ddd.logic.learning_unit.business_types import *
 
 
 class AcademicYearLowerThan2019Exception(BusinessException):
@@ -109,8 +110,66 @@ class SubdivisionShouldHaveOneLetterException(BusinessException):
 
 class SubdivisionAlreadyExistException(BusinessException):
     def __init__(self, learning_unit_identity: 'LearningUnitIdentity', subdivision: str, *args, **kwargs):
-        message = _("The subdivision {subd} already exists for {ue}").format(
-            subd=subdivision,
-            ue=learning_unit_identity,
+        message = _("The subdivision %(subd)s already exists for %(ue)s") % {
+            'subd': subdivision,
+            'ue': learning_unit_identity,
+        }
+        super().__init__(message, **kwargs)
+
+
+class ShouldBeAlphanumericException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Code should be one character A-Z or 0-9"
+        )
+        super().__init__(message, **kwargs)
+
+
+class CodeClassAlreadyExistForUeException(BusinessException):
+    def __init__(self, learning_unit_identity: 'LearningUnitIdentity', code: str, *args, **kwargs):
+        message = _("The code %(code)s already exists for %(ue)s") % {
+            'code': code,
+            'ue': learning_unit_identity,
+        }
+        super().__init__(message, **kwargs)
+
+
+class ClassTypeInvalidException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be neither mobility nor external"
+        )
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitHasPartimException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be created on learning unit having partim"
+        )
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitHasProposalException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be created on learning unit having proposal"
+        )
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitHasEnrollmentException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class can't be created on learning unit having enrollment"
+        )
+        super().__init__(message, **kwargs)
+
+
+class AnnualVolumeInvalidException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Annual volume should be greater than or equal to 0 "
+            "and the sum of first/second quadrimesters volumes should be equal to annual volume"
         )
         super().__init__(message, **kwargs)
