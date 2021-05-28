@@ -59,8 +59,8 @@ from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from base.models.hops import Hops as HopsModelDb
 from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
-from ddd.logic.formation_catalogue.dtos import TrainingDto, _SecondaryDomainDTO, _CoorganizationDTO, _CertificateAimDTO, \
-    BachelorDto
+from ddd.logic.formation_catalogue.dtos import TrainingDto, _SecondaryDomainDTO, _CoorganizationDTO, \
+    _CertificateAimDTO, BachelorDto
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import training, exception
 from education_group.ddd.domain._academic_partner import AcademicPartner, AcademicPartnerIdentity
@@ -223,8 +223,10 @@ def _convert_education_group_year_to_dto(
         'diploma_aims': certificate_aims,
     }
     if obj.is_bachelor:
+        first_year_administration_entity = obj.firstyearbachelor.administration_entity.most_recent_acronym \
+            if obj.firstyearbachelor.administration_entity else None,
         return BachelorDto(
-            first_year_bachelor_administration_entity_acronym=obj.firstyearbachelor.administration_entity.most_recent_acronym if obj.firstyearbachelor.administration_entity else None,
+            first_year_bachelor_administration_entity_acronym=first_year_administration_entity,
             **datas
         )
     return TrainingDto(**datas)

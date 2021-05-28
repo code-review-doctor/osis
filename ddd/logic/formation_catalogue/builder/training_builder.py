@@ -87,7 +87,8 @@ class TrainingBuilder(RootEntityBuilder):
                 ),
                 is_for_all_students=co_organization.all_students,
                 is_reference_institution=co_organization.enrollment_place,
-                certificate_type=DiplomaCoorganizationTypes[co_organization.diploma] if co_organization.diploma else None,
+                certificate_type=DiplomaCoorganizationTypes[co_organization.diploma]
+                if co_organization.diploma else None,
                 is_producing_certificate=co_organization.is_producing_cerfificate,
                 is_producing_certificate_annexes=co_organization.is_producing_annexe,
             )
@@ -119,7 +120,8 @@ class TrainingBuilder(RootEntityBuilder):
             ),
             'status': ActiveStatusEnum[dto_object.status],
             'keywords': dto_object.keywords,
-            'internship_presence': InternshipPresence[dto_object.internship_presence] if dto_object.internship_presence else None,
+            'internship_presence': InternshipPresence[dto_object.internship_presence]
+            if dto_object.internship_presence else None,
             'is_enrollment_enabled': dto_object.is_enrollment_enabled,
             'has_online_re_registration': dto_object.has_online_re_registration,
             'has_partial_deliberation': dto_object.has_partial_deliberation,
@@ -129,7 +131,8 @@ class TrainingBuilder(RootEntityBuilder):
             'decree_category': DecreeCategories[dto_object.decree_category] if dto_object.decree_category else None,
             'rate_code': RateCode[dto_object.rate_code] if dto_object.rate_code else None,
             'main_language': Language(name=dto_object.main_language_name,),
-            'english_activities': ActivityPresence[dto_object.english_activities] if dto_object.english_activities else None,
+            'english_activities': ActivityPresence[dto_object.english_activities]
+            if dto_object.english_activities else None,
             'other_language_activities': ActivityPresence[
                 dto_object.other_language_activities] if dto_object.other_language_activities else None,
             'internal_comment': dto_object.internal_comment,
@@ -157,7 +160,8 @@ class TrainingBuilder(RootEntityBuilder):
                 dto_object.other_campus_activities] if dto_object.other_campus_activities else None,
             'funding': Funding(
                 can_be_funded=dto_object.funding_can_be_funded,
-                funding_orientation=FundingCodes[dto_object.funding_orientation] if dto_object.funding_orientation else None,
+                funding_orientation=FundingCodes[dto_object.funding_orientation]
+                if dto_object.funding_orientation else None,
                 can_be_international_funded=dto_object.funding_can_be_international_funded,
                 international_funding_orientation=FundingCodes[dto_object.funding_international_funding_orientation]
                 if dto_object.funding_international_funding_orientation else None,
