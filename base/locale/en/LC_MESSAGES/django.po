@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-07 11:24+0200\n"
+"POT-Creation-Date: 2021-05-10 14:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -718,6 +718,9 @@ msgid "Dissertation presentation"
 msgstr ""
 
 msgid "Dissertation submission"
+msgstr ""
+
+msgid "Dissertations"
 msgstr ""
 
 msgid "Do not assign"
@@ -2274,6 +2277,9 @@ msgstr ""
 msgid "Student search"
 msgstr ""
 
+msgid "Student's dissertations management"
+msgstr ""
+
 msgid "Students"
 msgstr ""
 
@@ -2363,10 +2369,6 @@ msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "
 "exception in relation to the sessions calculated according to the "
 "quadrimesters."
-msgstr ""
-
-#, python-format
-msgid "The entity %(acronym_entity)s is not active for this academic year"
 msgstr ""
 
 #, python-format
@@ -2573,9 +2575,6 @@ msgid "This code already exists for this learning unit"
 msgstr ""
 
 msgid "This education group is not editable during this period."
-msgstr ""
-
-msgid "This entity is not active during this academic year"
 msgstr ""
 
 msgid "This feature is in testing phase"
