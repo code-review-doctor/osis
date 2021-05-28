@@ -155,7 +155,23 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
             academic_year__current=True
+        )
 
+        cls.bachelor_mdl = EducationGroupYearBachelorFactory(
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            academic_year__current=True
+        )
+        cls.fyb = FirstYearBachelorFactory(
+            education_group_year=cls.bachelor_mdl,
+            administration_entity=cls.entity_version.entity
+        )
+
+        cls.bachelor = TrainingRepository.get(
+            TrainingIdentityFactory(
+                acronym=cls.bachelor_mdl.acronym,
+                year=cls.bachelor_mdl.academic_year.year
+            )
         )
 
         cls.training = TrainingRepository.get(
@@ -216,6 +232,16 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             updated_training,
             self.entity_version.entity.id
         )
+
+    def test_update_bachelor(self):
+        self.assertEqual(self.fyb.administration_entity, self.entity_version.entity)
+        self.bachelor.first_year_bachelor.administration_entity = None
+        TrainingRepository.update(self.bachelor)
+
+        self.bachelor_mdl.refresh_from_db()
+        self.fyb.refresh_from_db()
+
+        self.assertEqual(self.fyb.administration_entity, None)
 
 
 class TestTrainingRepositoryGetMethod(TestCase):
