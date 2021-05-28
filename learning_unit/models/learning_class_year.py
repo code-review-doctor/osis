@@ -44,7 +44,6 @@ class LearningClassYearManager(models.Manager):
         )
 
 
-# FIXME: Use same validator as Leila
 ALPHANUMERIC_REGEX = r'^[a-zA-Z0-9]$'
 only_alphanumeric_validator = RegexValidator(ALPHANUMERIC_REGEX, _('Only alphanumeric characters are allowed.'))
 
