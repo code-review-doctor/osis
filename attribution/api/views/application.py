@@ -73,8 +73,7 @@ class ApplicationListCreateView(views.APIView):
 
 class ApplicationUpdateDeleteView(views.APIView):
     """
-        GET:  Update an application on the current application period
-        PATCH: Not Allowed
+        PUT:  Update an application on the current application period
         DELETE: Delete an application on the current application period
     """
     name = 'application_update_delete'

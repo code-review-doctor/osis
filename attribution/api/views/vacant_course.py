@@ -36,7 +36,7 @@ class VacantCourseListView(views.APIView):
     """
        Return vacant courses available filtered by criteria
     """
-    name = 'vacant_courses_list'
+    name = 'vacantcourses_list'
 
     def get(self, request, *args, **kwargs):
         serializer = VacantCourseFilterSerializer(data=request.query_params)
