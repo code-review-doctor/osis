@@ -73,13 +73,13 @@ class MiniTrainingRepository(interface.AbstractRepository):
             raise exception.ManagementEntityNotFound
 
         try:
-            try:
-                education_group_db_obj = EducationGroupModelDb.objects.filter(
-                    educationgroupyear__acronym=mini_training_obj.acronym,
-                    educationgroupyear__partial_acronym=mini_training_obj.code,
-                    educationgroupyear__education_group_type__name=mini_training_obj.type.name
-                ).distinct().get()
-            except EducationGroupModelDb.DoesNotExist:
+            education_group_db_obj = EducationGroupModelDb.objects.filter(
+                educationgroupyear__acronym=mini_training_obj.acronym,
+                educationgroupyear__partial_acronym=mini_training_obj.code,
+                educationgroupyear__education_group_type__name=mini_training_obj.type.name
+            ).distinct().last()
+
+            if not education_group_db_obj:
                 education_group_db_obj = EducationGroupModelDb.objects.create(
                     start_year=start_year,
                     end_year=end_year
@@ -200,7 +200,7 @@ def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
     education_group_db_obj = EducationGroupModelDb.objects.filter(
         educationgroupyear__acronym=mini_training_obj.acronym,
         educationgroupyear__academic_year__year=mini_training_obj.year,
-    ).distinct().get()
+    ).distinct().last()
     education_group_db_obj.end_year = end_year
     education_group_db_obj.save()
 
