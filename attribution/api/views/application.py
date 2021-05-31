@@ -102,6 +102,7 @@ class ApplicationUpdateDeleteView(views.APIView):
     def delete(self, request, *args, **kwargs):
         cmd = DeleteApplicationCommand(
             application_uuid=self.kwargs['application_uuid'],
+            global_id=self.person.global_id,
         )
         message_bus_instance.invoke(cmd)
         return Response(status=status.HTTP_204_NO_CONTENT)
