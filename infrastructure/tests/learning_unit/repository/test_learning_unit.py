@@ -6,6 +6,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, \
     LearningUnitYearPartimFactory, LearningUnitYearFactory
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
@@ -101,6 +102,24 @@ class LearningUnitRepositoryTestCase(TestCase):
                     year=partim_db.academic_year.year
                 )
             )
+
+    def test_assert_ignoring_components_with_volume_equals_to_0(self):
+        component = LecturingLearningComponentYearFactory(hourly_volume_total_annual=0.0)
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=component.learning_unit_year.acronym,
+            year=component.learning_unit_year.academic_year.year
+        )
+        persisted_learning_unit = self.learning_unit_repository.get(learning_unit_identity)
+        self.assertIsNone(persisted_learning_unit.lecturing_part)
+
+    def test_assert_ignoring_components_with_volume_equals_to_none(self):
+        component = LecturingLearningComponentYearFactory(hourly_volume_total_annual=None)
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=component.learning_unit_year.acronym,
+            year=component.learning_unit_year.academic_year.year
+        )
+        persisted_learning_unit = self.learning_unit_repository.get(learning_unit_identity)
+        self.assertIsNone(persisted_learning_unit.lecturing_part)
 
     def test_delete(self):
         learning_unit_db = LearningUnitYearFactory()
