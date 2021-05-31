@@ -84,4 +84,4 @@ class EffectiveClassRepositoryTestCase(TestCase):
             )
             for class_db in classes_db
         ]
-        self.assertEqual(identities, self.class_repository.get_all_identities())
+        self.assertListEqual(identities, self.class_repository.get_all_identities())
