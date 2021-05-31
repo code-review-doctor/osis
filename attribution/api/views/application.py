@@ -68,7 +68,10 @@ class ApplicationListCreateView(views.APIView):
         applications = message_bus_instance.invoke(cmd)
 
         serializer = ApplicationGetSerializer(applications, many=True)
-        return Response(serializer.data)
+        return Response({
+            "results": serializer.data,
+            "count": len(serializer.data)
+        })
 
 
 class ApplicationUpdateDeleteView(views.APIView):
@@ -127,4 +130,7 @@ class RenewAttributionsAboutToExpire(views.APIView):
         attribution_about_to_expires = message_bus_instance.invoke(cmd)
 
         serializer = AttributionsAboutToExpireGetSerializer(attribution_about_to_expires, many=True)
-        return Response(serializer.data)
+        return Response({
+            "count": len(serializer.data),
+            "results": serializer.data
+        })

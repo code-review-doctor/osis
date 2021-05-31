@@ -26,9 +26,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Application'
+                $ref: '#/components/schemas/ApplicationList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -156,9 +154,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VacantCourse'
+                $ref: '#/components/schemas/VacantCourseList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -177,9 +173,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AttributionAboutToExpire'
+                $ref: '#/components/schemas/AttributionAboutToExpireList'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -373,6 +367,22 @@ components:
         - practical_volume
         - remark
         - course_summary
+    VacantCourseList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VacantCourse'
+        count:
+          type: integer
+          example: 3
+        previous:
+          type: string
+          nullable: true
+        next:
+          type: string
+          nullable: true
     VacantCourse:
       type: object
       properties:
@@ -407,6 +417,16 @@ components:
         allocation_entity:
           type: string
           example: 'DRT'
+    AttributionAboutToExpireList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributionAboutToExpire'
+        count:
+          type: integer
+          example: 3
     AttributionAboutToExpire:
       type: object
       properties:
@@ -455,6 +475,16 @@ components:
           type: string
         is_renewable:
           type: boolean
+    ApplicationList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+        count:
+          type: integer
+          example: 3
     Application:
       type: object
       properties:
