@@ -224,7 +224,7 @@ def _convert_education_group_year_to_dto(
     }
     if obj.is_bachelor:
         try:
-            cohort_first_year = obj.cohortyear_set.get(name=CohortName.FIRST_YEAR.name)
+            cohort_first_year = obj.cohortyear_set.get_first_year_bachelor()
             first_year_administration_entity = cohort_first_year.administration_entity.most_recent_acronym \
                 if cohort_first_year.administration_entity else None
         except CohortYearModelDb.DoesNotExist:
