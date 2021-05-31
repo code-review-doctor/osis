@@ -24,15 +24,10 @@
 ##############################################################################
 from typing import Iterable, Optional
 
-from django.db.models import Count, OuterRef, Subquery, Q
+from django.db.models import Count, Q
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
-from program_management.models.education_group_version import EducationGroupVersion
-
-
-# import clean_common_core
 from program_management.models.element import Element
 
 YEAR_TO_CLEAN = 2021
@@ -86,7 +81,7 @@ def _was_in_use_last_year(link: GroupElementYear) -> bool:
     return GroupElementYear.objects.filter(
         parent_element__group_year__group_id=link.parent_element.group_year.group_id,
         parent_element__group_year__academic_year__year=link.parent_element.group_year.academic_year.year-1,
-        child_element__group_year__group_id=link.child_element.group_year.group_id,
+        child_element__group_year__partial_acronym=link.child_element.group_year.partial_acronym,
     ).exists()
 
 
