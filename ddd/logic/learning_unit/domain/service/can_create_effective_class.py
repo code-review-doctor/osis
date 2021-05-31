@@ -60,13 +60,14 @@ class CanCreateEffectiveClass(interface.DomainService):
         if learning_unit_repository.has_enrollments(learning_unit):
             exceptions.add(LearningUnitHasEnrollmentException())
 
-        if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
-            exceptions.add(AnnualVolumeInvalidException())
-
-        if all_existing_class_identities:
-            for id in all_existing_class_identities:
-                if id.learning_unit_identity == learning_unit.entity_id and id.class_code == cmd.class_code:
-                    exceptions.add(CodeClassAlreadyExistForUeException(learning_unit.entity_id, cmd.class_code))
+        # FIXME :: create other doamins service
+        # if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
+        #     exceptions.add(AnnualVolumeInvalidException())
+        #
+        # if all_existing_class_identities:
+        #     for id in all_existing_class_identities:
+        #         if id.learning_unit_identity == learning_unit.entity_id and id.class_code == cmd.class_code:
+        #             exceptions.add(CodeClassAlreadyExistForUeException(learning_unit.entity_id, cmd.class_code))
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
@@ -76,11 +77,13 @@ def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
         learning_unit: 'LearningUnit',
         cmd: 'CreateEffectiveClassCommand'
 ) -> Decimal:
-    practical_volumes = learning_unit.practical_part.volumes
-    lecturing_volumes = learning_unit.lecturing_part.volumes
-    if practical_volumes.volume_annual > 0 and not lecturing_volumes.volume_annual > 0:
-        volume_annual = practical_volumes.volume_annual
+    practical_part = learning_unit.practical_part
+    lecturing_part = learning_unit.lecturing_part
+
+    if practical_part and not lecturing_part:
+        volume_annual = practical_part.volumes.volume_annual
     else:
-        volume_annual = lecturing_volumes.volume_annual
+        volume_annual = lecturing_part.volumes.volume_annual
+
     sum_q1_q2 = cmd.volume_first_quadrimester + cmd.volume_second_quadrimester
     return volume_annual <= 0 or sum_q1_q2 != volume_annual

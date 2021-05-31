@@ -32,9 +32,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.learning_unit_year import LearningUnitYear
-from base.views.common import display_success_messages
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand
+from base.views.common import display_success_messages, display_error_messages
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
@@ -60,10 +61,16 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
 
-    # def get(self, request, *args, **kwargs):
-    #     if message_bus_instance.invoke():
-    #
-    #     return super().get(request, *args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        try:
+            message_bus_instance.invoke(
+                CanCreateEffectiveClassCommand(learning_unit_code=self.learning_unit_code, learning_unit_year=self.year)
+            )
+        except MultipleBusinessExceptions as e:
+            display_error_messages(request, [exc.message for exc in e.exceptions])
+            return self.redirect_to_learning_unit_identification()
+
+        return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -84,13 +91,16 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
-            return redirect(
-                reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
-            )
+            return self.redirect_to_learning_unit_identification()
 
         return render(request, self.template_name, {
             "form": form,
         })
+
+    def redirect_to_learning_unit_identification(self):
+        return redirect(
+            reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
+        )
 
     def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
         return _("Class %(class_identity)s successfully created.") % {
