@@ -135,7 +135,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                 return HttpResponseRedirect(self.get_success_url(group_id))
 
         return render(request, self.template_name, {
-            "group_form": group_fortraining_formm,
+            "group_form": group_form,
             "tabs": self.get_tabs(),
             "type_text": GroupType.get_value(self.kwargs['type']),
             "cancel_url": self.get_cancel_url()

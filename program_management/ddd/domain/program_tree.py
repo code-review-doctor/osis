@@ -31,7 +31,6 @@ from typing import List, Set, Optional, Dict
 
 import attr
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.ddd.utils.converters import to_upper_case_converter
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
@@ -44,7 +43,6 @@ from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DO_NOT_OVERRIDE
 from program_management.ddd.domain import exception, report_events
-from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.link import factory as link_factory, LinkBuilder
 from program_management.ddd.domain.node import factory as node_factory, NodeIdentity, Node, NodeNotFoundException
 from program_management.ddd.domain.prerequisite import Prerequisites, \
@@ -53,7 +51,6 @@ from program_management.ddd.domain.report import Report
 from program_management.ddd.domain.service.generate_node_code import GenerateNodeCode
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
-from program_management.ddd.validators._code_pattern import CodePatternValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import \
     CreateProgramTreeStandardVersionValidatorList

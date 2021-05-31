@@ -40,6 +40,7 @@ from education_group.ddd.validators._start_year_end_year import StartYearEndYear
 from education_group.ddd.validators._unique_code import UniqueCodeValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
+from program_management.ddd.validators._code_pattern import CodePatternValidator
 
 
 class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
@@ -49,6 +50,7 @@ class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
             UniqueCodeValidator(group.code),
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
+            CodePatternValidator(group.code, group.type.name)
         ]
         super().__init__()
 
