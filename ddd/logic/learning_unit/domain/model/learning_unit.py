@@ -78,6 +78,10 @@ class LearningUnit(interface.RootEntity):
         return self.entity_id.academic_year
 
     @property
+    def year(self) -> int:
+        return self.entity_id.year
+
+    @property
     def code(self) -> str:
         return self.entity_id.code
 

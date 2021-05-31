@@ -45,6 +45,11 @@
                 {% include "learning_unit/blocks/create_cancel_buttons.html" %}
             </div>
             <div class="panel-body">
+
+                {% bootstrap_form_errors form %}
+
+                {% bootstrap_field form.learning_unit_year %}
+
                 <div class="row">
                         {% block content_row1 %}
                                 <div class="col-md-3">
@@ -52,9 +57,9 @@
                                         {% trans 'Code' %}
                                     </label>
                                     <br>
-                                    <div id="id_acronym" class="form-group">
-                                        <input value="{{ learning_unit_year.acronym }}" disabled class="form-control"/>
-                                        {% bootstrap_field form.acronym form_group_class="col-md-2" show_label=False %}
+                                    <div id="id_acronym" class="form-group col-md-2">
+                                        {% bootstrap_field form.learning_unit_code show_label=False %}
+                                        {% bootstrap_field form.class_code show_label=False %}
                                     </div>
                                 </div>
                                 <div class="col-md-3">

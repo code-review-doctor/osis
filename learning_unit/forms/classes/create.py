@@ -28,16 +28,24 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.models.campus import Campus
+from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.domain.validator import exceptions
 from osis_common.forms.widgets import DecimalFormatInput
 from base.models.enums import quadrimesters, learning_unit_year_session
 
 
-class ClassForm(forms.Form):
+class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
-    acronym = forms.CharField(max_length=1, required=True, label=_('Code'))
+    field_name_by_exception = {
+        exceptions.AnnualVolumeInvalidException: ('hourly_volume_partial_q1', 'hourly_volume_partial_q2'),
+    }
 
-    title_fr = forms.CharField(max_length=255, required=False, label=_('Title in French'))
-    title_en = forms.CharField(max_length=255, required=False, label=_('Title in French'))
+    class_code = forms.CharField(max_length=1, required=True, label=_('Code'))
+
+    title_fr = forms.CharField(max_length=255, required=True, label=_('Title in French'))
+    title_en = forms.CharField(max_length=255, required=False, label=_('Title in English'))
 
     hourly_volume_partial_q1 = VolumeField(
         label=_('Vol. Q1'),
@@ -53,4 +61,36 @@ class ClassForm(forms.Form):
     quadrimester = forms.ChoiceField(choices=quadrimesters.LearningUnitYearQuadrimester.choices(), required=False)
 
     campus = forms.ModelChoiceField(
-        queryset=Campus.objects.all().order_by('name'))
+        queryset=Campus.objects.all().order_by('name')
+    )  # FIXME :: reuse servicebus
+
+    learning_unit_year = forms.ChoiceField(disabled=True)
+    learning_unit_code = forms.CharField(disabled=True)
+    # learning_unit_type = forms.ChoiceField(disabled=True)
+    # internship_subtype = forms.ChoiceField(disabled=True)
+    learning_unit_credits = forms.DecimalField(disabled=True)
+    # periodicity = forms.ChoiceField(disabled=True)
+
+    def __init__(self, *args, learning_unit: 'LearningUnit' = None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.learning_unit = learning_unit
+        self.fields['learning_unit_code'].initial = learning_unit.code
+        self.fields['learning_unit_year'].choices = [(learning_unit.year, str(learning_unit.entity_id.academic_year))]
+        self.fields['learning_unit_year'].initial = learning_unit.year
+        self.fields['learning_unit_credits'].initial = learning_unit.credits
+        # TODO :: ajouter l'initial pour les utres champs
+
+    def get_command(self) -> CreateEffectiveClassCommand:
+        return CreateEffectiveClassCommand(
+            class_code=self.cleaned_data['class_code'],
+            learning_unit_code=self.learning_unit.code,
+            year=self.learning_unit.year,
+            title_fr=self.cleaned_data['title_fr'],
+            title_en=self.cleaned_data['title_en'],
+            place=self.cleaned_data['campus'].name,
+            organization_name=self.cleaned_data['campus'].organization.name,  # FIXME
+            derogation_quadrimester=self.cleaned_data['quadrimester'],
+            session_derogation=self.cleaned_data['session'],
+            volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,
+            volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'] or 0,
+        )

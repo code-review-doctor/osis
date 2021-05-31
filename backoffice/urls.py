@@ -76,6 +76,8 @@ if 'admission' in settings.INSTALLED_APPS:
     )
 if 'osis_mail_template' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^osis_mail_template/', include('osis_mail_template.urls')),)
+if 'learning_unit' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^learning_unit/', include('learning_unit.urls')),)
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

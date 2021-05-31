@@ -61,7 +61,6 @@ from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplet
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
 from education_group import urls as education_group_urls
-from learning_unit.views.learning_unit_class.create import Create as create_learning_unit_class
 
 
 urlpatterns = [

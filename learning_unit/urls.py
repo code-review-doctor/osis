@@ -24,14 +24,12 @@
 #
 ##############################################################################
 from django.urls import include, path
-from learning_unit.views.learning_unit_class.identification_read import ClassIdentitificationView
 
-from learning_unit.views.learning_unit_class.create import Create as CreateClass
+from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
 
 urlpatterns = [
     path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
         path('class/', include([
-            path('<str:class_code>/identification', ClassIdentitificationView.as_view(), name='class_identification'),
             path('create', CreateClass.as_view(), name='class_create'),
         ]))
     ]))

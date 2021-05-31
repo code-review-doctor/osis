@@ -199,7 +199,9 @@ def _build_part(
         volume_q1: Decimal,
         volume_q2: Decimal,
         volume_annual: Decimal
-) -> Union['LecturingPart', 'PracticalPart']:
+) -> Union['LecturingPart', 'PracticalPart', None]:
+    if not volume_annual:
+        return  # TODO :: unit test
     volumes = Volumes(
         volume_first_quadrimester=volume_q1,
         volume_second_quadrimester=volume_q2,

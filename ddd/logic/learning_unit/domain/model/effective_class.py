@@ -47,6 +47,9 @@ class EffectiveClassIdentity(interface.EntityIdentity):
     class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
+    def __str__(self):
+        return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))
+
 
 @attr.s(slots=True, hash=False, eq=False)
 class EffectiveClass(interface.RootEntity, abc.ABC):

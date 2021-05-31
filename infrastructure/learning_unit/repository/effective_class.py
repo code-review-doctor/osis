@@ -92,21 +92,21 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         )
 
     @classmethod
-    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:  # TODO :: add unit tests
         all_classes = _get_common_queryset().annotate(
             class_code=F('acronym'),
             learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
             learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year')
         ).values(
-            "class_code"
+            "class_code",
             "learning_unit_code",
             "learning_unit_year",
         )
         return [
             EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-                class_code=learning_class.classs_code,
-                learning_unit_code=learning_class.learning_unit_code,
-                learning_unit_year=learning_class.learning_unit_year
+                class_code=learning_class['class_code'],
+                learning_unit_code=learning_class['learning_unit_code'],
+                learning_unit_year=learning_class['learning_unit_year'],
             )
             for learning_class in all_classes
         ]
