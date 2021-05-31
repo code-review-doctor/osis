@@ -28,12 +28,6 @@ from osis_common.ddd.interface import BusinessException
 from django.utils.translation import gettext_lazy as _
 
 
-class EmptyRequiredFieldException(BusinessException):
-    def __init__(self, empty_required_field: str, *args, **kwargs):
-        message = _("Following field is required : {}").format(empty_required_field)
-        super().__init__(message, **kwargs)
-
-
 class LecturingAndPracticalChargeNotFilledException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _("Lecturing charge or practical charge must be filled")
@@ -79,4 +73,10 @@ class AttributionAboutToExpireNotFound(BusinessException):
 class AttributionAboutToExpireFunctionException(BusinessException):
     def __init__(self, *args,  **kwargs):
         message = _("Cannot renew an attribution with a function different from holder or coholder")
+        super().__init__(message, **kwargs)
+
+
+class NotAuthorOfApplicationException(BusinessException):
+    def __init__(self, *args,  **kwargs):
+        message = _("Cannot update an application which is not owned by you")
         super().__init__(message, **kwargs)

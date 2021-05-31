@@ -28,7 +28,7 @@ from typing import List
 from django.db import transaction
 
 from ddd.logic.application.commands import RenewMultipleAttributionsCommand
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.model.application import ApplicationIdentity
 from ddd.logic.application.domain.service.attribution_about_to_expire_renew import AttributionAboutToExpireRenew
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
@@ -47,7 +47,7 @@ def renew_multiple_attributions(
 ) -> List[ApplicationIdentity]:
     # GIVEN
     application_calendar = application_calendar_repository.get_current_application_calendar()
-    applicant = applicant_repository.get(entity_id=ApplicantIdentity(cmd.global_id))
+    applicant = applicant_repository.get(entity_id=ApplicantIdentityBuilder.build_from_global_id(cmd.global_id))
     all_existing_applications = application_repository.search(global_id=cmd.global_id)
 
     # WHEN

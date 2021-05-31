@@ -29,7 +29,7 @@ import uuid
 from django.test import TestCase
 
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
@@ -50,7 +50,7 @@ class TestSearchApplicationByApplicantService(TestCase):
             end_date=today + datetime.timedelta(days=10),
         )
 
-        cls.applicant_id = ApplicantIdentity(global_id='123456789')
+        cls.applicant_id = ApplicantIdentityBuilder.build_from_global_id(global_id='123456789')
         cls.application = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=cls.applicant_id,
@@ -65,7 +65,7 @@ class TestSearchApplicationByApplicantService(TestCase):
         )
         cls.application_2 = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
-            applicant_id=ApplicantIdentity(global_id='9846567895'),
+            applicant_id=ApplicantIdentityBuilder.build_from_global_id(global_id='9846567895'),
             vacant_course_id=VacantCourseIdentity(
                 code='LDROI1200',
                 academic_year=cls.application_calendar.authorized_target_year

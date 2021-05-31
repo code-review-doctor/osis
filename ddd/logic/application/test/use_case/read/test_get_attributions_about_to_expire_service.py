@@ -31,7 +31,8 @@ from django.test import TestCase
 from attribution.models.enums.function import Functions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.attribution import Attribution
@@ -74,7 +75,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         )
         self.global_id = '123456789'
         self.applicant = Applicant(
-            entity_id=ApplicantIdentity(global_id=self.global_id),
+            entity_id=ApplicantIdentityBuilder.build_from_global_id(global_id=self.global_id),
             first_name="Thomas",
             last_name="Durant",
             attributions=[self.attribution_about_to_expire]

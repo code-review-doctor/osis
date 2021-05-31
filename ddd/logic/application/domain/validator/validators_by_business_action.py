@@ -28,10 +28,13 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand
+from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
+    DeleteApplicationCommand
 from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
+from ddd.logic.application.domain.validator._should_be_the_author_of_the_application import \
+    ShouldBeTheAuthorOfTheApplication
 from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled import \
     ShouldLecturingOrPracticalFilledValidator
 from ddd.logic.application.domain.validator._should_not_have_already_applied_on_vacant_course import \
@@ -75,6 +78,7 @@ class ApplyOnVacantCourseValidatorList(TwoStepsMultipleBusinessExceptionListVali
 @attr.s(frozen=True, slots=True)
 class UpdateApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     vacant_course = attr.ib(type=VacantCourse)
+    application = attr.ib(type=Application)
     command = attr.ib(type=UpdateApplicationCommand)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -84,11 +88,32 @@ class UpdateApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValida
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
+            ShouldBeTheAuthorOfTheApplication(
+                application=self.application,
+                global_id=self.command.global_id
+            ),
             ShouldVolumesAskedLowerOrEqualToAvailable(
                 vacant_course=self.vacant_course,
                 lecturing_volume_asked=self.command.lecturing_volume,
                 practical_volume_asked=self.command.practical_volume
             ),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    application = attr.ib(type=Application)
+    command = attr.ib(type=DeleteApplicationCommand)
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+               ShouldBeTheAuthorOfTheApplication(
+                   application=self.application,
+                   global_id=self.command.global_id
+               ),
         ]
 
 

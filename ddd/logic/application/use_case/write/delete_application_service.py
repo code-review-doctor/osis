@@ -27,6 +27,7 @@ from django.db import transaction
 
 from ddd.logic.application.commands import DeleteApplicationCommand
 from ddd.logic.application.domain.model.application import ApplicationIdentity
+from ddd.logic.application.domain.validator.validators_by_business_action import DeleteApplicationValidatorList
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 
 
@@ -37,7 +38,13 @@ def delete_application(
 ) -> None:
     # GIVEN
     application_identity = ApplicationIdentity(uuid=cmd.application_uuid)
-    application_repository.get(entity_id=application_identity)
+    application = application_repository.get(entity_id=application_identity)
+
+    # THEN
+    DeleteApplicationValidatorList(
+        application=application,
+        command=cmd
+    ).validate()
 
     # THEN
     application_repository.delete(application_identity)

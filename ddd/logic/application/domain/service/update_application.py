@@ -40,6 +40,7 @@ class UpdateApplication(interface.DomainService):
             application: Application
     ) -> Application:
         UpdateApplicationValidatorList(
+            application=application,
             vacant_course=vacant_course,
             command=cmd
         ).validate()

@@ -23,20 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalChargeNotFilledException
-from osis_common.ddd import interface
+from ddd.logic.application.domain.model.applicant import ApplicantIdentity
+from osis_common.ddd.interface import EntityIdentityBuilder
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldLecturingOrPracticalFilledValidator(BusinessValidator):
-    command = attr.ib(type=interface.CommandRequest)
-
-    def validate(self, *args, **kwargs):
-        practical_value = getattr(self.command, 'practical_volume', None)
-        lecturing_value = getattr(self.command, 'lecturing_volume', None)
-
-        if not any([practical_value, lecturing_value]):
-            raise LecturingAndPracticalChargeNotFilledException()
+class ApplicantIdentityBuilder(EntityIdentityBuilder):
+    @classmethod
+    def build_from_global_id(cls, global_id: str) -> ApplicantIdentity:
+        return ApplicantIdentity(global_id=global_id)

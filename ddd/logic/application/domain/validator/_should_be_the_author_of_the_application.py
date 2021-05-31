@@ -26,15 +26,17 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.validator.exceptions import EmptyRequiredFieldException
-from osis_common.ddd import interface
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.validator.exceptions import NotAuthorOfApplicationException
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldFieldsBeRequiredValidator(BusinessValidator):
-    command = attr.ib(type=interface.CommandRequest)
-    field_name = attr.ib(type=str)
+class ShouldBeTheAuthorOfTheApplication(BusinessValidator):
+    application = attr.ib(type=Application)
+    global_id = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        if getattr(self.command, self.field_name, None) is None:
-            raise EmptyRequiredFieldException(empty_required_field=self.field_name)
+        applicant_id = ApplicantIdentityBuilder.build_from_global_id(self.global_id)
+        if applicant_id != self.application.applicant_id:
+            raise NotAuthorOfApplicationException()

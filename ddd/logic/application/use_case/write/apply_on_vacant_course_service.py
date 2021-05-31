@@ -26,8 +26,8 @@
 from django.db import transaction
 
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
-from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
@@ -46,7 +46,7 @@ def apply_on_vacant_course(
 ) -> ApplicationIdentity:
     # GIVEN
     application_calendar = application_calendar_repository.get_current_application_calendar()
-    applicant = applicant_repository.get(entity_id=ApplicantIdentity(cmd.global_id))
+    applicant = applicant_repository.get(entity_id=ApplicantIdentityBuilder.build_from_global_id(cmd.global_id))
     vacant_course = vacant_course_repository.get(
         entity_id=VacantCourseIdentity(code=cmd.code, academic_year=application_calendar.authorized_target_year)
     )

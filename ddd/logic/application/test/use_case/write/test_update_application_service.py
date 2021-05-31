@@ -30,12 +30,13 @@ from django.test import TestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import UpdateApplicationCommand
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
 from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalChargeNotFilledException, \
-    VolumesAskedShouldBeLowerOrEqualToVolumeAvailable
+    VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, NotAuthorOfApplicationException
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -46,8 +47,9 @@ from infrastructure.messages_bus import message_bus_instance
 class TestUpdateApplicationService(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.global_id = '123456789'
         cls.applicant = Applicant(
-            entity_id=ApplicantIdentity(global_id='123456789'),
+            entity_id=ApplicantIdentityBuilder.build_from_global_id(global_id=cls.global_id),
             first_name="Thomas",
             last_name="Durant"
         )
@@ -95,6 +97,7 @@ class TestUpdateApplicationService(TestCase):
     def test_case_both_volume_not_provided_in_command_assert_not_filled_exception_raised(self):
         cmd = UpdateApplicationCommand(
             application_uuid=self.application.entity_id.uuid,
+            global_id=self.global_id,
             lecturing_volume=None,
             practical_volume=None,
             course_summary='Résumé du cours',
@@ -115,6 +118,7 @@ class TestUpdateApplicationService(TestCase):
     def test_case_both_volume_set_to_zero_in_command_assert_not_filled_exception_raised(self):
         cmd = UpdateApplicationCommand(
             application_uuid=self.application.entity_id.uuid,
+            global_id=self.global_id,
             lecturing_volume=Decimal(0),
             practical_volume=Decimal(0),
             course_summary='Résumé du cours',
@@ -131,9 +135,10 @@ class TestUpdateApplicationService(TestCase):
             ])
         )
 
-    def test_case_apply_on_vacant_course_with_practical_volume_greater_than_available_assert_raise_exception(self):
+    def test_case_update_with_practical_volume_greater_than_available_assert_raise_exception(self):
         cmd = UpdateApplicationCommand(
             application_uuid=self.application.entity_id.uuid,
+            global_id=self.global_id,
             lecturing_volume=Decimal(0),  # Available 10
             practical_volume=Decimal(50.1),  # Available 50
             course_summary='Résumé du cours',
@@ -150,9 +155,10 @@ class TestUpdateApplicationService(TestCase):
             ])
         )
 
-    def test_case_apply_on_vacant_course_with_lecturing_volume_greater_than_available_assert_raise_exception(self):
+    def test_case_update_with_lecturing_volume_greater_than_available_assert_raise_exception(self):
         cmd = UpdateApplicationCommand(
             application_uuid=self.application.entity_id.uuid,
+            global_id=self.global_id,
             lecturing_volume=Decimal(10.1),  # Available 10
             practical_volume=Decimal(0),  # Available 50
             course_summary='Résumé du cours',
@@ -169,9 +175,30 @@ class TestUpdateApplicationService(TestCase):
             ])
         )
 
+    def test_case_update_with_a_different_global_id_assert_raise_exception(self):
+        cmd = UpdateApplicationCommand(
+            application_uuid=self.application.entity_id.uuid,
+            global_id='465656565',
+            lecturing_volume=Decimal(10.1),  # Available 10
+            practical_volume=Decimal(0),  # Available 50
+            course_summary='Résumé du cours',
+            remark='Remarque personelle',
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as cm:
+            self.message_bus.invoke(cmd)
+
+        exceptions_raised = cm.exception.exceptions
+        self.assertTrue(
+            any([
+                exception for exception in exceptions_raised
+                if isinstance(exception, NotAuthorOfApplicationException)
+            ])
+        )
+
     def test_case_update_multiple_fields_assert_value_changed(self):
         cmd = UpdateApplicationCommand(
             application_uuid=self.application.entity_id.uuid,
+            global_id=self.global_id,
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(25),
             course_summary='Résumé du cours',

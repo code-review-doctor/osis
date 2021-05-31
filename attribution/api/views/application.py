@@ -42,7 +42,6 @@ class ApplicationListCreateView(views.APIView):
         GET: Return all applications of connected user of the current application period
     """
     name = 'application_list_create'
-    serializer_class = ApplicationPostSerializer
 
     @cached_property
     def person(self) -> Person:
@@ -81,12 +80,17 @@ class ApplicationUpdateDeleteView(views.APIView):
     """
     name = 'application_update_delete'
 
+    @cached_property
+    def person(self) -> Person:
+        return self.request.user.person
+
     def put(self, request, *args, **kwargs):
         serializer = ApplicationPutSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         cmd = UpdateApplicationCommand(
             application_uuid=self.kwargs['application_uuid'],
+            global_id=self.person.global_id,
             lecturing_volume=serializer.validated_data['lecturing_volume'],
             practical_volume=serializer.validated_data['practical_volume'],
             course_summary=serializer.validated_data['course_summary'],

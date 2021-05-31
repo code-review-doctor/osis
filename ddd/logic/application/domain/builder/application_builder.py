@@ -27,7 +27,8 @@ import uuid
 from typing import List
 
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
@@ -71,7 +72,7 @@ class ApplicationBuilder(RootEntityBuilder):
         vacant_course_academic_year_id = AcademicYearIdentityBuilder.build_from_year(year=dto.vacant_course_year)
         return Application(
             entity_id=ApplicationIdentity(uuid=dto.uuid),
-            applicant_id=ApplicantIdentity(global_id=dto.applicant_global_id),
+            applicant_id=ApplicantIdentityBuilder.build_from_global_id(global_id=dto.applicant_global_id),
             vacant_course_id=VacantCourseIdentity(
                 code=dto.vacant_course_code, academic_year=vacant_course_academic_year_id
             ),

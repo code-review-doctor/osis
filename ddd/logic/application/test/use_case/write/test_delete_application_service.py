@@ -27,12 +27,15 @@ import mock
 import uuid
 from django.test import TestCase
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import DeleteApplicationCommand
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
+from ddd.logic.application.domain.validator.exceptions import NotAuthorOfApplicationException
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -43,8 +46,9 @@ from infrastructure.messages_bus import message_bus_instance
 class TestDeleteApplicationService(TestCase):
     @classmethod
     def setUpTestData(cls):
+        cls.global_id = '123456789'
         cls.applicant = Applicant(
-            entity_id=ApplicantIdentity(global_id='123456789'),
+            entity_id=ApplicantIdentityBuilder.build_from_global_id(global_id=cls.global_id),
             first_name="Thomas",
             last_name="Durant"
         )
@@ -62,22 +66,21 @@ class TestDeleteApplicationService(TestCase):
             is_in_team=False,
             allocation_entity=AllocationEntity(code='AGRO')
         )
+        cls.applicant_repository = ApplicantInMemoryRepository([cls.applicant])
+        cls.vacant_course_repository = VacantCourseInMemoryRepository([cls.vacant_course])
 
-        cls.application = Application(
+    def setUp(self) -> None:
+        self.application = Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
-            applicant_id=cls.applicant.entity_id,
-            vacant_course_id=cls.vacant_course.entity_id,
+            applicant_id=self.applicant.entity_id,
+            vacant_course_id=self.vacant_course.entity_id,
             lecturing_volume=Decimal(5),
             practical_volume=Decimal(15),
             remark='',
             course_summary=''
         )
+        self.application_repository = ApplicationInMemoryRepository([self.application])
 
-        cls.applicant_repository = ApplicantInMemoryRepository([cls.applicant])
-        cls.vacant_course_repository = VacantCourseInMemoryRepository([cls.vacant_course])
-        cls.application_repository = ApplicationInMemoryRepository([cls.application])
-
-    def setUp(self) -> None:
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             ApplicationRepository=lambda: self.application_repository,
@@ -90,9 +93,29 @@ class TestDeleteApplicationService(TestCase):
         self.message_bus = message_bus_instance
 
     def test_assert_delete_on_repository(self):
-        cmd = DeleteApplicationCommand(application_uuid=self.application.entity_id.uuid)
+        cmd = DeleteApplicationCommand(
+            application_uuid=self.application.entity_id.uuid,
+            global_id=self.global_id
+        )
 
         self.assertEqual(len(self.application_repository.applications), 1)
 
         self.message_bus.invoke(cmd)
         self.assertEqual(len(self.application_repository.applications), 0)
+
+    def test_case_update_with_a_different_global_id_assert_raise_exception(self):
+        cmd = DeleteApplicationCommand(
+            application_uuid=self.application.entity_id.uuid,
+            global_id='265656556'
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as cm:
+            self.message_bus.invoke(cmd)
+
+        exceptions_raised = cm.exception.exceptions
+        self.assertTrue(
+            any([
+                exception for exception in exceptions_raised
+                if isinstance(exception, NotAuthorOfApplicationException)
+            ])
+        )

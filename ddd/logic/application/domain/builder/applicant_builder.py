@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.builder.attribution_builder import AttributionBuilder
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.dtos import ApplicantFromRepositoryDTO
 from osis_common.ddd.interface import RootEntityBuilder
 
@@ -36,7 +37,7 @@ class ApplicantBuilder(RootEntityBuilder):
             dto: ApplicantFromRepositoryDTO,
     ) -> Applicant:
         return Applicant(
-            entity_id=ApplicantIdentity(global_id=dto.global_id),
+            entity_id=ApplicantIdentityBuilder.build_from_global_id(global_id=dto.global_id),
             first_name=dto.first_name,
             last_name=dto.last_name,
             attributions=[

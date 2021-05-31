@@ -31,7 +31,8 @@ from django.test import TestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand
-from ddd.logic.application.domain.model.applicant import Applicant, ApplicantIdentity
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
@@ -49,7 +50,7 @@ class TestApplyOnVacantCourseService(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.applicant = Applicant(
-            entity_id=ApplicantIdentity(global_id='123456789'),
+            entity_id=ApplicantIdentityBuilder.build_from_global_id(global_id='123456789'),
             first_name="Thomas",
             last_name="Durant"
         )
