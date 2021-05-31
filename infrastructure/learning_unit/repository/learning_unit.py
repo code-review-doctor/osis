@@ -302,7 +302,8 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
         practical_volume_annual=Subquery(
             components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_total_annual')
         ),
-        derogation_quadrimester=F('quadrimester')
+        derogation_quadrimester=F('quadrimester'),
+        teaching_place_uuid=F('campus__uuid'),
     )
     return queryset
 
@@ -330,7 +331,8 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
         'practical_volume_q1',
         'practical_volume_q2',
         'practical_volume_annual',
-        'derogation_quadrimester'
+        'derogation_quadrimester',
+        'teaching_place_uuid',
     )
     return queryset
 

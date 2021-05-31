@@ -38,6 +38,7 @@ from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd import interface
 
@@ -64,6 +65,7 @@ class LearningUnit(interface.RootEntity):
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=InternshipSubtype)
+    teaching_place = attr.ib(type=UclouvainCampusIdentity)
     responsible_entity_identity = attr.ib(type=UCLEntityIdentity)
     periodicity = attr.ib(type=PeriodicityEnum)
     language_id = attr.ib(type=LanguageIdentity)

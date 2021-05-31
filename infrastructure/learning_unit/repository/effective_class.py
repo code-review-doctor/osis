@@ -73,7 +73,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         learning_component_year_id = _get_learning_component_year_id_from_entity(entity)
 
         campus_id = Campus.objects.filter(
-            name=entity.teaching_place.place,
+            name=entity.teaching_place.teaching_place_uuid,
             organization__name=entity.teaching_place.organization_name
         ).values_list('pk', flat=True).get()
 
@@ -132,8 +132,7 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         class_code=F('acronym'),
         learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
         learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
-        teaching_place=F('campus__name'),
-        teaching_organization=F('campus__organization__name'),
+        teaching_place_uuid=F('campus__uuid'),
         derogation_quadrimester=F('quadrimester'),
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
@@ -149,8 +148,7 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'learning_unit_year',
         'title_fr',
         'title_en',
-        'teaching_place',
-        'teaching_organization',
+        'teaching_place_uuid',
         'derogation_quadrimester',
         'session_derogation',
         'volume_q1',

@@ -48,6 +48,7 @@ from ddd.logic.learning_unit.domain.validator.validators_by_business_action impo
     CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
 from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO
+from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
 from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd.interface import RootEntityBuilder
@@ -94,7 +95,8 @@ class LearningUnitBuilder(RootEntityBuilder):
                 volume_annual=dto.practical_volume_annual
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
-            partims=[]
+            partims=[],
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
         )
 
     @classmethod
@@ -132,7 +134,8 @@ class LearningUnitBuilder(RootEntityBuilder):
             if dto.derogation_quadrimester else None,
             partims=[
                 PartimBuilder.build_from_dto(partim_dto) for partim_dto in dto.partims
-            ]
+            ],
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
         )
 
     @classmethod

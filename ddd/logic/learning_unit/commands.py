@@ -54,6 +54,7 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     lecturing_volume_q2 = attr.ib(type=Decimal)
     lecturing_volume_annual = attr.ib(type=Decimal)
     derogation_quadrimester = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -105,8 +106,7 @@ class CreateEffectiveClassCommand(interface.CommandRequest):
     year = attr.ib(type=int)
     title_fr = attr.ib(type=str)
     title_en = attr.ib(type=str)
-    place = attr.ib(type=str)
-    organization_name = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
     derogation_quadrimester = attr.ib(type=str)
     session_derogation = attr.ib(type=str)
     volume_first_quadrimester = attr.ib(type=float)

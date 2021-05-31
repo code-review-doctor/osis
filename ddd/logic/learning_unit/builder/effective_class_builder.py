@@ -31,7 +31,6 @@ from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
@@ -41,6 +40,7 @@ from ddd.logic.learning_unit.domain.service.can_create_effective_class import Ca
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
 from osis_common.ddd import interface
 
 
@@ -68,7 +68,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         return _define_effective_class_type(learning_unit)(
             entity_id=effective_class_identity,
             titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
-            teaching_place=TeachingPlace(place=cmd.place, organization_name=cmd.organization_name),
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(cmd.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester(cmd.derogation_quadrimester),
             session_derogation=DerogationSession(cmd.session_derogation),
             volumes=ClassVolumes(
@@ -90,10 +90,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
                 fr=dto_object.title_fr,
                 en=dto_object.title_en
             ),
-            teaching_place=TeachingPlace(
-                place=dto_object.teaching_place,
-                organization_name=dto_object.teaching_organization
-            ),
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester(dto_object.derogation_quadrimester),
             session_derogation=dto_object.session_derogation,
             volumes=ClassVolumes(

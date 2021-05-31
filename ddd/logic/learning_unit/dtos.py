@@ -69,6 +69,7 @@ class LearningUnitFromRepositoryDTO(DTO):
     lecturing_volume_annual = attr.ib(type=Decimal)
     derogation_quadrimester = attr.ib(type=str)
     partims = attr.ib(type=List[PartimFromRepositoryDTO])
+    teaching_place_uuid = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -94,8 +95,7 @@ class EffectiveClassFromRepositoryDTO(DTO):
     learning_unit_year = attr.ib(type=int)
     title_fr = attr.ib(type=str)
     title_en = attr.ib(type=str)
-    teaching_place = attr.ib(type=str)
-    teaching_organization = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
     derogation_quadrimester = attr.ib(type=str)
     session_derogation = attr.ib(type=str)
     volume_q1 = attr.ib(type=Decimal)

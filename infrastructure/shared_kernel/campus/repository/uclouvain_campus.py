@@ -45,7 +45,7 @@ class UclouvainCampusRepository(IUclouvainCampusRepository):
     def search(cls, entity_ids: Optional[List['UclouvainCampusIdentity']] = None, **kwargs) -> List['UclouvainCampus']:
         qs = _get_common_queryset()
         qs = annotate_qs(qs)
-        objects_as_dict = _values_qs(qs)
+        objects_as_dict = _values_qs(qs).order_by('name')
         return [
             UclouvainCampusBuilder.build_from_repository_dto(UclouvainCampusDataDTO(**obj_as_dict))
             for obj_as_dict in objects_as_dict
