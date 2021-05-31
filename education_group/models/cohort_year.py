@@ -36,10 +36,11 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 class CohortYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = (
         'education_group_year',
+        'name',
         'administration_entity',
         'changed'
     )
-    list_filter = ('education_group_year__academic_year',)
+    list_filter = ('name', 'education_group_year__academic_year')
     search_fields = [
         'education_group_year__acronym',
         'education_group_year__partial_acronym'
