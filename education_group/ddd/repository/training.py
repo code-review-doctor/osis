@@ -133,6 +133,7 @@ class TrainingRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
+        _delete_first_year_bachelor(entity_id)
         EducationGroupYear.objects.filter(
             acronym=entity_id.acronym,
             academic_year__year=entity_id.year,
@@ -730,3 +731,11 @@ def _save_first_year_bachelor(
         )
         return obj
     return None
+
+
+def _delete_first_year_bachelor(entity_id: 'TrainingIdentity') -> None:
+    CohortYearModelDb.objects.filter(
+        education_group_year__acronym=entity_id.acronym,
+        education_group_year__academic_year__year=entity_id.year,
+        name=CohortName.FIRST_YEAR.name
+    ).delete()
