@@ -26,11 +26,12 @@
 import datetime
 import functools
 import operator
+from decimal import Decimal
 from typing import Optional, List
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import F, QuerySet, OuterRef, Subquery, Q, Value, Case, When
+from django.db.models import F, QuerySet, OuterRef, Subquery, Q, Value, Case, When, fields
 from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
 from django_cte import With
@@ -117,6 +118,21 @@ class VacantCourseRepository(IVacantCourseRepository):
 
 def _vacant_course_base_qs() -> QuerySet:
     subqs = LearningComponentYear.objects.filter(learning_unit_year_id=OuterRef('pk'))
+    subqs_volume_declared_vacant = subqs.annotate(
+        volume_declared_vacant_casted=Case(
+            When(volume_declared_vacant__isnull=True, then=Decimal(0.0)),
+            default=F('volume_declared_vacant'),
+            output_field=fields.DecimalField()
+        )
+    ).values('volume_declared_vacant_casted')
+
+    subqs_volume_total = subqs.annotate(
+        hourly_volume_total_annual_casted=Case(
+            When(hourly_volume_total_annual__isnull=True, then=Decimal(0.0)),
+            default=F('hourly_volume_total_annual'),
+            output_field=fields.DecimalField()
+        )
+    ).values('hourly_volume_total_annual_casted')
 
     main_qs = LearningUnitYearQuerySet.annotate_entity_allocation_acronym(
         LearningUnitYear.objects.filter(
@@ -136,18 +152,28 @@ def _vacant_course_base_qs() -> QuerySet:
             vacant_declaration_type=F('learning_container_year__type_declaration_vacant'),
             allocation_entity=F('entity_allocation'),
             lecturing_volume_total=Subquery(
-                subqs.filter(type=learning_component_year_type.LECTURING).values('hourly_volume_total_annual')[:1]
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
             ),
             lecturing_volume_available=Subquery(
-                subqs.filter(type=learning_component_year_type.LECTURING).values('volume_declared_vacant')[:1]
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
             ),
             practical_volume_total=Subquery(
-                subqs.filter(
+                subqs_volume_total.filter(
                     type=learning_component_year_type.PRACTICAL_EXERCISES
-                ).values('hourly_volume_total_annual')[:1]
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
             ),
             practical_volume_available=Subquery(
-                subqs.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).values('volume_declared_vacant')[:1]
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
             )
         ).values(
             "code",
@@ -160,6 +186,9 @@ def _vacant_course_base_qs() -> QuerySet:
             "practical_volume_total",
             "practical_volume_available",
             "allocation_entity"
+        ).exclude(
+            lecturing_volume_available=Decimal(0),
+            practical_volume_available=Decimal(0)
         )
 
 

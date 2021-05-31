@@ -52,4 +52,10 @@ class VacantCourseListView(views.APIView):
         vacant_courses = message_bus_instance.invoke(cmd)
 
         serializer = VacantCourseGetSerializer(vacant_courses, many=True)
-        return Response(serializer.data)
+        # FIXME: Integrate pagination with command
+        return Response({
+            "count": len(serializer.data),
+            "results": serializer.data,
+            "next": None,
+            "previous": None
+        })

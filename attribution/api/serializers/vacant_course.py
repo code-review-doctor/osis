@@ -46,6 +46,9 @@ class VacantCourseGetSerializer(serializers.Serializer):
     lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
     practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
     title = serializers.CharField(required=False, read_only=True)
-    vacant_declaration_type = serializers.CharField(required=False, read_only=True)
+    vacant_declaration_type = serializers.CharField(
+        required=False, read_only=True, source="vacant_declaration_type.name"
+    )
+    vacant_declaration_type_text = serializers.CharField(source='vacant_declaration_type.value', read_only=True)
     is_in_team = serializers.BooleanField(required=False, read_only=True)
-    allocation_entity = serializers.CharField(required=False, read_only=True)
+    allocation_entity = serializers.CharField(required=False, read_only=True, source="allocation_entity.code")

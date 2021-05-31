@@ -161,7 +161,7 @@ class VacantCourseRepositorySearch(TestCase):
 
     def test_assert_filter_by_allocation_entity_code_and_with_child_set_true(self):
         # Create a vacant course below DRT entity
-        LearningUnitYearFactory(
+        ldroi2000_db = LearningUnitYearFactory(
             acronym='LDROI2000',
             academic_year__year=2020,
             learning_container_year__acronym='LDROI2000',
@@ -174,6 +174,7 @@ class VacantCourseRepositorySearch(TestCase):
             learning_container_year__type_declaration_vacant=VacantDeclarationType.RESEVED_FOR_INTERNS.name,
             learning_container_year__team=True
         )
+        LecturingLearningComponentYearFactory(learning_unit_year=ldroi2000_db, volume_declared_vacant=Decimal(15))
 
         results = self.repository.search(
             allocation_entity=AllocationEntity(code="DRT"),
