@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 13:54+0200\n"
+"POT-Creation-Date: 2021-05-31 09:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,6 +22,12 @@ msgstr "Gestionnaire central"
 msgid "Central managers"
 msgstr "Gestionnaires centraux"
 
+msgid "Class"
+msgstr "Classe"
+
+msgid "Code"
+msgstr "Code"
+
 msgid "Faculty manager"
 msgstr "Gestionnaire facultaire"
 
@@ -30,6 +36,9 @@ msgstr "Gestionnaires facultaires"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
+
+msgid "Internship subtype"
+msgstr "Sous-type de stage"
 
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
@@ -67,6 +76,9 @@ msgstr "Seuls les caractères alphanumériques sont acceptés."
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
+
+msgid "Professional integration"
+msgstr "Intégration professionnelle"
 
 msgid "Proposal is of modification type"
 msgstr "La proposition est une proposition de modification"
@@ -170,6 +182,15 @@ msgstr "Titre en anglais"
 
 msgid "Title in French"
 msgstr "Titre en français"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Vol. Q1"
+msgstr "Vol. Q1"
+
+msgid "Vol. Q2"
+msgstr "Vol. Q2"
 
 msgid "You are not allowed to create proposal during this academic year"
 msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"

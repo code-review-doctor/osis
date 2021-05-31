@@ -37,7 +37,7 @@ class ClassForm(forms.Form):
     acronym = forms.CharField(max_length=1, required=True, label=_('Code'))
 
     title_fr = forms.CharField(max_length=255, required=False, label=_('Title in French'))
-    title_en = forms.CharField(max_length=255, required=False, label=_('Title in French'))
+    title_en = forms.CharField(max_length=255, required=False, label=_('Title in English'))
 
     hourly_volume_partial_q1 = VolumeField(
         label=_('Vol. Q1'),
