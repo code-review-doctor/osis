@@ -23,43 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
 
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_proposal(cls, learning_unit: 'LearningUnit') -> bool:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls, learning_unit: 'LearningUnit') -> bool:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_all_identities(cls) -> List['LearningUnitIdentity']:
-        pass
+def get_learning_unit(
+        cmd: 'GetLearningUnitCommand',
+        learning_unit_repository: 'ILearningUnitRepository'
+) -> 'LearningUnit':
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(code=cmd.code, year=cmd.year)
+    return learning_unit_repository.get(entity_id=learning_unit_identity)

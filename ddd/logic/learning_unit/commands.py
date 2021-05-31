@@ -111,3 +111,9 @@ class CreateEffectiveClassCommand(interface.CommandRequest):
     session_derogation = attr.ib(type=str)
     volume_first_quadrimester = attr.ib(type=float)
     volume_second_quadrimester = attr.ib(type=float)
+
+
+@attr.s(frozen=True, slots=True)
+class GetLearningUnitCommand(interface.CommandRequest):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
