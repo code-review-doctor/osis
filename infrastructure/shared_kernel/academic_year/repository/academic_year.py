@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import List, Optional
 
 from base.models.academic_year import AcademicYear as AcademicYearDatabase
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_builder import AcademicYearBuilder
-from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
 from ddd.logic.shared_kernel.academic_year.dtos import AcademicYearDataDTO
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
-from osis_common.ddd.interface import RootEntity, EntityIdentity, ApplicationService
+from osis_common.ddd.interface import ApplicationService
 
 
 class AcademicYearRepository(IAcademicYearRepository):
@@ -40,19 +39,11 @@ class AcademicYearRepository(IAcademicYearRepository):
         raise NotImplementedError
 
     @classmethod
-    def search(
-            cls,
-            cmd: SearchAcademicYearCommand,
-            **kwargs
-    ) -> List['AcademicYear']:
+    def search(cls, early_limit_year: Optional[int], **kwargs) -> List['AcademicYear']:
         objects = _get_common_queryset()
-        if cmd.early_limit_year:
-            objects = _get_common_queryset().filter(year__gte=cmd.early_limit_year)
-        objects_as_dict = objects.values(
-            'year',
-            'start_date',
-            'end_date',
-        )
+        if early_limit_year:
+            objects = _get_common_queryset().filter(year__gte=early_limit_year)
+        objects_as_dict = objects.values('year', 'start_date', 'end_date')
         return [
             AcademicYearBuilder.build_from_repository_dto(AcademicYearDataDTO(**obj_as_dict))
             for obj_as_dict in objects_as_dict
