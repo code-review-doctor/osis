@@ -41,7 +41,7 @@ from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.models.first_year_bachelor import FirstYearBachelor as FirstYearBachelorModelDb
+from education_group.models.cohort_year import CohortYear as CohortYearModelDb
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
 from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
@@ -142,7 +142,9 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             academic_year__year=entity_id.year,
         )
 
-        first_year_bachelor = FirstYearBachelorModelDb.objects.get(education_group_year=education_group_year)
+        first_year_bachelor = CohortYearModelDb.objects.get_first_year_bachelor(
+            education_group_year=education_group_year
+        )
         self.assertTrue(first_year_bachelor)
 
 
@@ -162,7 +164,9 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             academic_year__current=True,
             gen_first_year_bachelor__administration_entity=cls.entity_version.entity
         )
-        cls.fyb = FirstYearBachelorModelDb.objects.get(education_group_year=cls.bachelor_mdl)
+        cls.fyb = CohortYearModelDb.objects.get_first_year_bachelor(
+            education_group_year=cls.bachelor_mdl
+        )
 
         cls.bachelor = TrainingRepository.get(
             TrainingIdentityFactory(

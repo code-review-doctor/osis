@@ -24,16 +24,16 @@
 #
 ##############################################################################
 from django.db import models
-from django.db.models import CheckConstraint, Q
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
-from base.models.enums.education_group_types import TrainingType
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableQuerySet
 
 
-class FirstYearBachelorAdmin(VersionAdmin, OsisModelAdmin):
+class CohortYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = (
         'education_group_year',
         'administration_entity',
@@ -49,16 +49,34 @@ class FirstYearBachelorAdmin(VersionAdmin, OsisModelAdmin):
     )
 
 
-class FirstYearBachelor(models.Model):
+class CohortYearQueryset(SerializableQuerySet):
+    def get_queryset(self):
+        return self.get_queryset().select_related(
+            'administration_entity',
+            'education_group_year'
+        ).prefetch_related(
+            'administration_entity.entityversion_set'
+        )
+
+
+class CohortYearManager(SerializableModelManager):
+    def get_queryset(self):
+        return CohortYearQueryset(self.model, using=self._db)
+
+    def get_first_year_bachelor(self, **kwargs):
+        return self.get(name=CohortName.FIRST_YEAR.name, **kwargs)
+
+
+class CohortYear(SerializableModel):
+    objects = CohortYearManager()
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
-    education_group_year = models.OneToOneField(
+    education_group_year = models.ForeignKey(
         'base.EducationGroupYear',
         verbose_name=_("Training"),
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         db_index=True,
-        primary_key=True
     )
 
     administration_entity = models.ForeignKey(
@@ -66,9 +84,19 @@ class FirstYearBachelor(models.Model):
         null=True,
         blank=True,
         verbose_name=_("Administration entity"),
-        related_name='first_year_administration_entity',
+        related_name='cohort_year_administration_entity',
         on_delete=models.PROTECT
     )
 
+    name = models.CharField(
+        max_length=25,
+        choices=CohortName.choices(),
+        default=CohortName.FIRST_YEAR.name,
+        verbose_name=_('Name'),
+    )
+
     class Meta:
-        verbose_name = _("First year bachelor")
+        verbose_name = _("Cohort year")
+        constraints = [
+            models.UniqueConstraint(fields=['education_group_year', 'name'], name='unique_education_group_year_cohort')
+        ]
