@@ -26,7 +26,6 @@
 import functools
 import operator
 import warnings
-from collections import namedtuple
 from typing import Optional, List
 
 from django.db import IntegrityError
@@ -77,7 +76,8 @@ from education_group.ddd.domain._language import Language
 from education_group.ddd.domain._study_domain import StudyDomain, StudyDomainIdentity
 from education_group.ddd.domain._titles import Titles
 from education_group.ddd.domain.training import TrainingIdentityThroughYears
-from education_group.models.first_year_bachelor import FirstYearBachelor as FirstYearBachelorModelDb
+from education_group.models.cohort_year import CohortYear as CohortYearModelDb
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
 from reference.models.domain import Domain as DomainModelDb
@@ -223,8 +223,13 @@ def _convert_education_group_year_to_dto(
         'diploma_aims': certificate_aims,
     }
     if obj.is_bachelor:
-        first_year_administration_entity = obj.firstyearbachelor.administration_entity.most_recent_acronym \
-            if obj.firstyearbachelor.administration_entity else None
+        try:
+            cohort_first_year = obj.cohortyear_set.get_first_year_bachelor()
+            first_year_administration_entity = cohort_first_year.administration_entity.most_recent_acronym \
+                if cohort_first_year.administration_entity else None
+        except CohortYearModelDb.DoesNotExist:
+            first_year_administration_entity = None
+
         return BachelorDto(
             first_year_bachelor_administration_entity_acronym=first_year_administration_entity,
             **datas
@@ -711,10 +716,11 @@ def _is_hops_fields_presence_correct(training: 'Training') -> bool:
 def _save_first_year_bachelor(
         training: 'Training',
         education_group_year_db_obj: EducationGroupYearModelDb
-) -> FirstYearBachelorModelDb:
+) -> CohortYearModelDb:
     if training.is_bachelor():
-        obj, created = FirstYearBachelorModelDb.objects.update_or_create(
+        obj, created = CohortYearModelDb.objects.update_or_create(
             education_group_year=education_group_year_db_obj,
+            name=CohortName.FIRST_YEAR.name,
             defaults={
                 'administration_entity_id': entity_version.find_by_acronym_and_year(
                     acronym=training.first_year_bachelor.administration_entity.acronym,

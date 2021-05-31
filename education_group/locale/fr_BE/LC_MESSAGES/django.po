@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 08:43+0200\n"
+"POT-Creation-Date: 2021-05-31 09:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -261,6 +261,9 @@ msgstr "Le code existe déjà en %(academic_year)s"
 
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
+
+msgid "Cohort year"
+msgstr "Cohort annualisée"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -682,6 +685,9 @@ msgstr "Modifier l'ordre des contacts"
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr "Plusieurs entités '{entity_acronym}' trouvées pour l'année {year}"
+
+msgid "Name"
+msgstr "Nom"
 
 msgid "New Education Group"
 msgstr "Nouveau Groupement"

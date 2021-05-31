@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,18 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
+from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.entity import EntityFactory
-from education_group.models.enums.cohort_name import CohortName
+from base.models.utils.utils import ChoiceEnum
+
+FIRST_YEAR = "FIRST_YEAR"
 
 
-class FirstYearBachelorFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "education_group.CohortYear"
-        django_get_or_create = ('education_group_year', 'name')
-
-    education_group_year = factory.SubFactory(EducationGroupYearFactory)
-    administration_entity = factory.SubFactory(EntityFactory)
-    name = CohortName.FIRST_YEAR.name
+class CohortName(ChoiceEnum):
+    FIRST_YEAR = _("First year bachelor")
