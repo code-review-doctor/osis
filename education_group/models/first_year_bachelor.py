@@ -24,10 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from django.db.models import CheckConstraint, Q
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
+from base.models.enums.education_group_types import TrainingType
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -67,3 +69,6 @@ class FirstYearBachelor(models.Model):
         related_name='first_year_administration_entity',
         on_delete=models.PROTECT
     )
+
+    class Meta:
+        verbose_name = _("First year bachelor")

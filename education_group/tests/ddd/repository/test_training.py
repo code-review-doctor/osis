@@ -34,9 +34,10 @@ from base.tests.factories.certificate_aim import CertificateAimFactory as Certif
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
     BachelorEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
+from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
@@ -153,7 +154,21 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
             academic_year__current=True
+        )
 
+        cls.bachelor_mdl = EducationGroupYearBachelorFactory(
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            academic_year__current=True,
+            gen_first_year_bachelor__administration_entity=cls.entity_version.entity
+        )
+        cls.fyb = FirstYearBachelorModelDb.objects.get(education_group_year=cls.bachelor_mdl)
+
+        cls.bachelor = TrainingRepository.get(
+            TrainingIdentityFactory(
+                acronym=cls.bachelor_mdl.acronym,
+                year=cls.bachelor_mdl.academic_year.year
+            )
         )
 
         cls.training = TrainingRepository.get(
@@ -215,6 +230,16 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             self.entity_version.entity.id
         )
 
+    def test_update_bachelor(self):
+        self.assertEqual(self.fyb.administration_entity, self.entity_version.entity)
+        self.bachelor.first_year_bachelor.administration_entity = None
+        TrainingRepository.update(self.bachelor)
+
+        self.bachelor_mdl.refresh_from_db()
+        self.fyb.refresh_from_db()
+
+        self.assertEqual(self.fyb.administration_entity, None)
+
 
 class TestTrainingRepositoryGetMethod(TestCase):
     @classmethod
@@ -256,6 +281,16 @@ class TestTrainingRepositoryGetMethod(TestCase):
         for idx, aims in enumerate(expected_order):
             self.assertEqual(result.diploma.aims[idx].section, aims.section)
             self.assertEqual(result.diploma.aims[idx].code, aims.code)
+
+    def test_get_bachelor(self):
+        ev = EntityVersionModelDbFactory()
+        egy = EducationGroupYearBachelorFactory(gen_first_year_bachelor__administration_entity=ev.entity)
+
+        training_identity = generate_training_identity_from_education_group_year(egy)
+
+        result = TrainingRepository.get(training_identity)
+        self.assertIsInstance(result, Bachelor)
+        self.assertEqual(result.first_year_bachelor.administration_entity.acronym, ev.acronym)
 
 
 class TestTrainingRepositorySearchMethod(TestCase):
