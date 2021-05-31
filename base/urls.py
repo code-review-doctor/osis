@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -247,9 +247,7 @@ urlpatterns = [
                 name="learning_unit_proposal_comparison"),
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
-            url(r'^learning_unit_class/', include([
-                url(r'^create/$', create_learning_unit_class.as_view(), name="create_class"),
-            ])),
+
         ])),
         url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
