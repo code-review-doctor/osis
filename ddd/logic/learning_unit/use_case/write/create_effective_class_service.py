@@ -25,10 +25,10 @@
 ##############################################################################
 from django.db import transaction
 
-from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.service.create_effective_class import CreateEffectiveClass
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
@@ -47,11 +47,11 @@ def create_effective_class(
     all_existing_class_identities = class_repository.get_all_identities()
 
     # When
-    effective_class = EffectiveClassBuilder.build_from_command(
-        cmd,
-        learning_unit,
-        all_existing_class_identities,
-        learning_unit_repository
+    effective_class = CreateEffectiveClass().create(
+        cmd=cmd,
+        learning_unit_repository=learning_unit_repository,
+        all_existing_class_identities=all_existing_class_identities,
+        learning_unit=learning_unit
     )
 
     # Then

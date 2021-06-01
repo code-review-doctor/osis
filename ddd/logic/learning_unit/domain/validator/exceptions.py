@@ -169,16 +169,18 @@ class LearningUnitHasEnrollmentException(BusinessException):
 class LearningUnitHasNoVolumeException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(
-            "You cannot create class on this learning unit because the component's annual volume [PM or default PP] is not "
-            "greater than 0 and there are no planned class."
+            "You cannot create class on this learning unit because the component's annual volume [PM or default PP] "
+            "is not greater than 0 and there are no planned class."
         )
         super().__init__(message, **kwargs)
 
 
 class AnnualVolumeInvalidException(BusinessException):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, learning_unit: 'LearningUnit', *args, **kwargs):
+        volume_annual = learning_unit.lecturing_part.volumes.volume_annual \
+            if learning_unit.lecturing_part else learning_unit.practical_part.volumes.volume_annual
         message = _(
-            "Annual volume should be greater than or equal to 0 "
-            "and the sum of first/second quadrimesters volumes should be equal to annual volume"
+            "The sum of first/second quadrimesters volumes should be equal to annual volume "
+            "of the learning unit ({})".format(volume_annual)
         )
         super().__init__(message, **kwargs)
