@@ -948,8 +948,7 @@ class LearningUnitYearCheckClassesVolumesWarnings(TestCase):
         LearningClassYearFactory(
             learning_component_year=self.lecturing_component,
             hourly_volume_partial_q1=self.lecturing_component.hourly_volume_partial_q1,
-            hourly_volume_partial_q2=self.lecturing_component.hourly_volume_partial_q2,
-            hourly_volume_total_annual=self.lecturing_component.hourly_volume_total_annual
+            hourly_volume_partial_q2=self.lecturing_component.hourly_volume_partial_q2
         )
         query_components = _get_components_with_classes()
 
@@ -961,8 +960,7 @@ class LearningUnitYearCheckClassesVolumesWarnings(TestCase):
         effective_class = LearningClassYearFactory(
             learning_component_year=self.lecturing_component,
             hourly_volume_partial_q1=self.lecturing_component.hourly_volume_partial_q1,
-            hourly_volume_partial_q2=too_high_volume,
-            hourly_volume_total_annual=self.lecturing_component.hourly_volume_total_annual
+            hourly_volume_partial_q2=too_high_volume
         )
         query_components = _get_components_with_classes()
         messages = learning_unit_year._check_classes_volumes(list(query_components))
@@ -995,8 +993,7 @@ class LearningUnitYearCheckClassesVolumesWarnings(TestCase):
         LearningClassYearFactory(
             learning_component_year=self.lecturing_component,
             hourly_volume_partial_q1=self.lecturing_component.hourly_volume_partial_q1,
-            hourly_volume_partial_q2=too_high_volume,
-            hourly_volume_total_annual=self.lecturing_component.hourly_volume_total_annual
+            hourly_volume_partial_q2=too_high_volume
         )
         query_components = _get_components_with_classes()
         messages = learning_unit_year._check_classes_volumes(list(query_components))
