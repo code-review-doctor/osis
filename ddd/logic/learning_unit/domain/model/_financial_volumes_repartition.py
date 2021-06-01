@@ -23,36 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 
 import attr
 
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from osis_common.ddd import interface
 
-
-@attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+DurationUnit = Decimal
 
 
 @attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+class FinancialVolumesRepartition(interface.ValueObject):
+    responsible_entity = attr.ib(type=UCLEntityIdentity)
+    entity_2 = attr.ib(type=UCLEntityIdentity)
+    entity_3 = attr.ib(type=UCLEntityIdentity)
+    repartition_volume_responsible_entity = attr.ib(type=DurationUnit)
+    repartition_volume_entity_2 = attr.ib(type=DurationUnit)
+    repartition_volume_entity_3 = attr.ib(type=DurationUnit)

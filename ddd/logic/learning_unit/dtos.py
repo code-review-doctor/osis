@@ -24,11 +24,14 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List
+from typing import List, Optional
 
 import attr
 
 from osis_common.ddd.interface import DTO
+
+
+EntityCode = str
 
 
 @attr.s(frozen=True, slots=True)
@@ -55,18 +58,32 @@ class LearningUnitFromRepositoryDTO(DTO):
     specific_title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
+    responsible_entity_code = attr.ib(type=EntityCode)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
     remark_faculty = attr.ib(type=str)
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
+
+    repartition_entity_2 = attr.ib(type=Optional[EntityCode])
+    repartition_entity_3 = attr.ib(type=Optional[EntityCode])
+
     practical_volume_q1 = attr.ib(type=Decimal)
     practical_volume_q2 = attr.ib(type=Decimal)
     practical_volume_annual = attr.ib(type=Decimal)
+    practical_planned_classes = attr.ib(type=int)
+    practical_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])
+    practical_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])
+    practical_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])
+
     lecturing_volume_q1 = attr.ib(type=Decimal)
     lecturing_volume_q2 = attr.ib(type=Decimal)
     lecturing_volume_annual = attr.ib(type=Decimal)
+    lecturing_planned_classes = attr.ib(type=int)
+    lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])
+    lecturing_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])
+    lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])
+
     derogation_quadrimester = attr.ib(type=str)
     partims = attr.ib(type=List[PartimFromRepositoryDTO])
     teaching_place_uuid = attr.ib(type=str)

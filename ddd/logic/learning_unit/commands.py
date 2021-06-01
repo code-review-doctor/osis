@@ -24,10 +24,14 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import Optional
 
 import attr
 
 from osis_common.ddd import interface
+
+
+EntityCode = str
 
 
 @attr.s(frozen=True, slots=True)
@@ -41,18 +45,30 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     specific_title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
+    responsible_entity_code = attr.ib(type=EntityCode)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
     remark_faculty = attr.ib(type=str)
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
+
+    # repartition_entity_2 = attr.ib(type=Optional[EntityCode])  # TODO :: to implement and unit test
+    # repartition_entity_3 = attr.ib(type=Optional[EntityCode])  # TODO :: to implement and unit test
+
     practical_volume_q1 = attr.ib(type=Decimal)
     practical_volume_q2 = attr.ib(type=Decimal)
     practical_volume_annual = attr.ib(type=Decimal)
+    # practical_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # practical_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # practical_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+
     lecturing_volume_q1 = attr.ib(type=Decimal)
     lecturing_volume_q2 = attr.ib(type=Decimal)
     lecturing_volume_annual = attr.ib(type=Decimal)
+    # lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # lecturing_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+
     derogation_quadrimester = attr.ib(type=str)
     teaching_place_uuid = attr.ib(type=str)
 

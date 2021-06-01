@@ -32,6 +32,7 @@ from base.models.enums.learning_container_year_types import LearningContainerYea
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import CreatePartimCommand
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
