@@ -36,6 +36,7 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import SESSION_X2X
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
@@ -146,9 +147,19 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     def __init_based_on_learning_unit(self):
         self.fields['session'].initial = SESSION_X2X  # TODO :: modifier quand session sera dans LearningUnit
         self.fields['quadrimester'].initial = self.learning_unit.derogation_quadrimester.name
+        bases_volumes = self._get_component_volumes()
+        self.fields['hourly_volume_partial_q1'].initial = bases_volumes.volume_first_quadrimester
+        self.fields['hourly_volume_partial_q2'].initial = bases_volumes.volume_second_quadrimester
+        print(bases_volumes.volume_annual)
+        self.fields['learning_unit_hourly_volume_total_annual'].initial = bases_volumes.volume_annual
 
-        self.fields['hourly_volume_partial_q1'].initial = self.learning_unit.total_vol_q1
-        self.fields['hourly_volume_partial_q2'].initial = self.learning_unit.total_vol_q2
+    def _get_component_volumes(self):
+        if self.learning_unit.lecturing_part.volumes and self.learning_unit.lecturing_part.volumes.volume_annual > 0:
+            return self.learning_unit.lecturing_part.volumes
+        if self.learning_unit.practical_part.volumes and self.learning_unit.practical_part.volumes.volume_annual > 0:
+            return self.learning_unit.practical_part.volumes
+
+        return Volumes(volume_second_quadrimester=0, volume_first_quadrimester=0, volume_annual=0)
 
     def __init_learning_unit_fields(self):
         learning_unit = self.learning_unit
@@ -168,8 +179,6 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.__init_learning_unit_responsible_field()
 
     def __init_volumes(self):
-        self.fields['learning_unit_hourly_volume_total_annual'].initial = \
-            self.learning_unit.total_vol_q1 + self.learning_unit.total_vol_q2  # todo :: pas sûre
         self.fields['learning_unit_planned_classes'].initial = 0  # TODO missing in learning_unit ???
         self.fields['learning_unit_repartition_volume_requirement_entity'].initial = 0
         self.fields['learning_unit_repartition_volume_allocation_entity'].initial = 0
