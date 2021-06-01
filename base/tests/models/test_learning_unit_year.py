@@ -870,5 +870,5 @@ class LearningUnitYearAndClassTest(TestCase):
         luy_this_year = LearningUnitYearFactory(learning_unit=lu)
         next_year = AcademicYearFactory(year=luy_this_year.academic_year.year + 1)
         luy_in_future = LearningUnitYearFactory(learning_unit=lu, academic_year=next_year)
-        effective_class = LearningClassYearFactory(learning_component_year__learning_unit_year=luy_in_future)
-        self.assertTrue(self.luy_this_year.has_class_this_year_or_in_future())
+        LearningClassYearFactory(learning_component_year__learning_unit_year=luy_in_future)
+        self.assertTrue(luy_this_year.has_class_this_year_or_in_future())
