@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory.fuzzy
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from base.models.enums.entity_type import EntityType
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity, UclEntity
 
 
-def check_can_create_effective_class(
-        cmd: 'CanCreateEffectiveClassCommand',
-        learning_unit_repository: 'ILearningUnitRepository'
-) -> None:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.learning_unit_year
-    )
-    learning_unit = learning_unit_repository.get(learning_unit_identity)
-    CanAccessCreationEffectiveClass().check(
-        learning_unit=learning_unit,
-        learning_unit_repository=learning_unit_repository
-    )
+class UclEntityIdentityFactory(factory.Factory):
+    class Meta:
+        model = UCLEntityIdentity
+        abstract = False
+
+    code = factory.Sequence(lambda n: 'ENTITY%02d' % n)
+
+
+# Private class
+class _UclEntityFactory(factory.Factory):
+    class Meta:
+        model = UclEntity
+        abstract = False
+
+    entity_id = factory.SubFactory(UclEntityIdentityFactory)
+    type = factory.fuzzy.FuzzyChoice(EntityType)
+
+
+class DRTEntityFactory(_UclEntityFactory):
+    entity_id = UclEntityIdentityFactory(code="DRT")
+    type = EntityType.FACULTY

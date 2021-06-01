@@ -274,7 +274,8 @@ def _get_partims(qs: QuerySet) -> QuerySet:
 
 def _annotate_queryset(queryset: QuerySet) -> QuerySet:
     components = LearningComponentYearDatabase.objects.filter(
-        learning_unit_year_id=OuterRef('pk')
+        learning_unit_year_id=OuterRef('pk'),
+        hourly_volume_total_annual__gt=0.0,
     )
     queryset = queryset.annotate(
         code=F('acronym'),
