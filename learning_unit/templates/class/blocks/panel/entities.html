@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load bootstrap3 %}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div>
+            {% bootstrap_field form.learning_unit_campus_organization_institution %}
+        </div>
+
+        <div>
+            {% bootstrap_field form.learning_unit_campus %}
+        </div>
+        <div>
+            {% bootstrap_field form.learning_unit_responsible_entity %}
+        </div>
+        <div>
+            ???
+            {% bootstrap_field form.learning_unit_allocation_entity %}
+            ???
+        </div>
+
+        <div>
+            {% bootstrap_field form.campus %}
+        </div>
+
+        <div>
+            {% bootstrap_field form.learning_unit_year %}
+        </div>
+    </div>
+</div>
+

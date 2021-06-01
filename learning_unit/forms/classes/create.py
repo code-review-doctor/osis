@@ -24,28 +24,36 @@
 #
 ##############################################################################
 from django import forms
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import VolumeField
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models.campus import Campus
+from base.models.enums import quadrimesters, learning_unit_year_session
+from base.models.enums.internship_subtypes import INTERNSHIP_SUBTYPES
+from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_session import SESSION_X2X
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
+from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
+from ddd.logic.shared_kernel.language.domain.model.language import Language
+from infrastructure.messages_bus import message_bus_instance
 from osis_common.forms.widgets import DecimalFormatInput
-from base.models.enums import quadrimesters, learning_unit_year_session
 
 
 class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
-
+    EMPTY_LABEL = BLANK_CHOICE_DISPLAY
     field_name_by_exception = {
         exceptions.AnnualVolumeInvalidException: ('hourly_volume_partial_q1', 'hourly_volume_partial_q2'),
     }
 
     class_code = forms.CharField(max_length=1, required=True, label=_('Code'))
 
-    title_fr = forms.CharField(max_length=255, required=True, label=_('Title in French'))
-    title_en = forms.CharField(max_length=255, required=False, label=_('Title in English'))
+    title_fr = forms.CharField(max_length=255, required=True, label=_('Class specific complement'))
+    title_en = forms.CharField(max_length=255, required=False, label=_('Class specific complement'))
 
     hourly_volume_partial_q1 = VolumeField(
         label=_('Vol. Q1'),
@@ -57,28 +65,134 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         widget=DecimalFormatInput(render_value=True),
         required=False,
     )
-    session = forms.ChoiceField(choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, required=False)
-    quadrimester = forms.ChoiceField(choices=quadrimesters.LearningUnitYearQuadrimester.choices(), required=False)
+    session = forms.ChoiceField(
+        choices=((None, BLANK_CHOICE_DISPLAY),) + learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
+        initial=None,
+        required=False
+    )
+    quadrimester = forms.ChoiceField(
+        choices=((None, BLANK_CHOICE_DISPLAY),) + quadrimesters.DerogationQuadrimester.choices(),
+        initial=None,
+        required=False
+    )
 
     campus = forms.ModelChoiceField(
         queryset=Campus.objects.all().order_by('name')
     )  # FIXME :: reuse servicebus
+    class_type = forms.CharField()
 
-    learning_unit_year = forms.ChoiceField(disabled=True)
-    learning_unit_code = forms.CharField(disabled=True)
-    # learning_unit_type = forms.ChoiceField(disabled=True)
-    # internship_subtype = forms.ChoiceField(disabled=True)
-    learning_unit_credits = forms.DecimalField(disabled=True)
-    # periodicity = forms.ChoiceField(disabled=True)
+    learning_unit_year = forms.ChoiceField(disabled=True, label=_('Academic year'), required=False)
+    learning_unit_code = forms.CharField(disabled=True, max_length=15, required=False)
+    learning_unit_type = forms.ChoiceField(disabled=True, label=_('Type'), required=False)
+    learning_unit_internship_subtype = forms.ChoiceField(disabled=True, label=_('Internship subtype'), required=False)
+    learning_unit_credits = forms.DecimalField(disabled=True, label=_('Credits'), required=False)
+    learning_unit_periodicity = forms.ChoiceField(disabled=True, label=_('Periodicity'), required=False, initial=None)
+    learning_unit_state = forms.BooleanField(disabled=True, label=_('Active'), required=False)
+    learning_unit_language = forms.ChoiceField(disabled=True, label=_('Language'), required=False)
+    learning_unit_professional_integration = forms.BooleanField(
+        disabled=True,
+        label=_('Professional integration'),
+        required=False
+    )
+    learning_unit_common_title_fr = forms.CharField(disabled=True, label=_('Common part'), required=False)
+    learning_unit_common_title_en = forms.CharField(disabled=True, label=_('Common part'), required=False)
+    learning_unit_remarks_faculty = forms.CharField(disabled=True, label=_('Faculty remark'), required=False)
+    learning_unit_remarks_publication_fr = forms.CharField(disabled=True, label=_('Other remark'), required=False)
 
-    def __init__(self, *args, learning_unit: 'LearningUnit' = None, **kwargs):
+    learning_unit_hourly_volume_total_annual = VolumeField(
+        label=_('Vol. annual'),
+        widget=DecimalFormatInput(render_value=True),
+        required=False,
+        disabled=True
+    )
+    learning_unit_planned_classes = forms.IntegerField(label=_('Planned classes'), disabled=True,
+                                                       widget=forms.TextInput(), required=False)
+    learning_unit_repartition_volume_requirement_entity = forms.DecimalField(disabled=True)
+    learning_unit_repartition_volume_allocation_entity = forms.DecimalField(disabled=True)
+    learning_unit_campus_organization_institution = forms.CharField(
+        label=_('Institution'),
+        disabled=True,
+        required=False
+    )
+    learning_unit_campus = forms.ModelChoiceField(
+        label=_('Learning location'),
+        queryset=Campus.objects.all().order_by('name'),
+        disabled=True,
+        required=False
+    )  # FIXME :: reuse servicebus
+    learning_unit_responsible_entity = forms.ChoiceField(
+        required=False,
+        initial=None,
+        disabled=True,
+        label=_('Requirement entity')
+    )
+    learning_unit_allocation_entity = forms.ChoiceField(
+        required=False,
+        initial=None,
+        disabled=True,
+        label=_('Allocation entity')
+    )
+
+    def __init__(self, *args, learning_unit: 'LearningUnit' = None, user: User, **kwargs):
+        self.user = user
         super().__init__(*args, **kwargs)
+
         self.learning_unit = learning_unit
+
+        self.fields['class_type'].initial = _get_class_type(self.learning_unit)
+        self.__init_based_on_learning_unit()
+        self.__init_learning_unit_fields()
+
+    def __init_based_on_learning_unit(self):
+        self.fields['session'].initial = SESSION_X2X  # TODO :: modifier quand session sera dans LearningUnit
+        self.fields['quadrimester'].initial = self.learning_unit.derogation_quadrimester.name
+
+        self.fields['hourly_volume_partial_q1'].initial = self.learning_unit.total_vol_q1
+        self.fields['hourly_volume_partial_q2'].initial = self.learning_unit.total_vol_q2
+
+    def __init_learning_unit_fields(self):
+        learning_unit = self.learning_unit
         self.fields['learning_unit_code'].initial = learning_unit.code
+        self.__init_year_choices(learning_unit)
+        self.fields['learning_unit_credits'].initial = learning_unit.credits
+        self.fields['learning_unit_type'].choices = [('CLASS', _("Class"))]
+        self.fields['learning_unit_type'].initial = 'CLASS'
+        self.__init_internship_subtype(learning_unit)
+        self.__init_periodicity(learning_unit)
+        self.fields['learning_unit_state'].initial = True  # TODO :: missing in learning unit
+        self.__init_language_choices()
+        self.fields['learning_unit_professional_integration'].initial = True  # TODO :: missing in learning unit
+        self.__init_titles(learning_unit)
+        self.__init_remarks(learning_unit)
+        self.__init_volumes()
+        self.__init_learning_unit_responsible_field()
+
+    def __init_volumes(self):
+        self.fields['learning_unit_hourly_volume_total_annual'].initial = \
+            self.learning_unit.total_vol_q1 + self.learning_unit.total_vol_q2  # todo :: pas sûre
+        self.fields['learning_unit_planned_classes'].initial = 0  # TODO missing in learning_unit ???
+        self.fields['learning_unit_repartition_volume_requirement_entity'].initial = 0
+        self.fields['learning_unit_repartition_volume_allocation_entity'].initial = 0
+
+    def __init_remarks(self, learning_unit):
+        self.fields['learning_unit_remarks_faculty'].initial = learning_unit.remarks.faculty
+        self.fields['learning_unit_remarks_publication_fr'].initial = learning_unit.remarks.publication_fr
+
+    def __init_titles(self, learning_unit):
+        self.fields['learning_unit_common_title_fr'].initial = learning_unit.titles.common_fr
+        self.fields['learning_unit_common_title_en'].initial = learning_unit.titles.common_en
+
+    def __init_periodicity(self, learning_unit):
+        self.fields['learning_unit_periodicity'].choices = ((None, BLANK_CHOICE_DISPLAY),) + PeriodicityEnum.choices()
+        self.fields['learning_unit_periodicity'].initial = learning_unit.periodicity.name
+
+    def __init_internship_subtype(self, learning_unit):
+        self.fields['learning_unit_internship_subtype'].choices = ((None, BLANK_CHOICE_DISPLAY),) + INTERNSHIP_SUBTYPES
+        self.fields['learning_unit_internship_subtype'].initial = learning_unit.internship_subtype
+
+    def __init_year_choices(self, learning_unit):
         self.fields['learning_unit_year'].choices = [(learning_unit.year, str(learning_unit.entity_id.academic_year))]
         self.fields['learning_unit_year'].initial = learning_unit.year
-        self.fields['learning_unit_credits'].initial = learning_unit.credits
-        # TODO :: ajouter l'initial pour les utres champs
 
     def get_command(self) -> CreateEffectiveClassCommand:
         return CreateEffectiveClassCommand(
@@ -94,3 +208,24 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,
             volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'] or 0,
         )
+
+    def __init_language_choices(self):
+        all_languages = message_bus_instance.invoke(SearchLanguagesCommand())  # type: List[Language]
+        choices = [(lang.code_iso, lang.name) for lang in all_languages]
+        choices.append((None, BLANK_CHOICE_DISPLAY))
+        self.fields['learning_unit_language'].choices = choices
+        self.fields['learning_unit_language'].initial = self.learning_unit.language_id.code_iso
+
+    def __init_learning_unit_responsible_field(self):
+        self.fields['learning_unit_responsible_entity'].choices = [
+            (self.learning_unit.responsible_entity_identity.code, self.learning_unit.responsible_entity_identity.code),
+        ]
+        self.fields['learning_unit_responsible_entity'].initial = self.learning_unit.responsible_entity_identity.code
+
+
+def _get_class_type(learning_unit: 'LearningUnit'):
+    if learning_unit.lecturing_part and (learning_unit.lecturing_part.volumes.volume_annual or 0) > 0:
+        return _('Lecturing')
+    if learning_unit.practical_part and (learning_unit.practical_part.volumes.volume_annual or 0) > 0:
+        return _('Practical exercises')
+    return _('Lecturing')

@@ -35,7 +35,7 @@ from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
+from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart, Volumes
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
@@ -100,6 +100,24 @@ class LearningUnit(interface.RootEntity):
 
     def is_external(self) -> bool:
         return isinstance(self, ExternalLearningUnit)
+
+    @property
+    def total_vol_q1(self) -> float:
+        tot_vol = 0
+        if self.lecturing_part:
+            tot_vol = self.lecturing_part.volumes.volume_first_quadrimester or 0
+        if self.practical_part:
+            tot_vol += self.practical_part.volumes.volume_first_quadrimester or 0
+        return tot_vol
+
+    @property
+    def total_vol_q2(self) -> float:
+        tot_vol = 0
+        if self.lecturing_part:
+            tot_vol = self.lecturing_part.volumes.volume_second_quadrimester or 0
+        if self.practical_part:
+            tot_vol += self.practical_part.volumes.volume_second_quadrimester or 0
+        return tot_vol
 
 
 class CourseLearningUnit(LearningUnit):

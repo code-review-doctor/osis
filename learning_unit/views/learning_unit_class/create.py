@@ -25,7 +25,6 @@
 ##############################################################################
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import QuerySet
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -75,6 +74,7 @@ class CreateClassView(PermissionRequiredMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['learning_unit'] = self.learning_unit
+        kwargs['user'] = self.request.user
         return kwargs
 
     def get_permission_object(self):
@@ -87,7 +87,7 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         )
 
     def post(self, request, *args, **kwargs):
-        form = ClassForm(request.POST, learning_unit=self.learning_unit)
+        form = ClassForm(request.POST, learning_unit=self.learning_unit, user=request.user)
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
