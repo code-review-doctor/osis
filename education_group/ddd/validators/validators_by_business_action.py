@@ -50,7 +50,6 @@ class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
             UniqueCodeValidator(group.code),
             ContentConstraintValidator(group.content_constraint),
             CreditsValidator(group.credits),
-            CodePatternValidator(group.code, group.type.name)
         ]
         super().__init__()
 
@@ -164,5 +163,14 @@ class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValid
         self.validators = [
             MiniTrainingEnrollmentsValidator(mini_training.entity_id),
             MiniTrainingLinkWithEPCValidator(mini_training.entity_id)
+        ]
+        super().__init__()
+
+
+class CreateOrphanGroupValidatorList(MultipleExceptionBusinessListValidator):
+
+    def __init__(self, code: str, group_type: str):
+        self.validators = [
+            CodePatternValidator(code, group_type)
         ]
         super().__init__()

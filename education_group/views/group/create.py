@@ -20,6 +20,7 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_group_service
+from education_group.ddd.validators.validators_by_business_action import CreateOrphanGroupValidatorList
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
@@ -109,6 +110,7 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         start_year=group_form.cleaned_data['academic_year'],
                         end_year=None
                     )
+                    CreateOrphanGroupValidatorList(cmd_create.code, cmd_create.type).validate()
                     group_id = create_group_service.create_orphan_group(cmd_create)
             except MultipleBusinessExceptions as multiple_exceptions:
                 for e in multiple_exceptions.exceptions:
