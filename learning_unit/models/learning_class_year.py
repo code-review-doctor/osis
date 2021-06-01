@@ -28,6 +28,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import quadrimesters, learning_unit_year_session
+from base.models.enums.component_type import LECTURING
 from osis_common.models import osis_model_admin
 
 
@@ -86,7 +87,7 @@ class LearningClassYear(models.Model):
     def effective_class_complete_acronym(self):
         return "{}{}{}".format(
             self.learning_component_year.learning_unit_year.acronym,
-            '-' if self.learning_component_year.type == self.learning_component_year.LECTURING else '_',
+            '-' if self.learning_component_year.type == LECTURING else '_',
             self.acronym
         )
 
