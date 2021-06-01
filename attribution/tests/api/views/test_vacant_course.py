@@ -26,6 +26,7 @@
 import mock
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.settings import api_settings
 from rest_framework.test import APITestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -70,7 +71,7 @@ class VacantCourseListViewTestCase(APITestCase):
         self.assertEqual(
             response.json(),
             {
-                'non_field_errors': [
+                api_settings.NON_FIELD_ERRORS_KEY: [
                     _('Please precise at least a faculty or a code (or a part of a code)')
                 ]
             }

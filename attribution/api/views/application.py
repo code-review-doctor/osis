@@ -29,19 +29,26 @@ from rest_framework.response import Response
 
 from attribution.api.serializers.application import ApplicationGetSerializer, ApplicationPostSerializer, \
     ApplicationPutSerializer, AttributionsAboutToExpireGetSerializer, RenewAttributionAboutToExpirePostSerializer
+from backoffice.settings.rest_framework.common_views import DisplayExceptionsByFieldNameAPIMixin
 from base.models.person import Person
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand, ApplyOnVacantCourseCommand, \
     UpdateApplicationCommand, DeleteApplicationCommand, GetAttributionsAboutToExpireCommand, \
     RenewMultipleAttributionsCommand
+from ddd.logic.application.domain.validator.exceptions import VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
+    LecturingAndPracticalChargeNotFilledException
 from infrastructure.messages_bus import message_bus_instance
 
 
-class ApplicationListCreateView(views.APIView):
+class ApplicationListCreateView(DisplayExceptionsByFieldNameAPIMixin, views.APIView):
     """
         POST: Create an application on the current application period
         GET: Return all applications of connected user of the current application period
     """
     name = 'application_list_create'
+    field_name_by_exception = {
+        VolumesAskedShouldBeLowerOrEqualToVolumeAvailable: ['lecturing_volume', 'practical_volume'],
+        LecturingAndPracticalChargeNotFilledException: ['lecturing_volume', 'practical_volume']
+    }
 
     @cached_property
     def person(self) -> Person:
@@ -73,12 +80,16 @@ class ApplicationListCreateView(views.APIView):
         })
 
 
-class ApplicationUpdateDeleteView(views.APIView):
+class ApplicationUpdateDeleteView(DisplayExceptionsByFieldNameAPIMixin, views.APIView):
     """
         PUT:  Update an application on the current application period
         DELETE: Delete an application on the current application period
     """
     name = 'application_update_delete'
+    field_name_by_exception = {
+        VolumesAskedShouldBeLowerOrEqualToVolumeAvailable: ['lecturing_volume', 'practical_volume'],
+        LecturingAndPracticalChargeNotFilledException: ['lecturing_volume', 'practical_volume']
+    }
 
     @cached_property
     def person(self) -> Person:
