@@ -42,6 +42,8 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
 from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
+from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
+from ddd.logic.shared_kernel.language.domain.model.language import Language
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.forms.widgets import DecimalFormatInput
 
