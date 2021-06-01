@@ -63,7 +63,6 @@ def run() -> dict:
     highest_year = max([program.year for program in programs_created])
     postpone_to_n_publication_datas(highest_year)
     return {
-        "groups": [str(group_identity) for group_identity in groups_created],
         "trainings": [str(training_identity) for training_identity in trainings_created],
         "mini_trainings": [str(mini_training_identity) for mini_training_identity in mini_trainings_created],
         "program": [str(program_identity) for program_identity in programs_created],
