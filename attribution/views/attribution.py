@@ -164,8 +164,7 @@ def _get_classes_charge_repartition_warning_messages(learning_unit_year: Learnin
 def _get_component_volume_total_of_classes(component: LearningComponentYear) -> float:
     volume_total_of_classes = 0
     for effective_classes in component.classes:
-        volume_total_of_classes += effective_classes.hourly_volume_partial_q1 or 0
-        volume_total_of_classes += effective_classes.hourly_volume_partial_q2 or 0
+        volume_total_of_classes += effective_classes.volume_annual
     return volume_total_of_classes
 
 
