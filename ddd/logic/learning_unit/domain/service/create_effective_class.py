@@ -53,25 +53,6 @@ class CreateEffectiveClass(interface.DomainService):
             learning_unit_repository=learning_unit_repository
         )
 
-        cls.can_create_effective_class(
-            cmd=cmd,
-            all_existing_class_identities=all_existing_class_identities,
-            learning_unit=learning_unit
-        )
-
-        effective_class = EffectiveClassBuilder.build_from_command(
-            cmd=cmd,
-            learning_unit=learning_unit
-        )
-        return effective_class
-
-    @classmethod
-    def can_create_effective_class(
-            cls,
-            cmd: 'CreateEffectiveClassCommand',
-            all_existing_class_identities: List['EffectiveClassIdentity'],
-            learning_unit: 'LearningUnit'
-    ):
         exceptions = set()  # type Set[BusinessException]
 
         if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
@@ -84,6 +65,12 @@ class CreateEffectiveClass(interface.DomainService):
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
+
+        effective_class = EffectiveClassBuilder.build_from_command(
+            cmd=cmd,
+            learning_unit=learning_unit
+        )
+        return effective_class
 
 
 def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
