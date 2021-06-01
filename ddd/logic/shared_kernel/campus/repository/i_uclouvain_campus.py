@@ -23,36 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from abc import abstractmethod
+from typing import Optional, List
 
-import attr
-
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus, UclouvainCampusIdentity
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-@attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+class IUclouvainCampusRepository(interface.AbstractRepository):
+    @classmethod
+    @abstractmethod
+    def get(cls, entity_id: 'UclouvainCampusIdentity') -> 'UclouvainCampus':
+        pass
 
+    @classmethod
+    @abstractmethod
+    def search(cls, entity_ids: Optional[List['UclouvainCampusIdentity']] = None, **kwargs) -> List['UclouvainCampus']:
+        pass
 
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
+    @classmethod
+    @abstractmethod
+    def delete(cls, entity_id: 'UclouvainCampusIdentity', **kwargs: ApplicationService) -> None:
+        pass
 
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+    @classmethod
+    @abstractmethod
+    def save(cls, entity: 'UclouvainCampus') -> None:
+        pass

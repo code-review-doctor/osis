@@ -23,36 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-import attr
-
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
+from osis_common.ddd.interface import CommandRequest, EntityIdentityBuilder, DTO
 
 
-@attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+class UclouvainCampusIdentityBuilder(EntityIdentityBuilder):
 
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'UclouvainCampusIdentity':
+        raise NotImplementedError
 
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'UclouvainCampusIdentity':
+        raise NotImplementedError
 
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+    @classmethod
+    def build_from_uuid(cls, uuid: str):
+        return UclouvainCampusIdentity(uuid=uuid)

@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
-from base.models.campus import Campus
 from base.models.enums import quadrimesters, learning_unit_year_session
 from base.models.enums.internship_subtypes import INTERNSHIP_SUBTYPES
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
@@ -39,8 +40,8 @@ from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
-from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
-from ddd.logic.shared_kernel.language.domain.model.language import Language
+from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.forms.widgets import DecimalFormatInput
 
@@ -77,9 +78,6 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         required=False
     )
 
-    campus = forms.ModelChoiceField(
-        queryset=Campus.objects.all().order_by('name')
-    )  # FIXME :: reuse servicebus
     class_type = forms.CharField()
 
     learning_unit_year = forms.ChoiceField(disabled=True, label=_('Academic year'), required=False)
@@ -110,12 +108,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
                                                        widget=forms.TextInput(), required=False)
     learning_unit_repartition_volume_requirement_entity = forms.DecimalField(disabled=True)
     learning_unit_repartition_volume_allocation_entity = forms.DecimalField(disabled=True)
-    learning_unit_campus = forms.ModelChoiceField(
-        label=_('Learning location'),
-        queryset=Campus.objects.all().order_by('name'),
-        disabled=True,
-        required=False
-    )  # FIXME :: reuse servicebus
+    learning_unit_campus = forms.ChoiceField()
     learning_unit_responsible_entity = forms.ChoiceField(
         required=False,
         initial=None,
@@ -147,6 +140,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.fields['hourly_volume_partial_q2'].initial = bases_volumes.volume_second_quadrimester
         print(bases_volumes.volume_annual)
         self.fields['learning_unit_hourly_volume_total_annual'].initial = bases_volumes.volume_annual
+        self.__init_learning_unit_campus()
 
     def _get_component_volumes(self):
         if self.learning_unit.lecturing_part.volumes and self.learning_unit.lecturing_part.volumes.volume_annual > 0:
@@ -196,7 +190,17 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     def __init_year_choices(self, learning_unit):
         self.fields['learning_unit_year'].choices = [(learning_unit.year, str(learning_unit.entity_id.academic_year))]
-        self.fields['learning_unit_year'].initial = learning_unit.year
+        self.initial['learning_unit_year'] = learning_unit.year
+
+    def __init_learning_unit_campus(self):
+        campuses = message_bus_instance.invoke(SearchUclouvainCampusesCommand())  # type: List[UclouvainCampus]
+        choices = [(campus.entity_id.uuid, str(campus)) for campus in campuses]
+        self.fields['learning_unit_campus'].choices = choices
+        campus = next(
+            (campus for campus in campuses if campus.entity_id == self.learning_unit.teaching_place),
+            None
+        )
+        self.initial['learning_unit_campus'] = campus.entity_id.uuid
 
     def get_command(self) -> CreateEffectiveClassCommand:
         return CreateEffectiveClassCommand(
@@ -205,8 +209,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             year=self.learning_unit.year,
             title_fr=self.cleaned_data['title_fr'],
             title_en=self.cleaned_data['title_en'],
-            place=self.cleaned_data['campus'].name,
-            organization_name=self.cleaned_data['campus'].organization.name,  # FIXME
+            teaching_place_uuid=self.cleaned_data['campus'],
             derogation_quadrimester=self.cleaned_data['quadrimester'],
             session_derogation=self.cleaned_data['session'],
             volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,

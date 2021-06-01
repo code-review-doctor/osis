@@ -23,15 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
+from ddd.logic.shared_kernel.campus.dtos import UclouvainCampusDataDTO
+from osis_common.ddd.interface import CommandRequest, RootEntityBuilder
 
-from osis_common.ddd import interface
 
+class UclouvainCampusBuilder(RootEntityBuilder):
 
-@attr.s(frozen=True, slots=True, str=False)
-class TeachingPlace(interface.ValueObject):
-    place = attr.ib(type=str)
-    organization_name = attr.ib(type=str)
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'UclouvainCampus':
+        raise NotImplementedError
 
-    def __str__(self):
-        return "{name} - {university_name}".format(name=self.place, university_name=self.organization_name)
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'UclouvainCampusDataDTO') -> 'UclouvainCampus':
+        return UclouvainCampus(
+            entity_id=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.uuid),
+            name=dto_object.name,
+            organization_name=dto_object.organization_name,
+        )

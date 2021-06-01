@@ -27,27 +27,36 @@ from decimal import Decimal
 from typing import List
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInvalidException, \
-    CodeClassAlreadyExistForUeException
+from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
+from ddd.logic.learning_unit.domain.validator.exceptions import CodeClassAlreadyExistForUeException, \
+    AnnualVolumeInvalidException
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
 
-class CanCreateEffectiveClass(interface.DomainService):
+class CreateEffectiveClass(interface.DomainService):
 
     @classmethod
-    def check(
+    def create(
             cls,
             learning_unit: 'LearningUnit',
             cmd: 'CreateEffectiveClassCommand',
-            all_existing_class_identities: List['EffectiveClassIdentity']
+            all_existing_class_identities: List['EffectiveClassIdentity'],
+            learning_unit_repository: 'ILearningUnitRepository'
     ):
+        CanAccessCreationEffectiveClass().check(
+            learning_unit=learning_unit,
+            learning_unit_repository=learning_unit_repository
+        )
+
         exceptions = set()  # type Set[BusinessException]
 
         if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
-            exceptions.add(AnnualVolumeInvalidException())
+            exceptions.add(AnnualVolumeInvalidException(learning_unit))
 
         if all_existing_class_identities:
             for class_id in all_existing_class_identities:
@@ -56,6 +65,12 @@ class CanCreateEffectiveClass(interface.DomainService):
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
+
+        effective_class = EffectiveClassBuilder.build_from_command(
+            cmd=cmd,
+            learning_unit=learning_unit
+        )
+        return effective_class
 
 
 def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
