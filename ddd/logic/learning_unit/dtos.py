@@ -84,6 +84,7 @@ class LearningUnitFromRepositoryDTO(DTO):
     lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[DurationUnit])
 
     derogation_quadrimester = attr.ib(type=str)
+    derogation_session = attr.ib(type=str)
     partims = attr.ib(type=List[PartimFromRepositoryDTO])
     teaching_place_uuid = attr.ib(type=str)
     professional_integration = attr.ib(type=bool)

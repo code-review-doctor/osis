@@ -30,6 +30,7 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
@@ -74,6 +75,7 @@ class LearningUnit(interface.RootEntity):
     remarks = attr.ib(type=Remarks)
     partims = attr.ib(type=List[Partim])
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
+    derogation_session = attr.ib(type=DerogationSession)
     lecturing_part = attr.ib(type=LecturingPart)
     practical_part = attr.ib(type=PracticalPart)
     professional_integration = attr.ib(type=bool)
