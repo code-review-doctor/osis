@@ -83,6 +83,14 @@ class LearningClassYear(models.Model):
         )
 
     @property
+    def effective_class_complete_acronym(self):
+        return "{}{}{}".format(
+            self.learning_component_year.learning_unit_year.acronym,
+            '-' if self.learning_component_year.type == self.learning_component_year.LECTURING else '_',
+            self.acronym
+        )
+
+    @property
     def volume_annual(self):
         volume_total_of_classes = 0
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
