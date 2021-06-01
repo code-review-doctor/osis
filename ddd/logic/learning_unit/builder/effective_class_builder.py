@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 from typing import Type
 
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
@@ -35,13 +34,10 @@ from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
-    LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
+    LecturingEffectiveClass, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
-from ddd.logic.learning_unit.domain.service.can_create_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
 
@@ -51,19 +47,8 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             cls,
             cmd: 'CreateEffectiveClassCommand',
             learning_unit: 'LearningUnit',
-            all_existing_class_identities: List['EffectiveClassIdentity'],
-            learning_unit_repository: 'ILearningUnitRepository'
     ) -> 'EffectiveClass':
-        CanAccessCreationEffectiveClass().check(
-            learning_unit=learning_unit,
-            learning_unit_repository=learning_unit_repository
-        )
         CreateEffectiveClassValidatorList(command=cmd).validate()
-        CanCreateEffectiveClass().check(
-            learning_unit=learning_unit,
-            all_existing_class_identities=all_existing_class_identities,
-            cmd=cmd,
-        )
 
         effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
 
