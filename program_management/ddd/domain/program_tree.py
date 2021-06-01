@@ -319,7 +319,7 @@ class ProgramTreeBuilder:
         for source_link in links_to_copy:
             child_node_identity = attr.evolve(source_link.child.entity_id, year=to_node.year)
             if source_link.child.is_learning_unit():
-                child = self._get_existing_learning_unit_node(source_link.child.entity_id)
+                child = self._get_existing_learning_unit_node(mapping_learning_unit_nodes, source_link.child.entity_id)
             else:
                 child = self._get_existing_node(existing_group_nodes, child_node_identity)
 
