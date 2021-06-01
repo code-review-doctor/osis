@@ -118,7 +118,7 @@ class TrainingBuilder(RootEntityBuilder):
             'credits': dto_object.credits,
             'schedule_type': ScheduleTypeEnum[dto_object.schedule_type],
             'duration': dto_object.duration,
-            'start_year': dto_object.year,
+            'start_year': dto_object.start_year,
             'titles': Titles(
                 title_fr=dto_object.title_fr,
                 partial_title_fr=dto_object.partial_title_fr,
