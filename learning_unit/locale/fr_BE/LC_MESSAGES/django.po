@@ -29,7 +29,7 @@ msgid "Additional requirement entity 2"
 msgstr "Entité resp. cahier des charges complémentaire 2"
 
 msgid "Allocation entity"
-msgstr ""
+msgstr "Entité d'attribution"
 
 msgid "Annual volume"
 msgstr "Volume annuel"
