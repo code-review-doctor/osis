@@ -26,33 +26,11 @@
 
 import attr
 
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
+from osis_common.ddd.interface import DTO
 
 
 @attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-
-
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+class UclouvainCampusDataDTO(DTO):
+    uuid = attr.ib(type=str)
+    name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)

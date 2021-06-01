@@ -26,33 +26,19 @@
 
 import attr
 
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+class UclouvainCampusIdentity(interface.EntityIdentity):
+    uuid = attr.ib(type=str)
 
 
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
+@attr.s(slots=True, hash=False, eq=False)
+class UclouvainCampus(interface.RootEntity):
+    entity_id = attr.ib(type=UclouvainCampusIdentity)
+    name = attr.ib(type=str)
+    organization_name = attr.ib(type=str)
 
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+    def __str__(self):
+        return self.name + " - " + self.organization_name

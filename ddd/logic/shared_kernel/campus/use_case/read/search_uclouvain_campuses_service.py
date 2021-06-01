@@ -23,36 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-import attr
-
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
+from ddd.logic.shared_kernel.campus.repository.i_uclouvain_campus import IUclouvainCampusRepository
 
 
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+def search_uclouvain_campuses(
+        cmd: SearchUclouvainCampusesCommand,
+        repository: 'IUclouvainCampusRepository'
+) -> List['UclouvainCampus']:
+    return repository.search()
