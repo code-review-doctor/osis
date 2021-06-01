@@ -570,7 +570,8 @@ class LearningUnitYear(SerializableModel):
     def has_class_this_year_or_in_future(self):
         return LearningClassYear.objects.filter(
             learning_component_year__learning_unit_year__learning_unit=self.learning_unit,
-            learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year).exists()
+            learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year
+        ).exists()
 
 
 def get_by_id(learning_unit_year_id):
