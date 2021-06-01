@@ -58,9 +58,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             learning_unit=learning_unit,
             learning_unit_repository=learning_unit_repository
         )
-        CreateEffectiveClassValidatorList(
-            command=cmd,
-        ).validate()
+        CreateEffectiveClassValidatorList(command=cmd).validate()
         CanCreateEffectiveClass().check(
             learning_unit=learning_unit,
             all_existing_class_identities=all_existing_class_identities,
@@ -107,20 +105,13 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         )
 
 
-def _get_effective_class_type_with_dto(
-        dto_object: 'EffectiveClassFromRepositoryDTO'
-) -> Type['EffectiveClass']:
+def _get_effective_class_type_with_dto(dto_object: 'EffectiveClassFromRepositoryDTO') -> Type['EffectiveClass']:
     return PracticalEffectiveClass if dto_object.class_type == PRACTICAL_EXERCISES else LecturingEffectiveClass
 
 
-def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
-    class_type = None
+def _define_effective_class_type(learning_unit: 'LearningUnit') -> Type['EffectiveClass']:
     lecturing_part = learning_unit.lecturing_part
     practical_part = learning_unit.practical_part
-    if lecturing_part and practical_part:
-        class_type = LecturingEffectiveClass
-    elif lecturing_part:
-        class_type = LecturingEffectiveClass
-    elif practical_part:
-        class_type = PracticalEffectiveClass
-    return class_type
+    if practical_part and not lecturing_part:
+        return PracticalEffectiveClass
+    return LecturingEffectiveClass
