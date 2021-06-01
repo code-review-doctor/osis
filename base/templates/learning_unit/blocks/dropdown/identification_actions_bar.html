@@ -52,8 +52,8 @@
                                         {% if proposal.type == 'CREATION' %}
                                             title="{% trans 'You cannot create a partim for a learning unit in proposition of creation' %}"
                                         {% else %}
-                                            {% if learning_unit_year.has_class %}
-                                                title="{% trans 'You cannot create a partim for a learning unit having classes' %}"
+                                            {% if learning_unit_year.has_class_this_year_or_in_future %}
+                                                title="{% trans 'You cannot create a partim for a learning unit having classes for this year or in the future' %}"
                                             {% endif %}
                                         {% endif %}>
                                         {% trans 'New partim' %}

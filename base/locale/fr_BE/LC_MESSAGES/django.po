@@ -2940,8 +2940,10 @@ msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
 
 msgid ""
-"You cannot create a partim for a learning unit having classes"
-msgstr "Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant une ou plusieurs classes"
+"You cannot create a partim for a learning unit having classes for this year or in the future"
+msgstr ""
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant une ou plusieurs classes cette année ou dans "
+"le futur"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
