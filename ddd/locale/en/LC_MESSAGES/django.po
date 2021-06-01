@@ -77,7 +77,7 @@ msgid "The subdivision must contain only one letter"
 msgstr ""
 
 msgid ""
-"You cannot create on this learning unit because the component's annual "
+"You cannot create class on this learning unit because the component's annual "
 "volume [PM or default PP] is not greater than 0 and there are no planned "
 "class."
 msgstr ""
