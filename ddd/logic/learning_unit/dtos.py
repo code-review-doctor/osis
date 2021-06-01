@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List, Optional
 
 import attr
 
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.responsible_entity import EntityCode
 from osis_common.ddd.interface import DTO
 
@@ -67,21 +67,21 @@ class LearningUnitFromRepositoryDTO(DTO):
     repartition_entity_2 = attr.ib(type=Optional[EntityCode])
     repartition_entity_3 = attr.ib(type=Optional[EntityCode])
 
-    practical_volume_q1 = attr.ib(type=Decimal)
-    practical_volume_q2 = attr.ib(type=Decimal)
-    practical_volume_annual = attr.ib(type=Decimal)
+    practical_volume_q1 = attr.ib(type=DurationUnit)
+    practical_volume_q2 = attr.ib(type=DurationUnit)
+    practical_volume_annual = attr.ib(type=DurationUnit)
     practical_planned_classes = attr.ib(type=int)
-    practical_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])
-    practical_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])
-    practical_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])
+    practical_volume_repartition_responsible_entity = attr.ib(type=Optional[DurationUnit])
+    practical_volume_repartition_entity_2 = attr.ib(type=Optional[DurationUnit])
+    practical_volume_repartition_entity_3 = attr.ib(type=Optional[DurationUnit])
 
-    lecturing_volume_q1 = attr.ib(type=Decimal)
-    lecturing_volume_q2 = attr.ib(type=Decimal)
-    lecturing_volume_annual = attr.ib(type=Decimal)
+    lecturing_volume_q1 = attr.ib(type=DurationUnit)
+    lecturing_volume_q2 = attr.ib(type=DurationUnit)
+    lecturing_volume_annual = attr.ib(type=DurationUnit)
     lecturing_planned_classes = attr.ib(type=int)
-    lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])
-    lecturing_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])
-    lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])
+    lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[DurationUnit])
+    lecturing_volume_repartition_entity_2 = attr.ib(type=Optional[DurationUnit])
+    lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[DurationUnit])
 
     derogation_quadrimester = attr.ib(type=str)
     partims = attr.ib(type=List[PartimFromRepositoryDTO])
@@ -116,6 +116,6 @@ class EffectiveClassFromRepositoryDTO(DTO):
     teaching_place_uuid = attr.ib(type=str)
     derogation_quadrimester = attr.ib(type=str)
     session_derogation = attr.ib(type=str)
-    volume_q1 = attr.ib(type=Decimal)
-    volume_q2 = attr.ib(type=Decimal)
+    volume_q1 = attr.ib(type=DurationUnit)
+    volume_q2 = attr.ib(type=DurationUnit)
     class_type = attr.ib(type=str)
