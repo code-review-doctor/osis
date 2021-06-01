@@ -24,14 +24,11 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import Optional
 
 import attr
 
+from ddd.logic.learning_unit.domain.model.responsible_entity import EntityCode
 from osis_common.ddd import interface
-
-
-EntityCode = str
 
 
 @attr.s(frozen=True, slots=True)

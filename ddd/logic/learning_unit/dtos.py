@@ -28,10 +28,8 @@ from typing import List, Optional
 
 import attr
 
+from ddd.logic.learning_unit.domain.model.responsible_entity import EntityCode
 from osis_common.ddd.interface import DTO
-
-
-EntityCode = str
 
 
 @attr.s(frozen=True, slots=True)
