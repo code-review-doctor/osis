@@ -80,7 +80,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         required=False
     )
 
-    class_type = forms.CharField()
+    class_type = forms.CharField(disabled=True, required=False)
 
     learning_unit_year = forms.ChoiceField(disabled=True, label=_('Academic year'), required=False)
     learning_unit_code = forms.CharField(disabled=True, max_length=15, required=False)
@@ -211,7 +211,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             year=self.learning_unit.year,
             title_fr=self.cleaned_data['title_fr'],
             title_en=self.cleaned_data['title_en'],
-            teaching_place_uuid=self.cleaned_data['campus'],
+            teaching_place_uuid=self.cleaned_data['learning_unit_campus'],
             derogation_quadrimester=self.cleaned_data['quadrimester'],
             session_derogation=self.cleaned_data['session'],
             volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,

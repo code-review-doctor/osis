@@ -41,9 +41,11 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
-            {% include "learning_unit/blocks/create_cancel_buttons.html" %}
-            <br>
             <form method="post" id="LearningUnitYearForm">
+                <div class="panel-heading">
+                    {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+                </div>
+                {% csrf_token %}
                 {% bootstrap_form_errors form %}
                 <div class="row">
                     <div class="col-md-8">
@@ -131,8 +133,10 @@
                         {% include 'class/blocks/panel/entities.html' %}
                     </div>
                 </div>
+                <div class="panel-footer">
+                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+                </div>
             </form>
-        {% include "learning_unit/blocks/create_cancel_buttons.html" %}
         </div>
     </div>
 {% endblock %}
