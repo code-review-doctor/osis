@@ -59,6 +59,7 @@ class LearningUnitFromRepositoryDTO(DTO):
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=str)
     responsible_entity_code = attr.ib(type=EntityCode)
+    attribution_entity_code = attr.ib(type=EntityCode)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
     remark_faculty = attr.ib(type=str)

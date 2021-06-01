@@ -80,6 +80,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=responsible_entity_identity,
+            attribution_entity_identity=None,  # TODO :: to implement and unit test
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
@@ -119,6 +120,9 @@ class LearningUnitBuilder(RootEntityBuilder):
             cls,
             dto: 'LearningUnitFromRepositoryDTO',
     ) -> 'LearningUnit':
+        attribution_entity = None
+        if dto.attribution_entity_code:
+            attribution_entity = UclEntityIdentityBuilder.build_from_code(dto.attribution_entity_code)
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
             titles=_build_titles(
@@ -130,6 +134,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
+            attribution_entity_identity=attribution_entity,
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),

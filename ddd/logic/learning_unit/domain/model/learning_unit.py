@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 import attr
 
@@ -68,6 +68,7 @@ class LearningUnit(interface.RootEntity):
     internship_subtype = attr.ib(type=InternshipSubtype)
     teaching_place = attr.ib(type=UclouvainCampusIdentity)
     responsible_entity_identity = attr.ib(type=UCLEntityIdentity)
+    attribution_entity_identity = attr.ib(type=Optional[UCLEntityIdentity])
     periodicity = attr.ib(type=PeriodicityEnum)
     language_id = attr.ib(type=LanguageIdentity)
     remarks = attr.ib(type=Remarks)

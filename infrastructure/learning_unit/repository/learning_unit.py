@@ -290,6 +290,11 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
                 entity__id=OuterRef('learning_container_year__requirement_entity_id')
             ).order_by('-start_date').values('acronym')[:1]
         ),
+        attribution_entity_code=Subquery(
+            EntityVersionDatabase.objects.filter(
+                entity__id=OuterRef('learning_container_year__allocation_entity_id')
+            ).order_by('-start_date').values('acronym')[:1]
+        ),
         iso_code=F('language__code'),
         remark_faculty=F('faculty_remark'),
         remark_publication_fr=F('other_remark'),
@@ -354,6 +359,7 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
         'credits',
         'internship_subtype',
         'responsible_entity_code',
+        'attribution_entity_code',
         'periodicity',
         'iso_code',
         'remark_faculty',
