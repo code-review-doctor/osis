@@ -47,7 +47,7 @@ class CanCreateEffectiveClass(interface.DomainService):
         exceptions = set()  # type Set[BusinessException]
 
         if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
-            exceptions.add(AnnualVolumeInvalidException())
+            exceptions.add(AnnualVolumeInvalidException(learning_unit))
 
         if all_existing_class_identities:
             for class_id in all_existing_class_identities:
