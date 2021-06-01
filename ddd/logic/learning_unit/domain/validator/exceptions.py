@@ -166,6 +166,15 @@ class LearningUnitHasEnrollmentException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class LearningUnitHasNoVolumeException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "You cannot create on this learning unit because the component's annual volume [PM or default PP] is not "
+            "greater than 0 and there are no planned class."
+        )
+        super().__init__(message, **kwargs)
+
+
 class AnnualVolumeInvalidException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(

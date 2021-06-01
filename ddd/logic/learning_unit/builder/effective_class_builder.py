@@ -37,6 +37,7 @@ from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolum
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
     LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
 from ddd.logic.learning_unit.domain.service.can_create_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
@@ -53,6 +54,10 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             all_existing_class_identities: List['EffectiveClassIdentity'],
             learning_unit_repository: 'ILearningUnitRepository'
     ) -> 'EffectiveClass':
+        CanAccessCreationEffectiveClass().check(
+            learning_unit=learning_unit,
+            learning_unit_repository=learning_unit_repository
+        )
         CreateEffectiveClassValidatorList(
             command=cmd,
         ).validate()
@@ -60,7 +65,6 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             learning_unit=learning_unit,
             all_existing_class_identities=all_existing_class_identities,
             cmd=cmd,
-            learning_unit_repository=learning_unit_repository
         )
 
         effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
@@ -111,12 +115,12 @@ def _get_effective_class_type_with_dto(
 
 def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
     class_type = None
-    lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual
-    practical_annual_volume = learning_unit.practical_part.volumes.volume_annual
-    if lecturing_annual_volume > 0.0 and practical_annual_volume > 0.0:
+    lecturing_part = learning_unit.lecturing_part
+    practical_part = learning_unit.practical_part
+    if lecturing_part and practical_part:
         class_type = LecturingEffectiveClass
-    elif lecturing_annual_volume > 0.0:
+    elif lecturing_part:
         class_type = LecturingEffectiveClass
-    elif practical_annual_volume > 0.0:
+    elif practical_part:
         class_type = PracticalEffectiveClass
     return class_type

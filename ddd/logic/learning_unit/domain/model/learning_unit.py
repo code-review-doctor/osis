@@ -101,6 +101,9 @@ class LearningUnit(interface.RootEntity):
     def is_external(self) -> bool:
         return isinstance(self, ExternalLearningUnit)
 
+    def has_volume(self) -> bool:
+        return self.lecturing_part is not None or self.practical_part is not None
+
 
 class CourseLearningUnit(LearningUnit):
     type = LearningContainerYearType.COURSE

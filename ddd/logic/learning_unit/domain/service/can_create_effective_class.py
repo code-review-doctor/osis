@@ -30,10 +30,8 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
-    LearningUnitHasPartimException, LearningUnitHasProposalException, \
-    LearningUnitHasEnrollmentException, AnnualVolumeInvalidException, CodeClassAlreadyExistForUeException
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.learning_unit.domain.validator.exceptions import AnnualVolumeInvalidException, \
+    CodeClassAlreadyExistForUeException
 from osis_common.ddd import interface
 
 
@@ -43,31 +41,18 @@ class CanCreateEffectiveClass(interface.DomainService):
     def check(
             cls,
             learning_unit: 'LearningUnit',
-            learning_unit_repository: 'ILearningUnitRepository',
             cmd: 'CreateEffectiveClassCommand',
             all_existing_class_identities: List['EffectiveClassIdentity']
     ):
         exceptions = set()  # type Set[BusinessException]
-        if learning_unit.is_external():
-            exceptions.add(ClassTypeInvalidException())
 
-        if learning_unit.has_partim():
-            exceptions.add(LearningUnitHasPartimException())
+        if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
+            exceptions.add(AnnualVolumeInvalidException())
 
-        if learning_unit_repository.has_proposal(learning_unit):
-            exceptions.add(LearningUnitHasProposalException())
-
-        if learning_unit_repository.has_enrollments(learning_unit):
-            exceptions.add(LearningUnitHasEnrollmentException())
-
-        # FIXME :: create other doamins service
-        # if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
-        #     exceptions.add(AnnualVolumeInvalidException())
-        #
-        # if all_existing_class_identities:
-        #     for id in all_existing_class_identities:
-        #         if id.learning_unit_identity == learning_unit.entity_id and id.class_code == cmd.class_code:
-        #             exceptions.add(CodeClassAlreadyExistForUeException(learning_unit.entity_id, cmd.class_code))
+        if all_existing_class_identities:
+            for class_id in all_existing_class_identities:
+                if class_id.learning_unit_identity == learning_unit.entity_id and class_id.class_code == cmd.class_code:
+                    exceptions.add(CodeClassAlreadyExistForUeException(learning_unit.entity_id, cmd.class_code))
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
