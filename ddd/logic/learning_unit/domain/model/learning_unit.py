@@ -104,24 +104,6 @@ class LearningUnit(interface.RootEntity):
     def has_volume(self) -> bool:
         return self.lecturing_part is not None or self.practical_part is not None
 
-    @property
-    def total_vol_q1(self) -> float:
-        tot_vol = 0
-        if self.lecturing_part:
-            tot_vol = self.lecturing_part.volumes.volume_first_quadrimester or 0
-        if self.practical_part:
-            tot_vol += self.practical_part.volumes.volume_first_quadrimester or 0
-        return tot_vol
-
-    @property
-    def total_vol_q2(self) -> float:
-        tot_vol = 0
-        if self.lecturing_part:
-            tot_vol = self.lecturing_part.volumes.volume_second_quadrimester or 0
-        if self.practical_part:
-            tot_vol += self.practical_part.volumes.volume_second_quadrimester or 0
-        return tot_vol
-
 
 class CourseLearningUnit(LearningUnit):
     type = LearningContainerYearType.COURSE
