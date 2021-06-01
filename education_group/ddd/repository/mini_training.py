@@ -43,6 +43,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.exception import MiniTrainingNotFoundException
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTraining
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
@@ -73,13 +74,13 @@ class MiniTrainingRepository(interface.AbstractRepository):
             raise exception.ManagementEntityNotFound
 
         try:
-            try:
-                education_group_db_obj = EducationGroupModelDb.objects.filter(
-                    educationgroupyear__acronym=mini_training_obj.acronym,
-                    educationgroupyear__partial_acronym=mini_training_obj.code,
-                    educationgroupyear__education_group_type__name=mini_training_obj.type.name
-                ).distinct().get()
-            except EducationGroupModelDb.DoesNotExist:
+            education_group_db_obj = EducationGroupModelDb.objects.filter(
+                educationgroupyear__acronym=mini_training_obj.acronym,
+                educationgroupyear__partial_acronym=mini_training_obj.code,
+                educationgroupyear__education_group_type__name=mini_training_obj.type.name
+            ).distinct().last()
+
+            if not education_group_db_obj:
                 education_group_db_obj = EducationGroupModelDb.objects.create(
                     start_year=start_year,
                     end_year=end_year
@@ -200,7 +201,9 @@ def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
     education_group_db_obj = EducationGroupModelDb.objects.filter(
         educationgroupyear__acronym=mini_training_obj.acronym,
         educationgroupyear__academic_year__year=mini_training_obj.year,
-    ).distinct().get()
+    ).distinct().last()
+    if not education_group_db_obj:
+        raise MiniTrainingNotFoundException()
     education_group_db_obj.end_year = end_year
     education_group_db_obj.save()
 

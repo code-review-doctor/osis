@@ -49,9 +49,6 @@ def run() -> dict:
     programs_created = postpone_program_trees_until_n_plus_6_service.postpone_program_trees_until_n_plus_6(
         PostponeProgramTreesUntilNPlus6Command()
     )
-    groups_created = postpone_groups_until_n_plus_6_service.postpone_groups_until_n_plus_6(
-        PostponeGroupsUntilNPlus6Command()
-    )
     trainings_created = postpone_trainings_until_n_plus_6_service.postpone_trainings_until_n_plus_6(
         PostponeTrainingsUntilNPlus6Command()
     )
