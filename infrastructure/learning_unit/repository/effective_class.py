@@ -73,8 +73,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         learning_component_year_id = _get_learning_component_year_id_from_entity(entity)
 
         campus_id = Campus.objects.filter(
-            name=entity.teaching_place.teaching_place_uuid,
-            organization__name=entity.teaching_place.organization_name
+            uuid=entity.teaching_place.uuid,
         ).values_list('pk', flat=True).get()
 
         LearningClassYearDb.objects.update_or_create(
