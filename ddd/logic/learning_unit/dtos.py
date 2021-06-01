@@ -88,6 +88,8 @@ class LearningUnitFromRepositoryDTO(DTO):
     derogation_quadrimester = attr.ib(type=str)
     partims = attr.ib(type=List[PartimFromRepositoryDTO])
     teaching_place_uuid = attr.ib(type=str)
+    professional_integration = attr.ib(type=bool)
+    is_active = attr.ib(type=bool)
 
 
 @attr.s(frozen=True, slots=True)

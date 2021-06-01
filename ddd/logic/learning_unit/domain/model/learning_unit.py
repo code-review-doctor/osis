@@ -76,6 +76,8 @@ class LearningUnit(interface.RootEntity):
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
     lecturing_part = attr.ib(type=LecturingPart)
     practical_part = attr.ib(type=PracticalPart)
+    professional_integration = attr.ib(type=bool)
+    is_active = attr.ib(type=bool)
 
     @property
     def academic_year(self) -> 'AcademicYearIdentity':

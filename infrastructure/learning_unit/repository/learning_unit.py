@@ -343,6 +343,7 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
 
         derogation_quadrimester=F('quadrimester'),
         teaching_place_uuid=F('campus__uuid'),
+        is_active=F('status'),
     )
     return queryset
 
@@ -387,6 +388,8 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
 
         'derogation_quadrimester',
         'teaching_place_uuid',
+        'professional_integration',
+        'is_active',
     )
     return queryset
 

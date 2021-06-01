@@ -113,6 +113,8 @@ class LearningUnitBuilder(RootEntityBuilder):
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
             partims=[],
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
+            professional_integration=False,  # TODO :: to implement and unit test
+            is_active=False,  # TODO :: to implement and unit test
         )
 
     @classmethod
@@ -170,6 +172,8 @@ class LearningUnitBuilder(RootEntityBuilder):
                 PartimBuilder.build_from_dto(partim_dto) for partim_dto in dto.partims
             ],
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
+            professional_integration=dto.professional_integration,
+            is_active=dto.is_active,
         )
 
     @classmethod
