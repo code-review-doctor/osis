@@ -22,7 +22,7 @@ msgid ""
 "second quadrimesters volumes should be equal to annual volume"
 msgstr ""
 "Le volume annuel doit être >=0. La somme des volumes Q1 et Q2 doit être "
-"égales au volume annuel "
+"égale au volume annuel "
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
