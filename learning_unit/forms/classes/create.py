@@ -110,11 +110,6 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
                                                        widget=forms.TextInput(), required=False)
     learning_unit_repartition_volume_requirement_entity = forms.DecimalField(disabled=True)
     learning_unit_repartition_volume_allocation_entity = forms.DecimalField(disabled=True)
-    learning_unit_campus_organization_institution = forms.CharField(
-        label=_('Institution'),
-        disabled=True,
-        required=False
-    )
     learning_unit_campus = forms.ModelChoiceField(
         label=_('Learning location'),
         queryset=Campus.objects.all().order_by('name'),
