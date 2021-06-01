@@ -10,7 +10,10 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDb
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -65,3 +68,19 @@ class EffectiveClassRepositoryTestCase(TestCase):
         self.assertEqual(LearningClassYearDb.objects.all().count(), 1)
         self.class_repository.delete(class_identity)
         self.assertEqual(LearningClassYearDb.objects.all().count(), 0)
+
+    def test_get_all_identities(self):
+        classes_db = [LearningClassYearFactory() for _ in range(5)]
+        identities = [
+            EffectiveClassIdentity(
+                class_code=class_db.acronym,
+                learning_unit_identity=LearningUnitIdentity(
+                    academic_year=AcademicYearIdentity(
+                        year=class_db.learning_component_year.learning_unit_year.academic_year.year
+                    ),
+                    code=class_db.learning_component_year.learning_unit_year.acronym
+                )
+            )
+            for class_db in classes_db
+        ]
+        self.assertListEqual(identities, self.class_repository.get_all_identities())

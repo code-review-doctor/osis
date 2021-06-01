@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-21 09:28+0200\n"
+"POT-Creation-Date: 2021-06-01 10:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-
-msgid ""
-"Annual volume should be greater than or equal to 0 and the sum of first/"
-"second quadrimesters volumes should be equal to annual volume"
-msgstr ""
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr ""
@@ -69,9 +64,20 @@ msgstr ""
 msgid "The code {} is not a valid code"
 msgstr ""
 
+#, python-format
+msgid "The subdivision %(subd)s already exists for %(ue)s"
+msgstr ""
+
 msgid "The subdivision must contain only one letter"
 msgstr ""
 
-#, python-format
-msgid "The subdivision %(subd)s already exists for %(ue)s"
+msgid ""
+"The sum of first/second quadrimesters volumes should be equal to annual "
+"volume of the learning unit ({})"
+msgstr ""
+
+msgid ""
+"You cannot create class on this learning unit because the component's annual "
+"volume [PM or default PP] is not greater than 0 and there are no planned "
+"class."
 msgstr ""

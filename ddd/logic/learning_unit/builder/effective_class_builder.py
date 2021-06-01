@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 from typing import Type
 
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
@@ -34,12 +33,10 @@ from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
-    LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
+    LecturingEffectiveClass, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.service.can_create_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
 from osis_common.ddd import interface
 
@@ -50,18 +47,8 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             cls,
             cmd: 'CreateEffectiveClassCommand',
             learning_unit: 'LearningUnit',
-            all_existing_class_identities: List['EffectiveClassIdentity'],
-            learning_unit_repository: 'ILearningUnitRepository'
     ) -> 'EffectiveClass':
-        CreateEffectiveClassValidatorList(
-            command=cmd,
-        ).validate()
-        CanCreateEffectiveClass().check(
-            learning_unit=learning_unit,
-            all_existing_class_identities=all_existing_class_identities,
-            cmd=cmd,
-            learning_unit_repository=learning_unit_repository
-        )
+        CreateEffectiveClassValidatorList(command=cmd).validate()
 
         effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
 
@@ -100,20 +87,13 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         )
 
 
-def _get_effective_class_type_with_dto(
-        dto_object: 'EffectiveClassFromRepositoryDTO'
-) -> Type['EffectiveClass']:
+def _get_effective_class_type_with_dto(dto_object: 'EffectiveClassFromRepositoryDTO') -> Type['EffectiveClass']:
     return PracticalEffectiveClass if dto_object.class_type == PRACTICAL_EXERCISES else LecturingEffectiveClass
 
 
-def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
-    class_type = None
-    lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual
-    practical_annual_volume = learning_unit.practical_part.volumes.volume_annual
-    if lecturing_annual_volume > 0.0 and practical_annual_volume > 0.0:
-        class_type = LecturingEffectiveClass
-    elif lecturing_annual_volume > 0.0:
-        class_type = LecturingEffectiveClass
-    elif practical_annual_volume > 0.0:
-        class_type = PracticalEffectiveClass
-    return class_type
+def _define_effective_class_type(learning_unit: 'LearningUnit') -> Type['EffectiveClass']:
+    lecturing_part = learning_unit.lecturing_part
+    practical_part = learning_unit.practical_part
+    if practical_part and not lecturing_part:
+        return PracticalEffectiveClass
+    return LecturingEffectiveClass
