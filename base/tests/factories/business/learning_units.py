@@ -426,8 +426,7 @@ def _setup_classes(learning_component_year, number_classes=5):
             session=learning_component_year.learning_unit_year.session,
             quadrimester=learning_component_year.learning_unit_year.quadrimester,
             hourly_volume_partial_q1=learning_component_year.hourly_volume_partial_q1,
-            hourly_volume_partial_q2=learning_component_year.hourly_volume_partial_q2,
-            hourly_volume_total_annual=learning_component_year.hourly_volume_total_annual
+            hourly_volume_partial_q2=learning_component_year.hourly_volume_partial_q2
         )
 
 
