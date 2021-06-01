@@ -43,6 +43,7 @@ from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd.domain import mini_training, exception
 from education_group.ddd.domain._entity import Entity as EntityValueObject
 from education_group.ddd.domain._titles import Titles
+from education_group.ddd.domain.exception import MiniTrainingNotFoundException
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity, MiniTraining
 from osis_common.ddd import interface
 from osis_common.ddd.interface import RootEntity
@@ -201,6 +202,8 @@ def _update_education_group(mini_training_obj: 'mini_training.MiniTraining'):
         educationgroupyear__acronym=mini_training_obj.acronym,
         educationgroupyear__academic_year__year=mini_training_obj.year,
     ).distinct().last()
+    if not education_group_db_obj:
+        raise MiniTrainingNotFoundException()
     education_group_db_obj.end_year = end_year
     education_group_db_obj.save()
 
