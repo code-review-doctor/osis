@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 14:35+0200\n"
+"POT-Creation-Date: 2021-05-31 09:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -249,6 +249,9 @@ msgstr ""
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
+msgid "Cohort year"
+msgstr ""
+
 msgid "Comment"
 msgstr ""
 
@@ -452,6 +455,9 @@ msgstr ""
 msgid "Fill program tree content from last year"
 msgstr ""
 
+msgid "First year bachelor"
+msgstr ""
+
 msgid "For all students"
 msgstr ""
 
@@ -642,6 +648,9 @@ msgstr ""
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr ""
 
+msgid "Name"
+msgstr ""
+
 msgid "New Education Group"
 msgstr ""
 
@@ -673,9 +682,6 @@ msgid "Other languages activities"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
-msgstr ""
-
-msgid "Own comment"
 msgstr ""
 
 msgid "Partial deliberation"

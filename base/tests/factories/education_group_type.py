@@ -67,9 +67,18 @@ class EducationGroupTypeFactory(DjangoModelFactory):
             name=factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
         )
 
+        bachelor = factory.Trait(
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.BACHELOR.name
+        )
+
 
 class TrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
     pass
+
+
+class BachelorEducationGroupTypeFactory(EducationGroupTypeFactory):
+    bachelor = True
 
 
 class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
