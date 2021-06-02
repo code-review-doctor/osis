@@ -84,7 +84,7 @@ def create_default_11ba_in_cohort_year(apps, shema_editor):
             education_group_year=my_1ba,
             name='FIRST_YEAR',
             defaults={
-                "administration_entity": last_existing_cohort.administration_entity,
+                "administration_entity": last_existing_cohort.administration_entity if last_existing_cohort else None,
             }
         )
 
