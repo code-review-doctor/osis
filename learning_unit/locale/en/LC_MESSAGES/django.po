@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 13:54+0200\n"
+"POT-Creation-Date: 2021-06-01 10:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,10 +17,53 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Academic year"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Additional requirement entity 1"
+msgstr ""
+
+msgid "Additional requirement entity 2"
+msgstr ""
+
+msgid "Allocation entity"
+msgstr ""
+
+msgid "Annual volume"
+msgstr ""
+
 msgid "Central manager"
 msgstr ""
 
 msgid "Central managers"
+msgstr ""
+
+msgid "Class"
+msgstr ""
+
+#, python-format
+msgid "Class %(class_identity)s successfully created."
+msgstr ""
+
+msgid "Class specific complement"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Common part"
+msgstr ""
+
+msgid "Components"
+msgstr ""
+
+msgid "Credits"
+msgstr ""
+
+msgid "Entity charges"
 msgstr ""
 
 msgid "Faculty manager"
@@ -29,7 +72,19 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
+msgid "Faculty remark"
+msgstr ""
+
 msgid "Formation catalogue"
+msgstr ""
+
+msgid "Institution"
+msgstr ""
+
+msgid "Internship subtype"
+msgstr ""
+
+msgid "Language"
 msgstr ""
 
 msgid "Learning location"
@@ -50,6 +105,9 @@ msgstr ""
 msgid "Learning units"
 msgstr ""
 
+msgid "Lecturing"
+msgstr ""
+
 msgid "New class"
 msgstr ""
 
@@ -62,7 +120,22 @@ msgstr ""
 msgid "Only alphanumeric characters are allowed."
 msgstr ""
 
+msgid "Other remark"
+msgstr ""
+
+msgid "Periodicity"
+msgstr ""
+
 msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Planned classes"
+msgstr ""
+
+msgid "Practical exercises"
+msgstr ""
+
+msgid "Professional integration"
 msgstr ""
 
 msgid "Proposal is of modification type"
@@ -72,6 +145,9 @@ msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
 msgid "Quadrimester"
+msgstr ""
+
+msgid "Requirement entity"
 msgstr ""
 
 msgid "Session derogation"
@@ -153,10 +229,31 @@ msgid ""
 "is not among those types: %(types)s"
 msgstr ""
 
+msgid "Title"
+msgstr ""
+
 msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Vol. Q1"
+msgstr ""
+
+msgid "Vol. Q2"
+msgstr ""
+
+msgid "Vol. annual"
+msgstr ""
+
+msgid "Volume Q1"
+msgstr ""
+
+msgid "Volume Q2"
 msgstr ""
 
 msgid "You are not allowed to create proposal during this academic year"

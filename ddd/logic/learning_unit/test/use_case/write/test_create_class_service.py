@@ -41,7 +41,8 @@ from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffect
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
-    LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException
+    LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException, \
+    LearningUnitHasNoVolumeException
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
@@ -246,7 +247,7 @@ class TestCreateClassServiceValidator(TestCase):
             LearningUnitHasPartimException
         )
 
-    def test_raise_check_class_volumes_consistency_exception(self):
+    def test_raise_check_learning_unit_has_no_volume_exception(self):
         command = attr.evolve(
             self.command,
             lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=0.0,
@@ -256,6 +257,27 @@ class TestCreateClassServiceValidator(TestCase):
         ue_no_volumes = _create_lu(command)
         self.learning_unit_repository.save(ue_no_volumes)
         cmd = _build_create_effective_class_command(learning_unit_code=ue_no_volumes.code, class_code='C')
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            LearningUnitHasNoVolumeException
+        )
+
+    def test_raise_check_partim_volume_inconsistent_exception(self):
+        command = attr.evolve(
+            self.command,
+            lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=10.0,
+            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
+            code='LTEST2026'
+        )
+        ue = _create_lu(command)
+        self.learning_unit_repository.save(ue)
+        cmd = _build_create_effective_class_command(learning_unit_code=ue.code, class_code='T')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,

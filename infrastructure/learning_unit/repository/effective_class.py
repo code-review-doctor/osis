@@ -73,8 +73,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
         learning_component_year_id = _get_learning_component_year_id_from_entity(entity)
 
         campus_id = Campus.objects.filter(
-            name=entity.teaching_place.place,
-            organization__name=entity.teaching_place.organization_name
+            uuid=entity.teaching_place.uuid,
         ).values_list('pk', flat=True).get()
 
         LearningClassYearDb.objects.update_or_create(
@@ -85,28 +84,28 @@ class EffectiveClassRepository(IEffectiveClassRepository):
                 'title_en': entity.titles.en,
                 'campus_id': campus_id,
                 'quadrimester': entity.derogation_quadrimester.name,
-                'session': entity.session_derogation,
+                'session': entity.session_derogation.value,
                 'hourly_volume_partial_q1': entity.volumes.volume_first_quadrimester,
                 'hourly_volume_partial_q2': entity.volumes.volume_second_quadrimester,
             }
         )
 
     @classmethod
-    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:  # TODO :: add unit tests
         all_classes = _get_common_queryset().annotate(
             class_code=F('acronym'),
             learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
             learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year')
         ).values(
-            "class_code"
+            "class_code",
             "learning_unit_code",
             "learning_unit_year",
         )
         return [
             EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-                class_code=learning_class.classs_code,
-                learning_unit_code=learning_class.learning_unit_code,
-                learning_unit_year=learning_class.learning_unit_year
+                class_code=learning_class['class_code'],
+                learning_unit_code=learning_class['learning_unit_code'],
+                learning_unit_year=learning_class['learning_unit_year'],
             )
             for learning_class in all_classes
         ]
@@ -132,8 +131,7 @@ def _annotate_queryset(qs: QuerySet) -> QuerySet:
         class_code=F('acronym'),
         learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
         learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
-        teaching_place=F('campus__name'),
-        teaching_organization=F('campus__organization__name'),
+        teaching_place_uuid=F('campus__uuid'),
         derogation_quadrimester=F('quadrimester'),
         session_derogation=F('session'),
         volume_q1=F('hourly_volume_partial_q1'),
@@ -149,8 +147,7 @@ def _values_queryset(qs: QuerySet) -> QuerySet:
         'learning_unit_year',
         'title_fr',
         'title_en',
-        'teaching_place',
-        'teaching_organization',
+        'teaching_place_uuid',
         'derogation_quadrimester',
         'session_derogation',
         'volume_q1',

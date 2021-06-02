@@ -29,10 +29,10 @@ import attr
 
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from osis_common.ddd import interface
 
 
@@ -47,12 +47,15 @@ class EffectiveClassIdentity(interface.EntityIdentity):
     class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
+    def __str__(self):
+        return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))
+
 
 @attr.s(slots=True, hash=False, eq=False)
 class EffectiveClass(interface.RootEntity, abc.ABC):
     entity_id = attr.ib(type=EffectiveClassIdentity)
     titles = attr.ib(type=ClassTitles)
-    teaching_place = attr.ib(type=TeachingPlace)
+    teaching_place = attr.ib(type=UclouvainCampusIdentity)
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
     session_derogation = attr.ib(type=DerogationSession)
     volumes = attr.ib(type=ClassVolumes)

@@ -1,11 +1,15 @@
 from django.test import TestCase
 
+from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, \
     LearningUnitYearPartimFactory, LearningUnitYearFactory
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
@@ -21,6 +25,7 @@ class LearningUnitRepositoryTestCase(TestCase):
         self.learning_unit_repository = LearningUnitRepository()
         anac = AcademicYearFactory(current=True)
         entity_version = EntityVersionFactory()
+        campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
         language = LanguageFactory()
         self.command = CreateLearningUnitCommand(
             code='LTEST2021',
@@ -45,6 +50,7 @@ class LearningUnitRepositoryTestCase(TestCase):
             lecturing_volume_q2=1.0,
             lecturing_volume_annual=3.0,
             derogation_quadrimester=DerogationQuadrimester.Q1.name,
+            teaching_place_uuid=campus.uuid,
         )
         self.learning_unit = LearningUnitBuilder.build_from_command(
             cmd=self.command,
@@ -101,6 +107,30 @@ class LearningUnitRepositoryTestCase(TestCase):
                     year=partim_db.academic_year.year
                 )
             )
+
+    def test_assert_ignoring_components_with_volume_equals_to_0(self):
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year__subtype=FULL,
+            hourly_volume_total_annual=0.0,
+        )
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=component.learning_unit_year.acronym,
+            year=component.learning_unit_year.academic_year.year
+        )
+        persisted_learning_unit = self.learning_unit_repository.get(learning_unit_identity)
+        self.assertIsNone(persisted_learning_unit.lecturing_part)
+
+    def test_assert_ignoring_components_with_volume_equals_to_none(self):
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year__subtype=FULL,
+            hourly_volume_total_annual=None,
+        )
+        learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=component.learning_unit_year.acronym,
+            year=component.learning_unit_year.academic_year.year
+        )
+        persisted_learning_unit = self.learning_unit_repository.get(learning_unit_identity)
+        self.assertIsNone(persisted_learning_unit.lecturing_part)
 
     def test_delete(self):
         learning_unit_db = LearningUnitYearFactory()

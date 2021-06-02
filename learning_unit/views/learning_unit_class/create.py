@@ -25,26 +25,84 @@
 ##############################################################################
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import render, redirect
+from django.urls import reverse
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.models.learning_unit_year import get_by_id, LearningUnitYear
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.learning_unit_year import LearningUnitYear
+from base.views.common import display_success_messages, display_error_messages
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.create import ClassForm
 
 
-class Create(PermissionRequiredMixin, FormView):
+class CreateClassView(PermissionRequiredMixin, FormView):
     template_name = "class/creation.html"
     form_class = ClassForm
     permission_required = 'base.can_create_class'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                'learning_unit_year': get_by_id(self.kwargs['learning_unit_year_id']),
-            }
+    @cached_property
+    def year(self) -> int:
+        return self.kwargs['learning_unit_year']
+
+    @cached_property
+    def learning_unit_code(self) -> int:
+        return self.kwargs['learning_unit_code']
+
+    @cached_property
+    def learning_unit(self) -> 'LearningUnit':
+        return message_bus_instance.invoke(
+            GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
-        return context
+
+    def get(self, request, *args, **kwargs):
+        try:
+            message_bus_instance.invoke(
+                CanCreateEffectiveClassCommand(learning_unit_code=self.learning_unit_code, learning_unit_year=self.year)
+            )
+        except MultipleBusinessExceptions as e:
+            display_error_messages(request, [exc.message for exc in e.exceptions])
+            return self.redirect_to_learning_unit_identification()
+
+        return super().get(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['learning_unit'] = self.learning_unit
+        kwargs['user'] = self.request.user
+        return kwargs
 
     def get_permission_object(self):
-        return LearningUnitYear.objects.filter(id=self.kwargs['learning_unit_year_id']).\
-            select_related('learning_container_year', 'academic_year')
+        return LearningUnitYear.objects.filter(
+            academic_year__year=self.year,
+            acronym=self.learning_unit_code
+        ).select_related(
+            'learning_container_year',
+            'academic_year',
+        )
+
+    def post(self, request, *args, **kwargs):
+        form = ClassForm(request.POST, learning_unit=self.learning_unit, user=request.user)
+        effective_class_identity = form.save()
+        if not form.errors:
+            display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
+            return self.redirect_to_learning_unit_identification()
+
+        return render(request, self.template_name, {
+            "form": form,
+        })
+
+    def redirect_to_learning_unit_identification(self):
+        return redirect(
+            reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
+        )
+
+    def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
+        return _("Class %(class_identity)s successfully created.") % {
+            "class_identity": effective_class_identity,
+        }

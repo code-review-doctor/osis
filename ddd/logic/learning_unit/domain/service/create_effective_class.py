@@ -27,60 +27,63 @@ from decimal import Decimal
 from typing import List
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
-    LearningUnitHasPartimException, LearningUnitHasProposalException, \
-    LearningUnitHasEnrollmentException, AnnualVolumeInvalidException, CodeClassAlreadyExistForUeException
+from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
+from ddd.logic.learning_unit.domain.validator.exceptions import CodeClassAlreadyExistForUeException, \
+    AnnualVolumeInvalidException
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
 
-class CanCreateEffectiveClass(interface.DomainService):
+class CreateEffectiveClass(interface.DomainService):
 
     @classmethod
-    def check(
+    def create(
             cls,
             learning_unit: 'LearningUnit',
-            learning_unit_repository: 'ILearningUnitRepository',
             cmd: 'CreateEffectiveClassCommand',
-            all_existing_class_identities: List['EffectiveClassIdentity']
+            all_existing_class_identities: List['EffectiveClassIdentity'],
+            learning_unit_repository: 'ILearningUnitRepository'
     ):
+        CanAccessCreationEffectiveClass().check(
+            learning_unit=learning_unit,
+            learning_unit_repository=learning_unit_repository
+        )
+
         exceptions = set()  # type Set[BusinessException]
-        if learning_unit.is_external():
-            exceptions.add(ClassTypeInvalidException())
-
-        if learning_unit.has_partim():
-            exceptions.add(LearningUnitHasPartimException())
-
-        if learning_unit_repository.has_proposal(learning_unit):
-            exceptions.add(LearningUnitHasProposalException())
-
-        if learning_unit_repository.has_enrollments(learning_unit):
-            exceptions.add(LearningUnitHasEnrollmentException())
 
         if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
-            exceptions.add(AnnualVolumeInvalidException())
+            exceptions.add(AnnualVolumeInvalidException(learning_unit))
 
         if all_existing_class_identities:
-            for id in all_existing_class_identities:
-                if id.learning_unit_identity == learning_unit.entity_id and id.class_code == cmd.class_code:
+            for class_id in all_existing_class_identities:
+                if class_id.learning_unit_identity == learning_unit.entity_id and class_id.class_code == cmd.class_code:
                     exceptions.add(CodeClassAlreadyExistForUeException(learning_unit.entity_id, cmd.class_code))
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
+
+        effective_class = EffectiveClassBuilder.build_from_command(
+            cmd=cmd,
+            learning_unit=learning_unit
+        )
+        return effective_class
 
 
 def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
         learning_unit: 'LearningUnit',
         cmd: 'CreateEffectiveClassCommand'
 ) -> Decimal:
-    practical_volumes = learning_unit.practical_part.volumes
-    lecturing_volumes = learning_unit.lecturing_part.volumes
-    if practical_volumes.volume_annual > 0 and not lecturing_volumes.volume_annual > 0:
-        volume_annual = practical_volumes.volume_annual
+    practical_part = learning_unit.practical_part
+    lecturing_part = learning_unit.lecturing_part
+
+    if practical_part and not lecturing_part:
+        volume_annual = practical_part.volumes.volume_annual
     else:
-        volume_annual = lecturing_volumes.volume_annual
+        volume_annual = lecturing_part.volumes.volume_annual
+
     sum_q1_q2 = cmd.volume_first_quadrimester + cmd.volume_second_quadrimester
     return volume_annual <= 0 or sum_q1_q2 != volume_annual

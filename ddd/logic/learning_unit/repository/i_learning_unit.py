@@ -34,6 +34,11 @@ from osis_common.ddd import interface
 class ILearningUnitRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
+    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
     def search_learning_units_dto(
             cls,
             code: str = None,

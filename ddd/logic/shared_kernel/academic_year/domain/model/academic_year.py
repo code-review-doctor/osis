@@ -39,7 +39,7 @@ class AcademicYearIdentity(interface.EntityIdentity):
 
     @staticmethod
     def get_verbose_year(year: int) -> str:
-        return u"%s-%s" % (year, str(year + 1)[-2:])
+        return "{}-{}".format(year, str(year + 1)[-2:])
 
 
 @attr.s(slots=True, hash=False, eq=False)

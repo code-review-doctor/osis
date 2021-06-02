@@ -274,7 +274,8 @@ def _get_partims(qs: QuerySet) -> QuerySet:
 
 def _annotate_queryset(queryset: QuerySet) -> QuerySet:
     components = LearningComponentYearDatabase.objects.filter(
-        learning_unit_year_id=OuterRef('pk')
+        learning_unit_year_id=OuterRef('pk'),
+        hourly_volume_total_annual__gt=0.0,
     )
     queryset = queryset.annotate(
         code=F('acronym'),
@@ -289,19 +290,61 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
                 entity__id=OuterRef('learning_container_year__requirement_entity_id')
             ).order_by('-start_date').values('acronym')[:1]
         ),
+        attribution_entity_code=Subquery(
+            EntityVersionDatabase.objects.filter(
+                entity__id=OuterRef('learning_container_year__allocation_entity_id')
+            ).order_by('-start_date').values('acronym')[:1]
+        ),
         iso_code=F('language__code'),
         remark_faculty=F('faculty_remark'),
         remark_publication_fr=F('other_remark'),
         remark_publication_en=F('other_remark_english'),
+
+        repartition_entity_2=Subquery(  # TODO :: to unit test
+            EntityVersionDatabase.objects.filter(
+                entity__id=OuterRef('learning_container_year__additional_entity_1_id')
+            ).order_by('-start_date').values('acronym')[:1]
+        ),
+        repartition_entity_3=Subquery(  # TODO :: to unit test
+            EntityVersionDatabase.objects.filter(
+                entity__id=OuterRef('learning_container_year__additional_entity_2_id')
+            ).order_by('-start_date').values('acronym')[:1]
+        ),
+
         lecturing_volume_q1=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q1')),
         lecturing_volume_q2=Subquery(components.filter(type=LECTURING).values('hourly_volume_partial_q2')),
         lecturing_volume_annual=Subquery(components.filter(type=LECTURING).values('hourly_volume_total_annual')),
+        lecturing_planned_classes=Subquery(components.filter(type=LECTURING).values('planned_classes')),
+        lecturing_volume_repartition_responsible_entity=Subquery(  # TODO :: to unit test
+            components.filter(type=LECTURING).values('repartition_volume_requirement_entity')
+        ),
+        lecturing_volume_repartition_entity_2=Subquery(  # TODO :: to unit test
+            components.filter(type=LECTURING).values('repartition_volume_additional_entity_1')
+        ),
+        lecturing_volume_repartition_entity_3=Subquery(  # TODO :: to unit test
+            components.filter(type=LECTURING).values('repartition_volume_additional_entity_2')
+        ),
+
         practical_volume_q1=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_partial_q1')),
         practical_volume_q2=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_partial_q2')),
         practical_volume_annual=Subquery(
             components.filter(type=PRACTICAL_EXERCISES).values('hourly_volume_total_annual')
         ),
-        derogation_quadrimester=F('quadrimester')
+        practical_planned_classes=Subquery(components.filter(type=PRACTICAL_EXERCISES).values('planned_classes')),
+        practical_volume_repartition_responsible_entity=Subquery(  # TODO :: to unit test
+            components.filter(type=PRACTICAL_EXERCISES).values('repartition_volume_requirement_entity')
+        ),
+        practical_volume_repartition_entity_2=Subquery(  # TODO :: to unit test
+            components.filter(type=PRACTICAL_EXERCISES).values('repartition_volume_additional_entity_1')
+        ),
+        practical_volume_repartition_entity_3=Subquery(  # TODO :: to unit test
+            components.filter(type=PRACTICAL_EXERCISES).values('repartition_volume_additional_entity_2')
+        ),
+
+        derogation_quadrimester=F('quadrimester'),
+        derogation_session=F('session'),
+        teaching_place_uuid=F('campus__uuid'),
+        is_active=F('status'),
     )
     return queryset
 
@@ -318,18 +361,37 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
         'credits',
         'internship_subtype',
         'responsible_entity_code',
+        'attribution_entity_code',
         'periodicity',
         'iso_code',
         'remark_faculty',
         'remark_publication_fr',
         'remark_publication_en',
+
+        'repartition_entity_2',
+        'repartition_entity_3',
+
         'lecturing_volume_q1',
         'lecturing_volume_q2',
         'lecturing_volume_annual',
+        'lecturing_planned_classes',
+        'lecturing_volume_repartition_responsible_entity',
+        'lecturing_volume_repartition_entity_2',
+        'lecturing_volume_repartition_entity_3',
+
         'practical_volume_q1',
         'practical_volume_q2',
         'practical_volume_annual',
-        'derogation_quadrimester'
+        'practical_planned_classes',
+        'practical_volume_repartition_responsible_entity',
+        'practical_volume_repartition_entity_2',
+        'practical_volume_repartition_entity_3',
+
+        'derogation_quadrimester',
+        'derogation_session',
+        'teaching_place_uuid',
+        'professional_integration',
+        'is_active',
     )
     return queryset
 
