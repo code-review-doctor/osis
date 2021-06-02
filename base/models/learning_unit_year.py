@@ -627,8 +627,8 @@ def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[
             inconsistent_msg = _('Volumes of {} are inconsistent').format(
                 effective_class.effective_class_complete_acronym
             )
-            if effective_class.hourly_volume_partial_q1 > learning_component_yr.hourly_volume_partial_q1 or \
-                    effective_class.hourly_volume_partial_q2 > learning_component_yr.hourly_volume_partial_q2:
+
+            if _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_component_yr):
                 _warnings.append(
                     "{} ({}) ".format(
                         inconsistent_msg,
@@ -637,8 +637,7 @@ def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[
                     )
                 )
 
-            class_sum_q1_q2 = effective_class.hourly_volume_partial_q1 + effective_class.hourly_volume_partial_q2
-            if class_sum_q1_q2 > learning_component_yr.hourly_volume_total_annual:
+            if _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_component_yr):
                 _warnings.append(
                     "{} ({}) ".format(
                         inconsistent_msg,
@@ -647,6 +646,16 @@ def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[
                 )
 
     return _warnings
+
+
+def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_component_yr):
+    return effective_class.hourly_volume_partial_q1 > learning_component_yr.hourly_volume_partial_q1 or \
+           effective_class.hourly_volume_partial_q2 > learning_component_yr.hourly_volume_partial_q2
+
+
+def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_component_yr):
+    class_sum_q1_q2 = effective_class.hourly_volume_partial_q1 + effective_class.hourly_volume_partial_q2
+    return class_sum_q1_q2 > learning_component_yr.hourly_volume_total_annual
 
 
 def _check_number_of_classes(all_components) -> List[str]:
