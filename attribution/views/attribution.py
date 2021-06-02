@@ -41,6 +41,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.enums.function import Functions
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.common import display_warning_messages
@@ -79,29 +80,25 @@ def learning_unit_attributions(request, learning_unit_year_id=None, code=None, y
 
 
 def get_charge_repartition_warning_messages(learning_container_year):
-    total_charges_by_attribution_and_learning_subtype = AttributionChargeNew.objects \
-        .filter(attribution__learning_container_year=learning_container_year) \
-        .order_by("attribution__tutor", "attribution__function", "attribution__start_year") \
-        .values("attribution__tutor", "attribution__tutor__person__first_name",
-                "attribution__tutor__person__middle_name", "attribution__tutor__person__last_name",
-                "attribution__function", "attribution__start_year",
-                "learning_component_year__learning_unit_year__subtype") \
-        .annotate(total_volume=Sum("allocation_charge"))
-
-    charges_by_attribution = itertools.groupby(total_charges_by_attribution_and_learning_subtype,
-                                               lambda rec: "{}_{}_{}".format(rec["attribution__tutor"],
-                                                                             rec["attribution__start_year"],
-                                                                             rec["attribution__function"]))
     msgs = []
+
+    charges_by_attribution = _get_charges_by_attribution_and_type_or_func(learning_container_year)
+
     for attribution_key, charges in charges_by_attribution:
         charges = list(charges)
-        subtype_key = "learning_component_year__learning_unit_year__subtype"
         full_total_charges = next(
-            (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.FULL),
-            0)
+            (
+                charge.total_volume for charge in charges
+                if charge.learning_component_year.learning_unit_year.subtype == learning_unit_year_subtypes.FULL
+            ), 0
+        )
         partim_total_charges = next(
-            (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.PARTIM),
-            0)
+            (
+                charge.total_volume for charge in charges
+                if charge.learning_component_year.learning_unit_year.subtype == learning_unit_year_subtypes.PARTIM
+            ), 0
+        )
+
         partim_total_charges = partim_total_charges or 0
         full_total_charges = full_total_charges or 0
         if partim_total_charges > full_total_charges:
@@ -112,66 +109,52 @@ def get_charge_repartition_warning_messages(learning_container_year):
 
 
 def _get_classes_charge_repartition_warning_messages(learning_unit_year: LearningUnitYear) -> List[str]:
-    msgs = []
-    total_charges_by_attribution_and_learning_subtype = AttributionChargeNew.objects \
-        .filter(attribution__learning_container_year=learning_unit_year.learning_container_year) \
-        .order_by(
-            "learning_component_year__type",
-            "attribution__tutor",
-            "attribution__function",
-            "attribution__start_year"
-        ) \
-        .values("attribution__tutor", "attribution__tutor__person__first_name",
-                "attribution__tutor__person__middle_name", "attribution__tutor__person__last_name",
-                "attribution__function", "attribution__start_year",
-                "learning_component_year__type", "learning_component_year__pk") \
-        .annotate(total_volume=Sum("allocation_charge"))
+    msgs = set()
 
-    charges_by_attribution_and_type = itertools.groupby(
-        total_charges_by_attribution_and_learning_subtype,
-        lambda rec: "{}_{}_{}".format(rec["attribution__tutor"],
-                                      rec["attribution__start_year"],
-                                      rec["learning_component_year__type"]
-                                      )
+    charges_by_attribution_and_type = _get_charges_by_attribution_and_type_or_func(
+        learning_unit_year.learning_container_year,
+        with_classes=True
     )
 
-    components_queryset = LearningComponentYear.objects.filter(
-        learning_unit_year__learning_container_year=learning_unit_year.learning_container_year
-    )
-    all_components = components_queryset.order_by('acronym') \
-        .select_related('learning_unit_year') \
-        .prefetch_related(models.Prefetch('learningclassyear_set', to_attr="classes"))
     msg_warning = _("The sum of volumes for the classes for professor %(tutor)s is superior to the volume of "
                     "UE(%(ue_type)s) for this professor")
-    for component in all_components:
-        volume_total_of_classes = _get_component_volume_total_of_classes(component)
 
-        for attribution_key, charges in charges_by_attribution_and_type:
-            charges = list(charges)
-            for charge in charges:
-                if charge['learning_component_year__pk'] == component.pk:
-                    if volume_total_of_classes > charge['total_volume']:
-                        msgs.append(
-                            msg_warning % {
-                                "tutor": _get_tutor_name_with_function(charges[0]),
-                                "ue_type": learning_unit_year.get_subtype_display().lower()
-                            }
-                        )
+    for attribution_key, charges in charges_by_attribution_and_type:
+        for charge in list(charges):
+            if _get_component_volume_total_of_classes(charge.learning_component_year) > charge.total_volume:
+                msgs.add(msg_warning % {
+                    "tutor": _get_tutor_name_with_function(charge),
+                    "ue_type": learning_unit_year.get_subtype_display().lower()
+                })
 
     return msgs
 
 
-def _get_component_volume_total_of_classes(component: LearningComponentYear) -> float:
-    volume_total_of_classes = 0
-    for effective_classes in component.classes:
-        volume_total_of_classes += effective_classes.volume_annual
-    return volume_total_of_classes
+def _get_charges_by_attribution_and_type_or_func(learning_container_year: LearningContainerYear, with_classes=False):
+    total_charges = AttributionChargeNew.objects.filter(
+        attribution__learning_container_year=learning_container_year,
+    ).annotate(total_volume=Sum("allocation_charge"))
 
+    if with_classes:
+        total_charges = total_charges.prefetch_related(
+            models.Prefetch('learning_component_year__learningclassyear_set', to_attr="classes")
+        )
 
-def _get_tutor_name_with_function(charge: dict) -> str:
-    tutor_name = Person.get_str(charge["attribution__tutor__person__first_name"],
-                                charge["attribution__tutor__person__last_name"])
-    return "{} ({})".format(
-        tutor_name,
-        getattr(Functions, charge["attribution__function"]).value
+    charges_by_attribution_and_type_or_func = itertools.groupby(
+        total_charges, lambda rec: "{}_{}_{}".format(
+            rec.attribution.tutor,
+            rec.attribution.start_year,
+            rec.learning_component_year.type if with_classes else rec.attribution.function
+        )
     )
+
+    return charges_by_attribution_and_type_or_func
+
+
+def _get_component_volume_total_of_classes(component: LearningComponentYear) -> float:
+    return sum([eff_class.volume_annual for eff_class in component.classes])
+
+
+def _get_tutor_name_with_function(charge: AttributionChargeNew) -> str:
+    tutor_name = Person.get_str(charge.attribution.tutor.person.first_name, charge.attribution.tutor.person.last_name)
+    return "{} ({})".format(tutor_name, getattr(Functions, charge.attribution.function).value)
