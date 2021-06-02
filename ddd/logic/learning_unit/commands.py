@@ -56,14 +56,14 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     practical_volume_q1 = attr.ib(type=Decimal)
     practical_volume_q2 = attr.ib(type=Decimal)
     practical_volume_annual = attr.ib(type=Decimal)
-    # practical_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # practical_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: implement + unit test
     # practical_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
     # practical_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
 
     lecturing_volume_q1 = attr.ib(type=Decimal)
     lecturing_volume_q2 = attr.ib(type=Decimal)
     lecturing_volume_annual = attr.ib(type=Decimal)
-    # lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: implement + unit test
     # lecturing_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
     # lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
 
