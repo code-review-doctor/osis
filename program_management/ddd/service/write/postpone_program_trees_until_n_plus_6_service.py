@@ -42,7 +42,11 @@ def postpone_program_trees_until_n_plus_6(cmd: PostponeProgramTreesUntilNPlus6Co
 
     )
 
-    trees_to_postpone = repo.search_last_occurence(current_academic_year.year)
+    trees_to_postpone = [
+        tree
+        for tree in repo.search_last_occurence(current_academic_year.year)
+        if not tree.root_node.is_group()
+    ]
 
     result = []
     for tree in trees_to_postpone:
