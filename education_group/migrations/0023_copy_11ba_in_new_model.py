@@ -72,14 +72,17 @@ def create_default_11ba_in_cohort_year(apps, shema_editor):
     )
 
     for my_1ba in all_1bas_without_cohort:
-        last_existing_cohort = CohortYear.objects.filter(
-            education_group_year__acronym=my_1ba.acronym,
-            name='FIRST_YEAR'
-        ).select_related(
-            'education_group_year'
-        ).prefetch_related(
-            'education_group_year__academic_year'
-        ).latest('education_group_year__academic_year__year')
+        try:
+            last_existing_cohort = CohortYear.objects.filter(
+                education_group_year__acronym=my_1ba.acronym,
+                name='FIRST_YEAR'
+            ).select_related(
+                'education_group_year'
+            ).prefetch_related(
+                'education_group_year__academic_year'
+            ).latest('education_group_year__academic_year__year')
+        except CohortYear.DoesNotExist:
+            last_existing_cohort = None
         CohortYear.objects.update_or_create(
             education_group_year=my_1ba,
             name='FIRST_YEAR',
