@@ -28,7 +28,7 @@ from typing import List
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, Prefetch
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -38,15 +38,17 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
+from base.business.learning_units.quadrimester_strategy import QUADRIMESTER_CHECK_RULES
+from base.business.learning_units.session_strategy import SESSION_CHECK_RULES
 from base.models import entity_version
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
+from base.models.enums.component_type import PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
@@ -58,7 +60,6 @@ from education_group import publisher
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
-from base.models.enums.component_type import PRACTICAL_EXERCISES, LECTURING
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -584,135 +585,37 @@ class LearningUnitYear(SerializableModel):
 
 
 def _check_classes_quadrimester(ue_quadrimester, all_components: List[LearningComponentYear]) -> List[str]:
-    quadrimester_check = {
-        quadrimesters.LearningUnitYearQuadrimester.Q1.name: {
-            'correct_values': [
-                None,
-                quadrimesters.LearningUnitYearQuadrimester.Q1.name
-            ],
-            'available_values_str': 'Q1'
-        },
-        quadrimesters.LearningUnitYearQuadrimester.Q2.name: {
-            'correct_values': [
-                None,
-                quadrimesters.LearningUnitYearQuadrimester.Q2.name
-            ],
-            'available_values_str': 'Q2'
-        },
-        quadrimesters.LearningUnitYearQuadrimester.Q1and2.name: {
-            'correct_values': [
-                quadrimesters.LearningUnitYearQuadrimester.Q1.name,
-                quadrimesters.LearningUnitYearQuadrimester.Q2.name,
-                quadrimesters.LearningUnitYearQuadrimester.Q1and2.name,
-                quadrimesters.LearningUnitYearQuadrimester.Q1or2.name
-            ],
-            'available_values_str': 'Q1 {}/{} Q2'.format(_('and'), _('or'))
-        },
-        quadrimesters.LearningUnitYearQuadrimester.Q1or2.name: {
-            'correct_values': [
-                quadrimesters.LearningUnitYearQuadrimester.Q1.name,
-                quadrimesters.LearningUnitYearQuadrimester.Q2.name,
-                quadrimesters.LearningUnitYearQuadrimester.Q1or2.name
-            ],
-            'available_values_str': 'Q1 {} Q2'.format(_('or'))
-        },
-        quadrimesters.LearningUnitYearQuadrimester.Q3.name: {
-            'correct_values': [
-                None,
-                quadrimesters.LearningUnitYearQuadrimester.Q3.name,
-                ],
-            'available_values_str': 'Q3'
-        }
-    }
     _warnings = []
     message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '
                 '(should be %(should_be_values)s)')
 
     for learning_component_year in all_components:
         for effective_class in learning_component_year.classes:
-            if ue_quadrimester and effective_class.quadrimester:
-                if effective_class.quadrimester \
-                        not in quadrimester_check[ue_quadrimester]['correct_values']:
-                    _warnings.append(message % {
-                        'code_class': effective_class.effective_class_complete_acronym,
-                        'should_be_values': quadrimester_check[ue_quadrimester]['available_values_str']
-                    })
+            quadri = effective_class.quadrimester
+            if ue_quadrimester and quadri and quadri not in QUADRIMESTER_CHECK_RULES[ue_quadrimester]['correct_values']:
+                _warnings.append(message % {
+                    'code_class': effective_class.effective_class_complete_acronym,
+                    'should_be_values': QUADRIMESTER_CHECK_RULES[ue_quadrimester]['available_values_str']
+                })
+
     return _warnings
 
 
 def _check_classes_session(ue_session, all_components: List[LearningComponentYear]) -> List[str]:
 
-    correct_values_23 = [
-        None,
-        learning_unit_year_session.SESSION_X2X,
-        learning_unit_year_session.SESSION_XX3,
-        learning_unit_year_session.SESSION_X23,
-        learning_unit_year_session.SESSION_P23
-    ]
-    available_values_str_23 = "2, 3, 23 {} P23".format(_('or'))
-    session_check = {
-        learning_unit_year_session.SESSION_1XX: {
-            'correct_values': [
-                None,
-                learning_unit_year_session.SESSION_1XX
-            ],
-            'available_values_str': '1'
-        },
-        learning_unit_year_session.SESSION_X2X: {
-            'correct_values': [
-                None,
-                learning_unit_year_session.SESSION_X2X
-            ],
-            'available_values_str': '2'
-        },
-        learning_unit_year_session.SESSION_XX3: {
-            'correct_values': [
-                None,
-                learning_unit_year_session.SESSION_XX3
-            ],
-            'available_values_str': '3'
-        },
-
-        learning_unit_year_session.SESSION_12X: {
-            'correct_values': [
-                None,
-                learning_unit_year_session.SESSION_1XX,
-                learning_unit_year_session.SESSION_X2X,
-                learning_unit_year_session.SESSION_12X
-            ],
-            'available_values_str': '1, 2 {} 12'.format(_('or'))
-        },
-        learning_unit_year_session.SESSION_1X3: {
-            'correct_values': [
-                None,
-                learning_unit_year_session.SESSION_1XX,
-                learning_unit_year_session.SESSION_XX3,
-                learning_unit_year_session.SESSION_1X3
-            ],
-            'available_values_str': '1, 3 {} 13'.format(_('or'))
-        },
-        learning_unit_year_session.SESSION_X23: {
-            'correct_values': correct_values_23,
-            'available_values_str': available_values_str_23
-        },
-        learning_unit_year_session.SESSION_P23: {
-            'correct_values': correct_values_23,
-            'available_values_str': available_values_str_23
-        },
-    }
     _warnings = []
     message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
                 '(should be %(should_be_values)s)')
 
     for learning_component_year in all_components:
         for effective_class in learning_component_year.classes:
-            if ue_session and effective_class.session:
-                if effective_class.session \
-                        not in session_check[ue_session]['correct_values']:
-                    _warnings.append(message % {
-                        'code_class': effective_class.effective_class_complete_acronym,
-                        'should_be_values': session_check[ue_session]['available_values_str']
-                    })
+            session = effective_class.session
+            if ue_session and session and session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
+                _warnings.append(message % {
+                    'code_class': effective_class.effective_class_complete_acronym,
+                    'should_be_values': SESSION_CHECK_RULES[ue_session]['available_values_str']
+                })
+
     return _warnings
 
 
