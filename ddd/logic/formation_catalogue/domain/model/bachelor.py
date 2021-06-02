@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,31 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import transaction
 
-from education_group.ddd import command
-from education_group.ddd.domain import exception
-from education_group.ddd.domain.training import TrainingIdentity
-from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
-from education_group.ddd.repository import training as training_repository
+import attr
+
+from base.models.enums.education_group_types import TrainingType
+from ddd.logic.formation_catalogue.domain.model._first_year_bachelor import FirstYearBachelor
+from education_group.ddd.domain.training import Training
 
 
-@transaction.atomic()
-def copy_training_to_next_year(copy_cmd: command.CopyTrainingToNextYearCommand) -> 'TrainingIdentity':
-    # GIVEN
-    repository = training_repository.TrainingRepository()
-    existing_training = repository.get(
-        entity_id=TrainingIdentity(acronym=copy_cmd.acronym, year=copy_cmd.postpone_from_year)
-    )
-
-    # WHEN
-    training_next_year = TrainingBuilder().copy_to_next_year(existing_training, repository)
-
-    # THEN
-    try:
-        with transaction.atomic():
-            identity = repository.create(training_next_year)
-    except exception.TrainingAcronymAlreadyExistException:
-        identity = repository.update(training_next_year)
-
-    return identity
+@attr.s(slots=True, hash=False, eq=False)
+class Bachelor(Training):
+    first_year_bachelor = attr.ib(type=FirstYearBachelor, kw_only=True)
+    type = TrainingType.BACHELOR
