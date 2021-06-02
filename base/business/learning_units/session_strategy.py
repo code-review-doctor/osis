@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from gettext import gettext as _
+
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import learning_unit_year_session
 
