@@ -720,6 +720,9 @@ msgstr ""
 msgid "Dissertation submission"
 msgstr ""
 
+msgid "Dissertations"
+msgstr ""
+
 msgid "Do not assign"
 msgstr ""
 
@@ -2274,6 +2277,9 @@ msgstr ""
 msgid "Student search"
 msgstr ""
 
+msgid "Student's dissertations management"
+msgstr ""
+
 msgid "Students"
 msgstr ""
 
@@ -2643,9 +2649,6 @@ msgid "Training title"
 msgstr ""
 
 msgid "Trainings"
-msgstr ""
-
-msgid "Trainings/gathering"
 msgstr ""
 
 msgid "Transformation"
