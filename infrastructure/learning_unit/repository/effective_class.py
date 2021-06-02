@@ -84,7 +84,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
                 'title_en': entity.titles.en,
                 'campus_id': campus_id,
                 'quadrimester': entity.derogation_quadrimester.name,
-                'session': entity.session_derogation,
+                'session': entity.session_derogation.value,
                 'hourly_volume_partial_q1': entity.volumes.volume_first_quadrimester,
                 'hourly_volume_partial_q2': entity.volumes.volume_second_quadrimester,
             }

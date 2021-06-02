@@ -342,6 +342,7 @@ def _annotate_queryset(queryset: QuerySet) -> QuerySet:
         ),
 
         derogation_quadrimester=F('quadrimester'),
+        derogation_session=F('session'),
         teaching_place_uuid=F('campus__uuid'),
         is_active=F('status'),
     )
@@ -387,6 +388,7 @@ def _values_queryset(queryset: QuerySet) -> QuerySet:
         'practical_volume_repartition_entity_3',
 
         'derogation_quadrimester',
+        'derogation_session',
         'teaching_place_uuid',
         'professional_integration',
         'is_active',

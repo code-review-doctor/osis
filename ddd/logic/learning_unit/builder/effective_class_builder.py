@@ -51,13 +51,13 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         CreateEffectiveClassValidatorList(command=cmd).validate()
 
         effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
-
+        quadri = cmd.derogation_quadrimester
         return _define_effective_class_type(learning_unit)(
             entity_id=effective_class_identity,
             titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(cmd.teaching_place_uuid),
-            derogation_quadrimester=DerogationQuadrimester(cmd.derogation_quadrimester),
-            session_derogation=DerogationSession(cmd.session_derogation),
+            derogation_quadrimester=DerogationQuadrimester[quadri] if quadri else None,
+            session_derogation=DerogationSession[cmd.session_derogation] if cmd.session_derogation else None,
             volumes=ClassVolumes(
                 volume_first_quadrimester=cmd.volume_first_quadrimester,
                 volume_second_quadrimester=cmd.volume_second_quadrimester,

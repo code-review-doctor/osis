@@ -32,6 +32,7 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
@@ -111,6 +112,7 @@ class LearningUnitBuilder(RootEntityBuilder):
                 repartition_volume_entity_3=None,  # TODO :: to implement and unit test
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
+            derogation_session=None,  # TODO :: to implement and unit test
             partims=[],
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=False,  # TODO :: to implement and unit test
@@ -125,6 +127,10 @@ class LearningUnitBuilder(RootEntityBuilder):
         attribution_entity = None
         if dto.attribution_entity_code:
             attribution_entity = UclEntityIdentityBuilder.build_from_code(dto.attribution_entity_code)
+        derogation_session = None
+        if dto.derogation_session:
+            enum_key = next(key for key, value in DerogationSession.choices() if value == dto.derogation_session)
+            derogation_session = DerogationSession[enum_key]
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
             titles=_build_titles(
@@ -168,6 +174,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester]
             if dto.derogation_quadrimester else None,
+            derogation_session=derogation_session,
             partims=[
                 PartimBuilder.build_from_dto(partim_dto) for partim_dto in dto.partims
             ],

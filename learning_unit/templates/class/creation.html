@@ -40,74 +40,100 @@
         <h2>{% block h2_title %}{% trans 'New class' %}{% endblock %}</h2>
     </div>
     <div class="panel panel-default">
-        <form method="post" id="LearningUnitYearForm" >
-            <div class="panel-heading">
-                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
-            </div>
-            <div class="panel-body">
-
-                {% bootstrap_form_errors form %}
-
-                {% bootstrap_field form.learning_unit_year %}
-
-                <div class="row">
-                        {% block content_row1 %}
-                                <div class="col-md-3">
-                                    <label>
-                                        {% trans 'Code' %}
-                                    </label>
-                                    <br>
-                                    <div id="id_acronym" class="form-group col-md-2">
-                                        {% bootstrap_field form.learning_unit_code show_label=False %}
-                                        {% bootstrap_field form.class_code show_label=False %}
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <label>
-                                        {% trans 'Type' %}
-                                    </label>
-                                    <br>
-                                    <input id="id_type" type="text" value="{% trans 'Class' %}" disabled/>
-                                </div>
-                                <div class="col-md-3">
-                                    <label>
-                                        {% trans 'Internship subtype' %}
-                                    </label>
-                                    <br>
-                                    <select id="id_internship_subtype" disabled>
-                                        <option>{{ learning_unit_year.internship_subtype | default_if_none:"-" }}</option>
-                                    </select>
-                                </div>
-                            {% endblock content_row1 %}
-                        </div>
-            <div class="row">
-                <span class="col-md-12" >
-                <input type="checkbox" value="{{ learning_unit_year.professional_integration  }}" disabled/>
-                <label>{% trans 'Professional integration' %}</label>
-                </span>
-            </div>
-                <div class="row">
-                    {% bootstrap_field form.title_fr form_group_class="col-md-6" %}
-                </div>
-                <div class="row">
-                    {% bootstrap_field form.title_en form_group_class="col-md-6" %}
-                </div>
-                <div class="row">
-                    {% bootstrap_field form.hourly_volume_partial_q1 form_group_class="col-md-6" %}
-                    {% bootstrap_field form.hourly_volume_partial_q2 form_group_class="col-md-6" %}
-                </div>
-                <div class="row">
-                    {% bootstrap_field form.quadrimester form_group_class="col-md-6" %}
-                    {% bootstrap_field form.session form_group_class="col-md-6" %}
-                </div>
-                <div class="row">
-                    {% bootstrap_field form.campus form_group_class="col-md-12" %}
+        <div class="panel-body">
+            <form method="post" id="LearningUnitYearForm">
+                <div class="panel-heading">
+                    {% include "learning_unit/blocks/create_cancel_buttons.html" %}
                 </div>
                 {% csrf_token %}
-            </div>
-            <div class="panel-footer">
+                {% bootstrap_form_errors form %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    {% block content_row1 %}
+                                        <div class="col-md-3">
+                                            <label>
+                                                {% trans 'Code' %}
+                                            </label>
+                                            <br>
+
+                                            <div class="form-group input-group">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon" id="basic-addon1">{{ form.learning_unit_code.initial }}</span>
+                                                    {% bootstrap_field form.class_code show_label=False %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {% bootstrap_field form.learning_unit_type %}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {% bootstrap_field form.learning_unit_internship_subtype %}
+                                        </div>
+                                    {% endblock content_row1 %}
+                                </div>
+                                <div class="row">
+                                    {% block content_row2 %}
+                                        <div class="col-md-3">
+                                            {% bootstrap_field form.learning_unit_credits %}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {% bootstrap_field form.learning_unit_periodicity %}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {#  FIXME: missing field#}
+                                            {% bootstrap_field form.learning_unit_state %}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {% bootstrap_field form.learning_unit_language %}
+                                        </div>
+                                    {% endblock content_row2 %}
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% bootstrap_field form.learning_unit_professional_integration %}
+                                    </div>
+                                </div>
+                                <label>
+                                    {% trans "Title" %}
+                                </label>
+                                {% bootstrap_field form.learning_unit_common_title_fr %}
+                                {% bootstrap_field form.title_fr %}
+                                <br/>
+                                <label>
+                                    {% trans "Title in English" %}
+                                </label>
+                                {% bootstrap_field form.learning_unit_common_title_fr %}
+                                {% bootstrap_field form.title_en %}
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {% bootstrap_field form.quadrimester %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {% bootstrap_field form.session %}
+                                    </div>
+                                </div>
+                                <div>
+                                    {% include 'class/simplified_class_volumes_management_form.html' %}
+                                </div>
+                            </div>
+                        </div>
+                        {% include 'class/blocks/panel/remarks.html' %}
+                    </div>
+                    <div class="col-md-4">
+                        {% include 'class/blocks/panel/entities.html' %}
+                    </div>
+                </div>
+                <div class="panel-footer">
                 {% include "learning_unit/blocks/create_cancel_buttons.html" %}
-            </div>
-        </form>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock %}

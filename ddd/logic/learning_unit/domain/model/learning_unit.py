@@ -30,13 +30,14 @@ import attr
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
+from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart, Volumes
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
@@ -74,6 +75,7 @@ class LearningUnit(interface.RootEntity):
     remarks = attr.ib(type=Remarks)
     partims = attr.ib(type=List[Partim])
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
+    derogation_session = attr.ib(type=DerogationSession)
     lecturing_part = attr.ib(type=LecturingPart)
     practical_part = attr.ib(type=PracticalPart)
     professional_integration = attr.ib(type=bool)
@@ -109,6 +111,12 @@ class LearningUnit(interface.RootEntity):
 
     def has_volume(self) -> bool:
         return self.lecturing_part is not None or self.practical_part is not None
+
+    def has_practical_volume(self) -> bool:
+        return self.practical_part and self.practical_part.volumes.volume_annual
+
+    def has_lecturing_volume(self) -> bool:
+        return self.lecturing_part and self.lecturing_part.volumes.volume_annual
 
 
 class CourseLearningUnit(LearningUnit):
