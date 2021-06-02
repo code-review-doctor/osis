@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from gettext import gettext as _
+
 from base.models.enums import learning_unit_year_session
 
 CORRECT_VALUES_23 = [
