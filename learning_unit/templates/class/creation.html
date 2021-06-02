@@ -58,14 +58,11 @@
                                                 {% trans 'Code' %}
                                             </label>
                                             <br>
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-sm-8">
-                                                        {% bootstrap_field form.learning_unit_code show_label=False %}
-                                                    </div>
-                                                    <div class="col-sm-4">
-                                                        {% bootstrap_field form.class_code show_label=False %}
-                                                    </div>
+
+                                            <div class="form-group input-group">
+                                                <div class="input-group">
+                                                    <span class="input-group-addon" id="basic-addon1">{{ form.learning_unit_code.initial }}</span>
+                                                    {% bootstrap_field form.class_code show_label=False %}
                                                 </div>
                                             </div>
                                         </div>

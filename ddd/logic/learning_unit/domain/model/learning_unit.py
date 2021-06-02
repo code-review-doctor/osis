@@ -112,6 +112,12 @@ class LearningUnit(interface.RootEntity):
     def has_volume(self) -> bool:
         return self.lecturing_part is not None or self.practical_part is not None
 
+    def has_practical_volume(self) -> bool:
+        return self.practical_part and self.practical_part.volumes.volume_annual
+
+    def has_lecturing_volume(self) -> bool:
+        return self.lecturing_part and self.lecturing_part.volumes.volume_annual
+
 
 class CourseLearningUnit(LearningUnit):
     type = LearningContainerYearType.COURSE

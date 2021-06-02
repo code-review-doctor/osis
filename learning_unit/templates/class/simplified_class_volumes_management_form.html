@@ -43,11 +43,11 @@
             <th class="text-center" title="{% trans 'Planned classes' %}">{% trans 'Planned classes' %}</th>
             <th>=</th>
             <th>[</th>
-            <th class="text-center" title="{% trans 'Requirement entity' %}">{% trans 'Entity charges' %}</th>
+            <th class="text-center" title="{% trans 'Requirement entity' %}">{{ form.learning_unit_responsible_entity.initial }}</th>
             <th>+</th>
-            <th class="text-center" title="{% trans 'Additional requirement entity 1' %}">EC1</th>
+            <th class="text-center" title="{% trans 'Additional requirement entity 1' %}">{{ form.repartition_entity_2.initial }}</th>
             <th>+</th>
-            <th class="text-center" title="{% trans 'Additional requirement entity 2' %}">EC2</th>
+            <th class="text-center" title="{% trans 'Additional requirement entity 2' %}">{{ form.repartition_entity_3.initial }}</th>
             <th>]</th>
         </tr>
         </thead>
@@ -64,15 +64,15 @@
                 <td>{% bootstrap_field form.hourly_volume_partial_q2 show_label=False %}</td>
                 <td></td>
                 <td></td>
-                <td>{% bootstrap_field form.learning_unit_hourly_volume_total_annual show_label=False %}</td>
+                <td>{% bootstrap_field form.volume_total_annual show_label=False %}</td>
                 <td></td><td></td>
-                <td>{% bootstrap_field form.learning_unit_planned_classes show_label=False %}</td>
+                <td>{% bootstrap_field form.planned_classes show_label=False %}</td>
                 <td></td><td></td>
-                <td>{% bootstrap_field form.learning_unit_repartition_volume_requirement_entity show_label=False %}</td>
+                <td>{% bootstrap_field form.repartition_volume_requirement_entity show_label=False %}</td>
                 <td></td>
-                <td>???</td>
+                <td>{% bootstrap_field form.repartition_volume_entity_2 show_label=False %}</td>
                 <td></td>
-                <td>????</td>
+                <td>{% bootstrap_field form.repartition_volume_entity_3 show_label=False %}</td>
                 <td></td>
             </tr>
 
