@@ -12,7 +12,7 @@
 * The core business involves the administration of students, teachers,
 * courses, programs and so on.
 *
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+* Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -44,12 +44,18 @@
 
                         {% flag "learning_unit_create" %}
                             {% if "base.can_create_learningunit" in perms and can_create_partim %}
-                                <li {% if not is_person_linked_to_entity or proposal.type == 'CREATION' %}class="disabled"{% endif %}>
+                                <li {% if not is_person_linked_to_entity or proposal.type == 'CREATION' or learning_unit_year.has_class_this_year_or_in_future %}class="disabled"{% endif %} >
                                     <a id="new_partim" {% if is_person_linked_to_entity or proposal.type == 'CREATION' %}
                                        href="{% url 'learning_unit_create_partim' learning_unit_year_id=learning_unit_year.id %}" {% endif %}
                                         data-toggle="tooltip"
-                                        {% if proposal.type == 'CREATION' %} disabled
-                                        title="{% trans 'You cannot create a partim for a learning unit in proposition of creation' %}"{% endif %}>
+                                        {% if proposal.type == 'CREATION' or learning_unit_year.has_class_this_year_or_in_future %} disabled {% endif %}
+                                        {% if proposal.type == 'CREATION' %}
+                                            title="{% trans 'You cannot create a partim for a learning unit in proposition of creation' %}"
+                                        {% else %}
+                                            {% if learning_unit_year.has_class_this_year_or_in_future %}
+                                                title="{% trans 'You cannot create a partim for a learning unit having classes for this year or in the future' %}"
+                                            {% endif %}
+                                        {% endif %}>
                                         {% trans 'New partim' %}
                                     </a>
                                 </li>
