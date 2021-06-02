@@ -334,10 +334,10 @@ components:
           type: string
           example: "Candidature aux cours vacants"
         lecturing_volume:
-          type: number
+          type: string
           example: '10.0'
         practical_volume:
-          type: number
+          type: string
           example: '15.0'
         remark:
           type: string
@@ -353,10 +353,10 @@ components:
       type: object
       properties:
         lecturing_volume:
-          type: number
+          type: string
           example: '10.0'
         practical_volume:
-          type: number
+          type: string
           example: '15.0'
         remark:
           type: string
@@ -393,16 +393,16 @@ components:
           type: integer
           example: 2020
         lecturing_volume_total:
-          type: number
+          type: string
           example: '20.0'
         practical_volume_total:
-          type: number
+          type: string
           example: '50.0'
         lecturing_volume_available:
-          type: number
+          type: string
           example: '10.0'
         practical_volume_available:
-          type: number
+          type: string
           example: '40.0'
         title:
           type: string
