@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-27 09:29+0200\n"
+"POT-Creation-Date: 2021-05-28 14:31+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2334,6 +2334,18 @@ msgstr ""
 msgid "The"
 msgstr ""
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
@@ -2475,6 +2487,12 @@ msgid "The partim"
 msgstr ""
 
 msgid "The period to edit scores responsibles is not opened yet"
+msgstr ""
+
+#, python-format
+msgid ""
+"The planned classes number and the effective classes number of %(code_ue)s/"
+"%(component_code)s is not consistent"
 msgstr ""
 
 #, python-format
@@ -2875,8 +2893,17 @@ msgstr ""
 msgid "aim number"
 msgstr ""
 
+msgid "and"
+msgstr ""
+
 #, python-format
 msgid "and postponed until %(year)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"at least one classe volume is greater than the volume of the LU "
+"(%(sub_type)s)"
 msgstr ""
 
 msgid "author"
@@ -3004,6 +3031,9 @@ msgstr ""
 msgid "optional"
 msgstr ""
 
+msgid "or"
+msgstr ""
+
 msgid "parameters"
 msgstr ""
 
@@ -3079,6 +3109,9 @@ msgid "text in French"
 msgstr ""
 
 msgid "the"
+msgstr ""
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr ""
 
 #, python-format
