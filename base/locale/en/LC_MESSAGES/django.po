@@ -2830,7 +2830,7 @@ msgid "You are succesfully logout."
 msgstr ""
 
 msgid ""
-"You cannot create a partim for a learning unit having classes"
+"You cannot create a partim for a learning unit having classes for this year or in the future"
 msgstr ""
 
 msgid ""
