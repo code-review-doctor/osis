@@ -24,10 +24,10 @@
 ##############################################################################
 from typing import List, Optional
 
+from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
 from education_group.ddd.domain.group import GroupBuilder
 from education_group.ddd.domain.mini_training import MiniTrainingBuilder
-from education_group.ddd.domain.training import TrainingBuilder
 from osis_common.ddd import interface
 from education_group.ddd.business_types import *
 

@@ -129,7 +129,8 @@ class TrainingRepository(interface.AbstractRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List['TrainingIdentity']] = None, **kwargs) -> List['Training']:
         qs = _get_queryset_to_fetch_data_for_training(entity_ids)
-        return [_convert_education_group_year_to_training(education_group_year_db) for education_group_year_db in qs]
+        dtos = [_convert_education_group_year_to_dto(education_group_year_db) for education_group_year_db in qs]
+        return [TrainingBuilder.build_from_repository_dto(dto) for dto in dtos]
 
     @classmethod
     def search_trainings_last_occurence(cls, from_year: int) -> List['Training']:
@@ -149,7 +150,8 @@ class TrainingRepository(interface.AbstractRepository):
         ).exclude(
             acronym__startswith="common"
         )
-        return [_convert_education_group_year_to_training(row) for row in qs]
+        dtos = [_convert_education_group_year_to_dto(education_group_year_db) for education_group_year_db in qs]
+        return [TrainingBuilder.build_from_repository_dto(dto) for dto in dtos]
 
     @classmethod
     def delete(cls, entity_id: 'TrainingIdentity', **_) -> None:
