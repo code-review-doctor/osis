@@ -44,8 +44,8 @@ msgid "Class"
 msgstr "Classe"
 
 #, python-format
-msgid "Class %(class_identity)s successfully created."
-msgstr "La classe %(class_identity)s a été créée avec succès."
+msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr "La classe %(effective_class_complete_acronym)s a été créée avec succès."
 
 msgid "Class specific complement"
 msgstr "Complément spécifique à la classe"
