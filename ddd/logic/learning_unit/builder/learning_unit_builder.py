@@ -92,7 +92,7 @@ class LearningUnitBuilder(RootEntityBuilder):
                 dto.specific_title_en
             ),
             credits=dto.credits,
-            internship_subtype=InternshipSubtype[dto.internship_subtype],
+            internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),

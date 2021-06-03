@@ -34,7 +34,7 @@ from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
-class ClassIdentitificationView(PermissionRequiredMixin, TemplateView):
+class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
     template_name = "class/identification_tab.html"
     permission_required = 'base.can_access_class'
 
@@ -42,18 +42,19 @@ class ClassIdentitificationView(PermissionRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
-                'learning_unit_year_id': self.get_learning_unit_year_id(),
+                'learning_unit_year': self.get_learning_unit_year(),
                 'learning_unit': self.get_learning_unit(),
-                # 'effective_class': self.get_effective_class() TODO: after 5880
+                # 'effective_class': self.get_effective_class() TODO: after 5880,
+                'show_button': True
             }
         )
         return context
 
-    def get_learning_unit_year_id(self):
+    def get_learning_unit_year(self):
         return LearningUnitYear.objects.get(
             acronym=self.kwargs['learning_unit_code'],
             academic_year__year=self.kwargs['learning_unit_year']
-        ).pk
+        )
 
     def get_permission_object(self):
         return LearningClassYear.objects.filter(

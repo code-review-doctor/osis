@@ -1,4 +1,4 @@
-{% extends "learning_unit/layout_detail.html" %}
+{% extends "class_detail_layout.html" %}
 {% load i18n static %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -46,14 +46,14 @@
                                     </label>
                                     <br>
                                     <span id="id_acronym">
-                                        {{ learning_unit.code }} {{ effective_class.code }}
+                                        {{ effective_class.complete_acronym }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
                                     <label>
                                         UE
                                     </label>
-                                    <a id="full_acronym" href="{% url 'learning_unit' learning_unit_year_id %}">
+                                    <a id="full_acronym" href="{% url 'learning_unit' learning_unit_year.id %}">
                                         {{ learning_unit.code }}
                                     </a>
                                 </div>
@@ -70,7 +70,7 @@
                                         {% trans 'Internship subtype' %}
                                     </label>
                                     <span id="id_internship_subtype">
-                                        {{ learning_unit.internship_subtype }}
+                                        {{ learning_unit.internship_subtype|default_if_none:'-' }}
                                     </span>
                                 </div>
                             {% endblock content_row1 %}
@@ -90,7 +90,7 @@
                                         {% trans 'Periodicity' %}
                                     </label>
                                     <span id="id_periodicity">
-                                        {{ learning_unit.periodicity }}
+                                        {{ learning_unit.periodicity.value }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
@@ -107,7 +107,7 @@
                                         {% trans 'Language' %}
                                     </label>
                                     <span id="id_language">
-                                        {{ learning_unit.language_id }}
+                                        {{ learning_unit.language_id.code_iso }}
                                     </span>
                                 </div>
                             {% endblock content_row2 %}
@@ -191,7 +191,7 @@
                                     {% trans 'Faculty remark' %}
                                 </label>
                                 <span id="id_faculty_remark">
-                                        {{ learning_unit.remarks.faculty }}
+                                        {{ learning_unit.remarks.faculty|default_if_none:'-' }}
                                 </span>
                             </div>
                             <div>
@@ -199,7 +199,7 @@
                                     {% trans 'Other remark' %}
                                 </label>
                                 <span id="id_other_remark">
-                                        {{ learning_unit.remarks.publication_fr }}
+                                        {{ learning_unit.remarks.publication_fr|default_if_none:'-' }}
                                 </span>
                             </div>
                             <div>
@@ -207,7 +207,7 @@
                                     {% trans 'Other remark in English' %}
                                 </label>
                                 <span id="id_other_remark_en">
-                                        {{ learning_unit.remarks.publication_en }}
+                                        {{ learning_unit.remarks.publication_en|default_if_none:'-' }}
                                 </span>
                             </div>
                         </div>
@@ -278,7 +278,7 @@
                             </label>
                             <span id="id_vacant">
 {#                                          FIXME: missing field#}
-                                {% trans 'From' %} {{ learning_unit.start_year }} {% trans 'To' %} {{ learning_unit_year.end_year }}
+                                {% trans 'From' %} {{ learning_unit.start_year }} {% trans 'to' %} {{ learning_unit_year.end_year }}
                             </span>
                         {% endblock %}
 
