@@ -42,7 +42,7 @@ class AcademicYearRepository(IAcademicYearRepository):
     def search(cls, early_limit_year: Optional[int], **kwargs) -> List['AcademicYear']:
         objects = _get_common_queryset()
         if early_limit_year:
-            objects = _get_common_queryset().filter(year__gte=early_limit_year)
+            objects = objects.filter(year__gte=early_limit_year)
         objects_as_dict = objects.values('year', 'start_date', 'end_date')
         return [
             AcademicYearBuilder.build_from_repository_dto(AcademicYearDataDTO(**obj_as_dict))
@@ -59,4 +59,4 @@ class AcademicYearRepository(IAcademicYearRepository):
 
 
 def _get_common_queryset():
-    return AcademicYearDatabase.objects.all()
+    return AcademicYearDatabase.objects.all().order_by("-year")

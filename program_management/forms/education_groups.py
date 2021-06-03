@@ -56,7 +56,7 @@ VERSION_CHOICES = (
 
 
 class GroupFilter(FilterSet):
-    academic_year = filters.ChoiceFilter(
+    academic_year__year = filters.ChoiceFilter(
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
@@ -169,8 +169,8 @@ class GroupFilter(FilterSet):
     def __init_academic_year_field(self):
         all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand())
         choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
-        self.form.fields['academic_year'].choices = choices
-        self.form.fields['academic_year'].initial = \
+        self.form.fields['academic_year__year'].choices = choices
+        self.form.fields['academic_year__year'].initial = \
             [
                 academic_year.year for academic_year in all_academic_year
                 if academic_year.year == EducationGroupSwitchCalendar().get_target_years_opened()[0]
