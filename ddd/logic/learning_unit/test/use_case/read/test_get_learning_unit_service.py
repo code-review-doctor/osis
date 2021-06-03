@@ -50,7 +50,7 @@ class TestGetLearningUnitService(SimpleTestCase):
         self.learning_unit_repository.save(self.learning_unit)
         self.command = GetLearningUnitCommand(code=self.learning_unit.code, year=self.learning_unit.year)
 
-    def test_mapping_command_to_domain_obj(self):
+    def test_get_correct_learning_unit(self):
         learning_unit = get_learning_unit_service.get_learning_unit(
             self.command,
             self.learning_unit_repository,
