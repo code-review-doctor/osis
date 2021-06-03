@@ -335,7 +335,6 @@ class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
 
 
 class TestGetIndirectParents(DDDTestCase):
-
     def setUp(self) -> None:
         super().setUp()
         self.program_tree = OSIS2MFactory(year=2020, end_year=2020)[0].get_tree()

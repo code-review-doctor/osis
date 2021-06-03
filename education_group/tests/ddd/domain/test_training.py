@@ -23,14 +23,8 @@
 # ############################################################################
 from copy import copy, deepcopy
 
-import mock
-from django.test import SimpleTestCase
-
-from education_group.ddd.domain import training, exception
-from education_group.ddd.domain._co_organization import Coorganization
-from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached
 from education_group.tests.ddd.factories.co_organization import CoorganizationFactory
-from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory, DiplomaAimIdentityFactory
+from education_group.tests.ddd.factories.diploma import DiplomaFactory
 from education_group.tests.ddd.factories.training import TrainingFactory
 from testing.testcases import DDDTestCase
 

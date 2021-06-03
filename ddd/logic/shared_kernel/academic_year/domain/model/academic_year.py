@@ -35,7 +35,11 @@ class AcademicYearIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
 
     def __str__(self):
-        return u"%s-%s" % (self.year, str(self.year + 1)[-2:])
+        return self.get_verbose_year(self.year)
+
+    @staticmethod
+    def get_verbose_year(year: int) -> str:
+        return u"%s-%s" % (year, str(year + 1)[-2:])
 
 
 @attr.s(slots=True, hash=False, eq=False)

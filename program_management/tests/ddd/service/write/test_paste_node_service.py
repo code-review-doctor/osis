@@ -216,7 +216,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
 
         link_identity = paste_element_service.paste_element(cmd)
         tree_version = self.reload_tree_version()
-        link = tree_version.get_tree().get_link_by_identity(link_identity)
+        link = tree_version.get_tree().get_link_from_identity(link_identity)
 
         self.assertFalse(link.is_mandatory)
 
@@ -235,7 +235,7 @@ class TestPasteLearningUnitNodeService(DDDTestCase):
 
         link_identity = paste_element_service.paste_element(cmd)
         tree_version = self.reload_tree_version()
-        link = tree_version.get_tree().get_link_by_identity(link_identity)
+        link = tree_version.get_tree().get_link_from_identity(link_identity)
 
         self.assertTrue(link.is_reference())
 

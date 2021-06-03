@@ -36,6 +36,8 @@ from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.ddd import command
+from ddd.logic.formation_catalogue.domain.model._first_year_bachelor import FirstYearBachelor, FirstYearBachelorIdentity
+from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
 from education_group.ddd.repository import training as training_repository
 from education_group.ddd.service.write import copy_training_service
@@ -156,3 +158,25 @@ class TrainingFactory(factory.Factory):
         )
 
 
+class FirstYearBachelorIdentityFactory(factory.Factory):
+    class Meta:
+        model = FirstYearBachelorIdentity
+        abstract = False
+
+
+class FirstYearBachelorFactory(factory.Factory):
+    class Meta:
+        model = FirstYearBachelor
+        abstract = False
+
+    entity_id = factory.SubFactory(FirstYearBachelorIdentityFactory)
+    administration_entity = factory.SubFactory(EntityFactory)
+
+
+class BachelorFactory(TrainingFactory):
+    class Meta:
+        model = Bachelor
+        abstract = False
+
+    first_year_bachelor = factory.SubFactory(FirstYearBachelorFactory)
+    type = TrainingType.BACHELOR

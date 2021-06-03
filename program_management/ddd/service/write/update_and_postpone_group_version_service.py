@@ -37,6 +37,7 @@ from program_management.ddd.repositories import program_tree_version as tree_ver
 from program_management.ddd.service.write import copy_program_version_service
 
 
+# DO NOT SET @transaction.atomic() because it breaks the update in case of GroupCopyConsistencyException
 def update_and_postpone_group_version(
         postpone_cmd: command.PostponeGroupVersionCommand
 ) -> List['ProgramTreeVersionIdentity']:

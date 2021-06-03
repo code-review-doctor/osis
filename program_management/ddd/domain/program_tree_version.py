@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union, Set
+from typing import Union, Set, Dict
 
 import attr
 
@@ -110,22 +110,25 @@ class ProgramTreeVersionBuilder:
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
-            existing_nodes: Set['Node'],
-            node_code_generator: 'GenerateNodeCode'
+            existing_group_nodes: Set['Node'],
+            mapping_learning_unit_nodes: Dict['NodeIdentity', 'Node'],
+            node_code_generator: 'GenerateNodeCode',
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
         if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
             program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_nodes,
+                existing_group_nodes,
+                mapping_learning_unit_nodes
             )
         else:
             program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_nodes,
-                node_code_generator
+                existing_group_nodes,
+                node_code_generator,
+                mapping_learning_unit_nodes
             )
         return to_tree_version
 

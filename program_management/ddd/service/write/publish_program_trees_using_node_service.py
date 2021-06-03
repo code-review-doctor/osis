@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import logging
 from threading import Thread
 from typing import List
 
@@ -38,6 +39,11 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.service.get_node_publish_url import GetNodePublishUrl
 from program_management.ddd.repositories import program_tree as program_tree_repository
 from program_management.ddd.service.read import search_program_trees_using_node_service
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 @transaction.atomic()
@@ -60,9 +66,11 @@ def _bulk_publish(nodes: List['NodeGroupYear']) -> None:
     error_root_nodes_ids = []
     for node in nodes:
         publish_url = GetNodePublishUrl.get_url_from_node(node)
+        logger.info("Call refresh pedagogy endpoint: " + publish_url)
         try:
             __publish(publish_url)
-        except Exception:
+        except Exception as e:
+            logger.warning("Failed to refresh pedagogy endpoint: " + publish_url + " Error: " + str(e))
             error_root_nodes_ids.append(node.entity_id)
 
     if error_root_nodes_ids:

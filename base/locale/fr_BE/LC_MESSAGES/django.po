@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-21 13:46+0200\n"
+"POT-Creation-Date: 2021-05-18 11:12+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -739,6 +739,9 @@ msgstr "Remise du mémoire"
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
 
+msgid "Dissertations"
+msgstr "Mémoires"
+
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
@@ -1089,7 +1092,7 @@ msgid "Funding international cooperation CCD/CUD direction"
 msgstr "Orientation coopération internationale CCD/CUD"
 
 msgid "Gathering"
-msgstr "Regroupement"
+msgstr "Groupement"
 
 msgid "Gender"
 msgstr "Genre"
@@ -2333,6 +2336,9 @@ msgstr "Parcours de l'étudiant"
 msgid "Student search"
 msgstr "Recherche étudiants"
 
+msgid "Student's dissertations management"
+msgstr "Gestion des mémoires des étudiants"
+
 msgid "Students"
 msgstr "Étudiants"
 
@@ -2562,7 +2568,8 @@ msgid "The partim"
 msgstr "Le partim"
 
 msgid "The period to edit scores responsibles is not opened yet"
-msgstr "La période d'édition des responsables de notes n'est pas encore ouverte."
+msgstr ""
+"La période d'édition des responsables de notes n'est pas encore ouverte."
 
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
@@ -2685,8 +2692,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application"
-msgstr "L'unité d'enseignement a au moins une candidature"
+msgid "This learning unit has application this year or in the future"
+msgstr "L'unité d'enseignement a au moins une candidature cette année ou dans le futur"
 
 #, python-format
 msgid ""
@@ -2751,9 +2758,6 @@ msgstr "Formation intitulé"
 
 msgid "Trainings"
 msgstr "Formations"
-
-msgid "Trainings/gathering"
-msgstr "Formations/regroupements"
 
 msgid "Transformation"
 msgstr "Transformation"
@@ -2934,6 +2938,12 @@ msgstr "Oui, je confirme."
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year or in the future"
+msgstr ""
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant une ou plusieurs classes cette année ou dans "
+"le futur"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
