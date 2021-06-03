@@ -29,6 +29,7 @@ import attr
 
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -67,6 +68,10 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
             self.entity_id.class_code
         )
+
+    def update(self, cmd: UpdateEffectiveClassCommand) -> None:
+        # ValidatorList (même contenu que création)
+        pass  # TODO :: to implement
 
 
 class PracticalEffectiveClass(EffectiveClass):
