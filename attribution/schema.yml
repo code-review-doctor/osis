@@ -440,10 +440,10 @@ components:
           type: string
           example: "Introduction au droit"
         lecturing_volume:
-          type: number
+          type: string
           example: '10.0'
         practical_volume:
-          type: number
+          type: string
           example: '15.0'
         function:
           $ref: '#/components/schemas/AttributionFunctionEnum'
@@ -460,16 +460,16 @@ components:
           description: 'Start year of attribution'
           nullable: true
         total_lecturing_volume_course:
-          type: number
+          type: string
           example: '50.0'
         total_practical_volume_course:
-          type: number
+          type: string
           example: '30.0'
         lecturing_volume_available:
-          type: number
+          type: string
           example: '50.0'
         practical_volume_available:
-          type: number
+          type: string
           example: '30.0'
         unavailable_renewal_reason:
           type: string
@@ -498,10 +498,10 @@ components:
           type: integer
           example: 2020
         lecturing_volume:
-          type: number
+          type: string
           example: '10.0'
         practical_volume:
-          type: number
+          type: string
           example: '15.0'
         remark:
           type: string
