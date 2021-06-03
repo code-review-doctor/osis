@@ -23,22 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+from functools import partial
 from typing import List
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.ddd.utils.business_validator import execute_functions_and_aggregate_exceptions
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
 from ddd.logic.learning_unit.domain.validator.exceptions import CodeClassAlreadyExistForUeException, \
     AnnualVolumeInvalidException
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
 
-class CreateEffectiveClass(interface.DomainService):
+class SaveEffectiveClass(interface.DomainService):
 
     @classmethod
     def create(
@@ -46,37 +44,54 @@ class CreateEffectiveClass(interface.DomainService):
             learning_unit: 'LearningUnit',
             cmd: 'CreateEffectiveClassCommand',
             all_existing_class_identities: List['EffectiveClassIdentity'],
-            learning_unit_repository: 'ILearningUnitRepository'
     ):
-        CanAccessCreationEffectiveClass().check(
-            learning_unit=learning_unit,
-            learning_unit_repository=learning_unit_repository
+        volumes_consistency_with_learning_unit = partial(
+            _raise_if_class_volumes_inconsistent_with_learning_unit_volumes,
+            learning_unit,
+            cmd.volume_first_quadrimester,
+            cmd.volume_second_quadrimester
+        )
+        __, effective_class = execute_functions_and_aggregate_exceptions(
+            volumes_consistency_with_learning_unit,
+            partial(_raise_if_class_code_already_exists, all_existing_class_identities, cmd.class_code, learning_unit),
+            partial(EffectiveClassBuilder.build_from_command, cmd, learning_unit),
         )
 
-        exceptions = set()  # type Set[BusinessException]
-
-        if _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(learning_unit, cmd):
-            exceptions.add(AnnualVolumeInvalidException(learning_unit))
-
-        if all_existing_class_identities:
-            for class_id in all_existing_class_identities:
-                if class_id.learning_unit_identity == learning_unit.entity_id and class_id.class_code == cmd.class_code:
-                    exceptions.add(CodeClassAlreadyExistForUeException(learning_unit.entity_id, cmd.class_code))
-
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
-
-        effective_class = EffectiveClassBuilder.build_from_command(
-            cmd=cmd,
-            learning_unit=learning_unit
-        )
         return effective_class
 
+    @classmethod
+    def update(
+            cls,
+            learning_unit: 'LearningUnit',
+            effective_class: 'EffectiveClass',
+            cmd: 'UpdateEffectiveClassCommand',
+            all_existing_class_identities: List['EffectiveClassIdentity'],
+    ) -> None:
+        volumes_consistency_with_learning_unit = partial(
+            _raise_if_class_volumes_inconsistent_with_learning_unit_volumes,
+            learning_unit,
+            cmd.volume_first_quadrimester,
+            cmd.volume_second_quadrimester
+        )
+        execute_functions_and_aggregate_exceptions(
+            volumes_consistency_with_learning_unit,
+            partial(_raise_if_class_code_already_exists, all_existing_class_identities, cmd.class_code, learning_unit),
+            partial(effective_class.update, cmd),
+        )
 
-def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
+
+def _raise_if_class_code_already_exists(all_existing_class_identities, class_code: str, learning_unit):
+    if all_existing_class_identities:
+        for class_id in all_existing_class_identities:
+            if class_id.learning_unit_identity == learning_unit.entity_id and class_id.class_code == class_code:
+                raise CodeClassAlreadyExistForUeException(learning_unit.entity_id, class_code)
+
+
+def _raise_if_class_volumes_inconsistent_with_learning_unit_volumes(
         learning_unit: 'LearningUnit',
-        cmd: 'CreateEffectiveClassCommand'
-) -> Decimal:
+        volume_first_quadrimester: float,
+        volume_second_quadrimester: float
+) -> None:
     practical_part = learning_unit.practical_part
     lecturing_part = learning_unit.lecturing_part
 
@@ -85,5 +100,6 @@ def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
     else:
         volume_annual = lecturing_part.volumes.volume_annual
 
-    sum_q1_q2 = cmd.volume_first_quadrimester + cmd.volume_second_quadrimester
-    return volume_annual <= 0 or sum_q1_q2 != volume_annual
+    sum_q1_q2 = volume_first_quadrimester + volume_second_quadrimester
+    if volume_annual <= 0 or sum_q1_q2 != volume_annual:
+        raise AnnualVolumeInvalidException(learning_unit)

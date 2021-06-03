@@ -3,7 +3,8 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand, \
+    UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
 from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ShouldBeAlphanumericValidator
@@ -79,6 +80,19 @@ class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 @attr.s(frozen=True, slots=True)
 class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     command = attr.ib(type=CreateEffectiveClassCommand)
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldBeAlphanumericValidator(self.command.class_code)
+        ]
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return []
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    command = attr.ib(type=UpdateEffectiveClassCommand)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [

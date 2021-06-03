@@ -148,4 +148,13 @@ class GetEffectiveClassCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class UpdateEffectiveClassCommand(interface.CommandRequest):
-    pass # TODO :: to implement
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title_fr = attr.ib(type=str)
+    title_en = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
+    derogation_quadrimester = attr.ib(type=Optional[str])
+    session_derogation = attr.ib(type=Optional[str])
+    volume_first_quadrimester = attr.ib(type=float)
+    volume_second_quadrimester = attr.ib(type=float)

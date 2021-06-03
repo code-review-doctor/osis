@@ -33,10 +33,10 @@ from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepo
 from osis_common.ddd import interface
 
 
-class CanAccessCreationEffectiveClass(interface.DomainService):
+class CanCreateEffectiveClass(interface.DomainService):
 
     @classmethod
-    def check(
+    def raise_if_can_not_access(
             cls,
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'ILearningUnitRepository',
