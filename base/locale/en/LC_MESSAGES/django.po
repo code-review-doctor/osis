@@ -3151,7 +3151,3 @@ msgstr ""
 msgid "yes,no"
 msgstr ""
 
-#~ msgid "On the file: direct access or access with additional training"
-#~ msgstr ""
-#~ "Based on application: accepted, conditional on further training, or "
-#~ "refusal"
