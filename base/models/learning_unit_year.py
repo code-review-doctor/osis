@@ -649,8 +649,8 @@ def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[
 
 
 def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_component_yr):
-    return effective_class.hourly_volume_partial_q1 > learning_component_yr.hourly_volume_partial_q1 or \
-           effective_class.hourly_volume_partial_q2 > learning_component_yr.hourly_volume_partial_q2
+    return (effective_class.hourly_volume_partial_q1 or 0) > (learning_component_yr.hourly_volume_partial_q1 or 0) or \
+           (effective_class.hourly_volume_partial_q2 or 0) > (learning_component_yr.hourly_volume_partial_q2 or 0)
 
 
 def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_component_yr):
