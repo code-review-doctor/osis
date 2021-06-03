@@ -96,6 +96,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
+            partims=[]  # FIXME: OSIS-4270
         )
 
     @classmethod
