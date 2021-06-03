@@ -462,17 +462,22 @@ components:
         total_lecturing_volume_course:
           type: string
           example: '50.0'
+          nullable: true
         total_practical_volume_course:
           type: string
           example: '30.0'
+          nullable: true
         lecturing_volume_available:
           type: string
           example: '50.0'
+          nullable: true
         practical_volume_available:
           type: string
           example: '30.0'
+          nullable: true
         unavailable_renewal_reason:
           type: string
+          nullable: true
         is_renewable:
           type: boolean
     ApplicationList:
