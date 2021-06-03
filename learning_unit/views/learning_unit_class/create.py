@@ -34,7 +34,8 @@ from django.views.generic import FormView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages, display_error_messages
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEffectiveClassCommand
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEffectiveClassCommand, \
+    GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
@@ -103,6 +104,13 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         )
 
     def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
-        return _("Class %(class_identity)s successfully created.") % {
-            "class_identity": effective_class_identity,
+        effective_class = message_bus_instance.invoke(
+            GetEffectiveClassCommand(
+                class_code=effective_class_identity.class_code,
+                learning_unit_code=effective_class_identity.learning_unit_identity.code,
+                learning_unit_year=effective_class_identity.learning_unit_identity.year
+            )
+        )
+        return _("Class %(effective_class_complete_acronym)s successfully created.") % {
+            "effective_class_complete_acronym": effective_class.complete_acronym
         }

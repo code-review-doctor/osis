@@ -60,6 +60,14 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     session_derogation = attr.ib(type=DerogationSession)
     volumes = attr.ib(type=ClassVolumes)
 
+    @property
+    def complete_acronym(self):
+        return "{}{}{}".format(
+            self.entity_id.learning_unit_identity.code,
+            '-' if isinstance(self, LecturingEffectiveClass) else '_',
+            self.entity_id.class_code
+        )
+
 
 class PracticalEffectiveClass(EffectiveClass):
     pass
