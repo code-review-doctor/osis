@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 from typing import Type
 
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
@@ -31,16 +30,14 @@ from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model._campus import TeachingPlace
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.effective_class import PracticalEffectiveClass, \
-    LecturingEffectiveClass, EffectiveClass, EffectiveClassIdentity
+    LecturingEffectiveClass, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.service.can_create_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreateEffectiveClassValidatorList
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
 from osis_common.ddd import interface
 
 
@@ -50,27 +47,17 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             cls,
             cmd: 'CreateEffectiveClassCommand',
             learning_unit: 'LearningUnit',
-            all_existing_class_identities: List['EffectiveClassIdentity'],
-            learning_unit_repository: 'ILearningUnitRepository'
     ) -> 'EffectiveClass':
-        CreateEffectiveClassValidatorList(
-            command=cmd,
-        ).validate()
-        CanCreateEffectiveClass().check(
-            learning_unit=learning_unit,
-            all_existing_class_identities=all_existing_class_identities,
-            cmd=cmd,
-            learning_unit_repository=learning_unit_repository
-        )
+        CreateEffectiveClassValidatorList(command=cmd).validate()
 
         effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
-
+        quadri = cmd.derogation_quadrimester
         return _define_effective_class_type(learning_unit)(
             entity_id=effective_class_identity,
             titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
-            teaching_place=TeachingPlace(place=cmd.place, organization_name=cmd.organization_name),
-            derogation_quadrimester=DerogationQuadrimester(cmd.derogation_quadrimester),
-            session_derogation=DerogationSession(cmd.session_derogation),
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(cmd.teaching_place_uuid),
+            derogation_quadrimester=DerogationQuadrimester[quadri] if quadri else None,
+            session_derogation=DerogationSession[cmd.session_derogation] if cmd.session_derogation else None,
             volumes=ClassVolumes(
                 volume_first_quadrimester=cmd.volume_first_quadrimester,
                 volume_second_quadrimester=cmd.volume_second_quadrimester,
@@ -90,10 +77,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
                 fr=dto_object.title_fr,
                 en=dto_object.title_en
             ),
-            teaching_place=TeachingPlace(
-                place=dto_object.teaching_place,
-                organization_name=dto_object.teaching_organization
-            ),
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester(dto_object.derogation_quadrimester),
             session_derogation=dto_object.session_derogation,
             volumes=ClassVolumes(
@@ -103,20 +87,13 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         )
 
 
-def _get_effective_class_type_with_dto(
-        dto_object: 'EffectiveClassFromRepositoryDTO'
-) -> Type['EffectiveClass']:
+def _get_effective_class_type_with_dto(dto_object: 'EffectiveClassFromRepositoryDTO') -> Type['EffectiveClass']:
     return PracticalEffectiveClass if dto_object.class_type == PRACTICAL_EXERCISES else LecturingEffectiveClass
 
 
-def _define_effective_class_type(learning_unit: LearningUnit) -> Type[EffectiveClass]:
-    class_type = None
-    lecturing_annual_volume = learning_unit.lecturing_part.volumes.volume_annual
-    practical_annual_volume = learning_unit.practical_part.volumes.volume_annual
-    if lecturing_annual_volume > 0.0 and practical_annual_volume > 0.0:
-        class_type = LecturingEffectiveClass
-    elif lecturing_annual_volume > 0.0:
-        class_type = LecturingEffectiveClass
-    elif practical_annual_volume > 0.0:
-        class_type = PracticalEffectiveClass
-    return class_type
+def _define_effective_class_type(learning_unit: 'LearningUnit') -> Type['EffectiveClass']:
+    lecturing_part = learning_unit.lecturing_part
+    practical_part = learning_unit.practical_part
+    if practical_part and not lecturing_part:
+        return PracticalEffectiveClass
+    return LecturingEffectiveClass

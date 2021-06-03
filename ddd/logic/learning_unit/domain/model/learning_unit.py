@@ -23,21 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 import attr
 
 from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import CreatePartimCommand
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
 from ddd.logic.learning_unit.domain.model._partim import Partim, PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
-from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart
+from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, PracticalPart, Volumes
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd import interface
 
@@ -64,14 +67,19 @@ class LearningUnit(interface.RootEntity):
     titles = attr.ib(type=Titles)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=InternshipSubtype)
+    teaching_place = attr.ib(type=UclouvainCampusIdentity)
     responsible_entity_identity = attr.ib(type=UCLEntityIdentity)
+    attribution_entity_identity = attr.ib(type=Optional[UCLEntityIdentity])
     periodicity = attr.ib(type=PeriodicityEnum)
     language_id = attr.ib(type=LanguageIdentity)
     remarks = attr.ib(type=Remarks)
     partims = attr.ib(type=List[Partim])
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
+    derogation_session = attr.ib(type=DerogationSession)
     lecturing_part = attr.ib(type=LecturingPart)
     practical_part = attr.ib(type=PracticalPart)
+    professional_integration = attr.ib(type=bool)
+    is_active = attr.ib(type=bool)
 
     @property
     def academic_year(self) -> 'AcademicYearIdentity':
@@ -100,6 +108,15 @@ class LearningUnit(interface.RootEntity):
 
     def is_external(self) -> bool:
         return isinstance(self, ExternalLearningUnit)
+
+    def has_volume(self) -> bool:
+        return self.lecturing_part is not None or self.practical_part is not None
+
+    def has_practical_volume(self) -> bool:
+        return self.practical_part and self.practical_part.volumes.volume_annual
+
+    def has_lecturing_volume(self) -> bool:
+        return self.lecturing_part and self.lecturing_part.volumes.volume_annual
 
 
 class CourseLearningUnit(LearningUnit):

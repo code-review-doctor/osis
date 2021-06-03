@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import List, Type, Union
+from typing import List, Type, Union, Optional
 
 import attr
 
@@ -32,10 +32,12 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition
 from ddd.logic.learning_unit.domain.model._partim import PartimBuilder
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.model._titles import Titles
@@ -47,7 +49,8 @@ from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIde
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import \
     CopyLearningUnitToNextYearValidatorList, \
     CreateLearningUnitValidatorList
-from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO
+from ddd.logic.learning_unit.dtos import LearningUnitFromRepositoryDTO, EntityCode
+from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
 from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
 from osis_common.ddd.interface import RootEntityBuilder
@@ -78,6 +81,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=responsible_entity_identity,
+            attribution_entity_identity=None,  # TODO :: to implement and unit test
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
@@ -85,16 +89,34 @@ class LearningUnitBuilder(RootEntityBuilder):
                 part_type=LECTURING,
                 volume_q1=dto.lecturing_volume_q1,
                 volume_q2=dto.lecturing_volume_q2,
-                volume_annual=dto.lecturing_volume_annual
+                volume_annual=dto.lecturing_volume_annual,
+                planned_classes=None,  # TODO :: to implement and unit test
+                repartition_entity_1=responsible_entity_identity,
+                repartition_entity_2=None,  # TODO :: to implement and unit test
+                repartition_entity_3=None,  # TODO :: to implement and unit test
+                repartition_volume_entity_1=None,  # TODO :: to implement and unit test
+                repartition_volume_entity_2=None,  # TODO :: to implement and unit test
+                repartition_volume_entity_3=None,  # TODO :: to implement and unit test
             ),
             practical_part=_build_part(
                 part_type=PRACTICAL_EXERCISES,
                 volume_q1=dto.practical_volume_q1,
                 volume_q2=dto.practical_volume_q2,
-                volume_annual=dto.practical_volume_annual
+                volume_annual=dto.practical_volume_annual,
+                planned_classes=None,  # TODO :: to implement and unit test
+                repartition_entity_1=responsible_entity_identity,
+                repartition_entity_2=None,  # TODO :: to implement and unit test
+                repartition_entity_3=None,  # TODO :: to implement and unit test
+                repartition_volume_entity_1=None,  # TODO :: to implement and unit test
+                repartition_volume_entity_2=None,  # TODO :: to implement and unit test
+                repartition_volume_entity_3=None,  # TODO :: to implement and unit test
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester],
-            partims=[]
+            derogation_session=None,  # TODO :: to implement and unit test
+            partims=[],
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
+            professional_integration=False,  # TODO :: to implement and unit test
+            is_active=False,  # TODO :: to implement and unit test
         )
 
     @classmethod
@@ -102,6 +124,13 @@ class LearningUnitBuilder(RootEntityBuilder):
             cls,
             dto: 'LearningUnitFromRepositoryDTO',
     ) -> 'LearningUnit':
+        attribution_entity = None
+        if dto.attribution_entity_code:
+            attribution_entity = UclEntityIdentityBuilder.build_from_code(dto.attribution_entity_code)
+        derogation_session = None
+        if dto.derogation_session:
+            enum_key = next(key for key, value in DerogationSession.choices() if value == dto.derogation_session)
+            derogation_session = DerogationSession[enum_key]
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
             titles=_build_titles(
@@ -113,6 +142,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             credits=dto.credits,
             internship_subtype=InternshipSubtype[dto.internship_subtype] if dto.internship_subtype else None,
             responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(dto.responsible_entity_code),
+            attribution_entity_identity=attribution_entity,
             periodicity=PeriodicityEnum[dto.periodicity],
             language_id=_build_language(dto.iso_code),
             remarks=_build_remarks(dto.remark_faculty, dto.remark_publication_fr, dto.remark_publication_en),
@@ -120,19 +150,37 @@ class LearningUnitBuilder(RootEntityBuilder):
                 part_type=LECTURING,
                 volume_q1=dto.lecturing_volume_q1,
                 volume_q2=dto.lecturing_volume_q2,
-                volume_annual=dto.lecturing_volume_annual
+                volume_annual=dto.lecturing_volume_annual,
+                planned_classes=dto.lecturing_planned_classes,
+                repartition_entity_1=dto.responsible_entity_code,
+                repartition_entity_2=dto.repartition_entity_2,
+                repartition_entity_3=dto.repartition_entity_3,
+                repartition_volume_entity_1=dto.lecturing_volume_repartition_responsible_entity,
+                repartition_volume_entity_2=dto.lecturing_volume_repartition_entity_2,
+                repartition_volume_entity_3=dto.lecturing_volume_repartition_entity_3,
             ),
             practical_part=_build_part(
                 part_type=PRACTICAL_EXERCISES,
                 volume_q1=dto.practical_volume_q1,
                 volume_q2=dto.practical_volume_q2,
-                volume_annual=dto.practical_volume_annual
+                volume_annual=dto.practical_volume_annual,
+                planned_classes=dto.practical_planned_classes,
+                repartition_entity_1=dto.responsible_entity_code,
+                repartition_entity_2=dto.repartition_entity_2,
+                repartition_entity_3=dto.repartition_entity_3,
+                repartition_volume_entity_1=dto.practical_volume_repartition_responsible_entity,
+                repartition_volume_entity_2=dto.practical_volume_repartition_entity_2,
+                repartition_volume_entity_3=dto.practical_volume_repartition_entity_3,
             ),
             derogation_quadrimester=DerogationQuadrimester[dto.derogation_quadrimester]
             if dto.derogation_quadrimester else None,
+            derogation_session=derogation_session,
             partims=[
                 PartimBuilder.build_from_dto(partim_dto) for partim_dto in dto.partims
-            ]
+            ],
+            teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
+            professional_integration=dto.professional_integration,
+            is_active=dto.is_active,
         )
 
     @classmethod
@@ -198,14 +246,33 @@ def _build_part(
         part_type: str,
         volume_q1: Decimal,
         volume_q2: Decimal,
-        volume_annual: Decimal
+        volume_annual: Decimal,
+        planned_classes: int,
+        repartition_entity_1: EntityCode,
+        repartition_entity_2: Optional['EntityCode'],
+        repartition_entity_3: Optional['EntityCode'],
+        repartition_volume_entity_1: Decimal,
+        repartition_volume_entity_2: Optional[Decimal],
+        repartition_volume_entity_3: Optional[Decimal],
 ) -> Union['LecturingPart', 'PracticalPart', None]:
     if not volume_annual:
-        return  # TODO :: unit test
+        return
+    entity_1 = UclEntityIdentityBuilder.build_from_code(repartition_entity_1)
+    entity_2 = UclEntityIdentityBuilder.build_from_code(repartition_entity_2) if repartition_entity_2 else None
+    entity_3 = UclEntityIdentityBuilder.build_from_code(repartition_entity_3) if repartition_entity_3 else None
     volumes = Volumes(
         volume_first_quadrimester=volume_q1,
         volume_second_quadrimester=volume_q2,
-        volume_annual=volume_annual
+        volume_annual=volume_annual,
+        planned_classes=planned_classes,
+        volumes_repartition=FinancialVolumesRepartition(
+            responsible_entity=entity_1,
+            entity_2=entity_2,
+            entity_3=entity_3,
+            repartition_volume_responsible_entity=repartition_volume_entity_1,
+            repartition_volume_entity_2=repartition_volume_entity_2,
+            repartition_volume_entity_3=repartition_volume_entity_3,
+        )
     )
     if part_type == LECTURING:
         return LecturingPart(volumes=volumes)

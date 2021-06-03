@@ -33,7 +33,6 @@ from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepo
 from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
 
 
-@transaction.atomic()
 def create_learning_unit(
         cmd: CreateLearningUnitCommand,
         learning_unit_repository: ILearningUnitRepository,

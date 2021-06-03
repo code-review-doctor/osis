@@ -25,9 +25,8 @@
 ##############################################################################
 
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.service.can_create_effective_class import CanCreateEffectiveClass
+from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanAccessCreationEffectiveClass
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
@@ -40,4 +39,7 @@ def check_can_create_effective_class(
         year=cmd.learning_unit_year
     )
     learning_unit = learning_unit_repository.get(learning_unit_identity)
-    CanCreateEffectiveClass.check(learning_unit, learning_unit_repository, cmd, [])  # FIXME
+    CanAccessCreationEffectiveClass().check(
+        learning_unit=learning_unit,
+        learning_unit_repository=learning_unit_repository
+    )

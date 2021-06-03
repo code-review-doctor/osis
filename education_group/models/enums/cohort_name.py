@@ -23,15 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from django.utils.translation import gettext_lazy as _
 
-from osis_common.ddd import interface
+from base.models.utils.utils import ChoiceEnum
+
+FIRST_YEAR = "FIRST_YEAR"
 
 
-@attr.s(frozen=True, slots=True, str=False)
-class TeachingPlace(interface.ValueObject):
-    place = attr.ib(type=str)
-    organization_name = attr.ib(type=str)
-
-    def __str__(self):
-        return "{name} - {university_name}".format(name=self.place, university_name=self.organization_name)
+class CohortName(ChoiceEnum):
+    FIRST_YEAR = _("First year bachelor")
