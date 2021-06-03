@@ -23,18 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.enums.quadrimesters import DerogationQuadrimester
-from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
-from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
-from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand, CreateLearningUnitCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
+    LearningUnitHasPartimException, LearningUnitHasNoVolumeException
+from ddd.logic.learning_unit.test.factory.learning_unit import LDROI1002ExternalLearningUnitFactory, \
+    LDROI1001CourseLearningUnitFactory, LDROI1003CourseWithPartimsLearningUnitFactory, \
+    LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
@@ -42,56 +40,57 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 class TestCheckCanCreateEffectiveClass(TestCase):
 
     def setUp(self):
-        self.code = 'LTEST2021'
-        self.year = 2020
-        self.cmd = CanCreateEffectiveClassCommand(learning_unit_code=self.code, learning_unit_year=self.year)
-
         self.learning_unit_repository = LearningUnitRepository()
 
-        self.create_lu_command = _build_create_learning_unit_command(self.code, self.year)
-        self.learning_unit = _create_lu(self.create_lu_command)
+        self.LDROI1001_course = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(self.LDROI1001_course)
 
-    @mock.patch.object(LearningUnitRepository, 'get')
-    def test_check_cannot_create_effective_class(self, mock_lu):
-        with self.assertRaises(MultipleBusinessExceptions):
-            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+        self.LDROI1002_external = LDROI1002ExternalLearningUnitFactory()
+        self.learning_unit_repository.save(self.LDROI1002_external)
 
-    @mock.patch.object(LearningUnitRepository, 'get')
-    def test_check_can_create_effective_class(self, mock_lu):
-        mock_lu.return_value = self.learning_unit
+        self.LDROI1003_course_with_partims = LDROI1003CourseWithPartimsLearningUnitFactory()
+        self.learning_unit_repository.save(self.LDROI1003_course_with_partims)
+
+        self.LDROI1004_course_without_volumes = LDROI1004CourseWithoutVolumesLearningUnitFactory()
+        self.learning_unit_repository.save(self.LDROI1004_course_without_volumes)
+
+    def test_check_can_create_effective_class(self):
+        self.cmd = CanCreateEffectiveClassCommand(
+            learning_unit_code=self.LDROI1001_course.entity_id.code,
+            learning_unit_year=self.LDROI1001_course.entity_id.academic_year.year
+        )
+
         self.assertIsNone(check_can_create_effective_class(self.cmd, self.learning_unit_repository))
 
+    def test_check_cannot_create_effective_class_invalid_learning_unit_type(self):
+        self.cmd = CanCreateEffectiveClassCommand(
+            learning_unit_code=self.LDROI1002_external.entity_id.code,
+            learning_unit_year=self.LDROI1002_external.entity_id.academic_year.year
+        )
 
-def _create_lu(command) -> 'LearningUnit':
-    return LearningUnitBuilder.build_from_command(
-        cmd=command,
-        all_existing_identities=[],
-        responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(code='UCL')
-    )
+        with self.assertRaises(MultipleBusinessExceptions) as context:
+            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+        raised_exceptions = [type(e) for e in context.exception.exceptions]
+        self.assertIn(ClassTypeInvalidException, raised_exceptions)
 
+    def test_check_cannot_create_effective_class_for_lu_with_partims(self):
+        self.cmd = CanCreateEffectiveClassCommand(
+            learning_unit_code=self.LDROI1003_course_with_partims.entity_id.code,
+            learning_unit_year=self.LDROI1003_course_with_partims.entity_id.academic_year.year
+        )
 
-def _build_create_learning_unit_command(code: str, year: int) -> 'CreateLearningUnitCommand':
-    return CreateLearningUnitCommand(
-        code=code,
-        academic_year=year,
-        type=LearningContainerYearType.COURSE.name,
-        common_title_fr='Common FR',
-        specific_title_fr='Specific FR',
-        common_title_en='Common EN',
-        specific_title_en='Specific EN',
-        credits=20,
-        internship_subtype=None,
-        responsible_entity_code='DRT',
-        periodicity=PeriodicityEnum.ANNUAL.name,
-        iso_code='fr-be',
-        remark_faculty=None,
-        remark_publication_fr=None,
-        remark_publication_en=None,
-        practical_volume_q1=10.0,
-        practical_volume_q2=10.0,
-        practical_volume_annual=20.0,
-        lecturing_volume_q1=10.0,
-        lecturing_volume_q2=10.0,
-        lecturing_volume_annual=20.0,
-        derogation_quadrimester=DerogationQuadrimester.Q1.name
-    )
+        with self.assertRaises(MultipleBusinessExceptions) as context:
+            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+        raised_exceptions = [type(e) for e in context.exception.exceptions]
+        self.assertIn(LearningUnitHasPartimException, raised_exceptions)
+
+    def test_check_cannot_create_effective_class_for_lu_without_volumes(self):
+        self.cmd = CanCreateEffectiveClassCommand(
+            learning_unit_code=self.LDROI1004_course_without_volumes.entity_id.code,
+            learning_unit_year=self.LDROI1004_course_without_volumes.entity_id.academic_year.year
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as context:
+            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+        raised_exceptions = [type(e) for e in context.exception.exceptions]
+        self.assertIn(LearningUnitHasNoVolumeException, raised_exceptions)
