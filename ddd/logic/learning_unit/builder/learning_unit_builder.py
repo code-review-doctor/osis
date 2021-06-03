@@ -84,7 +84,6 @@ class LearningUnitBuilder(RootEntityBuilder):
     ) -> 'LearningUnit':
         return _get_learning_unit_class(dto.type)(
             entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(dto.code, dto.year),
-            type=LearningContainerYearType[dto.type],
             titles=_build_titles(
                 dto.common_title_fr,
                 dto.specific_title_fr,
