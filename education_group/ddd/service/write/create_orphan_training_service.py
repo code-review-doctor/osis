@@ -30,7 +30,7 @@ from django.db import transaction
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd import command
 from education_group.ddd.business_types import *
-from education_group.ddd.domain.training import TrainingBuilder
+from ddd.logic.formation_catalogue.builder.training_builder import TrainingBuilder
 from education_group.ddd.repository import training as training_repository
 from education_group.ddd.service.write import postpone_training_and_group_modification_service, create_group_service
 
