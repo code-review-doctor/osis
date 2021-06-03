@@ -44,35 +44,6 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 from testing.testcases import DDDTestCase
 
 
-class TestGetNodeByIdAndTypeProgramTree(SimpleTestCase):
-    def setUp(self):
-        link = LinkFactory(child=NodeGroupYearFactory(node_id=1))
-        self.root_node = link.parent
-        self.subgroup_node = link.child
-
-        link_with_learning_unit = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=1))
-        self.learning_unit_node = link_with_learning_unit.child
-
-        self.tree = ProgramTreeFactory(root_node=self.root_node)
-
-    def test_should_return_None_when_no_node_present_with_corresponding_node_id(self):
-        result = self.tree.get_node_by_id_and_type(2, node_type.NodeType.LEARNING_UNIT)
-        self.assertIsNone(result)
-
-    def test_should_return_node_matching_specific_node_id_with_respect_to_class(self):
-        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.LEARNING_UNIT)
-        self.assertEqual(
-            result,
-            self.learning_unit_node
-        )
-
-        result = self.tree.get_node_by_id_and_type(1, node_type.NodeType.GROUP)
-        self.assertEqual(
-            result,
-            self.subgroup_node
-        )
-
-
 class TestGetParents(SimpleTestCase):
     def setUp(self):
         self.link_with_root = LinkFactory(parent__title='ROOT', child__title='child_ROOT')

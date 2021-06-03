@@ -24,8 +24,8 @@
 ##############################################################################
 
 from program_management.ddd import command
-from program_management.ddd.domain.exception import VersionNameAlreadyExist
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, NOT_A_TRANSITION, \
+from program_management.ddd.domain.exception import VersionNameExistsCurrentYearAndInFuture
+from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, \
     ProgramTreeVersionIdentity
 from program_management.ddd.service.write import create_and_postpone_tree_specific_version_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
@@ -54,7 +54,7 @@ class CreateAndPostponeProgramTreeSpecificVersionTestCase(DDDTestCase):
             version_name="VERSION"
         )
 
-        with self.assertRaisesBusinessException(VersionNameAlreadyExist):
+        with self.assertRaisesBusinessException(VersionNameExistsCurrentYearAndInFuture):
             create_and_postpone_tree_specific_version_service.create_and_postpone_program_tree_specific_version(
                 self.cmd
             )

@@ -26,8 +26,9 @@
 import attr
 
 from program_management.ddd import command
-from program_management.ddd.domain.exception import InvalidTransitionNameException, VersionNameAlreadyExist
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionIdentity, STANDARD
+from program_management.ddd.domain.exception import InvalidTransitionNameException, \
+    VersionNameExistsCurrentYearAndInFuture
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, STANDARD
 from program_management.ddd.service.write import create_and_postpone_tree_transition_version_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
@@ -56,7 +57,7 @@ class CreateAndPostponeProgramTreeTransitionVersionTestCase(DDDTestCase):
             transition_name="TRANSITION TRANS"
         )
 
-        with self.assertRaisesBusinessException(VersionNameAlreadyExist):
+        with self.assertRaisesBusinessException(VersionNameExistsCurrentYearAndInFuture):
             create_and_postpone_tree_transition_version_service.create_and_postpone_program_tree_transition_version(
                 self.cmd
             )

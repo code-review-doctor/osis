@@ -23,12 +23,10 @@
 # ############################################################################
 from unittest.mock import patch
 
-from django.test import TestCase
-
 from base.models.authorized_relationship import AuthorizedRelationshipObject
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.command import BulkUpdateLinkCommand
+from program_management.ddd.command import BulkUpdateLinkCommand, UpdateLinkCommand
 from program_management.ddd.domain import exception
 from program_management.ddd.domain.exception import BulkUpdateLinkException
 from program_management.ddd.domain.program_tree import ProgramTreeBuilder
@@ -38,31 +36,123 @@ from program_management.ddd.domain.service.search_program_trees_in_future import
 from program_management.ddd.repositories.report import ReportRepository
 from program_management.ddd.service.write import bulk_update_link_service
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.commands.update_link_comand import UpdateLinkCommandFactory
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from program_management.tests.ddd.factories.program_tree import tree_builder
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
-from testing.mocks import MockPatcherMixin
+from testing.testcases import DDDTestCase
 
+
+# class TestUpdateLink(DDDTestCase):
+#     def setUp(self) -> None:
+#         super().setUp()
+#         self.tree = OSIS1BAFactory()[0].tree
+#         self.cmd = UpdateLinkCommand(
+#             block="123",
+#             parent_node_code=self.tree.root_node.code,
+#             parent_node_year=self.tree.root_node.year,
+#             child_node_code=self.tree.root_node.children_as_nodes[0].code,
+#             child_node_year=self.tree.root_node.children_as_nodes[0].year,
+#             link_type=None,
+#             comment="A comment",
+#             comment_english="A comment in english",
+#             relative_credits=20,
+#             is_mandatory=False,
+#             access_condition=False
+#         )
+#
+#     def test_block_value_should_be_an_increasing_sequence_of_digit_between_1_and_6(self):
+#         cmd = attr.evolve(self.cmd, block="158")
+#
+#         with self.assertRaisesBusinessException(InvalidBlockException):
+#             update_link_service.update_link(cmd)
+#
+#     def test_cannot_have_relative_credits_lower_than_0(self):
+#         cmd = attr.evolve(self.cmd, relative_credits=-1)
+#
+#         with self.assertRaisesBusinessException(RelativeCreditShouldBeGreaterOrEqualsThanZero):
+#             update_link_service.update_link(cmd)
+#
+#     def test_cannot_have_relative_credits_greater_than_999(self):
+#         cmd = attr.evolve(self.cmd, relative_credits=1000)
+#
+#         with self.assertRaisesBusinessException(RelativeCreditShouldBeLowerOrEqualThan999):
+#             update_link_service.update_link(cmd)
+#
+#     def test_cannot_set_link_type_as_reference_for_link_with_a_learning_unit_as_a_child(self):
+#         link_with_learning_unit = next(link for link in self.tree.get_all_links() if link.child.is_learning_unit())
+#         cmd = attr.evolve(
+#             self.cmd,
+#             link_type=LinkTypes.REFERENCE.name,
+#             parent_node_code=link_with_learning_unit.parent.code,
+#             parent_node_year=link_with_learning_unit.parent.year,
+#             child_node_code=link_with_learning_unit.child.code,
+#             child_node_year=link_with_learning_unit.child.year,
+#         )
+#
+#         with self.assertRaisesBusinessException(ReferenceLinkNotAllowedWithLearningUnitException):
+#             update_link_service.update_link(cmd)
+#
+#     def test_always_reference_link_between_minor_major_list_choice_and_minor_or_major_or_deepening(self):
+#         link_with_minor = next(link for link in self.tree.get_all_links() if link.child.is_minor_major_deepening())
+#
+#         cmd = attr.evolve(
+#             self.cmd,
+#             link_type=None,
+#             parent_node_code=link_with_minor.parent.code,
+#             parent_node_year=link_with_minor.parent.year,
+#             child_node_code=link_with_minor.child.code,
+#             child_node_year=link_with_minor.child.year,
+#         )
+#
+#         update_link_service.update_link(cmd)
+#         self.assertEqual(link_with_minor.link_type, LinkTypes.REFERENCE)
+#
+#     def test_cannot_set_link_as_reference_when_children_of_child_are_not_valid_children_type_for_parent(self):
+#         cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
+#
+#         with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
+#             update_link_service.update_link(cmd)
+#
+#     def test_should_update_link_attributes(self):
+#         result = update_link_service.update_link(self.cmd)
+#
+#         self.assertEqual(result.link_type, self.cmd.link_type)
+#         self.assertEqual(result.access_condition, self.cmd.access_condition)
+#         self.assertEqual(result.is_mandatory, self.cmd.is_mandatory)
+#         self.assertEqual(result.block, self.cmd.block)
+#         self.assertEqual(result.comment, self.cmd.comment)
+#         self.assertEqual(result.comment_english, self.cmd.comment_english)
+#         self.assertEqual(result.relative_credits, self.cmd.relative_credits)
+#
+#     def test_cannot_convert_mandatory_child_link_to_reference(self):
+#         cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
+#
+#         with self.assertRaisesBusinessException(ChildTypeNotAuthorizedException):
+#             update_link_service.update_link(cmd)
 
 @patch(
     "base.business.academic_calendar.AcademicEventCalendarHelper.get_target_years_opened",
     return_value=[2016]
 )
-class TestUpdateLink(TestCase, MockPatcherMixin):
+class TestUpdateLink(DDDTestCase):
     def setUp(self) -> None:
-        self.tree = ProgramTreeBachelorFactory(2016, 2018)
-        self.fake_program_tree_repository = get_fake_program_tree_repository([self.tree])
+        super().setUp()
+        self.tree = OSIS1BAFactory(start_year=2016, end_year=2018)
 
     def test_failure_when_block_value_is_not_a_increasing_sequence_of_digits_between_1_and_6(self, mock_calendar):
         block_inputs = ["158", "265", "49"]
         for block_input in block_inputs:
-            cmd_with_invalid_block_value = UpdateLinkCommandFactory(
+            cmd_with_invalid_block_value = UpdateLinkCommand(
                 block=block_input,
                 parent_node_code=self.tree.root_node.code,
                 parent_node_year=self.tree.root_node.year,
                 child_node_code=self.tree.root_node.children_as_nodes[0].code,
                 child_node_year=self.tree.root_node.children_as_nodes[0].year,
+                link_type=None,
+                comment="",
+                comment_english="english cvommen",
+                relative_credits=10,
+                access_condition=True,
+                is_mandatory=False
             )
             invalid_bulk_update_cmd = BulkUpdateLinkCommand(
                 working_tree_code=self.tree.root_node.code,
@@ -82,12 +172,18 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             )
 
     def test_failure_when_relative_credits_less_or_equal_to_0(self, mock_calendar):
-        cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
+        cmd_with_invalid_relative_credits_value = UpdateLinkCommand(
             relative_credits=-1,
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
+            link_type=None,
+            comment="",
+            comment_english="english cvommen",
+            access_condition=True,
+            is_mandatory=False,
+            block="123"
         )
         invalid_bulk_update_cmd = BulkUpdateLinkCommand(
             working_tree_code=self.tree.root_node.code,
@@ -108,11 +204,17 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         )
 
     def test_failure_when_relative_credits_superior_to_999(self, mock_calendar):
-        cmd_with_invalid_relative_credits_value = UpdateLinkCommandFactory(
+        cmd_with_invalid_relative_credits_value = UpdateLinkCommand(
             relative_credits=1000, parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
+            link_type=None,
+            comment="",
+            comment_english="english cvommen",
+            access_condition=True,
+            is_mandatory=False,
+            block="123"
         )
         invalid_bulk_update_cmd = BulkUpdateLinkCommand(
             working_tree_code=self.tree.root_node.code,
@@ -133,12 +235,18 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         )
 
     def test_failure_when_reference_link_with_learning_unit_child_node(self, mock_calendar):
-        cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
+        cmd_with_invalid_reference_link = UpdateLinkCommand(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[2].code,
             child_node_year=self.tree.root_node.children_as_nodes[2].year,
+            comment="",
+            comment_english="english cvommen",
+            relative_credits=10,
+            access_condition=True,
+            is_mandatory=False,
+            block="123"
         )
         invalid_bulk_cmd = BulkUpdateLinkCommand(
             working_tree_code=self.tree.root_node.code,
@@ -171,12 +279,17 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         cmd_with_invalid_reference_link = BulkUpdateLinkCommand(
             working_tree_code=minor_list_choice_tree.root_node.code,
             working_tree_year=minor_list_choice_tree.root_node.year,
-            update_link_cmds=[UpdateLinkCommandFactory(
+            update_link_cmds=[UpdateLinkCommand(
                 link_type=None,
                 parent_node_code=minor_list_choice_tree.root_node.code,
                 parent_node_year=minor_list_choice_tree.root_node.year,
                 child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
                 child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+                comment="",
+                comment_english="english cvommen",
+                relative_credits=10,
+                access_condition=True,
+                is_mandatory=False
             )]
         )
 
@@ -208,12 +321,18 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         cmd = BulkUpdateLinkCommand(
             working_tree_code=minor_list_choice_tree.root_node.code,
             working_tree_year=minor_list_choice_tree.root_node.year,
-            update_link_cmds=[UpdateLinkCommandFactory(
+            update_link_cmds=[UpdateLinkCommand(
                 link_type=LinkTypes.REFERENCE.name,
                 parent_node_code=minor_list_choice_tree.root_node.code,
                 parent_node_year=minor_list_choice_tree.root_node.year,
                 child_node_code=minor_list_choice_tree.root_node.children_as_nodes[0].code,
                 child_node_year=minor_list_choice_tree.root_node.children_as_nodes[0].year,
+                comment="",
+                comment_english="english cvommen",
+                access_condition=True,
+                is_mandatory=False,
+                block="123",
+                relative_credits=10
             )]
         )
 
@@ -227,12 +346,18 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
             self,
             mock_calendar
     ):
-        cmd_with_invalid_reference_link = UpdateLinkCommandFactory(
+        cmd_with_invalid_reference_link = UpdateLinkCommand(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[0].code,
             child_node_year=self.tree.root_node.children_as_nodes[0].year,
+            comment="",
+            comment_english="english cvommen",
+            access_condition=True,
+            is_mandatory=False,
+            block="123",
+            relative_credits=10
         )
         invalid_bulk_cmd = BulkUpdateLinkCommand(
             working_tree_code=self.tree.root_node.code,
@@ -274,12 +399,18 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         tree_with_successive_reference_link = tree_builder(successive_reference_link_tree_data)
         self.fake_program_tree_repository.create(tree_with_successive_reference_link)
 
-        invalid_update_link_cmd = UpdateLinkCommandFactory(
+        invalid_update_link_cmd = UpdateLinkCommand(
             link_type=LinkTypes.REFERENCE.name,
             parent_node_code=tree_with_successive_reference_link.root_node.code,
             parent_node_year=tree_with_successive_reference_link.root_node.year,
             child_node_code=tree_with_successive_reference_link.root_node.children_as_nodes[0].code,
             child_node_year=tree_with_successive_reference_link.root_node.children_as_nodes[0].year,
+            comment="",
+            comment_english="english cvommen",
+            access_condition=True,
+            is_mandatory=False,
+            block="123",
+            relative_credits=10
         )
         invalid_bulk_cmd = BulkUpdateLinkCommand(
             working_tree_code=tree_with_successive_reference_link.root_node.code,
@@ -300,7 +431,7 @@ class TestUpdateLink(TestCase, MockPatcherMixin):
         )
 
     def test_update_link_properties(self, mock_calendar):
-        update_link_command = UpdateLinkCommandFactory(
+        update_link_command = UpdateLinkCommand(
             parent_node_code=self.tree.root_node.code,
             parent_node_year=self.tree.root_node.year,
             child_node_code=self.tree.root_node.children_as_nodes[1].code,

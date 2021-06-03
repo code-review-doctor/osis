@@ -178,6 +178,11 @@ class DDDTestCase(TestCase):
             side_effect=get_all_program_tree_version_identities
         )
 
+        self.mock_service(
+            "base.business.academic_calendar.AcademicEventCalendarHelper.get_target_years_opened",
+            return_value=[2016]
+        )
+
     def tearDown(self) -> None:
         self.fake_group_repository._groups = list()
         self.fake_mini_training_repository._mini_trainings = list()
@@ -293,13 +298,19 @@ def generate_node_code(code, child_node_type):
     return code[:-1] + "X"
 
 
-def get_next_transition_version_year(version: 'ProgramTreeVersion', initial_end_year: int) -> Optional[int]:
+def get_next_transition_version_year(
+        initial_end_year: int,
+        end_year: int,
+        offer_acronym: str,
+        version_name: str
+) -> Optional[int]:
+
     repo = FakeProgramTreeVersionRepository()
-    tree_versions = repo.search(version_name=version.version_name, offer_acronym=version.entity_id.offer_acronym)
+    tree_versions = repo.search(version_name=version_name, offer_acronym=offer_acronym)
     transitions = (tree_version for tree_version in tree_versions if tree_version.is_transition)
     transitions_year_in_range_year = (
         transition.entity_id.year for transition in transitions if
-        initial_end_year < transition.entity_id.year <= version.end_year_of_existence
+        initial_end_year < transition.entity_id.year <= end_year
     )
     return min(transitions_year_in_range_year, default=None)
 

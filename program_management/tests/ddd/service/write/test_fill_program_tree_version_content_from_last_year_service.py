@@ -67,7 +67,7 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         )
 
         self.mock_copy_cms()
-        self.create_node_next_years()
+        # self.create_node_next_years()
 
     def create_node_next_years(self, nodes):
         for node in nodes:

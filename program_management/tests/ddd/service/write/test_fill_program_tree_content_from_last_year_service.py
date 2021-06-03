@@ -22,41 +22,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import namedtuple
 
 import attr
 import mock
 from django.test import override_settings
 
-from base.models.enums.education_group_types import TrainingType, GroupType
-from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
-    FillProgramTreeContentFromLastYearCommand
-from program_management.ddd.domain.exception import ProgramTreeNonEmpty, InvalidTreeVersionToFillTo
+from base.models.enums.education_group_types import GroupType
+from program_management.ddd.command import FillProgramTreeContentFromLastYearCommand
 from program_management.ddd.domain.node import factory as node_factory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.service.write import fill_program_tree_content_from_last_year_service
-from program_management.ddd.service.write.fill_program_tree_version_content_from_program_tree_version_service import \
-    fill_program_tree_version_content_from_program_tree_version
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory, tree_builder
-from program_management.tests.ddd.factories.program_tree_version import SpecificProgramTreeVersionFactory, \
-    SpecificTransitionProgramTreeVersionFactory, StandardProgramTreeVersionFactory
 from testing.testcases import DDDTestCase
 
 PAST_ACADEMIC_YEAR_YEAR = 2020
 CURRENT_ACADEMIC_YEAR_YEAR = 2021
 NEXT_ACADEMIC_YEAR_YEAR = 2022
 
-
+# TODO refactoring
 @override_settings(YEAR_LIMIT_EDG_MODIFICATION=PAST_ACADEMIC_YEAR_YEAR)
 class TestFillProgramTreeContentFromLastYear(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
 
         tree_data = {
             "node_type": GroupType.COMMON_CORE,

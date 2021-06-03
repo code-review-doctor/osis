@@ -242,39 +242,39 @@ def get_fake_program_tree_version_repository(
     return FakeProgramTreeVersionRepository
 
 
-def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepository']:
-    class_name = 'FakeNodeRepository'
-    return type(class_name, (FakeRepository,), {
-        "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.NodeNotFoundException,
-        "search": _search_nodes,
-        "get_next_learning_unit_year_node": _get_next_learning_unit_year_node
-    })
-
-
-def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type['FakeRepository']:
-    class_name = "FakeProgramTreeRepository"
-    return type(class_name, (FakeRepository,), {
-        "create": _create_program_tree,
-        "search": _search_program_trees,
-        "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.ProgramTreeNotFoundException,
-        "delete": _delete_program_tree,
-        "search_from_children": _search_from_children,
-        "get_all_identities": _get_all_identities,
-    })
-
-
-def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVersion']) -> Type['FakeRepository']:
-    class_name = "FakeProgramTreeVersionRepository"
-    return type(class_name, (FakeRepository,), {
-        "create": _create_program_tree_version,
-        "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.ProgramTreeVersionNotFoundException,
-        "delete": _delete_program_tree_version,
-        "search": _search_program_tree_version,
-        "search_versions_from_trees": _search_versions_from_trees,
-    })
+# def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepository']:
+#     class_name = 'FakeNodeRepository'
+#     return type(class_name, (FakeRepository,), {
+#         "root_entities": root_entities.copy(),
+#         "not_found_exception_class": exception.NodeNotFoundException,
+#         "search": _search_nodes,
+#         "get_next_learning_unit_year_node": _get_next_learning_unit_year_node
+#     })
+#
+#
+# def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type['FakeRepository']:
+#     class_name = "FakeProgramTreeRepository"
+#     return type(class_name, (FakeRepository,), {
+#         "create": _create_program_tree,
+#         "search": _search_program_trees,
+#         "root_entities": root_entities.copy(),
+#         "not_found_exception_class": exception.ProgramTreeNotFoundException,
+#         "delete": _delete_program_tree,
+#         "search_from_children": _search_from_children,
+#         "get_all_identities": _get_all_identities,
+#     })
+#
+#
+# def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVersion']) -> Type['FakeRepository']:
+#     class_name = "FakeProgramTreeVersionRepository"
+#     return type(class_name, (FakeRepository,), {
+#         "create": _create_program_tree_version,
+#         "root_entities": root_entities.copy(),
+#         "not_found_exception_class": exception.ProgramTreeVersionNotFoundException,
+#         "delete": _delete_program_tree_version,
+#         "search": _search_program_tree_version,
+#         "search_versions_from_trees": _search_versions_from_trees,
+#     })
 
 
 @classmethod
