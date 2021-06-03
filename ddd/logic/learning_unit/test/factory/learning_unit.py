@@ -2,7 +2,6 @@ import factory.fuzzy
 import uuid
 
 from base.models.enums.internship_subtypes import InternshipSubtype
-from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -164,23 +163,17 @@ class _LearningUnitFactory(factory.Factory):
     professional_integration = True
     is_active = True
 
-    type = factory.fuzzy.FuzzyChoice(LearningContainerYearType)
-
 
 class _CourseLearningUnitFactory(_LearningUnitFactory):
     class Meta:
         model = CourseLearningUnit
         abstract = False
 
-    type = LearningContainerYearType.COURSE
-
 
 class _ExternalLearningUnitFactory(_LearningUnitFactory):
     class Meta:
         model = ExternalLearningUnit
         abstract = False
-
-    type = LearningContainerYearType.EXTERNAL
 
 
 class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):

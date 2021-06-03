@@ -80,8 +80,6 @@ class LearningUnit(interface.RootEntity):
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
 
-    type = attr.ib(type=Optional[LearningContainerYearType])
-
     @property
     def academic_year(self) -> 'AcademicYearIdentity':
         return self.entity_id.academic_year
