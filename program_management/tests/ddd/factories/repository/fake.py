@@ -24,6 +24,8 @@
 import itertools
 from typing import List, Type, Optional, Set
 
+import attr
+
 from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.business_types import *
@@ -38,6 +40,7 @@ def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepositor
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.NodeNotFoundException,
         "search": _search_nodes,
+        "get_next_learning_unit_year_node": _get_next_learning_unit_year_node
     })
 
 
@@ -181,6 +184,14 @@ def _search_nodes(cls, node_ids: List['NodeIdentity'] = None, year: int = None, 
     if year:
         return [node for node in cls.root_entities if node.entity_id.year == year]
     return []
+
+
+@classmethod
+def _get_next_learning_unit_year_node(cls, entity_id: 'NodeIdentity') -> Optional['Node']:
+    return next(
+        (node for node in cls.root_entities if node.entity_id == attr.evolve(entity_id, year=entity_id.year + 1)),
+        None
+    )
 
 
 @classmethod

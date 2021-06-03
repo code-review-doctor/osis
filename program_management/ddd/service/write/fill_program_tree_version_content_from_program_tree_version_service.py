@@ -23,7 +23,6 @@
 #
 ##############################################################################
 
-import attr
 from django.db import transaction
 
 from education_group.ddd.service.write import create_group_service, copy_group_service
@@ -32,6 +31,7 @@ from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
 from program_management.ddd.domain.report import Report, ReportIdentity
 from program_management.ddd.domain.service import generate_node_code, copy_tree_cms
+from program_management.ddd.domain.service.get_next_year_node import GetNextYearNode
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
     program_tree as program_tree_repository, node as node_repository, report
 
@@ -74,15 +74,18 @@ def fill_program_tree_version_content_from_program_tree_version(
             for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
-    existing_learning_unit_nodes = node_repo.search(
-        [
-            attr.evolve(node.entity_id, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
-        ]
-    )
-
-    existing_nodes = [tree_version.get_tree().root_node for tree_version in existing_transition_tree_versions] +\
-        [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
+    if cmd.to_year == cmd.from_year:
+        learning_unit_nodes = {
+            learning_unit_node.entity_id: learning_unit_node
+            for learning_unit_node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
+        }
+    else:
+        learning_unit_nodes = GetNextYearNode().search_for_learning_unit_years(
+            from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes(),
+            node_repo
+        )
+    existing_group_nodes = [tree_version.get_tree().root_node for tree_version in existing_transition_tree_versions] +\
+        [tree.root_node for tree in existing_trees]
 
     existing_codes = [identity.code for identity in tree_repository.get_all_identities()]
     node_code_generator = generate_node_code.GenerateNodeCode(existing_codes=existing_codes)
@@ -90,8 +93,9 @@ def fill_program_tree_version_content_from_program_tree_version(
     ProgramTreeVersionBuilder().fill_from_program_tree_version(
         from_tree_version,
         to_tree_version,
-        set(existing_nodes),
-        node_code_generator
+        set(existing_group_nodes),
+        learning_unit_nodes,
+        node_code_generator,
     )
     ProgramTreeVersionBuilder().copy_prerequisites_from_tree_version(from_tree_version, to_tree_version)
 
