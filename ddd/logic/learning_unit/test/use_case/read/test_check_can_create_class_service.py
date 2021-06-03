@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
 
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
-    LearningUnitHasPartimException, LearningUnitHasNoVolumeException
+    LearningUnitHasPartimException, LearningUnitHasNoVolumeException, LearningUnitHasEnrollmentException, \
+    LearningUnitHasProposalException
 from ddd.logic.learning_unit.test.factory.learning_unit import LDROI1002ExternalLearningUnitFactory, \
     LDROI1001CourseLearningUnitFactory, LDROI1003CourseWithPartimsLearningUnitFactory, \
     LDROI1004CourseWithoutVolumesLearningUnitFactory
@@ -94,3 +96,33 @@ class TestCheckCanCreateEffectiveClass(TestCase):
             check_can_create_effective_class(self.cmd, self.learning_unit_repository)
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasNoVolumeException, raised_exceptions)
+
+    @mock.patch('infrastructure.learning_unit.repository.in_memory.learning_unit.'
+                'LearningUnitRepository.has_enrollments')
+    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self, mock_has_enrollments):
+        mock_has_enrollments.return_value = True
+
+        self.cmd = CanCreateEffectiveClassCommand(
+            learning_unit_code=self.LDROI1001_course.entity_id.code,
+            learning_unit_year=self.LDROI1001_course.entity_id.academic_year.year
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as context:
+            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+        raised_exceptions = [type(e) for e in context.exception.exceptions]
+        self.assertIn(LearningUnitHasEnrollmentException, raised_exceptions)
+
+    @mock.patch('infrastructure.learning_unit.repository.in_memory.learning_unit.'
+                'LearningUnitRepository.has_proposal')
+    def test_check_cannot_create_effective_class_for_lu_with_proposal(self, mock_has_proposal):
+        mock_has_proposal.return_value = True
+
+        self.cmd = CanCreateEffectiveClassCommand(
+            learning_unit_code=self.LDROI1001_course.entity_id.code,
+            learning_unit_year=self.LDROI1001_course.entity_id.academic_year.year
+        )
+
+        with self.assertRaises(MultipleBusinessExceptions) as context:
+            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+        raised_exceptions = [type(e) for e in context.exception.exceptions]
+        self.assertIn(LearningUnitHasProposalException, raised_exceptions)
