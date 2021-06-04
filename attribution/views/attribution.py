@@ -121,7 +121,7 @@ def _get_classes_charge_repartition_warning_messages(learning_unit_year: Learnin
 
     for attribution_key, charges in charges_by_attribution_and_type:
         for charge in list(charges):
-            if _get_component_volume_total_of_classes(charge.learning_component_year) > charge.total_volume:
+            if _get_component_volume_total_of_classes(charge.learning_component_year) > (charge.total_volume or 0):
                 msgs.add(msg_warning % {
                     "tutor": _get_tutor_name_with_function(charge),
                     "ue_type": learning_unit_year.get_subtype_display().lower()
