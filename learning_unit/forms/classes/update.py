@@ -72,7 +72,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     )
     session = forms.ChoiceField(
         choices=add_blank(DerogationSession.choices()),
-        required=False
+        required=False,
+        label=_("Derogation's session")
     )
     quadrimester = forms.ChoiceField(
         choices=add_blank(quadrimesters.DerogationQuadrimester.choices()),
@@ -85,7 +86,12 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     learning_unit_code = forms.CharField(disabled=True, max_length=15, required=False)
     learning_unit_type = forms.ChoiceField(disabled=True, label=_('Type'), required=False)
     learning_unit_internship_subtype = forms.ChoiceField(disabled=True, label=_('Internship subtype'), required=False)
-    learning_unit_credits = forms.CharField(disabled=True, label=_('Credits'), required=False)
+    learning_unit_credits = learning_unit_credits = forms.CharField(
+        disabled=True,
+        label=_('Credits'),
+        required=False,
+        widget=DecimalFormatInput(render_value=True)
+    )
     learning_unit_periodicity = forms.ChoiceField(disabled=True, label=_('Periodicity'), required=False)
     learning_unit_state = forms.BooleanField(disabled=True, label=_('Active'), required=False)
     learning_unit_language = forms.ChoiceField(disabled=True, label=_('Language'), required=False)
@@ -117,7 +123,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     repartition_volume_entity_2 = forms.CharField(disabled=True, required=False)
     repartition_volume_entity_3 = forms.CharField(disabled=True, required=False)
 
-    learning_unit_campus = forms.ChoiceField()
+    learning_unit_campus = forms.ChoiceField(label=_("Learning location"))
     learning_unit_responsible_entity = forms.ChoiceField(
         required=False,
         disabled=True,
