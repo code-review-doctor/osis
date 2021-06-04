@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-01 10:29+0200\n"
+"POT-Creation-Date: 2021-06-04 10:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,9 +63,6 @@ msgstr ""
 msgid "Credits"
 msgstr ""
 
-msgid "Entity charges"
-msgstr ""
-
 msgid "Faculty manager"
 msgstr ""
 
@@ -76,9 +73,6 @@ msgid "Faculty remark"
 msgstr ""
 
 msgid "Formation catalogue"
-msgstr ""
-
-msgid "Institution"
 msgstr ""
 
 msgid "Internship subtype"
@@ -108,7 +102,7 @@ msgstr ""
 msgid "Lecturing"
 msgstr ""
 
-msgid "New class"
+msgid "New Class"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -239,6 +233,9 @@ msgid "Title in French"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "Update class"
 msgstr ""
 
 msgid "Vol. Q1"

@@ -257,7 +257,10 @@ class UpdateClassForm(ClassForm):
         self.fields['hourly_volume_partial_q1'].initial = effective_class.volumes.volume_first_quadrimester
         self.fields['hourly_volume_partial_q2'].initial = effective_class.volumes.volume_second_quadrimester
         self.fields['learning_unit_campus'].choices = [(campus.entity_id.uuid, str(campus)) for campus in self.campuses]
-        self.fields['learning_unit_campus'].initial = _init_learning_unit_campus(self.campuses, effective_class.teaching_place)
+        self.fields['learning_unit_campus'].initial = _init_learning_unit_campus(
+            self.campuses,
+            effective_class.teaching_place
+        )
 
     def get_command(self) -> UpdateEffectiveClassCommand:
         return UpdateEffectiveClassCommand(

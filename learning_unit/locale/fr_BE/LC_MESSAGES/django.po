@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-01 10:29+0200\n"
+"POT-Creation-Date: 2021-06-04 10:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,8 @@ msgstr "Classe"
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully created."
-msgstr "La classe %(effective_class_complete_acronym)s a été créée avec succès."
+msgstr ""
+"La classe %(effective_class_complete_acronym)s a été créée avec succès."
 
 msgid "Class specific complement"
 msgstr "Complément spécifique à la classe"
@@ -62,9 +63,6 @@ msgstr "Composants"
 msgid "Credits"
 msgstr "Crédits"
 
-msgid "Entity charges"
-msgstr "Entité de charge"
-
 msgid "Faculty manager"
 msgstr "Gestionnaire facultaire"
 
@@ -76,9 +74,6 @@ msgstr "Remarque de la faculté"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
-
-msgid "Institution"
-msgstr "Institution"
 
 msgid "Internship subtype"
 msgstr "Sous-type de stage"
@@ -109,7 +104,9 @@ msgstr "Unités d'enseignement"
 msgid "Lecturing"
 msgstr "Partie magistrale"
 
-msgid "New class"
+#, fuzzy
+#| msgid "New class"
+msgid "New Class"
 msgstr "Nouvelle classe"
 
 msgid "Not in period to edit description fiche."
@@ -252,6 +249,9 @@ msgstr "Titre en français"
 
 msgid "Type"
 msgstr "Type"
+
+msgid "Update class"
+msgstr "Modifier classe"
 
 msgid "Vol. Q1"
 msgstr "Vol. Q1"
