@@ -44,30 +44,24 @@ class TestCheckCanCreateEffectiveClass(TestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
 
-        self.LDROI1001_course = LDROI1001CourseLearningUnitFactory()
-        self.learning_unit_repository.save(self.LDROI1001_course)
-
-        self.LDROI1002_external = LDROI1002ExternalLearningUnitFactory()
-        self.learning_unit_repository.save(self.LDROI1002_external)
-
-        self.LDROI1003_course_with_partims = LDROI1003CourseWithPartimsLearningUnitFactory()
-        self.learning_unit_repository.save(self.LDROI1003_course_with_partims)
-
-        self.LDROI1004_course_without_volumes = LDROI1004CourseWithoutVolumesLearningUnitFactory()
-        self.learning_unit_repository.save(self.LDROI1004_course_without_volumes)
-
     def test_check_can_create_effective_class(self):
+        LDROI1001_course = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(LDROI1001_course)
+
         self.cmd = CanCreateEffectiveClassCommand(
-            learning_unit_code=self.LDROI1001_course.entity_id.code,
-            learning_unit_year=self.LDROI1001_course.entity_id.academic_year.year
+            learning_unit_code=LDROI1001_course.entity_id.code,
+            learning_unit_year=LDROI1001_course.entity_id.academic_year.year
         )
 
         self.assertIsNone(check_can_create_effective_class(self.cmd, self.learning_unit_repository))
 
     def test_check_cannot_create_effective_class_invalid_learning_unit_type(self):
+        LDROI1002_external = LDROI1002ExternalLearningUnitFactory()
+        self.learning_unit_repository.save(LDROI1002_external)
+
         self.cmd = CanCreateEffectiveClassCommand(
-            learning_unit_code=self.LDROI1002_external.entity_id.code,
-            learning_unit_year=self.LDROI1002_external.entity_id.academic_year.year
+            learning_unit_code=LDROI1002_external.entity_id.code,
+            learning_unit_year=LDROI1002_external.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
@@ -76,9 +70,13 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         self.assertIn(ClassTypeInvalidException, raised_exceptions)
 
     def test_check_cannot_create_effective_class_for_lu_with_partims(self):
+
+        LDROI1003_course_with_partims = LDROI1003CourseWithPartimsLearningUnitFactory()
+        self.learning_unit_repository.save(LDROI1003_course_with_partims)
+
         self.cmd = CanCreateEffectiveClassCommand(
-            learning_unit_code=self.LDROI1003_course_with_partims.entity_id.code,
-            learning_unit_year=self.LDROI1003_course_with_partims.entity_id.academic_year.year
+            learning_unit_code=LDROI1003_course_with_partims.entity_id.code,
+            learning_unit_year=LDROI1003_course_with_partims.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
@@ -87,9 +85,12 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         self.assertIn(LearningUnitHasPartimException, raised_exceptions)
 
     def test_check_cannot_create_effective_class_for_lu_without_volumes(self):
+        LDROI1004_course_without_volumes = LDROI1004CourseWithoutVolumesLearningUnitFactory()
+        self.learning_unit_repository.save(LDROI1004_course_without_volumes)
+
         self.cmd = CanCreateEffectiveClassCommand(
-            learning_unit_code=self.LDROI1004_course_without_volumes.entity_id.code,
-            learning_unit_year=self.LDROI1004_course_without_volumes.entity_id.academic_year.year
+            learning_unit_code=LDROI1004_course_without_volumes.entity_id.code,
+            learning_unit_year=LDROI1004_course_without_volumes.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
@@ -102,9 +103,12 @@ class TestCheckCanCreateEffectiveClass(TestCase):
     def test_check_cannot_create_effective_class_for_lu_with_enrollments(self, mock_has_enrollments):
         mock_has_enrollments.return_value = True
 
+        LDROI1001_course = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(LDROI1001_course)
+
         self.cmd = CanCreateEffectiveClassCommand(
-            learning_unit_code=self.LDROI1001_course.entity_id.code,
-            learning_unit_year=self.LDROI1001_course.entity_id.academic_year.year
+            learning_unit_code=LDROI1001_course.entity_id.code,
+            learning_unit_year=LDROI1001_course.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
@@ -117,9 +121,12 @@ class TestCheckCanCreateEffectiveClass(TestCase):
     def test_check_cannot_create_effective_class_for_lu_with_proposal(self, mock_has_proposal):
         mock_has_proposal.return_value = True
 
+        LDROI1001_course = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(LDROI1001_course)
+
         self.cmd = CanCreateEffectiveClassCommand(
-            learning_unit_code=self.LDROI1001_course.entity_id.code,
-            learning_unit_year=self.LDROI1001_course.entity_id.academic_year.year
+            learning_unit_code=LDROI1001_course.entity_id.code,
+            learning_unit_year=LDROI1001_course.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
