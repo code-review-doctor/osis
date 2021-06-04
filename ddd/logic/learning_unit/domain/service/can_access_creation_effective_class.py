@@ -48,7 +48,7 @@ class CanAccessCreationEffectiveClass(interface.DomainService):
         if learning_unit.has_partim():
             exceptions.add(LearningUnitHasPartimException())
 
-        if learning_unit_repository.has_proposal(learning_unit):
+        if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
             exceptions.add(LearningUnitHasProposalException())
 
         if learning_unit_repository.has_enrollments(learning_unit):

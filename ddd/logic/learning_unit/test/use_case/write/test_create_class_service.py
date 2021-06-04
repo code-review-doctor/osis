@@ -182,7 +182,7 @@ class TestCreateClassServiceValidator(TestCase):
 
     def test_raise_should_learning_unit_not_have_proposal_exception(self):
         learning_unit_repository = LearningUnitRepository()
-        learning_unit_repository.has_proposal = lambda *args, **kwargs: True
+        learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
         cmd = _build_create_effective_class_command(
             learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
             class_code='Z'

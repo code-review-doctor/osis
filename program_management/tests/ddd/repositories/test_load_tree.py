@@ -181,7 +181,7 @@ class TestLoadTree(TestCase):
                     command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.root_node.pk)
                 )
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
-                self.assertTrue(leaf.has_proposal)
+                self.assertTrue(leaf.has_proposal_this_year_or_in_past)
                 self.assertEqual(leaf.proposal_type, p_type)
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
@@ -189,7 +189,7 @@ class TestLoadTree(TestCase):
             command.GetProgramTreeFromRootElementIdCommand(root_element_id=self.root_node.pk)
         )
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
-        self.assertFalse(leaf.has_proposal)
+        self.assertFalse(leaf.has_proposal_this_year_or_in_past)
         self.assertIsNone(leaf.proposal_type)
 
     def test_when_load_tree_root_ids_contained_each_others(self):
