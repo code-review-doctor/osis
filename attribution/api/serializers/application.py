@@ -30,41 +30,41 @@ class ApplicationGetSerializer(serializers.Serializer):
     uuid = serializers.UUIDField(source="entity_id.uuid", read_only=True)
     code = serializers.CharField(source="vacant_course_id.code", read_only=True)
     year = serializers.IntegerField(source="vacant_course_id.year", read_only=True)
-    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
+    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     remark = serializers.CharField(read_only=True)
     course_summary = serializers.CharField(read_only=True)
 
 
 class ApplicationPostSerializer(serializers.Serializer):
     code = serializers.CharField()
-    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=2)
-    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=2)
-    remark = serializers.CharField(default='')
-    course_summary = serializers.CharField(default='')
+    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1)
+    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1)
+    remark = serializers.CharField(default='', allow_blank=True)
+    course_summary = serializers.CharField(default='', allow_blank=True)
 
 
 class ApplicationPutSerializer(serializers.Serializer):
-    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=2)
-    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=2)
-    remark = serializers.CharField(default='')
-    course_summary = serializers.CharField(default='')
+    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1)
+    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1)
+    remark = serializers.CharField(default='', allow_blank=True)
+    course_summary = serializers.CharField(default='', allow_blank=True)
 
 
 class AttributionsAboutToExpireGetSerializer(serializers.Serializer):
     code = serializers.CharField(read_only=True)
     year = serializers.IntegerField(read_only=True)
     title = serializers.CharField(read_only=True)
-    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
+    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     function = serializers.CharField(read_only=True, source="function.name")
     function_text = serializers.CharField(read_only=True, source="function.value")
     end_year = serializers.IntegerField(read_only=True)
     start_year = serializers.IntegerField(read_only=True)
-    total_lecturing_volume_course = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    total_practical_volume_course = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
+    total_lecturing_volume_course = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    total_practical_volume_course = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     unavailable_renewal_reason = serializers.CharField(default='', read_only=True)
     is_renewable = serializers.BooleanField(read_only=True)
 

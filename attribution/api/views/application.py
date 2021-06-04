@@ -33,7 +33,7 @@ from backoffice.settings.rest_framework.common_views import DisplayExceptionsByF
 from base.models.person import Person
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand, ApplyOnVacantCourseCommand, \
     UpdateApplicationCommand, DeleteApplicationCommand, GetAttributionsAboutToExpireCommand, \
-    RenewMultipleAttributionsCommand, SendApplicationsSummaryCommand
+    RenewMultipleAttributionsCommand, SendApplicationsSummaryCommand, SearchVacantCoursesCommand
 from ddd.logic.application.domain.validator.exceptions import VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     LecturingAndPracticalChargeNotFilledException
 from infrastructure.messages_bus import message_bus_instance
