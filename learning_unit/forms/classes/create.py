@@ -110,11 +110,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         widget=forms.TextInput(),
         required=False
     )
-    repartition_entity_2 = forms.ChoiceField(disabled=True, label=_("Additional requirement entity 1"), required=False)
-    repartition_entity_3 = forms.ChoiceField(disabled=True, label=_("Additional requirement entity 2"), required=False)
     repartition_volume_requirement_entity = forms.CharField(disabled=True, required=False)
-    repartition_volume_entity_2 = forms.CharField(disabled=True, required=False)
-    repartition_volume_entity_3 = forms.CharField(disabled=True, required=False)
 
     learning_unit_campus = forms.ChoiceField()
     learning_unit_responsible_entity = forms.ChoiceField(
@@ -164,16 +160,6 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         attribution_entity_code = self.learning_unit.attribution_entity_identity.code
         self.fields['learning_unit_allocation_entity'].choices = [(attribution_entity_code, attribution_entity_code)]
         self.fields['learning_unit_allocation_entity'].initial = attribution_entity_code
-        if repartition.entity_2:
-            repartition_entity_2 = repartition.entity_2.code
-            self.fields['repartition_entity_2'].choices = [(repartition_entity_2, repartition_entity_2)]
-            self.fields['repartition_entity_2'].initial = repartition_entity_2
-        if repartition.entity_3:
-            repartition_entity_3 = repartition.entity_3.code
-            self.fields['repartition_entity_3'].choices = [(repartition_entity_3, repartition_entity_3)]
-            self.fields['repartition_entity_3'].initial = repartition_entity_3
-        self.fields['repartition_volume_entity_2'].initial = repartition.repartition_volume_entity_2
-        self.fields['repartition_volume_entity_3'].initial = repartition.repartition_volume_entity_3
 
         # Fields editable for class, pre-filled from LearningUnit values
         quadri = self.learning_unit.derogation_quadrimester
