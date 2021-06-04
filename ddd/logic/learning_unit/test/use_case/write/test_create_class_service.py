@@ -30,7 +30,7 @@ from django.test import TestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.enums.learning_unit_year_session import SESSION_123
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
@@ -302,10 +302,9 @@ def _build_create_effective_class_command(
         volume_second_quadrimester=10,
         title_fr='Fr',
         title_en='en',
-        place=None,
-        organization_name=None,
         derogation_quadrimester='Q1',
-        session_derogation=SESSION_123
+        session_derogation=DerogationSession.SESSION_123.name,
+        teaching_place_uuid=None
     )
     return cmd
 
@@ -341,5 +340,6 @@ def _build_create_learning_unit_command() -> 'CreateLearningUnitCommand':
         lecturing_volume_q1=10.0,
         lecturing_volume_q2=10.0,
         lecturing_volume_annual=20.0,
-        derogation_quadrimester=DerogationQuadrimester.Q1.name
+        derogation_quadrimester=DerogationQuadrimester.Q1.name,
+        teaching_place_uuid=None
     )

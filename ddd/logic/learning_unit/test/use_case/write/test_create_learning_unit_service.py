@@ -67,6 +67,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
             lecturing_volume_q2=35.0,
             lecturing_volume_annual=60.0,
             derogation_quadrimester=DerogationQuadrimester.Q1and2.name,
+            teaching_place_uuid=None
         )
 
     def test_mapping_command_to_domain_obj(self):
