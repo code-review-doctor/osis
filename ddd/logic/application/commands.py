@@ -78,3 +78,8 @@ class DeleteApplicationCommand(interface.CommandRequest):
 class RenewMultipleAttributionsCommand(interface.CommandRequest):
     global_id = attr.ib(type=str)
     renew_codes = attr.ib(type=List[str])
+
+
+@attr.s(frozen=True, slots=True)
+class SendApplicationsSummaryCommand(interface.CommandRequest):
+    global_id = attr.ib(type=str)

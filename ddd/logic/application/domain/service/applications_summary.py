@@ -23,29 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from attribution.models.enums.function import Functions
-from ddd.logic.application.domain.model.attribution import Attribution
-from ddd.logic.application.dtos import AttributionFromRepositoryDTO
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
-from osis_common.ddd.interface import RootEntityBuilder
+import abc
+from typing import List
+
+from ddd.logic.application.domain.model.applicant import Applicant
+from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
+from osis_common.ddd import interface
 
 
-class AttributionBuilder(RootEntityBuilder):
+class ApplicationsSummary(interface.DomainService, abc.ABC):
+
     @classmethod
-    def build_from_repository_dto(
-            cls,
-            dto: AttributionFromRepositoryDTO,
-    ) -> Attribution:
-        return Attribution(
-            course_id=LearningUnitIdentity(
-                code=dto.course_id_code,
-                academic_year=AcademicYearIdentityBuilder.build_from_year(year=dto.course_id_year)
-            ),
-            course_title=dto.course_title or '',
-            end_year=AcademicYearIdentityBuilder.build_from_year(year=dto.end_year),
-            start_year=AcademicYearIdentityBuilder.build_from_year(year=dto.start_year),
-            function=Functions[dto.function] if dto.function else None,
-            lecturing_volume=dto.lecturing_volume,
-            practical_volume=dto.practical_volume
-        )
+    @abc.abstractmethod
+    def send(cls, applicant: Applicant, application_calendar: ApplicationCalendar, applications: List[Application]):
+        pass

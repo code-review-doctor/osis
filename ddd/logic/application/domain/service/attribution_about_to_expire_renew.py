@@ -56,6 +56,8 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             application_calendar.authorized_target_year
         )
         attributions_filtered = _filter_attribution_by_renewable_functions(attributions_about_to_expire)
+        if not attributions_about_to_expire:
+            return []
 
         # Lookup vacant course on next year for current attribution
         vacant_course_ids = [
@@ -87,7 +89,7 @@ class AttributionAboutToExpireRenew(interface.DomainService):
                 function=attribution_about_to_expire.function,
                 end_year=attribution_about_to_expire.end_year.year,
                 start_year=attribution_about_to_expire.start_year.year,
-                title=getattr(vacant_course_next_year, 'title', None),
+                title=getattr(vacant_course_next_year, 'title', None) or attribution_about_to_expire.course_title,
                 total_lecturing_volume_course=getattr(vacant_course_next_year, 'lecturing_volume_total', None),
                 total_practical_volume_course=getattr(vacant_course_next_year, 'practical_volume_total', None),
                 lecturing_volume_available=getattr(vacant_course_next_year, 'lecturing_volume_available', None),

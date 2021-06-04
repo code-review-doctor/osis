@@ -67,6 +67,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
                 code="LDROI1200",
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
             ),
+            course_title="Introduction au droit",
             function=Functions.CO_HOLDER,
             end_year=self.application_calendar.authorized_target_year,
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
@@ -143,6 +144,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
                 code="LAGRO1200",
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2020)
             ),
+            course_title="Introduction à l'agro",
             function=Functions.CO_HOLDER,
             end_year=self.application_calendar.authorized_target_year,
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),

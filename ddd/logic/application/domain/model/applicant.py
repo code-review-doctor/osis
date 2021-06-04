@@ -46,5 +46,6 @@ class Applicant(interface.RootEntity):
 
     def get_attributions_about_to_expire(self, academic_year_identity: AcademicYearIdentity):
         return [
-            attribution for attribution in self.attributions if attribution.end_year == academic_year_identity
+            attribution for attribution in self.attributions
+            if attribution.end_year == academic_year_identity and attribution.course_id.year == academic_year_identity
         ]

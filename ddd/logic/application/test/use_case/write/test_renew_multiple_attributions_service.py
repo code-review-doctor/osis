@@ -66,6 +66,7 @@ class TestRenewMultipleAttributionsService(TestCase):
                 code='LDROI1200',
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
             ),
+            course_title="Introduction au droit",
             function=Functions.HOLDER,
             end_year=cls.application_calendar.authorized_target_year,
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2017),

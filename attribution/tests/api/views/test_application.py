@@ -30,11 +30,11 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from attribution.api.views.application import ApplicationListCreateView, ApplicationUpdateDeleteView, \
-    RenewAttributionsAboutToExpire
+    RenewAttributionsAboutToExpire, SendApplicationsSummary
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, SearchApplicationByApplicantCommand, \
     DeleteApplicationCommand, UpdateApplicationCommand, GetAttributionsAboutToExpireCommand, \
-    RenewMultipleAttributionsCommand
+    RenewMultipleAttributionsCommand, SendApplicationsSummaryCommand
 
 
 class ApplicationCreateListViewTestCase(APITestCase):
@@ -207,3 +207,41 @@ class RenewAttributionsAboutToExpireTestCase(APITestCase):
         invoke_args = self.message_bus_mocked.call_args[0]
 
         self.assertIsInstance(invoke_args[0], RenewMultipleAttributionsCommand)
+
+
+class SendApplicationsSummaryTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory(person__global_id="2656859898")
+        cls.url = reverse('attribution_api_v1:' + SendApplicationsSummary.name)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.tutor.person.user)
+        self.patch_message_bus = mock.patch(
+            "attribution.api.views.application.message_bus_instance.invoke",
+            return_value=None
+        )
+        self.message_bus_mocked = self.patch_message_bus.start()
+        self.addCleanup(self.patch_message_bus.stop)
+
+    def test_user_not_logged_assert_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_assert_methods_not_allowed(self):
+        methods_not_allowed = ['get', 'patch', 'delete']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_post_assert_call_message_bus_invoke_send_applications_summary_command(self):
+        response = self.client.post(self.url, data={})
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        self.assertTrue(self.message_bus_mocked.called)
+        invoke_args = self.message_bus_mocked.call_args[0]
+
+        self.assertIsInstance(invoke_args[0], SendApplicationsSummaryCommand)

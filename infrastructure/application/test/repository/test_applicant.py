@@ -79,6 +79,7 @@ class ApplicantRepositoryGet(TestCase):
         self.assertEqual(len(applicant.attributions), 1)
         expected_attribution = Attribution(
             course_id=LearningUnitIdentity(code="LDROI1200", academic_year=AcademicYearIdentity(year=2018)),
+            course_title=self.ldroi1200.learning_container_year.common_title + " - " + self.ldroi1200.specific_title,
             function=Functions[self.attribution_practical_ldroi1200.attribution.function],
             end_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.end_year),
             start_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.start_year),

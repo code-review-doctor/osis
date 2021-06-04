@@ -36,6 +36,7 @@ from osis_common.ddd import interface
 @attr.s(frozen=True, slots=True)
 class Attribution(interface.ValueObject):
     course_id = attr.ib(type=LearningUnitIdentity)
+    course_title = attr.ib(type=str)
     function = attr.ib(type=Functions)
     end_year = attr.ib(type=AcademicYearIdentity)
     start_year = attr.ib(type=AcademicYearIdentity)

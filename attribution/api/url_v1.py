@@ -26,7 +26,7 @@
 from django.urls import path, include
 
 from attribution.api.views.application import ApplicationUpdateDeleteView, ApplicationListCreateView, \
-    RenewAttributionsAboutToExpire
+    RenewAttributionsAboutToExpire, SendApplicationsSummary
 from attribution.api.views.vacant_course import VacantCourseListView
 from attribution.api.views.attribution import AttributionListView, MyAttributionListView
 from attribution.api.views.calendar import ApplicationCoursesCalendarListView
@@ -38,6 +38,7 @@ urlpatterns = [
         path('vacant_courses', VacantCourseListView.as_view(), name=VacantCourseListView.name),
         path('renewal', RenewAttributionsAboutToExpire.as_view(), name=RenewAttributionsAboutToExpire.name),
         path('<str:application_uuid>/', ApplicationUpdateDeleteView.as_view(), name=ApplicationUpdateDeleteView.name),
+        path('send_summary', SendApplicationsSummary.as_view(), name=SendApplicationsSummary.name),
         path('', ApplicationListCreateView.as_view(), name=ApplicationListCreateView.name),
     ])),
 

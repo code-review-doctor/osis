@@ -33,7 +33,7 @@ from backoffice.settings.rest_framework.common_views import DisplayExceptionsByF
 from base.models.person import Person
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand, ApplyOnVacantCourseCommand, \
     UpdateApplicationCommand, DeleteApplicationCommand, GetAttributionsAboutToExpireCommand, \
-    RenewMultipleAttributionsCommand
+    RenewMultipleAttributionsCommand, SendApplicationsSummaryCommand
 from ddd.logic.application.domain.validator.exceptions import VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     LecturingAndPracticalChargeNotFilledException
 from infrastructure.messages_bus import message_bus_instance
@@ -150,3 +150,19 @@ class RenewAttributionsAboutToExpire(views.APIView):
             "count": len(serializer.data),
             "results": serializer.data
         })
+
+
+class SendApplicationsSummary(views.APIView):
+    """
+        POST:  Send applications summary
+    """
+    name = 'send_applications_summary'
+
+    @cached_property
+    def person(self) -> Person:
+        return self.request.user.person
+
+    def post(self, request, *args, **kwargs):
+        cmd = SendApplicationsSummaryCommand(global_id=self.person.global_id)
+        message_bus_instance.invoke(cmd)
+        return Response(status=status.HTTP_204_NO_CONTENT)

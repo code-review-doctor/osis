@@ -59,6 +59,21 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - application
+  /application/send_summary:
+    post:
+      description: 'Send an applications summary on the current application period'
+      operationId: applications_summary_send
+      responses:
+        '204':
+          description: 'The summary email has been sent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
   /application/{application_uuid}/:
     put:
       description: 'Update an application on the current application period'
@@ -103,7 +118,7 @@ paths:
             type: string
       responses:
         '204':
-          description: The resource was deleted successfully.
+          description: 'The resource was deleted successfully.'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

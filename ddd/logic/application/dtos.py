@@ -35,6 +35,7 @@ from osis_common.ddd.interface import DTO
 class AttributionFromRepositoryDTO(DTO):
     course_id_code = attr.ib(type=str)
     course_id_year = attr.ib(type=int)
+    course_title = attr.ib(type=int)
     applicant_id_global_id = attr.ib(type=str)
     function = attr.ib(type=str)
     end_year = attr.ib(type=int)

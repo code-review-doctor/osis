@@ -27,7 +27,7 @@ from typing import Dict, Callable, List
 
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
-    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand
+    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand
 from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
     get_attributions_about_to_expire
 from ddd.logic.application.use_case.read.search_applications_by_applicant_service import \
@@ -36,6 +36,7 @@ from ddd.logic.application.use_case.read.search_vacant_courses_service import se
 from ddd.logic.application.use_case.write.apply_on_vacant_course_service import apply_on_vacant_course
 from ddd.logic.application.use_case.write.delete_application_service import delete_application
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
+from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -47,6 +48,7 @@ from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
+from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
@@ -91,6 +93,10 @@ class MessageBus:
         GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
             ApplicantRepository(), VacantCourseRepository()
+        ),
+        SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
+            ApplicationsMailSummary()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
