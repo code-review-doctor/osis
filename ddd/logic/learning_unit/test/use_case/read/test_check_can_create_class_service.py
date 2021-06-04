@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
 from django.test import TestCase
 
@@ -98,10 +97,8 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasNoVolumeException, raised_exceptions)
 
-    @mock.patch('infrastructure.learning_unit.repository.in_memory.learning_unit.'
-                'LearningUnitRepository.has_enrollments')
-    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self, mock_has_enrollments):
-        mock_has_enrollments.return_value = True
+    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self):
+        self.learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
 
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
@@ -116,10 +113,8 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasEnrollmentException, raised_exceptions)
 
-    @mock.patch('infrastructure.learning_unit.repository.in_memory.learning_unit.'
-                'LearningUnitRepository.has_proposal')
-    def test_check_cannot_create_effective_class_for_lu_with_proposal(self, mock_has_proposal):
-        mock_has_proposal.return_value = True
+    def test_check_cannot_create_effective_class_for_lu_with_proposal(self):
+        self.learning_unit_repository.has_proposal = lambda *args, **kwargs: True
 
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
