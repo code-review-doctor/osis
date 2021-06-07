@@ -56,10 +56,9 @@ class LearningClassYear(models.Model):
         on_delete=models.CASCADE
     )
     acronym = models.CharField(max_length=1, validators=[only_alphanumeric_validator])
-    description = models.CharField(max_length=100, blank=True)  # FIXME: to delete when classes development finished
 
     title_fr = models.CharField(max_length=255, blank=True, verbose_name=_('Title in French'))
-    title_en = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Title in English'))
+    title_en = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Title in English'))
 
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q1"))

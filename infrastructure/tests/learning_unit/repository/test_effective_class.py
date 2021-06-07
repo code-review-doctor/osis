@@ -83,4 +83,5 @@ class EffectiveClassRepositoryTestCase(TestCase):
             )
             for class_db in classes_db
         ]
-        self.assertListEqual(identities, self.class_repository.get_all_identities())
+        # assert lists contain same elements regardless order
+        self.assertCountEqual(identities, self.class_repository.get_all_identities())

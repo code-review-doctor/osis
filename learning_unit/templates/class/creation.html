@@ -55,10 +55,13 @@
                                     {% block content_row1 %}
                                         <div class="col-md-3">
                                             <label>
-                                                {% trans 'Code' %}
+                                                {% trans 'Code' %} *
                                             </label>
+                                            <abbr title="{% trans 'external acronym rules' %}">
+                                            <span class="glyphicon glyphicon-question-sign "
+                                                  title="{% trans 'external acronym rules' %}"
+                                                  style="font-size: 14pt;"></span></abbr>
                                             <br>
-
                                             <div class="form-group input-group">
                                                 <div class="input-group">
                                                     <span class="input-group-addon" id="basic-addon1">{{ form.learning_unit_code.initial }}</span>
@@ -115,7 +118,12 @@
                                         {% bootstrap_field form.quadrimester %}
                                     </div>
                                     <div class="col-md-6">
-                                        {% bootstrap_field form.session %}
+                                        {% bootstrap_label form.session.label %}
+                                        <abbr title="{% trans 'The derogation session field must be completed ONLY if you want to encode an exception in relation to the sessions calculated according to the quadrimesters.' %}">
+                                            <span class="glyphicon glyphicon-question-sign"
+                                                  style="font-size: 14pt;"></span>
+                                        </abbr>
+                                        {% bootstrap_field form.session show_label=False%}
                                     </div>
                                 </div>
                                 <div>

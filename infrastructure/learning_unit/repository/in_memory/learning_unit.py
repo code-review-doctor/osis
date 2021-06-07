@@ -22,7 +22,7 @@ class LearningUnitRepository(ILearningUnitRepository):
 
     # TODO: To implement when Proposals are in DDD
     @classmethod
-    def has_proposal(cls, learning_unit: 'LearningUnit') -> bool:
+    def has_proposal_this_year_or_in_past(cls, learning_unit: 'LearningUnit') -> bool:
         return False
 
     # TODO: To implement when Enrollments are in DDD

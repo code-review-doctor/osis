@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-01 10:29+0200\n"
+"POT-Creation-Date: 2021-06-07 08:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,7 +63,7 @@ msgstr ""
 msgid "Credits"
 msgstr ""
 
-msgid "Entity charges"
+msgid "Derogation's session"
 msgstr ""
 
 msgid "Faculty manager"
@@ -72,7 +72,7 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
-msgid "Faculty remark"
+msgid "Faculty remark (unpublished)"
 msgstr ""
 
 msgid "Formation catalogue"
@@ -120,7 +120,10 @@ msgstr ""
 msgid "Only alphanumeric characters are allowed."
 msgstr ""
 
-msgid "Other remark"
+msgid "Other remark (intended for publication)"
+msgstr ""
+
+msgid "Other remark in english (intended for publication)"
 msgstr ""
 
 msgid "Periodicity"
@@ -151,6 +154,12 @@ msgid "Requirement entity"
 msgstr ""
 
 msgid "Session derogation"
+msgstr ""
+
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
 msgstr ""
 
 #, python-format
@@ -295,6 +304,9 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "external acronym rules"
 msgstr ""
 
 msgid "hourly volume partial q1"
