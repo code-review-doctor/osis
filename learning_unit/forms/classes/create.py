@@ -70,7 +70,6 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         required=False,
     )
     session = forms.ChoiceField(
-        choices=add_blank(DerogationSession.choices()),
         required=False,
         label=_("Derogation's session")
     )
@@ -196,8 +195,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         # Fields editable for class, pre-filled from LearningUnit values
         quadri = self.learning_unit.derogation_quadrimester
         self.fields['quadrimester'].initial = quadri.name if quadri else None
-        session = self.learning_unit.derogation_session
-        self.fields['session'].initial = session.name if session else None
+        self.__init_session(self.learning_unit.derogation_session)
         self.fields['hourly_volume_partial_q1'].initial = volumes.volume_first_quadrimester
         self.fields['hourly_volume_partial_q2'].initial = volumes.volume_second_quadrimester
         self.fields['volume_total_annual'].initial = volumes.volume_annual
@@ -247,7 +245,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             title_en=self.cleaned_data['title_en'],
             teaching_place_uuid=self.cleaned_data['learning_unit_campus'],
             derogation_quadrimester=self.cleaned_data['quadrimester'],
-            session_derogation=session,
+            session_derogation=self.cleaned_data['session'],
             volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,
             volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'] or 0,
         )
@@ -263,3 +261,11 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             (self.learning_unit.responsible_entity_identity.code, self.learning_unit.responsible_entity_identity.code),
         ]
         self.fields['learning_unit_responsible_entity'].initial = self.learning_unit.responsible_entity_identity.code
+
+    def __init_session(self, derogation_session: DerogationSession):
+        session_choices = []
+        for session_choice in DerogationSession.choices():
+            session_choices.append((session_choice[1], session_choice[1]))
+        self.fields['session'].choices = add_blank(session_choices)
+        session = self.learning_unit.derogation_session
+        self.fields['session'].initial = session.value if session else None
