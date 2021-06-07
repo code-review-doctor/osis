@@ -71,7 +71,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     )
     session = forms.ChoiceField(
         choices=add_blank(DerogationSession.choices()),
-        required=False
+        required=False,
+        label=_("Derogation's session")
     )
     quadrimester = forms.ChoiceField(
         choices=add_blank(quadrimesters.DerogationQuadrimester.choices()),
@@ -84,7 +85,12 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     learning_unit_code = forms.CharField(disabled=True, max_length=15, required=False)
     learning_unit_type = forms.ChoiceField(disabled=True, label=_('Type'), required=False)
     learning_unit_internship_subtype = forms.ChoiceField(disabled=True, label=_('Internship subtype'), required=False)
-    learning_unit_credits = forms.CharField(disabled=True, label=_('Credits'), required=False)
+    learning_unit_credits = forms.CharField(
+        disabled=True,
+        label=_('Credits'),
+        required=False,
+        widget=DecimalFormatInput(render_value=True)
+    )
     learning_unit_periodicity = forms.ChoiceField(disabled=True, label=_('Periodicity'), required=False)
     learning_unit_state = forms.BooleanField(disabled=True, label=_('Active'), required=False)
     learning_unit_language = forms.ChoiceField(disabled=True, label=_('Language'), required=False)
@@ -95,9 +101,21 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     )
     learning_unit_common_title_fr = forms.CharField(disabled=True, label=_('Common part'), required=False)
     learning_unit_common_title_en = forms.CharField(disabled=True, label=_('Common part'), required=False)
-    learning_unit_remarks_faculty = forms.CharField(disabled=True, label=_('Faculty remark'), required=False)
-    learning_unit_remarks_publication_fr = forms.CharField(disabled=True, label=_('Other remark'), required=False)
-
+    learning_unit_remarks_faculty = forms.CharField(
+        disabled=True,
+        label=_('Faculty remark (unpublished)'),
+        required=False
+    )
+    learning_unit_remarks_publication_fr = forms.CharField(
+        disabled=True,
+        label=_('Other remark (intended for publication)'),
+        required=False
+    )
+    learning_unit_remarks_publication_en = forms.CharField(
+        disabled=True,
+        label=_('Other remark in english (intended for publication)'),
+        required=False
+    )
     volume_total_annual = VolumeField(
         label=_('Vol. annual'),
         widget=DecimalFormatInput(render_value=True),
@@ -116,7 +134,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     repartition_volume_entity_2 = forms.CharField(disabled=True, required=False)
     repartition_volume_entity_3 = forms.CharField(disabled=True, required=False)
 
-    learning_unit_campus = forms.ChoiceField()
+    learning_unit_campus = forms.ChoiceField(label=_("Learning location"))
     learning_unit_responsible_entity = forms.ChoiceField(
         required=False,
         disabled=True,
@@ -188,6 +206,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     def __init_remarks(self, learning_unit):
         self.fields['learning_unit_remarks_faculty'].initial = learning_unit.remarks.faculty
         self.fields['learning_unit_remarks_publication_fr'].initial = learning_unit.remarks.publication_fr
+        self.fields['learning_unit_remarks_publication_en'].initial = learning_unit.remarks.publication_en
 
     def __init_titles(self, learning_unit):
         self.fields['learning_unit_common_title_fr'].initial = learning_unit.titles.common_fr
