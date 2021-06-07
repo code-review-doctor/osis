@@ -98,6 +98,8 @@ class TrainingRepository(interface.AbstractRepository):
         _save_first_year_bachelor(training, education_group_year_db_obj)
         _save_secondary_domains(training, education_group_year_db_obj)
         _save_hops(training, education_group_year_db_obj)
+        if training.diploma.aims is not None:
+            _save_certificate_aims(training, education_group_year_db_obj)
         return training.entity_id
 
     @classmethod
