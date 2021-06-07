@@ -31,7 +31,7 @@ from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasNoVolumeException, LearningUnitHasEnrollmentException, \
     LearningUnitHasProposalException
-from ddd.logic.learning_unit.test.factory.learning_unit import LDROI1002ExternalLearningUnitFactory, \
+from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1002ExternalLearningUnitFactory, \
     LDROI1001CourseLearningUnitFactory, LDROI1003CourseWithPartimsLearningUnitFactory, \
     LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
