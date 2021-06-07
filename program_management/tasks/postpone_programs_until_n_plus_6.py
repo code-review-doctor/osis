@@ -30,6 +30,7 @@ from base.business.education_groups.achievement import bulk_postpone_achievement
 from base.business.education_groups.publication_contact import bulk_postpone_publication_contact, \
     bulk_postpone_publication_entity
 from base.models.education_group_year import EducationGroupYear
+from education_group.cms import postpone_commons
 
 from education_group.ddd.command import PostponeGroupsUntilNPlus6Command, PostponeTrainingsUntilNPlus6Command, \
     PostponeMiniTrainingsUntilNPlus6Command
@@ -71,6 +72,8 @@ def run() -> dict:
 
 
 def postpone_to_n_publication_datas(to_year: int):
+    postpone_commons.postpone_to_year(to_year)
+
     education_group_year_qs = EducationGroupYear.objects.filter(academic_year__year=to_year-1)
     group_year_qs = GroupYear.objects.filter(academic_year__year=to_year-1)
 
