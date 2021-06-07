@@ -28,9 +28,11 @@
 {% block breadcrumb %}
     <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
     <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
-    {% if learning_unit_year.id %}
-        <li><a href="{% url 'learning_unit' learning_unit_year.id %}">{{ learning_unit_year.acronym }}</a></li>
-    {% endif %}
+    <li>
+        <a href="{% url 'learning_unit' acronym=form.learning_unit_code.initial year=form.learning_unit_year.initial %}">
+            {{ form.learning_unit_code.initial }}
+        </a>
+    </li>
     <li class="active">{% trans 'New class' %}</li>
 {% endblock %}
 {% block header_content %}
