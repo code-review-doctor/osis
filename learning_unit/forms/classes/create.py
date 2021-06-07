@@ -43,6 +43,7 @@ from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesComma
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.domain.model.language import Language
+from education_group.forms.fields import UpperCaseCharField
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.forms.widgets import DecimalFormatInput
 
@@ -53,7 +54,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         exceptions.AnnualVolumeInvalidException: ('hourly_volume_partial_q1', 'hourly_volume_partial_q2'),
     }
 
-    class_code = forms.CharField(max_length=1, required=True, label=_('Code'))
+    class_code = UpperCaseCharField(max_length=1, required=True, label=_('Code'))
 
     title_fr = forms.CharField(max_length=255, required=True, label=_('Class specific complement'))
     title_en = forms.CharField(max_length=255, required=False, label=_('Class specific complement'))
@@ -109,11 +110,11 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         widget=forms.TextInput(),
         required=False
     )
-    repartition_entity_2 = forms.ChoiceField(disabled=True, label=_("Additional requirement entity 1"))
-    repartition_entity_3 = forms.ChoiceField(disabled=True, label=_("Additional requirement entity 2"))
+    repartition_entity_2 = forms.ChoiceField(disabled=True, label=_("Additional requirement entity 1"), required=False)
+    repartition_entity_3 = forms.ChoiceField(disabled=True, label=_("Additional requirement entity 2"), required=False)
     repartition_volume_requirement_entity = forms.CharField(disabled=True, required=False)
-    repartition_volume_entity_2 = forms.CharField(disabled=True)
-    repartition_volume_entity_3 = forms.CharField(disabled=True)
+    repartition_volume_entity_2 = forms.CharField(disabled=True, required=False)
+    repartition_volume_entity_3 = forms.CharField(disabled=True, required=False)
 
     learning_unit_campus = forms.ChoiceField()
     learning_unit_responsible_entity = forms.ChoiceField(
