@@ -23,43 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
 
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from osis_common.ddd import interface
+from django.test import SimpleTestCase
+
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand
+from ddd.logic.learning_unit.test.factory.learning_unit import LDROI1001CourseLearningUnitFactory
+from ddd.logic.learning_unit.use_case.read import get_learning_unit_service
+from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
-class ILearningUnitRepository(interface.AbstractRepository):
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
-        pass
+class TestGetLearningUnitService(SimpleTestCase):
 
-    @classmethod
-    @abc.abstractmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
-        pass
+    def setUp(self):
+        self.learning_unit_repository = LearningUnitRepository()
+        self.learning_unit = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(self.learning_unit)
+        self.command = GetLearningUnitCommand(code=self.learning_unit.code, year=self.learning_unit.year)
 
-    @classmethod
-    @abc.abstractmethod
-    def has_proposal_this_year_or_in_past(cls, learning_unit: 'LearningUnit') -> bool:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments(cls, learning_unit: 'LearningUnit') -> bool:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_all_identities(cls) -> List['LearningUnitIdentity']:
-        pass
+    def test_get_correct_learning_unit(self):
+        learning_unit = get_learning_unit_service.get_learning_unit(
+            self.command,
+            self.learning_unit_repository,
+        )
+        self.assertEqual(learning_unit, self.learning_unit)
+        fields = vars(self.learning_unit)
+        for field in fields:
+            self.assertEqual(getattr(learning_unit, field), getattr(self.learning_unit, field), field)

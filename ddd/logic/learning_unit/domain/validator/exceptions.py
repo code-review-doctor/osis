@@ -127,7 +127,8 @@ class ShouldBeAlphanumericException(BusinessException):
 
 class CodeClassAlreadyExistForUeException(BusinessException):
     def __init__(self, learning_unit_identity: 'LearningUnitIdentity', code: str, *args, **kwargs):
-        message = _("The code %(code)s already exists for %(ue)s") % {
+        message = _("The code %('ue_code')s - %(code)s already exists for %(ue)s") % {
+            'ue_code': learning_unit_identity.code,
             'code': code,
             'ue': learning_unit_identity,
         }
@@ -153,7 +154,7 @@ class LearningUnitHasPartimException(BusinessException):
 class LearningUnitHasProposalException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(
-            "Class can't be created on learning unit having proposal"
+            "You cannot create a class on this learning unit because it is in proposal this year or in past."
         )
         super().__init__(message, **kwargs)
 

@@ -27,11 +27,13 @@
 import attr
 from django.test import SimpleTestCase
 
+from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from base.tests.factories.campus import CampusFactory
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
-from ddd.logic.learning_unit.test.factory.ucl_entity import DRTEntityFactory
+from ddd.logic.learning_unit.tests.factory.ucl_entity import DRTEntityFactory
 from ddd.logic.learning_unit.use_case.write import create_learning_unit_service
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 from infrastructure.learning_unit.repository.in_memory.ucl_entity import UclEntityRepository
@@ -44,6 +46,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
         self.entity_repository = UclEntityRepository()
         self.fac_drt = DRTEntityFactory()
         self.entity_repository.save(self.fac_drt)
+        campus = CampusFactory(organization__type=organization_type.MAIN)
         self.command = CreateLearningUnitCommand(
             code="LDROI1001",
             academic_year=2020,
@@ -67,6 +70,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
             lecturing_volume_q2=35.0,
             lecturing_volume_annual=60.0,
             derogation_quadrimester=DerogationQuadrimester.Q1and2.name,
+            teaching_place_uuid=campus.uuid
         )
 
     def test_mapping_command_to_domain_obj(self):

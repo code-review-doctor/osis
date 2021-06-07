@@ -30,29 +30,11 @@
         <thead>
         <tr>
             <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
-            <th>[</th>
-            <th>(</th>
             <th class="text-center" title="{% trans 'Volume Q1' %}">{% trans 'Vol. Q1' %}</th>
             <th>+</th>
             <th class="text-center" title="{% trans 'Volume Q2' %}">{% trans 'Vol. Q2' %}</th>
-            <th>)</th>
             <th>=</th>
             <th class="text-center" title="{% trans 'Annual volume' %}">{% trans 'Vol. annual' %}</th>
-            <th>]</th>
-            <th>*</th>
-            <th class="text-center" title="{% trans 'Planned classes' %}">{% trans 'Planned classes' %}</th>
-            <th>=</th>
-            <th>[</th>
-            <th class="text-center" title="{% trans 'Requirement entity' %}">{{ form.learning_unit_responsible_entity.initial }}</th>
-            {% if form.repartition_entity_2.initial %}
-                <th>+</th>
-                <th class="text-center" title="{% trans 'Additional requirement entity 1' %}">{{ form.repartition_entity_2.initial }}</th>
-            {% endif %}
-            {% if form.repartition_entity_3.initial %}
-                <th>+</th>
-                <th class="text-center" title="{% trans 'Additional requirement entity 2' %}">{{ form.repartition_entity_3.initial }}</th>
-            {% endif %}
-            <th>]</th>
         </tr>
         </thead>
         <tbody>
@@ -61,27 +43,11 @@
                 <td>
                     <input type="text" value="{{ form.class_type.value }}" style="background: rgba(0, 0, 0, 0);border: none;"/>
                 </td>
-                <td></td>
-                <td></td>
                 <td>{% bootstrap_field form.hourly_volume_partial_q1 show_label=False %}</td>
                 <td></td>
                 <td>{% bootstrap_field form.hourly_volume_partial_q2 show_label=False %}</td>
                 <td></td>
-                <td></td>
                 <td>{% bootstrap_field form.volume_total_annual show_label=False %}</td>
-                <td></td><td></td>
-                <td>{% bootstrap_field form.planned_classes show_label=False %}</td>
-                <td></td><td></td>
-                <td>{% bootstrap_field form.repartition_volume_requirement_entity show_label=False %}</td>
-                {% if form.repartition_entity_2.initial %}
-                    <td></td>
-                    <td>{% bootstrap_field form.repartition_volume_entity_2 show_label=False %}</td>
-                {% endif %}
-                {% if form.repartition_entity_3.initial %}
-                    <td></td>
-                    <td>{% bootstrap_field form.repartition_volume_entity_3 show_label=False %}</td>
-                {% endif %}
-                <td></td>
             </tr>
 
         </tbody>
