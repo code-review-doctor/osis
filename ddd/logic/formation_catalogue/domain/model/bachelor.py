@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
 
 import attr
 
@@ -35,3 +36,10 @@ from education_group.ddd.domain.training import Training
 class Bachelor(Training):
     first_year_bachelor = attr.ib(type=FirstYearBachelor, kw_only=True)
     type = TrainingType.BACHELOR
+
+    def get_acronym_first_year(self):
+        pattern_1ba = re.compile(r'1BA')
+        return pattern_1ba.sub(
+            self.first_year_bachelor.entity_id.acronym,
+            self.acronym
+        )

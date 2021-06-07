@@ -24,12 +24,13 @@
 #
 ##############################################################################
 from typing import List, Optional
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy as _
 
 from assessments.models.enums import score_sheet_address_choices
-from base.models.education_group_year import EducationGroupYear
+from education_group.models.enums.cohort_name import CohortName
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -55,6 +56,14 @@ class ScoreSheetAddress(models.Model):
         'base.EducationGroup',
         on_delete=models.CASCADE,
     )
+    cohort_name = models.CharField(
+        max_length=25,
+        blank=True,
+        null=True,
+        choices=CohortName.choices(),
+        default=None,
+        verbose_name=_('Cohort name'),
+    )
     # Info to find the address
     entity_address_choice = models.CharField(max_length=50, blank=True, null=True,
                                              choices=score_sheet_address_choices.CHOICES)
@@ -68,9 +77,17 @@ class ScoreSheetAddress(models.Model):
         blank=True, null=True,
         on_delete=models.CASCADE
     )
-    phone = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Phone"))
-    fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=gettext_lazy("Fax"))
-    email = models.EmailField(null=True, blank=True, verbose_name=gettext_lazy("Email"))
+    phone = models.CharField(max_length=30, blank=True, null=True, verbose_name=_("Phone"))
+    fax = models.CharField(max_length=30, blank=True, null=True, verbose_name=_("Fax"))
+    email = models.EmailField(null=True, blank=True, verbose_name=_("Email"))
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['education_group', 'cohort_name'],
+                name='unique_education_group_year_cohort'
+            )
+        ]
 
     @property
     def offer_acronym(self):
