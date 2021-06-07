@@ -51,10 +51,10 @@ from reference.models.language import Language as LanguageDatabase
 class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
-    def has_proposal(cls, learning_unit: 'LearningUnit') -> bool:
+    def has_proposal_this_year_or_in_past(cls, learning_unit: 'LearningUnit') -> bool:
         return ProposalLearningUnitDatabase.objects.filter(
             learning_unit_year__acronym=learning_unit.entity_id.code,
-            learning_unit_year__academic_year__year=learning_unit.entity_id.year
+            learning_unit_year__academic_year__year__lte=learning_unit.entity_id.year
         ).exists()
 
     @classmethod

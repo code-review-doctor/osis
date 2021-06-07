@@ -51,7 +51,7 @@ class ILearningUnitRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def has_proposal(cls, learning_unit: 'LearningUnit') -> bool:
+    def has_proposal_this_year_or_in_past(cls, learning_unit: 'LearningUnit') -> bool:
         pass
 
     @classmethod

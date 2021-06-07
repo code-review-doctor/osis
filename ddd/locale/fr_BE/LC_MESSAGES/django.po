@@ -30,11 +30,6 @@ msgstr ""
 "Vous ne pouvez pas créer des classes sur une unité d'enseignement ayant des "
 "partims."
 
-msgid "Class can't be created on learning unit having proposal"
-msgstr ""
-"Vous ne pouvez pas créer une nouvelle classe sur cette unité d'enseignement "
-"car elle est en proposition pour cette année ou une année antérieure."
-
 msgid "Class can't be neither mobility nor external"
 msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
@@ -81,6 +76,13 @@ msgid ""
 msgstr ""
 "La somme des volumes Q1 et Q2 doit être égale au volume annuel de l'unité "
 "d'enseignement ({}) "
+
+msgid ""
+"You cannot create a class on this learning unit because it is in proposal "
+"this year or in past."
+msgstr ""
+"Vous ne pouvez pas créer une nouvelle classe sur cette unité d'enseignement "
+"car elle est en proposition pour cette année ou une année antérieure."
 
 msgid ""
 "You cannot create class on this learning unit because the component's annual "

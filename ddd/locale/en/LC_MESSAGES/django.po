@@ -27,9 +27,6 @@ msgstr ""
 msgid "Class can't be created on learning unit having partim"
 msgstr ""
 
-msgid "Class can't be created on learning unit having proposal"
-msgstr ""
-
 msgid "Class can't be neither mobility nor external"
 msgstr ""
 
@@ -74,6 +71,11 @@ msgstr ""
 msgid ""
 "The sum of first/second quadrimesters volumes should be equal to annual "
 "volume of the learning unit ({})"
+msgstr ""
+
+msgid ""
+"You cannot create a class on this learning unit because it is in proposal "
+"this year or in past."
 msgstr ""
 
 msgid ""
