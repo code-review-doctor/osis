@@ -42,6 +42,7 @@ from program_management.ddd.validators._authorized_root_type_for_prerequisite im
 from program_management.ddd.validators._block_validator import BlockValidator
 from program_management.ddd.validators._cannot_fill_content_of_program_tree_of_type_finality import \
     CannotFillContentOfProgramTreeOfTypeFinalityValidator
+from program_management.ddd.validators._code_pattern import CodePatternValidator
 from program_management.ddd.validators._copy_check_end_date_program_tree import CheckProgramTreeEndDateValidator
 from program_management.ddd.validators._copy_check_end_date_tree_version import CheckTreeVersionEndDateValidator
 from program_management.ddd.validators._delete_check_versions_end_date import CheckVersionsEndDateValidator
@@ -336,6 +337,14 @@ class CreateProgramTreeTransitionVersionValidatorList(BusinessListValidator):
             VersionNameExistsValidator(year, offer_acronym, version_name, transition_name),
             TransitionNamePatternValidator(transition_name=transition_name),
             CheckExistenceOfTransition(end_year, year, offer_acronym, version_name, transition_name)
+        ]
+        super().__init__()
+
+
+class CreateProgramTreeStandardVersionValidatorList(BusinessListValidator):
+    def __init__(self, program_tree: 'ProgramTree'):
+        self.validators = [
+            CodePatternValidator(program_tree.entity_id.code, program_tree.root_node.category.name),
         ]
         super().__init__()
 
