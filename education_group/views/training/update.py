@@ -35,8 +35,7 @@ from django.views import View
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages, \
-    check_formations_impacted_by_update
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from education_group.ddd import command
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -105,8 +104,6 @@ class TrainingUpdateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                     updated_trainings
                 )
                 display_success_messages(request, success_messages, extra_tags='safe')
-                check_formations_impacted_by_update(self.get_training_obj().code, self.get_training_obj().year,
-                                                    request, self.get_training_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)
