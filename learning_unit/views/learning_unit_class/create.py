@@ -62,13 +62,13 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         )
 
     def get(self, request, *args, **kwargs):
-        # try:
-        #     message_bus_instance.invoke(
-        #         CanCreateEffectiveClassCommand(learning_unit_code=self.learning_unit_code, learning_unit_year=self.year)
-        #     )
-        # except MultipleBusinessExceptions as e:
-        #     display_error_messages(request, [exc.message for exc in e.exceptions])
-        #     return self.redirect_to_learning_unit_identification()
+        try:
+            message_bus_instance.invoke(
+                CanCreateEffectiveClassCommand(learning_unit_code=self.learning_unit_code, learning_unit_year=self.year)
+            )
+        except MultipleBusinessExceptions as e:
+            display_error_messages(request, [exc.message for exc in e.exceptions])
+            return self.redirect_to_learning_unit_identification()
 
         return super().get(request, *args, **kwargs)
 
