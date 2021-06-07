@@ -28,6 +28,7 @@ from typing import List, Optional
 
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
+from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
@@ -43,6 +44,15 @@ class IApplicationRepository(interface.AbstractRepository):
             academic_year_id: AcademicYearIdentity = None,
             **kwargs
     ) -> List[Application]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_by_applicant(
+            cls,
+            applicant_id: ApplicantIdentity,
+            academic_year_id: AcademicYearIdentity,
+    ) -> List[ApplicationByApplicantDTO]:
         pass
 
     @classmethod

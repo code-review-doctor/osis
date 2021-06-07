@@ -94,3 +94,14 @@ class AttributionAboutToExpireDTO(DTO):
     practical_volume_available = attr.ib(type=Decimal)
     unavailable_renewal_reason = attr.ib(type=str)
     is_renewable = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class ApplicationByApplicantDTO(DTO):
+    uuid = attr.ib(type=str)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
+    remark = attr.ib(type=str)
+    course_summary = attr.ib(type=str)

@@ -27,7 +27,7 @@ from typing import List
 
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
-from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 
@@ -36,13 +36,13 @@ def search_applications_by_applicant(
         cmd: SearchApplicationByApplicantCommand,
         application_repository: IApplicationRepository,
         application_calendar_repository: IApplicationCalendarRepository,
-) -> List[Application]:
+) -> List[ApplicationByApplicantDTO]:
     # Given
     application_calendar = application_calendar_repository.get_current_application_calendar()
     applicant_id = ApplicantIdentityBuilder.build_from_global_id(global_id=cmd.global_id)
 
     # Then
-    return application_repository.search(
+    return application_repository.search_by_applicant(
         applicant_id=applicant_id,
         academic_year_id=application_calendar.authorized_target_year,
     )
