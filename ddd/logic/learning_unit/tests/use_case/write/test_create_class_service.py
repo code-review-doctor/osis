@@ -329,7 +329,7 @@ def _build_create_effective_class_command(
         title_fr='Fr',
         title_en='en',
         derogation_quadrimester='Q1',
-        session_derogation=DerogationSession.SESSION_123.name,
+        session_derogation=DerogationSession.DEROGATION_SESSION_123.name,
         teaching_place_uuid=None
     )
     return cmd

@@ -236,6 +236,9 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.initial['learning_unit_campus'] = campus.entity_id.uuid
 
     def get_command(self) -> CreateEffectiveClassCommand:
+        session = None
+        if self.cleaned_data['session']:
+            session = DerogationSession[self.cleaned_data['session']].value
         return CreateEffectiveClassCommand(
             class_code=self.cleaned_data['class_code'],
             learning_unit_code=self.learning_unit.code,
@@ -244,7 +247,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             title_en=self.cleaned_data['title_en'],
             teaching_place_uuid=self.cleaned_data['learning_unit_campus'],
             derogation_quadrimester=self.cleaned_data['quadrimester'],
-            session_derogation=self.cleaned_data['session'],
+            session_derogation=session,
             volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,
             volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'] or 0,
         )
