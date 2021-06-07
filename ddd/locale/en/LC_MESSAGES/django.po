@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-01 10:11+0200\n"
+"POT-Creation-Date: 2021-06-07 08:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,7 +55,7 @@ msgid "Selected entity {} is not an authorized responsible entity"
 msgstr ""
 
 #, python-format
-msgid "The code %(code)s already exists for %(ue)s"
+msgid "The code %('ue_code')s - %(code)s already exists for %(ue)s"
 msgstr ""
 
 msgid "The code {} already exists"
