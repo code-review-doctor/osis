@@ -33,6 +33,8 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.enums.internship_presence import InternshipPresence
 from base.models.enums.rate_code import RateCode
 from base.models.enums.schedule_type import ScheduleTypeEnum
+from ddd.logic.formation_catalogue.domain.model._first_year_bachelor import FirstYearBachelor, FirstYearBachelorIdentity
+from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
 from education_group.tests.ddd.factories.campus import CampusIdentityFactory
 from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
@@ -111,3 +113,27 @@ class TrainingFactory(factory.Factory):
     academic_type = factory.fuzzy.FuzzyChoice(AcademicTypes)
     duration_unit = factory.fuzzy.FuzzyChoice(DurationUnitsEnum)
     diploma = factory.SubFactory(DiplomaFactory)
+
+
+class FirstYearBachelorIdentityFactory(factory.Factory):
+    class Meta:
+        model = FirstYearBachelorIdentity
+        abstract = False
+
+
+class FirstYearBachelorFactory(factory.Factory):
+    class Meta:
+        model = FirstYearBachelor
+        abstract = False
+
+    entity_id = factory.SubFactory(FirstYearBachelorIdentityFactory)
+    administration_entity = factory.SubFactory(EntityFactory)
+
+
+class BachelorFactory(TrainingFactory):
+    class Meta:
+        model = Bachelor
+        abstract = False
+
+    first_year_bachelor = factory.SubFactory(FirstYearBachelorFactory)
+    type = TrainingType.BACHELOR
