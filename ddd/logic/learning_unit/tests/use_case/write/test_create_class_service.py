@@ -289,17 +289,43 @@ class TestCreateClassServiceValidator(TestCase):
             AnnualVolumeInvalidException
         )
 
+    def test_not_raise_check_volume_inconsistent_exception_because_no_volumes_encoded(self):
+        ue_command = attr.evolve(
+            self.command,
+            lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=10.0,
+            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
+            code='LTEST2026'
+        )
+        ue = _create_lu(ue_command)
+        self.learning_unit_repository.save(ue)
+        cmd = _build_create_effective_class_command(
+            learning_unit_code=ue.code,
+            class_code='T',
+            volume_first_quadrimester=0,
+            volume_second_quadrimester=0,
+        )
+        new_effective_class_identity = create_effective_class(
+            cmd,
+            self.learning_unit_repository,
+            self.effective_class_repository
+        )
+        self.assertEqual(new_effective_class_identity.class_code, cmd.class_code)
+        self.assertEqual(new_effective_class_identity.learning_unit_identity.code, ue_command.code)
+        self.assertEqual(new_effective_class_identity.learning_unit_identity.year, ue_command.academic_year)
+
 
 def _build_create_effective_class_command(
         learning_unit_code: str,
         class_code: str,
+        volume_first_quadrimester: int = 10,
+        volume_second_quadrimester: int = 10
 ) -> 'CreateEffectiveClassCommand':
     cmd = CreateEffectiveClassCommand(
         class_code=class_code,
         learning_unit_code=learning_unit_code,
         year=YEAR,
-        volume_first_quadrimester=10,
-        volume_second_quadrimester=10,
+        volume_first_quadrimester=volume_first_quadrimester,
+        volume_second_quadrimester=volume_second_quadrimester,
         title_fr='Fr',
         title_en='en',
         derogation_quadrimester='Q1',

@@ -79,7 +79,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             ),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester[dto_object.derogation_quadrimester],
-            session_derogation=dto_object.session_derogation,
+            session_derogation=DerogationSession[dto_object.session_derogation],
             volumes=ClassVolumes(
                 volume_first_quadrimester=dto_object.volume_q1,
                 volume_second_quadrimester=dto_object.volume_q2,

@@ -84,6 +84,8 @@ def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
         volume_annual = practical_part.volumes.volume_annual
     else:
         volume_annual = lecturing_part.volumes.volume_annual
-
+    if (cmd.volume_first_quadrimester is None or cmd.volume_first_quadrimester == 0) and \
+            (cmd.volume_second_quadrimester is None or cmd.volume_second_quadrimester == 0):
+        return False
     sum_q1_q2 = cmd.volume_first_quadrimester + cmd.volume_second_quadrimester
     return volume_annual <= 0 or sum_q1_q2 != volume_annual
