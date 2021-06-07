@@ -127,7 +127,7 @@ class ShouldBeAlphanumericException(BusinessException):
 
 class CodeClassAlreadyExistForUeException(BusinessException):
     def __init__(self, learning_unit_identity: 'LearningUnitIdentity', code: str, *args, **kwargs):
-        message = _("The code %('ue_code')s - %(code)s already exists for %(ue)s") % {
+        message = _("The code %(ue_code)s - %(code)s already exists for %(ue)s") % {
             'ue_code': learning_unit_identity.code,
             'code': code,
             'ue': learning_unit_identity,

@@ -44,7 +44,7 @@ class EffectiveClassRepositoryTestCase(TestCase):
             title_en='TItle in english',
             teaching_place_uuid=self.campus.uuid,
             derogation_quadrimester=DerogationQuadrimester.Q1.name,
-            session_derogation=DerogationSession.SESSION_123.name,
+            session_derogation=DerogationSession.DEROGATION_SESSION_123.value,
             volume_q1=Decimal('1.5'),
             volume_q2=Decimal('2.6'),
             class_type=LECTURING
@@ -85,3 +85,23 @@ class EffectiveClassRepositoryTestCase(TestCase):
         ]
         # assert lists contain same elements regardless order
         self.assertCountEqual(identities, self.class_repository.get_all_identities())
+
+    def test_get_effective_class(self):
+        ue = LearningUnitYearFactory()
+        class_db = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+        effective_class = self.class_repository.get(
+            entity_id=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+                class_code=class_db.acronym,
+                learning_unit_code=ue.acronym,
+                learning_unit_year=ue.academic_year.year
+            )
+        )
+        self.assertEqual(effective_class.entity_id.class_code, class_db.acronym)
+        self.assertEqual(effective_class.entity_id.learning_unit_identity.code, ue.acronym)
+        self.assertEqual(effective_class.entity_id.learning_unit_identity.academic_year.year, ue.academic_year.year)
+        self.assertEqual(effective_class.titles.fr, class_db.title_fr)
+        self.assertEqual(effective_class.titles.en, class_db.title_en)
+        self.assertEqual(effective_class.derogation_quadrimester.value, class_db.quadrimester)
+        self.assertEqual(DerogationSession[effective_class.session_derogation].value, class_db.session)
+        self.assertEqual(effective_class.volumes.volume_first_quadrimester, class_db.hourly_volume_partial_q1)
+        self.assertEqual(effective_class.volumes.volume_second_quadrimester, class_db.hourly_volume_partial_q2)
