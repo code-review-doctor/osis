@@ -161,9 +161,6 @@ msgid ""
 "exception in relation to the sessions calculated according to the "
 "quadrimesters."
 msgstr ""
-"Le champ session dérogation doit être complété UNIQUEMENT si l'on veut "
-"encoder une exception par rapport aux sessions calculées en fonction des "
-"quadrimestres."
 
 #, python-format
 msgid ""
