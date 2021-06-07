@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union, Set
+from typing import Union, Set, Dict
 
 import attr
 
@@ -74,6 +74,35 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
         return bool(self.transition_name)
 
 
+class ProgramTreeVersionIdentityBuilder:
+    def build(
+            self,
+            year: int,
+            offer_acronym: str,
+            version_name: str,
+            transition_name: str
+    ) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentity(
+            year=year,
+            offer_acronym=offer_acronym,
+            version_name=version_name,
+            transition_name=transition_name
+        )
+
+    def build_specific_version(
+            self,
+            year: int,
+            offer_acronym: str,
+            version_name: str,
+    ) -> 'ProgramTreeVersionIdentity':
+        return self.build(
+            year=year,
+            offer_acronym=offer_acronym,
+            version_name=version_name,
+            transition_name=NOT_A_TRANSITION
+        )
+
+
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
@@ -81,22 +110,25 @@ class ProgramTreeVersionBuilder:
             self,
             from_tree_version: 'ProgramTreeVersion',
             to_tree_version: 'ProgramTreeVersion',
-            existing_nodes: Set['Node'],
-            node_code_generator: 'GenerateNodeCode'
+            existing_group_nodes: Set['Node'],
+            mapping_learning_unit_nodes: Dict['NodeIdentity', 'Node'],
+            node_code_generator: 'GenerateNodeCode',
     ) -> 'ProgramTreeVersion':
         validators_by_business_action.FillProgramTreeVersionValidatorList(from_tree_version, to_tree_version).validate()
         if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
             program_tree.ProgramTreeBuilder().fill_from_last_year_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_nodes,
+                existing_group_nodes,
+                mapping_learning_unit_nodes
             )
         else:
             program_tree.ProgramTreeBuilder().fill_transition_from_program_tree(
                 from_tree_version.get_tree(),
                 to_tree_version.get_tree(),
-                existing_nodes,
-                node_code_generator
+                existing_group_nodes,
+                node_code_generator,
+                mapping_learning_unit_nodes
             )
         return to_tree_version
 
@@ -171,6 +203,7 @@ class ProgramTreeVersionBuilder:
     ) -> 'ProgramTreeVersion':
         if command.transition_name:
             validator = validators_by_business_action.CreateProgramTreeTransitionVersionValidatorList(
+                command.end_year,
                 command.start_year,
                 command.offer_acronym,
                 command.version_name,

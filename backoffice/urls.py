@@ -74,6 +74,12 @@ if 'admission' in settings.INSTALLED_APPS:
         # API
         url(r'^admissions/v1/', include('admission.api.urls_v1', namespace='admission_api_v1')),
     )
+if 'osis_mail_template' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^osis_mail_template/', include('osis_mail_template.urls')),)
+if 'osis_notification' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^notifications/v1/', include('osis_notification.api.urls_v1')),
+    )
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

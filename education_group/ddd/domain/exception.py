@@ -221,16 +221,20 @@ class MultipleEntitiesFoundException(BusinessException):
 
 class AbstractConsistencyException(ABC):
     def __init__(self, year_to: int, conflict_fields: List[str], *args, **kwargs):
-        fields_str = ", ".join([str(self.__map_field_to_label(field_name)) for field_name in set(conflict_fields)])
-        message = _("Consistency error in %(academic_year)s: %(fields)s has already been modified") % {
-            "academic_year": display_as_academic_year(year_to),
-            "fields": fields_str
-        }
+        message = common_postponement_consistency_message(year_to, conflict_fields)
         self.conflicted_fields_year = year_to
         super().__init__(message, **kwargs)
 
     def __map_field_to_label(self, field_name: str) -> str:
         return MAP_FIELDS_TO_NAME.get(field_name, field_name)
+
+
+def common_postponement_consistency_message(year_to: int, conflict_fields: List[str]):
+    fields_str = ", ".join([str(MAP_FIELDS_TO_NAME.get(field_name, field_name)) for field_name in set(conflict_fields)])
+    return _("Consistency error in %(academic_year)s: %(fields)s has already been modified") % {
+        "academic_year": display_as_academic_year(year_to),
+        "fields": fields_str
+    }
 
 
 MAP_FIELDS_TO_NAME = {
@@ -275,6 +279,11 @@ MAP_FIELDS_TO_NAME = {
     "certificate_aims": _("certificate aims"),
     "funding_orientation": _("Funding direction"),
     "international_funding_orientation": _('Funding international cooperation CCD/CUD direction'),
+    "block": _('Block'),
+    "comment": _('Comment'),
+    "comment_english": _('English comment'),
+    "is_mandatory": _('Mandatory'),
+    "abbreviated_title": _('Abbreviated title'),
 }
 
 
@@ -315,10 +324,10 @@ class HopsFieldsAllOrNone(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class HopsFields2OrNoneForFormationPhd(BusinessException):
+class HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES(BusinessException):
     def __init__(self, *args, **kwargs):
-        message = _("For formation PhD the fields 'ARES study code' and 'ARES ability' have to be filled-in "
-                    "or none of the ARES fields")
+        message = _("For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
+                    "the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields")
         super().__init__(message, **kwargs)
 
 

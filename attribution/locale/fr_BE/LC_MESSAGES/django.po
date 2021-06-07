@@ -164,8 +164,8 @@ msgstr "Gérer les fiches descriptives"
 msgid "Manage repartition"
 msgstr "Gérer la répartition"
 
-msgid "No attributions exist for the full UE"
-msgstr "Aucune attribution n'existe pour l'UE complète"
+msgid "No attributions exist for the UE"
+msgstr "Aucune attribution n'existe pour l'UE "
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
@@ -236,8 +236,8 @@ msgstr "A supprimer"
 msgid "Tutor"
 msgstr "Enseignant·e"
 
-msgid "Tutor for UE full"
-msgstr "Enseignant·e UE complète"
+msgid "Tutor for UE "
+msgstr "Enseignant·e UE "
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"
