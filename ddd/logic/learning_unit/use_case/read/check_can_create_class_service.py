@@ -26,7 +26,7 @@
 
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.service.can_access_creation_effective_class import CanCreateEffectiveClass
+from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
@@ -39,7 +39,7 @@ def check_can_create_effective_class(
         year=cmd.learning_unit_year
     )
     learning_unit = learning_unit_repository.get(learning_unit_identity)
-    CanCreateEffectiveClass().raise_if_can_not_access(
+    CanCreateEffectiveClass().verify(
         learning_unit=learning_unit,
         learning_unit_repository=learning_unit_repository
     )

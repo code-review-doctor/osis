@@ -36,7 +36,7 @@ from osis_common.ddd import interface
 class CanCreateEffectiveClass(interface.DomainService):
 
     @classmethod
-    def raise_if_can_not_access(
+    def verify(
             cls,
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'ILearningUnitRepository',

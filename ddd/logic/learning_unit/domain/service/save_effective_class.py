@@ -46,14 +46,14 @@ class SaveEffectiveClass(interface.DomainService):
             all_existing_class_identities: List['EffectiveClassIdentity'],
     ):
         volumes_consistency_with_learning_unit = partial(
-            _raise_if_class_volumes_inconsistent_with_learning_unit_volumes,
+            _should_class_volumes_be_consistent_with_learning_unit,
             learning_unit,
             cmd.volume_first_quadrimester,
             cmd.volume_second_quadrimester
         )
         __, effective_class = execute_functions_and_aggregate_exceptions(
             volumes_consistency_with_learning_unit,
-            partial(_raise_if_class_code_already_exists, all_existing_class_identities, cmd.class_code, learning_unit),
+            partial(_should_class_code_not_already_exist, all_existing_class_identities, cmd.class_code, learning_unit),
             partial(EffectiveClassBuilder.build_from_command, cmd, learning_unit),
         )
 
@@ -68,26 +68,26 @@ class SaveEffectiveClass(interface.DomainService):
             all_existing_class_identities: List['EffectiveClassIdentity'],
     ) -> None:
         volumes_consistency_with_learning_unit = partial(
-            _raise_if_class_volumes_inconsistent_with_learning_unit_volumes,
+            _should_class_volumes_be_consistent_with_learning_unit,
             learning_unit,
             cmd.volume_first_quadrimester,
             cmd.volume_second_quadrimester
         )
         execute_functions_and_aggregate_exceptions(
             volumes_consistency_with_learning_unit,
-            partial(_raise_if_class_code_already_exists, all_existing_class_identities, cmd.class_code, learning_unit),
+            partial(_should_class_code_not_already_exist, all_existing_class_identities, cmd.class_code, learning_unit),
             partial(effective_class.update, cmd),
         )
 
 
-def _raise_if_class_code_already_exists(all_existing_class_identities, class_code: str, learning_unit):
+def _should_class_code_not_already_exist(all_existing_class_identities, class_code: str, learning_unit):
     if all_existing_class_identities:
         for class_id in all_existing_class_identities:
             if class_id.learning_unit_identity == learning_unit.entity_id and class_id.class_code == class_code:
                 raise CodeClassAlreadyExistForUeException(learning_unit.entity_id, class_code)
 
 
-def _raise_if_class_volumes_inconsistent_with_learning_unit_volumes(
+def _should_class_volumes_be_consistent_with_learning_unit(
         learning_unit: 'LearningUnit',
         volume_first_quadrimester: float,
         volume_second_quadrimester: float
