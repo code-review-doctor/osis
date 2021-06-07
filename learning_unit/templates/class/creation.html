@@ -43,7 +43,7 @@
         <div class="panel-body">
             <form method="post" id="LearningClassYearForm">
                 <div class="panel-heading">
-                    {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+                    {% include "class/blocks/class_create_cancel_buttons.html" %}
                 </div>
                 {% csrf_token %}
                 {% bootstrap_form_errors form %}
@@ -138,7 +138,7 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                {% include "learning_unit/blocks/create_cancel_buttons.html" %}
+                    {% include "class/blocks/class_create_cancel_buttons.html" %}
                 </div>
             </form>
         </div>
