@@ -101,9 +101,21 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     )
     learning_unit_common_title_fr = forms.CharField(disabled=True, label=_('Common part'), required=False)
     learning_unit_common_title_en = forms.CharField(disabled=True, label=_('Common part'), required=False)
-    learning_unit_remarks_faculty = forms.CharField(disabled=True, label=_('Faculty remark'), required=False)
-    learning_unit_remarks_publication_fr = forms.CharField(disabled=True, label=_('Other remark'), required=False)
-
+    learning_unit_remarks_faculty = forms.CharField(
+        disabled=True,
+        label=_('Faculty remark (unpublished)'),
+        required=False
+    )
+    learning_unit_remarks_publication_fr = forms.CharField(
+        disabled=True,
+        label=_('Other remark (intended for publication)'),
+        required=False
+    )
+    learning_unit_remarks_publication_en = forms.CharField(
+        disabled=True,
+        label=_('Other remark in english (intended for publication)'),
+        required=False
+    )
     volume_total_annual = VolumeField(
         label=_('Vol. annual'),
         widget=DecimalFormatInput(render_value=True),
@@ -194,6 +206,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     def __init_remarks(self, learning_unit):
         self.fields['learning_unit_remarks_faculty'].initial = learning_unit.remarks.faculty
         self.fields['learning_unit_remarks_publication_fr'].initial = learning_unit.remarks.publication_fr
+        self.fields['learning_unit_remarks_publication_en'].initial = learning_unit.remarks.publication_en
 
     def __init_titles(self, learning_unit):
         self.fields['learning_unit_common_title_fr'].initial = learning_unit.titles.common_fr
