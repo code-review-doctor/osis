@@ -213,7 +213,7 @@ def _annotate_queryset(queryset):
         specific_title_en=F('specific_title_english'),
         responsible_entity_code=Subquery(
             EntityVersionDatabase.objects.filter(
-                entity__id=OuterRef('requirement_entity_id')
+                entity__id=OuterRef('learning_container_year__requirement_entity_id')
             ).order_by('-start_date').values('acronym')[:1]
         ),
         iso_code=F('language__code'),
