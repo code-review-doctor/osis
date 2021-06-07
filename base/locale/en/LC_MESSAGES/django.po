@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-18 11:12+0200\n"
+"POT-Creation-Date: 2021-06-03 13:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,6 +171,9 @@ msgid "Academic year"
 msgstr ""
 
 msgid "Accepted"
+msgstr ""
+
+msgid "Access based on application"
 msgstr ""
 
 msgid "Access condition"
@@ -1498,9 +1501,6 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
 msgid "Maximum number of permitted relationships"
 msgstr ""
 
@@ -1511,9 +1511,6 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method not allowed"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Minerval complete"
@@ -1671,10 +1668,6 @@ msgstr ""
 
 msgid "Ok"
 msgstr ""
-
-msgid "On the file: direct access or access with additional training"
-msgstr ""
-"Based on application: accepted, conditional on further training, or refusal"
 
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
@@ -2048,9 +2041,6 @@ msgid "Quadri"
 msgstr ""
 
 msgid "Quadrimester"
-msgstr ""
-
-msgid "Quadrimester derogation"
 msgstr ""
 
 msgid "Rate code"
@@ -2687,9 +2677,6 @@ msgstr ""
 msgid "UCL Diploma"
 msgstr ""
 
-msgid "UE full"
-msgstr ""
-
 msgid "URL of the learning unit"
 msgstr ""
 
@@ -2827,6 +2814,11 @@ msgid "Yes, I confirm."
 msgstr ""
 
 msgid "You are succesfully logout."
+msgstr ""
+
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year "
+"or in the future"
 msgstr ""
 
 msgid ""
@@ -3158,3 +3150,4 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+
