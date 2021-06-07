@@ -83,6 +83,7 @@ class NodeGroupYearFactory(NodeFactory):
         model = NodeGroupYear
         abstract = False
 
+    node_id = factory.Sequence(lambda n: n*2)
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
     group_title_fr = factory.fuzzy.FuzzyText(length=240)
     group_title_en = factory.fuzzy.FuzzyText(length=240)
@@ -143,6 +144,7 @@ class NodeLearningUnitYearFactory(NodeFactory):
         model = NodeLearningUnitYear
         abstract = False
 
+    node_id = factory.Sequence(lambda n: n*2+1)
     node_type = NodeType.LEARNING_UNIT
     code = factory.Sequence(lambda n: 'LUCODE%02d' % n)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

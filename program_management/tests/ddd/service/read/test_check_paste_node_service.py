@@ -22,79 +22,55 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
-from django.test import SimpleTestCase
+import attr
 
-import program_management.ddd
-from osis_common.ddd.interface import BusinessExceptions
-from program_management.ddd.repositories import node as node_repositoriy
+from program_management.ddd import command
+from program_management.ddd.domain.exception import CannotPasteToLearningUnitException
+from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.service.read import check_paste_node_service
-from program_management.ddd.validators.validators_by_business_action import CheckPasteNodeValidatorList
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
+from program_management.tests.ddd.factories.domain.program_tree_version.mini_training.MINECON import MINECONFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from testing.testcases import DDDTestCase
 
 
-# TODO refactor
-class TestCheckPaste(SimpleTestCase, ValidatorPatcherMixin):
+class TestCheckPasteNodeService(DDDTestCase):
     def setUp(self) -> None:
-        self.tree = ProgramTreeFactory()
-        self.node_to_attach_from = NodeGroupYearFactory()
-        LinkFactory(parent=self.tree.root_node, child=self.node_to_attach_from)
-        self.path = "|".join([str(self.tree.root_node.node_id), str(self.node_to_attach_from.node_id)])
+        super().setUp()
+        self.tree_version = OSIS1BAFactory()[0]
+        self.tree = self.tree_version.tree
 
-        self.node_to_paste = NodeGroupYearFactory()
+        self.learning_unit_node = NodeLearningUnitYearFactory(year=self.tree.root_node.year, persist=True)
+        self.mini_training_version = MINECONFactory()[0]
 
-        self._patch_load_tree()
-        self._patch_load_node()
-        self.mock_check_paste_validator = self._path_validator()
-
-    def _patch_load_node(self):
-        patcher_load_nodes = mock.patch.object(
-            node_repositoriy.NodeRepository,
-            "get"
+        path = build_path(
+            self.tree.root_node,
+            self.tree.get_node_by_code_and_year("LOSIS101T", self.tree.root_node.year),
+            self.tree.get_node_by_code_and_year("LOSIS102R", self.tree.root_node.year),
         )
-        self.mock_load_node = patcher_load_nodes.start()
-        self.mock_load_node.return_value = self.node_to_paste
-        self.addCleanup(patcher_load_nodes.stop)
 
-    def _patch_load_tree(self):
-        patcher_load_tree = mock.patch(
-            "program_management.ddd.repositories.load_tree.load"
+        self.cmd = command.CheckPasteNodeCommand(
+            node_to_paste_code=self.learning_unit_node.code,
+            node_to_paste_year=self.learning_unit_node.year,
+            path_to_paste=path,
+            path_to_detach=None,
+            root_id=self.tree.root_node.node_id
         )
-        self.mock_load_tree = patcher_load_tree.start()
-        self.mock_load_tree.return_value = self.tree
-        self.addCleanup(patcher_load_tree.stop)
 
-    def _path_validator(self):
-        patch_validator = mock.patch.object(
-            CheckPasteNodeValidatorList, "validate"
+    def test_cannot_paste_node_to_learning_unit_node(self):
+        path = build_path(
+            self.tree.root_node,
+            self.tree.get_node_by_code_and_year("LOSIS101T", self.tree.root_node.year),
+            self.tree.get_node_by_code_and_year("LOSIS102R", self.tree.root_node.year),
+            self.tree.get_node_by_code_and_year("LDROI1001", self.tree.root_node.year),
         )
-        mock_validator = patch_validator.start()
-        mock_validator.return_value = True
-        self.addCleanup(patch_validator.stop)
-        return mock_validator
+        cmd = attr.evolve(self.cmd, path_to_paste=path)
 
-    def test_should_propagate_error_when_validator_raises_exception(self):
-        self.mock_check_paste_validator.side_effect = BusinessExceptions(["an error"])
-        check_command = program_management.ddd.command.CheckPasteNodeCommand(
-            root_id=self.tree.root_node.node_id,
-            node_to_paste_code=self.node_to_paste.code,
-            node_to_paste_year=self.node_to_paste.year,
-            path_to_paste=self.path,
-            path_to_detach=None
-        )
-        with self.assertRaises(BusinessExceptions):
-            check_paste_node_service.check_paste(check_command)
+        with self.assertRaisesBusinessException(CannotPasteToLearningUnitException):
+            check_paste_node_service.check_paste(cmd)
 
-    def test_should_return_none_when_validator_do_not_raise_exception(self):
-        check_command = program_management.ddd.command.CheckPasteNodeCommand(
-            root_id=self.tree.root_node.node_id,
-            node_to_paste_code=self.node_to_paste.code,
-            node_to_paste_year=self.node_to_paste.year,
-            path_to_paste=self.path,
-            path_to_detach=None
+    def test_should_return_none_when_checks_pass(self):
+        self.assertIsNone(
+            check_paste_node_service.check_paste(self.cmd)
         )
-        self.assertIsNone(check_paste_node_service.check_paste(check_command))

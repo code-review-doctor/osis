@@ -100,11 +100,14 @@ class FakeProgramTreeRepository(tree_repository.ProgramTreeRepository):
     def search(
             cls,
             entity_ids: Optional[List['ProgramTreeIdentity']] = None,
-            root_ids: List[int] = None
+            root_ids: List[int] = None,
+            code: str = None
     ) -> List['ProgramTree']:
         result = []
         if entity_ids:
             return [root_entity for root_entity in cls._trees if root_entity.entity_id in entity_ids]
+        if code:
+            return [root_entity for root_entity in cls._trees if root_entity.entity_id.code == code]
         return result
 
     @classmethod
