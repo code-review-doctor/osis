@@ -67,7 +67,7 @@ class LearningUnitPedagogyTestCase(TestCase):
     def setUpTestData(cls):
         now = datetime.datetime.now()
 
-        cls.academic_year = create_current_academic_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = GenerateAcademicYear(
@@ -95,7 +95,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse('learning_units_summary')
-        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity)
+        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity, person__french=True)
         TranslatedTextLabelFactory(text_label__label='resume')
 
     def setUp(self):
@@ -192,6 +192,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(response.context['cms_labels_translated'])
+        print(response.context['cms_labels_translated'])
 
 
 class LearningUnitPedagogyExportXLSTestCase(TestCase):
