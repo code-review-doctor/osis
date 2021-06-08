@@ -179,9 +179,27 @@ class LearningUnitHasNoVolumeException(BusinessException):
 class AnnualVolumeInvalidException(BusinessException):
     def __init__(self, learning_unit: 'LearningUnit', *args, **kwargs):
         volume_annual = learning_unit.lecturing_part.volumes.volume_annual \
-            if learning_unit.lecturing_part else learning_unit.practical_part.volumes.volume_annual
+            if learning_unit.lecturing_part else learning_unit.practical_part.volumes.volume_annual  # FIXME
         message = _(
             "The sum of first/second quadrimesters volumes should be equal to annual volume "
             "of the learning unit ({})".format(volume_annual)
         )
+        super().__init__(message, **kwargs)
+
+
+class DerogationQuadrimesterInvalidChoiceException(BusinessException):
+    def __init__(self, derogation_quadrimester: str, **kwargs):
+        message = _("'{value}' is not a valid derogation quadrimester.").format(value=derogation_quadrimester)
+        super().__init__(message, **kwargs)
+
+
+class DerogationSessionInvalidChoiceException(BusinessException):
+    def __init__(self, derogation_session: str, **kwargs):
+        message = _("'{value}' is not a valid derogation session.").format(value=derogation_session)
+        super().__init__(message, **kwargs)
+
+
+class TeachingPlaceRequiredException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The teaching place is required.")
         super().__init__(message, **kwargs)

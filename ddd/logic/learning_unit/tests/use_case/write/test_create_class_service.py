@@ -42,7 +42,9 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException, \
-    LearningUnitHasNoVolumeException
+    LearningUnitHasNoVolumeException, TeachingPlaceRequiredException, DerogationQuadrimesterInvalidChoiceException, \
+    DerogationSessionInvalidChoiceException
+from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001CourseLearningUnitFactory
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
@@ -294,7 +296,7 @@ class TestCreateClassServiceValidator(TestCase):
             self.command,
             lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=10.0,
             practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
-            code='LTEST2026'
+            code='LTEST2027'
         )
         ue = _create_lu(ue_command)
         self.learning_unit_repository.save(ue)
@@ -313,6 +315,84 @@ class TestCreateClassServiceValidator(TestCase):
         self.assertEqual(new_effective_class_identity.learning_unit_identity.code, ue_command.code)
         self.assertEqual(new_effective_class_identity.learning_unit_identity.year, ue_command.academic_year)
 
+    def test_teaching_place_be_required(self):
+        learning_unit = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(learning_unit)
+        cmd = CreateEffectiveClassCommand(
+            class_code="Z",
+            learning_unit_code=learning_unit.code,
+            year=learning_unit.year,
+            volume_first_quadrimester=None,
+            volume_second_quadrimester=None,
+            title_fr='Fr',
+            title_en='en',
+            derogation_quadrimester=None,
+            session_derogation=None,
+            teaching_place_uuid=None
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:  # FIXME :: écrire un generique
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            TeachingPlaceRequiredException
+        )
+
+    def test_quadrimester_is_valid_choice(self):
+        learning_unit = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(learning_unit)
+        cmd = CreateEffectiveClassCommand(
+            class_code="Z",
+            learning_unit_code=learning_unit.code,
+            year=learning_unit.year,
+            volume_first_quadrimester=None,
+            volume_second_quadrimester=None,
+            title_fr='Fr',
+            title_en='en',
+            derogation_quadrimester="invalid choice",
+            session_derogation=None,
+            teaching_place_uuid=None
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:  # FIXME :: écrire un generique
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            DerogationQuadrimesterInvalidChoiceException
+        )
+
+    def test_quadrimester_is_valid_choice(self):
+        learning_unit = LDROI1001CourseLearningUnitFactory()
+        self.learning_unit_repository.save(learning_unit)  # TODO :: réimplémenter save en mémoire pour éviter doublons
+        cmd = CreateEffectiveClassCommand(
+            class_code="Z",
+            learning_unit_code=learning_unit.code,
+            year=learning_unit.year,
+            volume_first_quadrimester=None,
+            volume_second_quadrimester=None,
+            title_fr='Fr',
+            title_en='en',
+            derogation_quadrimester=None,
+            session_derogation="invalid choice",
+            teaching_place_uuid=None
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:  # FIXME :: écrire un generique
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            DerogationSessionInvalidChoiceException
+        )
+
 
 def _build_create_effective_class_command(
         learning_unit_code: str,
@@ -330,7 +410,7 @@ def _build_create_effective_class_command(
         title_en='en',
         derogation_quadrimester='Q1',
         session_derogation=DerogationSession.DEROGATION_SESSION_123.value,
-        teaching_place_uuid=None
+        teaching_place_uuid="35bbb236-7de6-4322-a496-fa8397054305"
     )
     return cmd
 

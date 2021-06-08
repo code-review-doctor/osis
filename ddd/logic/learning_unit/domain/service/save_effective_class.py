@@ -51,10 +51,10 @@ class SaveEffectiveClass(interface.DomainService):
             cmd.volume_first_quadrimester,
             cmd.volume_second_quadrimester
         )
-        __, effective_class = execute_functions_and_aggregate_exceptions(
+        _, _, effective_class = execute_functions_and_aggregate_exceptions(
             volumes_consistency_with_learning_unit,
             partial(_should_class_code_not_already_exist, all_existing_class_identities, cmd.class_code, learning_unit),
-            partial(EffectiveClassBuilder.build_from_command, cmd, learning_unit),
+            partial(EffectiveClassBuilder().build_from_command, cmd, learning_unit),
         )
 
         return effective_class
@@ -92,6 +92,9 @@ def _should_class_volumes_be_consistent_with_learning_unit(
         volume_first_quadrimester: float,
         volume_second_quadrimester: float
 ) -> None:
+    if not volume_first_quadrimester and not volume_second_quadrimester:
+        return
+
     practical_part = learning_unit.practical_part
     lecturing_part = learning_unit.lecturing_part
 
