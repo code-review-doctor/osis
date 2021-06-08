@@ -70,12 +70,8 @@ class LearningUnitPedagogyTestCase(TestCase):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.previous_academic_year = GenerateAcademicYear(
-            cls.old_academic_year,
-            cls.old_academic_year
-        ).academic_years[0]
         AcademicCalendarFactory(
-            data_year=cls.previous_academic_year,
+            data_year=cls.old_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
