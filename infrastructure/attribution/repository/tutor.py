@@ -63,13 +63,15 @@ class TutorRepository(ITutorRepository):
             first_name=F('attribution__tutor__person__first_name'),
             attribution_function=F('attribution__function'),
             personal_id_number=F('attribution__tutor__person__global_id'),
-            attribution_uuid=F('attribution__pk')
+            attribution_uuid=F('attribution__pk'),
+            volume=F('allocation_charge')
         ).values(
             "last_name",
             "first_name",
             "attribution_function",
             "personal_id_number",
-            "attribution_uuid"
+            "attribution_uuid",
+            "volume"
         ).order_by('attribution__tutor__person__last_name', 'attribution__tutor__person__first_name', )
         # TODO : UUId pas juste
         result = []
@@ -86,7 +88,8 @@ class TutorRepository(ITutorRepository):
                                 learning_unit_identity,
                                 LearningUnitAttributionDTO(
                                     function=data_dict['attribution_function'],
-                                    attribution_uuid=data_dict['attribution_uuid']
+                                    attribution_uuid=data_dict['attribution_uuid'],
+                                    volume=data_dict['volume']
                                 )
                             )
                         ]

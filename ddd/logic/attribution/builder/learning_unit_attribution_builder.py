@@ -26,6 +26,7 @@
 from ddd.logic.attribution.builder.learning_unit_attribution_identity_builder import \
     LearningUnitAttributionIdentityBuilder
 from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution
+from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 
 from osis_common.ddd import interface
 
@@ -45,5 +46,7 @@ class LearningUnitAttributionBuilder(interface.RootEntityBuilder):
             entity_id=entity_id,
             function=dto_object.function,
             learning_unit=learning_unit_identity,
-            distributed_effective_classes=[]  # TODO tocomplete
+            distributed_effective_classes=[
+                ClassVolumeRepartition(distributed_volume=dto_object.volume, effective_class=None)  # TODO tocomplete
+            ]  # TODO tocomplete
         )

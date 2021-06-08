@@ -55,3 +55,4 @@ class TutorSearchDTO(DTO):
 class LearningUnitAttributionDTO(DTO):
     function = attr.ib(type=str)
     attribution_uuid = attr.ib(type=str)
+    volume = attr.ib(type=float)
