@@ -23,22 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from decimal import Decimal
 
-from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
-from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+import attr
+
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
+from osis_common.ddd import interface
+
+DurationUnit = Decimal
 
 
-def search_tutors_attributed_to_learning_unit(
-        cmd: SearchTutorAttributedToLearningUnitCommand,
-        repository: 'ITutorRepository'
-) -> List['Tutor']:
-    return repository.search(
-        learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.learning_unit_code,
-            year=cmd.learning_unit_year
-        )
-    )
-
+@attr.s(frozen=True, slots=True)
+class FinancialVolumesRepartition(interface.ValueObject):
+    responsible_entity = attr.ib(type=UCLEntityIdentity)
+    entity_2 = attr.ib(type=UCLEntityIdentity)
+    entity_3 = attr.ib(type=UCLEntityIdentity)
+    repartition_volume_responsible_entity = attr.ib(type=DurationUnit)
+    repartition_volume_entity_2 = attr.ib(type=DurationUnit)
+    repartition_volume_entity_3 = attr.ib(type=DurationUnit)

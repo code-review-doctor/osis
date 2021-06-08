@@ -23,22 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
-from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.attribution.domain.model._attribution import LearningUnitAttributionIdentity
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
-def search_tutors_attributed_to_learning_unit(
-        cmd: SearchTutorAttributedToLearningUnitCommand,
-        repository: 'ITutorRepository'
-) -> List['Tutor']:
-    return repository.search(
-        learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.learning_unit_code,
-            year=cmd.learning_unit_year
-        )
-    )
+class LearningUnitAttributionIdentityBuilder(EntityIdentityBuilder):
 
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'LearningUnitAttributionIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def build_from_code_and_learning_unit_identity_data(
+            cls,
+            uuid: str
+    ) -> 'LearningUnitAttributionIdentity':
+        return LearningUnitAttributionIdentity(uuid=uuid)

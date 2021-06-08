@@ -27,6 +27,7 @@ from decimal import Decimal
 
 import attr
 
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 

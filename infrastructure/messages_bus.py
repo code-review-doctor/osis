@@ -25,12 +25,16 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
+from ddd.logic.attribution.use_case.read.search_tutors_attributed_to_learning_unit_service import \
+    search_tutors_attributed_to_learning_unit
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
@@ -53,6 +57,10 @@ class MessageBus:
         GetReportCommand: lambda cmd: get_report(cmd),
         BulkUpdateLinkCommand: lambda cmd: bulk_update_and_postpone_links(
             cmd, ProgramTreeRepository(), ReportRepository()
+        ),
+        SearchTutorAttributedToLearningUnitCommand: lambda cmd: search_tutors_attributed_to_learning_unit(
+            cmd,
+            TutorRepository()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
