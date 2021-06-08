@@ -313,7 +313,6 @@ class FullForm(LearningUnitBaseForm):
             start_year=self.start_year,
             learning_container=learning_container,
             commit=commit,
-            academic_year=self.academic_year
         )
 
         container_year = self.learning_container_year_form.save(

@@ -76,8 +76,7 @@ class LearningUnitModelForm(forms.ModelForm):
         start_year = kwargs.pop('start_year')
         self.instance.start_year = start_year
         end_year = kwargs.pop('end_year', None)
-        academic_year = kwargs.pop('academic_year', None)
-        self.instance.end_year = self._compute_end_year(academic_year or start_year, end_year)
+        self.instance.end_year = self._compute_end_year(start_year, end_year)
         return super().save(**kwargs)
 
     def _compute_end_year(self, start_year, end_year):
