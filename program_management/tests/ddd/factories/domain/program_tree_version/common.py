@@ -69,8 +69,9 @@ class ProgramTreeVersionBuilder:
         year = kwargs.get("year", cls.year)
         start_year = kwargs.get("start_year", cls.start_year)
         end_year = kwargs.get("end_year", cls.end_year)
+        with_postpone = kwargs.get('with_postpone', True)
 
-        tree_builder = ProgramTreeBuilder(tree_data, year, start_year, end_year)
+        tree_builder = ProgramTreeBuilder(tree_data, year, start_year, end_year, with_postpone=with_postpone)
 
         tree_versions = [build_tree_version(tree) for tree in tree_builder.trees]
         sub_tree_versions = [
@@ -140,7 +141,14 @@ class ProgramTreeVersionBuilder:
 
 class ProgramTreeBuilder:
 
-    def __init__(self, tree_data: Dict, year: int = 2018, start_year: int = 2018, end_year: Optional[int] = 2025):
+    def __init__(
+            self,
+            tree_data: Dict,
+            year: int = 2018,
+            start_year: int = 2018,
+            end_year: Optional[int] = 2025,
+            with_postpone: bool = True
+    ):
         initial_program_tree = build_tree(tree_data, year, start_year, end_year)
         children_trees = build_children_trees(initial_program_tree)
 
@@ -148,8 +156,12 @@ class ProgramTreeBuilder:
 
         self.__persist_trees(all_trees)
 
-        trees = [initial_program_tree] + self._postpone_program_tree(initial_program_tree)
-        sub_trees = list(itertools.chain.from_iterable(self._postpone_program_tree(tree) for tree in children_trees))
+        if with_postpone:
+            trees = [initial_program_tree] + self._postpone_program_tree(initial_program_tree)
+            sub_trees = list(itertools.chain.from_iterable(self._postpone_program_tree(tree) for tree in children_trees))
+        else:
+            trees = [initial_program_tree]
+            sub_trees = children_trees
 
         self.__persist_nodes(trees + sub_trees)
 

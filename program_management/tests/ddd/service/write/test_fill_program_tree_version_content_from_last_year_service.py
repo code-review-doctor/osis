@@ -67,14 +67,13 @@ class TestFillProgramTreeVersionContentFromLastYear(DDDTestCase):
         )
 
         self.mock_copy_cms()
-        # self.create_node_next_years()
+        self.create_node_next_years(self.tree_version_from.tree.get_all_learning_unit_nodes())
 
     def create_node_next_years(self, nodes):
         for node in nodes:
-            if node.is_group():
-                continue
-            next_year_node = node_factory.copy_to_next_year(node)
-            self.add_node_to_repo(next_year_node)
+            if node.is_learning_unit():
+                next_year_node = node_factory.copy_to_next_year(node)
+                self.add_node_to_repo(next_year_node)
 
     def mock_copy_cms(self):
         patcher = mock.patch(

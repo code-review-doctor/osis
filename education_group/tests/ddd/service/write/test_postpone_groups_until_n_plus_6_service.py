@@ -24,6 +24,7 @@
 ##############################################################################
 from education_group.ddd.command import PostponeGroupsUntilNPlus6Command, GetGroupCommand
 from education_group.ddd.domain.exception import GroupNotFoundException
+from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write.postpone_groups_until_n_plus_6_service import \
     postpone_groups_until_n_plus_6
@@ -34,18 +35,12 @@ from testing.testcases import DDDTestCase
 
 class TestPostponeGroupsUntilNPlus6(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
         self.groups = [
-            GroupFactory(entity_identity__year=2021, end_year=None),
-            GroupFactory(entity_identity__year=2021, end_year=2029),
-            GroupFactory(entity_identity__year=2025, end_year=None),
+            GroupFactory(entity_identity__year=2021, end_year=None, persist=True),
+            GroupFactory(entity_identity__year=2021, end_year=2029, persist=True),
+            GroupFactory(entity_identity__year=2025, end_year=None, persist=True),
         ]
-
-        self.fake_group_repository = get_fake_group_repository(self.groups)
-        self.mock_repo(
-            "education_group.ddd.repository.group.GroupRepository",
-            self.fake_group_repository
-        )
 
         self.cmd = PostponeGroupsUntilNPlus6Command()
 
@@ -58,9 +53,7 @@ class TestPostponeGroupsUntilNPlus6(DDDTestCase):
             get_group_service.get_group(GetGroupCommand(code=group.entity_id.code, year=2025))
 
     def test_should_postpone_groups_until_n_plus_6(self):
-        postpone_groups_until_n_plus_6(self.cmd)
+        result = postpone_groups_until_n_plus_6(self.cmd)
 
         for group in self.groups:
-            self.assertTrue(
-                get_group_service.get_group(GetGroupCommand(code=group.entity_id.code, year=2026))
-            )
+            self.assertIn(GroupIdentity(code=group.entity_id.code, year=2026), result)

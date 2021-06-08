@@ -57,9 +57,9 @@ class FakeNodeRepository(node_repository.NodeRepository):
         return result
 
     @classmethod
-    def search(cls, node_ids: List['NodeIdentity'] = None, year: int = None, **kwargs) -> List['Node']:
-        if node_ids:
-            return [node for node in cls._nodes if node.entity_id in node_ids]
+    def search(cls, entity_ids: List['NodeIdentity'] = None, year: int = None, **kwargs) -> List['Node']:
+        if entity_ids:
+            return [node for node in cls._nodes if node.entity_id in entity_ids]
         if year:
             return [node for node in cls._nodes if node.entity_id.year == year]
         return []
@@ -124,7 +124,7 @@ class FakeProgramTreeRepository(tree_repository.ProgramTreeRepository):
 
     @classmethod
     def search_last_occurence(cls, from_year: int) -> List['ProgramTree']:
-        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        datas = (root_entity for root_entity in cls._trees if root_entity.entity_id.year >= from_year)
         group_by_code = itertools.groupby(datas, lambda tree: tree.entity_id.code)
         return [max(tree, key=lambda tree: tree.entity_id.year) for code, tree in group_by_code]
 
@@ -215,7 +215,7 @@ class FakeProgramTreeVersionRepository(tree_version_repository.ProgramTreeVersio
 
     @classmethod
     def search_last_occurence(cls, from_year: int) -> List['ProgramTreeVersion']:
-        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        datas = (root_entity for root_entity in cls._trees_version if root_entity.entity_id.year >= from_year)
         group_by_acronym = itertools.groupby(datas, lambda tree: tree.entity_id.offer_acronym)
         return [max(tree, key=lambda tree: tree.entity_id.year) for code, tree in group_by_acronym]
 

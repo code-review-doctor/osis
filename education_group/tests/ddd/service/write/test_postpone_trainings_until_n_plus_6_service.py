@@ -34,18 +34,12 @@ from testing.testcases import DDDTestCase
 
 class TestPostponeTrainingsUntilNPlus6(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
         self.trainings = [
-            TrainingFactory(entity_identity__year=2021, end_year=None),
-            TrainingFactory(entity_identity__year=2021, end_year=2029),
-            TrainingFactory(entity_identity__year=2025, end_year=None),
+            TrainingFactory(entity_identity__year=2021, end_year=None, persist=True),
+            TrainingFactory(entity_identity__year=2021, end_year=2029, persist=True),
+            TrainingFactory(entity_identity__year=2025, end_year=None, persist=True),
         ]
-
-        self.fake_training_repository = get_fake_training_repository(self.trainings)
-        self.mock_repo(
-            "education_group.ddd.repository.training.TrainingRepository",
-            self.fake_training_repository
-        )
 
         self.cmd = PostponeTrainingsUntilNPlus6Command()
 

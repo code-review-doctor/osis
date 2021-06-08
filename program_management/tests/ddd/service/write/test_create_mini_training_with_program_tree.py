@@ -44,7 +44,7 @@ from testing.testcases import DDDTestCase
 class TestCreateAndReportMiniTrainingWithProgramTree(DDDTestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.max_postponement_year = cls.starting_academic_year_year + DEFAULT_YEARS_TO_POSTPONE
+        cls.max_postponement_year = cls.CURRENT_ACADEMIC_YEAR + DEFAULT_YEARS_TO_POSTPONE
 
     def setUp(self) -> None:
         super().setUp()

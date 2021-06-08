@@ -37,7 +37,7 @@ class FakeGroupRepository(group_repository.GroupRepository):
 
     @classmethod
     def search_groups_last_occurence(cls, from_year: int) -> List['Group']:
-        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        datas = (root_entity for root_entity in cls._groups if root_entity.entity_id.year >= from_year)
         group_by_code = itertools.groupby(datas, lambda group: group.code)
         return [max(groups, key=lambda group: group.year) for acronym, groups in group_by_code]
 
@@ -118,7 +118,7 @@ class FakeMiniTrainingRepository(mini_training_repository.MiniTrainingRepository
 
     @classmethod
     def search_mini_trainings_last_occurence(cls, from_year: int) -> List['MiniTraining']:
-        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        datas = (root_entity for root_entity in cls._mini_trainings if root_entity.entity_id.year >= from_year)
         group_by_acronym = itertools.groupby(datas, lambda training: training.acronym)
         return [max(mini_training, key=lambda mini: mini.year) for acronym, mini_training in group_by_acronym]
 
@@ -162,7 +162,7 @@ class FakeTrainingRepository(training_repository.TrainingRepository):
 
     @classmethod
     def search_trainings_last_occurence(cls, from_year: int) -> List['Training']:
-        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        datas = (root_entity for root_entity in cls._trainings if root_entity.entity_id.year >= from_year)
         group_by_acronym = itertools.groupby(datas, lambda training: training.acronym)
         return [max(trainings, key=lambda training: training.year) for acronym, trainings in group_by_acronym]
 
