@@ -41,4 +41,3 @@ def search_tutors_attributed_to_learning_unit(
             year=cmd.learning_unit_year
         )
     )
-
