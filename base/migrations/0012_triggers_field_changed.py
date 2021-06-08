@@ -35,7 +35,8 @@ class Migration(migrations.Migration):
             END IF;
             RETURN NEW;
         END;
-        $$ language 'plpgsql';"""
+        $$ language 'plpgsql';""",
+            elidable=True
         ),
 
 

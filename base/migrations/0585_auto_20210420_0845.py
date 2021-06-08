@@ -23,5 +23,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(assign_specific_permissions_and_remove_unused_groups, migrations.RunPython.noop)
+        migrations.RunPython(assign_specific_permissions_and_remove_unused_groups, migrations.RunPython.noop, elidable=True)
     ]

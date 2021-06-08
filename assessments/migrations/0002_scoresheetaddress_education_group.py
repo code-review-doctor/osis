@@ -58,7 +58,7 @@ def set_education_group_id_field(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('assessments', '0001_squashed_0006_auto_20190802_1104'),
+        ('assessments', '0006_auto_20190802_1104'),
     ]
 
     operations = [
@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
             name='education_group',
             field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroup'),
         ),
-        migrations.RunPython(set_education_group_id_field),
+        migrations.RunPython(set_education_group_id_field, elidable=True),
         migrations.AlterField(
             model_name='scoresheetaddress',
             name='education_group',
