@@ -24,12 +24,9 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block action_top %}
-    {% include "class/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
 {% endblock %}
 {% block action_bottom %}
-    {% include "class/blocks/dropdown/identification_actions_bar.html"  with dropdirection="dropup" %}
 {% endblock %}
-
 
 {% block content_tab %}
     <div role="tabpanel" class="tab-pane active" id="identification">
@@ -45,31 +42,33 @@
                                         {% trans 'Code' %}
                                     </label>
                                     <br>
-                                    <span id="id_acronym">
-                                        {{ effective_class.complete_acronym }}
-                                    </span>
+                                    {{ effective_class.complete_acronym }}
                                 </div>
                                 <div class="col-md-3">
                                     <label>
-                                        UE
+                                        {% trans 'UE' %}({{ learning_unit.subtype }})
+{#                                        {% trans 'UE' %}({{ learning_unit.subtype }})**subtype missing#}
                                     </label>
-                                    <a id="full_acronym" href="{% url 'learning_unit' learning_unit_year.id %}">
+                                    <br>
+                                    <span id="id_type">
                                         {{ learning_unit.code }}
-                                    </a>
+                                    </span>
                                 </div>
                                 <div class="col-md-3">
                                     <label>
                                         {% trans 'Type' %}
                                     </label>
+                                    <br>
                                     <span id="id_type">
                                         {% trans 'Class' %}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
-                                    <label>
+                                    <label id="id_internship_subtype">
                                         {% trans 'Internship subtype' %}
                                     </label>
-                                    <span id="id_internship_subtype">
+                                    <br>
+                                    <span>
                                         {{ learning_unit.internship_subtype|default_if_none:'-' }}
                                     </span>
                                 </div>
@@ -81,14 +80,14 @@
                                     <label>
                                         {% trans 'Learning unit credits' %}
                                     </label>
+                                    <br>
                                     <span id="id_credits">
                                         {{ learning_unit.credits }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
-                                    <label>
-                                        {% trans 'Periodicity' %}
-                                    </label>
+                                    <label>{% trans 'Periodicity' %}</label>
+                                    <br>
                                     <span id="id_periodicity">
                                         {{ learning_unit.periodicity.value }}
                                     </span>
@@ -97,197 +96,182 @@
                                     <label>
                                         {% trans 'State' %}
                                     </label>
+                                    <br>
                                     <span id="id_state">
-{#                                        FIXME: missing field#}
-                                        {{ learning_unit.state }}
+                                        {% if learning_unit.is_active %}
+                                            {% trans 'Active' %}
+                                        {% else %}
+                                            {% trans 'Inactive' %}
+                                        {% endif %}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
                                     <label>
                                         {% trans 'Language' %}
                                     </label>
+                                    <br>
                                     <span id="id_language">
-                                        {{ learning_unit.language_id.code_iso }}
+                                         {{ learning_unit.language_id.code_iso }}{# todo remplacer par Francais... #}
                                     </span>
                                 </div>
                             {% endblock content_row2 %}
                         </div>
+                    <br>
                         <div class="row">
-                            {% block content_row3 %}
-                                <div class="col-md-3">
-                                    <label>
-                                        {% trans 'Professional integration' %}
-                                    </label>
-                                    <span id="id_professional_integration">
-{#                                        FIXME: missing field#}
-                                        {{ learning_unit.professional_integration }}
-                                    </span>
-                                </div>
-                            {% endblock content_row3 %}
-                        </div>
-                        {% block titles %}
-                            <div class="panel panel-default">
-                                <div class="panel-body">
-                                    <label>
-                                        {% trans "Title in French" %}
-                                    </label>
-                                    <span id="id_common_title_fr">
-                                        {{ learning_unit.titles.common_title_fr }}
-                                    </span>
-                                    <span id="id_specific_title_fr">
-                                        {{ effective_class.titles.title_fr }}
-                                    </span>
-                                </div>
-                            </div>
-                            <br/>
-                            <div class="panel panel-default">
-                                <div class="panel-body">
-                                    <label>
-                                        {% trans "Title in English" %}
-                                    </label>
-                                    <span id="id_common_title_en">
-                                        {{ learning_unit.titles.common_title_en }}
-                                    </span>
-                                    <span id="id_specific_title_en">
-                                        {{ effective_class.titles.title_en }}
-                                    </span>
-                                </div>
-                            </div>
-                        {% endblock titles %}
-                    </div>
-                </div>
-                {% block panel_remarks %}
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div class="row" style="padding-left: 5px">
-                                <div class="col-md-3">
-                                    <label>
-                                        {% trans 'Quadrimester' %}
-                                    </label>
-                                    <span id="id_quadrimester">
-                                        {{ effective_class.derogation_quadrimester }}
-                                    </span>
-                                </div>
-                                <div class="col-md-9">
-                                    <label>
-                                        {% trans 'Session derogation' %}
-                                    </label>
-                                    <span id="id_session_derogation">
-                                        {{ effective_class.session_derogation }}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% block panel_components %}
-                                {#                                TODO: COMPONENTS PART#}
-                            {% endblock panel_components %}
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div>
+                            <div class="col-md-12">
                                 <label>
-                                    {% trans 'Faculty remark' %}
+                                    {% trans 'Professional integration' %}
                                 </label>
-                                <span id="id_faculty_remark">
-                                        {{ learning_unit.remarks.faculty|default_if_none:'-' }}
-                                </span>
-                            </div>
-                            <div>
-                                <label>
-                                    {% trans 'Other remark' %}
-                                </label>
-                                <span id="id_other_remark">
-                                        {{ learning_unit.remarks.publication_fr|default_if_none:'-' }}
-                                </span>
-                            </div>
-                            <div>
-                                <label>
-                                    {% trans 'Other remark in English' %}
-                                </label>
-                                <span id="id_other_remark_en">
-                                        {{ learning_unit.remarks.publication_en|default_if_none:'-' }}
+                                <br>
+                                <span id="id_professional_integration">
+                                    {{ learning_unit.professional_integration | yesno | title }}
                                 </span>
                             </div>
                         </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-md-2">
-                                    <p id="id_is_vacant">
-                                        <label>
-                                            {% trans 'Vacant' %}
-                                        </label>
-                                        <span id="id_vacant">
-{#                                          FIXME: missing field#}
-                                            {{ learning_unit.vacant }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="col-md-3">
-                                    <p id="id_team">
-                                        <label>
-                                            {% trans 'Team' %}
-                                        </label>
-                                        <span id="id_team">
-{#                                          FIXME: missing field#}
-                                            {{ learning_unit.team }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="col-md-4">
-                                    <p id="id_type_declaration_vacant">
-                                        <label>
-                                            {% trans 'Decision' %}
-                                        </label>
-                                        <span id="id_decision">
-{#                                          FIXME: missing field#}
-                                            {{ learning_unit.decision }}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="col-md-3">
-                                    <p id="id_attribution_procedure">
-                                        <label>
-                                            {% trans 'Procedure' %}
-                                        </label>
-                                        <span id="id_procedure">
-{#                                          FIXME: missing field#}
-                                            {{ learning_unit.procedure }}
-                                        </span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endblock panel_remarks %}
-            </div>
-
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        {% block institution %}
-                            {#                            TODO: Campus + Entités + urls#}
-                        {% endblock institution %}
-
-                        {% block edit_academic_year %}
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
                             <label>
-                                {% trans 'Academic year' %}
+                                {% trans "Title" %}
                             </label>
-                            <span id="id_vacant">
-{#                                          FIXME: missing field#}
-                                {% trans 'From' %} {{ learning_unit.start_year }} {% trans 'to' %} {{ learning_unit_year.end_year }}
-                            </span>
-                        {% endblock %}
-
+                            <label>{% trans 'Common part' %}</label>
+                            <br>
+                            {{ learning_unit.titles.common_fr|default_if_none:'-'}}
+                            <br>
+                                <label>{% trans 'Class specific complement' %}</label><br>
+                            {{ effective_class.titles.title_fr|default_if_none:'-' }}
+                            <br>
+                            <label>
+                                {% trans "Title in English" %}
+                            </label>
+                            <br>
+                            {{ learning_unit.titles.common_en|default_if_none:'-'}}
+                            <br>
+                                <label>{% trans 'Class specific complement' %}</label>
+                                <br>
+                            {{ effective_class.titles.title_en|default_if_none:'-' }}
+                        </div>
                     </div>
+
                 </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>
+                                {% trans 'Quadrimester' %}
+                            </label>
+                            <br>
+                            <span id="id_quadrimester">
+                                {{ effective_class.quadrimester |default_if_none:'-'}}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <label>
+                                {% trans 'Session derogation' %}
+                            </label>
+                            <br>
+                            <span id="id_session_derogation">
+                                {{ effective_class.session |default_if_none:'-'}}
+                            </span>
+                        </div>
+                    </div>
+                <div>
+                <div class="table-responsive">
+                    <table class="table volumes_simplified">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Components' %}&nbsp;&nbsp;</th>
+                            <th class="text-center" title="{% trans 'Volume Q1' %}">{% trans 'Vol. Q1' %}</th>
+                            <th>+</th>
+                            <th class="text-center" title="{% trans 'Volume Q2' %}">{% trans 'Vol. Q2' %}</th>
+                            <th>=</th>
+                            <th class="text-center" title="{% trans 'Annual volume' %}">{% trans 'Vol. annual' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="text" value="{{ class_type }}" style="background: rgba(0, 0, 0, 0);border: none;"/>
+                            </td>
+                            <td>{{ effective_class.hourly_volume_partial_q1 }}</td>
+                            <td></td>
+                            <td>{{ effective_class.hourly_volume_partial_q2 }}</td>
+                            <td></td>
+                            <td>{{ volumes.volume_total_annual }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div>
+            <label>
+                {% trans 'Faculty remark (unpublished)' %}
+            </label>
+            <span id="id_faculty_remark">
+                {{ learning_unit.remarks.faculty |default_if_none:'-'}}
+            </span>
+        </div>
+        <div>
+            <label>
+                {% trans 'Other remark (intended for publication)' %}
+            </label>
+            <span id="id_other_remark">
+                {{ learning_unit.remarks.publication_fr|default_if_none:'-' }}
+            </span>
+        </div>
+        <div>
+            <label>
+                {% trans 'Other remark in english (intended for publication)' %}
+            </label>
+            <span id="id_other_remark_en">
+                {{ learning_unit.remarks.publication_en|default_if_none:'-' }}
+            </span>
+        </div>
+    </div>
+</div>
+</div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div>
+                            <label>{% trans 'Institution' %}</label>
+                            <br>
+                            UClouvain
+                        </div>
+                        <br>
+                        <div>
+                            <label>
+                                {% trans 'Learning location' %}
+                            </label>
+                            <br>
+                            {{learning_unit.campus|default_if_none:'-'  }}
+                        </div>
+                        <br>
+                        <div>
+                            <label>
+                                {% trans 'Requirement entity' %}
+                            </label>
+                            <br>
+                            {{learning_unit.responsible_entity|default_if_none:'-'  }}
+                            </div>
+                            <br>
+                        <div>
+                            <label>
+                                {% trans 'Attribution entity' %}
+                            </label>
+                            <br>
+                            {{learning_unit.allocation_entity|default_if_none:'-'  }}
+                        </div>
+                    </div>
+                </div>
+                {% include  "education_group_app/training/identification/panel_history.html" %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
