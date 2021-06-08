@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +5,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,11 +22,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
-
-from osis_common.ddd import interface
+from cms.models.translated_text import TranslatedText
 
 
-@attr.s(frozen=True, slots=True)
-class Entity(interface.ValueObject):
-    acronym = attr.ib(type=str)
+def postpone_cms(from_reference: int, to_reference: int, entity: str):
+    TranslatedText.objects.filter(entity=entity, reference=to_reference).delete()
+
+    for text in TranslatedText.objects.filter(entity=entity, reference=from_reference):
+        text.pk = None
+        text.reference = to_reference
+        text.save()

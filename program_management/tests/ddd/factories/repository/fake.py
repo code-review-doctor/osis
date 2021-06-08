@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import itertools
 from typing import List, Type, Optional, Set
 
 import attr
@@ -53,6 +54,7 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
         "delete": _delete_program_tree,
         "search_from_children": _search_from_children,
         "get_all_identities": _get_all_identities,
+        "search_last_occurence": search_trees_last_occurence,
     })
 
 
@@ -65,6 +67,7 @@ def get_fake_program_tree_version_repository(root_entities: List['ProgramTreeVer
         "delete": _delete_program_tree_version,
         "search": _search_program_tree_version,
         "search_versions_from_trees": _search_versions_from_trees,
+        "search_last_occurence": search_tree_versions_last_occurence,
     })
 
 
@@ -199,3 +202,17 @@ def _get_all_identities(cls) -> Set['ProgramTreeIdentity']:
                       if not node.is_learning_unit()}
         result.union(identities)
     return result
+
+
+@classmethod
+def search_trees_last_occurence(cls, from_year: int) -> List['ProgramTree']:
+    datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+    group_by_code = itertools.groupby(datas, lambda tree: tree.entity_id.code)
+    return [max(tree, key=lambda tree: tree.entity_id.year) for code, tree in group_by_code]
+
+
+@classmethod
+def search_tree_versions_last_occurence(cls, from_year: int) -> List['ProgramTreeVersion']:
+    datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+    group_by_acronym = itertools.groupby(datas, lambda tree: tree.entity_id.offer_acronym)
+    return [max(tree, key=lambda tree: tree.entity_id.year) for code, tree in group_by_acronym]
