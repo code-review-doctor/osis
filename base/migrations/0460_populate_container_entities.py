@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
                     ecy_requirement.learning_container_year_id = base_learningcontaineryear.id 
                     and ecy_requirement.type = 'REQUIREMENT_ENTITY'
                 )
-            """
+            """,
+            elidable=True
         ),
 
         migrations.RunSQL(
@@ -39,7 +40,8 @@ class Migration(migrations.Migration):
                     ecy_allocation.learning_container_year_id = base_learningcontaineryear.id 
                     and ecy_allocation.type = 'ALLOCATION_ENTITY'
                 )
-            """
+            """,
+            elidable=True
         ),
 
         migrations.RunSQL(
@@ -54,7 +56,8 @@ class Migration(migrations.Migration):
                     ecy_additionnal_1.learning_container_year_id = base_learningcontaineryear.id 
                     and ecy_additionnal_1.type = 'ADDITIONAL_REQUIREMENT_ENTITY_1'
                 )
-            """
+            """,
+            elidable=True
         ),
 
         migrations.RunSQL(
@@ -69,7 +72,8 @@ class Migration(migrations.Migration):
                     ecy_additionnal_2.learning_container_year_id = base_learningcontaineryear.id 
                     and ecy_additionnal_2.type = 'ADDITIONAL_REQUIREMENT_ENTITY_2'
                 )
-            """
+            """,
+            elidable=True
         ),
 
     ]

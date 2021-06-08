@@ -40,61 +40,63 @@ class Migration(migrations.Migration):
             END IF;
             RETURN NEW;
         END;
-        $$ language 'plpgsql';"""
+        $$ language 'plpgsql';""",
+        elidable=True
         ),
 
         migrations.RunSQL(
             create_trigger_for_changed_field('person'),
+            elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('tutor'),
+            create_trigger_for_changed_field('tutor'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('student'),
+            create_trigger_for_changed_field('student'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('organization'),
+            create_trigger_for_changed_field('organization'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('structure'),
+            create_trigger_for_changed_field('structure'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('programmemanager'),
+            create_trigger_for_changed_field('programmemanager'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('academicyear'),
+            create_trigger_for_changed_field('academicyear'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('academiccalendar'),
+            create_trigger_for_changed_field('academiccalendar'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('offer'),
+            create_trigger_for_changed_field('offer'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('offeryear'),
+            create_trigger_for_changed_field('offeryear'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('offerenrollment'),
+            create_trigger_for_changed_field('offerenrollment'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('offeryearcalendar'),
+            create_trigger_for_changed_field('offeryearcalendar'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('learningunit'),
+            create_trigger_for_changed_field('learningunit'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('attribution'),
+            create_trigger_for_changed_field('attribution'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('learningunityear'),
+            create_trigger_for_changed_field('learningunityear'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('learningunitenrollment'),
+            create_trigger_for_changed_field('learningunitenrollment'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('sessionexam'),
+            create_trigger_for_changed_field('sessionexam'), elidable=True
         ),
         migrations.RunSQL(
-            create_trigger_for_changed_field('examenrollment'),
+            create_trigger_for_changed_field('examenrollment'), elidable=True
         )
     ]
