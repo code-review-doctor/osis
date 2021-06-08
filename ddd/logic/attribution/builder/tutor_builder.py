@@ -42,4 +42,3 @@ class TutorBuilder(interface.RootEntityBuilder):
             first_name=dto_object.first_name,
             attributions=dto_object.attributions
         )
-
