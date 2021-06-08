@@ -27,7 +27,7 @@ import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef, Q, ProtectedError
+from django.db.models import Prefetch, Subquery, OuterRef, Q, ProtectedError, Max, Exists, QuerySet
 from django.utils import timezone
 
 from education_group import publisher
@@ -179,24 +179,7 @@ class GroupRepository(interface.AbstractRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List['GroupIdentity']] = None, **kwargs) -> List['Group']:
         if entity_ids:
-            qs = GroupYearModelDb.objects.all().select_related(
-                'academic_year',
-                'education_group_type',
-                'main_teaching_campus__organization',
-                'group__start_year',
-                'group__end_year',
-            ).prefetch_related(
-                Prefetch(
-                    'management_entity',
-                    EntityModelDb.objects.all().annotate(
-                        most_recent_acronym=Subquery(
-                            EntityVersionModelDb.objects.filter(
-                                entity__id=OuterRef('pk')
-                            ).order_by('-start_date').values('acronym')[:1]
-                        )
-                    )
-                ),
-            )
+            qs = _get_group_year_qs()
             filter_or_clause = Q()
             for entity_id in entity_ids:
                 filter_or_clause |= Q(
@@ -205,6 +188,22 @@ class GroupRepository(interface.AbstractRepository):
                 )
             return [_convert_db_model_to_ddd_model(obj) for obj in qs.filter(filter_or_clause)]
         return []
+
+    @classmethod
+    def search_groups_last_occurence(cls, from_year: int) -> List['Group']:
+        subquery_max_existing_year_for_group = GroupYearModelDb.objects.filter(
+            academic_year__year__gte=from_year,
+            group=OuterRef("group"),
+        ).values(
+            "group"
+        ).annotate(
+            max_year=Max("academic_year__year")
+        ).order_by(
+            "group"
+        ).values("max_year")
+
+        qs = _get_group_year_qs().filter(academic_year__year=Subquery(subquery_max_existing_year_for_group[:1]))
+        return [_convert_db_model_to_ddd_model(obj) for obj in qs]
 
     @classmethod
     def delete(cls, entity_id: 'GroupIdentity', **_) -> None:
@@ -248,4 +247,25 @@ def _convert_db_model_to_ddd_model(obj: GroupYearModelDb) -> 'Group':
         ),
         start_year=obj.group.start_year.year,
         end_year=obj.group.end_year.year if obj.group.end_year else None,
+    )
+
+
+def _get_group_year_qs() -> QuerySet:
+    return GroupYearModelDb.objects.all().select_related(
+        'academic_year',
+        'education_group_type',
+        'main_teaching_campus__organization',
+        'group__start_year',
+        'group__end_year',
+    ).prefetch_related(
+        Prefetch(
+            'management_entity',
+            EntityModelDb.objects.all().annotate(
+                most_recent_acronym=Subquery(
+                    EntityVersionModelDb.objects.filter(
+                        entity__id=OuterRef('pk')
+                    ).order_by('-start_date').values('acronym')[:1]
+                )
+            )
+        ),
     )
