@@ -58,12 +58,12 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     entity_id = attr.ib(type=EffectiveClassIdentity)
     titles = attr.ib(type=ClassTitles)
     teaching_place = attr.ib(type=UclouvainCampusIdentity)
-    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
-    session_derogation = attr.ib(type=DerogationSession)
     volumes = attr.ib(type=ClassVolumes)
+    derogation_quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
+    session_derogation = attr.ib(type=DerogationSession, default=None)
 
     @property
-    def complete_acronym(self):
+    def complete_acronym(self) -> str:  # TODO : rename to complete_code
         return "{}{}{}".format(
             self.entity_id.learning_unit_identity.code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
