@@ -192,7 +192,6 @@ class LearningUnitPedagogyTestCase(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(response.context['cms_labels_translated'])
-        print(response.context['cms_labels_translated'])
 
 
 class LearningUnitPedagogyExportXLSTestCase(TestCase):
