@@ -64,7 +64,7 @@ msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée
 
 #, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
-msgstr "Le code %('ue_code')s - %(code)s existe déjà pour l'UE %(ue)s"
+msgstr "Le code %(ue_code)s - %(code)s existe déjà pour l'UE %(ue)s"
 
 msgid "The code {} already exists"
 msgstr "Le code {} existe déjà"
