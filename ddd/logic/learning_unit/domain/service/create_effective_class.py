@@ -77,6 +77,9 @@ def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
         learning_unit: 'LearningUnit',
         cmd: 'CreateEffectiveClassCommand'
 ) -> Decimal:
+    if not cmd.volume_first_quadrimester and not cmd.volume_second_quadrimester:
+        return False
+
     practical_part = learning_unit.practical_part
     lecturing_part = learning_unit.lecturing_part
 
@@ -84,6 +87,5 @@ def _is_effective_class_volumes_inconsistent_with_learning_unit_volume_annual(
         volume_annual = practical_part.volumes.volume_annual
     else:
         volume_annual = lecturing_part.volumes.volume_annual
-
     sum_q1_q2 = cmd.volume_first_quadrimester + cmd.volume_second_quadrimester
     return volume_annual <= 0 or sum_q1_q2 != volume_annual

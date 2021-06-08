@@ -31,6 +31,7 @@ import factory.fuzzy
 from base.models.enums import learning_unit_year_session, quadrimesters
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from continuing_education.tests.utils.utils import get_enum_keys
 
 
 class LearningClassYearFactory(factory.django.DjangoModelFactory):

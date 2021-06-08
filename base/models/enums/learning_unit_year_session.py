@@ -49,11 +49,11 @@ LEARNING_UNIT_YEAR_SESSION = ((SESSION_1XX, SESSION_1XX),
 
 # TODO :: move this into ddd/domain layer
 class DerogationSession(ChoiceEnum):
-    SESSION_1XX = _("1")
-    SESSION_X2X = _("2")
-    SESSION_XX3 = _("3")
-    SESSION_12X = _("12")
-    SESSION_1X3 = _("13")
-    SESSION_X23 = _("23")
-    SESSION_123 = _("123")
-    SESSION_P23 = _("P23")
+    DEROGATION_SESSION_1XX = _("1")
+    DEROGATION_SESSION_X2X = _("2")
+    DEROGATION_SESSION_XX3 = _("3")
+    DEROGATION_SESSION_12X = _("12")
+    DEROGATION_SESSION_1X3 = _("13")
+    DEROGATION_SESSION_X23 = _("23")
+    DEROGATION_SESSION_123 = _("123")
+    DEROGATION_SESSION_P23 = _("P23")
