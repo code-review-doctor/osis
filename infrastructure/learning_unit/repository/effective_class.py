@@ -29,6 +29,7 @@ from django.db.models import F, QuerySet
 
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
+from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.learning_component_year import LearningComponentYear as LearningComponentYearDb
 from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
@@ -84,7 +85,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
                 'title_en': entity.titles.en,
                 'campus_id': campus_id,
                 'quadrimester': entity.derogation_quadrimester.name if entity.derogation_quadrimester else None,
-                'session': entity.session_derogation.value,
+                'session': DerogationSession[entity.session_derogation].value if entity.session_derogation else None,
                 'hourly_volume_partial_q1': entity.volumes.volume_first_quadrimester,
                 'hourly_volume_partial_q2': entity.volumes.volume_second_quadrimester,
             }
