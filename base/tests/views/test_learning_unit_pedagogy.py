@@ -67,15 +67,11 @@ class LearningUnitPedagogyTestCase(TestCase):
     def setUpTestData(cls):
         now = datetime.datetime.now()
 
-        cls.academic_year = create_current_academic_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.previous_academic_year = GenerateAcademicYear(
-            cls.old_academic_year,
-            cls.old_academic_year
-        ).academic_years[0]
         AcademicCalendarFactory(
-            data_year=cls.previous_academic_year,
+            data_year=cls.old_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
@@ -95,7 +91,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse('learning_units_summary')
-        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity)
+        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity, person__french=True)
         TranslatedTextLabelFactory(text_label__label='resume')
 
     def setUp(self):
