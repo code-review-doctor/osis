@@ -117,6 +117,9 @@ def _get_cms_force_majeure_labels_translated(learning_unit_year_id: int, user_la
 
 
 def _get_cms_labels_translated(learning_unit_year_id: int, text_labels: List[str], user_language: str):
+    print(user_language)
+    print(text_labels)
+    print(TranslatedText.objects.all())
     return TranslatedTextLabel.objects.filter(
         language=user_language,
         text_label__label__in=text_labels
