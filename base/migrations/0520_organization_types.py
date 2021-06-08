@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
             model_name='organization',
             name='is_current_partner',
         ),
-        migrations.RunPython(forward, migrations.RunPython.noop),
+        migrations.RunPython(forward, migrations.RunPython.noop, elidable=True),
         migrations.AlterField(
             model_name='organization',
             name='type',
