@@ -52,7 +52,7 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
-from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.organization import OrganizationFactory, MainOrganizationFactory
 from base.tests.factories.person import PersonFactory
 from learning_unit.tests.factories.central_manager import CentralManagerFactory
 from reference.tests.factories.language import FrenchLanguageFactory
@@ -284,7 +284,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
 
-        cls.organization_1 = OrganizationFactory()
+        cls.organization_1 = MainOrganizationFactory()
         cls.be_organization_adr_city1 = MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=cls.organization_1,
             country__iso_code="BE",
@@ -297,7 +297,7 @@ class TestExternalLearningUnitSearchForm(TestCase):
             learning_unit_year__campus__organization=cls.organization_1,
         )
 
-        cls.organization_2 = OrganizationFactory()
+        cls.organization_2 = MainOrganizationFactory()
         cls.be_organization_adr_city2 = MainRootEntityVersionAddressFactory(
             entity_version__entity__organization=cls.organization_2,
             country__iso_code="BE",

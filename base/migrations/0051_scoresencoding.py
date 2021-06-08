@@ -50,6 +50,7 @@ class Migration(migrations.Migration):
             base_offeryear.id,
             base_learningunityear.id
             ;
-            """
+            """,
+            elidable=True
         ),
     ]
