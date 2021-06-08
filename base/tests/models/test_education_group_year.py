@@ -36,7 +36,7 @@ from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
-    string_generator
+    string_generator, EducationGroupYearMasterFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
@@ -386,10 +386,10 @@ class TestFindWithEnrollmentsCount(TestCase):
 class EducationGroupYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.education_group_year = EducationGroupYearMasterFactory()
         cls.translated_text = OfferTranslatedTextFactory(reference=cls.education_group_year.id)
 
-        cls.education_group_year_no_cms = EducationGroupYearFactory()
+        cls.education_group_year_no_cms = EducationGroupYearMasterFactory()
 
     def test_delete_education_group_yr_and_cms(self):
         egy_id = self.education_group_year.id
