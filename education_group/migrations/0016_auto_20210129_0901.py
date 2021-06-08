@@ -67,5 +67,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(change_exam_enrollment_calendar, migrations.RunPython.noop),
+        migrations.RunPython(change_exam_enrollment_calendar, migrations.RunPython.noop, elidable=True),
     ]

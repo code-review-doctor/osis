@@ -21,7 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List, Type, Optional
+import itertools
+from typing import List, Type
+from typing import Optional
 
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception
@@ -32,6 +34,12 @@ from education_group.ddd.repository import group as group_repository, mini_train
 #  TODO update and get should work on copy
 class FakeGroupRepository(group_repository.GroupRepository):
     _groups = list()  # type: List['Group']
+
+    @classmethod
+    def search_groups_last_occurence(cls, from_year: int) -> List['Group']:
+        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        group_by_code = itertools.groupby(datas, lambda group: group.code)
+        return [max(groups, key=lambda group: group.year) for acronym, groups in group_by_code]
 
     @classmethod
     def create(cls, group: 'Group', **_) -> 'GroupIdentity':
@@ -108,6 +116,12 @@ class FakeMiniTrainingRepository(mini_training_repository.MiniTrainingRepository
         if mini_training_to_delete:
             cls._mini_trainings.remove(mini_training_to_delete)
 
+    @classmethod
+    def search_mini_trainings_last_occurence(cls, from_year: int) -> List['MiniTraining']:
+        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        group_by_acronym = itertools.groupby(datas, lambda training: training.acronym)
+        return [max(mini_training, key=lambda mini: mini.year) for acronym, mini_training in group_by_acronym]
+
 
 #  TODO update and get should work on copy
 class FakeTrainingRepository(training_repository.TrainingRepository):
@@ -145,6 +159,12 @@ class FakeTrainingRepository(training_repository.TrainingRepository):
         training_to_delete = next((training for training in cls._trainings if training.entity_id == entity_id), None)
         if training_to_delete:
             cls._trainings.remove(training_to_delete)
+
+    @classmethod
+    def search_trainings_last_occurence(cls, from_year: int) -> List['Training']:
+        datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+        group_by_acronym = itertools.groupby(datas, lambda training: training.acronym)
+        return [max(trainings, key=lambda training: training.year) for acronym, trainings in group_by_acronym]
 
 
 def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeGroupRepository']:

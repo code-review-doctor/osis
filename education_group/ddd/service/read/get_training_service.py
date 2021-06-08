@@ -31,4 +31,4 @@ from education_group.ddd.repository import training as training_repository
 
 def get_training(cmd: command.GetTrainingCommand) -> 'Training':
     training_id = TrainingIdentity(acronym=cmd.acronym, year=cmd.year)
-    return training_repository.TrainingRepository.get(training_id)
+    return training_repository.TrainingRepository().get(training_id)

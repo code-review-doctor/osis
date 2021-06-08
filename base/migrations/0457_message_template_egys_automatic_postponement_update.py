@@ -144,7 +144,7 @@ class Migration(migrations.Migration):
             {% endautoescape %}''',
                'egy_after_auto_postponement_html',
                'HTML',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -207,7 +207,7 @@ class Migration(migrations.Migration):
                 ''',
                'egy_after_auto_postponement_txt',
                'PLAIN',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -342,7 +342,7 @@ class Migration(migrations.Migration):
             {% endautoescape %}''',
                'egy_after_auto_postponement_html',
                'HTML',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -408,20 +408,20 @@ class Migration(migrations.Migration):
                 ''',
                'egy_after_auto_postponement_txt',
                'PLAIN',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET subject=%s WHERE reference=%s AND format=%s AND language=%s;",
               ['Report of the annual procedure of copy of the education groups',
                'egy_after_auto_postponement_txt',
                'PLAIN',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET subject=%s WHERE reference=%s AND format=%s AND language=%s;",
               ['Report of the annual procedure of copy of the education groups',
                'egy_after_auto_postponement_html',
                'HTML',
-               'en'])],
+               'en'])], elidable=True
         ),
     ]

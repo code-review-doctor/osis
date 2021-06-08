@@ -25,6 +25,7 @@ import traceback
 import warnings
 from collections import namedtuple
 from typing import Any, Optional, List
+import datetime
 
 import mock
 from django.test import TestCase
@@ -34,6 +35,8 @@ from base.models.enums.education_group_types import EducationGroupTypesEnum
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
     get_fake_mini_training_repository, get_fake_training_repository, FakeGroupRepository
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
+from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -76,13 +79,13 @@ class _AssertRaisesBusinessException:
 
 # FIXME should herit from SimpleTestCase
 class DDDTestCase(TestCase):
-    starting_academic_year_year = 2020
+    CURRENT_ACADEMIC_YEAR = 2020
 
     def setUp(self) -> None:
         super().setUp()
         self.mock_service(
             "base.models.academic_year.starting_academic_year",
-            return_value=namedtuple("academic_year", "year")(self.starting_academic_year_year)
+            return_value=namedtuple("academic_year", "year")(self.CURRENT_ACADEMIC_YEAR)
         )
         self._init_education_group_app_repo()
         self._init_program_management_app_repo()
@@ -122,6 +125,15 @@ class DDDTestCase(TestCase):
         self.mock_service(
             "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
             side_effect=get_from_element_id
+        )
+        self.mock_service(
+            "ddd.logic.shared_kernel.academic_year.domain.service.get_current_academic_year.GetCurrentAcademicYear"
+            ".get_starting_academic_year",
+            return_value=AcademicYear(
+                entity_id=AcademicYearIdentity(self.CURRENT_ACADEMIC_YEAR),
+                start_date=datetime.date.today(),
+                end_date=datetime.date.today(),
+            )
         )
 
         self.mock_service(

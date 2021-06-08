@@ -39,5 +39,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(populate_data_year, reverse_migration),
+        migrations.RunPython(populate_data_year, reverse_migration, elidable=True),
     ]

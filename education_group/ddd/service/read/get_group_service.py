@@ -31,4 +31,4 @@ from education_group.ddd.repository import group as group_repository
 
 def get_group(cmd: command.GetGroupCommand) -> 'Group':
     group_id = GroupIdentity(code=cmd.code, year=cmd.year)
-    return group_repository.GroupRepository.get(group_id)
+    return group_repository.GroupRepository().get(group_id)
