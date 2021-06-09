@@ -35,6 +35,11 @@ def can_postpone_achievements(education_group_year: 'EducationGroupYear') -> boo
     return not education_group_year.academic_year.is_past
 
 
+def bulk_postpone_achievements(education_group_years_from: List['EducationGroupYear']) -> None:
+    for egy in education_group_years_from:
+        postpone_achievements(egy)
+
+
 def postpone_achievements(education_group_year: "EducationGroupYear") -> None:
     if not can_postpone_achievements(education_group_year):
         raise PermissionDenied

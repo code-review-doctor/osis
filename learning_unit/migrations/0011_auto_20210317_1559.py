@@ -27,9 +27,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_title_learning_unit_summary_edition_calendar, migrations.RunPython.noop),
+        migrations.RunPython(update_title_learning_unit_summary_edition_calendar, migrations.RunPython.noop, elidable=True),
         migrations.RunPython(
             update_title_learning_unit_force_majeur_summary_edition_calendar,
-            migrations.RunPython.noop
+            migrations.RunPython.noop,
+            elidable=True,
         ),
     ]

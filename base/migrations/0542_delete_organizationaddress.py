@@ -34,5 +34,5 @@ class Migration(migrations.Migration):
         migrations.DeleteModel(
             name='OrganizationAddress',
         ),
-        migrations.RunPython(forward, migrations.RunPython.noop)
+        migrations.RunPython(forward, migrations.RunPython.noop, elidable=True)
     ]
