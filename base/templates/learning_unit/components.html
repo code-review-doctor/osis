@@ -141,15 +141,17 @@
                             <td></td>
                         {% endif %}
                         <td colspan="1">
-                            {{ learning_class_year.used_by_learning_units_year }}{% if  component.learning_component_year.type == 'LECTURING'%}-{% else %}_{% endif %}{{ learning_class_year.acronym }}
+                            {{ learning_class_year.used_by_learning_units_year }}
+                                    {% if  component.learning_component_year.type == 'LECTURING' %}-{% else %}
+                                        _{% endif %}{{ learning_class_year.acronym }}
                         </td>
                         <td>
                             {{ learning_class_year.title_fr }}
                         </td>
                         <td></td>
                         <td></td>
-                        <td>{{ learning_class_year.hourly_volume_partial_q1 | default_if_none:'' }}</td>
-                        <td>{{ learning_class_year.hourly_volume_partial_q2 | default_if_none:''}}</td>
+                        <td>{{ learning_class_year.hourly_volume_partial_q1 | floatformat | default_if_none:'' }}</td>
+                        <td>{{ learning_class_year.hourly_volume_partial_q2 | floatformat | default_if_none:''}}</td>
                         <td></td>
                         <td></td>
                         <td></td>
