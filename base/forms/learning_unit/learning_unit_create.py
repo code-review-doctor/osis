@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class LearningUnitModelForm(forms.ModelForm):
         self.instance.learning_container = kwargs.pop('learning_container')
         start_year = kwargs.pop('start_year')
         self.instance.start_year = start_year
-        end_year = kwargs.pop('end_year', None)
+        end_year = kwargs.pop('end_year', self.instance.end_year)
         self.instance.end_year = self._compute_end_year(start_year, end_year)
         return super().save(**kwargs)
 
