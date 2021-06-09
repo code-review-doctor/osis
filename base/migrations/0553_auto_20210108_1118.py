@@ -22,5 +22,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(fix_title_academic_calendar)
+        migrations.RunPython(fix_title_academic_calendar, elidable=True)
     ]

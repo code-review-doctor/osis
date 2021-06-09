@@ -27,8 +27,6 @@
 """
 Utility files for mail sending
 """
-import itertools
-from typing import List
 import datetime
 import itertools
 from typing import List, Set
@@ -330,8 +328,10 @@ def send_message_after_all_encoded_by_manager(
         updated_enrollments_ids,
         encoding_already_completed_before_update
     )
+
     receivers_by_lang = itertools.groupby(sorted(receivers, key=__order_by_lang), __order_by_lang)
     for receiver_lang, receivers in receivers_by_lang:
+
         table = message_config.create_table(
             'enrollments',
             get_enrollment_headers(receiver_lang),

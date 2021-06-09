@@ -39,5 +39,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(change_education_group_preparation_calendar, migrations.RunPython.noop),
+        migrations.RunPython(change_education_group_preparation_calendar, migrations.RunPython.noop, elidable=True),
     ]

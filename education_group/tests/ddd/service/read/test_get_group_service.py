@@ -34,6 +34,6 @@ class TestGetGroup(SimpleTestCase):
         self.cmd = command.GetGroupCommand(year=2018, code="LTRONC1")
 
     def test_assert_repository_called(self):
-        with patch('education_group.ddd.service.read.get_group_service.GroupRepository.get') as mock_grp_repo_get:
+        with patch('education_group.ddd.repository.group.GroupRepository') as mock_grp_repo_get:
             get_group_service.get_group(self.cmd)
             self.assertTrue(mock_grp_repo_get.called)

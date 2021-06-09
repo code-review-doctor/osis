@@ -114,16 +114,6 @@
                             </div>
                         </td>
                     </tr>
-                    {% if link.own_comment %}
-                        {% with nb_col_spanned=10 %}
-                            <tr>
-                                <td colspan="{{ nb_col_spanned }}" style="border-top: none;border-bottom: none;">
-                                    <label>{% trans 'Own comment' %}</label> :&nbsp;
-                                    {{ link.own_comment }}
-                                </td>
-                            </tr>
-                        {% endwith %}
-                    {% endif %}
                 {% endfor %}
                 </tbody>
             </table>

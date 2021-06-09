@@ -26,6 +26,7 @@ from copy import copy, deepcopy
 import mock
 from django.test import SimpleTestCase
 
+import ddd.logic.formation_catalogue.builder.training_builder
 from education_group.ddd.domain import training, exception
 from education_group.ddd.domain._co_organization import Coorganization
 from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached
@@ -42,7 +43,7 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         mock_repository.get.return_value = training_next_year
 
-        result = training.TrainingBuilder().copy_to_next_year(training_source, mock_repository)
+        result = ddd.logic.formation_catalogue.builder.training_builder.TrainingBuilder().copy_to_next_year(training_source, mock_repository)
 
         self.assertEqual(training_next_year, result)
 
@@ -52,7 +53,7 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         mock_repository.get.side_effect = exception.TrainingNotFoundException
 
-        result = training.TrainingBuilder().copy_to_next_year(training_source, mock_repository)
+        result = ddd.logic.formation_catalogue.builder.training_builder.TrainingBuilder().copy_to_next_year(training_source, mock_repository)
 
         self.assertEqual(training_source.entity_id.year + 1, result.entity_id.year)
         self.assertEqual(training_source.identity_through_years, result.identity_through_years)
@@ -69,7 +70,7 @@ class TestTrainingBuilderCopyToNextYear(SimpleTestCase):
 
         mock_repository.get.return_value = training_next_year
 
-        training.TrainingBuilder().copy_aims_to_next_year(training_source, mock_repository)
+        ddd.logic.formation_catalogue.builder.training_builder.TrainingBuilder().copy_aims_to_next_year(training_source, mock_repository)
         self.assertTrue(mock_update_aims.called)
 
 

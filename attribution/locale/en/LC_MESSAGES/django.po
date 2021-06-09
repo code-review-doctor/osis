@@ -159,7 +159,7 @@ msgstr ""
 msgid "Manage repartition"
 msgstr ""
 
-msgid "No attributions exist for the full UE"
+msgid "No attributions exist for the UE"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -227,7 +227,7 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for UE full"
+msgid "Tutor for UE "
 msgstr ""
 
 msgid "Tutors"

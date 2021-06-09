@@ -255,9 +255,6 @@ msgstr ""
 msgid "Diplomas /  Certificates"
 msgstr ""
 
-msgid "Direct gathering"
-msgstr ""
-
 msgid "Dissertation"
 msgstr ""
 
@@ -353,6 +350,9 @@ msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
 msgid "Funding international cooperation CCD/CUD direction"
+msgstr ""
+
+msgid "Gathering"
 msgstr ""
 
 msgid "General informations"
@@ -521,9 +521,6 @@ msgid "List of trainings with administrative data"
 msgstr ""
 
 msgid "Made in"
-msgstr ""
-
-msgid "Main gathering"
 msgstr ""
 
 msgid "Manag. ent."
