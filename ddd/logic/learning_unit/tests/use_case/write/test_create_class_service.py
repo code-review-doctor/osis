@@ -367,9 +367,9 @@ class TestCreateClassServiceValidator(TestCase):
             DerogationQuadrimesterInvalidChoiceException
         )
 
-    def test_quadrimester_is_valid_choice(self):
+    def test_session_is_valid_choice(self):
         learning_unit = LDROI1001CourseLearningUnitFactory()
-        self.learning_unit_repository.save(learning_unit)  # TODO :: réimplémenter save en mémoire pour éviter doublons
+        self.learning_unit_repository.save(learning_unit)
         cmd = CreateEffectiveClassCommand(
             class_code="Z",
             learning_unit_code=learning_unit.code,
