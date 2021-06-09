@@ -25,15 +25,14 @@
 ##############################################################################
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from reversion.models import Version
 
 from base.models.learning_unit_year import LearningUnitYear
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
-from django.utils.translation import gettext_lazy as _
 
 
 class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
@@ -42,17 +41,16 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # effective_class = self.get_effective_class() TODO: after 4270 integration,
+        effective_class = self.get_effective_class()
         learning_unit = self.get_learning_unit()
         context.update(
             {
                 'learning_unit_year': self.get_learning_unit_year(),
                 'learning_unit': learning_unit,
-                # 'effective_class': None TODO: after 5880,
-                'effective_class': {'quadrimester': 'Q1'},
+                'effective_class': effective_class,
                 'show_button': True,
-                # 'class_type': self.get_class_type(learning_unit) TODO: after 4270 integration,
-                # 'volumes': self.get_volumes(learning_unit) TODO: after 4270 integration
+                'class_type': self.get_class_type(learning_unit),
+                'volumes': self.get_volumes(learning_unit),
                 'history': self.get_related_history(),
             }
         )
@@ -77,30 +75,27 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
     def get_learning_unit(self) -> 'LearningUnit':
         command = GetLearningUnitCommand(code=self.kwargs['learning_unit_code'], year=self.kwargs['learning_unit_year'])
         return message_bus_instance.invoke(command)
-    # TODO :: uncomment below, after 4270 integration
-    # def get_effective_class(self) -> 'EffectiveClass':
-    #     command = GetEffectiveClassCommand(
-    #         class_code=self.kwargs['class_code'],
-    #         learning_unit_code=self.kwargs['learning_unit_code'],
-    #         learning_unit_year=self.kwargs['learning_unit_year']
-    #     )
-    #     return message_bus_instance.invoke(command)
 
-    # TODO :: uncomment below, after 4270 integration
-    # def get_class_type(learning_unit):
-    #     if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-    #         return _('Practical exercises')
-    #     return _('Lecturing')
-    #
+    def get_effective_class(self) -> 'EffectiveClass':
+        command = GetEffectiveClassCommand(
+            class_code=self.kwargs['class_code'],
+            learning_unit_code=self.kwargs['learning_unit_code'],
+            learning_unit_year=self.kwargs['learning_unit_year']
+        )
+        return message_bus_instance.invoke(command)
 
-    # TODO :: uncomment below, after 4270 integration
-    # def get_learning_unit(learning_unit):
-    #     if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-    #         return learning_unit.practical_part.volumes
-    #         self.fields['class_type'].initial = _('Practical exercises')
-    #     else:
-    #         return learning_unit.lecturing_part.volumes
-    #         self.fields['class_type'].initial = _('Lecturing')
+    def get_class_type(self, learning_unit):
+        if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
+            return _('Practical exercises')
+        return _('Lecturing')
+
+    def get_volumes(self, learning_unit):
+        if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
+            return learning_unit.practical_part.volumes
+            self.fields['class_type'].initial = _('Practical exercises')
+        else:
+            return learning_unit.lecturing_part.volumes
+            self.fields['class_type'].initial = _('Lecturing')
 
     def get_related_history(self):
         pass

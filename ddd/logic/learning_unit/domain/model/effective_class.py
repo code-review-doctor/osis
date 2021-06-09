@@ -68,6 +68,10 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
             self.entity_id.class_code
         )
 
+    @property
+    def type(self):
+        return self.__class__.__name__
+
 
 class PracticalEffectiveClass(EffectiveClass):
     pass

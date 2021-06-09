@@ -23,21 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
-from reversion.models import Version
 
+from attribution.models.enums.function import COORDINATOR
 from base.models.learning_unit_year import LearningUnitYear
+from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution, LearningUnitAttributionIdentity
+from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
+from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
-from django.utils.translation import gettext_lazy as _
 
 
-class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
-    template_name = "class/identification_tab.html"
+class ClassTutorsView(PermissionRequiredMixin, TemplateView):
+    template_name = "class/tutors_tab.html"
     permission_required = 'base.can_access_class'
 
     def get_context_data(self, **kwargs):
@@ -49,10 +52,7 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                 'learning_unit_year': self.get_learning_unit_year(),
                 'learning_unit': learning_unit,
                 'effective_class': effective_class,
-                'show_button': True,
-                'class_type': self.get_class_type(learning_unit),
-                'volumes': self.get_volumes(learning_unit),
-                'history': self.get_related_history(),
+                'tutors': self.get_class_tutors(),
             }
         )
         return context
@@ -85,37 +85,25 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
         )
         return message_bus_instance.invoke(command)
 
-    def get_class_type(self, learning_unit):
-        if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-            return _('Practical exercises')
-        return _('Lecturing')
-
-    def get_volumes(self, learning_unit):
-        if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-            return learning_unit.practical_part.volumes
-            self.fields['class_type'].initial = _('Practical exercises')
-        else:
-            return learning_unit.lecturing_part.volumes
-            self.fields['class_type'].initial = _('Lecturing')
-
-    def get_related_history(self):
-        pass
-        # todo :: uncomment below,  when LearningClassYear will be registered in django reversion
-        # effective_class = LearningClassYear.objects.get(pk=26) #TODO :: adapter ceci
-        # versions = Version.objects.get_for_object(
-        #     effective_class
-        # ).select_related('revision__user__person')
-        #
-        # related_models = [
-        #     LearningClassYear,
-        # ]
-        #
-        # subversion = Version.objects.none()
-        # for model in related_models:
-        #     subversion |= Version.objects.get_for_model(model).select_related('revision__user__person')
-        #
-        # versions |= subversion.filter(
-        #     serialized_data__contains="\"learning_class_year\": {}".format(effective_class.pk)
-        # )
-        #
-        # return versions.order_by('-revision__date_created').distinct('revision__date_created')
+    def get_class_tutors(self) -> List['Tutor']:
+        # replace with service result
+        return [
+            Tutor(
+                entity_id=TutorIdentity(personal_id_number='id_number'),
+                first_name='Toto',
+                last_name='Tutu',
+                attributions=[
+                    LearningUnitAttribution(
+                        entity_id=LearningUnitAttributionIdentity(uuid='uuid'),
+                        function=COORDINATOR,
+                        learning_unit=self.get_learning_unit().entity_id,
+                        distributed_effective_classes=[
+                            ClassVolumeRepartition(
+                                effective_class=self.get_effective_class().entity_id,
+                                distributed_volume=10
+                            )
+                        ]
+                    )
+                ]
+            )
+        ]
