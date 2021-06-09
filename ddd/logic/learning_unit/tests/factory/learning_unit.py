@@ -67,7 +67,7 @@ class _PartimIdentityFactory(factory.Factory):
         model = PartimIdentity
         abstract = False
 
-    subdivision = factory.fuzzy.FuzzyText(length=10)
+    subdivision = factory.fuzzy.FuzzyText(length=1)
 
 
 class _PartimFactory(factory.Factory):

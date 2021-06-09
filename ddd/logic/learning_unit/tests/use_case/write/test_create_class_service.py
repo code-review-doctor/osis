@@ -65,7 +65,7 @@ class CreateClassService(SimpleTestCase):
             teaching_place_uuid="35bbb236-7de6-4322-a496-fa8397054305"
         )
 
-    def test_save_type_practical(self):
+    def test_should_save_type_practical(self):
         ue_with_practical_volumes_only = CourseWithPracticalVolumesOnly()
         self.learning_unit_repository.save(ue_with_practical_volumes_only)
 
@@ -78,7 +78,7 @@ class CreateClassService(SimpleTestCase):
         effective_class = self.effective_class_repository.get(effective_class_id)
         self.assertIsInstance(effective_class, PracticalEffectiveClass)
 
-    def test_save_type_lecturing(self):
+    def test_should_save_type_lecturing(self):
         ue_with_lecturing_volumes_only = CourseWithLecturingVolumesOnly()
         self.learning_unit_repository.save(ue_with_lecturing_volumes_only)
 
@@ -91,7 +91,7 @@ class CreateClassService(SimpleTestCase):
         effective_class = self.effective_class_repository.get(effective_class_id)
         self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
-    def test_save_type_lecturing_when_both_volumes_are_filled(self):
+    def test_should_save_type_lecturing_when_both_volumes_are_filled(self):
         ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
         self.learning_unit_repository.save(ue_with_lecturing_and_practical_volumes)
 
@@ -213,7 +213,7 @@ class CreateClassService(SimpleTestCase):
             LearningUnitHasNoVolumeException
         )
 
-    def test_raise_check_partim_volume_inconsistent_exception(self):
+    def test_should_class_volumes_be_consistent_with_learning_unit(self):
         annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
         bad_repartition = annual_volume + 10.0
         cmd = attr.evolve(

@@ -43,18 +43,12 @@ def update_effective_class(
     learning_unit = learning_unit_repository.get(
         entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
     )
-    CanCreateEffectiveClass().verify(
-        learning_unit=learning_unit,
-        learning_unit_repository=learning_unit_repository
-    )
-    all_existing_class_identities = class_repository.get_all_identities()
 
     # When
     SaveEffectiveClass().update(
         learning_unit=learning_unit,
         effective_class=effective_class,
-        cmd=cmd,
-        all_existing_class_identities=all_existing_class_identities,
+        cmd=cmd
     )
 
     # Then

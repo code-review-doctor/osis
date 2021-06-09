@@ -65,7 +65,6 @@ class SaveEffectiveClass(interface.DomainService):
             learning_unit: 'LearningUnit',
             effective_class: 'EffectiveClass',
             cmd: 'UpdateEffectiveClassCommand',
-            all_existing_class_identities: List['EffectiveClassIdentity'],
     ) -> None:
         volumes_consistency_with_learning_unit = partial(
             _should_class_volumes_be_consistent_with_learning_unit,
@@ -75,7 +74,6 @@ class SaveEffectiveClass(interface.DomainService):
         )
         execute_functions_and_aggregate_exceptions(
             volumes_consistency_with_learning_unit,
-            partial(_should_class_code_not_already_exist, all_existing_class_identities, cmd.class_code, learning_unit),
             partial(effective_class.update, cmd),
         )
 

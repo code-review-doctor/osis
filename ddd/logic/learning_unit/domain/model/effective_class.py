@@ -72,16 +72,17 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
 
     def update(self, cmd: UpdateEffectiveClassCommand) -> None:
         UpdateEffectiveClassValidatorList(command=cmd).validate()
-        self.entity_id.class_code = cmd.class_code
-        self.titles.fr = cmd.title_fr
-        self.titles.en = cmd.title_en
-        self.teaching_place.uuid = cmd.teaching_place_uuid
+        # self.entity_id.class_code = cmd.class_code  # FIXME :: gérer la mise à jour du code de la classe
+        self.titles = ClassTitles(fr=cmd.title_fr, en=cmd.title_en)
+        self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
         self.derogation_quadrimester.uuid = cmd.teaching_place_uuid
         quadri = cmd.derogation_quadrimester
         self.derogation_quadrimester = DerogationQuadrimester[quadri] if quadri else None
-        self.session_derogation = DerogationSession[cmd.session_derogation] if cmd.session_derogation else None
-        self.volumes.volume_first_quadrimester = cmd.volume_first_quadrimester
-        self.volumes.volume_second_quadrimester = cmd.volume_second_quadrimester
+        self.session_derogation = DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None
+        self.volumes = ClassVolumes(
+            volume_first_quadrimester=cmd.volume_first_quadrimester,
+            volume_second_quadrimester=cmd.volume_second_quadrimester
+        )
 
 
 class PracticalEffectiveClass(EffectiveClass):
