@@ -29,9 +29,12 @@ from base.models.enums.entity_type import EntityType
 from osis_common.ddd import interface
 
 
+EntityCode = str
+
+
 @attr.s(frozen=True, slots=True)
 class UCLEntityIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
+    code = attr.ib(type=EntityCode)
 
 
 @attr.s(slots=True, hash=False, eq=False)
@@ -40,7 +43,7 @@ class UclEntity(interface.RootEntity):
     type = attr.ib(type=EntityType)
 
     @property
-    def code(self) -> str:
+    def code(self) -> EntityCode:
         return self.entity_id.code
 
     def is_responsible_entity(self) -> bool:

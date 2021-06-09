@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-03 13:47+0200\n"
+"POT-Creation-Date: 2021-05-25 09:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -94,11 +94,32 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
+msgid "1"
+msgstr "1"
+
+msgid "12"
+msgstr "12"
+
+msgid "123"
+msgstr "123"
+
+msgid "13"
+msgstr "13"
+
 msgid "1st quadri"
 msgstr "1er quadri"
 
+msgid "2"
+msgstr "2"
+
+msgid "23"
+msgstr "23"
+
 msgid "2nd quadri"
 msgstr "2e quadri"
+
+msgid "3"
+msgstr "3"
 
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
@@ -187,9 +208,6 @@ msgstr "Année académique"
 
 msgid "Accepted"
 msgstr "Accepté"
-
-msgid "Access based on application"
-msgstr "Accès sur dossier"
 
 msgid "Access condition"
 msgstr "Condition d'accès"
@@ -1622,6 +1640,9 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
+msgid "New class"
+msgstr "Nouvelle classe"
+
 msgid "New external learning unit"
 msgstr "Nouvelle unité d'enseignement externe"
 
@@ -1709,6 +1730,10 @@ msgstr "Inscriptions aux formations"
 msgid "Ok"
 msgstr "Ok"
 
+msgid "On the file: direct access or access with additional training"
+msgstr ""
+"Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
+
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
@@ -1783,6 +1808,9 @@ msgstr "Composants propres"
 
 msgid "P."
 msgstr "P."
+
+msgid "P23"
+msgstr "P23"
 
 msgid "Page not found."
 msgstr "Page inexistante."
@@ -2682,10 +2710,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application this year or in the future"
-msgstr ""
-"L'unité d'enseignement a au moins une candidature cette année ou dans le "
-"futur"
+msgid "This learning unit has application"
+msgstr "L'unité d'enseignement a au moins une candidature"
 
 #, python-format
 msgid ""
@@ -2786,6 +2812,9 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
+
+msgid "UE full"
+msgstr "UE complète"
 
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
@@ -2927,13 +2956,6 @@ msgstr "Oui, je confirme."
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
-
-msgid ""
-"You cannot create a partim for a learning unit having classes for this year "
-"or in the future"
-msgstr ""
-"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant une "
-"ou plusieurs classes cette année ou dans le futur"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"

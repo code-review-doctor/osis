@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -61,6 +61,8 @@ from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplet
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
 from education_group import urls as education_group_urls
+from learning_unit import urls
+
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -135,7 +137,8 @@ urlpatterns = [
         url(r'^mandates/$', institution.mandates, name='mandates'),
     ])),
 
-    url(r'^learning_units/', include([
+    url(r'^learning_units/', include(
+        urls.urlpatterns + [
         url(r'^by_activity/', base.views.learning_units.search.simple.LearningUnitSearch.as_view(),
             name='learning_units'),
         url(r'^by_service_course/', base.views.learning_units.search.service_course.ServiceCourseSearch.as_view(),
@@ -245,6 +248,7 @@ urlpatterns = [
                 name="learning_unit_proposal_comparison"),
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
+
         ])),
         url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
@@ -255,6 +259,7 @@ urlpatterns = [
             ])),
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
+
     ])),
     url(r'^proposals/search/$', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
         name="learning_unit_proposal_search"),
@@ -312,6 +317,7 @@ urlpatterns = [
     path('geocoding', base.views.geocoding.geocode),
     url(r'^clear_filter/$', base.views.search.clear_filter, name="clear_filter"),
 ]
+
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

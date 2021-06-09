@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-18 17:09+0200\n"
+"POT-Creation-Date: 2021-06-08 10:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,74 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Academic year"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Allocation entity"
+msgstr ""
+
+msgid "Annual volume"
+msgstr ""
+
 msgid "Central manager"
 msgstr ""
 
 msgid "Central managers"
 msgstr ""
 
+msgid "Class"
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr ""
+
+msgid "Class specific complement"
+msgstr ""
+
+msgid "Classes can only be created by a faculty manager"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Common part"
+msgstr ""
+
+msgid "Components"
+msgstr ""
+
+msgid "Credits"
+msgstr ""
+
+msgid "Derogation's session"
+msgstr ""
+
 msgid "Faculty manager"
 msgstr ""
 
 msgid "Faculty managers"
+msgstr ""
+
+msgid "Faculty remark (unpublished)"
+msgstr ""
+
+msgid "Formation catalogue"
+msgstr ""
+
+msgid "Institution"
+msgstr ""
+
+msgid "Internship subtype"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Learning location"
 msgstr ""
 
 msgid "Learning unit is not full"
@@ -41,22 +99,64 @@ msgid ""
 "has the following type: %(types)s"
 msgstr ""
 
+msgid "Learning units"
+msgstr ""
+
+msgid "Lecturing"
+msgstr ""
+
+msgid "New class"
+msgstr ""
+
 msgid "Not in period to edit description fiche."
 msgstr ""
 
 msgid "Not in period to edit force majeure section."
 msgstr ""
 
-msgid "Only letters are allowed."
+msgid "Only alphanumeric characters are allowed."
+msgstr ""
+
+msgid "Other remark (intended for publication)"
+msgstr ""
+
+msgid "Other remark in english (intended for publication)"
+msgstr ""
+
+msgid "Periodicity"
 msgstr ""
 
 msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Planned classes"
+msgstr ""
+
+msgid "Practical exercises"
+msgstr ""
+
+msgid "Professional integration"
 msgstr ""
 
 msgid "Proposal is of modification type"
 msgstr ""
 
 msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+msgid "Quadrimester"
+msgstr ""
+
+msgid "Requirement entity"
+msgstr ""
+
+msgid "Session derogation"
+msgstr ""
+
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
 msgstr ""
 
 #, python-format
@@ -102,16 +202,10 @@ msgstr ""
 msgid "This learning unit has application this year"
 msgstr ""
 
-msgid "This learning unit has application this year or in the future"
-msgstr ""
-
 msgid "This learning unit has attribution"
 msgstr ""
 
 msgid "This learning unit has attribution this year"
-msgstr ""
-
-msgid "This learning unit has attribution this year or in the future"
 msgstr ""
 
 msgid "This learning unit has teachers"
@@ -139,6 +233,33 @@ msgstr ""
 msgid ""
 "This learning unit isn't eligible for modification because of its type which "
 "is not among those types: %(types)s"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Title in English"
+msgstr ""
+
+msgid "Title in French"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Vol. Q1"
+msgstr ""
+
+msgid "Vol. Q2"
+msgstr ""
+
+msgid "Vol. annual"
+msgstr ""
+
+msgid "Volume Q1"
+msgstr ""
+
+msgid "Volume Q2"
 msgstr ""
 
 msgid "You are not allowed to create proposal during this academic year"
@@ -180,4 +301,13 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "external acronym rules"
+msgstr ""
+
+msgid "hourly volume partial q1"
+msgstr ""
+
+msgid "hourly volume partial q2"
 msgstr ""
