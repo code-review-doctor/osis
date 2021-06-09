@@ -25,7 +25,7 @@
 ##############################################################################
 
 import attr
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -52,7 +52,7 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 YEAR = 2020
 
 
-class TestCreateClassServiceEffectiveClassType(TestCase):
+class TestCreateClassServiceEffectiveClassType(SimpleTestCase):
 
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
@@ -110,7 +110,7 @@ class TestCreateClassServiceEffectiveClassType(TestCase):
         self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
 
-class TestCreateClassServiceValidator(TestCase):
+class TestCreateClassServiceValidator(SimpleTestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
         self.command = _build_create_learning_unit_command()
@@ -380,7 +380,7 @@ class TestCreateClassServiceValidator(TestCase):
             title_en='en',
             derogation_quadrimester=None,
             session_derogation="invalid choice",
-            teaching_place_uuid=None
+            teaching_place_uuid="35bbb236-7de6-4322-a496-fa8397054305"
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(

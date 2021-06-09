@@ -34,7 +34,6 @@ from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClass
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-@transaction.atomic()
 def create_effective_class(
         cmd: 'CreateEffectiveClassCommand',
         learning_unit_repository: 'ILearningUnitRepository',
