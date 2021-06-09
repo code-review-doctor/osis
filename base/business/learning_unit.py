@@ -73,14 +73,8 @@ def get_same_container_year_components(learning_unit_year):
                 learning_class_year.used_by_learning_units_year = learning_unit_year.acronym
                 learning_class_year.is_used_by_full_learning_unit_year = _is_used_by_full_learning_unit_year(
                     learning_class_year)
-                learning_class_year.quadrimester_name = LearningUnitYearQuadrimester.get_value(
-                    learning_class_year.quadrimester
-                )
 
         used_by_learning_unit = learning_component_year.learning_unit_year == learning_unit_year
-        learning_component_year.learning_unit_year.quadrimester_name = LearningUnitYearQuadrimester.get_value(
-            learning_component_year.learning_unit_year.quadrimester
-        )
         components.append(
             {
                 'learning_component_year': learning_component_year,

@@ -127,7 +127,7 @@
                     {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
                 {% endblock %}
                 <td>
-                    {{ component.learning_component_year.learning_unit_year.quadrimester_name | default_if_none:'' }}</td>
+                    {{ component.learning_component_year.learning_unit_year.get_quadrimester_display | default_if_none:'' }}</td>
                 <td>{{ component.learning_component_year.learning_unit_year.session | default_if_none:'' }}</td>
                 <td>{% if component.learning_component_year.learning_unit_year.campus %}
                     {{ component.learning_component_year.learning_unit_year.campus.name }}{% endif %}</td>
@@ -162,7 +162,7 @@
                         {% if ADDITIONAL_REQUIREMENT_ENTITY_2 %}
                             <td></td>
                         {% endif %}
-                        <td>{{ learning_class_year.quadrimester_name | default_if_none:'' }}</td>
+                        <td>{{ learning_class_year.get_quadrimester_display | default_if_none:'' }}</td>
                         <td>{{ learning_class_year.session | default_if_none:'' }}</td>
                         <td>{% if learning_class_year.campus %}{{ learning_class_year.campus.name }}{% endif %}</td>
                     </tr>
