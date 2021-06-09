@@ -242,3 +242,63 @@ class LDROI1004CourseWithoutVolumesLearningUnitFactory(_CourseLearningUnitFactor
     )
     lecturing_part = None
     practical_part = None
+
+
+class CourseWithPracticalVolumesOnly(_CourseLearningUnitFactory):
+    lecturing_part = None
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = []
+
+
+class CourseWithLecturingVolumesOnly(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = None
+    partims = []
+
+
+class CourseWithLecturingAndPracticalVolumes(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = []
+
+
+class CourseWithOnePartim(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = factory.List([factory.SubFactory(_PartimFactory)])
