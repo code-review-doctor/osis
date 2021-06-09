@@ -63,7 +63,7 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     session_derogation = attr.ib(type=DerogationSession, default=None)
 
     @property
-    def complete_acronym(self) -> str:  # TODO : rename to complete_code
+    def complete_code(self) -> str:
         return "{}{}{}".format(
             self.entity_id.learning_unit_identity.code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
