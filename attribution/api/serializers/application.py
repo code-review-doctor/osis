@@ -27,9 +27,10 @@ from rest_framework import serializers
 
 
 class ApplicationGetSerializer(serializers.Serializer):
-    uuid = serializers.UUIDField(source="entity_id.uuid", read_only=True)
-    code = serializers.CharField(source="vacant_course_id.code", read_only=True)
-    year = serializers.IntegerField(source="vacant_course_id.year", read_only=True)
+    uuid = serializers.UUIDField(read_only=True)
+    code = serializers.CharField(read_only=True)
+    year = serializers.IntegerField(read_only=True)
+    course_title = serializers.CharField(read_only=True)
     lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)

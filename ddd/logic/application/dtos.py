@@ -112,6 +112,7 @@ class ApplicationByApplicantDTO(DTO):
     uuid = attr.ib(type=str)
     code = attr.ib(type=str)
     year = attr.ib(type=int)
+    course_title = attr.ib(type=str)
     lecturing_volume = attr.ib(type=Decimal)
     lecturing_volume_available = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)

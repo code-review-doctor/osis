@@ -521,6 +521,9 @@ components:
         year:
           type: integer
           example: 2020
+        course_title:
+          type: string
+          example: "Introduction au droit"
         lecturing_volume:
           type: string
           example: '10.0'

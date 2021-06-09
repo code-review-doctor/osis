@@ -28,13 +28,15 @@ import operator
 from decimal import Decimal
 from typing import List, Optional
 
+from django.db import models
 from django.db.models import F, Q, OuterRef, fields, Case, When, Subquery
 
 from attribution.models.tutor_application import TutorApplication
 from base.auth.roles.tutor import Tutor
-from base.models.enums import learning_component_year_type
+from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import ApplicationIdentity, Application
@@ -92,12 +94,21 @@ class ApplicationRepository(IApplicationRepository):
         ).annotate(
             code=F('learning_container_year__acronym'),
             year=F('learning_container_year__academic_year__year'),
+            lecturing_volume=F('volume_lecturing'),
+            course_title=Subquery(
+                LearningUnitYear.objects.filter(
+                    learning_container_year_id=OuterRef('learning_container_year_id'),
+                    subtype=learning_unit_year_subtypes.FULL
+                ).annotate_full_title().values('full_title')[:1],
+                output_field=models.CharField()
+            ),
             lecturing_volume_available=Subquery(
                 subqs_volume_declared_vacant.filter(
                     type=learning_component_year_type.LECTURING
                 ).values('volume_declared_vacant_casted')[:1],
                 output_field=fields.DecimalField()
             ),
+            practical_volume=F('volume_pratical_exercice'),
             practical_volume_available=Subquery(
                 subqs_volume_declared_vacant.filter(
                     type=learning_component_year_type.PRACTICAL_EXERCISES
@@ -108,6 +119,7 @@ class ApplicationRepository(IApplicationRepository):
             'uuid',
             'code',
             'year',
+            'course_title',
             'lecturing_volume',
             'lecturing_volume_available',
             'practical_volume',
