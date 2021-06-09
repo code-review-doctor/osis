@@ -21,22 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest.mock import patch
 
 import attr
 
-from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
+from infrastructure.messages_bus import message_bus_instance
 from program_management.ddd.command import BulkUpdateLinkCommand, UpdateLinkCommand
 from program_management.ddd.domain.exception import BulkUpdateLinkException, InvalidBlockException, \
     RelativeCreditShouldBeGreaterOrEqualsThanZero, RelativeCreditShouldBeLowerOrEqualThan999, \
     ReferenceLinkNotAllowedWithLearningUnitException, ChildTypeNotAuthorizedException
-from program_management.ddd.domain.program_tree import ProgramTreeBuilder
 from program_management.ddd.domain.report import ReportIdentity
 from program_management.ddd.domain.report_events import CannotPostponeLinkToNextYearAsConsistencyError
-from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
 from program_management.ddd.repositories.report import ReportRepository
-from program_management.ddd.service.write import bulk_update_link_service
 from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
 from testing.testcases import DDDTestCase
 
@@ -64,33 +60,24 @@ class TestUpdateLink(DDDTestCase):
         cmd = attr.evolve(self.cmd, block="158")
 
         with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(
-                self._generate_bulk_cmd(cmd),
-                self.fake_program_tree_repository,
-                ReportRepository()
-            )
+            message_bus_instance.invoke(self._generate_bulk_cmd(cmd))
+
         self.assert_exception_in(e.exception, cmd, InvalidBlockException)
 
     def test_cannot_have_relative_credits_lower_than_0(self):
         cmd = attr.evolve(self.cmd, relative_credits=-1)
 
         with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(
-                self._generate_bulk_cmd(cmd),
-                self.fake_program_tree_repository,
-                ReportRepository()
-            )
+            message_bus_instance.invoke(self._generate_bulk_cmd(cmd))
+
         self.assert_exception_in(e.exception, cmd, RelativeCreditShouldBeGreaterOrEqualsThanZero)
 
     def test_cannot_have_relative_credits_greater_than_999(self):
         cmd = attr.evolve(self.cmd, relative_credits=1000)
 
         with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(
-                self._generate_bulk_cmd(cmd),
-                self.fake_program_tree_repository,
-                ReportRepository()
-            )
+            message_bus_instance.invoke(self._generate_bulk_cmd(cmd))
+
         self.assert_exception_in(e.exception, cmd, RelativeCreditShouldBeLowerOrEqualThan999)
 
     def test_cannot_set_link_type_as_reference_for_link_with_a_learning_unit_as_a_child(self):
@@ -105,12 +92,17 @@ class TestUpdateLink(DDDTestCase):
         )
 
         with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(
-                self._generate_bulk_cmd(cmd, tree_code=link_with_learning_unit.parent.code),
-                self.fake_program_tree_repository,
-                ReportRepository()
-            )
+            message_bus_instance.invoke(self._generate_bulk_cmd(cmd, tree_code=link_with_learning_unit.parent.code))
+
         self.assert_exception_in(e.exception, cmd, ReferenceLinkNotAllowedWithLearningUnitException)
+
+    def test_cannot_set_link_as_reference_when_children_of_child_are_not_valid_children_type_for_parent(self):
+        cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
+
+        with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
+            message_bus_instance.invoke(self._generate_bulk_cmd(cmd))
+
+        self.assert_exception_in(e.exception, cmd, ChildTypeNotAuthorizedException)
 
     def test_always_reference_link_between_minor_major_list_choice_and_minor_or_major_or_deepening(self):
         link_with_minor = next(link for link in self.tree.get_all_links() if link.child.is_minor_major_deepening())
@@ -124,30 +116,13 @@ class TestUpdateLink(DDDTestCase):
             child_node_year=link_with_minor.child.year,
         )
 
-        bulk_update_link_service.bulk_update_and_postpone_links(
-            self._generate_bulk_cmd(cmd, tree_code=link_with_minor.parent.code, tree_year=link_with_minor.parent.year),
-            self.fake_program_tree_repository,
-            ReportRepository()
+        message_bus_instance.invoke(
+            self._generate_bulk_cmd(cmd, tree_code=link_with_minor.parent.code, tree_year=link_with_minor.parent.year)
         )
         self.assertEqual(link_with_minor.link_type, LinkTypes.REFERENCE)
 
-    def test_cannot_set_link_as_reference_when_children_of_child_are_not_valid_children_type_for_parent(self):
-        cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
-
-        with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(
-                self._generate_bulk_cmd(cmd),
-                self.fake_program_tree_repository,
-                ReportRepository()
-            )
-        self.assert_exception_in(e.exception, cmd, ChildTypeNotAuthorizedException)
-
     def test_should_update_link_attributes(self):
-        result = bulk_update_link_service.bulk_update_and_postpone_links(
-            self._generate_bulk_cmd(self.cmd),
-            self.fake_program_tree_repository,
-            ReportRepository()
-        )[0]
+        result = message_bus_instance.invoke(self._generate_bulk_cmd(self.cmd))[0]
 
         self.assertEqual(result.link_type, self.cmd.link_type)
         self.assertEqual(result.access_condition, self.cmd.access_condition)
@@ -160,11 +135,7 @@ class TestUpdateLink(DDDTestCase):
     def test_should_report_link_modifications(self):
         bulk_update_cmd = self._generate_bulk_cmd(self.cmd)
 
-        bulk_update_link_service.bulk_update_and_postpone_links(
-            bulk_update_cmd,
-            self.fake_program_tree_repository,
-            ReportRepository()
-        )
+        message_bus_instance.invoke(bulk_update_cmd)
 
         conflict_report = ReportRepository().get(ReportIdentity(bulk_update_cmd.transaction_id))
         self.assertTrue(isinstance(conflict_report.warnings[0], CannotPostponeLinkToNextYearAsConsistencyError))
@@ -181,11 +152,8 @@ class TestUpdateLink(DDDTestCase):
         cmd = attr.evolve(self.cmd, link_type=LinkTypes.REFERENCE.name)
 
         with self.assertRaisesBusinessException(BulkUpdateLinkException) as e:
-            bulk_update_link_service.bulk_update_and_postpone_links(
-                self._generate_bulk_cmd(cmd),
-                self.fake_program_tree_repository,
-                ReportRepository()
-            )
+            message_bus_instance.invoke(self._generate_bulk_cmd(cmd))
+
         self.assert_exception_in(e.exception, cmd, ChildTypeNotAuthorizedException)
 
     def assert_exception_in(self, bulk_exceptions: BulkUpdateLinkException, cmd: UpdateLinkCommand, exception_cls):
