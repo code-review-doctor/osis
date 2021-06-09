@@ -661,7 +661,7 @@ def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learn
 def _check_number_of_classes(all_components) -> List[str]:
     _warnings = []
     for learning_component_year in all_components:
-        if learning_component_year.planned_classes != len(learning_component_year.classes):
+        if (learning_component_year.planned_classes or 0) != len(learning_component_year.classes):
             _warnings.append(
                 _('The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
                   'is not consistent') % {
