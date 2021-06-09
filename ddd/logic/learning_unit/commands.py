@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from decimal import Decimal
-from typing import Optional
 
 import attr
 
@@ -73,18 +72,17 @@ class CreateLearningUnitCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class CreatePartimCommand(interface.CommandRequest):
-    # FIXME :: add default=None to not required args
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
     subdivision = attr.ib(type=int)
-    title_fr = attr.ib(type=str)
-    title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str, default="")
+    title_en = attr.ib(type=str, default="")
+    remark_faculty = attr.ib(type=str, default=None)
+    remark_publication_fr = attr.ib(type=str, default=None)
+    remark_publication_en = attr.ib(type=str, default=None)
 
 
 @attr.s(frozen=True, slots=True)

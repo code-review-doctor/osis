@@ -330,7 +330,7 @@ class TestCreateClassServiceValidator(TestCase):
             session_derogation=None,
             teaching_place_uuid=None
         )
-        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:  # FIXME :: écrire un generique
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
                 self.learning_unit_repository,
@@ -356,7 +356,7 @@ class TestCreateClassServiceValidator(TestCase):
             session_derogation=None,
             teaching_place_uuid=None
         )
-        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:  # FIXME :: écrire un generique
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
                 self.learning_unit_repository,
@@ -382,7 +382,7 @@ class TestCreateClassServiceValidator(TestCase):
             session_derogation="invalid choice",
             teaching_place_uuid=None
         )
-        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:  # FIXME :: écrire un generique
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(
                 cmd,
                 self.learning_unit_repository,
