@@ -52,7 +52,7 @@ class ScoreSheetAddressAdmin(OsisModelAdmin):
 class ScoreSheetAddress(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    education_group = models.OneToOneField(
+    education_group = models.ForeignKey(
         'base.EducationGroup',
         on_delete=models.CASCADE,
     )
@@ -85,7 +85,7 @@ class ScoreSheetAddress(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['education_group', 'cohort_name'],
-                name='unique_education_group_year_cohort'
+                name='unique_education_group_cohort_name'
             )
         ]
 
