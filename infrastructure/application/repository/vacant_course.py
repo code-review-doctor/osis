@@ -110,7 +110,7 @@ class VacantCourseRepository(IVacantCourseRepository):
                     lecturing_volume=tutor_attribution.lecturing_volume,
                     practical_volume=tutor_attribution.practical_volume,
                 ) for tutor_attribution in tutors_attributions
-                if tutor_attribution.code == row_as_dict.code and tutor_attribution.year == row_as_dict.year
+                if tutor_attribution.code == row_as_dict['code'] and tutor_attribution.year == row_as_dict['year']
             ]
             vacant_course_search_dto = VacantCourseSearchDTO(
                 code=row_as_dict['code'],

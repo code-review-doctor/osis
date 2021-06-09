@@ -609,11 +609,11 @@ components:
         function_text:
           type: string
           example: 'Coordinateur'
-        lecturing_charge:
+        lecturing_volume:
           type: string
           example: '15.0'
           nullable: true
-        practical_charge:
+        practical_volume:
           type: string
           example: '10.5'
           nullable: true
