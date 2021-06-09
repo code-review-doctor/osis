@@ -25,14 +25,12 @@
 import itertools
 from typing import Dict, Optional, List, Callable
 
-import factory
-
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from education_group.ddd.command import CopyTrainingToNextYearCommand, CopyMiniTrainingToNextYearCommand, \
     CopyGroupCommand
 from education_group.ddd.service.write import copy_training_service, copy_mini_training_service, copy_group_service
-from education_group.tests.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from education_group.ddd.repository import training as training_repository, mini_training as mini_trainig_repository, \
     group as group_repository
@@ -46,7 +44,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
     ProgramTreeVersionIdentity
 from program_management.ddd.repositories import program_tree as program_tree_repository, \
     program_tree_version as program_tree_version_repository, node as node_repository
-from program_management.ddd.service.write import copy_program_version_service, copy_program_tree_service, \
+from program_management.ddd.service.write import copy_program_tree_service, \
     create_and_postpone_tree_specific_version_service, create_and_postpone_tree_transition_version_service
 from program_management.models.enums.node_type import NodeType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory

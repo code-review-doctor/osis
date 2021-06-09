@@ -27,7 +27,7 @@ from django.test import TestCase
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.ddd.domain.service.link_with_epc import LinkWithEPC
-from education_group.tests.ddd.factories.training import TrainingIdentityFactory
+from education_group.tests.ddd.factories.domain.training import TrainingIdentityFactory
 
 
 class TestLinkWithEPC(TestCase):

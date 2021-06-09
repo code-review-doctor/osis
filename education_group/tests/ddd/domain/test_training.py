@@ -23,9 +23,9 @@
 # ############################################################################
 from copy import copy, deepcopy
 
-from education_group.tests.ddd.factories.co_organization import CoorganizationFactory
-from education_group.tests.ddd.factories.diploma import DiplomaFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.co_organization import CoorganizationFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from testing.testcases import DDDTestCase
 
 

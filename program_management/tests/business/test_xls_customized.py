@@ -36,17 +36,17 @@ from base.tests.factories.education_group_publication_contact import EducationGr
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
-from education_group.tests.ddd.factories.address import AddressFactory
-from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
-from education_group.tests.ddd.factories.co_organization import CoorganizationFactory
-from education_group.tests.ddd.factories.content_constraint import ContentConstraintFactory
-from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory
-from education_group.tests.ddd.factories.funding import FundingFactory
-from education_group.tests.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.remark import RemarkFactory
-from education_group.tests.ddd.factories.titles import TitlesFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.academic_partner import AcademicPartnerFactory
+from education_group.tests.ddd.factories.domain.address import AddressFactory
+from education_group.tests.ddd.factories.domain.co_graduation import CoGraduationFactory
+from education_group.tests.ddd.factories.domain.co_organization import CoorganizationFactory
+from education_group.tests.ddd.factories.domain.content_constraint import ContentConstraintFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory, DiplomaAimFactory
+from education_group.tests.ddd.factories.domain.funding import FundingFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
+from education_group.tests.ddd.factories.domain.remark import RemarkFactory
+from education_group.tests.ddd.factories.domain.titles import TitlesFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.business.xls_customized import _build_headers, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS, \
     WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
@@ -62,7 +62,7 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
     SpecificProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
+from education_group.tests.ddd.factories.domain.study_domain import StudyDomainFactory
 
 FIRST_CUSTOMIZABLE_COL = 7
 

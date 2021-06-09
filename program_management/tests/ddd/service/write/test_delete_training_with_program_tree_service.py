@@ -31,7 +31,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.ddd.command import GetTrainingCommand
 from education_group.ddd.domain.exception import TrainingHaveEnrollments, TrainingHaveLinkWithEPC
 from education_group.ddd.service.read import get_training_service
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from program_management.ddd.command import DeleteTrainingWithProgramTreeCommand
 from program_management.ddd.domain.exception import ProgramTreeNonEmpty
 from program_management.ddd.service.write import delete_training_with_program_tree_service

@@ -32,13 +32,12 @@ from education_group.ddd import command
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.repository import group as group_repository
 from education_group.ddd.service.write import copy_group_service
-from education_group.tests.ddd.factories.campus import CampusFactory
-from education_group.tests.ddd.factories.content_constraint import ContentConstraintFactory
-from education_group.tests.ddd.factories.entity import EntityFactory
-from education_group.tests.ddd.factories.remark import RemarkFactory
-from education_group.tests.ddd.factories.titles import TitlesFactory
-from program_management.ddd.domain.node import Node, NodeGroupYear
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from education_group.tests.ddd.factories.domain.campus import CampusFactory
+from education_group.tests.ddd.factories.domain.content_constraint import ContentConstraintFactory
+from education_group.tests.ddd.factories.domain.entity import EntityFactory
+from education_group.tests.ddd.factories.domain.remark import RemarkFactory
+from education_group.tests.ddd.factories.domain.titles import TitlesFactory
+from program_management.ddd.domain.node import NodeGroupYear
 
 
 def generate_end_date(group):

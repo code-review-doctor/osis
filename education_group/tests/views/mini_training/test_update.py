@@ -34,7 +34,7 @@ from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.organization import MainOrganizationFactory
 from base.utils.urls import reverse_with_get
 from education_group.ddd.domain import mini_training
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory, MiniTrainingIdentityFactory
 from reference.tests.factories.language import FrenchLanguageFactory

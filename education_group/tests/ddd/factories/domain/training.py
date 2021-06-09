@@ -41,16 +41,16 @@ from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain.training import Training, TrainingIdentity, TrainingIdentityThroughYears
 from education_group.ddd.repository import training as training_repository
 from education_group.ddd.service.write import copy_training_service
-from education_group.tests.ddd.factories.campus import CampusFactory
-from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
-from education_group.tests.ddd.factories.diploma import DiplomaFactory
-from education_group.tests.ddd.factories.entity import EntityFactory
-from education_group.tests.ddd.factories.funding import FundingFactory
-from education_group.tests.ddd.factories.hops import HOPSFactory
-from education_group.tests.ddd.factories.isced_domain import IscedDomainFactory
-from education_group.tests.ddd.factories.language import LanguageFactory
-from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
-from education_group.tests.ddd.factories.titles import TitlesFactory
+from education_group.tests.ddd.factories.domain.campus import CampusFactory
+from education_group.tests.ddd.factories.domain.co_graduation import CoGraduationFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory
+from education_group.tests.ddd.factories.domain.entity import EntityFactory
+from education_group.tests.ddd.factories.domain.funding import FundingFactory
+from education_group.tests.ddd.factories.domain.hops import HOPSFactory
+from education_group.tests.ddd.factories.domain.isced_domain import IscedDomainFactory
+from education_group.tests.ddd.factories.domain.language import LanguageFactory
+from education_group.tests.ddd.factories.domain.study_domain import StudyDomainFactory
+from education_group.tests.ddd.factories.domain.titles import TitlesFactory
 from program_management.ddd.domain.node import NodeGroupYear
 
 

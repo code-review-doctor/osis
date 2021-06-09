@@ -26,10 +26,10 @@ from unittest import mock
 from django.test import TestCase
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, \
     get_fake_mini_training_repository
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.ddd.domain.program_tree_version import STANDARD
 from program_management.ddd.domain.service.calculate_end_postponement import CalculateEndPostponement

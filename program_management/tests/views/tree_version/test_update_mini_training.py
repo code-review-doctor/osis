@@ -31,7 +31,7 @@ from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory

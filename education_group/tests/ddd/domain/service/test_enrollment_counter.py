@@ -27,7 +27,7 @@ from django.test import TestCase
 
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from education_group.ddd.domain.service.enrollment_counter import EnrollmentCounter
-from education_group.tests.ddd.factories.training import TrainingIdentityFactory
+from education_group.tests.ddd.factories.domain.training import TrainingIdentityFactory
 
 
 class TestEnrollmentCounter(TestCase):

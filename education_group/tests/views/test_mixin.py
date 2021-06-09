@@ -29,7 +29,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.utils.cache import ElementCache
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.views.mixin import ElementSelectedClipBoardSerializer
 from program_management.tests.ddd.factories.program_tree_version import StandardProgramTreeVersionFactory, \
     SpecificProgramTreeVersionFactory

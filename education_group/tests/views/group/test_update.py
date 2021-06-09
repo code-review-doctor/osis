@@ -37,7 +37,7 @@ from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.forms.group import GroupUpdateForm
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 

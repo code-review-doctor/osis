@@ -34,9 +34,9 @@ from education_group.ddd import command
 from education_group.ddd.domain.mini_training import MiniTraining, MiniTrainingIdentity
 from education_group.ddd.repository import mini_training as mini_training_repository
 from education_group.ddd.service.write import copy_mini_training_service
-from education_group.tests.ddd.factories.entity import EntityFactory
-from education_group.tests.ddd.factories.titles import TitlesFactory
-from program_management.ddd.domain.node import Node, NodeGroupYear
+from education_group.tests.ddd.factories.domain.entity import EntityFactory
+from education_group.tests.ddd.factories.domain.titles import TitlesFactory
+from program_management.ddd.domain.node import NodeGroupYear
 
 
 class MiniTrainingIdentityFactory(factory.Factory):

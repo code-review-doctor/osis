@@ -37,7 +37,7 @@ from education_group.ddd.domain.exception import CodeAlreadyExistException, Acro
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.validators._hops_validator import TRAINING_TYPES_FOR_WHICH_ARES_GRACA_IS_OPTIONAL
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import NOT_A_TRANSITION, STANDARD
 from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE

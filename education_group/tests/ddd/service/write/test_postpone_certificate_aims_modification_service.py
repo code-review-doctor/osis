@@ -29,8 +29,8 @@ from education_group.ddd.domain.exception import MaximumCertificateAimType2Reach
     CertificateAimsCopyConsistencyException
 from education_group.ddd.domain.training import Training
 from education_group.ddd.service.write import postpone_certificate_aims_modification_service
-from education_group.tests.ddd.factories.diploma import DiplomaFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from testing.testcases import DDDTestCase
 
 

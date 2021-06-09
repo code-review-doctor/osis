@@ -24,7 +24,7 @@
 import mock
 from django.test import TestCase
 
-from education_group.tests.ddd.factories.group import GroupIdentityFactory
+from education_group.tests.ddd.factories.domain.group import GroupIdentityFactory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import prolong_existing_tree_version_service
 from program_management.tests.ddd.factories.commands.prolong_existing_program_tree_version import \

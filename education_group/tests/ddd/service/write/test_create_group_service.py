@@ -32,7 +32,7 @@ from education_group.ddd.domain.exception import CodeAlreadyExistException, Cont
     CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintMaximumInvalid
 from education_group.ddd.service.write import create_group_service
 from education_group.ddd.validators import _content_constraint, _credits
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from testing.testcases import DDDTestCase
 
 

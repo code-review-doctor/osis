@@ -28,8 +28,7 @@ from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write.postpone_groups_until_n_plus_6_service import \
     postpone_groups_until_n_plus_6
-from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from testing.testcases import DDDTestCase
 
 

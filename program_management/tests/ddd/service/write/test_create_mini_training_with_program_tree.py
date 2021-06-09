@@ -32,7 +32,7 @@ from education_group.ddd import command
 from education_group.ddd.domain.exception import CodeAlreadyExistException, AcronymRequired, AcronymAlreadyExist, \
     StartYearGreaterThanEndYearException, CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from program_management.ddd.command import GetProgramTreeVersionCommand
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.ddd.domain.service.calculate_end_postponement import DEFAULT_YEARS_TO_POSTPONE

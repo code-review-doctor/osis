@@ -27,8 +27,7 @@ from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.service.read import get_training_service
 from education_group.ddd.service.write.postpone_trainings_until_n_plus_6_service import \
     postpone_trainings_until_n_plus_6
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from testing.testcases import DDDTestCase
 
 

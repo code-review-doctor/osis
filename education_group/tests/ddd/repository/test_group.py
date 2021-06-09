@@ -44,7 +44,7 @@ from education_group.ddd.domain.exception import AcademicYearNotFound, TypeNotFo
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.repository.group import GroupRepository
 from education_group.models.group_year import GroupYear as GroupYearModelDb
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 
 

@@ -26,8 +26,8 @@ from education_group.ddd.command import GetTrainingEmptyFieldsOnWarningCommand
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read.check_training_empty_fields_on_warning_service import \
     check_training_empty_fields_on_warning
-from education_group.tests.ddd.factories.funding import FundingFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.funding import FundingFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from testing.testcases import DDDTestCase
 
 

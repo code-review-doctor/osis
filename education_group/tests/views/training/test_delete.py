@@ -35,7 +35,7 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import TrainingNotFoundException, TrainingHaveLinkWithEPC
 from education_group.templatetags.academic_year_display import display_as_academic_year
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory

@@ -25,7 +25,7 @@
 ##############################################################################
 
 from education_group.ddd.domain.service.code_exist import CheckCodeExist
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from testing.testcases import DDDTestCase
 
 

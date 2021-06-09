@@ -27,7 +27,7 @@ import factory.fuzzy
 
 from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from education_group.ddd.domain._co_organization import Coorganization, CoorganizationIdentity
-from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
+from education_group.tests.ddd.factories.domain.academic_partner import AcademicPartnerFactory
 
 
 class CoorganizationIdentityFactory(factory.Factory):

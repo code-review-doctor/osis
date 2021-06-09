@@ -25,7 +25,7 @@
 from education_group.ddd import command
 from education_group.ddd.domain import exception
 from education_group.ddd.service.read import get_group_service
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from testing.testcases import DDDTestCase
 
 

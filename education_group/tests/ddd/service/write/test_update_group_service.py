@@ -30,7 +30,7 @@ from education_group.ddd.domain.exception import ContentConstraintMinimumMaximum
     CreditShouldBeGreaterOrEqualsThanZero
 from education_group.ddd.service.write import update_group_service
 from education_group.ddd.validators import _credits
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from testing.testcases import DDDTestCase
 
 
