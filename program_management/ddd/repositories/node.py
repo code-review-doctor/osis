@@ -53,6 +53,15 @@ class NodeRepository(interface.AbstractRepository):
             return search_result[0]
 
     @classmethod
+    def get_next_learning_unit_year_node(cls, entity_id: 'NodeIdentity') -> Optional['Node']:
+        qs = Element.objects.filter(
+            learning_unit_year__academic_year__year=entity_id.year+1,
+            learning_unit_year__learning_unit__learningunityear__acronym=entity_id.code
+        )
+        nodes = load_node.load_multiple(qs.values_list('pk', flat=True))
+        return nodes[0] if nodes else None
+
+    @classmethod
     def search(cls, entity_ids: Optional[List['NodeIdentity']] = None, year: int = None, **kwargs) -> List['Node']:
         if entity_ids:
             return _search_by_entity_ids(entity_ids)

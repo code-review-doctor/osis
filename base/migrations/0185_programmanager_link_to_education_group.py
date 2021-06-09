@@ -49,5 +49,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_program_managers_with_education_group),
+        migrations.RunPython(update_program_managers_with_education_group, elidable=True),
     ]

@@ -35,5 +35,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_application_courses_calendar, migrations.RunPython.noop),
+        migrations.RunPython(update_application_courses_calendar, migrations.RunPython.noop, elidable=True),
     ]

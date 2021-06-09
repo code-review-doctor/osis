@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
                                    max_length=5),
         ),
 
-        migrations.RunPython(set_many),
+        migrations.RunPython(set_many, elidable=True),
 
         migrations.AlterField(
             model_name='authorizedrelationship',

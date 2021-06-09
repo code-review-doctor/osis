@@ -120,7 +120,7 @@ class SubdivisionAlreadyExistException(BusinessException):
 class ShouldBeAlphanumericException(BusinessException):
     def __init__(self, *args, **kwargs):
         message = _(
-            "Code should be one character A-Z or 0-9"
+            "Subdivision should be one character A-Z or 0-9"
         )
         super().__init__(message, **kwargs)
 
