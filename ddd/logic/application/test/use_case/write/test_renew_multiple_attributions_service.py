@@ -64,7 +64,7 @@ class TestRenewMultipleAttributionsService(TestCase):
         cls.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(
                 code='LDROI1200',
-                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
+                academic_year=cls.application_calendar.authorized_target_year
             ),
             course_title="Introduction au droit",
             function=Functions.HOLDER,

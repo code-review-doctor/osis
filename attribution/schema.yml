@@ -432,6 +432,10 @@ components:
         allocation_entity:
           type: string
           example: 'DRT'
+        tutors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TutorAttribution'
     AttributionAboutToExpireList:
       type: object
       properties:
@@ -529,6 +533,14 @@ components:
         course_summary:
           type: string
           example: "Le droit est l'ensemble des règles...."
+        lecturing_volume_available:
+          type: string
+          example: '50.0'
+          nullable: true
+        practical_volume_available:
+          type: string
+          example: '30.0'
+          nullable: true
     Attribution:
       type: object
       properties:
@@ -580,6 +592,28 @@ components:
           nullable: true
         links:
           $ref: '#/components/schemas/AttributionLinks'
+    TutorAttribution:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: 'Thomas'
+        last_name:
+          type: string
+          example: 'Durant'
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+          example: 'Coordinateur'
+        lecturing_charge:
+          type: string
+          example: '15.0'
+          nullable: true
+        practical_charge:
+          type: string
+          example: '10.5'
+          nullable: true
     AttributionFunctionEnum:
       type: string
       enum:

@@ -108,12 +108,6 @@ class ApplicationRepositorySearch(TestCase):
             application.applicant_id == self.applicant_id for application in filtered_results
         ]))
 
-    def test_search_assert_return_filtered_by_academic_year_identity(self):
-        filtered_results = self.repository.search(academic_year_id=AcademicYearIdentity(year=2018))
-
-        self.assertEqual(len(filtered_results), 1)
-        self.assertEqual(filtered_results[0].vacant_course_id.year, 2018)
-
 
 class ApplicationRepositorySave(TestCase):
     @classmethod

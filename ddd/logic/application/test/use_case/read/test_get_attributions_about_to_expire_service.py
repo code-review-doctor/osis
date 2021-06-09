@@ -65,7 +65,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(
                 code="LDROI1200",
-                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
+                academic_year=self.application_calendar.authorized_target_year
             ),
             course_title="Introduction au droit",
             function=Functions.CO_HOLDER,
@@ -142,7 +142,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.applicant.attributions = [Attribution(
             course_id=LearningUnitIdentity(
                 code="LAGRO1200",
-                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2020)
+                academic_year=self.application_calendar.authorized_target_year
             ),
             course_title="Introduction à l'agro",
             function=Functions.CO_HOLDER,
@@ -161,13 +161,13 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertEqual(results[0].unavailable_renewal_reason, VacantCourseNotFound().message)
 
         self.assertEqual(results[0].code, "LAGRO1200")
-        self.assertEqual(results[0].year, 2020)
+        self.assertEqual(results[0].title, "Introduction à l'agro")
+        self.assertEqual(results[0].year, self.application_calendar.authorized_target_year.year)
         self.assertEqual(results[0].lecturing_volume, Decimal(10))
         self.assertEqual(results[0].practical_volume, Decimal(15))
         self.assertEqual(results[0].function, Functions.CO_HOLDER)
         self.assertEqual(results[0].end_year, self.application_calendar.authorized_target_year.year)
         self.assertEqual(results[0].start_year, 2016)
-        self.assertIsNone(results[0].title)
         self.assertIsNone(results[0].total_lecturing_volume_course)
         self.assertIsNone(results[0].total_practical_volume_course)
         self.assertIsNone(results[0].lecturing_volume_available)

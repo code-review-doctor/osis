@@ -27,7 +27,7 @@ import datetime
 import functools
 import operator
 from decimal import Decimal
-from typing import Optional, List
+from typing import List, Optional
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -36,6 +36,8 @@ from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
 from django_cte import With
 
+from attribution.models.attribution_charge_new import AttributionChargeNew
+from attribution.models.attribution_new import AttributionNew
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types, learning_component_year_type
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
@@ -43,35 +45,44 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.utils.func import ArrayConcat
 from ddd.logic.application.domain.builder.vacant_course_builder import VacantCourseBuilder
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
+from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO, VacantCourseSearchDTO, \
+    TutorAttributionFromRepositoryDTO, TutorAttributionDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
 
 class VacantCourseRepository(IVacantCourseRepository):
     @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[VacantCourseIdentity]] = None,
-            code: str = None,
-            academic_year_id: AcademicYearIdentity = None,
-            allocation_entity: AllocationEntity = None,
-            with_allocation_entity_children: bool = False,
-            vacant_declaration_types: List[VacantDeclarationType] = None,
-            **kwargs
-    ) -> List[VacantCourse]:
+    def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
         qs = _vacant_course_base_qs()
-        if allocation_entity and with_allocation_entity_children:
-            qs = _annotate_allocation_entity_parents(qs)
-
         if entity_ids is not None:
             filter_clause = functools.reduce(
                 operator.or_,
                 ((Q(code=entity_id.code) & Q(year=entity_id.year)) for entity_id in entity_ids)
             )
             qs = qs.filter(filter_clause)
+
+        results = []
+        for obj_as_dict in qs:
+            dto_from_database = VacantCourseFromRepositoryDTO(**obj_as_dict)
+            results.append(VacantCourseBuilder.build_from_repository_dto(dto_from_database))
+        return results
+
+    @classmethod
+    def search_vacant_course_dto(
+            cls,
+            code: str = None,
+            academic_year_id: AcademicYearIdentity = None,
+            allocation_entity_code: str = None,
+            with_allocation_entity_children: bool = False,
+            vacant_declaration_types: List[VacantDeclarationType] = None,
+            **kwargs
+    ) -> List[VacantCourseSearchDTO]:
+        qs = _vacant_course_base_qs()
+        if allocation_entity_code and with_allocation_entity_children:
+            qs = _annotate_allocation_entity_parents(qs)
+
         if code is not None:
             qs = qs.filter(learning_container_year__acronym__icontains=code)
         if academic_year_id is not None:
@@ -80,29 +91,41 @@ class VacantCourseRepository(IVacantCourseRepository):
             qs = qs.filter(
                 learning_container_year__type_declaration_vacant__in=[enum.name for enum in vacant_declaration_types]
             )
-        if allocation_entity and not with_allocation_entity_children:
-            qs = qs.filter(allocation_entity=allocation_entity.code)
-        if allocation_entity and with_allocation_entity_children:
+        if allocation_entity_code and not with_allocation_entity_children:
+            qs = qs.filter(allocation_entity=allocation_entity_code)
+        if allocation_entity_code and with_allocation_entity_children:
             qs = qs.filter(
-                Q(allocation_entity=allocation_entity.code)
-                | Q(allocation_entity_parents__contains=[allocation_entity.code])
+                Q(allocation_entity=allocation_entity_code)
+                | Q(allocation_entity_parents__contains=[allocation_entity_code])
             )
 
+        tutors_attributions = _prefetch_tutors_attributions(qs)
         results = []
         for row_as_dict in qs:
-            dto_from_database = VacantCourseFromRepositoryDTO(
+            tutors_attributions_dto = [
+                TutorAttributionDTO(
+                    first_name=tutor_attribution.first_name,
+                    last_name=tutor_attribution.last_name,
+                    function=tutor_attribution.function,
+                    lecturing_volume=tutor_attribution.lecturing_volume,
+                    practical_volume=tutor_attribution.practical_volume,
+                ) for tutor_attribution in tutors_attributions
+                if tutor_attribution.code == row_as_dict.code and tutor_attribution.year == row_as_dict.year
+            ]
+            vacant_course_search_dto = VacantCourseSearchDTO(
                 code=row_as_dict['code'],
                 year=row_as_dict['year'],
                 title=row_as_dict['title'],
                 is_in_team=row_as_dict['is_in_team'],
-                allocation_entity=row_as_dict['allocation_entity'],
+                allocation_entity_code=row_as_dict['allocation_entity'],
                 vacant_declaration_type=row_as_dict['vacant_declaration_type'],
                 lecturing_volume_available=row_as_dict['lecturing_volume_available'],
                 lecturing_volume_total=row_as_dict['lecturing_volume_total'],
                 practical_volume_available=row_as_dict['practical_volume_available'],
                 practical_volume_total=row_as_dict['practical_volume_total'],
+                tutors=tutors_attributions_dto
             )
-            results.append(VacantCourseBuilder.build_from_repository_dto(dto_from_database))
+            results.append(vacant_course_search_dto)
         return results
 
     @classmethod
@@ -250,3 +273,41 @@ def _annotate_allocation_entity_parents(qs: QuerySet) -> QuerySet:
         )
     )
     return qs
+
+
+def _prefetch_tutors_attributions(vacant_course_qs) -> List[TutorAttributionFromRepositoryDTO]:
+    subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
+
+    filter_clause = functools.reduce(
+        operator.or_,
+        ((Q(learning_container_year__acronym=entity_id['code'])
+          & Q(learning_container_year__academic_year__year=entity_id['year'])) for entity_id in vacant_course_qs)
+    )
+
+    qs = AttributionNew.objects.filter(filter_clause).annotate(
+        code=F('learning_container_year__acronym'),
+        year=F('learning_container_year__academic_year__year'),
+        first_name=F('tutor__person__first_name'),
+        last_name=F('tutor__person__last_name'),
+        lecturing_volume=Subquery(
+            subqs.filter(
+                learning_component_year__type=learning_component_year_type.LECTURING
+            ).values('allocation_charge')[:1],
+            output_field=models.DecimalField()
+        ),
+        practical_volume=Subquery(
+            subqs.filter(
+                learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
+            ).values('allocation_charge')[:1],
+            output_field=models.DecimalField()
+        )
+    ).values(
+        'code',
+        'year',
+        'first_name',
+        'last_name',
+        'function',
+        'lecturing_volume',
+        'practical_volume',
+    )
+    return [TutorAttributionFromRepositoryDTO(**row) for row in qs]

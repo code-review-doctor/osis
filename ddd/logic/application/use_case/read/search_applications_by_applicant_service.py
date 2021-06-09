@@ -42,7 +42,7 @@ def search_applications_by_applicant(
     applicant_id = ApplicantIdentityBuilder.build_from_global_id(global_id=cmd.global_id)
 
     # Then
-    return application_repository.search_by_applicant(
+    return application_repository.search_by_applicant_dto(
         applicant_id=applicant_id,
         academic_year_id=application_calendar.authorized_target_year,
     )

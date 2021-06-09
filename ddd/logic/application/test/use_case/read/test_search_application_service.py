@@ -33,6 +33,7 @@ from ddd.logic.application.domain.builder.applicant_identity_builder import Appl
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
+from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.application_in_memory import ApplicationInMemoryRepository
@@ -110,5 +111,28 @@ class TestSearchApplicationByApplicantService(TestCase):
         results = self.message_bus.invoke(cmd)
         self.assertListEqual(
             results,
-            [self.application, self.application_3]
+            [
+                ApplicationByApplicantDTO(
+                    uuid=self.application.entity_id.uuid,
+                    code=self.application.vacant_course_id.code,
+                    year=self.application.vacant_course_id.year,
+                    lecturing_volume=self.application.lecturing_volume,
+                    lecturing_volume_available=self.application.lecturing_volume,
+                    practical_volume=self.application.practical_volume,
+                    practical_volume_available=self.application.practical_volume,
+                    remark=self.application.remark,
+                    course_summary=self.application.course_summary,
+                ),
+                ApplicationByApplicantDTO(
+                    uuid=self.application_3.entity_id.uuid,
+                    code=self.application_3.vacant_course_id.code,
+                    year=self.application_3.vacant_course_id.year,
+                    lecturing_volume=self.application_3.lecturing_volume,
+                    lecturing_volume_available=self.application_3.lecturing_volume,
+                    practical_volume=self.application_3.practical_volume,
+                    practical_volume_available=self.application_3.practical_volume,
+                    remark=self.application_3.remark,
+                    course_summary=self.application_3.course_summary,
+                )
+            ]
         )

@@ -27,6 +27,7 @@ from typing import List, Optional
 
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
+from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
@@ -43,7 +44,6 @@ class ApplicationInMemoryRepository(IApplicationRepository):
             cls,
             entity_ids: Optional[List[ApplicationIdentity]] = None,
             applicant_id: Optional[ApplicantIdentity] = None,
-            academic_year_id: AcademicYearIdentity = None,
             **kwargs
     ) -> List[Application]:
         results = cls.applications
@@ -51,11 +51,31 @@ class ApplicationInMemoryRepository(IApplicationRepository):
             results = filter(lambda application: application.entity_id in entity_ids, results)
         if applicant_id is not None:
             results = filter(lambda application: application.applicant_id == applicant_id, results)
-        if academic_year_id is not None:
-            results = filter(
-                lambda application: application.vacant_course_id.academic_year == academic_year_id, results
-            )
         return list(results)
+
+    def search_by_applicant_dto(
+            cls,
+            applicant_id: ApplicantIdentity,
+            academic_year_id: AcademicYearIdentity,
+            **kwargs
+    ) -> List[ApplicationByApplicantDTO]:
+        results = filter(
+            lambda application: application.applicant_id == applicant_id and
+            application.vacant_course_id.academic_year == academic_year_id, cls.applications
+        )
+        return [
+            ApplicationByApplicantDTO(
+                uuid=result.entity_id.uuid,
+                code=result.vacant_course_id.code,
+                year=result.vacant_course_id.year,
+                lecturing_volume=result.lecturing_volume,
+                practical_volume=result.practical_volume,
+                lecturing_volume_available=result.lecturing_volume,
+                practical_volume_available=result.practical_volume,
+                remark=result.remark,
+                course_summary=result.course_summary,
+            ) for result in results
+        ]
 
     @classmethod
     def get(cls, entity_id: ApplicationIdentity) -> Application:

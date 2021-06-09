@@ -33,6 +33,7 @@ from ddd.logic.application.commands import SearchVacantCoursesCommand
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
+from ddd.logic.application.dtos import VacantCourseSearchDTO
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.vacant_course_in_memory import VacantCourseInMemoryRepository
@@ -99,13 +100,42 @@ class TestSearchVacantCourseService(TestCase):
         cmd = SearchVacantCoursesCommand(code="LDR", allocation_entity_code=None, vacant_declaration_types=None)
 
         results = self.message_bus.invoke(cmd)
-        self.assertListEqual(results, [self.vacant_course_ldroi1200])
+        expected_results = [
+            VacantCourseSearchDTO(
+                code=self.vacant_course_ldroi1200.code,
+                year=self.vacant_course_ldroi1200.year,
+                title=self.vacant_course_ldroi1200.title,
+                is_in_team=self.vacant_course_ldroi1200.is_in_team,
+                allocation_entity_code=self.vacant_course_ldroi1200.allocation_entity.code,
+                vacant_declaration_type=self.vacant_course_ldroi1200.vacant_declaration_type,
+                lecturing_volume_total=self.vacant_course_ldroi1200.lecturing_volume_total,
+                lecturing_volume_available=self.vacant_course_ldroi1200.lecturing_volume_available,
+                practical_volume_total=self.vacant_course_ldroi1200.practical_volume_total,
+                practical_volume_available=self.vacant_course_ldroi1200.practical_volume_available,
+                tutors=[],
+            )
+        ]
+        self.assertListEqual(results, expected_results)
 
     def test_assert_search_return_result_filtered_by_allocation_entity(self):
         cmd = SearchVacantCoursesCommand(code=None, allocation_entity_code="AGRO", vacant_declaration_types=None)
 
         results = self.message_bus.invoke(cmd)
-        self.assertListEqual(results, [self.vacant_course_lagro1510])
+        self.assertListEqual(results, [
+            VacantCourseSearchDTO(
+                code=self.vacant_course_lagro1510.code,
+                year=self.vacant_course_lagro1510.year,
+                title=self.vacant_course_lagro1510.title,
+                is_in_team=self.vacant_course_lagro1510.is_in_team,
+                allocation_entity_code=self.vacant_course_lagro1510.allocation_entity.code,
+                vacant_declaration_type=self.vacant_course_lagro1510.vacant_declaration_type,
+                lecturing_volume_total=self.vacant_course_lagro1510.lecturing_volume_total,
+                lecturing_volume_available=self.vacant_course_lagro1510.lecturing_volume_available,
+                practical_volume_total=self.vacant_course_lagro1510.practical_volume_total,
+                practical_volume_available=self.vacant_course_lagro1510.practical_volume_available,
+                tutors=[],
+            )
+        ])
 
     def test_assert_search_return_result_filtered_by_vacant_declaration_types(self):
         cmd = SearchVacantCoursesCommand(
@@ -115,4 +145,18 @@ class TestSearchVacantCourseService(TestCase):
         )
 
         results = self.message_bus.invoke(cmd)
-        self.assertListEqual(results, [self.vacant_course_lagro1510])
+        self.assertListEqual(results, [
+            VacantCourseSearchDTO(
+                code=self.vacant_course_lagro1510.code,
+                year=self.vacant_course_lagro1510.year,
+                title=self.vacant_course_lagro1510.title,
+                is_in_team=self.vacant_course_lagro1510.is_in_team,
+                allocation_entity_code=self.vacant_course_lagro1510.allocation_entity.code,
+                vacant_declaration_type=self.vacant_course_lagro1510.vacant_declaration_type,
+                lecturing_volume_total=self.vacant_course_lagro1510.lecturing_volume_total,
+                lecturing_volume_available=self.vacant_course_lagro1510.lecturing_volume_available,
+                practical_volume_total=self.vacant_course_lagro1510.practical_volume_total,
+                practical_volume_available=self.vacant_course_lagro1510.practical_volume_available,
+                tutors=[],
+            )
+        ])

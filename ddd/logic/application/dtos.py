@@ -67,6 +67,17 @@ class VacantCourseFromRepositoryDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class TutorAttributionFromRepositoryDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    first_name = attr.ib(type=str)
+    last_name = attr.ib(type=str)
+    function = attr.ib(type=str)
+    lecturing_volume = attr.ib(Decimal)
+    practical_volume = attr.ib(Decimal)
+
+
+@attr.s(frozen=True, slots=True)
 class ApplicationFromRepositoryDTO(DTO):
     uuid = attr.ib(type=str)
     applicant_global_id = attr.ib(type=str)
@@ -102,6 +113,32 @@ class ApplicationByApplicantDTO(DTO):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     lecturing_volume = attr.ib(type=Decimal)
+    lecturing_volume_available = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
     remark = attr.ib(type=str)
     course_summary = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class TutorAttributionDTO(DTO):
+    first_name = attr.ib(type=str)
+    last_name = attr.ib(type=str)
+    function = attr.ib(type=str)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
+
+
+@attr.s(frozen=True, slots=True)
+class VacantCourseSearchDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title = attr.ib(type=str)
+    is_in_team = attr.ib(type=bool)
+    allocation_entity_code = attr.ib(type=str)
+    vacant_declaration_type = attr.ib(type=str)
+    lecturing_volume_total = attr.ib(type=Decimal)
+    lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_total = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
+    tutors = attr.ib(type=List[TutorAttributionDTO], default=[])

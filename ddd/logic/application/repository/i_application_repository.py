@@ -41,14 +41,13 @@ class IApplicationRepository(interface.AbstractRepository):
             cls,
             entity_ids: Optional[List[ApplicationIdentity]] = None,
             applicant_id: Optional[ApplicantIdentity] = None,
-            academic_year_id: AcademicYearIdentity = None,
             **kwargs
     ) -> List[Application]:
         pass
 
     @classmethod
     @abc.abstractmethod
-    def search_by_applicant(
+    def search_by_applicant_dto(
             cls,
             applicant_id: ApplicantIdentity,
             academic_year_id: AcademicYearIdentity,

@@ -26,8 +26,8 @@
 from typing import List, Optional
 
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
+from ddd.logic.application.dtos import VacantCourseSearchDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
@@ -40,30 +40,50 @@ class VacantCourseInMemoryRepository(IVacantCourseRepository):
         VacantCourseInMemoryRepository.vacant_courses = vacant_courses or []
 
     @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List[VacantCourseIdentity]] = None,
-            code: str = None,
-            academic_year_id: AcademicYearIdentity = None,
-            allocation_entity: AllocationEntity = None,
-            with_allocation_entity_children: bool = False,
-            vacant_declaration_types: List[VacantDeclarationType] = None,
-            **kwargs
-    ) -> List[VacantCourse]:
+    def search(cls, entity_ids: Optional[List[VacantCourseIdentity]] = None, **kwargs) -> List[VacantCourse]:
         results = cls.vacant_courses
         if entity_ids:
             results = filter(lambda vacant_course: vacant_course.entity_id in entity_ids, results)
+        return list(results)
+
+    @classmethod
+    def search_vacant_course_dto(
+            cls,
+            code: str = None,
+            academic_year_id: AcademicYearIdentity = None,
+            allocation_entity_code: str = None,
+            with_allocation_entity_children: bool = False,
+            vacant_declaration_types: List[VacantDeclarationType] = None,
+            **kwargs
+    ) -> List[VacantCourseSearchDTO]:
+        results = cls.vacant_courses
         if code is not None:
             results = filter(lambda vacant_course: code in vacant_course.code, results)
         if academic_year_id is not None:
             results = filter(lambda vacant_course: academic_year_id.year == vacant_course.year, results)
-        if allocation_entity is not None:
-            results = filter(lambda vacant_course: vacant_course.allocation_entity == allocation_entity, results)
+        if allocation_entity_code is not None:
+            results = filter(
+                lambda vacant_course: vacant_course.allocation_entity.code == allocation_entity_code, results
+            )
         if vacant_declaration_types is not None:
             results = filter(
                 lambda vacant_course: vacant_course.vacant_declaration_type in vacant_declaration_types, results
             )
-        return list(results)
+        return [
+            VacantCourseSearchDTO(
+                code=result.code,
+                year=result.year,
+                title=result.title,
+                is_in_team=result.is_in_team,
+                allocation_entity_code=result.allocation_entity.code,
+                vacant_declaration_type=result.vacant_declaration_type,
+                lecturing_volume_available=result.lecturing_volume_available,
+                lecturing_volume_total=result.lecturing_volume_total,
+                practical_volume_available=result.practical_volume_available,
+                practical_volume_total=result.practical_volume_total,
+                tutors=[]
+            ) for result in results
+        ]
 
     @classmethod
     def get(cls, entity_id: VacantCourseIdentity) -> VacantCourse:

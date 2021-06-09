@@ -32,6 +32,8 @@ class ApplicationGetSerializer(serializers.Serializer):
     year = serializers.IntegerField(source="vacant_course_id.year", read_only=True)
     lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     remark = serializers.CharField(read_only=True)
     course_summary = serializers.CharField(read_only=True)
 
