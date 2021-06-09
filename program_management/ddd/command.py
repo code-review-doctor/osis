@@ -687,3 +687,13 @@ class GetProgramTreeVersionOriginCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class GetReportCommand(interface.CommandRequest):
     from_transaction_id = attr.ib(type=uuid.UUID)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeProgramTreesUntilNPlus6Command(interface.CommandRequest):
+    pass
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeProgramTreeVersionsUntilNPlus6Command(interface.CommandRequest):
+    pass

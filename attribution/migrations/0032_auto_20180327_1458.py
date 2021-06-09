@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
 
     operations = [
         # Remove all deleted records physically
-        migrations.RunSQL("DELETE FROM attribution_attribution CASCADE WHERE deleted is not null"),
-        migrations.RunSQL("DELETE FROM attribution_attributionchargenew CASCADE WHERE deleted is not null"),
-        migrations.RunSQL("DELETE FROM attribution_attributionnew CASCADE WHERE deleted is not null"),
-        migrations.RunSQL("DELETE FROM attribution_tutorapplication CASCADE WHERE deleted is not null"),
+        migrations.RunSQL("DELETE FROM attribution_attribution CASCADE WHERE deleted is not null", elidable=True),
+        migrations.RunSQL("DELETE FROM attribution_attributionchargenew CASCADE WHERE deleted is not null",elidable=True),
+        migrations.RunSQL("DELETE FROM attribution_attributionnew CASCADE WHERE deleted is not null", elidable=True),
+        migrations.RunSQL("DELETE FROM attribution_tutorapplication CASCADE WHERE deleted is not null", elidable=True),
         # Remove unique index
-        migrations.RunSQL("DROP INDEX IF EXISTS attributionnew_learningcontaineryearid_tutorid_function_deleted"),
-        migrations.RunSQL("DROP INDEX IF EXISTS tutorapplication_learningcontaineryearid_tutorid_function_deleted"),
+        migrations.RunSQL("DROP INDEX IF EXISTS attributionnew_learningcontaineryearid_tutorid_function_deleted", elidable=True),
+        migrations.RunSQL("DROP INDEX IF EXISTS tutorapplication_learningcontaineryearid_tutorid_function_deleted",elidable=True),
     ]
