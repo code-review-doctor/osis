@@ -105,4 +105,4 @@ def _should_class_volumes_be_consistent_with_learning_unit(
 
     sum_q1_q2 = volume_first_quadrimester + volume_second_quadrimester
     if volume_annual <= 0 or sum_q1_q2 != volume_annual:
-        raise AnnualVolumeInvalidException(learning_unit)
+        raise AnnualVolumeInvalidException(volume_annual)

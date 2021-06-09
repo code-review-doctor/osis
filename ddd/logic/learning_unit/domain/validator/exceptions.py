@@ -29,6 +29,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 
 from ddd.logic.learning_unit.business_types import *
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from osis_common.ddd.interface import BusinessException
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
@@ -177,9 +178,7 @@ class LearningUnitHasNoVolumeException(BusinessException):
 
 
 class AnnualVolumeInvalidException(BusinessException):
-    def __init__(self, learning_unit: 'LearningUnit', *args, **kwargs):
-        volume_annual = learning_unit.lecturing_part.volumes.volume_annual \
-            if learning_unit.lecturing_part else learning_unit.practical_part.volumes.volume_annual  # FIXME
+    def __init__(self, volume_annual: 'DurationUnit', *args, **kwargs):
         message = _(
             "The sum of first/second quadrimesters volumes should be equal to annual volume "
             "of the learning unit ({})".format(volume_annual)
