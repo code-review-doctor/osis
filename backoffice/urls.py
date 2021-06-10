@@ -80,6 +80,8 @@ if 'osis_notification' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^notifications/v1/', include('osis_notification.api.urls_v1')),
     )
+if 'osis_document' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^osis_document/', include('osis_document.contrib.urls')), )
 if 'learning_unit' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^learning_unit/', include('learning_unit.urls')),)
 
