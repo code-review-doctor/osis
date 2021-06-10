@@ -28,5 +28,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(start_years, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(start_years, reverse_code=migrations.RunPython.noop, elidable=True),
     ]

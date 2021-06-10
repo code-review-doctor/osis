@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import Any, List
+from typing import Any, List, Optional
 
 import mock
 
@@ -72,6 +72,16 @@ class FakeRepository:
             return next((root_entity for root_entity in cls.root_entities if root_entity.entity_id == entity_id))
         except StopIteration:
             raise cls.not_found_exception_class()
+
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['interface.EntityIdentity']] = None,
+            **kwargs
+    ) -> List['interface.RootEntity']:
+        if entity_ids:
+            return [root_entity for root_entity in cls.root_entities if root_entity.entity_id in entity_ids]
+        return cls.root_entities
 
     @classmethod
     def delete(cls, entity_id: interface.EntityIdentity, **_) -> None:

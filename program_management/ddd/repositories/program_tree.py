@@ -28,11 +28,10 @@ from typing import Dict, Any
 from typing import Optional, List
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Max, OuterRef, Subquery
 
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from education_group.models.group_year import GroupYear
@@ -172,6 +171,26 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def get_all_identities(cls) -> List['ProgramTreeIdentity']:
         qs = GroupYear.objects.all().values_list("partial_acronym", "academic_year__year")
         return [program_tree.ProgramTreeIdentity(code=row[0], year=row[1]) for row in qs]
+
+    @classmethod
+    def search_last_occurence(cls, from_year: int) -> List['ProgramTree']:
+        subquery_max_existing_year_for_group = GroupYear.objects.filter(
+            academic_year__year__gte=from_year,
+            group=OuterRef("group_year__group"),
+        ).values(
+            "group"
+        ).annotate(
+            max_year=Max("academic_year__year")
+        ).order_by(
+            "group"
+        ).values("max_year")
+
+        qs = Element.objects.filter(
+            group_year__academic_year__year=Subquery(subquery_max_existing_year_for_group[:1])
+        ).values_list(
+            "id", flat=True
+        )
+        return _load_trees(list(qs))
 
 
 def _load(tree_root_id: int) -> 'ProgramTree':

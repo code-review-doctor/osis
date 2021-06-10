@@ -21,10 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import datetime
 
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -34,6 +36,8 @@ from testing.mocks import MockPatcherMixin
 
 
 class DDDTestCase(MockPatcherMixin, TestCase):
+    CURRENT_ACADEMIC_YEAR = 2020
+
     def _init_fake_repos(self):
         self.fake_program_tree_version_repository = get_fake_program_tree_version_repository([])
         self.mock_repo(
@@ -57,6 +61,16 @@ class DDDTestCase(MockPatcherMixin, TestCase):
         self.mock_repo(
             "education_group.ddd.repository.group.GroupRepository",
             self.fake_group_repository
+        )
+
+        self.mock_service(
+            "ddd.logic.shared_kernel.academic_year.domain.service.get_current_academic_year.GetCurrentAcademicYear"
+            ".get_starting_academic_year",
+            return_value=AcademicYear(
+                entity_id=AcademicYearIdentity(self.CURRENT_ACADEMIC_YEAR),
+                start_date=datetime.date.today(),
+                end_date=datetime.date.today(),
+            )
         )
 
     def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):

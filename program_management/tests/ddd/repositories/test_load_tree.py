@@ -38,6 +38,7 @@ from program_management.ddd import command
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
 from program_management.ddd.domain.exception import ProgramTreeNotFoundException
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
@@ -214,10 +215,17 @@ class TestLoadTree(TestCase):
             node_contained_in_training.pk, training_containing_root_node.pk
         ]
         result = ProgramTreeRepository.search(root_ids=root_ids_where_one_root_is_contained_into_the_second_root)
-        self.assertTrue(len(result) == 2)
-        first_root = result[0].root_node
-        self.assertEqual(first_root.code, node_contained_in_training.group_year.partial_acronym)
-        self.assertEqual(first_root.year, node_contained_in_training.group_year.academic_year.year)
-        second_root = result[1].root_node
-        self.assertEqual(second_root.code, training_containing_root_node.group_year.partial_acronym)
-        self.assertEqual(second_root.year, training_containing_root_node.group_year.academic_year.year)
+
+        actual_identities = [tree.entity_id for tree in result]
+        expected_identities = [
+            ProgramTreeIdentity(
+                code=node_contained_in_training.group_year.partial_acronym,
+                year=node_contained_in_training.group_year.academic_year.year
+            ),
+            ProgramTreeIdentity(
+                code=training_containing_root_node.group_year.partial_acronym,
+                year=training_containing_root_node.group_year.academic_year.year
+            ),
+        ]
+
+        self.assertCountEqual(actual_identities, expected_identities)
