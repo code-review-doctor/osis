@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,12 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import Optional, List
 
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
 
 
-@attr.s(frozen=True, slots=True)
-class ClassTitles(interface.ValueObject):
-    fr = attr.ib(type=str, default="")
-    en = attr.ib(type=str, default="")
+class InMemoryGenericRepository(interface.AbstractRepository):
+    entities = list()  # type: List[RootEntity]
+
+    @classmethod
+    def get(cls, entity_id: 'EntityIdentity') -> 'RootEntity':
+        return next(
+            (entity for entity in cls.entities if entity.entity_id == entity_id),
+            None
+        )
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
+        raise NotImplementedError
+
+    @classmethod
+    def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
+        cls.entities.remove(cls.get(entity_id))
+
+    @classmethod
+    def save(cls, entity: 'RootEntity') -> None:
+        if entity in cls.entities:
+            cls.entities.remove(entity)
+        cls.entities.append(entity)
+
+    @classmethod
+    def get_all_identities(cls) -> List['EntityIdentity']:
+        return [entity.entity_id for entity in cls.entities]

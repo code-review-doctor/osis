@@ -266,7 +266,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.repartition_volume_requirement_entity = Decimal(30)
         self.component_full_lecturing.save()
 
-        complete_acronym = self.component_full_lecturing.complete_acronym
+        complete_acronym = self.component_full_lecturing.complete_code
         excepted_error = "{} ({})".format(_('Volumes of {} are inconsistent').format(complete_acronym),
                                           _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
         self.assertIn(excepted_error, self.component_full_lecturing.warnings)
@@ -280,7 +280,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.repartition_volume_requirement_entity = Decimal(40)
         self.component_full_lecturing.save()
 
-        complete_acronym = self.component_full_lecturing.complete_acronym
+        complete_acronym = self.component_full_lecturing.complete_code
         excepted_error = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(complete_acronym),
             _('the sum of repartition volumes must be equal to the global volume'))
@@ -295,14 +295,14 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.planned_classes = 2
         self.component_full_lecturing.save()
 
-        complete_acronym = self.component_full_lecturing.complete_acronym
+        complete_acronym = self.component_full_lecturing.complete_code
         excepted_error_1 = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(complete_acronym),
             _('the sum of repartition volumes must be equal to the global volume'))
         self.assertIn(excepted_error_1, self.component_full_lecturing.warnings)
         self.assertIn(excepted_error_1, self.luy_full.warnings)
 
-        complete_component_acronym = self.component_full_lecturing.complete_acronym
+        complete_component_acronym = self.component_full_lecturing.complete_code
         excepted_error_2 = "{} ({})".format(_('Volumes of {} are inconsistent').format(complete_component_acronym),
                                             _('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
         self.assertIn(excepted_error_2, self.component_full_lecturing.warnings)
@@ -542,7 +542,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.save()
 
         excepted_error = "{} ({})".format(
-            _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_acronym),
+            _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_code),
             _('planned classes cannot be 0 while volume is greater than 0'))
 
         self.assertCountEqual(
@@ -561,7 +561,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.save()
 
         excepted_error = "{} ({})".format(
-            _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_acronym),
+            _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_code),
             _('planned classes cannot be greather than 0 while volume is equal to 0'))
         self.assertCountEqual(
             self.luy_full._check_learning_component_year_warnings(),

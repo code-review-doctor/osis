@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
+from ddd.logic.learning_unit.domain.service.save_effective_class import SaveEffectiveClass
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
@@ -35,14 +38,20 @@ def update_effective_class(
         learning_unit_repository: ILearningUnitRepository,
         class_repository: IEffectiveClassRepository,
 ) -> EffectiveClassIdentity:
-    # GIVEN
+    # Given
+    effective_class = class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
+    learning_unit = learning_unit_repository.get(
+        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+    )
 
-    # WHEN
+    # When
+    SaveEffectiveClass().update(
+        learning_unit=learning_unit,
+        effective_class=effective_class,
+        cmd=cmd
+    )
 
-    # Appelle effective_class.update() + validations relatives à l'UE
-    # OU renommer CreateEffectiveClass en SaveEffectiveClass
-    # UpdateEffectiveClass().update(effective_class)
+    # Then
+    class_repository.save(effective_class)
 
-    # THEN
-
-    return
+    return effective_class.entity_id
