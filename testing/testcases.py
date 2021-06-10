@@ -40,9 +40,10 @@ from infrastructure.formation_catalogue.repository.in_memory.training import InM
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
-    get_fake_program_tree_repository, get_fake_node_repository, FakeNodeRepository, FakeProgramTreeVersionRepository, \
-    FakeProgramTreeRepository
+from infrastructure.formation_catalogue.repository.in_memory.node import InMemoryNodeRepository
+from infrastructure.formation_catalogue.repository.in_memory.program_tree import InMemoryProgramTreeRepository
+from infrastructure.formation_catalogue.repository.in_memory.program_tree_version import \
+    InMemoryProgramTreeVersionRepository
 
 
 class _AssertRaisesBusinessException:
@@ -102,9 +103,9 @@ class DDDTestCase(TestCase):
         )
 
     def _init_program_management_app_repo(self):
-        self.fake_node_repository = get_fake_node_repository([])
-        self.fake_program_tree_repository = get_fake_program_tree_repository([])
-        self.fake_program_tree_version_repository = get_fake_program_tree_version_repository([])
+        self.fake_node_repository = InMemoryNodeRepository
+        self.fake_program_tree_repository = InMemoryProgramTreeRepository
+        self.fake_program_tree_version_repository = InMemoryProgramTreeVersionRepository
         self.mock_repo(
             "program_management.ddd.repositories.node.NodeRepository",
             self.fake_node_repository
@@ -253,7 +254,7 @@ class DDDTestCase(TestCase):
 
 
 def get_from_element_id(element_id: int) -> Optional['NodeIdentity']:
-    repo = FakeNodeRepository()
+    repo = InMemoryNodeRepository()
     return next(
         (node for node in repo._nodes if node.node_id == element_id),
         None
@@ -261,14 +262,14 @@ def get_from_element_id(element_id: int) -> Optional['NodeIdentity']:
 
 
 def get_node_identities_from_code(group_code: str) -> List['NodeIdentity']:
-    repo = FakeProgramTreeRepository()
+    repo = InMemoryProgramTreeRepository()
     return [tree.root_node.entity_id for tree in repo._trees if tree.root_node.code == group_code]
 
 
 def get_program_tree_version_identity_from_node_identities(
         node_identities: List['NodeIdentity']
 ) -> List['ProgramTreeVersionIdentity']:
-    repo = FakeProgramTreeVersionRepository()
+    repo = InMemoryProgramTreeVersionRepository()
     node_identities_set = set(node_identities)
     return [
         tree_version.entity_id for tree_version in repo._trees_version
@@ -277,7 +278,7 @@ def get_program_tree_version_identity_from_node_identities(
 
 
 def get_group_identity_from_tree_version_identity(identity: 'ProgramTreeVersionIdentity') -> 'GroupIdentity':
-    repo = FakeProgramTreeVersionRepository()
+    repo = InMemoryProgramTreeVersionRepository()
     return next(
         (GroupIdentity(code=tree_version.program_tree_identity.code, year=tree_version.program_tree_identity.year) for
          tree_version in repo._trees_version if tree_version.entity_id == identity),
@@ -295,7 +296,7 @@ def get_last_existing_version_identity(
         offer_acronym: str,
         transition_name: str,
 ) -> Optional['ProgramTreeVersionIdentity']:
-    repo = FakeProgramTreeVersionRepository()
+    repo = InMemoryProgramTreeVersionRepository()
     existing_tree_version = repo.search(
         version_name=version_name,
         offer_acronym=offer_acronym,
@@ -317,7 +318,7 @@ def get_next_transition_version_year(
         version_name: str
 ) -> Optional[int]:
 
-    repo = FakeProgramTreeVersionRepository()
+    repo = InMemoryProgramTreeVersionRepository()
     tree_versions = repo.search(version_name=version_name, offer_acronym=offer_acronym)
     transitions = (tree_version for tree_version in tree_versions if tree_version.is_transition)
     transitions_year_in_range_year = (
@@ -328,7 +329,7 @@ def get_next_transition_version_year(
 
 
 def transition_version_greater_than_specific_version_year(specific_version: 'ProgramTreeVersion') -> bool:
-    repo = FakeProgramTreeVersionRepository()
+    repo = InMemoryProgramTreeVersionRepository()
     tree_versions = repo.search(
         version_name=specific_version.version_name,
         offer_acronym=specific_version.entity_id.offer_acronym
@@ -340,7 +341,7 @@ def transition_version_greater_than_specific_version_year(specific_version: 'Pro
 def get_all_program_tree_version_identities(
         program_tree_version_identity: 'ProgramTreeVersionIdentity'
 ) -> List['ProgramTreeVersionIdentity']:
-    repo = FakeProgramTreeVersionRepository()
+    repo = InMemoryProgramTreeVersionRepository()
     return [
         tree_version.entity_id for tree_version in repo._trees_version
         if (tree_version.entity_id.version_name,
