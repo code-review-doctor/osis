@@ -21,22 +21,22 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import datetime
 import traceback
 import warnings
 from collections import namedtuple
 from typing import Any, Optional, List
-import datetime
 
 import mock
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.education_group_types import EducationGroupTypesEnum
-from education_group.ddd.domain.group import GroupIdentity
-from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository, \
-    get_fake_mini_training_repository, get_fake_training_repository, FakeGroupRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear, AcademicYearIdentity
-from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
+from education_group.ddd.domain.group import GroupIdentity
+from infrastructure.formation_catalogue.repository.in_memory.group import InMemoryGroupRepository
+from infrastructure.formation_catalogue.repository.in_memory.mini_training import InMemoryMiniTrainingRepository
+from infrastructure.formation_catalogue.repository.in_memory.training import InMemoryTrainingRepository
 from program_management.ddd.business_types import *
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
@@ -91,9 +91,9 @@ class DDDTestCase(TestCase):
         self._init_program_management_app_repo()
 
     def _init_education_group_app_repo(self):
-        self.fake_training_repository = get_fake_training_repository([])
-        self.fake_mini_training_repository = get_fake_mini_training_repository([])
-        self.fake_group_repository = get_fake_group_repository([])
+        self.fake_training_repository = InMemoryTrainingRepository
+        self.fake_mini_training_repository = InMemoryMiniTrainingRepository
+        self.fake_group_repository = InMemoryGroupRepository
         self.mock_repo("education_group.ddd.repository.group.GroupRepository", self.fake_group_repository)
         self.mock_repo("education_group.ddd.repository.training.TrainingRepository", self.fake_training_repository)
         self.mock_repo(
@@ -286,7 +286,7 @@ def get_group_identity_from_tree_version_identity(identity: 'ProgramTreeVersionI
 
 
 def check_acronym_exists(abbreviated_title: str) -> bool:
-    repo = FakeGroupRepository()
+    repo = InMemoryGroupRepository()
     return any(group for group in repo._groups if group.abbreviated_title == abbreviated_title)
 
 
