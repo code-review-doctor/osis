@@ -46,8 +46,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label>
-                                        {% trans 'UE' %}({{ learning_unit.subtype }})
-{#                                        {% trans 'UE' %}({{ learning_unit.subtype }})**subtype missing#}
+                                        {% trans 'UE' %}({{ learning_unit.learning_unit_type.value }})
                                     </label>
                                     <br>
                                     <span id="id_type">
@@ -74,6 +73,7 @@
                                 </div>
                             {% endblock content_row1 %}
                         </div>
+                        <br>
                         <div class="row">
                             {% block content_row2 %}
                                 <div class="col-md-3">
@@ -111,7 +111,7 @@
                                     </label>
                                     <br>
                                     <span id="id_language">
-                                         {{ learning_unit.language_id.code_iso }}{# todo remplacer par Francais... #}
+                                         {{ language.name }}
                                     </span>
                                 </div>
                             {% endblock content_row2 %}
@@ -139,7 +139,7 @@
                             {{ learning_unit.titles.common_fr|default_if_none:'-'}}
                             <br>
                                 <label>{% trans 'Class specific complement' %}</label><br>
-                            {{ effective_class.titles.title_fr|default_if_none:'-' }}
+                            {{ effective_class.titles.fr|default_if_none:'-' }}
                             <br>
                             <label>
                                 {% trans "Title in English" %}
@@ -149,7 +149,7 @@
                             <br>
                                 <label>{% trans 'Class specific complement' %}</label>
                                 <br>
-                            {{ effective_class.titles.title_en|default_if_none:'-' }}
+                            {{ effective_class.titles.en|default_if_none:'-' }}
                         </div>
                     </div>
 
@@ -164,7 +164,7 @@
                             </label>
                             <br>
                             <span id="id_quadrimester">
-                                {{ effective_class.quadrimester |default_if_none:'-'}}
+                                {{ effective_class.derogation_quadrimester.value |default_if_none:'-'}}
                             </span>
                         </div>
                         <div class="col-md-6">
@@ -173,7 +173,7 @@
                             </label>
                             <br>
                             <span id="id_session_derogation">
-                                {{ effective_class.session |default_if_none:'-'}}
+                                {{ effective_class.session_derogation.value |default_if_none:'-'}}
                             </span>
                         </div>
                     </div>
@@ -195,11 +195,11 @@
                             <td>
                                 <input type="text" value="{{ class_type }}" style="background: rgba(0, 0, 0, 0);border: none;"/>
                             </td>
-                            <td>{{ effective_class.hourly_volume_partial_q1 }}</td>
+                            <td style="text-align: center">{{ effective_class.volumes.volume_first_quadrimester|default_if_none:''}}</td>
                             <td></td>
-                            <td>{{ effective_class.hourly_volume_partial_q2 }}</td>
+                            <td style="text-align: center">{{ effective_class.volumes.volume_second_quadrimester|default_if_none:''}}</td>
                             <td></td>
-                            <td>{{ volumes.volume_total_annual }}</td>
+                            <td style="text-align: center">{{ volumes.volume_annual|default_if_none:'' }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -213,6 +213,7 @@
             <label>
                 {% trans 'Faculty remark (unpublished)' %}
             </label>
+            <br>
             <span id="id_faculty_remark">
                 {{ learning_unit.remarks.faculty |default_if_none:'-'}}
             </span>
@@ -221,6 +222,7 @@
             <label>
                 {% trans 'Other remark (intended for publication)' %}
             </label>
+            <br>
             <span id="id_other_remark">
                 {{ learning_unit.remarks.publication_fr|default_if_none:'-' }}
             </span>
@@ -229,6 +231,7 @@
             <label>
                 {% trans 'Other remark in english (intended for publication)' %}
             </label>
+            <br>
             <span id="id_other_remark_en">
                 {{ learning_unit.remarks.publication_en|default_if_none:'-' }}
             </span>
@@ -250,7 +253,7 @@
                                 {% trans 'Learning location' %}
                             </label>
                             <br>
-                            {{learning_unit.campus|default_if_none:'-'  }}
+                            {{teaching_place|default_if_none:'-'  }}
                         </div>
                         <br>
                         <div>
@@ -258,7 +261,7 @@
                                 {% trans 'Requirement entity' %}
                             </label>
                             <br>
-                            {{learning_unit.responsible_entity|default_if_none:'-'  }}
+                            {{ learning_unit.responsible_entity_identity.code|default_if_none:'-'}}
                             </div>
                             <br>
                         <div>
@@ -266,7 +269,7 @@
                                 {% trans 'Attribution entity' %}
                             </label>
                             <br>
-                            {{learning_unit.allocation_entity|default_if_none:'-'  }}
+                            {{ learning_unit.attribution_entity_identity.code|default_if_none:'-'}}
                         </div>
                     </div>
                 </div>

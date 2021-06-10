@@ -33,6 +33,7 @@ from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
+from base.models.enums.learning_unit_year_subtypes import LearningUnitType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
@@ -117,6 +118,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=False,  # TODO :: to implement and unit test
             is_active=False,  # TODO :: to implement and unit test
+            learning_unit_type=dto.learning_unit_type
         )
 
     @classmethod
@@ -181,6 +183,7 @@ class LearningUnitBuilder(RootEntityBuilder):
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=dto.professional_integration,
             is_active=dto.is_active,
+            learning_unit_type=LearningUnitType[dto.learning_unit_type] if dto.learning_unit_type else None,
         )
 
     @classmethod
