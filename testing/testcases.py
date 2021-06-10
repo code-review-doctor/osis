@@ -78,7 +78,6 @@ class _AssertRaisesBusinessException:
         return False
 
 
-# FIXME should herit from SimpleTestCase
 class DDDTestCase(TestCase):
     CURRENT_ACADEMIC_YEAR = 2020
 
