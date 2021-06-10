@@ -23,16 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class SearchLanguagesCommand(interface.CommandRequest):
-    pass  # Filters can ba added later when it's needed
+from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
 
 
-@attr.s(frozen=True, slots=True)
-class GetLanguageCommand(interface.CommandRequest):
-    code_iso = attr.ib(type=str)
+def get_language(
+        cmd: 'GetLLanguageCommand',
+        language_repository: 'ILanguageRepository'
+) -> 'Language':
+    language_identity = LanguageIdentityBuilder.build_from_code_iso(code_iso=cmd.code_iso)
+    return language_repository.get(entity_id=language_identity)
