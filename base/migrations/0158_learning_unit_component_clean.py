@@ -23,5 +23,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(delete_learning_unit_component),
+        migrations.RunPython(delete_learning_unit_component, elidable=True),
     ]

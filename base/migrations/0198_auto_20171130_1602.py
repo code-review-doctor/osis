@@ -30,5 +30,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(copy_previous_pgrm_to_current_lunit),
+        migrations.RunPython(copy_previous_pgrm_to_current_lunit, elidable=True),
     ]

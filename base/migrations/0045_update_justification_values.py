@@ -36,6 +36,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_justifications_forwards),
+        migrations.RunPython(update_justifications_forwards, elidable=True),
     ]
 

@@ -53,7 +53,7 @@ class LearningUnitRepository(ILearningUnitRepository):
     @classmethod
     def has_proposal_this_year_or_in_past(cls, learning_unit: 'LearningUnit') -> bool:
         return ProposalLearningUnitDatabase.objects.filter(
-            learning_unit_year__acronym=learning_unit.entity_id.code,
+            learning_unit_year__learning_unit__learningunityear__acronym=learning_unit.entity_id.code,
             learning_unit_year__academic_year__year__lte=learning_unit.entity_id.year
         ).exists()
 

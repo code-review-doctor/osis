@@ -76,7 +76,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     )
     quadrimester = forms.ChoiceField(
         choices=add_blank(quadrimesters.DerogationQuadrimester.choices()),
-        required=False
+        required=False,
+        label=_("Quadrimester")
     )
 
     class_type = forms.CharField(disabled=True, required=False)

@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import itertools
 from typing import List, Type
 
 from education_group.ddd.business_types import *
@@ -32,7 +33,8 @@ def get_fake_group_repository(root_entities: List['Group']) -> Type['FakeReposit
     class_name = "FakeGroupRepository"
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.GroupNotFoundException
+        "not_found_exception_class": exception.GroupNotFoundException,
+        "search_groups_last_occurence": search_groups_last_occurence
     })
 
 
@@ -40,7 +42,8 @@ def get_fake_mini_training_repository(root_entities: List['MiniTraining']) -> Ty
     class_name = "FakeMiniTrainingRepository"
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.MiniTrainingNotFoundException
+        "not_found_exception_class": exception.MiniTrainingNotFoundException,
+        "search_mini_trainings_last_occurence": search_trainings_last_occurence
     })
 
 
@@ -48,5 +51,20 @@ def get_fake_training_repository(root_entities: List['Training']) -> Type['FakeR
     class_name = "FakeTrainingRepository"
     return type(class_name, (FakeRepository,), {
         "root_entities": root_entities.copy(),
-        "not_found_exception_class": exception.TrainingNotFoundException
+        "not_found_exception_class": exception.TrainingNotFoundException,
+        "search_trainings_last_occurence": search_trainings_last_occurence
     })
+
+
+@classmethod
+def search_trainings_last_occurence(cls, from_year: int) -> List['Training']:
+    datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+    group_by_acronym = itertools.groupby(datas, lambda training: training.acronym)
+    return [max(trainings, key=lambda training: training.year) for acronym, trainings in group_by_acronym]
+
+
+@classmethod
+def search_groups_last_occurence(cls, from_year: int) -> List['Group']:
+    datas = (root_entity for root_entity in cls.root_entities if root_entity.entity_id.year >= from_year)
+    group_by_code = itertools.groupby(datas, lambda group: group.code)
+    return [max(groups, key=lambda group: group.year) for acronym, groups in group_by_code]

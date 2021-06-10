@@ -40,5 +40,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_access_schedule_calendar, remove_access_schedule_calendar),
+        migrations.RunPython(create_access_schedule_calendar, remove_access_schedule_calendar, elidable=True),
     ]
