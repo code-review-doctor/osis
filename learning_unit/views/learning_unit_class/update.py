@@ -88,8 +88,8 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
         )
         kwargs = super().get_form_kwargs()
         kwargs['learning_unit'] = self.learning_unit
+        kwargs['effective_class'] = effective_class
         kwargs['user'] = self.request.user
-        kwargs['initial']['effective_class'] = effective_class
         return kwargs
 
     def get_permission_object(self):

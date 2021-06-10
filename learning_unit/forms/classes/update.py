@@ -141,7 +141,6 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         disabled=True,
         label=_('Allocation entity')
     )
-    campuses = message_bus_instance.invoke(SearchUclouvainCampusesCommand())  # type: List[UclouvainCampus]
 
     def __init__(self, *args, learning_unit: 'LearningUnit' = None, user: User, **kwargs):
         self.user = user
@@ -163,12 +162,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.__init_remarks(learning_unit)
         self.__init_volumes()
         self.__init_learning_unit_responsible_field()
-        self.fields['learning_unit_campus'].choices = [(campus.entity_id.uuid, str(campus)) for campus in self.campuses]
-        self.fields['learning_unit_campus'].initial = _init_learning_unit_campus(
-            self.campuses,
-            self.learning_unit.teaching_place
-        )
-
+        self.__init_learning_unit_campus()
 
     def __init_volumes(self):
         if self.learning_unit.has_practical_volume() and not self.learning_unit.has_lecturing_volume():
@@ -263,12 +257,10 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
 class UpdateClassForm(ClassForm):
 
-    def __init__(self, *args, learning_unit: 'LearningUnit' = None, user: User, **kwargs):
+    def __init__(self, *args, learning_unit: 'LearningUnit' = None, effective_class: 'EffectiveClass' = None, user: User, **kwargs):
         super().__init__(*args, learning_unit=learning_unit, user=user, **kwargs)
         self.form_title = _('Update class')
-        effective_class = self.initial.get('effective_class')
-        if effective_class:
-            self.__init_effective_class_fields_for_update(effective_class)
+        self.__init_effective_class_fields_for_update(effective_class)
 
     def __init_effective_class_fields_for_update(self, effective_class: EffectiveClass):
         self.fields['class_code'].initial = effective_class.entity_id.class_code
@@ -278,11 +270,7 @@ class UpdateClassForm(ClassForm):
         self.fields['title_en'].initial = effective_class.titles.en
         self.fields['hourly_volume_partial_q1'].initial = effective_class.volumes.volume_first_quadrimester
         self.fields['hourly_volume_partial_q2'].initial = effective_class.volumes.volume_second_quadrimester
-        self.fields['learning_unit_campus'].choices = [(campus.entity_id.uuid, str(campus)) for campus in self.campuses]
-        self.fields['learning_unit_campus'].initial = _init_learning_unit_campus(
-            self.campuses,
-            effective_class.teaching_place
-        )
+        self.__init_learning_unit_campus(effective_class.teaching_place)
 
     def get_command(self) -> UpdateEffectiveClassCommand:
         return UpdateEffectiveClassCommand(
@@ -294,14 +282,16 @@ class UpdateClassForm(ClassForm):
             teaching_place_uuid=self.cleaned_data['learning_unit_campus'],
             derogation_quadrimester=self.cleaned_data['quadrimester'],
             session_derogation=self.cleaned_data['session'],
-            volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,
-            volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'] or 0,
+            volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'],
+            volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'],
         )
 
-
-def _init_learning_unit_campus(campuses, teaching_place):
-    campus = next(
-        (campus for campus in campuses if campus.entity_id == teaching_place),
-        None
-    )
-    return campus.entity_id.uuid
+    def __init_learning_unit_campus(self, teaching_place):
+        campuses = message_bus_instance.invoke(SearchUclouvainCampusesCommand())  # type: List[UclouvainCampus]
+        choices = [(campus.entity_id.uuid, str(campus)) for campus in campuses]
+        self.fields['learning_unit_campus'].choices = choices
+        campus = next(
+            (campus for campus in campuses if campus.entity_id == teaching_place),
+            None
+        )
+        self.initial['learning_unit_campus'] = campus.entity_id.uuid
