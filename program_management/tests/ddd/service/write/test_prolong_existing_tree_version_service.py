@@ -25,13 +25,11 @@ import mock
 from django.test import TestCase
 
 from education_group.tests.ddd.factories.domain.group import GroupIdentityFactory
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
+from program_management.ddd.command import ProlongExistingProgramTreeVersionCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, NOT_A_TRANSITION
 from program_management.ddd.service.write import prolong_existing_tree_version_service
-from program_management.tests.ddd.factories.commands.prolong_existing_program_tree_version import \
-    ProlongExistingProgramTreeVersionCommandFactory
 
 
-# todo do tests
 class TestProlongExistingTreeVersion(TestCase):
 
     @mock.patch(
@@ -48,7 +46,15 @@ class TestProlongExistingTreeVersion(TestCase):
             mock_extend_existing_past_version,
             mock_get_from_tree_version_identity
     ):
-        cmd = ProlongExistingProgramTreeVersionCommandFactory()
+        cmd = ProlongExistingProgramTreeVersionCommand(
+            offer_acronym="CHIM1BA",
+            version_name="VERSIONNAME",
+            transition_name=NOT_A_TRANSITION,
+            updated_year=2019,
+            end_year=None,
+            title_fr="fr  title",
+            title_en="title  en",
+        )
         identity_expected = ProgramTreeVersionIdentity(
             version_name=cmd.version_name,
             offer_acronym=cmd.offer_acronym,
