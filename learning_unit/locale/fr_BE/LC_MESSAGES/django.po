@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-08 10:33+0200\n"
+"POT-Creation-Date: 2021-06-10 14:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,9 @@ msgstr ""
 msgid "Academic year"
 msgstr "Année académique"
 
+msgid "Actions"
+msgstr "Actions"
+
 msgid "Active"
 msgstr "Actif"
 
@@ -27,6 +30,9 @@ msgstr "Entité d'attribution"
 
 msgid "Annual volume"
 msgstr "Volume annuel"
+
+msgid "Attribution entity"
+msgstr "Entité d'attribution"
 
 msgid "Central manager"
 msgstr "Gestionnaire central"
@@ -75,17 +81,26 @@ msgstr "Remarque de faculté (non publiée)"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "Inactive"
+msgstr "Inactif"
+
 msgid "Institution"
 msgstr "Institution"
 
 msgid "Internship subtype"
 msgstr "Sous-type de stage"
 
+msgid "LU"
+msgstr "UE"
+
 msgid "Language"
 msgstr "Langue"
 
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
+
+msgid "Learning unit credits"
+msgstr "Crédits"
 
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
@@ -156,6 +171,9 @@ msgstr "Entité resp. cahier des charges"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
+
+msgid "State"
+msgstr "Etat"
 
 msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "
