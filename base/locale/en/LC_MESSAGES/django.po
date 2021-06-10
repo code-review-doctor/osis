@@ -83,10 +83,31 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr ""
 
+msgid "1"
+msgstr ""
+
+msgid "12"
+msgstr ""
+
+msgid "123"
+msgstr ""
+
+msgid "13"
+msgstr ""
+
 msgid "1st quadri"
 msgstr ""
 
+msgid "2"
+msgstr ""
+
+msgid "23"
+msgstr ""
+
 msgid "2nd quadri"
+msgstr ""
+
+msgid "3"
 msgstr ""
 
 msgid "<b>create</b> a new learning unit using that acronym"
@@ -1582,6 +1603,9 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
+msgid "New class"
+msgstr ""
+
 msgid "New external learning unit"
 msgstr ""
 
@@ -1742,6 +1766,9 @@ msgid "Own components"
 msgstr ""
 
 msgid "P."
+msgstr ""
+
+msgid "P23"
 msgstr ""
 
 msgid "Page not found."
@@ -3150,4 +3177,3 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
-

@@ -26,18 +26,27 @@
 from typing import Dict, Callable, List
 
 from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
+    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand
 from ddd.logic.attribution.use_case.read.search_tutors_attributed_to_learning_unit_service import \
     search_tutors_attributed_to_learning_unit
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
+from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
+from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
+from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
+from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
+from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from infrastructure.attribution.repository.tutor import TutorRepository
-from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
+from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
+from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
+from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
@@ -58,6 +67,13 @@ class MessageBus:
         BulkUpdateLinkCommand: lambda cmd: bulk_update_and_postpone_links(
             cmd, ProgramTreeRepository(), ReportRepository()
         ),
+        GetLearningUnitCommand: lambda cmd: get_learning_unit(cmd, LearningUnitRepository()),
+        CreateEffectiveClassCommand: lambda cmd: create_effective_class(
+            cmd, LearningUnitRepository(), EffectiveClassRepository()
+        ),
+        CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
+        SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
+        GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
         SearchTutorAttributedToLearningUnitCommand: lambda cmd: search_tutors_attributed_to_learning_unit(
             cmd,
             TutorRepository()

@@ -29,7 +29,6 @@ from typing import Dict, List
 
 import attr
 
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from education_group.ddd.domain.exception import GroupNotFoundException, TrainingNotFoundException, \
     MiniTrainingNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
@@ -38,9 +37,7 @@ from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from osis_common.ddd import interface
 from program_management.ddd.domain.link import Link
-from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTree
-from program_management.ddd.domain.service.search_program_trees_in_future import SearchProgramTreesInFuture
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.program_tree import ProgramTree
 
 Year = int
 FieldLabel = str
