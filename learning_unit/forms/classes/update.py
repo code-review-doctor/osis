@@ -183,7 +183,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         # Fields editable for class, pre-filled from LearningUnit values
         quadri = self.learning_unit.derogation_quadrimester
         self.fields['quadrimester'].initial = quadri.name if quadri else None
-        self.__init_session(self.learning_unit.derogation_session)
+        self.__init_session()
         self.fields['hourly_volume_partial_q1'].initial = volumes.volume_first_quadrimester
         self.fields['hourly_volume_partial_q2'].initial = volumes.volume_second_quadrimester
         self.fields['volume_total_annual'].initial = volumes.volume_annual
@@ -246,7 +246,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         ]
         self.fields['learning_unit_responsible_entity'].initial = self.learning_unit.responsible_entity_identity.code
 
-    def __init_session(self, derogation_session: DerogationSession):
+    def __init_session(self):
         session_choices = []
         for session_choice in DerogationSession.choices():
             session_choices.append((session_choice[1], session_choice[1]))
@@ -257,7 +257,14 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
 class UpdateClassForm(ClassForm):
 
-    def __init__(self, *args, learning_unit: 'LearningUnit' = None, effective_class: 'EffectiveClass' = None, user: User, **kwargs):
+    def __init__(
+            self,
+            *args,
+            learning_unit: 'LearningUnit' = None,
+            effective_class: 'EffectiveClass' = None,
+            user: User,
+            **kwargs
+    ):
         super().__init__(*args, learning_unit=learning_unit, user=user, **kwargs)
         self.form_title = _('Update class')
         self.__init_effective_class_fields_for_update(effective_class)
