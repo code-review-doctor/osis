@@ -122,6 +122,7 @@ class TestSearchApplicationByApplicantService(TestCase):
                     practical_volume_available=self.application.practical_volume,
                     remark=self.application.remark,
                     course_summary=self.application.course_summary,
+                    course_title=""
                 ),
                 ApplicationByApplicantDTO(
                     uuid=self.application_3.entity_id.uuid,
@@ -133,6 +134,7 @@ class TestSearchApplicationByApplicantService(TestCase):
                     practical_volume_available=self.application_3.practical_volume,
                     remark=self.application_3.remark,
                     course_summary=self.application_3.course_summary,
+                    course_title=""
                 )
             ]
         )

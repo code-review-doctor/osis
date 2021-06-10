@@ -28,12 +28,13 @@ from rest_framework import status, views
 from rest_framework.response import Response
 
 from attribution.api.serializers.application import ApplicationGetSerializer, ApplicationPostSerializer, \
-    ApplicationPutSerializer, AttributionsAboutToExpireGetSerializer, RenewAttributionAboutToExpirePostSerializer
+    ApplicationPutSerializer, AttributionsAboutToExpireGetSerializer, RenewAttributionAboutToExpirePostSerializer, \
+    MyChargeSummarySerializer
 from backoffice.settings.rest_framework.common_views import DisplayExceptionsByFieldNameAPIMixin
 from base.models.person import Person
 from ddd.logic.application.commands import SearchApplicationByApplicantCommand, ApplyOnVacantCourseCommand, \
     UpdateApplicationCommand, DeleteApplicationCommand, GetAttributionsAboutToExpireCommand, \
-    RenewMultipleAttributionsCommand, SendApplicationsSummaryCommand, SearchVacantCoursesCommand
+    RenewMultipleAttributionsCommand, SendApplicationsSummaryCommand, GetChargeSummaryCommand
 from ddd.logic.application.domain.validator.exceptions import VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
     LecturingAndPracticalChargeNotFilledException
 from infrastructure.messages_bus import message_bus_instance
@@ -166,3 +167,25 @@ class SendApplicationsSummary(views.APIView):
         cmd = SendApplicationsSummaryCommand(global_id=self.person.global_id)
         message_bus_instance.invoke(cmd)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class MyChargeSummaryView(views.APIView):
+    """
+        Gateway which will merge data from multiple source
+
+        GET: Return charge summary of connected user of the current application period
+    """
+    name = 'my_charge_summary'
+
+    @cached_property
+    def person(self) -> Person:
+        return self.request.user.person
+
+    def get(self, request, *args, **kwargs):
+        cmd = GetChargeSummaryCommand(global_id=self.person.global_id)
+        results = message_bus_instance.invoke(cmd)
+        serializer = MyChargeSummarySerializer(results, many=True)
+        return Response({
+            "results": serializer.data,
+            "count": len(serializer.data)
+        })

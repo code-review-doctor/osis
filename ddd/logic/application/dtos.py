@@ -28,6 +28,7 @@ from typing import List
 
 import attr
 
+from attribution.models.enums.function import Functions
 from osis_common.ddd.interface import DTO
 
 
@@ -143,3 +144,27 @@ class VacantCourseSearchDTO(DTO):
     practical_volume_total = attr.ib(type=Decimal)
     practical_volume_available = attr.ib(type=Decimal)
     tutors = attr.ib(type=List[TutorAttributionDTO], default=[])
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitVolumeDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    lecturing_volume_total = attr.ib(type=Decimal)
+    practical_volume_total = attr.ib(type=Decimal)
+
+
+@attr.s(frozen=True, slots=True)
+class ChargeSummaryDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title = attr.ib(type=str)
+    start_year = attr.ib(type=int)
+    end_year = attr.ib(type=int)
+    function = attr.ib(type=Functions)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
+    lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
+    total_lecturing_volume_course = attr.ib(type=Decimal)
+    total_practical_volume_course = attr.ib(type=Decimal)

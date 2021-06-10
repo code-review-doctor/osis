@@ -59,6 +59,25 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - application
+  /application/my_charges:
+    get:
+      description: 'Return charge summary of connected user of the current application period'
+      operationId: my_charge_summary
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyChargeSummaryList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
   /application/send_summary:
     post:
       description: 'Send an applications summary on the current application period'
@@ -382,6 +401,61 @@ components:
         - practical_volume
         - remark
         - course_summary
+    MyChargeSummaryList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyChargeSummary'
+        count:
+          type: integer
+          example: 3
+    MyChargeSummary:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "LDROI1200"
+        year:
+          type: integer
+          example: 2020
+        title:
+          type: string
+          example: "Introduction au droit"
+        start_year:
+          type: integer
+          example: 2018
+          description: 'Start year of attribution'
+          nullable: true
+        end_year:
+          type: integer
+          example: 2018
+          description: 'End year of attribution'
+          nullable: true
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+          example: 'Coordinateur'
+        lecturing_volume:
+          type: string
+          example: '10.0'
+        practical_volume:
+          type: string
+          example: '10.0'
+        lecturing_volume_available:
+          type: string
+          example: '15.0'
+        practical_volume_available:
+          type: string
+          example: '10.5'
+        total_lecturing_volume_course:
+          type: string
+          example: '30.0'
+        total_practical_volume_course:
+          type: string
+          example: '30.0'
     VacantCourseList:
       type: object
       properties:

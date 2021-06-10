@@ -68,6 +68,7 @@ class ApplicationInMemoryRepository(IApplicationRepository):
                 uuid=result.entity_id.uuid,
                 code=result.vacant_course_id.code,
                 year=result.vacant_course_id.year,
+                course_title="",
                 lecturing_volume=result.lecturing_volume,
                 practical_volume=result.practical_volume,
                 lecturing_volume_available=result.lecturing_volume,

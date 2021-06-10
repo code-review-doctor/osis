@@ -27,9 +27,11 @@ from typing import Dict, Callable, List
 
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
-    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand
+    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
+    GetChargeSummaryCommand
 from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
     get_attributions_about_to_expire
+from ddd.logic.application.use_case.read.get_charge_summary_service import get_charge_summary
 from ddd.logic.application.use_case.read.search_applications_by_applicant_service import \
     search_applications_by_applicant
 from ddd.logic.application.use_case.read.search_vacant_courses_service import search_vacant_courses
@@ -49,6 +51,7 @@ from infrastructure.application.repository.application import ApplicationReposit
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
+from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
@@ -89,6 +92,10 @@ class MessageBus:
         ),
         SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(
             cmd, ApplicationCalendarRepository(), VacantCourseRepository()
+        ),
+        GetChargeSummaryCommand: lambda cmd: get_charge_summary(
+            cmd, ApplicationCalendarRepository(), ApplicantRepository(), VacantCourseRepository(),
+            LearningUnitTranslator()
         ),
         GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),

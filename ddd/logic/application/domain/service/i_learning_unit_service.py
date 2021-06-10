@@ -23,20 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import List
 
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from ddd.logic.application.dtos import LearningUnitVolumeDTO
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
-class ApplicationCalendarIdentity(interface.EntityIdentity):
-    uuid = attr.ib(type=str)
-
-
-@attr.s(slots=True, hash=False, eq=False)
-class ApplicationCalendar(interface.RootEntity):
-    entity_id = attr.ib(type=ApplicationCalendarIdentity)
-    authorized_target_year = attr.ib(type=AcademicYearIdentity)
-    start_date = attr.ib(type=str)
-    end_date = attr.ib(type=str)
+class ILearningUnitService(interface.DomainService):
+    """
+        Anticorruption layer to translate data from learning_unit bounded context to application bounded context
+    """
+    def search_learning_unit_volumes_dto(self, entity_ids: List[LearningUnitIdentity]) -> List[LearningUnitVolumeDTO]:
+        pass

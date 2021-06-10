@@ -44,6 +44,11 @@ class SearchVacantCoursesCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class GetChargeSummaryCommand(interface.CommandRequest):
+    global_id = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class GetAttributionsAboutToExpireCommand(interface.CommandRequest):
     global_id = attr.ib(type=str)
 
