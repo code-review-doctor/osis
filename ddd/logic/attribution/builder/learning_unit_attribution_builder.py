@@ -23,15 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+from ddd.logic.attribution.builder.learning_unit_attribution_identity_builder import \
+    LearningUnitAttributionIdentityBuilder
+from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution
+from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 
-import attr
-
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
-@attr.s(slots=True, hash=False, eq=False)
-class ClassVolumeRepartition(interface.ValueObject):
-    effective_class = attr.ib(type=EffectiveClassIdentity)
-    distributed_volume = attr.ib(type=Decimal)
+class LearningUnitAttributionBuilder(interface.RootEntityBuilder):
+
+    @classmethod
+    def build_from_repository_dto(
+            cls,
+            learning_unit_identity: 'LearningUnitIdentity',
+            dto_object: 'LearningUnitAttributionDTO') \
+            -> 'LearningUnitAttribution':
+        entity_id = LearningUnitAttributionIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+            uuid=dto_object.attribution_uuid
+        )
+        return LearningUnitAttribution(
+            entity_id=entity_id,
+            function=dto_object.function,
+            learning_unit=learning_unit_identity,
+            distributed_effective_classes=[
+                ClassVolumeRepartition(distributed_volume=dto_object.volume, effective_class=None)  # TODO tocomplete
+            ]  # TODO tocomplete
+        )

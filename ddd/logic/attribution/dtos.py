@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from typing import List
 
 import attr
 
@@ -35,3 +36,23 @@ class AcademicYearDataDTO(DTO):
     year = attr.ib(type=str)
     start_date = attr.ib(type=datetime.date)
     end_date = attr.ib(type=datetime.date)
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitAttributionFromRepositoryDTO(DTO):
+    function = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class TutorSearchDTO(DTO):
+    last_name = attr.ib(type=str)
+    first_name = attr.ib(type=str)
+    personal_id_number = attr.ib(type=str)
+    attributions = attr.ib(type=List[LearningUnitAttributionFromRepositoryDTO])
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitAttributionDTO(DTO):
+    function = attr.ib(type=str)
+    attribution_uuid = attr.ib(type=str)
+    volume = attr.ib(type=float)

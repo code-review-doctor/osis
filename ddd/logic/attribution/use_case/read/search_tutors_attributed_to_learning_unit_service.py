@@ -28,11 +28,16 @@ from typing import List
 from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
 def search_tutors_attributed_to_learning_unit(
         cmd: SearchTutorAttributedToLearningUnitCommand,
         repository: 'ITutorRepository'
 ) -> List['Tutor']:
-    # TODO: to implement
-    return repository.search()
+    return repository.search(
+        learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=cmd.learning_unit_code,
+            year=cmd.learning_unit_year
+        )
+    )

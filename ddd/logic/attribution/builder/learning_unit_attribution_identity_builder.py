@@ -23,15 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-
-import attr
-
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from osis_common.ddd import interface
+from ddd.logic.attribution.domain.model._attribution import LearningUnitAttributionIdentity
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
-@attr.s(slots=True, hash=False, eq=False)
-class ClassVolumeRepartition(interface.ValueObject):
-    effective_class = attr.ib(type=EffectiveClassIdentity)
-    distributed_volume = attr.ib(type=Decimal)
+class LearningUnitAttributionIdentityBuilder(EntityIdentityBuilder):
+
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'LearningUnitAttributionIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def build_from_code_and_learning_unit_identity_data(
+            cls,
+            uuid: str
+    ) -> 'LearningUnitAttributionIdentity':
+        return LearningUnitAttributionIdentity(uuid=uuid)
