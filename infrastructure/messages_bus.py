@@ -25,6 +25,9 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
+from ddd.logic.attribution.use_case.read.search_tutors_attributed_to_learning_unit_service import \
+    search_tutors_attributed_to_learning_unit
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
@@ -38,6 +41,7 @@ from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesComma
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -70,6 +74,10 @@ class MessageBus:
         CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
+        SearchTutorAttributedToLearningUnitCommand: lambda cmd: search_tutors_attributed_to_learning_unit(
+            cmd,
+            TutorRepository()
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
