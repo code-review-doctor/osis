@@ -23,8 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import abc
+from typing import Optional, List
+
+from ddd.logic.learning_unit.domain.model.responsible_entity import UclEntity, UCLEntityIdentity
 from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, ApplicationService
 
 
 class IUclEntityRepository(interface.AbstractRepository):
-    pass
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'UCLEntityIdentity') -> 'UclEntity':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List['UclEntity']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: 'UCLEntityIdentity', **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: 'UclEntity') -> None:
+        pass
