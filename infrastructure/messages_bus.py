@@ -26,12 +26,13 @@
 from typing import Dict, Callable, List
 
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
-    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand
+    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
+from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
@@ -70,6 +71,11 @@ class MessageBus:
         CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
+        UpdateEffectiveClassCommand: lambda cmd: update_effective_class(
+            cmd,
+            LearningUnitRepository,
+            EffectiveClassRepository()
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

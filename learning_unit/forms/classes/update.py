@@ -268,12 +268,15 @@ class UpdateClassForm(ClassForm):
     ):
         super().__init__(*args, learning_unit=learning_unit, user=user, **kwargs)
         self.form_title = _('Update class')
-        self.__init_effective_class_fields_for_update(effective_class)
+        if effective_class:
+            self.__init_effective_class_fields_for_update(effective_class)
 
     def __init_effective_class_fields_for_update(self, effective_class: EffectiveClass):
         self.fields['class_code'].initial = effective_class.entity_id.class_code
-        self.fields['quadrimester'].initial = effective_class.derogation_quadrimester
-        self.fields['session'].initial = effective_class.session_derogation
+        quadri = effective_class.derogation_quadrimester
+        self.fields['quadrimester'].initial = quadri.name if quadri else None
+        session = effective_class.session_derogation
+        self.fields['session'].initial = session.value if session else None
         self.fields['title_fr'].initial = effective_class.titles.fr
         self.fields['title_en'].initial = effective_class.titles.en
         self.fields['hourly_volume_partial_q1'].initial = effective_class.volumes.volume_first_quadrimester
