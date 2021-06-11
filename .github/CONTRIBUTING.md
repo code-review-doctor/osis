@@ -39,10 +39,11 @@
             - [Validator](#dddvalidator)
             - [BusinessException (exceptions.py)](#ddddomainbusinessexception)
     - [Repository (interface)](#dddrepository) (implémentation dans la couche "infrastructure")
-    - Test (unit tests) - Documentation/guidelines à développer
     - [Use case (Application Service)](#dddservice-application-service)
     - [Commande (commands.py)](#dddcommandpy)
     - [DTOs (dtos.py)](#dto--data-transfer-object)
+    - [Test](#dddtest)
+       - [Factory](#dddtestfactory)
 - [Couche Infrastructure](#couche-infrastructure)
     - [Exemple concret d'implémentation des guidelines](https://github.com/uclouvain/osis/tree/dev/infrastructure)
     - [Repository (implémentation)](#repository-implémentation)
@@ -924,6 +925,7 @@ class UpdateTrainingCommand(interface.CommandRequest):
 
 
 
+
 ## DTO : Data Transfer Object
 
 - "Objet de transfert de données"
@@ -941,6 +943,71 @@ class UpdateTrainingCommand(interface.CommandRequest):
 
 
 
+## ddd/test
+- Contient les tests relatifs au bounded context en question
+- Teste les différents scénarios ainsi que les invariants métiers des application services
+- Nommage des fichiers: test_<fichier_application_service>.py
+- Nommage des classes de test: Test<nom_application_service>
+- Nommage méthode de test: test_should_...
+- Utilise des inMemoryRepository
+
+Exemple :
+```python
+# test_update_training_service.py
+import attr
+from django.test import SimpleTestCase
+
+
+class UpdateTrainingServiceTest(SimpleTestCase):
+    def setup(self):
+      self.training = TrainingFactory()
+      self.cmd = UpdateTrainingCommand(
+        title_fr="Title fr",
+        credits=5
+        ...
+      )
+      
+    def test_should_not_accept_negative_credits_value(self):
+      cmd = attr.evolve(self.cmd, credits=-1)
+      
+      with self.assertRaises(NegativeCreditsException):
+        message_bus.invoke(cmd)
+
+```
+
+
+<br/><br/><br/><br/>
+
+
+
+## ddd/test/factory
+- Dans la mesure du possible, initialise au maximum les champs avec des valeurs par défaut.
+- Ne sont utilisées dans les tests que les factory représentant des objets ou cas business.
+- Utilise la même interface que factory boy (par défaut persiste l'objet)
+
+
+Exemple :
+```python
+# factory/training.py
+import factory
+
+class _TrainingFactory(factory.Factory):
+    class Meta:
+        model = Training
+    
+    acronym = ...
+    code = ...
+    ...
+
+class Master2M(_TrainingFactory):
+    acronym = "OSIS2M"
+    code = "LOSIS200M"
+    ...
+
+```
+
+
+<br/><br/><br/><br/>
 
 
 
