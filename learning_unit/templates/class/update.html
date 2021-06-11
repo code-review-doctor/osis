@@ -33,13 +33,13 @@
             {{ form.learning_unit_code.initial }}
         </a>
     </li>
-    <li class="active">{% trans 'New class' %}</li>
+    <li class="active">{{form.form_title}}</li>
 {% endblock %}
 {% block header_content %}
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% block h2_title %}{% trans 'New class' %}{% endblock %}</h2>
+        <h2>{% block h2_title %}{{form.form_title}}{% endblock %}</h2>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">

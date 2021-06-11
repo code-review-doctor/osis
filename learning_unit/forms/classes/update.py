@@ -36,7 +36,8 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
 from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
@@ -162,6 +163,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.__init_remarks(learning_unit)
         self.__init_volumes()
         self.__init_learning_unit_responsible_field()
+        self.__init_learning_unit_campus()
 
     def __init_volumes(self):
         if self.learning_unit.has_practical_volume() and not self.learning_unit.has_lecturing_volume():
@@ -182,11 +184,10 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         # Fields editable for class, pre-filled from LearningUnit values
         quadri = self.learning_unit.derogation_quadrimester
         self.fields['quadrimester'].initial = quadri.name if quadri else None
-        self.__init_session(self.learning_unit.derogation_session)
+        self.__init_session()
         self.fields['hourly_volume_partial_q1'].initial = volumes.volume_first_quadrimester
         self.fields['hourly_volume_partial_q2'].initial = volumes.volume_second_quadrimester
         self.fields['volume_total_annual'].initial = volumes.volume_annual
-        self.__init_learning_unit_campus()
 
     def __init_remarks(self, learning_unit):
         self.fields['learning_unit_remarks_faculty'].initial = learning_unit.remarks.faculty
@@ -246,10 +247,59 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         ]
         self.fields['learning_unit_responsible_entity'].initial = self.learning_unit.responsible_entity_identity.code
 
-    def __init_session(self, derogation_session: DerogationSession):
+    def __init_session(self):
         session_choices = []
         for session_choice in DerogationSession.choices():
             session_choices.append((session_choice[1], session_choice[1]))
         self.fields['session'].choices = add_blank(session_choices)
         session = self.learning_unit.derogation_session
         self.fields['session'].initial = session.value if session else None
+
+
+class UpdateClassForm(ClassForm):
+
+    def __init__(
+            self,
+            *args,
+            learning_unit: 'LearningUnit' = None,
+            effective_class: 'EffectiveClass' = None,
+            user: User,
+            **kwargs
+    ):
+        super().__init__(*args, learning_unit=learning_unit, user=user, **kwargs)
+        self.form_title = _('Update class')
+        self.__init_effective_class_fields_for_update(effective_class)
+
+    def __init_effective_class_fields_for_update(self, effective_class: EffectiveClass):
+        self.fields['class_code'].initial = effective_class.entity_id.class_code
+        self.fields['quadrimester'].initial = effective_class.derogation_quadrimester
+        self.fields['session'].initial = effective_class.session_derogation
+        self.fields['title_fr'].initial = effective_class.titles.fr
+        self.fields['title_en'].initial = effective_class.titles.en
+        self.fields['hourly_volume_partial_q1'].initial = effective_class.volumes.volume_first_quadrimester
+        self.fields['hourly_volume_partial_q2'].initial = effective_class.volumes.volume_second_quadrimester
+        self.__init_learning_unit_campus(effective_class.teaching_place)
+
+    def get_command(self) -> UpdateEffectiveClassCommand:
+        return UpdateEffectiveClassCommand(
+            class_code=self.cleaned_data['class_code'],
+            learning_unit_code=self.learning_unit.code,
+            year=self.learning_unit.year,
+            title_fr=self.cleaned_data['title_fr'],
+            title_en=self.cleaned_data['title_en'],
+            teaching_place_uuid=self.cleaned_data['learning_unit_campus'],
+            derogation_quadrimester=self.cleaned_data['quadrimester'],
+            session_derogation=self.cleaned_data['session'],
+            volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'],
+            volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'],
+        )
+
+    def __init_learning_unit_campus(self, teaching_place):
+        campuses = message_bus_instance.invoke(SearchUclouvainCampusesCommand())  # type: List[UclouvainCampus]
+        choices = [(campus.entity_id.uuid, str(campus)) for campus in campuses]
+        self.fields['learning_unit_campus'].choices = choices
+        campus = next(
+            (campus for campus in campuses if campus.entity_id == teaching_place),
+            None
+        )
+        self.initial['learning_unit_campus'] = campus.entity_id.uuid

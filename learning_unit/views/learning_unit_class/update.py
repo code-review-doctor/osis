@@ -31,21 +31,19 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.learning_unit_year import LearningUnitYear
-from base.views.common import display_success_messages, display_error_messages
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEffectiveClassCommand, \
-    GetEffectiveClassCommand
+from base.views.common import display_success_messages
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
-from learning_unit.forms.classes.update import ClassForm
+from learning_unit.forms.classes.update import UpdateClassForm
 
 
-class CreateClassView(PermissionRequiredMixin, FormView):
+class UpdateClassView(PermissionRequiredMixin, FormView):
     template_name = "class/update.html"
-    form_class = ClassForm
-    permission_required = 'base.can_create_class'
+    form_class = UpdateClassForm
+    permission_required = 'base.can_create_class'  # TODO : adapt to update
 
     @cached_property
     def year(self) -> int:
@@ -56,25 +54,41 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         return self.kwargs['learning_unit_code']
 
     @cached_property
+    def class_code(self) -> int:
+        return self.kwargs['class_code']
+
+    @cached_property
     def learning_unit(self) -> 'LearningUnit':
         return message_bus_instance.invoke(
             GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
 
     def get(self, request, *args, **kwargs):
-        try:
-            message_bus_instance.invoke(
-                CanCreateEffectiveClassCommand(learning_unit_code=self.learning_unit_code, learning_unit_year=self.year)
-            )
-        except MultipleBusinessExceptions as e:
-            display_error_messages(request, [exc.message for exc in e.exceptions])
-            return self.redirect_to_learning_unit_identification()
+        # TODO :: Add permission check, like it has been done below for the creation
+        # try:
+        #     message_bus_instance.invoke(
+        #         CanCreateEffectiveClassCommand(
+        #             learning_unit_code=self.learning_unit_code,
+        #             learning_unit_year=self.year
+        #         )
+        #     )
+        # except MultipleBusinessExceptions as e:
+        #     display_error_messages(request, [exc.message for exc in e.exceptions])
+        #     return self.redirect_to_learning_unit_identification()
 
         return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self):
+        effective_class = message_bus_instance.invoke(
+            GetEffectiveClassCommand(
+                class_code=self.class_code,
+                learning_unit_code=self.learning_unit_code,
+                learning_unit_year=self.year
+            )
+        )
         kwargs = super().get_form_kwargs()
         kwargs['learning_unit'] = self.learning_unit
+        kwargs['effective_class'] = effective_class
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -88,17 +102,18 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         )
 
     def post(self, request, *args, **kwargs):
-        form = ClassForm(request.POST, learning_unit=self.learning_unit, user=request.user)
+        form = UpdateClassForm(request.POST, learning_unit=self.learning_unit, user=request.user)
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
-            return self.redirect_to_learning_unit_identification()
+            return self.redirect_to_effective_class_identification()
 
         return render(request, self.template_name, {
             "form": form,
         })
 
-    def redirect_to_learning_unit_identification(self):
+    def redirect_to_effective_class_identification(self):
+        # TODO :: Redirect to effective_class identification in view mode
         return redirect(
             reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
         )
@@ -112,5 +127,5 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             )
         )
         return _("Class %(effective_class_complete_acronym)s successfully created.") % {
-            "effective_class_complete_acronym": effective_class.complete_code
+            "effective_class_complete_acronym": effective_class.complete_acronym
         }
