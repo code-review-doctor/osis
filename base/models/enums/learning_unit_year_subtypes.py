@@ -25,7 +25,6 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from base.models.utils.utils import ChoiceEnum
 
 FULL = "FULL"
 PARTIM = "PARTIM"
@@ -34,8 +33,3 @@ LEARNING_UNIT_YEAR_SUBTYPES = (
     (FULL, _("Full")),
     (PARTIM, _("Partim"))
 )
-
-
-class LearningUnitSubtype(ChoiceEnum):
-    FULL = _("Full")
-    PARTIM = _("Partim")
