@@ -28,7 +28,7 @@ from typing import List, Optional
 import attr
 
 from base.models.enums.internship_subtypes import InternshipSubtype
-from base.models.enums.learning_unit_year_subtypes import LearningUnitType
+from base.models.enums.learning_unit_year_subtypes import LearningUnitSubtype
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession

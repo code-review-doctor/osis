@@ -102,6 +102,7 @@ class EffectiveClassRepositoryTestCase(TestCase):
         self.assertEqual(effective_class.titles.fr, class_db.title_fr)
         self.assertEqual(effective_class.titles.en, class_db.title_en)
         self.assertEqual(effective_class.derogation_quadrimester.value, class_db.quadrimester)
-        self.assertEqual(DerogationSession[effective_class.session_derogation].value, class_db.session)
+        self.assertIsInstance(effective_class.session_derogation, DerogationSession)
+        self.assertEqual(effective_class.session_derogation.value, class_db.session)
         self.assertEqual(effective_class.volumes.volume_first_quadrimester, class_db.hourly_volume_partial_q1)
         self.assertEqual(effective_class.volumes.volume_second_quadrimester, class_db.hourly_volume_partial_q2)

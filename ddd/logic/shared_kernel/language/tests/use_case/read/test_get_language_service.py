@@ -40,7 +40,7 @@ class TestGetLanguageService(SimpleTestCase):
         self.language_repository.save(self.language)
         self.command = GetLanguageCommand(code_iso=self.language.entity_id.code_iso)
 
-    def test_get_correct_learning_unit(self):
+    def test_should_return_french_language(self):
         language = get_language_service.get_language(
             self.command,
             self.language_repository,

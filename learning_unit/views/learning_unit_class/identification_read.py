@@ -112,7 +112,7 @@ def get_related_history(
         learning_unit_year: LearningUnitYear,
         effective_class: 'EffectiveClass'
 ) -> List[Version]:
-
+    # TODO :: Integration in DDD
     effective_class = LearningClassYear.objects.get(
         learning_component_year__learning_unit_year=learning_unit_year,
         acronym=effective_class.entity_id.class_code)
