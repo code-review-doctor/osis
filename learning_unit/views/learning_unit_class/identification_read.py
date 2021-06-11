@@ -138,4 +138,4 @@ def get_related_history(
 def get_teaching_place(teaching_place: 'UclouvainCampusIdentity') -> str:
     return message_bus_instance.invoke(
         GetCampusCommand(uuid=teaching_place.uuid)
-    ),  # type: Campus
+    )  # type: Campus

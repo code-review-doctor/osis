@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label>
-                                        {% trans 'LU' %}({{ learning_unit.learning_unit_type.value }})
+                                        {% trans 'LU' %}({% trans 'Full' %})
                                     </label>
                                     <br>
                                     <span id="id_type">
@@ -253,7 +253,7 @@
                                 {% trans 'Learning location' %}
                             </label>
                             <br>
-                            {{teaching_place|default_if_none:'-'  }}
+                            {{teaching_place.name|default_if_none:'-'  }}
                         </div>
                         <br>
                         <div>

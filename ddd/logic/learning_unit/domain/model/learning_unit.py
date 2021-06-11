@@ -80,7 +80,6 @@ class LearningUnit(interface.RootEntity):
     practical_part = attr.ib(type=PracticalPart)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
-    learning_unit_type = attr.ib(type=str)
 
     @property
     def academic_year(self) -> 'AcademicYearIdentity':

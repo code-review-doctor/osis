@@ -89,7 +89,6 @@ class LearningUnitFromRepositoryDTO(DTO):
     teaching_place_uuid = attr.ib(type=str)
     professional_integration = attr.ib(type=bool)
     is_active = attr.ib(type=bool)
-    learning_unit_type = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

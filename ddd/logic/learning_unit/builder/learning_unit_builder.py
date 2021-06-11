@@ -118,7 +118,6 @@ class LearningUnitBuilder(RootEntityBuilder):
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=False,  # TODO :: to implement and unit test
             is_active=False,  # TODO :: to implement and unit test
-            learning_unit_type=dto.learning_unit_type
         )
 
     @classmethod
@@ -183,7 +182,6 @@ class LearningUnitBuilder(RootEntityBuilder):
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto.teaching_place_uuid),
             professional_integration=dto.professional_integration,
             is_active=dto.is_active,
-            learning_unit_type=LearningUnitSubtype[dto.learning_unit_type] if dto.learning_unit_type else None,
         )
 
     @classmethod
