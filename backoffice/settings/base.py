@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'hijack_admin',
     'reversion',
     'django.contrib.gis',
+    'ddd',
 )
 
 
