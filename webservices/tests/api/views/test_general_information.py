@@ -39,7 +39,7 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.tests.ddd.factories.group import GroupFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd import command
 from program_management.ddd.service.read import get_program_tree_service
@@ -150,7 +150,8 @@ class GeneralInformationTestCase(APITestCase):
                 'offer': self.egy,
                 'group': GroupFactory(
                     type=self.group.education_group_type,
-                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year)
+                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year),
+                    persist=False
                 )
             }
         )
@@ -173,7 +174,8 @@ class GeneralInformationTestCase(APITestCase):
                 'offer': self.egy,
                 'group': GroupFactory(
                     type=self.group.education_group_type,
-                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year)
+                    entity_identity=GroupIdentity(code=self.group.partial_acronym, year=self.group.academic_year.year),
+                    persist=False
                 )
             }
         )

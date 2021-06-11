@@ -26,7 +26,7 @@
 
 from django.test import SimpleTestCase
 
-from education_group.tests.ddd.factories.diploma import DiplomaAimFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaAimFactory
 
 
 class TestDiplomaAim(SimpleTestCase):
