@@ -26,7 +26,7 @@
 
 from django.test import SimpleTestCase
 
-from education_group.tests.ddd.factories.isced_domain import IscedDomainFactory
+from education_group.tests.ddd.factories.domain.isced_domain import IscedDomainFactory
 
 
 class TestIscedDomain(SimpleTestCase):

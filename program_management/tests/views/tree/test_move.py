@@ -31,9 +31,8 @@ from django.urls import reverse
 from waffle.testutils import override_flag
 
 from base.tests.factories.person import CentralManagerForUEFactory
+from program_management.ddd.command import OrderUpLinkCommand, OrderDownLinkCommand
 from program_management.ddd.domain import node
-from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
-from program_management.tests.ddd.factories.commands.order_up_link_command import OrderUpLinkCommandFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -56,7 +55,9 @@ class TestUp(TestCase):
         response = self.client.post(self.url, data=self.post_valid_data, HTTP_REFERER=http_referer)
         self.assertRedirects(response, http_referer)
 
-        mock_up.assert_called_with(OrderUpLinkCommandFactory(path=self.path))
+        mock_up.assert_called_with(
+            OrderUpLinkCommand(path=self.path)
+        )
 
 
 @override_flag('education_group_update', active=True)
@@ -78,4 +79,6 @@ class TestDown(TestCase):
         response = self.client.post(self.url, data=self.post_valid_data, HTTP_REFERER=http_referer)
         self.assertRedirects(response, http_referer)
 
-        mock_down.assert_called_with(OrderDownLinkCommandFactory(path=self.path))
+        mock_down.assert_called_with(
+            OrderDownLinkCommand(path=self.path)
+        )

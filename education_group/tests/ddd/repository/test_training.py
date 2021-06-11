@@ -32,18 +32,21 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory as CampusModelDbFactory
 from base.tests.factories.certificate_aim import CertificateAimFactory as CertificateAimModelDbFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
-from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
+    BachelorEducationGroupTypeFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
+from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.tests.ddd.factories.campus import CampusIdentityFactory
-from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
-from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
-from education_group.tests.ddd.factories.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
-from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory
+from education_group.tests.ddd.factories.domain.campus import CampusFactory
+from education_group.models.cohort_year import CohortYear as CohortYearModelDb
+from education_group.tests.ddd.factories.domain.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
+from education_group.tests.ddd.factories.domain.isced_domain import IscedDomainIdentityFactory
+from education_group.tests.ddd.factories.domain.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
 from reference.models.domain import Domain
 from reference.tests.factories.domain import DomainFactory as DomainModelDbFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory as DomainIscedFactoryModelDb
@@ -57,6 +60,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
 
         cls.repository = TrainingRepository()
 
+        BachelorEducationGroupTypeFactory()
         cls.education_group_type = TrainingEducationGroupTypeFactory()
         cls.language = LanguageModelDbFactory()
         cls.study_domain = DomainModelDbFactory()
@@ -69,7 +73,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             decree_name=cls.study_domain.decree.name,
             code=cls.study_domain.code
         )
-        campus_identity = CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
+        campus_identity = CampusFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
         training_identity = TrainingIdentityFactory(year=cls.year)
         cls.training = TrainingFactory(
             entity_id=training_identity,
@@ -86,6 +90,22 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             secondary_domains=[
                 StudyDomainFactory(entity_id=study_domain_identity)
             ],
+        )
+        cls.my_bac = BachelorFactory(
+            entity_id=training_identity,
+            entity_identity=training_identity,
+            start_year=cls.year,
+            end_year=cls.year,
+            main_language__name=cls.language.name,
+            main_domain__entity_id=study_domain_identity,
+            isced_domain__entity_id=IscedDomainIdentityFactory(code=cls.isced_domain.code),
+            management_entity__acronym=cls.entity_version.acronym,
+            administration_entity__acronym=cls.entity_version.acronym,
+            enrollment_campus=campus_identity,
+            secondary_domains=[
+                StudyDomainFactory(entity_id=study_domain_identity)
+            ],
+            first_year_bachelor__administration_entity__acronym=cls.entity_version.acronym
         )
 
     def test_fields_mapping(self):
@@ -114,6 +134,19 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             )
         )
 
+    def test_first_year_bachelor_created(self):
+        entity_id = self.repository.create(self.my_bac)
+
+        education_group_year = EducationGroupYearModelDb.objects.get(
+            acronym=entity_id.acronym,
+            academic_year__year=entity_id.year,
+        )
+
+        first_year_bachelor = CohortYearModelDb.objects.get_first_year_bachelor(
+            education_group_year=education_group_year
+        )
+        self.assertTrue(first_year_bachelor)
+
 
 class TestTrainingRepositoryUpdateMethod(TestCase):
     @classmethod
@@ -123,7 +156,23 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
             academic_year__current=True
+        )
 
+        cls.bachelor_mdl = EducationGroupYearBachelorFactory(
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+            academic_year__current=True,
+            gen_first_year_bachelor__administration_entity=cls.entity_version.entity
+        )
+        cls.fyb = CohortYearModelDb.objects.get_first_year_bachelor(
+            education_group_year=cls.bachelor_mdl
+        )
+
+        cls.bachelor = TrainingRepository.get(
+            TrainingIdentityFactory(
+                acronym=cls.bachelor_mdl.acronym,
+                year=cls.bachelor_mdl.academic_year.year
+            )
         )
 
         cls.training = TrainingRepository.get(
@@ -163,7 +212,7 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             isced_domain__entity_id__code=self.isced_domain.code,
             management_entity=self.training.management_entity,
             administration_entity=self.training.administration_entity,
-            enrollment_campus=CampusIdentityFactory(
+            enrollment_campus=CampusFactory(
                 name=self.campus.name,
                 university_name=self.campus.organization.name
             ),
@@ -172,7 +221,7 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             ],
             diploma__aims=[
                 DiplomaAimFactory(entity_id=diploma_aim_identity)
-            ]
+            ],
         )
 
         TrainingRepository.update(updated_training)
@@ -184,6 +233,16 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             updated_training,
             self.entity_version.entity.id
         )
+
+    def test_update_bachelor(self):
+        self.assertEqual(self.fyb.administration_entity, self.entity_version.entity)
+        self.bachelor.first_year_bachelor.administration_entity = None
+        TrainingRepository.update(self.bachelor)
+
+        self.bachelor_mdl.refresh_from_db()
+        self.fyb.refresh_from_db()
+
+        self.assertEqual(self.fyb.administration_entity, None)
 
 
 class TestTrainingRepositoryGetMethod(TestCase):
@@ -226,6 +285,16 @@ class TestTrainingRepositoryGetMethod(TestCase):
         for idx, aims in enumerate(expected_order):
             self.assertEqual(result.diploma.aims[idx].section, aims.section)
             self.assertEqual(result.diploma.aims[idx].code, aims.code)
+
+    def test_get_bachelor(self):
+        ev = EntityVersionModelDbFactory()
+        egy = EducationGroupYearBachelorFactory(gen_first_year_bachelor__administration_entity=ev.entity)
+
+        training_identity = generate_training_identity_from_education_group_year(egy)
+
+        result = TrainingRepository.get(training_identity)
+        self.assertIsInstance(result, Bachelor)
+        self.assertEqual(result.first_year_bachelor.administration_entity.acronym, ev.acronym)
 
 
 class TestTrainingRepositorySearchMethod(TestCase):

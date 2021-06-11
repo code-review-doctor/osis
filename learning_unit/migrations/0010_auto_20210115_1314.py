@@ -99,8 +99,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_proposal_limited_calendar, remove_proposal_limited_calendar),
-        migrations.RunPython(create_proposal_extended_calendar, remove_proposal_extended_calendar),
-        migrations.RunPython(update_start_date_of_daily_management_calendars),
-        migrations.RunPython(remove_old_calendars),
+        migrations.RunPython(create_proposal_limited_calendar, remove_proposal_limited_calendar, elidable=True),
+        migrations.RunPython(create_proposal_extended_calendar, remove_proposal_extended_calendar, elidable=True),
+        migrations.RunPython(update_start_date_of_daily_management_calendars, elidable=True),
+        migrations.RunPython(remove_old_calendars, elidable=True),
     ]
