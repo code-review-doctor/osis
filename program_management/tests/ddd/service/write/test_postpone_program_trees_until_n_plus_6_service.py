@@ -27,33 +27,21 @@ from program_management.ddd.domain.exception import ProgramTreeNotFoundException
 from program_management.ddd.service.read import get_program_tree_service
 from program_management.ddd.service.write.postpone_program_trees_until_n_plus_6_service import \
     postpone_program_trees_until_n_plus_6
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
 from testing.testcases import DDDTestCase
 
 
 class TestPostponeProgramTreesUntilNPlus6(DDDTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        pass
 
     def setUp(self) -> None:
-        self._init_fake_repos()
-
-        self.program_trees = [
-            ProgramTreeBachelorFactory(current_year=2020, end_year=2028),
-        ]
-        self.add_tree_to_repo(self.program_trees[0])
-
+        super().setUp()
         self.cmd = PostponeProgramTreesUntilNPlus6Command()
 
-        self.mock_service(
-            "program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_tree",
-            return_value=None
-        )
+        self.mock_service("program_management.ddd.domain.service.copy_tree_cms.CopyCms.from_tree", return_value=None)
 
     def test_should_stop_postponement_before_if_end_date_inferior_to_postponement_year(self):
-        tree = ProgramTreeBachelorFactory(current_year=2020, end_year=2025)
-        self.add_tree_to_repo(tree)
+        tree = OSIS2MFactory(end_year=2025)[0].tree
 
         postpone_program_trees_until_n_plus_6(self.cmd)
 
@@ -61,9 +49,10 @@ class TestPostponeProgramTreesUntilNPlus6(DDDTestCase):
             get_program_tree_service.get_program_tree(GetProgramTree(code=tree.entity_id.code, year=2026))
 
     def test_should_postpone_trees_until_n_plus_6(self):
+        tree = OSIS1BAFactory(end_year=2028, with_postpone=False)[0].tree
+
         postpone_program_trees_until_n_plus_6(self.cmd)
 
-        for tree in self.program_trees:
-            self.assertTrue(
-                get_program_tree_service.get_program_tree(GetProgramTree(code=tree.entity_id.code, year=2026))
-            )
+        self.assertTrue(
+            get_program_tree_service.get_program_tree(GetProgramTree(code=tree.entity_id.code, year=2026))
+        )

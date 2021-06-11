@@ -177,7 +177,7 @@ class GroupRepository(interface.AbstractRepository):
         return results[0]
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['GroupIdentity']] = None, **kwargs) -> List['Group']:
+    def search(cls, entity_ids: Optional[List['GroupIdentity']] = None, code: str = None, **kwargs) -> List['Group']:
         if entity_ids:
             qs = _get_group_year_qs()
             filter_or_clause = Q()
@@ -187,6 +187,9 @@ class GroupRepository(interface.AbstractRepository):
                     academic_year__year=entity_id.year
                 )
             return [_convert_db_model_to_ddd_model(obj) for obj in qs.filter(filter_or_clause)]
+        if code:
+            qs = _get_group_year_qs()
+            return [_convert_db_model_to_ddd_model(obj) for obj in qs.filter(partial_acronym=code)]
         return []
 
     @classmethod

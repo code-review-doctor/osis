@@ -36,17 +36,17 @@ from base.tests.factories.education_group_publication_contact import EducationGr
 from base.tests.factories.education_group_type import MiniTrainingEducationGroupTypeFactory
 from education_group.ddd.domain.group import GroupIdentity
 from education_group.ddd.domain.mini_training import MiniTrainingIdentity
-from education_group.tests.ddd.factories.academic_partner import AcademicPartnerFactory
-from education_group.tests.ddd.factories.address import AddressFactory
-from education_group.tests.ddd.factories.co_graduation import CoGraduationFactory
-from education_group.tests.ddd.factories.co_organization import CoorganizationFactory
-from education_group.tests.ddd.factories.content_constraint import ContentConstraintFactory
-from education_group.tests.ddd.factories.diploma import DiplomaFactory, DiplomaAimFactory
-from education_group.tests.ddd.factories.funding import FundingFactory
-from education_group.tests.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.remark import RemarkFactory
-from education_group.tests.ddd.factories.titles import TitlesFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.academic_partner import AcademicPartnerFactory
+from education_group.tests.ddd.factories.domain.address import AddressFactory
+from education_group.tests.ddd.factories.domain.co_graduation import CoGraduationFactory
+from education_group.tests.ddd.factories.domain.co_organization import CoorganizationFactory
+from education_group.tests.ddd.factories.domain.content_constraint import ContentConstraintFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory, DiplomaAimFactory
+from education_group.tests.ddd.factories.domain.funding import FundingFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
+from education_group.tests.ddd.factories.domain.remark import RemarkFactory
+from education_group.tests.ddd.factories.domain.titles import TitlesFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from program_management.business.xls_customized import _build_headers, TRAINING_LIST_CUSTOMIZABLE_PARAMETERS, \
     WITH_ACTIVITIES, WITH_ORGANIZATION, WITH_ARES_CODE, WITH_CO_GRADUATION_AND_PARTNERSHIP, \
@@ -62,7 +62,7 @@ from program_management.tests.ddd.factories.program_tree_version import Standard
     SpecificProgramTreeVersionFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-from education_group.tests.ddd.factories.study_domain import StudyDomainFactory
+from education_group.tests.ddd.factories.domain.study_domain import StudyDomainFactory
 
 FIRST_CUSTOMIZABLE_COL = 7
 
@@ -190,16 +190,19 @@ class XlsCustomizedContentTestCase(TestCase):
                                                   minimum=1,
                                                   maximum=15)
 
-        cls.group_training = GroupFactory(entity_identity__code=cls.training_version.root_group.partial_acronym,
-                                          entity_identity__year=cls.current_year,
-                                          content_constraint=cls.constraint,
-                                          remark=remark
-                                          )
-        cls.training = TrainingFactory(entity_identity__acronym=cls.training_version.root_group.partial_acronym,
-                                       entity_identity__year=cls.current_year,
-                                       internal_comment='Internal comment',
-                                       start_year=cls.current_year,
-                                       end_year=cls.current_year+6)
+        cls.group_training = GroupFactory(
+            entity_identity__code=cls.training_version.root_group.partial_acronym,
+            entity_identity__year=cls.current_year,
+            content_constraint=cls.constraint,
+            remark=remark,
+        )
+        cls.training = TrainingFactory(
+            entity_identity__acronym=cls.training_version.root_group.partial_acronym,
+            entity_identity__year=cls.current_year,
+            internal_comment='Internal comment',
+            start_year=cls.current_year,
+            end_year=cls.current_year+6,
+        )
 
         root_node_training = NodeGroupYearFactory(node_type=TrainingType.PGRM_MASTER_120,
                                                   offer_partial_title_fr='LDROI200M',
@@ -236,7 +239,7 @@ class XlsCustomizedContentTestCase(TestCase):
             entity_identity__code=cls.mini_training_version.root_group.partial_acronym,
             entity_identity__year=cls.current_year,
             content_constraint=cls.constraint,
-            remark=remark
+            remark=remark,
         )
 
         cls.group = GroupFactory(
@@ -244,7 +247,7 @@ class XlsCustomizedContentTestCase(TestCase):
             start_year=cls.current_year,
             type=GroupType.COMMON_CORE.name,
             content_constraint=cls.constraint,
-            remark=remark
+            remark=remark,
         )
 
     def test_build_validity_for_training(self):
@@ -263,12 +266,9 @@ class XlsCustomizedContentTestCase(TestCase):
     def test_get_start_year(self):
         standard_current_version = StandardProgramTreeVersionFactory()
         particular_current_version = SpecificProgramTreeVersionFactory()
-        training = TrainingFactory(start_year=2020,
-                                   end_year=2021)
-        mini_training = MiniTrainingFactory(start_year=2022,
-                                            end_year=2023)
-        group = GroupFactory(start_year=2018,
-                             end_year=2019)
+        training = TrainingFactory(start_year=2020, end_year=2021)
+        mini_training = MiniTrainingFactory(start_year=2022, end_year=2023)
+        group = GroupFactory(start_year=2018, end_year=2019)
         self.assertEqual(_get_start_year(standard_current_version, training, group),
                          "{}-{}".format(str(training.start_year), str(training.start_year + 1)[-2:]))
         self.assertEqual(_get_start_year(particular_current_version, training, group),
@@ -313,13 +313,10 @@ class XlsCustomizedContentTestCase(TestCase):
     def test_end_year(self):
         standard_current_version = StandardProgramTreeVersionFactory()
         particular_current_version = SpecificProgramTreeVersionFactory()
-        training = TrainingFactory(start_year=2020,
-                                   end_year=2021)
+        training = TrainingFactory(start_year=2020, end_year=2021)
         training_without_end_year = TrainingFactory(start_year=2020, end_year=None)
-        mini_training = MiniTrainingFactory(start_year=2022,
-                                            end_year=2023)
-        group = GroupFactory(start_year=2018,
-                             end_year=2019)
+        mini_training = MiniTrainingFactory(start_year=2022,end_year=2023)
+        group = GroupFactory(start_year=2018, end_year=2019)
         self.assertEqual(_get_end_year(standard_current_version, training, group),
                          "{}-{}".format(str(training.end_year), str(training.end_year + 1)[-2:]))
         self.assertEqual(_get_end_year(particular_current_version, training, group),
@@ -350,10 +347,12 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
             cls.aims1,
             cls.aims2,
         ])
-        cls.training = TrainingFactory(titles=titles, diploma=diplomas_factory,
-                                       type=TrainingType.BACHELOR)
-        cls.training_finality = TrainingFactory(titles=titles,
-                                                type=TrainingType.MASTER_MA_120)
+        cls.training = TrainingFactory(
+            titles=titles,
+            diploma=diplomas_factory,
+            type=TrainingType.BACHELOR,
+        )
+        cls.training_finality = TrainingFactory(titles=titles, type=TrainingType.MASTER_MA_120)
 
         cls.mini_training = MiniTrainingFactory(titles=titles)
         cls.group = GroupFactory(titles=titles)
@@ -456,7 +455,8 @@ class XlsCustomizedContentTitlesPartialAndEnTestCase(TestCase):
         education_group_version = StandardEducationGroupVersionFactory()
 
         g = GroupFactory(entity_identity=GroupIdentity(code=education_group_version.offer.partial_acronym,
-                                                       year=education_group_version.offer.academic_year.year))
+                                                       year=education_group_version.offer.academic_year.year),
+                         )
         academic_responsible_contact = EducationGroupPublicationContactFactory(
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name,
             role_fr='dummy role in french',
