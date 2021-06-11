@@ -33,6 +33,7 @@ from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.validator.validators_by_business_action import UpdateEffectiveClassValidatorList
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from osis_common.ddd import interface
 
@@ -57,12 +58,12 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     entity_id = attr.ib(type=EffectiveClassIdentity)
     titles = attr.ib(type=ClassTitles)
     teaching_place = attr.ib(type=UclouvainCampusIdentity)
-    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
-    session_derogation = attr.ib(type=DerogationSession)
     volumes = attr.ib(type=ClassVolumes)
+    derogation_quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
+    session_derogation = attr.ib(type=DerogationSession, default=None)
 
     @property
-    def complete_acronym(self):
+    def complete_code(self) -> str:
         return "{}{}{}".format(
             self.entity_id.learning_unit_identity.code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
@@ -70,8 +71,18 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         )
 
     def update(self, cmd: UpdateEffectiveClassCommand) -> None:
-        # ValidatorList (même contenu que création)
-        pass  # TODO :: to implement
+        UpdateEffectiveClassValidatorList(command=cmd).validate()
+        # self.entity_id.class_code = cmd.class_code  # FIXME :: gérer la mise à jour du code de la classe
+        self.titles = ClassTitles(fr=cmd.title_fr, en=cmd.title_en)
+        self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
+        self.derogation_quadrimester.uuid = cmd.teaching_place_uuid
+        quadri = cmd.derogation_quadrimester
+        self.derogation_quadrimester = DerogationQuadrimester[quadri] if quadri else None
+        self.session_derogation = DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None
+        self.volumes = ClassVolumes(
+            volume_first_quadrimester=cmd.volume_first_quadrimester,
+            volume_second_quadrimester=cmd.volume_second_quadrimester
+        )
 
 
 class PracticalEffectiveClass(EffectiveClass):

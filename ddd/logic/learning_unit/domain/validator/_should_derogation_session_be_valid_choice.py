@@ -23,23 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
-from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from base.ddd.utils.business_validator import BusinessValidator
+from base.models.enums.learning_unit_year_session import DerogationSession
+from ddd.logic.learning_unit.domain.validator.exceptions import DerogationSessionInvalidChoiceException
+
+MINIMUM_VALUE = 1
 
 
-def check_can_create_effective_class(
-        cmd: 'CanCreateEffectiveClassCommand',
-        learning_unit_repository: 'ILearningUnitRepository'
-) -> None:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.learning_unit_year
-    )
-    learning_unit = learning_unit_repository.get(learning_unit_identity)
-    CanCreateEffectiveClass().verify(
-        learning_unit=learning_unit,
-        learning_unit_repository=learning_unit_repository
-    )
+@attr.s(frozen=True, slots=True)
+class ShouldDerogationSessionBeValidChoice(BusinessValidator):
+
+    derogation_session = attr.ib(type=str)
+
+    def validate(self, *args, **kwargs):
+        if self.derogation_session and self.derogation_session not in DerogationSession.get_values():
+            raise DerogationSessionInvalidChoiceException(self.derogation_session)

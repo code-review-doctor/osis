@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-07 08:12+0200\n"
+"POT-Creation-Date: 2021-06-08 17:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-brace-format
+msgid "'{value}' is not a valid derogation quadrimester."
+msgstr ""
+
+#, python-brace-format
+msgid "'{value}' is not a valid derogation session."
+msgstr ""
 
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr ""
@@ -52,7 +60,7 @@ msgid "Selected entity {} is not an authorized responsible entity"
 msgstr ""
 
 #, python-format
-msgid "The code %('ue_code')s - %(code)s already exists for %(ue)s"
+msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr ""
 
 msgid "The code {} already exists"
@@ -71,6 +79,9 @@ msgstr ""
 msgid ""
 "The sum of first/second quadrimesters volumes should be equal to annual "
 "volume of the learning unit ({})"
+msgstr ""
+
+msgid "The teaching place is required."
 msgstr ""
 
 msgid ""

@@ -12,7 +12,7 @@ from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, Volumes, PracticalPart
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     ExternalLearningUnit
-from ddd.logic.learning_unit.test.factory.ucl_entity import UclEntityIdentityFactory, DRTEntityFactory
+from ddd.logic.learning_unit.tests.factory.ucl_entity import UclEntityIdentityFactory, DRTEntityFactory
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
@@ -67,7 +67,7 @@ class _PartimIdentityFactory(factory.Factory):
         model = PartimIdentity
         abstract = False
 
-    subdivision = factory.fuzzy.FuzzyText(length=10)
+    subdivision = factory.fuzzy.FuzzyText(length=1)
 
 
 class _PartimFactory(factory.Factory):
@@ -242,3 +242,63 @@ class LDROI1004CourseWithoutVolumesLearningUnitFactory(_CourseLearningUnitFactor
     )
     lecturing_part = None
     practical_part = None
+
+
+class CourseWithPracticalVolumesOnly(_CourseLearningUnitFactory):
+    lecturing_part = None
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = []
+
+
+class CourseWithLecturingVolumesOnly(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = None
+    partims = []
+
+
+class CourseWithLecturingAndPracticalVolumes(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = []
+
+
+class CourseWithOnePartim(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = factory.List([factory.SubFactory(_PartimFactory)])
