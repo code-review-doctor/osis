@@ -80,37 +80,6 @@ class UpdateClassService(SimpleTestCase):
             update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
             self.assertEqual(str(none_type.exception), "'NoneType' object has no attribute 'update'")
 
-    # def test_should_class_code_be_alphanumeric(self):  # FIXME :: gérer la mise à jour du code de la classe
-    #     cmd = attr.evolve(
-    #         self.update_class_cmd,
-    #         class_code='*',
-    #     )
-    #     with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-    #         update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
-    #     self.assertIsInstance(
-    #         class_exceptions.exception.exceptions.pop(),
-    #         ShouldBeAlphanumericException
-    #     )
-
-    # def test_should_update_class_code(self):  # FIXME :: gérer la mise à jour du code de la classe
-    #     new_code = '1'
-    #     cmd = attr.evolve(
-    #         self.update_class_cmd,
-    #         class_code=new_code,
-    #     )
-    #     update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
-    #     # new_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-    #     #     class_code=new_code,
-    #     #     learning_unit_code=cmd.learning_unit_code,
-    #     #     learning_unit_year=cmd.year,
-    #     # )
-    #     persisted_class_identity = self.effective_class_repository.get(new_identity)
-    #     self.assertEqual(new_code, persisted_class_identity.code)
-    #     self.assertIsInstance(
-    #         class_exceptions.exception.exceptions.pop(),
-    #         ShouldBeAlphanumericException
-    #     )
-
     def test_should_class_volumes_be_consistent_with_learning_unit(self):
         annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
         bad_repartition = annual_volume + 10.0

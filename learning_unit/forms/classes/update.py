@@ -258,6 +258,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
 class UpdateClassForm(ClassForm):
 
+    class_code = UpperCaseCharField(max_length=1, disabled=True, required=False, label=_('Code'))
+
     def __init__(
             self,
             *args,
