@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import datetime
+from typing import List
 
 import attr
 
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd.interface import DTO
 
 
@@ -35,3 +37,21 @@ class AcademicYearDataDTO(DTO):
     year = attr.ib(type=str)
     start_date = attr.ib(type=datetime.date)
     end_date = attr.ib(type=datetime.date)
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitAttributionFromRepositoryDTO(DTO):
+    function = attr.ib(type=str)
+    attribution_uuid = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+    effective_classes = attr.ib(type=List[EffectiveClassFromRepositoryDTO])
+    attribution_volume = attr.ib(type=float)
+
+
+@attr.s(frozen=True, slots=True)
+class TutorSearchDTO(DTO):
+    last_name = attr.ib(type=str)
+    first_name = attr.ib(type=str)
+    personal_id_number = attr.ib(type=str)
+    attributions = attr.ib(type=List[LearningUnitAttributionFromRepositoryDTO])
