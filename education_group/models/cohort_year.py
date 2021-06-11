@@ -23,7 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -101,3 +104,8 @@ class CohortYear(SerializableModel):
         constraints = [
             models.UniqueConstraint(fields=['education_group_year', 'name'], name='unique_education_group_year_cohort')
         ]
+
+    @cached_property
+    def acronym(self):
+        pattern_1ba = re.compile(r'1BA')
+        return pattern_1ba.sub('11BA', self.education_group_year.acronym)
