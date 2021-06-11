@@ -55,4 +55,3 @@ class TutorSearchDTO(DTO):
     first_name = attr.ib(type=str)
     personal_id_number = attr.ib(type=str)
     attributions = attr.ib(type=List[LearningUnitAttributionFromRepositoryDTO])
-
