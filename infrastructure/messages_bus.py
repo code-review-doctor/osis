@@ -29,14 +29,16 @@ from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearn
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
+from ddd.logic.shared_kernel.campus.use_case.read.get_campus_service import get_campus
+from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
-from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
+from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand, GetCampusCommand
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
-from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
+from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -70,6 +72,8 @@ class MessageBus:
         CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
+        GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
+        GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
