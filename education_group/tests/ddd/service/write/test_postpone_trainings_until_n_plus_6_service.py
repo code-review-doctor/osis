@@ -27,25 +27,18 @@ from education_group.ddd.domain.exception import TrainingNotFoundException
 from education_group.ddd.service.read import get_training_service
 from education_group.ddd.service.write.postpone_trainings_until_n_plus_6_service import \
     postpone_trainings_until_n_plus_6
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from testing.testcases import DDDTestCase
 
 
 class TestPostponeTrainingsUntilNPlus6(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
         self.trainings = [
-            TrainingFactory(entity_identity__year=2021, end_year=None),
-            TrainingFactory(entity_identity__year=2021, end_year=2029),
-            TrainingFactory(entity_identity__year=2025, end_year=None),
+            TrainingFactory(entity_identity__year=2021, end_year=None, persist=True),
+            TrainingFactory(entity_identity__year=2021, end_year=2029, persist=True),
+            TrainingFactory(entity_identity__year=2025, end_year=None, persist=True),
         ]
-
-        self.fake_training_repository = get_fake_training_repository(self.trainings)
-        self.mock_repo(
-            "education_group.ddd.repository.training.TrainingRepository",
-            self.fake_training_repository
-        )
 
         self.cmd = PostponeTrainingsUntilNPlus6Command()
 

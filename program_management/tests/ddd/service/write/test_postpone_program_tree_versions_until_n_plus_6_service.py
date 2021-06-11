@@ -23,29 +23,22 @@
 #
 ##############################################################################
 from program_management.ddd.command import GetProgramTreeVersionCommand, PostponeProgramTreeVersionsUntilNPlus6Command
-from program_management.ddd.domain.exception import ProgramTreeVersionNotFoundException
 from program_management.ddd.service.read import get_program_tree_version_service
 from program_management.ddd.service.write.postpone_program_tree_versions_until_n_plus_6_service import \
     postpone_program_tree_versions_until_n_plus_6
-from program_management.tests.ddd.factories.domain.program_tree.BACHELOR_1BA import ProgramTreeBachelorFactory
-from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
+
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
 from testing.testcases import DDDTestCase
 
 
 class TestPostponeProgramTreeVersionsUntilNPlus6(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
-
-        self.program_tree_versions = [
-            ProgramTreeVersionFactory(tree=ProgramTreeBachelorFactory(current_year=2020, end_year=2028))
-        ]
-        self.add_tree_version_to_repo(self.program_tree_versions[0])
+        super().setUp()
 
         self.cmd = PostponeProgramTreeVersionsUntilNPlus6Command()
 
     def test_should_stop_postponement_before_if_end_date_inferior_to_postponement_year(self):
-        tree_version = ProgramTreeVersionFactory(tree=ProgramTreeBachelorFactory(current_year=2020, end_year=2025))
-        self.add_tree_version_to_repo(tree_version)
+        tree_version = OSIS2MFactory(end_year=2025)[0]
 
         postpone_program_tree_versions_until_n_plus_6(self.cmd)
 
@@ -61,16 +54,17 @@ class TestPostponeProgramTreeVersionsUntilNPlus6(DDDTestCase):
         )
 
     def test_should_postpone_trees_until_n_plus_6(self):
+        tree_version = OSIS2MFactory(end_year=2028)[0]
+
         postpone_program_tree_versions_until_n_plus_6(self.cmd)
 
-        for tree_version in self.program_tree_versions:
-            self.assertTrue(
-                get_program_tree_version_service.get_program_tree_version(
-                    GetProgramTreeVersionCommand(
-                        acronym=tree_version.entity_id.offer_acronym,
-                        version_name=tree_version.version_name,
-                        transition_name=tree_version.transition_name,
-                        year=2026
-                    )
+        self.assertTrue(
+            get_program_tree_version_service.get_program_tree_version(
+                GetProgramTreeVersionCommand(
+                    acronym=tree_version.entity_id.offer_acronym,
+                    version_name=tree_version.version_name,
+                    transition_name=tree_version.transition_name,
+                    year=2026
                 )
             )
+        )
