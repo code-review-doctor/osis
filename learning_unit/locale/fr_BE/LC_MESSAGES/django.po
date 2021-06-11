@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-10 14:59+0200\n"
+"POT-Creation-Date: 2021-06-11 17:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,12 @@ msgstr "Actions"
 
 msgid "Active"
 msgstr "Actif"
+
+msgid "Additional requirement entity 1"
+msgstr "Entité resp. cahier des charges complémentaire 1"
+
+msgid "Additional requirement entity 2"
+msgstr "Entité resp. cahier des charges complémentaire 2"
 
 msgid "Allocation entity"
 msgstr "Entité d'attribution"
@@ -80,6 +86,9 @@ msgstr "Remarque de faculté (non publiée)"
 
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
+
+msgid "Full"
+msgstr "Complet"
 
 msgid "Inactive"
 msgstr "Inactif"
@@ -165,6 +174,9 @@ msgstr "La proposition n'est pas dans un état éligible à la consolidation"
 
 msgid "Quadrimester"
 msgstr "Quadrimestre"
+
+msgid "Refer to learning unit"
+msgstr "Voir unité d'enseignement"
 
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
