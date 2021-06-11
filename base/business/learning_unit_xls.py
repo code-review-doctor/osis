@@ -470,7 +470,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             learning_unit_yr).values()
         if attributions_values:
             for value in attributions_values:
-                data.append(lu_data_part1+_get_attribution_detail(value))
+                data.append(lu_data_part1 + _get_attribution_detail(value))
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
@@ -575,7 +575,7 @@ def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
     for k, attribution in attributions.items():
         if attribution.get('person'):
             teachers.add(attribution.get('person'))
-    return teachers
+    return sorted(list(teachers), key=lambda person: person.full_name)
 
 
 def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:

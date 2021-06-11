@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-18 11:12+0200\n"
+"POT-Creation-Date: 2021-06-03 13:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,10 +83,31 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr ""
 
+msgid "1"
+msgstr ""
+
+msgid "12"
+msgstr ""
+
+msgid "123"
+msgstr ""
+
+msgid "13"
+msgstr ""
+
 msgid "1st quadri"
 msgstr ""
 
+msgid "2"
+msgstr ""
+
+msgid "23"
+msgstr ""
+
 msgid "2nd quadri"
+msgstr ""
+
+msgid "3"
 msgstr ""
 
 msgid "<b>create</b> a new learning unit using that acronym"
@@ -171,6 +192,9 @@ msgid "Academic year"
 msgstr ""
 
 msgid "Accepted"
+msgstr ""
+
+msgid "Access based on application"
 msgstr ""
 
 msgid "Access condition"
@@ -718,6 +742,9 @@ msgid "Dissertation presentation"
 msgstr ""
 
 msgid "Dissertation submission"
+msgstr ""
+
+msgid "Dissertations"
 msgstr ""
 
 msgid "Do not assign"
@@ -1495,9 +1522,6 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
 msgid "Maximum number of permitted relationships"
 msgstr ""
 
@@ -1508,9 +1532,6 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method not allowed"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Minerval complete"
@@ -1580,6 +1601,9 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "New class"
 msgstr ""
 
 msgid "New external learning unit"
@@ -1669,10 +1693,6 @@ msgstr ""
 msgid "Ok"
 msgstr ""
 
-msgid "On the file: direct access or access with additional training"
-msgstr ""
-"Based on application: accepted, conditional on further training, or refusal"
-
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
@@ -1746,6 +1766,9 @@ msgid "Own components"
 msgstr ""
 
 msgid "P."
+msgstr ""
+
+msgid "P23"
 msgstr ""
 
 msgid "Page not found."
@@ -2047,9 +2070,6 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
-msgid "Quadrimester derogation"
-msgstr ""
-
 msgid "Rate code"
 msgstr ""
 
@@ -2272,6 +2292,9 @@ msgid "Student path"
 msgstr ""
 
 msgid "Student search"
+msgstr ""
+
+msgid "Student's dissertations management"
 msgstr ""
 
 msgid "Students"
@@ -2645,9 +2668,6 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
-msgid "Trainings/gathering"
-msgstr ""
-
 msgid "Transformation"
 msgstr ""
 
@@ -2682,9 +2702,6 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
-msgstr ""
-
-msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
@@ -2824,6 +2841,11 @@ msgid "Yes, I confirm."
 msgstr ""
 
 msgid "You are succesfully logout."
+msgstr ""
+
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year "
+"or in the future"
 msgstr ""
 
 msgid ""

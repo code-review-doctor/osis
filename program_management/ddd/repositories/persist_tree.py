@@ -25,12 +25,10 @@
 ##############################################################################
 from typing import List, Set, Dict
 
-from django.db import transaction
 from django.db.models import F
 
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
-from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import _persist_prerequisite
 from program_management.models.element import Element
@@ -38,15 +36,7 @@ from program_management.models.element import Element
 ElementId = int
 
 
-@deprecated  # use ProgramTreeRepository.create() or .update() instead
-@transaction.atomic
-def persist(tree: 'ProgramTree') -> None:
-    __update_or_create_links(tree)
-    __delete_links(tree, tree.root_node)
-    _persist_prerequisite.persist(tree)
-
-
-def __update_or_create_links(tree: 'ProgramTree'):
+def _update_or_create_links(tree: 'ProgramTree'):
     links_has_changed = [
         link for link in tree.get_all_links() if link.has_changed
     ]
@@ -101,15 +91,11 @@ def __persist_group_element_year(link: 'Link', elements_by_identity: Dict['NodeI
         child_element_id=elements_by_identity[link.child.entity_id],
         defaults={
             'relative_credits': link.relative_credits,
-            'min_credits': link.min_credits,
-            'max_credits': link.max_credits,
             'is_mandatory': link.is_mandatory,
             'block': link.block,
             'access_condition': link.access_condition,
             'comment': link.comment,
             'comment_english': link.comment_english,
-            'own_comment': link.own_comment,
-            'quadrimester_derogation': link.quadrimester_derogation.name if link.quadrimester_derogation else None,
             # FIXME : Find a rules for enum in order to be consistant
             'link_type': link.link_type.name if isinstance(link.link_type, LinkTypes) else link.link_type,
             'order': link.order,
@@ -118,12 +104,12 @@ def __persist_group_element_year(link: 'Link', elements_by_identity: Dict['NodeI
     )
 
 
-def __delete_links(tree: 'ProgramTree', node: 'Node'):
+def _delete_links(tree: 'ProgramTree', node: 'Node'):
     for link in node._deleted_children:
         __persist_deleted_prerequisites(tree, link.child)
         __delete_group_element_year(link)
     for link in node.children:
-        __delete_links(tree, link.child)
+        _delete_links(tree, link.child)
 
 
 def __persist_deleted_prerequisites(tree: 'ProgramTree', node: 'Node'):

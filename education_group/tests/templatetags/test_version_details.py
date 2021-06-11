@@ -30,7 +30,7 @@ from education_group.templatetags.version_details import version_details
 from program_management.ddd.domain.node import NodeIdentity
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
-from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_repository
+from infrastructure.formation_catalogue.repository.in_memory.program_tree import InMemoryProgramTreeRepository
 
 YEAR = 2019
 
@@ -44,7 +44,8 @@ class TestVersionDetails(SimpleTestCase):
             entity_id__year=YEAR,
             entity_id__code=self.root_node_code,
         )
-        self.fake_program_tree_repository = get_fake_program_tree_repository([self.program_tree])
+        self.fake_program_tree_repository = InMemoryProgramTreeRepository()
+        self.fake_program_tree_repository.create(self.program_tree)
 
         self.program_tree_version = ProgramTreeVersionFactory(
             tree=self.program_tree,
@@ -56,7 +57,7 @@ class TestVersionDetails(SimpleTestCase):
     def test_version_details(self):
         node_identity = NodeIdentity(code=self.root_node_code, year=YEAR)
         result_data = version_details(node_identity, [self.program_tree_version])
-        self.assertEqual(result_data['title'], ' - Title fr')
+        self.assertEqual(result_data['title'], ' [Title fr]')
         self.assertEqual(result_data['version_label'], '[CEMS]')
 
     def test_no_version(self):

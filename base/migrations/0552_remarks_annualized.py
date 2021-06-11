@@ -58,8 +58,8 @@ class Migration(migrations.Migration):
             name='other_remark',
             field=models.TextField(blank=True, null=True, verbose_name='Other remark (intended for publication)'),
         ),
-        migrations.RunPython(copy_remarks_from_lu_to_luy),
-        migrations.RunPython(adapt_initial_data_from_proposals),
+        migrations.RunPython(copy_remarks_from_lu_to_luy, elidable=True),
+        migrations.RunPython(adapt_initial_data_from_proposals, elidable=True),
         migrations.RemoveField(
             model_name='learningunit',
             name='faculty_remark',

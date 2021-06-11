@@ -70,10 +70,9 @@ class AuthorizedRelationshipObject:
     max_count_authorized = attr.ib(type=int, converter=lambda value: INFINITE_VALUE if value is None else value)
 
 
+@attr.s()
 class AuthorizedRelationshipList:
-
-    def __init__(self, authorized_relationships: List[AuthorizedRelationshipObject]):
-        self.authorized_relationships = authorized_relationships
+    authorized_relationships = attr.ib(type=List[AuthorizedRelationshipObject])
 
     def get_authorized_relationship(
             self,
@@ -151,3 +150,11 @@ class AuthorizedRelationshipList:
 
     def __copy__(self) -> 'AuthorizedRelationshipList':
         return self.__class__(authorized_relationships=self.authorized_relationships.copy())
+
+    def is_mandatory_child_type(self, child_type: EducationGroupTypesEnum) -> bool:
+        return any(
+            auth_rel for auth_rel in self.authorized_relationships
+            if auth_rel.child_type == child_type
+            and auth_rel.min_count_authorized == 1
+            and auth_rel.max_count_authorized == 1
+        )

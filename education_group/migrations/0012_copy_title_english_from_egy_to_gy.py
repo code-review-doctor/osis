@@ -24,5 +24,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(fix_unsynchronized_title_english),
+        migrations.RunPython(fix_unsynchronized_title_english, elidable=True),
     ]

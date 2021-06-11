@@ -130,6 +130,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(copy_program_managers),
-        migrations.RunPython(copy_score_sheet_address)
+        migrations.RunPython(copy_program_managers, elidable=True),
+        migrations.RunPython(copy_score_sheet_address, elidable=True)
     ]
