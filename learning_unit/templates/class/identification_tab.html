@@ -262,7 +262,7 @@
                             </label>
                             <br>
                             {{ learning_unit.responsible_entity_identity.code|default_if_none:'-'}}
-                            </div>
+                        </div>
                             <br>
                         <div>
                             <label>
@@ -270,6 +270,30 @@
                             </label>
                             <br>
                             {{ learning_unit.attribution_entity_identity.code|default_if_none:'-'}}
+                        </div>
+                        <br>
+                        <div>
+                            <label>
+                                {% trans 'Additional requirement entity 1' %}
+                            </label>
+                            <br>
+                            <a href="{% url 'learning_unit' learning_unit.code learning_unit.year %}">
+                                <em>
+                                    {% trans 'Refer to learning unit' %}
+                                </em>
+                            </a>
+                        </div>
+                        <br>
+                        <div>
+                            <label>
+                                {% trans 'Additional requirement entity 2' %}
+                            </label>
+                            <br>
+                            <a href="{% url 'learning_unit' learning_unit.code learning_unit.year %}">
+                                <em>
+                                    {% trans 'Refer to learning unit' %}
+                                </em>
+                            </a>
                         </div>
                     </div>
                 </div>

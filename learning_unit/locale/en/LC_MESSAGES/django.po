@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-10 14:59+0200\n"
+"POT-Creation-Date: 2021-06-11 17:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,12 @@ msgid "Actions"
 msgstr ""
 
 msgid "Active"
+msgstr ""
+
+msgid "Additional requirement entity 1"
+msgstr ""
+
+msgid "Additional requirement entity 2"
 msgstr ""
 
 msgid "Allocation entity"
@@ -79,6 +85,9 @@ msgid "Faculty remark (unpublished)"
 msgstr ""
 
 msgid "Formation catalogue"
+msgstr ""
+
+msgid "Full"
 msgstr ""
 
 msgid "Inactive"
@@ -160,6 +169,9 @@ msgid "Proposal not in eligible state for consolidation"
 msgstr ""
 
 msgid "Quadrimester"
+msgstr ""
+
+msgid "Refer to learning unit"
 msgstr ""
 
 msgid "Requirement entity"
