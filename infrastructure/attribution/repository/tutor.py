@@ -29,12 +29,10 @@ from django.db.models import F, QuerySet
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
-from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution, LearningUnitAttributionIdentity
-from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.dtos import TutorSearchDTO
+from ddd.logic.attribution.dtos import TutorSearchDTO, LearningUnitAttributionFromRepositoryDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 from osis_common.ddd.interface import ApplicationService
@@ -83,7 +81,6 @@ class TutorRepository(ITutorRepository):
         result = []
 
         for data_dict in qs.values():
-            effective_classes = _get_effective_classes(data_dict['luy_id'])
             result.append(
                 TutorBuilder.build_from_repository_dto(
                     TutorSearchDTO(
@@ -91,13 +88,16 @@ class TutorRepository(ITutorRepository):
                         first_name=data_dict['first_name'],
                         personal_id_number=data_dict['personal_id_number'],
                         attributions=[
-                            LearningUnitAttribution(
-                                entity_id=LearningUnitAttributionIdentity(uuid=data_dict['attribution_uuid']),
+                            LearningUnitAttributionFromRepositoryDTO(
                                 function=data_dict['attribution_function'],
-                                learning_unit=learning_unit_identity,
-                                distributed_effective_classes=_get_distributed_effective_classes(
-                                    data_dict, effective_classes)
-                                )
+                                attribution_uuid=data_dict['attribution_uuid'],
+                                learning_unit_code=learning_unit_identity.code,
+                                learning_unit_year=learning_unit_identity.year,
+                                effective_classes=cls._get_effective_classes(
+                                    _get_effective_classes_queryset(data_dict['luy_id'])
+                                ),
+                                attribution_volume=data_dict['volume']
+                            )
                         ]
                     )
                 )
@@ -105,32 +105,41 @@ class TutorRepository(ITutorRepository):
         return result
 
     @classmethod
+    def _get_effective_classes(cls, effective_classes):
+        classes = []
+        for effective_classe in effective_classes:
+            dto_from_database = EffectiveClassFromRepositoryDTO(**effective_classe)
+            classes.append(EffectiveClassBuilder.build_from_repository_dto(dto_from_database))
+        return classes
+
+    @classmethod
     def save(cls, entity: 'Tutor') -> None:
         pass
 
 
-def _get_effective_classes(learning_unit_year_id: int) -> QuerySet:
+def _get_effective_classes_queryset(learning_unit_year_id: int) -> QuerySet:
     return LearningClassYearDatabase.objects.filter(
         learning_component_year__learning_unit_year__id=learning_unit_year_id
     ).annotate(
         class_code=F('acronym'),
         learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
         learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
+        teaching_place_uuid=F('campus__uuid'),
+        derogation_quadrimester=F('quadrimester'),
+        session_derogation=F('session'),
+        volume_q1=F('hourly_volume_partial_q1'),
+        volume_q2=F('hourly_volume_partial_q2'),
+        class_type=F('learning_component_year__type')
     ).values(
         'class_code',
         'learning_unit_code',
-        'learning_unit_year'
+        'learning_unit_year',
+        'title_fr',
+        'title_en',
+        'teaching_place_uuid',
+        'derogation_quadrimester',
+        'session_derogation',
+        'volume_q1',
+        'volume_q2',
+        'class_type'
     )
-
-
-def _get_distributed_effective_classes(data_dict, effective_classes):
-    return [
-        ClassVolumeRepartition(
-            effective_class=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-                class_code=effective_classe['class_code'],
-                learning_unit_code=effective_classe['learning_unit_code'],
-                learning_unit_year=effective_classe['learning_unit_year']
-            ),
-            distributed_volume=data_dict['volume']
-        ) for effective_classe in effective_classes
-    ]

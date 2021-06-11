@@ -28,6 +28,7 @@ from typing import List
 
 import attr
 
+from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from osis_common.ddd.interface import DTO
 
 
@@ -41,6 +42,11 @@ class AcademicYearDataDTO(DTO):
 @attr.s(frozen=True, slots=True)
 class LearningUnitAttributionFromRepositoryDTO(DTO):
     function = attr.ib(type=str)
+    attribution_uuid = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+    effective_classes = attr.ib(type=List[EffectiveClassFromRepositoryDTO])
+    attribution_volume = attr.ib(type=float)
 
 
 @attr.s(frozen=True, slots=True)
@@ -50,9 +56,3 @@ class TutorSearchDTO(DTO):
     personal_id_number = attr.ib(type=str)
     attributions = attr.ib(type=List[LearningUnitAttributionFromRepositoryDTO])
 
-
-@attr.s(frozen=True, slots=True)
-class LearningUnitAttributionDTO(DTO):
-    function = attr.ib(type=str)
-    attribution_uuid = attr.ib(type=str)
-    volume = attr.ib(type=float)
