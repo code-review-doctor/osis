@@ -277,9 +277,11 @@
                                 {% trans 'Additional requirement entity 1' %}
                             </label>
                             <br>
-                            <em>
-                                {% trans 'Refer to learning unit' %}
-                            </em>
+                            <a href="{% url 'learning_unit' learning_unit.code learning_unit.year %}">
+                                <em>
+                                    {% trans 'Refer to learning unit' %}
+                                </em>
+                            </a>
                         </div>
                         <br>
                         <div>
@@ -287,9 +289,11 @@
                                 {% trans 'Additional requirement entity 2' %}
                             </label>
                             <br>
-                            <em>
-                                {% trans 'Refer to learning unit' %}
-                            </em>
+                            <a href="{% url 'learning_unit' learning_unit.code learning_unit.year %}">
+                                <em>
+                                    {% trans 'Refer to learning unit' %}
+                                </em>
+                            </a>
                         </div>
                     </div>
                 </div>
