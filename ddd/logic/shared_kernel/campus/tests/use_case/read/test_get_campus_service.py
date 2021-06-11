@@ -26,26 +26,26 @@
 
 from django.test import SimpleTestCase
 
-from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
-from ddd.logic.shared_kernel.language.tests.factory.language import FRLanguageFactory
-from ddd.logic.shared_kernel.language.use_case.read import get_language_service
-from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
-from infrastructure.shared_kernel.language.repository.in_memory.language import LanguageRepository
+from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
+from ddd.logic.shared_kernel.campus.tests.factory.campus import UCLCampusFactory
+from ddd.logic.shared_kernel.campus.use_case.read import get_campus_service
+from infrastructure.shared_kernel.campus.repository.in_memory.campus import UclouvainCampusRepository
 
 
 class TestGetCampusService(SimpleTestCase):
 
     def setUp(self):
-        self.language_repository = GenericInMemoryRepository()
-        self.language = FRLanguageFactory()
-        self.language_repository.save(self.language)
-        self.command = GetLanguageCommand(code_iso=self.language.entity_id.code_iso)
+        self.campus_repository = UclouvainCampusRepository()
+        self.campus = UCLCampusFactory()
+        self.campus_repository.save(self.campus)
+        self.command = GetCampusCommand(uuid=self.campus.entity_id.uuid)
 
-    def test_should_return_french_language(self):
-        language = get_language_service.get_language(
+    def test_should_return_ucl_campus(self):
+        campus = get_campus_service.get_campus(
             self.command,
-            self.language_repository,
+            self.campus_repository,
         )
-        self.assertEqual(language, self.language)
-        self.assertEqual(language.entity_id, self.language.entity_id)
-        self.assertEqual(language.name, self.language.name)
+        self.assertEqual(campus, self.campus)
+        self.assertEqual(campus.entity_id, self.campus.entity_id)
+        self.assertEqual(campus.name, self.campus.name)
+        self.assertEqual(campus.organization_name, self.campus.organization_name)
