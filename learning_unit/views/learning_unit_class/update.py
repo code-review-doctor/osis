@@ -34,7 +34,7 @@ from django.views.generic import FormView
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.update import UpdateClassForm
@@ -63,6 +63,16 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
 
+    @cached_property
+    def effective_class(self) -> 'EffectiveClass':
+        return message_bus_instance.invoke(
+            GetEffectiveClassCommand(
+                class_code=self.class_code,
+                learning_unit_code=self.learning_unit_code,
+                learning_unit_year=self.year
+            )
+        )
+
     def get(self, request, *args, **kwargs):
         # TODO :: Add permission check, like it has been done below for the creation
         # try:
@@ -79,16 +89,9 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
         return super().get(request, *args, **kwargs)
 
     def get_form_kwargs(self):
-        effective_class = message_bus_instance.invoke(
-            GetEffectiveClassCommand(
-                class_code=self.class_code,
-                learning_unit_code=self.learning_unit_code,
-                learning_unit_year=self.year
-            )
-        )
         kwargs = super().get_form_kwargs()
         kwargs['learning_unit'] = self.learning_unit
-        kwargs['effective_class'] = effective_class
+        kwargs['effective_class'] = self.effective_class
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -102,7 +105,10 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
         )
 
     def post(self, request, *args, **kwargs):
-        form = UpdateClassForm(request.POST, learning_unit=self.learning_unit, user=request.user)
+        form = UpdateClassForm(request.POST,
+                               learning_unit=self.learning_unit,
+                               effective_class=self.effective_class,
+                               user=request.user)
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
