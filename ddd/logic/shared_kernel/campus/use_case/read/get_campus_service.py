@@ -23,16 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
-
-from osis_common.ddd import interface
+from ddd.logic.shared_kernel.campus.builder.uclouvain_campus_identity_builder import UclouvainCampusIdentityBuilder
 
 
-@attr.s(frozen=True, slots=True)
-class SearchUclouvainCampusesCommand(interface.CommandRequest):
-    pass  # Filters can ba added later when it's needed
-
-
-@attr.s(frozen=True, slots=True)
-class GetCampusCommand(interface.CommandRequest):
-    uuid = attr.ib(type=str)
+def get_campus(
+        cmd: 'GetCampustCommand',
+        campus_repository: 'IUclouvainCampusRepository'
+) -> 'UclouvainCampus':
+    campus_identity = UclouvainCampusIdentityBuilder.build_from_uuid(uuid=cmd.uuid)
+    return campus_repository.get(entity_id=campus_identity)

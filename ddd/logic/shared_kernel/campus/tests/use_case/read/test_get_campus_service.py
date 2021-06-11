@@ -23,16 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
-from osis_common.ddd import interface
+from django.test import SimpleTestCase
+
+from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
+from ddd.logic.shared_kernel.language.tests.factory.language import FRLanguageFactory
+from ddd.logic.shared_kernel.language.use_case.read import get_language_service
+from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
+from infrastructure.shared_kernel.language.repository.in_memory.language import LanguageRepository
 
 
-@attr.s(frozen=True, slots=True)
-class SearchUclouvainCampusesCommand(interface.CommandRequest):
-    pass  # Filters can ba added later when it's needed
+class TestGetCampusService(SimpleTestCase):
 
+    def setUp(self):
+        self.language_repository = GenericInMemoryRepository()
+        self.language = FRLanguageFactory()
+        self.language_repository.save(self.language)
+        self.command = GetLanguageCommand(code_iso=self.language.entity_id.code_iso)
 
-@attr.s(frozen=True, slots=True)
-class GetCampusCommand(interface.CommandRequest):
-    uuid = attr.ib(type=str)
+    def test_should_return_french_language(self):
+        language = get_language_service.get_language(
+            self.command,
+            self.language_repository,
+        )
+        self.assertEqual(language, self.language)
+        self.assertEqual(language.entity_id, self.language.entity_id)
+        self.assertEqual(language.name, self.language.name)

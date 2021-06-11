@@ -33,7 +33,7 @@ from reversion.models import Version
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
+from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand, GetCampusCommand
 from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
@@ -136,8 +136,6 @@ def get_related_history(
 
 
 def get_teaching_place(teaching_place: 'UclouvainCampusIdentity') -> str:
-    campuses = message_bus_instance.invoke(SearchUclouvainCampusesCommand())  # type: List[UclouvainCampus]
-    for campus in campuses:
-        if campus.entity_id == teaching_place:
-            return campus
-    return None
+    return message_bus_instance.invoke(
+        GetCampusCommand(uuid=teaching_place.uuid)
+    ),  # type: Campus
