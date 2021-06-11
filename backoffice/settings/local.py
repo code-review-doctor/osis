@@ -37,7 +37,6 @@ OPTIONAL_APPS = (
     'behave_django',
     'osis_role',
     'backoffice',
-    'ddd',
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()
