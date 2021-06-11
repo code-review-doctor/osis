@@ -30,10 +30,13 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.attribution.domain.model.tutor import Tutor
+from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class TutorRepositoryTestCase(TestCase):
@@ -103,3 +106,29 @@ class TutorRepositoryTestCase(TestCase):
         self.assertEqual(a_ddd_attribution.entity_id.uuid, db_attribution.id)
         self.assertEqual(a_ddd_attribution.learning_unit.code, ue.acronym)
         self.assertEqual(a_ddd_attribution.learning_unit.year, ue.academic_year.year)
+
+    def test_should_correctly_map_database_fields_with_dto_fields_for_effective_class(self):
+        ue = LearningUnitYearFactory(
+            academic_year__current=True
+        )
+        attribution_1 = AttributionChargeNewFactory(
+            learning_component_year__learning_unit_year=ue,
+            attribution__tutor__person__last_name='Dupont',
+            allocation_charge=10
+        )
+
+        effective_class = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+        effective_class_id = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+            class_code=effective_class.acronym,
+            learning_unit_code=ue.acronym,
+            learning_unit_year=ue.academic_year.year,
+        )
+        entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
+            code=ue.acronym,
+            year=ue.academic_year.year
+        )
+        results = self.tutor_repository.search(learning_unit_identity=entity_id)
+        self.assertEqual(len(results), 1)
+        effective_classes = results[0].attributions[0].distributed_effective_classes
+        self.assertEqual(effective_classes[0].distributed_volume, attribution_1.allocation_charge)
+        self.assertEqual(effective_classes[0].effective_class, effective_class_id)
