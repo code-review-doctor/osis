@@ -22,35 +22,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.ddd.command import PostponeTrainingsUntilNPlus6Command, GetTrainingCommand, \
-    PostponeMiniTrainingsUntilNPlus6Command, GetMiniTrainingCommand
-from education_group.ddd.domain.exception import TrainingNotFoundException, MiniTrainingNotFoundException
-from education_group.ddd.service.read import get_training_service, get_mini_training_service
+from education_group.ddd.command import PostponeMiniTrainingsUntilNPlus6Command, GetMiniTrainingCommand
+from education_group.ddd.domain.exception import MiniTrainingNotFoundException
+from education_group.ddd.service.read import get_mini_training_service
 from education_group.ddd.service.write.postpone_mini_trainings_until_n_plus_6_service import \
     postpone_minitrainings_until_n_plus_6
-from education_group.ddd.service.write.postpone_trainings_until_n_plus_6_service import \
-    postpone_trainings_until_n_plus_6
-from education_group.tests.ddd.factories.repository.fake import get_fake_training_repository, \
-    get_fake_mini_training_repository
-from education_group.tests.ddd.factories.training import TrainingFactory
 from education_group.tests.factories.mini_training import MiniTrainingFactory
 from testing.testcases import DDDTestCase
 
 
 class TestPostponeTrainingsUntilNPlus6(DDDTestCase):
     def setUp(self) -> None:
-        self._init_fake_repos()
+        super().setUp()
         self.mini_trainings = [
-            MiniTrainingFactory(entity_identity__year=2021, end_year=None),
-            MiniTrainingFactory(entity_identity__year=2021, end_year=2029),
-            MiniTrainingFactory(entity_identity__year=2025, end_year=None),
+            MiniTrainingFactory(entity_identity__year=2021, end_year=None, persist=True),
+            MiniTrainingFactory(entity_identity__year=2021, end_year=2029, persist=True),
+            MiniTrainingFactory(entity_identity__year=2025, end_year=None, persist=True),
         ]
-
-        self.fake_mini_training_repository = get_fake_mini_training_repository(self.mini_trainings)
-        self.mock_repo(
-            "education_group.ddd.repository.mini_training.MiniTrainingRepository",
-            self.fake_mini_training_repository
-        )
 
         self.cmd = PostponeMiniTrainingsUntilNPlus6Command()
 
