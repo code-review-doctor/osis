@@ -44,7 +44,7 @@ from infrastructure.learning_unit.repository.in_memory.effective_class import Ef
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
-class CreateClassService(SimpleTestCase):
+class CreateEffectiveClassService(SimpleTestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
         self.ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
