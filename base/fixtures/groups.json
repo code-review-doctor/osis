@@ -362,6 +362,11 @@
                     "can_access_structure",
                     "base",
                     "structure"
+                ],
+                [
+                    "can_access_class",
+                    "base",
+                    "learningclassyear"
                 ]
             ]
         }
