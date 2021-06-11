@@ -34,7 +34,7 @@ class TutorIdentityBuilder(EntityIdentityBuilder):
         raise NotImplementedError
 
     @classmethod
-    def build_from_code_and_learning_unit_identity_data(
+    def build_from_personal_id_number(
             cls,
             personal_id_number: str
     ) -> 'TutorIdentity':

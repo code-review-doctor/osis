@@ -37,45 +37,53 @@ from infrastructure.learning_unit.repository.learning_unit import LearningUnitRe
 
 
 class TutorRepositoryTestCase(TestCase):
+
     def setUp(self):
-        self.ue_without_attribution = LearningUnitYearFactory(
-            academic_year__current=True
-        )
-
-        self.ue_with_attributions = LearningUnitYearFactory(
-            academic_year__current=True
-        )
-        self.attribution_1_ue_2 = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year=self.ue_with_attributions,
-            attribution__tutor__person__last_name='Dupont'
-        )
-        self.attribution_2_ue_2 = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year=self.ue_with_attributions,
-            attribution__tutor__person__last_name='Bastin'
-        )
-
         self.tutor_repository = TutorRepository()
         self.learning_rep = LearningUnitRepository()
 
-    def test_search_no_attribution(self):
+    def test_should_return_empty_list_when_no_attribution_found(self):
+        ue_without_attribution = LearningUnitYearFactory(
+            academic_year__current=True
+        )
         entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=self.ue_without_attribution.acronym,
-            year=self.ue_without_attribution.academic_year.year
+            code=ue_without_attribution.acronym,
+            year=ue_without_attribution.academic_year.year
         )
         results = self.tutor_repository.search(learning_unit_identity=entity_id)
         self.assertEqual(len(results), 0)
 
-    def test_search(self):
+    def test_should_return_2_attributions(self):
+        ue_with_attributions = LearningUnitYearFactory(
+            academic_year__current=True
+        )
+        attribution_1 = AttributionChargeNewFactory(
+            learning_component_year__learning_unit_year=ue_with_attributions,
+            attribution__tutor__person__last_name='Dupont'
+        )
+        attribution_2 = AttributionChargeNewFactory(
+            learning_component_year__learning_unit_year=ue_with_attributions,
+            attribution__tutor__person__last_name='Bastin'
+        )
+
         entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=self.ue_with_attributions.acronym,
-            year=self.ue_with_attributions.academic_year.year
+            code=ue_with_attributions.acronym,
+            year=ue_with_attributions.academic_year.year
         )
         results = self.tutor_repository.search(learning_unit_identity=entity_id)
         self.assertEqual(len(results), 2)
-        self._assert_equal_attribution(results[0], self.attribution_2_ue_2.attribution, self.ue_with_attributions)
-        self._assert_equal_attribution(results[1], self.attribution_1_ue_2.attribution, self.ue_with_attributions)
+        self._assert_should_correctly_map_database_fields_with_dto_fields(
+            results[0],
+            attribution_2.attribution,
+            ue_with_attributions
+        )
+        self._assert_should_correctly_map_database_fields_with_dto_fields(
+            results[1],
+            attribution_1.attribution,
+            ue_with_attributions
+        )
 
-    def _assert_equal_attribution(
+    def _assert_should_correctly_map_database_fields_with_dto_fields(
             self,
             ddd_tutor_attribution: Tutor,
             db_attribution: AttributionNew,

@@ -33,7 +33,7 @@ class TutorBuilder(interface.RootEntityBuilder):
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'TutorDTO') -> 'Tutor':
-        tutor_identity = TutorIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(
             personal_id_number=dto_object.personal_id_number
         )
         return Tutor(

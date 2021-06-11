@@ -28,10 +28,11 @@ from typing import List, Optional
 from django.db.models import F
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
-from ddd.logic.attribution.builder.learning_unit_attribution_builder import LearningUnitAttributionBuilder
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
+from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution, LearningUnitAttributionIdentity
+from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.dtos import TutorSearchDTO, LearningUnitAttributionDTO
+from ddd.logic.attribution.dtos import TutorSearchDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from osis_common.ddd.interface import ApplicationService
 
@@ -84,14 +85,16 @@ class TutorRepository(ITutorRepository):
                         first_name=data_dict['first_name'],
                         personal_id_number=data_dict['personal_id_number'],
                         attributions=[
-                            LearningUnitAttributionBuilder.build_from_repository_dto(
-                                learning_unit_identity,
-                                LearningUnitAttributionDTO(
-                                    function=data_dict['attribution_function'],
-                                    attribution_uuid=data_dict['attribution_uuid'],
-                                    volume=data_dict['volume']
+                            LearningUnitAttribution(
+                                entity_id=LearningUnitAttributionIdentity(uuid=data_dict['attribution_uuid']),
+                                function=data_dict['attribution_function'],
+                                learning_unit=learning_unit_identity,
+                                distributed_effective_classes=[
+                                    # ClassVolumeRepartition(effective_class=, # TODO to complete
+                                    #                        distributed_volume=data_dict['volume']
+                                    #                        )
+                                   ]
                                 )
-                            )
                         ]
                     )
                 )
