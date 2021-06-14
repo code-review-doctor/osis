@@ -1187,6 +1187,3 @@ msgstr "indéterminé"
 
 msgid "with certificate aims"
 msgstr "avec attendus du diplôme"
-
-#~ msgid "Own comment"
-#~ msgstr "Commentaire propre"
