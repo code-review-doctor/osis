@@ -20,11 +20,13 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
 from education_group.ddd.domain.group import GroupIdentity, Group
 from education_group.ddd.service.read import get_group_service
 from education_group.ddd.service.write import create_group_service
+from education_group.ddd.validators.validators_by_business_action import CreateOrphanGroupValidatorList
 from education_group.forms.group import GroupForm, GroupAttachForm
 from education_group.models.group_year import GroupYear
 from education_group.templatetags.academic_year_display import display_as_academic_year
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.service.read import node_identity_service
@@ -108,10 +110,13 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         start_year=group_form.cleaned_data['academic_year'],
                         end_year=None
                     )
+                    CreateOrphanGroupValidatorList(cmd_create.code, cmd_create.type).validate()
                     group_id = create_group_service.create_orphan_group(cmd_create)
             except MultipleBusinessExceptions as multiple_exceptions:
                 for e in multiple_exceptions.exceptions:
                     if isinstance(e, CodeAlreadyExistException):
+                        group_form.add_error('code', e.message)
+                    elif isinstance(e, CodePatternException):
                         group_form.add_error('code', e.message)
                     elif isinstance(e, ContentConstraintTypeMissing):
                         group_form.add_error('constraint_type', e.message)
@@ -125,6 +130,8 @@ class GroupCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         group_form.add_error('max_constraint', e.message)
                     else:
                         group_form.add_error(None, e.message)
+            except CodePatternException as e:
+                group_form.add_error('code', e.message)
             if not group_form.errors:
                 display_success_messages(request, self.get_success_msg(group_id), extra_tags='safe')
                 return HttpResponseRedirect(self.get_success_url(group_id))

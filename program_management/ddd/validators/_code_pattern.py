@@ -22,14 +22,22 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 
-from django.db import transaction
+import re
 
-from education_group.ddd import command
-from education_group.ddd.domain import group
-from education_group.ddd.repository import group as group_repository
+from base.ddd.utils import business_validator
+from base.models.enums.education_group_types import GroupType
+from program_management.ddd.domain.exception import CodePatternException
+
+CODE_REGEX = "^([LWMBlwmb])([A-Z0-9]+)$"
 
 
-@transaction.atomic()
-def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'group.GroupIdentity':
-    grp = group.builder.build_from_create_cmd(cmd)
-    return group_repository.GroupRepository.create(grp)
+class CodePatternValidator(business_validator.BusinessValidator):
+    def __init__(self, code: str, training_type: str):
+        super().__init__()
+        self.code = code
+        self.training_type = training_type
+
+    def validate(self, *args, **kwargs):
+        if self.code and self.training_type != GroupType.SUB_GROUP.name and \
+                not bool(re.match(CODE_REGEX, self.code.upper())):
+            raise CodePatternException(self.code.upper())
