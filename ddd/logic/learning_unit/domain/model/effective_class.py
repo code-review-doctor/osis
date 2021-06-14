@@ -72,7 +72,6 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
 
     def update(self, cmd: UpdateEffectiveClassCommand) -> None:
         UpdateEffectiveClassValidatorList(command=cmd).validate()
-        # self.entity_id.class_code = cmd.class_code  # FIXME :: gérer la mise à jour du code de la classe
         self.titles = ClassTitles(fr=cmd.title_fr, en=cmd.title_en)
         self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
         self.derogation_quadrimester.uuid = cmd.teaching_place_uuid
