@@ -26,12 +26,13 @@
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.enums import quadrimesters, learning_unit_year_session
 from osis_common.models import osis_model_admin
 
 
-class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
+class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym')
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
 
