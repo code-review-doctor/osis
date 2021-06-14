@@ -76,6 +76,15 @@ class RenewAttributionAboutToExpirePostSerializer(serializers.Serializer):
     codes = serializers.ListField(child=serializers.CharField(), allow_empty=False)
 
 
+class LearningUnitTutorAttributionSerializer(serializers.Serializer):
+    first_name = serializers.CharField(read_only=True)
+    last_name = serializers.CharField(read_only=True)
+    function = serializers.CharField(read_only=True, source="function.name")
+    function_text = serializers.CharField(read_only=True, source="function.value")
+    lecturing_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+
+
 class MyChargeSummarySerializer(serializers.Serializer):
     code = serializers.CharField(read_only=True)
     year = serializers.IntegerField(read_only=True)
@@ -90,3 +99,4 @@ class MyChargeSummarySerializer(serializers.Serializer):
     practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     total_lecturing_volume_course = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     total_practical_volume_course = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    tutors = LearningUnitTutorAttributionSerializer(read_only=True, many=True, default=list())

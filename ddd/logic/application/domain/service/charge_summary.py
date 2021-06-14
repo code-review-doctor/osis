@@ -63,7 +63,7 @@ class ChargeSummary(interface.DomainService):
         ]
         vacant_courses = vacant_course_repository.search(vacant_courses_ids)
 
-        learning_unit_ids = [attribution.course_id for attribution in applicant.attributions]
+        learning_unit_ids = [attribution.course_id for attribution in current_attribution]
         learning_unit_volumes = learning_unit_service.search_learning_unit_volumes_dto(learning_unit_ids)
         learning_unit_tutors = learning_unit_service.search_tutor_attribution_dto(learning_unit_ids)
 
