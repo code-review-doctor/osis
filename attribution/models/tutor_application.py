@@ -26,7 +26,6 @@
 import uuid as uuid
 from django.contrib import admin
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 from attribution.models.enums.function import Functions
 from base.models.utils.utils import filter_with_list_or_object
@@ -41,13 +40,6 @@ class TutorApplicationAdmin(admin.ModelAdmin):
     raw_id_fields = ('learning_container_year', 'tutor')
     search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
                      'tutor__person__global_id', 'function']
-    actions = ['publish_application_to_portal']
-
-    def publish_application_to_portal(self, request, queryset):
-        from attribution.business import application_json
-        global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
-        return application_json.publish_to_portal(global_ids)
-    publish_application_to_portal.short_description = _("Publish application to portal")
 
 
 class TutorApplication(models.Model):

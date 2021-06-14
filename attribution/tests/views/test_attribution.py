@@ -23,14 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
-
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import status
-from rest_framework.test import APIClient
+
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -40,32 +37,6 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
-from base.tests.factories.user import UserFactory
-
-
-class RecomputePortalTestCase(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.global_ids = ['12348', '565656', '5888']
-        self.url = reverse('recompute_attribution_portal')
-
-        self.client = APIClient()
-        self.client.force_authenticate(user=self.user)
-
-    def test_recompute_portal_without_authentification(self):
-        self.client.force_authenticate(user=None)
-        response = self.client.post(self.url, {'global_ids': self.global_ids})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_recompute_portal_not_valid_http_method(self):
-        response = self.client.get(self.url, {'global_ids': self.global_ids})
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    @mock.patch('attribution.business.attribution_json.publish_to_portal', side_effect=lambda global_ids: True)
-    def test_recompute_portal_success_test_case(self, mock_publish_to_portal):
-        response = self.client.post(self.url, {'global_ids': self.global_ids})
-        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
-        mock_publish_to_portal.assert_called_with(self.global_ids)
 
 
 class TestViewAttributions(TestCase):

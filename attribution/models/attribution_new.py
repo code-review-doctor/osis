@@ -42,14 +42,6 @@ class AttributionNewAdmin(admin.ModelAdmin):
     raw_id_fields = ('learning_container_year', 'tutor', 'substitute')
     search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
                      'tutor__person__global_id', 'function']
-    actions = ['publish_attribution_to_portal']
-
-    def publish_attribution_to_portal(self, request, queryset):
-        from attribution.business import attribution_json
-        queryset = queryset.filter(decision_making='')
-        global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
-        return attribution_json.publish_to_portal(global_ids)
-    publish_attribution_to_portal.short_description = _("Publish attribution to portal")
 
 
 class AttributionNew(models.Model):
