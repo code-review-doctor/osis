@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-07 08:12+0200\n"
+"POT-Creation-Date: 2021-06-11 13:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,9 +33,6 @@ msgstr ""
 msgid "Class can't be neither mobility nor external"
 msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
-msgid "Code should be one character A-Z or 0-9"
-msgstr "Le code de la classe doit être alphanumérique"
-
 msgid "Credits should be greather than 0"
 msgstr "Les crédits doivent être > 0"
 
@@ -54,8 +51,11 @@ msgstr "L'UE est utilisée dans les formations suivantes : {}"
 msgid "Selected entity {} is not an authorized responsible entity"
 msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée"
 
-msgid "The code %('ue_code')s - %(code)s already exists for %(ue)s"
-msgstr "Le code %('ue_code')s - %(code)s existe déjà pour l'UE %(ue)s"
+msgid "Subdivision should be one character A-Z or 0-9"
+msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
+
+msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
+msgstr "Le code %('ue_code')s - %(code)s existe déjà pour %(ue)s"
 
 msgid "The code {} already exists"
 msgstr "Le code {} existe déjà"
