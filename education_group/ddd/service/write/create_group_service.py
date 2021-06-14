@@ -32,5 +32,4 @@ from education_group.ddd.repository import group as group_repository
 @transaction.atomic()
 def create_orphan_group(cmd: command.CreateOrphanGroupCommand) -> 'group.GroupIdentity':
     grp = group.builder.build_from_create_cmd(cmd)
-
     return group_repository.GroupRepository.create(grp)
