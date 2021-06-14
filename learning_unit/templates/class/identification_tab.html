@@ -77,27 +77,27 @@
                         <div class="row">
                             {% block content_row2 %}
                                 <div class="col-md-3">
-                                    <label class="grey-color">
+                                    <label class="text-muted">
                                         {% trans 'Learning unit credits' %}
                                     </label>
                                     <br>
-                                    <span id="id_credits" class="grey-color">
+                                    <span id="id_credits" class="text-muted">
                                         {{ learning_unit.credits }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="grey-color">{% trans 'Periodicity' %}</label>
+                                    <label class="text-muted">{% trans 'Periodicity' %}</label>
                                     <br>
-                                    <span id="id_periodicity" class="grey-color">
+                                    <span id="id_periodicity" class="text-muted">
                                         {{ learning_unit.periodicity.value }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="grey-color">
+                                    <label class="text-muted">
                                         {% trans 'State' %}
                                     </label>
                                     <br>
-                                    <span id="id_state" class="grey-color">
+                                    <span id="id_state" class="text-muted">
                                         {% if learning_unit.is_active %}
                                             {% trans 'Active' %}
                                         {% else %}
@@ -106,11 +106,11 @@
                                     </span>
                                 </div>
                                 <div class="col-md-3">
-                                    <label class="grey-color">
+                                    <label class="text-muted">
                                         {% trans 'Language' %}
                                     </label>
                                     <br>
-                                    <span id="id_language" class="grey-color">
+                                    <span id="id_language" class="text-muted">
                                          {{ language.name }}
                                     </span>
                                 </div>
@@ -119,11 +119,11 @@
                     <br>
                         <div class="row">
                             <div class="col-md-12">
-                                <label class="grey-color">
+                                <label class="text-muted">
                                     {% trans 'Professional integration' %}
                                 </label>
                                 <br>
-                                <span id="id_professional_integration" class="grey-color">
+                                <span id="id_professional_integration" class="text-muted">
                                     {{ learning_unit.professional_integration | yesno | title }}
                                 </span>
                             </div>
@@ -132,10 +132,10 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title" %}</label><br>
-                            <label class="grey-color">{% trans 'Common part' %}</label><br>
-                            <span class="grey-color">{{ learning_unit.titles.common_fr|default_if_none:'-'}}</span><br>
-                            <label class="grey-color">{% trans 'Specific complement (Full)' %}</label><br>
-                            <span class="grey-color">{{ learning_unit.titles.specific_fr|default_if_none:'-'}}</span><br>
+                            <label class="text-muted">{% trans 'Common part' %}</label><br>
+                            <span class="text-muted">{{ learning_unit.titles.common_fr|default_if_none:'-'}}</span><br>
+                            <label class="text-muted">{% trans 'Specific complement (Full)' %}</label><br>
+                            <span class="text-muted">{{ learning_unit.titles.specific_fr|default_if_none:'-'}}</span><br>
                             <label>{% trans 'Class specific complement' %}</label><br>
                             {{ effective_class.titles.fr|default_if_none:'-' }}
                         </div>
@@ -144,10 +144,10 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title in English" %}</label><br>
-                            <label class="grey-color">{% trans 'Common part' %}</label><br>
-                            <span class="grey-color">{{ learning_unit.titles.common_en|default_if_none:'-'}}</span><br>
-                            <label class="grey-color">{% trans 'Specific complement (Full)' %}</label><br>
-                            <span class="grey-color">{{ learning_unit.titles.specific_en|default_if_none:'-'}}</span><br>
+                            <label class="text-muted">{% trans 'Common part' %}</label><br>
+                            <span class="text-muted">{{ learning_unit.titles.common_en|default_if_none:'-'}}</span><br>
+                            <label class="text-muted">{% trans 'Specific complement (Full)' %}</label><br>
+                            <span class="text-muted">{{ learning_unit.titles.specific_en|default_if_none:'-'}}</span><br>
                             <label>{% trans 'Class specific complement' %}</label><br>
                             {{ effective_class.titles.en|default_if_none:'-' }}
                         </div>
@@ -184,7 +184,7 @@
                                 <th>{% trans 'Code' %}&nbsp;&nbsp;</th>
                                 <th class="text-center" title="{% trans 'Volume Q1' %}">{% trans 'Vol. Q1' %}</th>
                                 <th class="text-center" title="{% trans 'Volume Q2' %}">{% trans 'Vol. Q2' %}</th>
-                                <th class="text-center grey-color" title="{% trans 'Annual volume' %}">{% trans 'Vol. annual' %}</th>
+                                <th class="text-center text-muted" title="{% trans 'Annual volume' %}">{% trans 'Vol. annual' %}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -195,7 +195,7 @@
                                 <td>/{% if class_type == 'LECTURING' %}PM{% else %}PP{% endif %}</td>
                                 <td style="text-align: center">{{ effective_class.volumes.volume_first_quadrimester|default_if_none:''}}</td>
                                 <td style="text-align: center">{{ effective_class.volumes.volume_second_quadrimester|default_if_none:''}}</td>
-                                <td style="text-align: center"  class="grey-color">{{ volumes.volume_annual|default_if_none:'' }}</td>
+                                <td style="text-align: center"  class="text-muted">{{ volumes.volume_annual|default_if_none:'' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -207,30 +207,30 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Faculty remark (unpublished)' %}
                             </label>
                             <br>
-                            <span id="id_faculty_remark" class="grey-color">
+                            <span id="id_faculty_remark" class="text-muted">
                                 {{ learning_unit.remarks.faculty |default_if_none:'-'}}
                             </span>
                         </div>
                         <br>
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Other remark (intended for publication)' %}
                             </label>
                             <br>
-                            <span id="id_other_remark" class="grey-color">
+                            <span id="id_other_remark" class="text-muted">
                                 {{ learning_unit.remarks.publication_fr|default_if_none:'-' }}
                             </span>
                         </div>
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Other remark in english (intended for publication)' %}
                             </label>
                             <br>
-                            <span id="id_other_remark_en" class="grey-color">
+                            <span id="id_other_remark_en" class="text-muted">
                                 {{ learning_unit.remarks.publication_en|default_if_none:'-' }}
                             </span>
                         </div>
@@ -241,9 +241,9 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div>
-                            <label class="grey-color">{% trans 'Institution' %}</label>
+                            <label class="text-muted">{% trans 'Institution' %}</label>
                             <br>
-                            <span class="grey-color">UClouvain</span>
+                            <span class="text-muted">UClouvain</span>
                         </div>
                         <br>
                         <div>
@@ -255,7 +255,7 @@
                         </div>
                         <br>
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Requirement entity' %}
                             </label>
                             <br>
@@ -269,7 +269,7 @@
                         </div>
                             <br>
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Attribution entity' %}
                             </label>
                             <br>
@@ -283,7 +283,7 @@
                         </div>
                         <br>
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Additional requirement entity 1' %}
                             </label>
                             <br>
@@ -295,7 +295,7 @@
                         </div>
                         <br>
                         <div>
-                            <label class="grey-color">
+                            <label class="text-muted">
                                 {% trans 'Additional requirement entity 2' %}
                             </label>
                             <br>
