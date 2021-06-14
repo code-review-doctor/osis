@@ -18,6 +18,7 @@ class Migration(migrations.Migration):
                 set learning_unit_year_id = luc.learning_unit_year_id 
                 from base_learningunitcomponent as luc
                 where luc.learning_component_year_id = base_learningcomponentyear.id
-            """
+            """,
+            elidable=True
         ),
     ]

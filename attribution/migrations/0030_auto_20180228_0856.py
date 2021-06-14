@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
             "DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted",
             """CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted
                     ON attribution_attributionnew
-                (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));"""
+                (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));""",
+            elidable=True
         ),
     ]

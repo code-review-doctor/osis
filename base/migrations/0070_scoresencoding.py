@@ -51,6 +51,7 @@ class Migration(migrations.Migration):
             base_learningunityear.id,
             base_examenrollment.enrollment_state
             ;
-            """
+            """,
+            elidable=True
         ),
     ]
