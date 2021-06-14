@@ -28,7 +28,6 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase, SimpleTestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.tests.factories.user import UserFactory

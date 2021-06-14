@@ -56,6 +56,7 @@ from education_group.views.proxy.read import Tab
 from osis_common.ddd.interface import BusinessExceptions
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -176,6 +177,8 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         training_form.add_error('ares_authorization', e.message)
                     else:
                         training_form.add_error(None, e.message)
+            except CodePatternException as e:
+                training_form.add_error('code', e.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))
