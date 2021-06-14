@@ -947,7 +947,7 @@ class UpdateTrainingCommand(interface.CommandRequest):
 - Contient les tests relatifs au bounded context en question
 - Teste les différents scénarios ainsi que les invariants métiers des application services
 - Nommage des fichiers: test_<fichier_application_service>.py
-- Nommage des classes de test: Test<nom_application_service>
+- Nommage des classes de test: doit contenir le nom de l'application service
 - Nommage méthode de test: test_should_...
 - Utilise des inMemoryRepository
 
@@ -958,7 +958,7 @@ import attr
 from django.test import SimpleTestCase
 
 
-class UpdateTrainingServiceTest(SimpleTestCase):
+class TestUpdateTrainingService(SimpleTestCase):
     def setup(self):
       self.training = TrainingFactory()
       self.cmd = UpdateTrainingCommand(
