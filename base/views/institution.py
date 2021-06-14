@@ -28,7 +28,7 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
@@ -36,8 +36,9 @@ from base.business import academic_calendar
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
-from base.models import entity_version as entity_version_mdl
+from base.models import entity_version as entity_version_mdl, entity
 from base.models.academic_year import AcademicYear
+from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.views.common import paginate_queryset
 from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
@@ -81,9 +82,12 @@ def entities_search(request):
 @login_required
 def entity_read(request, entity_version_id):
     entity_version = get_object_or_404(EntityVersion, id=entity_version_id)
+    return _build_entity_read_render(entity_version, request)
+
+
+def _build_entity_read_render(entity_version, request):
     entity_parent = entity_version.get_parent_version()
     descendants = entity_version.descendants
-
     calendar = LearningUnitSummaryEditionCalendar()
     target_years_opened = calendar.get_target_years_opened()
     if target_years_opened:
@@ -91,7 +95,6 @@ def entity_read(request, entity_version_id):
     else:
         previous_academic_event = calendar.get_previous_academic_event()
         target_year_displayed = previous_academic_event.authorized_target_year
-
     academic_year = AcademicYear.objects.get(year=target_year_displayed)
     calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(
         entity_version=entity_version,
@@ -148,3 +151,14 @@ def get_entity_address(request, entity_version_id):
             'fax': entity.fax,
         }
     return JsonResponse(response)
+
+
+@login_required
+def entity_read_by_acronym(request, entity_acronym):
+    results = entity.search(acronym=entity_acronym)
+    if results:
+        entity_version = results[0].most_recent_entity_version
+    else:
+        raise Http404('No EntityVersion matches the given query.')
+    return _build_entity_read_render(entity_version, request)
+
