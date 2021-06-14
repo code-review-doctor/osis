@@ -147,5 +147,5 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 osis_role_predicates.always_deny(
                     message=_('Classes can only be created by a faculty manager')
                 ),
-            'base.can_access_class': rules.always_allow,
+            'learning_unit.view_learningclassyear': rules.always_allow,
          })
