@@ -86,6 +86,7 @@ class NodeGroupYearFactory(NodeFactory):
 
     node_id = factory.Sequence(lambda n: n*2)
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    category = factory.LazyAttribute(lambda o: o.node_type)
     group_title_fr = factory.fuzzy.FuzzyText(length=240)
     group_title_en = factory.fuzzy.FuzzyText(length=240)
     remark_fr = factory.fuzzy.FuzzyText(length=240)
@@ -104,6 +105,7 @@ class NodeGroupYearFactory(NodeFactory):
     max_constraint = 5
     version_name = STANDARD
     transition_name = NOT_A_TRANSITION
+    category = GroupType.SUB_GROUP
 
     class Params:
         minitraining = factory.Trait(
