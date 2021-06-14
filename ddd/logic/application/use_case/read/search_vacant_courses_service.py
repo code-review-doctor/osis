@@ -27,6 +27,8 @@ from typing import List
 
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import SearchVacantCoursesCommand
+from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
+from ddd.logic.application.domain.service.vacant_course_searcher import VacantCourseSearcher
 from ddd.logic.application.dtos import VacantCourseSearchDTO
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
@@ -35,7 +37,8 @@ from ddd.logic.application.repository.i_vacant_course_repository import IVacantC
 def search_vacant_courses(
         cmd: SearchVacantCoursesCommand,
         application_calendar_repository: IApplicationCalendarRepository,
-        vacant_course_repository: IVacantCourseRepository
+        vacant_course_repository: IVacantCourseRepository,
+        learning_unit_service: ILearningUnitService
 ) -> List[VacantCourseSearchDTO]:
     # Given
     application_calendar = application_calendar_repository.get_current_application_calendar()
@@ -43,9 +46,11 @@ def search_vacant_courses(
         VacantDeclarationType[vacant_declaration_str] for vacant_declaration_str in cmd.vacant_declaration_types
     ] if cmd.vacant_declaration_types else None
 
-    return vacant_course_repository.search_vacant_course_dto(
+    return VacantCourseSearcher.search(
         code=cmd.code,
-        academic_year_id=application_calendar.authorized_target_year,
+        application_calendar=application_calendar,
         allocation_entity_code=cmd.allocation_entity_code,
-        vacant_declaration_types=vacant_declaration_types
+        vacant_declaration_types=vacant_declaration_types,
+        vacant_course_repository=vacant_course_repository,
+        learning_unit_service=learning_unit_service
     )

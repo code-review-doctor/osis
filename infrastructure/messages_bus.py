@@ -107,7 +107,7 @@ class MessageBus:
             cmd, ApplicationRepository(), ApplicationCalendarRepository()
         ),
         SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(
-            cmd, ApplicationCalendarRepository(), VacantCourseRepository()
+            cmd, ApplicationCalendarRepository(), VacantCourseRepository(), LearningUnitTranslator()
         ),
         GetChargeSummaryCommand: lambda cmd: get_charge_summary(
             cmd, ApplicationCalendarRepository(), ApplicantRepository(), VacantCourseRepository(),
@@ -115,7 +115,7 @@ class MessageBus:
         ),
         GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
-            ApplicantRepository(), VacantCourseRepository()
+            ApplicantRepository(), VacantCourseRepository(), LearningUnitTranslator()
         ),
         SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),

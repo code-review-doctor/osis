@@ -14,7 +14,7 @@ from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
-from ddd.logic.application.dtos import LearningUnitVolumeDTO, ChargeSummaryDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, ChargeSummaryDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
@@ -60,9 +60,7 @@ class GetChargeSummary(TestCase):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2019)
             ),
             lecturing_volume_available=Decimal(10),
-            lecturing_volume_total=Decimal(30),
             practical_volume_available=Decimal(50),
-            practical_volume_total=Decimal(70),
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
@@ -74,13 +72,14 @@ class GetChargeSummary(TestCase):
         cls.vacant_course_repository = VacantCourseInMemoryRepository([cls.vacant_course_ldroi1200])
         cls.learning_unit_service_mocked = mock.Mock()
         cls.learning_unit_service_mocked.search_learning_unit_volumes_dto = mock.Mock(return_value=[
-            LearningUnitVolumeDTO(
+            LearningUnitVolumeFromServiceDTO(
                 code='LDROI1200',
                 year=2019,
                 lecturing_volume_total=Decimal(50),
                 practical_volume_total=Decimal(70),
             )
         ])
+        cls.learning_unit_service_mocked.search_tutor_attribution_dto = mock.Mock(return_value=[])
 
     def setUp(self) -> None:
         message_bus_patcher = mock.patch.multiple(
@@ -115,3 +114,4 @@ class GetChargeSummary(TestCase):
         self.assertEqual(results[0].practical_volume_available, Decimal(50))
         self.assertEqual(results[0].total_lecturing_volume_course, Decimal(50))
         self.assertEqual(results[0].total_practical_volume_course, Decimal(70))
+        self.assertEqual(results[0].tutors, [])

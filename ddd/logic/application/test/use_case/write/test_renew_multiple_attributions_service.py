@@ -88,9 +88,7 @@ class TestRenewMultipleAttributionsService(TestCase):
                     year=cls.application_calendar.authorized_target_year.year + 1
                 )
             ),
-            lecturing_volume_total=Decimal(10),
             lecturing_volume_available=Decimal(10),
-            practical_volume_total=Decimal(50),
             practical_volume_available=Decimal(50),
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,

@@ -67,9 +67,7 @@ class TestApplyOnVacantCourseService(TestCase):
                 academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
             ),
             lecturing_volume_available=Decimal(10),
-            lecturing_volume_total=Decimal(10),
             practical_volume_available=Decimal(50),
-            practical_volume_total=Decimal(50),
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,

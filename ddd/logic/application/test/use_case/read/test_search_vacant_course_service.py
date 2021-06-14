@@ -28,12 +28,14 @@ import mock
 import uuid
 from django.test import TestCase
 
+from attribution.models.enums.function import Functions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import SearchVacantCoursesCommand
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
 from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseSearchDTO
+from ddd.logic.application.dtos import VacantCourseSearchDTO, LearningUnitVolumeFromServiceDTO, \
+    LearningUnitTutorAttributionFromServiceDTO, TutorAttributionDTO
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.application_calendar_in_memory import ApplicationCalendarInMemoryRepository
 from infrastructure.application.repository.vacant_course_in_memory import VacantCourseInMemoryRepository
@@ -57,9 +59,7 @@ class TestSearchVacantCourseService(TestCase):
                 academic_year=cls.application_calendar.authorized_target_year
             ),
             lecturing_volume_available=Decimal(10),
-            lecturing_volume_total=Decimal(30),
             practical_volume_available=Decimal(50),
-            practical_volume_total=Decimal(50),
             title='Introduction au droit',
             vacant_declaration_type=VacantDeclarationType.RESEVED_FOR_INTERNS,
             is_in_team=False,
@@ -71,9 +71,7 @@ class TestSearchVacantCourseService(TestCase):
                 academic_year=cls.application_calendar.authorized_target_year
             ),
             lecturing_volume_available=Decimal(50),
-            lecturing_volume_total=Decimal(50),
             practical_volume_available=Decimal(25),
-            practical_volume_total=Decimal(25),
             title='Introduction en agro',
             vacant_declaration_type=VacantDeclarationType.OPEN_FOR_EXTERNS,
             is_in_team=False,
@@ -84,12 +82,39 @@ class TestSearchVacantCourseService(TestCase):
         cls.vacant_course_repository = VacantCourseInMemoryRepository([
             cls.vacant_course_ldroi1200, cls.vacant_course_lagro1510
         ])
+        cls.learning_unit_service_mocked = mock.Mock()
+        cls.learning_unit_service_mocked.search_learning_unit_volumes_dto = mock.Mock(return_value=[
+            LearningUnitVolumeFromServiceDTO(
+                code='LDROI1200',
+                year=2019,
+                lecturing_volume_total=Decimal(50),
+                practical_volume_total=Decimal(70),
+            ),
+            LearningUnitVolumeFromServiceDTO(
+                code='LAGRO1510',
+                year=2019,
+                lecturing_volume_total=Decimal(50),
+                practical_volume_total=Decimal(25),
+            ),
+        ])
+        cls.learning_unit_service_mocked.search_tutor_attribution_dto = mock.Mock(return_value=[
+            LearningUnitTutorAttributionFromServiceDTO(
+                code="LDROI1200",
+                year=2019,
+                first_name="Thomas",
+                last_name="Durant",
+                function=Functions.CO_HOLDER.name,
+                lecturing_volume=Decimal(20),
+                practical_volume=Decimal(15),
+            )
+        ])
 
     def setUp(self) -> None:
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             VacantCourseRepository=lambda: self.vacant_course_repository,
-            ApplicationCalendarRepository=lambda: self.application_calendar_repository
+            ApplicationCalendarRepository=lambda: self.application_calendar_repository,
+            LearningUnitTranslator=lambda: self.learning_unit_service_mocked
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -108,11 +133,21 @@ class TestSearchVacantCourseService(TestCase):
                 is_in_team=self.vacant_course_ldroi1200.is_in_team,
                 allocation_entity_code=self.vacant_course_ldroi1200.allocation_entity.code,
                 vacant_declaration_type=self.vacant_course_ldroi1200.vacant_declaration_type,
-                lecturing_volume_total=self.vacant_course_ldroi1200.lecturing_volume_total,
                 lecturing_volume_available=self.vacant_course_ldroi1200.lecturing_volume_available,
-                practical_volume_total=self.vacant_course_ldroi1200.practical_volume_total,
                 practical_volume_available=self.vacant_course_ldroi1200.practical_volume_available,
-                tutors=[],
+                # From learning unit service
+                lecturing_volume_total=Decimal(50),
+                practical_volume_total=Decimal(70),
+                # From learning unit service
+                tutors=[
+                  TutorAttributionDTO(
+                        first_name="Thomas",
+                        last_name="Durant",
+                        function=Functions.CO_HOLDER,
+                        lecturing_volume=Decimal(20),
+                        practical_volume=Decimal(15),
+                  )
+                ],
             )
         ]
         self.assertListEqual(results, expected_results)
@@ -129,10 +164,12 @@ class TestSearchVacantCourseService(TestCase):
                 is_in_team=self.vacant_course_lagro1510.is_in_team,
                 allocation_entity_code=self.vacant_course_lagro1510.allocation_entity.code,
                 vacant_declaration_type=self.vacant_course_lagro1510.vacant_declaration_type,
-                lecturing_volume_total=self.vacant_course_lagro1510.lecturing_volume_total,
                 lecturing_volume_available=self.vacant_course_lagro1510.lecturing_volume_available,
-                practical_volume_total=self.vacant_course_lagro1510.practical_volume_total,
                 practical_volume_available=self.vacant_course_lagro1510.practical_volume_available,
+                # From learning unit service
+                practical_volume_total=Decimal(25),
+                lecturing_volume_total=Decimal(50),
+                # From learning unit service
                 tutors=[],
             )
         ])
@@ -153,10 +190,12 @@ class TestSearchVacantCourseService(TestCase):
                 is_in_team=self.vacant_course_lagro1510.is_in_team,
                 allocation_entity_code=self.vacant_course_lagro1510.allocation_entity.code,
                 vacant_declaration_type=self.vacant_course_lagro1510.vacant_declaration_type,
-                lecturing_volume_total=self.vacant_course_lagro1510.lecturing_volume_total,
                 lecturing_volume_available=self.vacant_course_lagro1510.lecturing_volume_available,
-                practical_volume_total=self.vacant_course_lagro1510.practical_volume_total,
                 practical_volume_available=self.vacant_course_lagro1510.practical_volume_available,
+                # From learning unit service
+                practical_volume_total=Decimal(25),
+                lecturing_volume_total=Decimal(50),
+                # From learning unit service
                 tutors=[],
             )
         ])

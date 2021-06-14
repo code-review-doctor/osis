@@ -27,7 +27,7 @@ from typing import List, Optional
 
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseSearchDTO
+from ddd.logic.application.dtos import VacantCourseDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
@@ -55,7 +55,7 @@ class VacantCourseInMemoryRepository(IVacantCourseRepository):
             with_allocation_entity_children: bool = False,
             vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
-    ) -> List[VacantCourseSearchDTO]:
+    ) -> List[VacantCourseDTO]:
         results = cls.vacant_courses
         if code is not None:
             results = filter(lambda vacant_course: code in vacant_course.code, results)
@@ -70,7 +70,7 @@ class VacantCourseInMemoryRepository(IVacantCourseRepository):
                 lambda vacant_course: vacant_course.vacant_declaration_type in vacant_declaration_types, results
             )
         return [
-            VacantCourseSearchDTO(
+            VacantCourseDTO(
                 code=result.code,
                 year=result.year,
                 title=result.title,
@@ -78,10 +78,7 @@ class VacantCourseInMemoryRepository(IVacantCourseRepository):
                 allocation_entity_code=result.allocation_entity.code,
                 vacant_declaration_type=result.vacant_declaration_type,
                 lecturing_volume_available=result.lecturing_volume_available,
-                lecturing_volume_total=result.lecturing_volume_total,
                 practical_volume_available=result.practical_volume_available,
-                practical_volume_total=result.practical_volume_total,
-                tutors=[]
             ) for result in results
         ]
 

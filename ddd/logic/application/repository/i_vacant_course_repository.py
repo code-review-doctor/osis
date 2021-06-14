@@ -28,7 +28,7 @@ from typing import List, Optional
 
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseSearchDTO
+from ddd.logic.application.dtos import VacantCourseDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
@@ -55,7 +55,7 @@ class IVacantCourseRepository(interface.AbstractRepository):
             with_allocation_entity_children: bool = False,
             vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
-    ) -> List[VacantCourseSearchDTO]:
+    ) -> List[VacantCourseDTO]:
         pass
 
     @classmethod

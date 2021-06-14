@@ -61,21 +61,8 @@ class VacantCourseFromRepositoryDTO(DTO):
     is_in_team = attr.ib(type=bool)
     allocation_entity = attr.ib(type=str)
     vacant_declaration_type = attr.ib(type=str)
-    lecturing_volume_total = attr.ib(type=Decimal)
     lecturing_volume_available = attr.ib(type=Decimal)
-    practical_volume_total = attr.ib(type=Decimal)
     practical_volume_available = attr.ib(type=Decimal)
-
-
-@attr.s(frozen=True, slots=True)
-class TutorAttributionFromRepositoryDTO(DTO):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
-    first_name = attr.ib(type=str)
-    last_name = attr.ib(type=str)
-    function = attr.ib(type=str)
-    lecturing_volume = attr.ib(Decimal)
-    practical_volume = attr.ib(Decimal)
 
 
 @attr.s(frozen=True, slots=True)
@@ -126,9 +113,21 @@ class ApplicationByApplicantDTO(DTO):
 class TutorAttributionDTO(DTO):
     first_name = attr.ib(type=str)
     last_name = attr.ib(type=str)
-    function = attr.ib(type=str)
+    function = attr.ib(type=Functions)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
+
+
+@attr.s(frozen=True, slots=True)
+class VacantCourseDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    title = attr.ib(type=str)
+    is_in_team = attr.ib(type=bool)
+    allocation_entity_code = attr.ib(type=str)
+    vacant_declaration_type = attr.ib(type=str)
+    lecturing_volume_available = attr.ib(type=Decimal)
+    practical_volume_available = attr.ib(type=Decimal)
 
 
 @attr.s(frozen=True, slots=True)
@@ -147,11 +146,22 @@ class VacantCourseSearchDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitVolumeDTO(DTO):
+class LearningUnitVolumeFromServiceDTO(DTO):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
     lecturing_volume_total = attr.ib(type=Decimal)
     practical_volume_total = attr.ib(type=Decimal)
+
+
+@attr.s(frozen=True, slots=True)
+class LearningUnitTutorAttributionFromServiceDTO(DTO):
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    first_name = attr.ib(type=str)
+    last_name = attr.ib(type=str)
+    function = attr.ib(type=str)
+    lecturing_volume = attr.ib(type=Decimal)
+    practical_volume = attr.ib(type=Decimal)
 
 
 @attr.s(frozen=True, slots=True)
@@ -168,3 +178,4 @@ class ChargeSummaryDTO(DTO):
     practical_volume_available = attr.ib(type=Decimal)
     total_lecturing_volume_course = attr.ib(type=Decimal)
     total_practical_volume_course = attr.ib(type=Decimal)
+    tutors = attr.ib(type=List[TutorAttributionDTO], default=[])

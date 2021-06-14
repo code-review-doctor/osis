@@ -33,11 +33,13 @@ from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
+from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
     AttributionAboutToExpireFunctionException, VacantCourseNotFound
 from ddd.logic.application.domain.validator.validators_by_business_action import RenewApplicationValidatorList
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd import interface
 
@@ -50,7 +52,8 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             application_calendar: ApplicationCalendar,
             applicant: Applicant,
             all_existing_applications: List[Application],
-            vacant_course_repository: IVacantCourseRepository
+            vacant_course_repository: IVacantCourseRepository,
+            learning_unit_service: ILearningUnitService,
     ) -> List[AttributionAboutToExpireDTO]:
         attributions_about_to_expire = applicant.get_attributions_about_to_expire(
             application_calendar.authorized_target_year
@@ -70,6 +73,12 @@ class AttributionAboutToExpireRenew(interface.DomainService):
         ]
         vacant_courses_next_year = vacant_course_repository.search(vacant_course_ids)
 
+        learning_unit_ids = [
+            LearningUnitIdentity(academic_year=vacant_course_id.academic_year, code=vacant_course_id.code)
+            for vacant_course_id in vacant_course_ids
+        ]
+        vacant_courses_next_year_volumes = learning_unit_service.search_learning_unit_volumes_dto(learning_unit_ids)
+
         attributions_about_to_expire_dto = []
         for attribution_about_to_expire in attributions_filtered:
             unavailable_renewal_reason = _get_unavailable_renewal_reason(
@@ -80,6 +89,10 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             vacant_course_next_year = _get_vacant_course_by_code(
                 attribution_about_to_expire.course_id.code, vacant_courses_next_year
             )
+            vacant_course_next_year_volume = next((
+                vc_volume for vc_volume in vacant_courses_next_year_volumes
+                if vc_volume.code == attribution_about_to_expire.course_id.code
+            ), None)
 
             attribution_dto = AttributionAboutToExpireDTO(
                 code=attribution_about_to_expire.course_id.code,
@@ -90,8 +103,8 @@ class AttributionAboutToExpireRenew(interface.DomainService):
                 end_year=attribution_about_to_expire.end_year.year,
                 start_year=attribution_about_to_expire.start_year.year,
                 title=getattr(vacant_course_next_year, 'title', None) or attribution_about_to_expire.course_title,
-                total_lecturing_volume_course=getattr(vacant_course_next_year, 'lecturing_volume_total', None),
-                total_practical_volume_course=getattr(vacant_course_next_year, 'practical_volume_total', None),
+                total_lecturing_volume_course=getattr(vacant_course_next_year_volume, 'lecturing_volume_total', None),
+                total_practical_volume_course=getattr(vacant_course_next_year_volume, 'practical_volume_total', None),
                 lecturing_volume_available=getattr(vacant_course_next_year, 'lecturing_volume_available', None),
                 practical_volume_available=getattr(vacant_course_next_year, 'practical_volume_available', None),
                 unavailable_renewal_reason=unavailable_renewal_reason,

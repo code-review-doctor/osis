@@ -30,7 +30,7 @@ from django.test import TestCase
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from ddd.logic.application.dtos import LearningUnitVolumeDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
@@ -68,7 +68,7 @@ class LearningUnitTranslatorSearchLearningUnitVolumes(TestCase):
         self.assertEqual(len(results), 2)
 
         self.assertIn(
-            LearningUnitVolumeDTO(
+            LearningUnitVolumeFromServiceDTO(
                 code="LDROI1200",
                 year=2018,
                 lecturing_volume_total=Decimal(30),
@@ -78,7 +78,7 @@ class LearningUnitTranslatorSearchLearningUnitVolumes(TestCase):
         )
 
         self.assertIn(
-            LearningUnitVolumeDTO(
+            LearningUnitVolumeFromServiceDTO(
                 code="LAGRO2000",
                 year=2018,
                 lecturing_volume_total=Decimal(5),

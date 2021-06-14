@@ -50,10 +50,10 @@ class VacantCourseGetTutorAttributionSerializer(serializers.Serializer):
 class VacantCourseGetSerializer(serializers.Serializer):
     code = serializers.CharField(required=False, read_only=True)
     year = serializers.IntegerField(required=False, read_only=True)
-    lecturing_volume_total = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    practical_volume_total = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
-    practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=2, read_only=True)
+    lecturing_volume_total = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume_total = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    lecturing_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
+    practical_volume_available = serializers.DecimalField(max_digits=5, decimal_places=1, read_only=True)
     title = serializers.CharField(required=False, read_only=True)
     vacant_declaration_type = serializers.CharField(
         required=False, read_only=True, source="vacant_declaration_type.name"

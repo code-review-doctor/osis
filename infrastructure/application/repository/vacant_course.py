@@ -36,18 +36,14 @@ from django.db.models.expressions import RawSQL
 from django.db.models.functions import Cast
 from django_cte import With
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.models.attribution_new import AttributionNew
-from attribution.models.enums.function import Functions
 from base.models.entity_version import EntityVersion
-from base.models.enums import learning_container_year_types, learning_component_year_type
+from base.models.enums import learning_container_year_types
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.utils.func import ArrayConcat
 from ddd.logic.application.domain.builder.vacant_course_builder import VacantCourseBuilder
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO, VacantCourseSearchDTO, \
-    TutorAttributionFromRepositoryDTO, TutorAttributionDTO
+from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO, VacantCourseDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 
@@ -78,7 +74,7 @@ class VacantCourseRepository(IVacantCourseRepository):
             with_allocation_entity_children: bool = False,
             vacant_declaration_types: List[VacantDeclarationType] = None,
             **kwargs
-    ) -> List[VacantCourseSearchDTO]:
+    ) -> List[VacantCourseDTO]:
         qs = _vacant_course_base_qs()
         if allocation_entity_code and with_allocation_entity_children:
             qs = _annotate_allocation_entity_parents(qs)
@@ -98,21 +94,9 @@ class VacantCourseRepository(IVacantCourseRepository):
                 Q(allocation_entity=allocation_entity_code)
                 | Q(allocation_entity_parents__contains=[allocation_entity_code])
             )
-
-        tutors_attributions = _prefetch_tutors_attributions(qs)
         results = []
         for row_as_dict in qs:
-            tutors_attributions_dto = [
-                TutorAttributionDTO(
-                    first_name=tutor_attribution.first_name,
-                    last_name=tutor_attribution.last_name,
-                    function=Functions[tutor_attribution.function] if tutor_attribution.function else None,
-                    lecturing_volume=tutor_attribution.lecturing_volume,
-                    practical_volume=tutor_attribution.practical_volume,
-                ) for tutor_attribution in tutors_attributions
-                if tutor_attribution.code == row_as_dict['code'] and tutor_attribution.year == row_as_dict['year']
-            ]
-            vacant_course_search_dto = VacantCourseSearchDTO(
+            vacant_course_search_dto = VacantCourseDTO(
                 code=row_as_dict['code'],
                 year=row_as_dict['year'],
                 title=row_as_dict['title'],
@@ -120,10 +104,7 @@ class VacantCourseRepository(IVacantCourseRepository):
                 allocation_entity_code=row_as_dict['allocation_entity'],
                 vacant_declaration_type=row_as_dict['vacant_declaration_type'],
                 lecturing_volume_available=row_as_dict['lecturing_volume_available'],
-                lecturing_volume_total=row_as_dict['lecturing_volume_total'],
                 practical_volume_available=row_as_dict['practical_volume_available'],
-                practical_volume_total=row_as_dict['practical_volume_total'],
-                tutors=tutors_attributions_dto
             )
             results.append(vacant_course_search_dto)
         return results
@@ -151,7 +132,6 @@ def _vacant_course_base_qs() -> QuerySet:
     )
 
     return main_qs.\
-        annotate_volume_total().\
         annotate_volume_vacant_available().\
         annotate(
             code=F('learning_container_year__acronym'),
@@ -166,9 +146,7 @@ def _vacant_course_base_qs() -> QuerySet:
             "title",
             "is_in_team",
             "vacant_declaration_type",
-            "lecturing_volume_total",
             "lecturing_volume_available",
-            "practical_volume_total",
             "practical_volume_available",
             "allocation_entity"
         ).exclude(
@@ -235,41 +213,3 @@ def _annotate_allocation_entity_parents(qs: QuerySet) -> QuerySet:
         )
     )
     return qs
-
-
-def _prefetch_tutors_attributions(vacant_course_qs) -> List[TutorAttributionFromRepositoryDTO]:
-    subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
-
-    filter_clause = functools.reduce(
-        operator.or_,
-        ((Q(learning_container_year__acronym=entity_id['code'])
-          & Q(learning_container_year__academic_year__year=entity_id['year'])) for entity_id in vacant_course_qs)
-    )
-
-    qs = AttributionNew.objects.filter(filter_clause).annotate(
-        code=F('learning_container_year__acronym'),
-        year=F('learning_container_year__academic_year__year'),
-        first_name=F('tutor__person__first_name'),
-        last_name=F('tutor__person__last_name'),
-        lecturing_volume=Subquery(
-            subqs.filter(
-                learning_component_year__type=learning_component_year_type.LECTURING
-            ).values('allocation_charge')[:1],
-            output_field=models.DecimalField()
-        ),
-        practical_volume=Subquery(
-            subqs.filter(
-                learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
-            ).values('allocation_charge')[:1],
-            output_field=models.DecimalField()
-        )
-    ).values(
-        'code',
-        'year',
-        'first_name',
-        'last_name',
-        'function',
-        'lecturing_volume',
-        'practical_volume',
-    )
-    return [TutorAttributionFromRepositoryDTO(**row) for row in qs]

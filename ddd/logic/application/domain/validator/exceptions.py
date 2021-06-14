@@ -29,54 +29,72 @@ from django.utils.translation import gettext_lazy as _
 
 
 class LecturingAndPracticalChargeNotFilledException(BusinessException):
+    status_code = "APPLICATION-1"
+
     def __init__(self, *args, **kwargs):
         message = _("Lecturing charge or practical charge must be filled")
         super().__init__(message, **kwargs)
 
 
 class ApplicationAlreadyExistsException(BusinessException):
+    status_code = "APPLICATION-2"
+
     def __init__(self, *args, **kwargs):
         message = _("You have already applied on vacant course")
         super().__init__(message, **kwargs)
 
 
 class VacantCourseNotFound(BusinessException):
+    status_code = "APPLICATION-3"
+
     def __init__(self, *args, **kwargs):
         message = _("No vacant corresponding activity")
         super().__init__(message, **kwargs)
 
 
 class VacantCourseNotAllowedDeclarationType(BusinessException):
+    status_code = "APPLICATION-4"
+
     def __init__(self, *args, **kwargs):
         message = _("Application on this vacant course is not reserved for interns/open for extern")
         super().__init__(message, **kwargs)
 
 
 class VacantCourseApplicationManagedInTeamException(BusinessException):
+    status_code = "APPLICATION-5"
+
     def __init__(self, *args, **kwargs):
         message = _("This course is team-managed. The application to this activity is based on a paper transmission.")
         super().__init__(message, **kwargs)
 
 
 class VolumesAskedShouldBeLowerOrEqualToVolumeAvailable(BusinessException):
+    status_code = "APPLICATION-6"
+
     def __init__(self, *args, **kwargs):
         message = _("Volumes asked should be lower or equal to volume available")
         super().__init__(message, **kwargs)
 
 
 class AttributionAboutToExpireNotFound(BusinessException):
+    status_code = "APPLICATION-7"
+
     def __init__(self, *args, code: str, **kwargs):
         message = _("Cannot found attribution about to expire with code: {}".format(code))
         super().__init__(message, **kwargs)
 
 
 class AttributionAboutToExpireFunctionException(BusinessException):
+    status_code = "APPLICATION-8"
+
     def __init__(self, *args,  **kwargs):
         message = _("Cannot renew an attribution with a function different from holder or coholder")
         super().__init__(message, **kwargs)
 
 
 class NotAuthorOfApplicationException(BusinessException):
+    status_code = "APPLICATION-9"
+
     def __init__(self, *args,  **kwargs):
         message = _("Cannot update an application which is not owned by you")
         super().__init__(message, **kwargs)

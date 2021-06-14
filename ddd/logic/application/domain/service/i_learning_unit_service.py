@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.application.dtos import LearningUnitVolumeDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, LearningUnitTutorAttributionFromServiceDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
@@ -34,5 +34,14 @@ class ILearningUnitService(interface.DomainService):
     """
         Anticorruption layer to translate data from learning_unit bounded context to application bounded context
     """
-    def search_learning_unit_volumes_dto(self, entity_ids: List[LearningUnitIdentity]) -> List[LearningUnitVolumeDTO]:
+    def search_learning_unit_volumes_dto(
+            self,
+            entity_ids: List[LearningUnitIdentity]
+    ) -> List[LearningUnitVolumeFromServiceDTO]:
+        pass
+
+    def search_tutor_attribution_dto(
+            self,
+            entity_ids: List[LearningUnitIdentity]
+    ) -> List[LearningUnitTutorAttributionFromServiceDTO]:
         pass

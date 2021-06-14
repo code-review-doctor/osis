@@ -26,11 +26,12 @@
 from decimal import Decimal
 from typing import List
 
+from attribution.models.enums.function import Functions
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
-from ddd.logic.application.dtos import ChargeSummaryDTO
+from ddd.logic.application.dtos import ChargeSummaryDTO, TutorAttributionDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from osis_common.ddd import interface
 
@@ -64,6 +65,7 @@ class ChargeSummary(interface.DomainService):
 
         learning_unit_ids = [attribution.course_id for attribution in applicant.attributions]
         learning_unit_volumes = learning_unit_service.search_learning_unit_volumes_dto(learning_unit_ids)
+        learning_unit_tutors = learning_unit_service.search_tutor_attribution_dto(learning_unit_ids)
 
         results = []
         for attribution in current_attribution:
@@ -72,7 +74,15 @@ class ChargeSummary(interface.DomainService):
                 (luv for luv in learning_unit_volumes if luv.code == attribution.course_id.code),
                 None
             )
-
+            tutors_filtered = [
+                TutorAttributionDTO(
+                    first_name=t_dto.first_name,
+                    last_name=t_dto.last_name,
+                    function=Functions[t_dto.function] if t_dto.function else None,
+                    lecturing_volume=t_dto.lecturing_volume,
+                    practical_volume=t_dto.practical_volume,
+                ) for t_dto in learning_unit_tutors if t_dto.code == attribution.course_id.code
+            ]
             results.append(
                 ChargeSummaryDTO(
                     code=attribution.course_id.code,
@@ -95,7 +105,7 @@ class ChargeSummary(interface.DomainService):
                     total_practical_volume_course=getattr(
                         learning_unit_volume, 'practical_volume_total'
                     ) if learning_unit_volume else Decimal(0.0),
+                    tutors=tutors_filtered
                 )
             )
-
         return results

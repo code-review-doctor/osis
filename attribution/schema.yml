@@ -456,6 +456,10 @@ components:
         total_practical_volume_course:
           type: string
           example: '30.0'
+        tutors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TutorAttribution'
     VacantCourseList:
       type: object
       properties:

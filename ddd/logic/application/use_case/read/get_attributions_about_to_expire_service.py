@@ -28,6 +28,7 @@ from typing import List
 from ddd.logic.application.commands import GetAttributionsAboutToExpireCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.service.attribution_about_to_expire_renew import AttributionAboutToExpireRenew
+from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
@@ -41,6 +42,7 @@ def get_attributions_about_to_expire(
         application_calendar_repository: IApplicationCalendarRepository,
         applicant_repository: IApplicantRepository,
         vacant_course_repository: IVacantCourseRepository,
+        learning_unit_service: ILearningUnitService,
 ) -> List[AttributionAboutToExpireDTO]:
     # Given
     application_calendar = application_calendar_repository.get_current_application_calendar()
@@ -52,5 +54,6 @@ def get_attributions_about_to_expire(
         application_calendar,
         applicant,
         all_existing_applications,
-        vacant_course_repository
+        vacant_course_repository,
+        learning_unit_service
     )

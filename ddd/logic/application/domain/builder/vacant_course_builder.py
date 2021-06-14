@@ -44,8 +44,6 @@ class VacantCourseBuilder(RootEntityBuilder):
             vacant_declaration_type=VacantDeclarationType[dto.vacant_declaration_type]
             if dto.vacant_declaration_type else None,
             allocation_entity=AllocationEntity(dto.allocation_entity),
-            lecturing_volume_total=dto.lecturing_volume_total,
             lecturing_volume_available=dto.lecturing_volume_available,
-            practical_volume_total=dto.practical_volume_total,
             practical_volume_available=dto.practical_volume_available,
         )

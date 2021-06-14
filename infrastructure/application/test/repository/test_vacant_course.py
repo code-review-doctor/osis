@@ -35,7 +35,7 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
-from ddd.logic.application.dtos import VacantCourseSearchDTO
+from ddd.logic.application.dtos import VacantCourseSearchDTO, VacantCourseDTO
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 
@@ -178,7 +178,7 @@ class VacantCourseRepositorySearchDTO(TestCase):
         results = self.repository.search_vacant_course_dto(code="LDROI")
 
         self.assertEqual(len(results), 1)
-        self.assertIsInstance(results[0], VacantCourseSearchDTO)
+        self.assertIsInstance(results[0], VacantCourseDTO)
         self.assertEqual(results[0].code, 'LDROI1200')
         self.assertEqual(results[0].year, 2020)
 
@@ -186,7 +186,7 @@ class VacantCourseRepositorySearchDTO(TestCase):
         results = self.repository.search_vacant_course_dto(allocation_entity_code="AGRO")
 
         self.assertEqual(len(results), 1)
-        self.assertIsInstance(results[0], VacantCourseSearchDTO)
+        self.assertIsInstance(results[0], VacantCourseDTO)
         self.assertEqual(results[0].code, 'LAGRO1500')
         self.assertEqual(results[0].year, 2020)
 
@@ -212,7 +212,7 @@ class VacantCourseRepositorySearchDTO(TestCase):
             with_allocation_entity_children=True
         )
         self.assertEqual(len(results), 2)
-        self.assertIsInstance(results[0], VacantCourseSearchDTO)
+        self.assertIsInstance(results[0], VacantCourseDTO)
         self.assertIn('LDROI2000', [result.code for result in results])
 
     def test_search_assert_filtered_by_academic_year_identity(self):

@@ -49,8 +49,6 @@ class VacantCourseIdentity(interface.EntityIdentity):
 @attr.s(slots=True, hash=False, eq=False)
 class VacantCourse(interface.RootEntity):
     entity_id = attr.ib(type=VacantCourseIdentity)
-    lecturing_volume_total = attr.ib(type=Decimal)
-    practical_volume_total = attr.ib(type=Decimal)
     lecturing_volume_available = attr.ib(type=Decimal)
     practical_volume_available = attr.ib(type=Decimal)
     title = attr.ib(type=str)
