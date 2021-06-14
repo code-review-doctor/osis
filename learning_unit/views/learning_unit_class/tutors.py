@@ -28,11 +28,9 @@ from typing import List
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 
-from attribution.models.enums.function import COORDINATOR
 from base.models.learning_unit_year import LearningUnitYear
-from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution, LearningUnitAttributionIdentity
-from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
+from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
+from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
@@ -86,24 +84,8 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
         return message_bus_instance.invoke(command)
 
     def get_class_tutors(self) -> List['Tutor']:
-        # replace with service result
-        return [
-            Tutor(
-                entity_id=TutorIdentity(personal_id_number='id_number'),
-                first_name='Toto',
-                last_name='Tutu',
-                attributions=[
-                    LearningUnitAttribution(
-                        entity_id=LearningUnitAttributionIdentity(uuid='uuid'),
-                        function=COORDINATOR,
-                        learning_unit=self.get_learning_unit().entity_id,
-                        distributed_effective_classes=[
-                            ClassVolumeRepartition(
-                                effective_class=self.get_effective_class().entity_id,
-                                distributed_volume=10
-                            )
-                        ]
-                    )
-                ]
-            )
-        ]
+        command = SearchTutorAttributedToLearningUnitCommand(
+            learning_unit_code=self.kwargs['learning_unit_code'],
+            learning_unit_year=self.kwargs['learning_unit_year']
+        )
+        return message_bus_instance.invoke(command)
