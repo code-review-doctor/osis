@@ -143,7 +143,7 @@ class TutorRepository(ITutorRepository):
                 academic_year__year=attribution.learning_unit.year
             ).values_list('learning_container_year_id', flat=True).get()
 
-            attribution_new = AttributionNewDatabase.objects.get_or_create(
+            attribution_new, _ = AttributionNewDatabase.objects.get_or_create(
                 tutor_id=tutor.pk,
                 learning_container_year_id=learning_container_year_id,
                 defaults={
