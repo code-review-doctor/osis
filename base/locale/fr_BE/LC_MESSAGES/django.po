@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-03 13:47+0200\n"
+"POT-Creation-Date: 2021-06-14 16:08+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -208,6 +208,9 @@ msgstr "Année académique"
 
 msgid "Accepted"
 msgstr "Accepté"
+
+msgid "Access based on application"
+msgstr ""
 
 msgid "Access condition"
 msgstr "Condition d'accès"
@@ -1730,10 +1733,6 @@ msgstr "Inscriptions aux formations"
 msgid "Ok"
 msgstr "Ok"
 
-msgid "On the file: direct access or access with additional training"
-msgstr ""
-"Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
-
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
@@ -2710,8 +2709,8 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application"
-msgstr "L'unité d'enseignement a au moins une candidature"
+msgid "This learning unit has application this year or in the future"
+msgstr "L'unité d'enseignement a au moins une candidature cette année ou dans le futur"
 
 #, python-format
 msgid ""
@@ -2812,9 +2811,6 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
-
-msgid "UE full"
-msgstr "UE complète"
 
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
@@ -2956,6 +2952,12 @@ msgstr "Oui, je confirme."
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year "
+"or in the future"
+msgstr ""
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant des classes cette année ou dans le futur"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
