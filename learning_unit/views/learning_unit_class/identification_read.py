@@ -42,7 +42,7 @@ from learning_unit.models.learning_class_year import LearningClassYear
 
 class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
     template_name = "class/identification_tab.html"
-    permission_required = 'base.can_access_class'
+    permission_required = 'learning_unit.view_learningclassyear'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
