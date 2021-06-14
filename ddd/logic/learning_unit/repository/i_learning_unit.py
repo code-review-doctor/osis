@@ -26,11 +26,16 @@
 import abc
 from typing import List
 
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
 from osis_common.ddd import interface
 
 
 class ILearningUnitRepository(interface.AbstractRepository):
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'LearningUnitIdentity') -> 'LearningUnit':
+        pass
 
     @classmethod
     @abc.abstractmethod
@@ -42,4 +47,19 @@ class ILearningUnitRepository(interface.AbstractRepository):
             type: str = None,
             responsible_entity_code: str = None
     ) -> List['LearningUnitSearchDTO']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def has_proposal_this_year_or_in_past(cls, learning_unit: 'LearningUnit') -> bool:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def has_enrollments(cls, learning_unit: 'LearningUnit') -> bool:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_all_identities(cls) -> List['LearningUnitIdentity']:
         pass

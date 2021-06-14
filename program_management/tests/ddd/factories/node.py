@@ -28,11 +28,14 @@ import factory.fuzzy
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from education_group.models.enums.constraint_type import ConstraintTypes
+from program_management.ddd.domain import exception
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
+from education_group.ddd.business_types import *
 from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.repositories import node as node_repository
 
 
 def generate_end_date(node):
@@ -53,6 +56,16 @@ class NodeFactory(factory.Factory):
     end_date = factory.LazyAttribute(generate_end_date)
     entity_id = factory.LazyAttribute(generate_node_identity)
 
+    @factory.post_generation
+    def persist(obj, create, extracted, **kwargs):
+        if extracted:
+            from program_management.tests.ddd.factories import program_tree as tree_factory
+            try:
+                node_repository.NodeRepository.get(obj.entity_id)
+            except exception.NodeNotFoundException:
+                node_repository.NodeRepository.create(obj)
+                tree_factory.ProgramTreeFactory(root_node=obj, persist=True, load_fixture=True)
+
 
 class CampusFactory(factory.Factory):
 
@@ -70,7 +83,9 @@ class NodeGroupYearFactory(NodeFactory):
         model = NodeGroupYear
         abstract = False
 
+    node_id = factory.Sequence(lambda n: n*2)
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
+    category = factory.LazyAttribute(lambda o: o.node_type)
     group_title_fr = factory.fuzzy.FuzzyText(length=240)
     group_title_en = factory.fuzzy.FuzzyText(length=240)
     remark_fr = factory.fuzzy.FuzzyText(length=240)
@@ -89,6 +104,7 @@ class NodeGroupYearFactory(NodeFactory):
     max_constraint = 5
     version_name = STANDARD
     transition_name = NOT_A_TRANSITION
+    category = GroupType.SUB_GROUP
 
     class Params:
         minitraining = factory.Trait(
@@ -101,6 +117,28 @@ class NodeGroupYearFactory(NodeFactory):
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_option_list_choice_enums())
         )
 
+    @classmethod
+    def from_group(cls, group: 'Group', persist: bool) -> 'Node':
+        return cls(
+            code=group.code,
+            title=group.abbreviated_title,
+            year=group.year,
+            start_year=group.start_year,
+            end_year=group.end_year,
+            end_date=group.end_year,
+            node_type=group.type,
+            teaching_campus=group.teaching_campus,
+            remark_fr=group.remark.text_fr,
+            remark_en=group.remark.text_en,
+            group_title_fr=group.titles.title_fr,
+            group_title_en=group.titles.title_en,
+            offer_title_fr=group.titles.title_fr,
+            offer_title_en=group.titles.title_en,
+            offer_partial_title_fr=group.titles.partial_title_fr,
+            offer_partial_title_en=group.titles.partial_title_en,
+            persist=persist
+        )
+
 
 class NodeLearningUnitYearFactory(NodeFactory):
 
@@ -108,6 +146,7 @@ class NodeLearningUnitYearFactory(NodeFactory):
         model = NodeLearningUnitYear
         abstract = False
 
+    node_id = factory.Sequence(lambda n: n*2+1)
     node_type = NodeType.LEARNING_UNIT
     code = factory.Sequence(lambda n: 'LUCODE%02d' % n)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

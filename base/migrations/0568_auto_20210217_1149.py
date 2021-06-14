@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
                '[OSIS] Rappel événement(s) du calendrier académique',
                'calendar_reminder_notice_html',
                'HTML',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("INSERT INTO osis_common_messagetemplate (template, subject, reference, format, language) "
@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                '[OSIS] Rappel événement(s) du calendrier académique',
                'calendar_reminder_notice_txt',
                'PLAIN',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("INSERT INTO osis_common_messagetemplate (template, subject, reference, format, language)"
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
                '[OSIS] Remind event(s) academic calendar',
                'calendar_reminder_notice_html',
                'HTML',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("INSERT INTO osis_common_messagetemplate (template, subject, reference, format, language) "
@@ -134,6 +134,6 @@ class Migration(migrations.Migration):
                '[OSIS] Remind event(s) academic calendar',
                'calendar_reminder_notice_txt',
                'PLAIN',
-               'en'])],
+               'en'])], elidable=True
         ),
     ]

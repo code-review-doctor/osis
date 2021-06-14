@@ -25,5 +25,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_groups, rollback_groups),
+        migrations.RunPython(remove_groups, rollback_groups, elidable=True),
     ]

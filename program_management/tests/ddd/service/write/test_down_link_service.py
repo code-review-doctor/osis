@@ -21,64 +21,38 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from unittest import mock
 
-from django.test import TestCase
+import attr
 
-from program_management.ddd.domain import program_tree, node
+from program_management.ddd.command import OrderDownLinkCommand
+from program_management.ddd.domain import program_tree
 from program_management.ddd.service.write import down_link_service
-from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS1BA import OSIS1BAFactory
+from testing.testcases import DDDTestCase
 
 
-class TestDownLink(TestCase):
-
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
-        self.parent = self.tree.root_node
-        self.link0 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=0)
-        self.link1 = LinkFactory(parent=self.parent, child=NodeGroupYearFactory(), order=1)
-        self.link2 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=2)
-
-        self.load_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.get",
-            return_value=self.tree
+class TestDownLinkService(DDDTestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        self.tree = OSIS1BAFactory()[0].tree
+        self.cmd = OrderDownLinkCommand(
+            path=program_tree.build_path(self.tree.root_node, self.tree.root_node.children_as_nodes[0])
         )
-        self.mocked_load_tree = self.load_tree_patcher.start()
-        self.addCleanup(self.load_tree_patcher.stop)
 
-        self.get_node_from_element_id_patcher = mock.patch(
-            "program_management.ddd.domain.service.identity_search.NodeIdentitySearch.get_from_element_id",
-            return_value=self.tree.root_node
-        )
-        self.mocked_get_node_from_element_id = self.get_node_from_element_id_patcher.start()
-        self.addCleanup(self.get_node_from_element_id_patcher.stop)
+    def test_should_replace_one_child_after(self):
+        node_id = down_link_service.down_link(self.cmd)
 
-        self.persist_tree_patcher = mock.patch(
-            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.update",
-            return_value=self.tree.entity_id
-        )
-        self.mocked_persist_tree = self.persist_tree_patcher.start()
-        self.addCleanup(self.persist_tree_patcher.stop)
+        children = self.tree.root_node.children_as_nodes
+        self.assertEqual(node_id, children[1].entity_id)
 
-        self.load_node_element = mock.patch(
-            "program_management.ddd.repositories.load_node.load",
+    def test_should_keep_order_when_child_is_already_the_first_child(self):
+        cmd = attr.evolve(
+            self.cmd,
+            path=program_tree.build_path(self.tree.root_node, self.tree.root_node.children_as_nodes[1])
         )
-        self.mocked_load_node_element = self.load_node_element.start()
-        self.addCleanup(self.load_node_element.stop)
+        order_before_service_call = self.tree.root_node.children_as_nodes
 
-    def test_should_return_node_identity_of_node_downed(self):
-        self.mocked_load_node_element.side_effect = [self.parent, self.link1.child]
+        down_link_service.down_link(cmd)
 
-        command = OrderDownLinkCommandFactory(path=program_tree.build_path(self.parent, self.link1.child))
-        result = down_link_service.down_link(command)
-        expected = node.NodeIdentity(
-            code=self.link1.child.code,
-            year=self.link1.child.academic_year.year
-        )
-        self.assertEqual(
-            result,
-            expected
-        )
+        order_after_service_call = self.tree.root_node.children_as_nodes
+        self.assertListEqual(order_before_service_call, order_after_service_call)
