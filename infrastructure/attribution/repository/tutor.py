@@ -138,13 +138,13 @@ class TutorRepository(ITutorRepository):
             attribution_db = AttributionNewDatabase.objects.get(attribution.entity_id.uuid)
 
             for class_volume in attribution.distributed_effective_classes:
-                learning_class_year = LearningClassYearDatabase.objects.filter(
+                learning_class_year = LearningClassYearDatabase.objects.get(
                     learning_component_year__learning_unit_year__acronym=attribution.learning_unit.code,
                     learning_component_year__learning_unit_year__academic_year__year=attribution.learning_unit.year,
                     acronym=class_volume.class_code
                 )
 
-                attribution_charge_id = AttributionChargeNewDatabase.objects.get(
+                attribution_charge_id = AttributionChargeNewDatabase.objects.filter(
                     attribution_id=attribution_db.pk,
                     learning_component_year_id=learning_class_year.learning_component_year_id,
                 ).values_list('pk', flat=True).get()
