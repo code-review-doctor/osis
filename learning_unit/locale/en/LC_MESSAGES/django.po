@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-14 09:22+0200\n"
+"POT-Creation-Date: 2021-06-15 06:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,6 +26,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Add over the current year"
+msgstr ""
+
 msgid "Additional requirement entity 1"
 msgstr ""
 
@@ -39,6 +42,9 @@ msgid "Annual volume"
 msgstr ""
 
 msgid "Attribution entity"
+msgstr ""
+
+msgid "Cancel"
 msgstr ""
 
 msgid "Central manager"
@@ -88,6 +94,9 @@ msgid "Formation catalogue"
 msgstr ""
 
 msgid "Full"
+msgstr ""
+
+msgid "Function"
 msgstr ""
 
 msgid "Inactive"
@@ -147,6 +156,13 @@ msgstr ""
 msgid "Other remark in english (intended for publication)"
 msgstr ""
 
+msgctxt "pm component type"
+msgid "PM"
+msgstr ""
+
+msgid "PP"
+msgstr ""
+
 msgid "Periodicity"
 msgstr ""
 
@@ -177,6 +193,9 @@ msgstr ""
 msgid "Requirement entity"
 msgstr ""
 
+msgid "Save"
+msgstr ""
+
 msgid "Session derogation"
 msgstr ""
 
@@ -184,6 +203,9 @@ msgid "Specific complement (Full)"
 msgstr ""
 
 msgid "State"
+msgstr ""
+
+msgid "Substitute"
 msgstr ""
 
 msgid ""
@@ -284,6 +306,15 @@ msgid "Title in English"
 msgstr ""
 
 msgid "Title in French"
+msgstr ""
+
+msgid "Tutor"
+msgstr ""
+
+msgid "Tutor (full)"
+msgstr ""
+
+msgid "Tutors"
 msgstr ""
 
 msgid "Type"

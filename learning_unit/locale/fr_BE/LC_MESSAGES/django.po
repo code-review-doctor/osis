@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-14 09:22+0200\n"
+"POT-Creation-Date: 2021-06-15 06:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,9 @@ msgstr "Actions"
 msgid "Active"
 msgstr "Actif"
 
+msgid "Add over the current year"
+msgstr "Ajouter sur l’année en cours"
+
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
 
@@ -39,6 +42,9 @@ msgstr "Volume annuel"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Central manager"
 msgstr "Gestionnaire central"
@@ -89,6 +95,9 @@ msgstr "Catalogue des formations"
 
 msgid "Full"
 msgstr "Complet"
+
+msgid "Function"
+msgstr "Fonction"
 
 msgid "Inactive"
 msgstr "Inactif"
@@ -151,6 +160,13 @@ msgstr "Autre remarque (destinée à la publication)"
 msgid "Other remark in english (intended for publication)"
 msgstr "Autre remarque en anglais (destinée à la publication)"
 
+msgctxt "pm component type"
+msgid "PM"
+msgstr "PM"
+
+msgid "PP"
+msgstr "PP"
+
 msgid "Periodicity"
 msgstr "Périodicité"
 
@@ -181,6 +197,9 @@ msgstr "Voir unité d'enseignement"
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
+msgid "Save"
+msgstr "Enregistrer"
+
 msgid "Session derogation"
 msgstr "Session dérogation"
 
@@ -189,6 +208,9 @@ msgstr "Complément spécifique à l'UE (complet)"
 
 msgid "State"
 msgstr "Etat"
+
+msgid "Substitute"
+msgstr "Suppléé"
 
 msgid ""
 "The derogation session field must be completed ONLY if you want to encode an "
@@ -238,7 +260,8 @@ msgid "The proposal is not on this academic year"
 msgstr "La proposition n'est pas sur cette année académique"
 
 msgid "The title is made up of the common part and / or any supplement"
-msgstr "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
+msgstr ""
+"L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
 msgid "This learning unit has an application in the future"
 msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
@@ -305,6 +328,15 @@ msgstr "Titre en anglais"
 
 msgid "Title in French"
 msgstr "Titre en français"
+
+msgid "Tutor"
+msgstr "Enseignant·e"
+
+msgid "Tutor (full)"
+msgstr "Enseignant·e UE complète"
+
+msgid "Tutors"
+msgstr "Enseignant·e·s"
 
 msgid "Type"
 msgstr "Type"
