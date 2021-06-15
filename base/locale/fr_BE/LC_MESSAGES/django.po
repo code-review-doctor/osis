@@ -2710,7 +2710,7 @@ msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
 msgid "This learning unit has application this year or in the future"
-msgstr "L'unité d'enseignement a au moins une candidature cette année ou dans le futur"
+msgstr "L'unité d'enseignement possède au moins une candidature cette année ou dans le futur"
 
 #, python-format
 msgid ""
