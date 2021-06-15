@@ -20,6 +20,8 @@ paths:
     get:
       description: 'Return all applications of connected user of the current application period'
       operationId: application_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       responses:
         '200':
           description: OK
@@ -38,6 +40,8 @@ paths:
     post:
       description: 'Create an application on the current application period'
       operationId: application_create
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       requestBody:
         required: true
         content:
@@ -63,6 +67,8 @@ paths:
     get:
       description: 'Return charge summary of connected user of the current application period'
       operationId: my_charge_summary
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       responses:
         '200':
           description: OK
@@ -82,6 +88,8 @@ paths:
     post:
       description: 'Send an applications summary on the current application period'
       operationId: applications_summary_send
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       responses:
         '204':
           description: 'The summary email has been sent'
@@ -98,6 +106,7 @@ paths:
       description: 'Update an application on the current application period'
       operationId: application_update
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: path
           name: application_uuid
           required: true
@@ -129,6 +138,7 @@ paths:
       description: 'Delete an application on the current application period'
       operationId: application_delete
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: path
           name: application_uuid
           required: true
@@ -150,6 +160,8 @@ paths:
     get:
       description: Return all calendars related to application courses.
       operationId: applicationcoursescalendars_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       responses:
         '200':
           description: OK
@@ -172,6 +184,7 @@ paths:
       description: 'Return vacant courses available filtered by criteria'
       operationId: vacantcourses_list
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: query
           name: code
           schema:
@@ -201,6 +214,8 @@ paths:
     get:
       description: 'Get all attributions about to expire during current application period'
       operationId: attributionsabouttoexpire_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       responses:
         '200':
           description: OK
@@ -219,6 +234,8 @@ paths:
     post:
       description: ' Renew multiple attributions about to expire application during current application period'
       operationId: attributionsabouttoexpire_renew
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       requestBody:
         required: true
         content:
@@ -241,6 +258,7 @@ paths:
       description: Return all attributions of connected user in a specific year.
       operationId: myattributions_list
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: path
           name: year
           required: true
@@ -274,6 +292,7 @@ paths:
       description: Return all attributions of specific user in a specific year.
       operationId: attributions_list
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: path
           name: year
           required: true
@@ -315,6 +334,17 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        type: string
+        example: "en"
+        enum: ["en", "fr_BE"]
+      required: false
   responses:
     Unauthorized:
       description: Unauthorized
