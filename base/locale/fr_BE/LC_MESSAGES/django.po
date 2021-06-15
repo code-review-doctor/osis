@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 09:54+0200\n"
+"POT-Creation-Date: 2021-06-15 14:24+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2436,6 +2436,35 @@ msgstr ""
 "Le quadrimestre de %(code_class)s est incohérent avec celui de l'unité "
 "d'enseignement (le quadrimestre doit être %(should_be_values)s)"
 
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les volumes Q1 et Q2 doivent avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed)"
+msgstr "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume Q1 ou Q2 doit avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul le volume %(quadrimester)s doit avoir une "
+"valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume %(quadrimester)s doit avoir une "
+"valeur)"
+
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
@@ -3067,9 +3096,9 @@ msgstr "et"
 msgid "and postponed until %(year)s"
 msgstr "et reportée jusque %(year)s"
 
+#, python-format
 msgid ""
-"at least one class volume is greater than the volume of the LU "
-"(%(sub_type)s)"
+"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
 msgstr ""
 "au moins une valeur de volume de classe est supérieure à celle du volume "
 "correspondant de l'UE(%(sub_type)s)"

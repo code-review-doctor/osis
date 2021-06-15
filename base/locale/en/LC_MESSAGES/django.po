@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 09:54+0200\n"
+"POT-Creation-Date: 2021-06-15 14:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2372,6 +2372,30 @@ msgid ""
 "(should be %(should_be_values)s)"
 msgstr ""
 
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
@@ -2933,8 +2957,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"at least one class volume is greater than the volume of the LU "
-"(%(sub_type)s)"
+"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
 msgstr ""
 
 msgid "author"

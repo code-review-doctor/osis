@@ -97,3 +97,11 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
+
+    @property
+    def has_hourly_volume_partial_q1_defined(self):
+        return self.hourly_volume_partial_q1 is not None and self.hourly_volume_partial_q1 > 0
+
+    @property
+    def has_hourly_volume_partial_q2_defined(self):
+        return self.hourly_volume_partial_q2 is not None and self.hourly_volume_partial_q2 > 0
