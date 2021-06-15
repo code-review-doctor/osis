@@ -767,7 +767,7 @@ components:
       type: string
       enum:
         - 'en'
-        - 'fr_BE'
+        - 'fr-be'
     Error:
       type: object
       properties:
