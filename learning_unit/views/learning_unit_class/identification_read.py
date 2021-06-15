@@ -62,7 +62,8 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                     message_bus_instance.invoke(
                         GetLanguageCommand(code_iso=learning_unit.language_id.code_iso)
                     ),  # type: Language
-                'teaching_place': get_teaching_place(effective_class.teaching_place)
+                'teaching_place': get_teaching_place(effective_class.teaching_place),
+                'warnings': learning_unit_year.warnings
             }
         )
         return context
