@@ -591,7 +591,7 @@ def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear
         classes = learning_component_year.classes
         if classes:
             for ue_class in classes:
-                total_class_volume = ue_class.hourly_volume_partial_q1 + ue_class.hourly_volume_partial_q2
+                total_class_volume = ue_class.hourly_volume_partial_q1 or 0 + ue_class.hourly_volume_partial_q2 or 0
                 if total_class_volume != learning_component_year.hourly_volume_total_annual:
                     _warnings.append(
                         _(
