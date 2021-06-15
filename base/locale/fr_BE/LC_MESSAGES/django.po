@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-03 13:47+0200\n"
+"POT-Creation-Date: 2021-06-15 09:54+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2419,6 +2419,23 @@ msgstr "Clôturé"
 msgid "The"
 msgstr "Le"
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+"La session de dérogation de %(code_class)s est incohérente avec celle de "
+"l'unité d'enseignement (la session de dérogation doit être "
+"%(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+"Le quadrimestre de %(code_class)s est incohérent avec celui de l'unité "
+"d'enseignement (le quadrimestre doit être %(should_be_values)s)"
+
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
@@ -2587,6 +2604,14 @@ msgstr "Le partim"
 msgid "The period to edit scores responsibles is not opened yet"
 msgstr ""
 "La période d'édition des responsables de notes n'est pas encore ouverte."
+
+#, python-format
+msgid ""
+"The planned classes number and the effective classes number of %(code_ue)s/"
+"%(component_code)s is not consistent"
+msgstr ""
+"Le nombre de classes prévues et de classes effectives de %(code_ue)s/"
+"%(component_code)s est incohérent."
 
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
@@ -3035,9 +3060,19 @@ msgstr "activités en anglais"
 msgid "aim number"
 msgstr "numéro de l'attendu"
 
+msgid "and"
+msgstr "et"
+
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr "et reportée jusque %(year)s"
+
+msgid ""
+"at least one classe volume is greater than the volume of the LU "
+"(%(sub_type)s)"
+msgstr ""
+"au moins une valeur de volume de classe est supérieure à celle du volume "
+"correspondant de l'UE(%(sub_type)s)"
 
 msgid "author"
 msgstr "auteur"
@@ -3164,6 +3199,9 @@ msgstr "ressources en ligne"
 msgid "optional"
 msgstr "optionnel"
 
+msgid "or"
+msgstr "ou"
+
 msgid "parameters"
 msgstr "paramètres"
 
@@ -3243,6 +3281,9 @@ msgstr "texte en français"
 
 msgid "the"
 msgstr "le"
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr "le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
 #, python-format
 msgid ""
