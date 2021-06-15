@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Dict
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from reversion.models import Version
 
+from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES, COMPONENT_TYPES, DEFAULT_ACRONYM_COMPONENT
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -96,10 +96,14 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
         return message_bus_instance.invoke(command)
 
 
-def get_class_type(learning_unit: 'LearningUnit') -> str:
+def get_class_type(learning_unit: 'LearningUnit') -> Dict[str, str]:
+    class_type = LECTURING
     if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-        return _('Practical exercises')
-    return _('Lecturing')
+        class_type = PRACTICAL_EXERCISES
+    return {
+        'type_title': dict(COMPONENT_TYPES).get(class_type),
+        'acronym': DEFAULT_ACRONYM_COMPONENT[class_type]
+    }
 
 
 def get_volumes(learning_unit: 'LearningUnit') -> 'Volumes':

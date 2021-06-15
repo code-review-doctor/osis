@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-14 09:22+0200\n"
+"POT-Creation-Date: 2021-06-15 08:39+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -90,6 +90,11 @@ msgstr "Catalogue des formations"
 msgid "Full"
 msgstr "Complet"
 
+#, fuzzy
+#| msgid "Institution"
+msgid "Identification"
+msgstr "Institution"
+
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -108,8 +113,13 @@ msgstr "Langue"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
+#, fuzzy
+#| msgid "Learning units"
+msgid "Learning unit"
+msgstr "Unités d'enseignement"
+
 msgid "Learning unit credits"
-msgstr "Crédits"
+msgstr "Crédits de l'UE"
 
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
@@ -184,9 +194,6 @@ msgstr "Entité resp. cahier des charges"
 msgid "Session derogation"
 msgstr "Session dérogation"
 
-msgid "Specific complement (Full)"
-msgstr "Complément spécifique à l'UE (complet)"
-
 msgid "State"
 msgstr "Etat"
 
@@ -238,7 +245,8 @@ msgid "The proposal is not on this academic year"
 msgstr "La proposition n'est pas sur cette année académique"
 
 msgid "The title is made up of the common part and / or any supplement"
-msgstr "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
+msgstr ""
+"L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
 msgid "This learning unit has an application in the future"
 msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
@@ -391,3 +399,6 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
+
+#~ msgid "Specific complement (Full)"
+#~ msgstr "Complément spécifique à l'UE (complet)"
