@@ -28,9 +28,8 @@ from typing import List, Optional
 from django.db.models import F, QuerySet
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
+from attribution.models.attribution_class import AttributionClass as AttributionClassDatabase
 from attribution.models.attribution_new import AttributionNew as AttributionNewDatabase
-from base.auth.roles.tutor import Tutor as TutorRole
-from base.models.learning_unit_year import LearningUnitYear as LearningUnitYearDatabase
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
 from ddd.logic.attribution.dtos import TutorSearchDTO, LearningUnitAttributionFromRepositoryDTO
@@ -135,32 +134,24 @@ class TutorRepository(ITutorRepository):
 
     @classmethod
     def save(cls, entity: 'Tutor') -> None:
-        tutor, _ = TutorRole.objects.get_or_create(person__global_id=entity.entity_id.personal_id_number)
-
         for attribution in entity.attributions:
-            learning_container_year_id = LearningUnitYearDatabase.objects.filter(
-                acronym=attribution.learning_unit.code,
-                academic_year__year=attribution.learning_unit.year
-            ).values_list('learning_container_year_id', flat=True).get()
-
-            attribution_new, _ = AttributionNewDatabase.objects.get_or_create(
-                tutor_id=tutor.pk,
-                learning_container_year_id=learning_container_year_id,
-                defaults={
-                    'function': attribution.function
-                }
-            )
+            attribution_db = AttributionNewDatabase.objects.get(attribution.entity_id.uuid)
 
             for class_volume in attribution.distributed_effective_classes:
-                learning_component_year_id = LearningClassYearDatabase.objects.filter(
+                learning_class_year = LearningClassYearDatabase.objects.filter(
                     learning_component_year__learning_unit_year__acronym=attribution.learning_unit.code,
                     learning_component_year__learning_unit_year__academic_year__year=attribution.learning_unit.year,
                     acronym=class_volume.class_code
-                ).values_list('learning_component_year_id', flat=True).get()
+                )
 
-                attribution_charge_new, _ = AttributionChargeNewDatabase.objects.get_or_create(
-                    attribution_id=attribution_new.pk,
-                    learning_component_year_id=learning_component_year_id,
+                attribution_charge_id = AttributionChargeNewDatabase.objects.get(
+                    attribution_id=attribution_db.pk,
+                    learning_component_year_id=learning_class_year.learning_component_year_id,
+                ).values_list('pk', flat=True).get()
+
+                attribution_class, _ = AttributionClassDatabase.objects.get_or_create(
+                    attribution_charge_id=attribution_charge_id,
+                    learning_class_year_id=learning_class_year.pk,
                     defaults={
                         'allocation_charge': class_volume.distributed_volume
                     }
@@ -168,19 +159,19 @@ class TutorRepository(ITutorRepository):
 
 
 def _get_effective_classes_queryset(learning_unit_code: str, learning_unit_year: int) -> QuerySet:
-    return LearningClassYearDatabase.objects.filter(
-        learning_component_year__learning_unit_year__acronym=learning_unit_code,
-        learning_component_year__learning_unit_year__academic_year__year=learning_unit_year
+    return AttributionClassDatabase.objects.filter(
+        learning_class_year__learning_component_year__learning_unit_year__acronym=learning_unit_code,
+        learning_class_year__learning_component_year__learning_unit_year__academic_year__year=learning_unit_year
     ).annotate(
-        class_code=F('acronym'),
-        learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
-        learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
-        teaching_place_uuid=F('campus__uuid'),
-        derogation_quadrimester=F('quadrimester'),
-        session_derogation=F('session'),
-        volume_q1=F('hourly_volume_partial_q1'),
-        volume_q2=F('hourly_volume_partial_q2'),
-        class_type=F('learning_component_year__type')
+        class_code=F('learning_class_year__acronym'),
+        learning_unit_code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
+        learning_unit_year=F('learning_class_year__learning_component_year__learning_unit_year__academic_year__year'),
+        teaching_place_uuid=F('learning_class_year__campus__uuid'),
+        derogation_quadrimester=F('learning_class_year__quadrimester'),
+        session_derogation=F('learning_class_year__session'),
+        volume_q1=F('learning_class_year__hourly_volume_partial_q1'),
+        volume_q2=F('learning_class_year__hourly_volume_partial_q2'),
+        class_type=F('learning_class_year__learning_component_year__type')
     ).values(
         'class_code',
         'learning_unit_code',
