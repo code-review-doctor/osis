@@ -546,7 +546,6 @@ class LearningUnitYearWarningsTest(TestCase):
 
     @mock.patch('base.models.learning_unit_year.LearningUnitYear._check_classes')
     def test_warning_planned_classes_zero_and_volume(self, mock_check_classes_warnings=[]):
-
         self.luy_full.credits = self.luy_full.credits + 1
         self.luy_full.save()
 
@@ -701,9 +700,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('Only the volume Q1 must have a value'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('Only the volume Q1 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -743,9 +742,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('Only the volume Q2 must have a value'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('Only the volume Q2 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -777,9 +776,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volumes Q1 and Q2 must have a value'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('The volumes Q1 and Q2 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -812,9 +811,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q1 or Q2 must have a value but not both'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('The volume Q1 or Q2 must have a value but not both'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -884,6 +883,81 @@ class LearningUnitYearDeleteCms(TestCase):
         luy_id = self.learning_unit_year_no_cms.id
         self.learning_unit_year_no_cms.delete()
         self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])
+
+
+class LearningUnitYearCheckVolumeConsistencyWithUeWarnings(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year,
+            planned_classes=1
+        )
+
+    def test_check_with_no_classes(self):
+        LearningUnitYearFactory()
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_volume_consistency_with_ue(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def test_check_with_class_volume_inconsistent(self):
+        learning_class = LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_total_annual + 1
+        )
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_volume_consistency_with_ue(list(query_components))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            self._build_check_consistency_volume_message(learning_class)
+        )
+
+    def test_check_with_class_volume_consistent(self):
+        LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_total_annual,
+            hourly_volume_partial_q2=0
+        )
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_volume_consistency_with_ue(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def _build_check_consistency_volume_message(self, learning_class):
+        return _('Class volumes of class {code_ue}{code_class} are inconsistent (Annual volume must be equal'
+                 ' to the sum of volume Q1 and Q2') % \
+               {
+                   'code_ue': self.learning_unit_year.acronym,
+                   'code_class': learning_class.acronym
+               }
+
+    def test_check_number_of_classes_correct(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(
+            component=self.lecturing_component,
+            number_of_occurence=self.lecturing_component.planned_classes
+        )
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def test_check_number_of_classes_inconsistent(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(
+            component=self.lecturing_component,
+            number_of_occurence=self.lecturing_component.planned_classes + 1
+        )
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _(
+                'The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
+                'is not consistent'
+            ) % {
+                'code_ue': self.learning_unit_year.acronym,
+                'component_code': 'PM'
+            }
+        )
 
 
 class LearningUnitYearCheckNumberOfClassesWarnings(TestCase):
@@ -1293,5 +1367,6 @@ def _get_components_with_classes():
 
 
 def _build_effective_classes(component: LearningComponentYear, number_of_occurence: int) -> None:
+    factories = []
     for cpt in range(number_of_occurence):
-        LearningClassYearFactory(learning_component_year=component)
+        factories.append(LearningClassYearFactory(learning_component_year=component))

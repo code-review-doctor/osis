@@ -214,7 +214,7 @@ class BaseLearningUnitYearManager(SerializableModelManager):
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
-        return super().get_queryset().select_related('learning_container_year')\
+        return super().get_queryset().select_related('learning_container_year') \
             .filter(learning_container_year__isnull=False)
 
 
@@ -351,7 +351,7 @@ class LearningUnitYear(SerializableModel):
             complete_title = ' - '.join(filter(None, [self.learning_container_year.common_title, self.specific_title]))
         return complete_title
 
-    @property    # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def complete_title_english(self):
         complete_title_english = self.specific_title_english
         if self.learning_container_year:
@@ -581,7 +581,27 @@ class LearningUnitYear(SerializableModel):
         if self.session:
             _warnings.extend(_check_classes_session(self.session, all_components))
         _warnings.extend(_check_number_of_classes(all_components))
+        _warnings.extend(_check_volume_consistency_with_ue(all_components))
         return _warnings
+
+
+def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear]):
+    _warnings = []
+    for learning_component_year in all_components:
+        classes = learning_component_year.classes
+        if classes:
+            for ue_class in classes:
+                total_class_volume = ue_class.hourly_volume_partial_q1 + ue_class.hourly_volume_partial_q2
+                if total_class_volume != learning_component_year.hourly_volume_total_annual:
+                    _warnings.append(
+                        _(
+                            'Class volumes of class {code_ue}{code_class} are inconsistent (Annual volume must be equal'
+                            ' to the sum of volume Q1 and Q2') % {
+                                'code_ue': learning_component_year.learning_unit_year.acronym,
+                                'code_class': ue_class.acronym
+                        }
+                    )
+    return _warnings
 
 
 def _check_classes_quadrimester(ue_quadrimester, all_components: List[LearningComponentYear]) -> List[str]:
@@ -602,7 +622,6 @@ def _check_classes_quadrimester(ue_quadrimester, all_components: List[LearningCo
 
 
 def _check_classes_session(ue_session, all_components: List[LearningComponentYear]) -> List[str]:
-
     _warnings = []
     message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
                 '(should be %(should_be_values)s)')
@@ -661,10 +680,15 @@ def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learn
 def _check_number_of_classes(all_components) -> List[str]:
     _warnings = []
     for learning_component_year in all_components:
-        if (learning_component_year.planned_classes or 0) != len(learning_component_year.classes):
+        number_of_classes = len(learning_component_year.classes)
+        if learning_component_year.planned_classes:
+            # consider at least one effective class if planned classes
+            number_of_classes = number_of_classes or 1
+        if (learning_component_year.planned_classes or 0) != number_of_classes:
             _warnings.append(
-                _('The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
-                  'is not consistent') % {
+                _(
+                    'The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
+                    'is not consistent') % {
                     'code_ue': learning_component_year.learning_unit_year.acronym,
                     'component_code': 'PP' if learning_component_year.type == PRACTICAL_EXERCISES else 'PM'
                 }
