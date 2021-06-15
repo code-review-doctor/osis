@@ -149,7 +149,7 @@ class TutorRepository(ITutorRepository):
                     learning_component_year_id=learning_class_year.learning_component_year_id,
                 ).values_list('pk', flat=True).get()
 
-                attribution_class, _ = AttributionClassDatabase.objects.get_or_create(
+                attribution_class, _ = AttributionClassDatabase.objects.update_or_create(
                     attribution_charge_id=attribution_charge_id,
                     learning_class_year_id=learning_class_year.pk,
                     defaults={
