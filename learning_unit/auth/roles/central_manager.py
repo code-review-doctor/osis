@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from learning_unit.auth import predicates
 from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import models as osis_role_models
+from osis_role.contrib import predicates as osis_role_predicates
 
 
 class CentralManagerAdmin(osis_role_admin.EntityRoleModelAdmin):
@@ -142,4 +143,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
                     (predicates.has_learning_unit_no_attribution_this_year &
                      predicates.has_learning_unit_no_application_this_year)
                  ),
-        })
+            'base.can_create_class':
+                osis_role_predicates.always_deny(
+                    message=_('Classes can only be created by a faculty manager')
+                ),
+         })

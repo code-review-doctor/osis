@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         # Remove all teaching material because this table will implement OrderedModel
-        migrations.RunSQL("DELETE FROM base_teachingmaterial;"),
+        migrations.RunSQL("DELETE FROM base_teachingmaterial;", elidable=True),
         migrations.AddField(
             model_name='teachingmaterial',
             name='order',

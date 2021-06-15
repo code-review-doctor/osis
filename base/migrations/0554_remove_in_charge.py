@@ -21,5 +21,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(delete_in_charge_from_initial_data),
+        migrations.RunPython(delete_in_charge_from_initial_data, elidable=True),
     ]

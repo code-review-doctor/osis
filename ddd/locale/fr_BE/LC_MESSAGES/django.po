@@ -1,0 +1,94 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-06-11 13:49+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Can't create a learning unit lower than 2019-20"
+msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
+
+msgid "Class can't be created on learning unit having enrollment"
+msgstr ""
+"Il y a déjà des inscriptions sur cette unité d'enseignement. Vous ne pouvez "
+"plus créer de classes."
+
+msgid "Class can't be created on learning unit having partim"
+msgstr ""
+"Vous ne pouvez pas créer des classes sur une unité d'enseignement ayant des "
+"partims."
+
+msgid "Class can't be neither mobility nor external"
+msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
+
+msgid "Credits should be greather than 0"
+msgstr "Les crédits doivent être > 0"
+
+msgid "Following fields are required : {}"
+msgstr "Les champs suivants sont requis : {}"
+
+msgid "Internship subtype is a mandatory field"
+msgstr "Le sous-type de stage est obligatoire"
+
+msgid "Learning unit {} already exists next year"
+msgstr "L'UE {} existe déjà sur l'année suivante"
+
+msgid "Learning unit {} is used in following programs : {}"
+msgstr "L'UE est utilisée dans les formations suivantes : {}"
+
+msgid "Selected entity {} is not an authorized responsible entity"
+msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée"
+
+msgid "Subdivision should be one character A-Z or 0-9"
+msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
+
+msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
+msgstr "Le code %('ue_code')s - %(code)s existe déjà pour %(ue)s"
+
+msgid "The code {} already exists"
+msgstr "Le code {} existe déjà"
+
+msgid "The code {} is not a valid code"
+msgstr "Le code {} est invalide"
+
+#, python-format
+msgid "The subdivision %(subd)s already exists for %(ue)s"
+msgstr "La subdivision %(subd)s existe déjà pour l'UE %(ue)s"
+
+msgid "The subdivision must contain only one letter"
+msgstr "La subdivision ne doit contenir qu'une lettre"
+
+msgid ""
+"The sum of first/second quadrimesters volumes should be equal to annual "
+"volume of the learning unit ({})"
+msgstr ""
+"La somme des volumes Q1 et Q2 doit être égale au volume annuel de l'unité "
+"d'enseignement ({}) "
+
+msgid ""
+"You cannot create a class on this learning unit because it is in proposal "
+"this year or in past."
+msgstr ""
+"Vous ne pouvez pas créer une nouvelle classe sur cette unité d'enseignement "
+"car elle est en proposition pour cette année ou une année antérieure."
+
+msgid ""
+"You cannot create class on this learning unit because the component's annual "
+"volume [PM or default PP] is not greater than 0 and there are no planned "
+"class."
+msgstr ""
+"Vous ne pouvez pas créer une classe sur cette unité d'enseignement car le "
+"volume annuel du composant [PM ou à défaut PP] n'est pas supérieur à 0 et il "
+"n'y a pas de classe prévue."
