@@ -43,6 +43,7 @@ from ddd.logic.application.domain.model.application import ApplicationIdentity, 
 from ddd.logic.application.dtos import ApplicationFromRepositoryDTO, ApplicationByApplicantDTO
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from infrastructure.application import queue
 from osis_common.ddd.interface import ApplicationService
 
 
@@ -159,12 +160,14 @@ class ApplicationRepository(IApplicationRepository):
                 "course_summary": application.course_summary
             }
         )
+        queue.notify_application_deleted(application)
 
     @classmethod
     def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
-        TutorApplication.objects.filter(
-            uuid=entity_id.uuid
-        ).delete()
+        application = cls.get(entity_id)
+
+        TutorApplication.objects.filter(uuid=entity_id.uuid).delete()
+        queue.notify_application_deleted(application)
 
 
 def _application_base_qs():
