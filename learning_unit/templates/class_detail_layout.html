@@ -25,7 +25,7 @@
 {% endcomment %}
 
 {% block title %}
-    <title>OSIS - {{ effective_class.complete_acronym }}</title>
+    <title>OSIS - {{ effective_class.complete_code }}</title>
 {% endblock %}
 
 {% block breadcrumb %}
@@ -35,7 +35,7 @@
 {% block header_content %}
     <div class="row" style="margin:0 -15px 5px; padding:0;">
         <div class="col-md-10 col-md-offset-1">
-            <h2>{{ effective_class.complete_acronym|default_if_none:'' }}
+            <h2>{{ effective_class.complete_code|default_if_none:'' }}
                 &mdash; {{ effective_class.entity_id.learning_unit_identity.academic_year }}</h2>
             <h4 style="margin-top: 0;">{{ learning_unit_year.complete_title }}</h4>
         </div>

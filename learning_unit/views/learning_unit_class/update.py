@@ -119,9 +119,14 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
         })
 
     def redirect_to_effective_class_identification(self):
-        # TODO :: Redirect to effective_class identification in view mode
         return redirect(
-            reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
+            reverse('class_identification',
+                    kwargs={
+                        'learning_unit_year': self.year,
+                        'learning_unit_code': self.learning_unit_code,
+                        'class_code': self.effective_class.entity_id.class_code
+                    }
+                    )
         )
 
     def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
@@ -132,6 +137,6 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
                 learning_unit_year=effective_class_identity.learning_unit_identity.year
             )
         )
-        return _("Class %(effective_class_complete_acronym)s successfully created.") % {
+        return _("Class %(effective_class_complete_acronym)s successfully updated.") % {
             "effective_class_complete_acronym": effective_class.complete_code
         }
