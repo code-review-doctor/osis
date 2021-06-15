@@ -210,7 +210,7 @@ msgid "Accepted"
 msgstr "Accepté"
 
 msgid "Access based on application"
-msgstr ""
+msgstr "Accès sur dossier"
 
 msgid "Access condition"
 msgstr "Condition d'accès"
