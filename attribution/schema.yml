@@ -341,9 +341,7 @@ components:
       description: >
         The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
       schema:
-        type: string
-        example: "en"
-        enum: ["en", "fr_BE"]
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
       required: false
   responses:
     Unauthorized:
@@ -765,6 +763,11 @@ components:
         - 'EXCEPTIONAL_PROCEDURE'
         - 'VACANT_NOT_PUBLISH'
         - 'DO_NOT_ASSIGN'
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr_BE'
     Error:
       type: object
       properties:
