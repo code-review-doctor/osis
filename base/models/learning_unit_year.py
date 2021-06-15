@@ -595,8 +595,9 @@ def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear
                 if total_class_volume != learning_component_year.hourly_volume_total_annual:
                     _warnings.append(
                         _(
-                            'Class volumes of class {code_ue}{code_class} are inconsistent (Annual volume must be equal'
-                            ' to the sum of volume Q1 and Q2') % {
+                            'Class volumes of class %(code_ue)s/%(code_class)s are inconsistent '
+                            '(Annual volume must be equal to the sum of volume Q1 and Q2)'
+                        ) % {
                                 'code_ue': learning_component_year.learning_unit_year.acronym,
                                 'code_class': ue_class.acronym
                         }

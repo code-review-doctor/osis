@@ -924,12 +924,13 @@ class LearningUnitYearCheckVolumeConsistencyWithUeWarnings(TestCase):
         self.assertEqual(len(messages), 0)
 
     def _build_check_consistency_volume_message(self, learning_class):
-        return _('Class volumes of class {code_ue}{code_class} are inconsistent (Annual volume must be equal'
-                 ' to the sum of volume Q1 and Q2') % \
-               {
-                   'code_ue': self.learning_unit_year.acronym,
-                   'code_class': learning_class.acronym
-               }
+        return _(
+            'Class volumes of class %(code_ue)s/%(code_class)s are inconsistent '
+            '(Annual volume must be equal to the sum of volume Q1 and Q2)'
+        ) % {
+           'code_ue': self.learning_unit_year.acronym,
+           'code_class': learning_class.acronym
+        }
 
     def test_check_number_of_classes_correct(self):
         query_components = _get_components_with_classes()

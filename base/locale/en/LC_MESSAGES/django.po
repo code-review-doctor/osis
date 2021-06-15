@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 08:51+0200\n"
+"POT-Creation-Date: 2021-06-15 16:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -500,10 +500,10 @@ msgstr ""
 msgid "City of institution"
 msgstr ""
 
-#, python-brace-format
+#, python-format
 msgid ""
-"Class volumes of class {code_ue}{code_class} are inconsistent (Annual volume "
-"must be equal to the sum of volume Q1 and Q2"
+"Class volumes of class %(code_ue)s/%(code_class)s are inconsistent (Annual "
+"volume must be equal to the sum of volume Q1 and Q2)"
 msgstr ""
 
 msgid "Classes"
