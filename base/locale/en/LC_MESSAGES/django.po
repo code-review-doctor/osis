@@ -2933,7 +2933,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"at least one classe volume is greater than the volume of the LU "
+"at least one class volume is greater than the volume of the LU "
 "(%(sub_type)s)"
 msgstr ""
 

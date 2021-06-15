@@ -635,7 +635,7 @@ def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[
                 _warnings.append(
                     "{} ({}) ".format(
                         inconsistent_msg,
-                        _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') %
+                        _('at least one class volume is greater than the volume of the LU (%(sub_type)s)') %
                         {'sub_type': learning_component_yr.learning_unit_year.get_subtype_display().lower()}
                     )
                 )
