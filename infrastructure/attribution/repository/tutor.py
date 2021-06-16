@@ -32,11 +32,10 @@ from attribution.models.attribution_class import AttributionClass as Attribution
 from attribution.models.attribution_new import AttributionNew as AttributionNewDatabase
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
-from ddd.logic.attribution.dtos import TutorSearchDTO, LearningUnitAttributionFromRepositoryDTO
+from ddd.logic.attribution.dtos import TutorSearchDTO, LearningUnitAttributionFromRepositoryDTO, \
+    DistributedEffectiveClassesDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.learning_unit.builder.effective_class_builder import EffectiveClassBuilder
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 from osis_common.ddd.interface import ApplicationService
 
@@ -125,11 +124,10 @@ class TutorRepository(ITutorRepository):
         return result
 
     @classmethod
-    def _get_effective_classes(cls, effective_classes):
+    def _get_effective_classes(cls, effective_classes: QuerySet) -> List['DistributedEffectiveClassesDTO']:
         classes = []
         for effective_classe in effective_classes:
-            dto_from_database = EffectiveClassFromRepositoryDTO(**effective_classe)
-            classes.append(EffectiveClassBuilder.build_from_repository_dto(dto_from_database))
+            classes.append(DistributedEffectiveClassesDTO(**effective_classe))
         return classes
 
     @classmethod
@@ -141,22 +139,21 @@ class TutorRepository(ITutorRepository):
             'attributionchargenew_set'
         )
         for attribution in entity.attributions:
-            attribution_db = attributions_db.get(attribution.entity_id.uuid)
+            attribution_db = attributions_db.get(uuid=attribution.entity_id.uuid)
             for class_volume in attribution.distributed_effective_classes:
-                learning_component_year_id = LearningClassYearDatabase.objects.filter(
+                learning_class_year = LearningClassYearDatabase.objects.get(
                     learning_component_year__learning_unit_year__acronym=attribution.learning_unit.code,
                     learning_component_year__learning_unit_year__academic_year__year=attribution.learning_unit.year,
-                    acronym=class_volume.class_code
-                ).values_list('learning_component_year_id', flat=True).get()
+                    acronym=class_volume.effective_class.class_code
+                )
 
                 attribution_charge_id = attribution_db.attributionchargenew_set.filter(
-                    learning_component_year_id=learning_component_year_id
+                    learning_component_year_id=learning_class_year.learning_component_year_id
                 ).values_list('pk', flat=True).get()
 
                 attribution_class, _ = AttributionClassDatabase.objects.update_or_create(
                     attribution_charge_id=attribution_charge_id,
-                    learning_class_year__learning_component_year_id=learning_component_year_id,
-                    learning_class_year__acronym=class_volume.class_code,
+                    learning_class_year=learning_class_year,
                     defaults={
                         'allocation_charge': class_volume.distributed_volume
                     }
@@ -171,24 +168,10 @@ def _get_effective_classes_queryset(learning_unit_code: str, learning_unit_year:
         class_code=F('learning_class_year__acronym'),
         learning_unit_code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
         learning_unit_year=F('learning_class_year__learning_component_year__learning_unit_year__academic_year__year'),
-        teaching_place_uuid=F('learning_class_year__campus__uuid'),
-        derogation_quadrimester=F('learning_class_year__quadrimester'),
-        session_derogation=F('learning_class_year__session'),
-        volume_q1=F('learning_class_year__hourly_volume_partial_q1'),
-        volume_q2=F('learning_class_year__hourly_volume_partial_q2'),
-        class_type=F('learning_class_year__learning_component_year__type')
     ).values(
         'class_code',
         'learning_unit_code',
         'learning_unit_year',
-        'title_fr',
-        'title_en',
-        'teaching_place_uuid',
-        'derogation_quadrimester',
-        'session_derogation',
-        'volume_q1',
-        'volume_q2',
-        'class_type'
     )
 
 
