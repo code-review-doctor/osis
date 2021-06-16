@@ -51,6 +51,7 @@ from base.models.enums import learning_unit_year_subtypes, internship_subtypes, 
 from base.models.enums.component_type import PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
@@ -601,7 +602,7 @@ def _check_classes_quadrimester(ue_quadrimester, all_components: List[LearningCo
                     'code_class': effective_class.effective_class_complete_acronym,
                     'should_be_values': QUADRIMESTER_CHECK_RULES[ue_quadrimester]['available_values_str']
                 })
-            _warnings.extend(_check_quadrimester_volume(_warnings, effective_class, quadri))
+            _warnings.extend(_check_quadrimester_volume(effective_class, quadri))
 
     return _warnings
 
@@ -833,51 +834,61 @@ def _learningunityear_delete(sender, instance, **kwargs):
     TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()
 
 
-def _check_quadrimester_volume(_warnings, effective_class: LearningClassYear, quadri: str) -> List[str]:
-    warnings = _warnings.copy()
-    other_quadri_partial_volume = None
-    quadri_volume = None
-    if quadri == "Q2":
-        other_quadri_partial_volume = effective_class.hourly_volume_partial_q1
-        quadri_volume = effective_class.hourly_volume_partial_q2
-    elif quadri == "Q1":
-        other_quadri_partial_volume = effective_class.hourly_volume_partial_q2
-        quadri_volume = effective_class.hourly_volume_partial_q1
+def _check_quadrimester_volume(effective_class: LearningClassYear, quadri: str) -> List[str]:
+    q1_q2_warnings = _get_q1_q2_warnings(effective_class, quadri)
+    q1and2_q1or2_warnings = _get_q1and2_q1or2_warnings(effective_class, quadri)
+    return q1_q2_warnings + q1and2_q1or2_warnings
 
-    if other_quadri_partial_volume and other_quadri_partial_volume > 0:
+
+def _get_q1and2_q1or2_warnings(effective_class, quadri):
+    warnings = []
+
+    q1and2 = LearningUnitYearQuadrimester.Q1and2.name
+    q1or2 = LearningUnitYearQuadrimester.Q1or2.name
+
+    if quadri == q1and2 and not (effective_class.hourly_volume_partial_q1 and effective_class.hourly_volume_partial_q2):
         warnings.append(
-            _('The %(effective_class_complete_acronym)s volumes are inconsistent(only the %(quadrimester)s '
-              'volume has to be completed)') % {
-                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym,
-                'quadrimester': quadri
+            _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 and Q2 volumes have to be '
+              'completed)') % {
+                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
             }
         )
-    else:
-        if quadri_volume is None or int(quadri_volume) <= 0:
+    elif quadri == q1or2 and not (effective_class.hourly_volume_partial_q1 or effective_class.hourly_volume_partial_q2):
+        warnings.append(
+            _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '
+              'completed)') % {
+                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
+            }
+        )
+    return warnings
+
+
+def _get_q1_q2_warnings(effective_class, quadri):
+    warnings = []
+
+    q1 = LearningUnitYearQuadrimester.Q1.name
+    q2 = LearningUnitYearQuadrimester.Q2.name
+
+    if quadri in [q1, q2]:
+        other_quadri_partial_volume = effective_class.hourly_volume_partial_q2 \
+            if quadri == q1 else effective_class.hourly_volume_partial_q1
+        quadri_volume = effective_class.hourly_volume_partial_q1 \
+            if quadri == q1 else effective_class.hourly_volume_partial_q2
+
+        if other_quadri_partial_volume and other_quadri_partial_volume > 0:
             warnings.append(
-                _('The %(effective_class_complete_acronym)s volumes are inconsistent(the %(quadrimester)s '
+                _('The %(effective_class_complete_acronym)s volumes are inconsistent(only the %(quadrimester)s '
                   'volume has to be completed)') % {
                     'effective_class_complete_acronym': effective_class.effective_class_complete_acronym,
                     'quadrimester': quadri
                 }
             )
-    if quadri == "Q1and2":
-        if not(effective_class.has_hourly_volume_partial_q1_defined) or \
-                not(effective_class.has_hourly_volume_partial_q2_defined):
+        elif not quadri_volume or quadri_volume < 0:
             warnings.append(
-                _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 and Q2 volumes have to be '
-                  'completed)') % {
-                    'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
-                }
-            )
-
-    if quadri == "Q1or2":
-        if not (effective_class.has_hourly_volume_partial_q1_defined or
-                effective_class.has_hourly_volume_partial_q2_defined):
-            warnings.append(
-                _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '
-                  'completed)') % {
-                    'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
+                _('The %(effective_class_complete_acronym)s volumes are inconsistent(the %(quadrimester)s '
+                  'volume has to be completed)') % {
+                    'effective_class_complete_acronym': effective_class.effective_class_complete_acronym,
+                    'quadrimester': quadri
                 }
             )
     return warnings
