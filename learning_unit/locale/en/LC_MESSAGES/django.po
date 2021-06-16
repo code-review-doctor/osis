@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 07:32+0200\n"
+"POT-Creation-Date: 2021-06-16 15:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -290,6 +290,9 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "Update"
+msgstr ""
+
 msgid "Update class"
 msgstr ""
 
@@ -347,6 +350,9 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "You do not have sufficient access rights to update a class."
 msgstr ""
 
 msgid "external acronym rules"

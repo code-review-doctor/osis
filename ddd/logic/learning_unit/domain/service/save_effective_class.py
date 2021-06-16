@@ -101,6 +101,6 @@ def _should_class_volumes_be_consistent_with_learning_unit(
     else:
         volume_annual = lecturing_part.volumes.volume_annual
 
-    sum_q1_q2 = volume_first_quadrimester + volume_second_quadrimester
+    sum_q1_q2 = (volume_first_quadrimester or 0) + (volume_second_quadrimester or 0)
     if volume_annual <= 0 or sum_q1_q2 != volume_annual:
         raise AnnualVolumeInvalidException(volume_annual)

@@ -43,7 +43,7 @@ from learning_unit.forms.classes.update import UpdateClassForm
 class UpdateClassView(PermissionRequiredMixin, FormView):
     template_name = "class/update.html"
     form_class = UpdateClassForm
-    permission_required = 'base.can_create_class'  # TODO : adapt to update
+    permission_required = 'learning_unit.change_learningclassyear'
 
     @cached_property
     def year(self) -> int:
@@ -73,20 +73,22 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             )
         )
 
-    def get(self, request, *args, **kwargs):
-        # TODO :: Add permission check, like it has been done below for the creation
-        # try:
-        #     message_bus_instance.invoke(
-        #         CanCreateEffectiveClassCommand(
-        #             learning_unit_code=self.learning_unit_code,
-        #             learning_unit_year=self.year
-        #         )
-        #     )
-        # except MultipleBusinessExceptions as e:
-        #     display_error_messages(request, [exc.message for exc in e.exceptions])
-        #     return self.redirect_to_learning_unit_identification()
+    @cached_property
+    def cancel_url(self):
+        return reverse(
+            'class_identification',
+            kwargs={
+                'learning_unit_year': self.effective_class.year,
+                'learning_unit_code': self.effective_class.learning_unit_code,
+                'class_code': self.effective_class.class_code,
+            }
+        )
 
-        return super().get(request, *args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['effective_class'] = self.effective_class
+        context['cancel_url'] = self.cancel_url
+        return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

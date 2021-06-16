@@ -80,13 +80,41 @@ class UpdateClassService(SimpleTestCase):
             update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
             self.assertEqual(str(none_type.exception), "'NoneType' object has no attribute 'update'")
 
-    def test_should_class_volumes_be_consistent_with_learning_unit(self):
+    def test_should_class_volumes_be_consistent_with_learning_unit_when_q1_and_q2_are_filled(self):
         annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
         bad_repartition = annual_volume + 10.0
         cmd = attr.evolve(
             self.update_class_cmd,
             volume_first_quadrimester=bad_repartition,
             volume_second_quadrimester=bad_repartition,
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            AnnualVolumeInvalidException
+        )
+
+    def test_should_class_volumes_be_consistent_with_learning_unit_when_only_q2_is_null(self):
+        annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
+        cmd = attr.evolve(
+            self.update_class_cmd,
+            volume_first_quadrimester=annual_volume - 1,
+            volume_second_quadrimester=None,
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            AnnualVolumeInvalidException
+        )
+
+    def test_should_class_volumes_be_consistent_with_learning_unit_when_only_q1_is_null(self):
+        annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
+        cmd = attr.evolve(
+            self.update_class_cmd,
+            volume_first_quadrimester=None,
+            volume_second_quadrimester=annual_volume - 1,
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
@@ -131,6 +159,18 @@ class UpdateClassService(SimpleTestCase):
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             DerogationQuadrimesterInvalidChoiceException
+        )
+
+    def test_should_session_be_valid_choice(self):
+        cmd = attr.evolve(
+            self.update_class_cmd,
+            session_derogation="invalid choice",
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            update_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            DerogationSessionInvalidChoiceException
         )
 
     def test_should_session_be_valid_choice(self):
