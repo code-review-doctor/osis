@@ -33,19 +33,19 @@
             {{ form.learning_unit_code.initial }}
         </a>
     </li>
-    <li class="active">{{form.form_title}}</li>
+    <li class="active">{{effective_class}}</li>
 {% endblock %}
 {% block header_content %}
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% block h2_title %}{{form.form_title}}{% endblock %}</h2>
+        <h2>{% block h2_title %}{{effective_class}}{% endblock %}</h2>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
             <form method="post" id="LearningClassYearForm">
                 <div class="panel-heading">
-                    {% include "class/blocks/class_create_cancel_buttons.html" %}
+                    {% include "class/blocks/class_update_cancel_buttons.html" %}
                 </div>
                 {% csrf_token %}
                 {% bootstrap_form_errors form %}
@@ -140,7 +140,7 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    {% include "class/blocks/class_create_cancel_buttons.html" %}
+                    {% include "class/blocks/class_update_cancel_buttons.html" %}
                 </div>
             </form>
         </div>

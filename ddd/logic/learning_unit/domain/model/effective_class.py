@@ -68,10 +68,22 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     @property
     def complete_code(self) -> str:
         return "{}{}{}".format(
-            self.entity_id.learning_unit_identity.code,
+            self.learning_unit_code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
-            self.entity_id.class_code
+            self.class_code
         )
+
+    @property
+    def class_code(self) -> str:
+        return self.entity_id.class_code
+
+    @property
+    def learning_unit_code(self) -> str:
+        return self.entity_id.learning_unit_identity.code
+
+    @property
+    def year(self) -> int:
+        return self.entity_id.learning_unit_identity.academic_year.year
 
     def update(self, cmd: UpdateEffectiveClassCommand) -> None:
         UpdateEffectiveClassValidatorList(command=cmd).validate()

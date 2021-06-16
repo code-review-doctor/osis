@@ -22,5 +22,6 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% url 'learning_unit' acronym=form.learning_unit_code.initial year=form.learning_unit_year.initial as cancel_url %}
-{% include "blocks/forms/create_cancel_buttons.html" with btn_submit_name="class_add" %}
+<p>{{ effective_class.year }} {{effective_class.learning_unit_code}} {{effective_class.class_code }}</p>
+{% url 'class_identification' effective_class.year effective_class.learning_unit_code effective_class.class_code as cancel_url %}
+{% include "blocks/forms/create_cancel_buttons.html" with btn_submit_name="class_update" %}

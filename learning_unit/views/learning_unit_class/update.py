@@ -73,6 +73,11 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             )
         )
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['effective_class'] = self.effective_class
+        return context
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['learning_unit'] = self.learning_unit
