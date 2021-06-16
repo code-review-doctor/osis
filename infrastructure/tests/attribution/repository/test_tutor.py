@@ -42,7 +42,7 @@ from infrastructure.learning_unit.repository.learning_unit import LearningUnitRe
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
-class TutorSearchRepositoryTestCase(TestCase):
+class TutorRepositoryTestCase(TestCase):
 
     def setUp(self):
         self.tutor_repository = TutorRepository()
