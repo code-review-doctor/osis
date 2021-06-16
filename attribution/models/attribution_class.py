@@ -23,16 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 from django.core import validators
 from django.db import models
 
 from attribution.models.attribution_charge_new import MIN_ALLOCATION_CHARGE
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class AttributionClassAdmin(admin.ModelAdmin):
+class AttributionClassAdmin(OsisModelAdmin):
     list_display = ('attribution_charge', 'learning_class_year', 'allocation_charge')
-    raw_id_fields = ('attribution_charge', 'learning_class_year')
     search_fields = ['attribution_charge__attribution__tutor__person__first_name',
                      'attribution_charge__attribution__tutor__person__last_name',
                      'attribution_charge__attribution__tutor__person__global_id',

@@ -134,24 +134,31 @@ class TutorRepository(ITutorRepository):
 
     @classmethod
     def save(cls, entity: 'Tutor') -> None:
+        uuids = [attribution.entity_id.uuid for attribution in entity.attributions]
+        attributions_db = AttributionNewDatabase.objects.filter(
+            uuid__in=uuids
+        ).prefetch_related(
+            'attributionchargenew_set'
+        )
         for attribution in entity.attributions:
-            attribution_db = AttributionNewDatabase.objects.get(attribution.entity_id.uuid)
-
+            attribution_db = attributions_db.get(attribution.entity_id.uuid)
             for class_volume in attribution.distributed_effective_classes:
-                learning_class_year = LearningClassYearDatabase.objects.filter(
+                learning_component_year_id = LearningClassYearDatabase.objects.filter(
                     learning_component_year__learning_unit_year__acronym=attribution.learning_unit.code,
                     learning_component_year__learning_unit_year__academic_year__year=attribution.learning_unit.year,
                     acronym=class_volume.class_code
-                )
+                ).values_list('learning_component_year_id', flat=True).get()
 
-                attribution_charge_id = AttributionChargeNewDatabase.objects.get(
-                    attribution_id=attribution_db.pk,
-                    learning_component_year_id=learning_class_year.learning_component_year_id,
+                attribution_charge_id = attribution_db.attributionchargenew_set.filter(
+                    learning_component_year_id=learning_component_year_id
                 ).values_list('pk', flat=True).get()
-
                 attribution_class, _ = AttributionClassDatabase.objects.update_or_create(
                     attribution_charge_id=attribution_charge_id,
-                    learning_class_year_id=learning_class_year.pk,
+                    learning_class_year__learning_component_year__learning_unit_year__acronym=
+                    attribution.learning_unit.code,
+                    learning_class_year__learning_component_year__learning_unit_year__academic_year__year=
+                    attribution.learning_unit.year,
+                    learning_class_year__acronym=class_volume.class_code,
                     defaults={
                         'allocation_charge': class_volume.distributed_volume
                     }
