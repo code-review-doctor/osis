@@ -28,7 +28,7 @@ import string
 import factory.fuzzy
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class AttributionClassFactory(factory.django.DjangoModelFactory):
@@ -37,5 +37,5 @@ class AttributionClassFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     attribution_charge = factory.SubFactory(AttributionChargeNewFactory)
-    learning_class_year = factory.SubFactory(LearningClassYear)
+    learning_class_year = factory.SubFactory(LearningClassYearFactory)
     allocation_charge = 0
