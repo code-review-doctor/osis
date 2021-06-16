@@ -136,11 +136,11 @@
                     {% url 'class_identification' learning_unit_year.academic_year.year learning_unit_year.acronym learning_class_year.acronym as class_identification_url %}
                     <tr class="class_year collapse collapse_classes{{ component_number }}">
                         <td colspan="1">
-                            {% a_tag_has_perm class_identification_url learning_class_year.used_by_learning_units_year 'base.can_access_class' user %}
+                            {% a_tag_has_perm class_identification_url learning_class_year.used_by_learning_units_year 'learning_unit.view_learningclassyear' user %}
                         </td>
                         <td colspan="2">
                             {% with "/ "|add:component.learning_component_year.type_letter_acronym|add:" - "|add:learning_class_year.acronym as class_code %}
-                                {% a_tag_has_perm class_identification_url class_code 'base.can_access_class' user %}
+                                {% a_tag_has_perm class_identification_url class_code 'learning_unit.view_learningclassyear' user %}
                             {% endwith %}
                         </td>
                         <td colspan="6">
