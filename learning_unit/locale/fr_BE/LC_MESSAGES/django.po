@@ -387,7 +387,7 @@ msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
 
-msgid "You dont' have sufficient access rights to update a class."
+msgid "You do not have sufficient access rights to update a class."
 msgstr "Vous n'avez pas les droits nécessaires pour modifier une classe."
 
 msgid "external acronym rules"
