@@ -74,7 +74,6 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         UpdateEffectiveClassValidatorList(command=cmd).validate()
         self.titles = ClassTitles(fr=cmd.title_fr, en=cmd.title_en)
         self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
-        self.derogation_quadrimester.uuid = cmd.teaching_place_uuid
         quadri = cmd.derogation_quadrimester
         self.derogation_quadrimester = DerogationQuadrimester[quadri] if quadri else None
         self.session_derogation = DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None
