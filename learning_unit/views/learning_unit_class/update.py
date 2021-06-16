@@ -73,9 +73,21 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             )
         )
 
+    @cached_property
+    def cancel_url(self):
+        return reverse(
+            'class_identification',
+            kwargs={
+                'learning_unit_year': self.effective_class.year,
+                'learning_unit_code': self.effective_class.learning_unit_code,
+                'class_code': self.effective_class.class_code,
+            }
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['effective_class'] = self.effective_class
+        context['cancel_url'] = self.cancel_url
         return context
 
     def get_form_kwargs(self):

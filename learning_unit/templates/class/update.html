@@ -45,7 +45,7 @@
         <div class="panel-body">
             <form method="post" id="LearningClassYearForm">
                 <div class="panel-heading">
-                    {% include "class/blocks/class_update_cancel_buttons.html" %}
+                    {% include "blocks/forms/create_cancel_buttons.html" with btn_submit_name="class_update" cancel_url=cancel_url%}
                 </div>
                 {% csrf_token %}
                 {% bootstrap_form_errors form %}
@@ -140,7 +140,7 @@
                     </div>
                 </div>
                 <div class="panel-footer">
-                    {% include "class/blocks/class_update_cancel_buttons.html" %}
+                    {% include "blocks/forms/create_cancel_buttons.html" with btn_submit_name="class_update" cancel_url=cancel_url%}
                 </div>
             </form>
         </div>

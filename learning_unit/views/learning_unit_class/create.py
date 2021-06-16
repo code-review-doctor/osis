@@ -61,6 +61,21 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
 
+    @cached_property
+    def cancel_url(self):
+        return reverse(
+            'learning_unit',
+            kwargs={
+                'acronym': self.learning_unit_code,
+                'year': self.learning_unit.year,
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cancel_url'] = self.cancel_url
+        return context
+
     def get(self, request, *args, **kwargs):
         try:
             message_bus_instance.invoke(
