@@ -125,10 +125,9 @@ class TutorRepository(ITutorRepository):
 
     @classmethod
     def _get_effective_classes(cls, effective_classes: QuerySet) -> List['DistributedEffectiveClassesDTO']:
-        classes = []
-        for effective_classe in effective_classes:
-            classes.append(DistributedEffectiveClassesDTO(**effective_classe))
-        return classes
+        return [
+            DistributedEffectiveClassesDTO(**effective_class) for effective_class in effective_classes
+        ]
 
     @classmethod
     def save(cls, entity: 'Tutor') -> None:
