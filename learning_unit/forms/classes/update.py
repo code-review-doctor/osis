@@ -269,7 +269,7 @@ class UpdateClassForm(ClassForm):
             **kwargs
     ):
         super().__init__(*args, learning_unit=learning_unit, user=user, **kwargs)
-        self.form_title = _('Update class')
+        self.form_title = str(effective_class)
         self.__init_effective_class_fields_for_update(effective_class)
 
     def __init_effective_class_fields_for_update(self, effective_class: EffectiveClass):

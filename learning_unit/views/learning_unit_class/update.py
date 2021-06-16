@@ -73,21 +73,6 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             )
         )
 
-    def get(self, request, *args, **kwargs):
-        # TODO :: Add permission check, like it has been done below for the creation
-        # try:
-        #     message_bus_instance.invoke(
-        #         CanCreateEffectiveClassCommand(
-        #             learning_unit_code=self.learning_unit_code,
-        #             learning_unit_year=self.year
-        #         )
-        #     )
-        # except MultipleBusinessExceptions as e:
-        #     display_error_messages(request, [exc.message for exc in e.exceptions])
-        #     return self.redirect_to_learning_unit_identification()
-
-        return super().get(request, *args, **kwargs)
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['learning_unit'] = self.learning_unit

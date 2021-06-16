@@ -62,6 +62,9 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     derogation_quadrimester = attr.ib(type=DerogationQuadrimester, default=None)
     session_derogation = attr.ib(type=DerogationSession, default=None)
 
+    def __str__(self):
+        return "{} - ({})".format(self.complete_code, self.entity_id.learning_unit_identity.academic_year)
+
     @property
     def complete_code(self) -> str:
         return "{}{}{}".format(
