@@ -147,7 +147,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 osis_role_predicates.always_deny(
                     message=_('Classes can only be created by a faculty manager')
                 ),
-            'base.can_update_class':
+            'learning_unit.change_learningclassyear':
                 osis_role_predicates.always_deny(
                     message=_("You dont' have sufficient access rights to update a class.")
                 ),

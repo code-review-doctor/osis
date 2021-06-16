@@ -43,7 +43,7 @@ from learning_unit.forms.classes.update import UpdateClassForm
 class UpdateClassView(PermissionRequiredMixin, FormView):
     template_name = "class/update.html"
     form_class = UpdateClassForm
-    permission_required = 'base.can_create_class'  # TODO : adapt to update
+    permission_required = 'learning_unit.change_learningclassyear'
 
     @cached_property
     def year(self) -> int:
