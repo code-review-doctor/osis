@@ -89,7 +89,7 @@
                     {% if component.learning_component_year.classes %}
                         <a role="button" data-toggle="collapse"
                            href=".collapse_classes{{ forloop.counter0 }}"
-                           aria-expanded="false" aria-controls="collapse_classes{{ forloop.counter0 }}"
+                           aria-expanded="true" aria-controls="collapse_classes{{ forloop.counter0 }}"
                            style="border:0;padding:0;"
                            onclick="changeOrientation(expandButton{{ forloop.counter0 }})">
                                         <span id="expandButton{{ forloop.counter0 }}" class="glyphicon glyphicon-expand"
@@ -134,7 +134,7 @@
             </tr>
             {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
-                    <tr class="class_year collapse collapse_classes{{ component_number }}">
+                    <tr class="class_year collapse collapse_classes{{ component_number }} in">
                         {% if forloop.first %}
                             <td><strong>{% trans 'Classes' %}</strong></td>
                         {% else %}

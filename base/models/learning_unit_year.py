@@ -49,6 +49,7 @@ from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
 from base.models.enums.component_type import PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import LECTURING
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
 from base.models.learning_component_year import LearningComponentYear
@@ -595,10 +596,11 @@ def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear
                 if total_class_volume != learning_component_year.hourly_volume_total_annual:
                     _warnings.append(
                         _(
-                            'Class volumes of class %(code_ue)s/%(code_class)s are inconsistent '
+                            'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
                             '(Annual volume must be equal to the sum of volume Q1 and Q2)'
                         ) % {
                                 'code_ue': learning_component_year.learning_unit_year.acronym,
+                                'separator': '-' if learning_component_year.type == LECTURING else '_',
                                 'code_class': ue_class.acronym
                         }
                     )

@@ -925,11 +925,12 @@ class LearningUnitYearCheckVolumeConsistencyWithUeWarnings(TestCase):
 
     def _build_check_consistency_volume_message(self, learning_class):
         return _(
-            'Class volumes of class %(code_ue)s/%(code_class)s are inconsistent '
+            'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
             '(Annual volume must be equal to the sum of volume Q1 and Q2)'
         ) % {
-           'code_ue': self.learning_unit_year.acronym,
-           'code_class': learning_class.acronym
+            'code_ue': self.learning_unit_year.acronym,
+            'separator': '-' if learning_class.learning_component_year.type == LECTURING else '_',
+            'code_class': learning_class.acronym
         }
 
     def test_check_number_of_classes_correct(self):

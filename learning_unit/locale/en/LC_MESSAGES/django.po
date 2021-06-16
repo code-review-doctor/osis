@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-27 09:42+0200\n"
+"POT-Creation-Date: 2021-06-16 15:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,9 +51,6 @@ msgid "Not in period to edit force majeure section."
 msgstr ""
 
 msgid "Only alphanumeric characters are allowed."
-msgstr ""
-
-msgid "Only letters are allowed."
 msgstr ""
 
 msgid "Person not in accordance with proposal state"
@@ -198,7 +195,4 @@ msgid "hourly volume partial q1"
 msgstr ""
 
 msgid "hourly volume partial q2"
-msgstr ""
-
-msgid "hourly volume total annual"
 msgstr ""
