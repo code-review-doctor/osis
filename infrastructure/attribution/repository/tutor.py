@@ -152,12 +152,10 @@ class TutorRepository(ITutorRepository):
                 attribution_charge_id = attribution_db.attributionchargenew_set.filter(
                     learning_component_year_id=learning_component_year_id
                 ).values_list('pk', flat=True).get()
+
                 attribution_class, _ = AttributionClassDatabase.objects.update_or_create(
                     attribution_charge_id=attribution_charge_id,
-                    learning_class_year__learning_component_year__learning_unit_year__acronym=
-                    attribution.learning_unit.code,
-                    learning_class_year__learning_component_year__learning_unit_year__academic_year__year=
-                    attribution.learning_unit.year,
+                    learning_class_year__learning_component_year_id=learning_component_year_id,
                     learning_class_year__acronym=class_volume.class_code,
                     defaults={
                         'allocation_charge': class_volume.distributed_volume
