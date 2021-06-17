@@ -55,3 +55,10 @@ class TutorSearchDTO(DTO):
     first_name = attr.ib(type=str)
     personal_id_number = attr.ib(type=str)
     attributions = attr.ib(type=List[LearningUnitAttributionFromRepositoryDTO])
+
+
+@attr.s(frozen=True, slots=True)
+class DistributedEffectiveClassesDTO(DTO):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
