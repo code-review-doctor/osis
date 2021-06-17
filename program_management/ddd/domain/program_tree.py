@@ -51,6 +51,8 @@ from program_management.ddd.domain.service.generate_node_code import GenerateNod
 from program_management.ddd.repositories import load_authorized_relationship
 from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
+from program_management.ddd.validators.validators_by_business_action import \
+    CreateProgramTreeStandardVersionValidatorList
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
@@ -469,6 +471,7 @@ class ProgramTreeBuilder:
     ) -> 'ProgramTree':
         root_node = node_repository.get(NodeIdentity(code=orphan_group_as_root.code, year=orphan_group_as_root.year))
         program_tree = ProgramTree(root_node=root_node, authorized_relationships=load_authorized_relationship.load())
+        CreateProgramTreeStandardVersionValidatorList(program_tree).validate()
         self._generate_mandatory_direct_children(program_tree=program_tree)
         return program_tree
 

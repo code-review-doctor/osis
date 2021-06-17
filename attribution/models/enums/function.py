@@ -37,6 +37,7 @@ DEPUTY_TEMPORARY = "DEPUTY_TEMPORARY"
 PROFESSOR = "PROFESSOR"  # To remove afterwards.
 INTERNSHIP_SUPERVISOR = "INTERNSHIP_SUPERVISOR"
 INTERNSHIP_CO_SUPERVISOR = "INTERNSHIP_CO_SUPERVISOR"
+DEPUTY_DISEASE_OR_MATERNITY = "DEPUTY_DISEASE_OR_MATERNITY"
 
 
 class Functions(ChoiceEnum):
@@ -50,6 +51,7 @@ class Functions(ChoiceEnum):
     PROFESSOR = _("Professor")
     INTERNSHIP_SUPERVISOR = _("Internship supervisor")
     INTERNSHIP_CO_SUPERVISOR = _("Internship co-supervisor")
+    DEPUTY_DISEASE_OR_MATERNITY = _('Deputy disease or maternity')
 
     @classmethod
     def choices_without_professor(cls):

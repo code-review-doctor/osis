@@ -31,5 +31,5 @@ class Migration(migrations.Migration):
             name='code_name',
             field=models.CharField(blank=True, max_length=100, null=True, verbose_name='code'),
         ),
-        migrations.RunPython(empty_code_name_to_none, reverse_code=fill_null_code_name)
+        migrations.RunPython(empty_code_name_to_none, reverse_code=fill_null_code_name, elidable=True)
     ]

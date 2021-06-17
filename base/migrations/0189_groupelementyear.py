@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
             model_name='groupelementyear',
             name='sessions_derogation',
             field=models.CharField(choices=[('SESSION_1', 'SESSION_1'), ('SESSION_2', 'SESSION_2'), ('SESSION_3', 'SESSION_3'), ('SESSION_1_2', 'SESSION_1_2'), ('SESSION_1_3', 'SESSION_1_3'), ('SESSION_2_3', 'SESSION_2_3'), ('SESSION_1_2_3', 'SESSION_1_2_3'), ('SESSION_UNDEFINED', 'SESSION_UNDEFINED'), ('SESSION_PARTIAL_2_3', 'SESSION_PARTIAL_2_3')],
-                                   default=SessionsDerogationTypes('SESSION_UNDEFINED'), max_length=65),
+                                   default='SESSION_UNDEFINED', max_length=65),
         ),
         migrations.AddField(
             model_name='groupelementyear',

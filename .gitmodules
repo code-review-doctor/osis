@@ -29,3 +29,6 @@
 [submodule "osis_notification"]
 	path = osis_notification
 	url = https://github.com/uclouvain/osis-notification
+[submodule "osis_document"]
+	path = osis_document
+	url = https://github.com/uclouvain/osis-document.git

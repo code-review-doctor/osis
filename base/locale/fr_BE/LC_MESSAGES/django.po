@@ -94,11 +94,32 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
+msgid "1"
+msgstr "1"
+
+msgid "12"
+msgstr "12"
+
+msgid "123"
+msgstr "123"
+
+msgid "13"
+msgstr "13"
+
 msgid "1st quadri"
 msgstr "1er quadri"
 
+msgid "2"
+msgstr "2"
+
+msgid "23"
+msgstr "23"
+
 msgid "2nd quadri"
 msgstr "2e quadri"
+
+msgid "3"
+msgstr "3"
 
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
@@ -1622,6 +1643,9 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
+msgid "New class"
+msgstr "Nouvelle classe"
+
 msgid "New external learning unit"
 msgstr "Nouvelle unité d'enseignement externe"
 
@@ -1783,6 +1807,9 @@ msgstr "Composants propres"
 
 msgid "P."
 msgstr "P."
+
+msgid "P23"
+msgstr "P23"
 
 msgid "Page not found."
 msgstr "Page inexistante."
@@ -3019,10 +3046,10 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 msgid "biennial even"
-msgstr "bisannuelle paire"
+msgstr "Bisannuelle paire"
 
 msgid "biennial odd"
-msgstr "bisannuelle impaire"
+msgstr "Bisannuelle impaire"
 
 msgid "blocked update for tutor"
 msgstr "mise à jour bloquée pour l'enseignant"

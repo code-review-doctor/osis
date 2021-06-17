@@ -561,3 +561,18 @@ class CopyCertificateAimsToNextYearCommand(interface.CommandRequest):
 class GetTrainingEmptyFieldsOnWarningCommand(interface.CommandRequest):
     acronym = attr.ib(type=str)
     year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeTrainingsUntilNPlus6Command(interface.CommandRequest):
+    pass
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeMiniTrainingsUntilNPlus6Command(interface.CommandRequest):
+    pass
+
+
+@attr.s(frozen=True, slots=True)
+class PostponeGroupsUntilNPlus6Command(interface.CommandRequest):
+    pass

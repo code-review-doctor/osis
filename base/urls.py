@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ from base.views.autocomplete import OrganizationAutocomplete, CountryAutocomplet
     EntityAutocomplete, AllocationEntityAutocomplete, AdditionnalEntity1Autocomplete, AdditionnalEntity2Autocomplete, \
     EntityRequirementAutocomplete, EmployeeAutocomplete, AcademicCalendarTypeAutocomplete
 from education_group import urls as education_group_urls
+
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -127,7 +128,10 @@ urlpatterns = [
             url(r'^address/$', institution.get_entity_address, name='entity_address'),
             url(r'^diagram/$', institution.entity_diagram, name='entity_diagram'),
             url(r'^versions/$', institution.entities_version, name='entities_version'),
-        ]))
+        ])),
+        url(r'^(?P<entity_acronym>[A-Z]+)/', include([
+            url(r'^$', institution.entity_read_by_acronym, name='entity_read'),
+        ])),
     ])),
 
     url(r'^institution/', include([
@@ -245,6 +249,7 @@ urlpatterns = [
                 name="learning_unit_proposal_comparison"),
             url(r'^consolidate/$', base.views.learning_units.proposal.consolidate.consolidate_proposal,
                 name="learning_unit_consolidate_proposal"),
+
         ])),
         url(r'^(?P<code>[A-Za-z0-9]+)/(?P<year>[0-9]+)/', include([
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),

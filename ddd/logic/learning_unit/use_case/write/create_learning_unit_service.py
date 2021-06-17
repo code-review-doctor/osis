@@ -33,14 +33,13 @@ from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepo
 from ddd.logic.learning_unit.repository.i_ucl_entity import IUclEntityRepository
 
 
-@transaction.atomic()
 def create_learning_unit(
         cmd: CreateLearningUnitCommand,
         learning_unit_repository: ILearningUnitRepository,
         entity_repository: IUclEntityRepository,
 ) -> LearningUnitIdentity:
     # GIVEN
-    all_existing_identities = learning_unit_repository.get_identities()
+    all_existing_identities = learning_unit_repository.get_all_identities()
     entity = entity_repository.get(
         entity_id=UclEntityIdentityBuilder.build_from_code(cmd.responsible_entity_code),
     )

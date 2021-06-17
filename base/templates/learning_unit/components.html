@@ -3,6 +3,7 @@
 {% load learning_unit %}
 {% load components_classes %}
 {% load waffle_tags %}
+{% load osis_role %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -132,13 +133,15 @@
                     <td colspan="6">{% trans 'Description' %}</td>
                 </tr>
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
+                    {% url 'class_identification' learning_unit_year.academic_year.year learning_unit_year.acronym learning_class_year.acronym as class_identification_url %}
                     <tr class="class_year collapse collapse_classes{{ component_number }}">
-                        <td colspan="1">{{ learning_class_year.used_by_learning_units_year }}</td>
+                        <td colspan="1">
+                            {% a_tag_has_perm class_identification_url learning_class_year.used_by_learning_units_year 'learning_unit.view_learningclassyear' user %}
+                        </td>
                         <td colspan="2">
-                            /{% if component.learning_component_year.type_letter_acronym %}
-                            {{ component.learning_component_year.type_letter_acronym }}
-                        {% endif %}
-                            - {{ learning_class_year.acronym }}
+                            {% with "/ "|add:component.learning_component_year.type_letter_acronym|add:" - "|add:learning_class_year.acronym as class_code %}
+                                {% a_tag_has_perm class_identification_url class_code 'learning_unit.view_learningclassyear' user %}
+                            {% endwith %}
                         </td>
                         <td colspan="6">
                             {{ learning_class_year.description|default_if_none:'' }}
