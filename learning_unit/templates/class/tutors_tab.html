@@ -43,7 +43,6 @@
                 <th>
                     <abbr title="{% trans 'Practical exercises' %}">PP</abbr>
                 </th>
-                <th>{% trans 'Substitute' %}</th>
                 <th></th>
             </tr>
             </thead>
@@ -69,8 +68,6 @@
                                         {{ class_repartition.distributed_volume | floatformat:2 }}
                                     {% endif %}
                                 </td>
-
-                                <td>{{ attribution.substitute | default_if_none:'' }}</td>
 
                                 {% comment %}
                                 <!-- TODO: uncomment with actions on tutors attribution -->
