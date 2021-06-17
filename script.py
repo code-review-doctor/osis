@@ -151,6 +151,10 @@ def main_postpone_programs():
     print('Delete cohorts linked to 11ba')
     timeit(delete_cohorts_linked_to_11ba)()
 
+    print('Postpone coorganizations data')
+    for year in range(FROM_YEAR, FROM_YEAR+5):
+        timeit(postpone_programs_until_n_plus_6.postpone_coorganizations_data)(year)
+
 
 def main_postpone_cms():
     print('Copy cms')

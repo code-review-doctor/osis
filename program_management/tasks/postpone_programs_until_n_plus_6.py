@@ -27,6 +27,7 @@ from backoffice.celery import app as celery_app
 from base.business.education_groups.access_requirements import bulk_postpone_access_requirements, \
     bulk_postpone_access_requirements_line
 from base.business.education_groups.achievement import bulk_postpone_achievements
+from base.business.education_groups.organizations import bulk_postpone_organizations
 from base.business.education_groups.publication_contact import bulk_postpone_publication_contact, \
     bulk_postpone_publication_entity
 from base.models.education_group_year import EducationGroupYear
@@ -91,3 +92,9 @@ def _postpone_until_n_plus_6_publication_datas(education_group_year_qs, group_ye
     bulk_postpone_publication_entity(education_group_year_qs)
 
     bulk_postpone_achievements(education_group_year_qs)
+
+
+def postpone_coorganizations_data(to_year: int):
+    education_group_year_qs = EducationGroupYear.objects.filter(academic_year__year=to_year-1)
+
+    bulk_postpone_organizations(education_group_year_qs)
