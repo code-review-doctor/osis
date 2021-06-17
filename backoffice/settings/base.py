@@ -91,6 +91,7 @@ INSTALLED_APPS = (
     'reversion',
     'django.contrib.gis',
     'ddd',
+    'partnership',
 )
 
 

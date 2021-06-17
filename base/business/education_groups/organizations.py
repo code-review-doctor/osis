@@ -24,6 +24,8 @@
 ##############################################################################
 from typing import List
 
+from django.db import IntegrityError
+
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
 
@@ -45,7 +47,10 @@ def postpone_organizations(education_group_year_from: "EducationGroupYear") -> N
 
     for egy in next_qs:
         for organization in organizations_to_postpone:
-            _postpone_organization(egy, organization)
+            try:
+                _postpone_organization(egy, organization)
+            except IntegrityError:
+                pass
 
 
 def _postpone_organization(egy: 'EducationGroupYear', organization_to_postpone: 'EducationGroupOrganization') -> None:
