@@ -29,7 +29,6 @@ from typing import List
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
@@ -81,7 +80,6 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
     def tutors(self) -> List['Tutor']:
         command = SearchTutorAttributedToLearningUnitCommand(
             learning_unit_code=self.kwargs['learning_unit_code'],
-            learning_unit_year=self.kwargs['learning_unit_year'],
-            class_type=LECTURING if self.effective_class.is_lecturing else PRACTICAL_EXERCISES
+            learning_unit_year=self.kwargs['learning_unit_year']
         )
         return message_bus_instance.invoke(command)

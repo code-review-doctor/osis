@@ -38,11 +38,10 @@
                 <th>{% trans 'Start' %}</th>
                 <th>{% trans 'Duration' %}</th>
                 <th>
-                    {% if effective_class.is_lecturing %}
-                        <abbr title="{% trans 'Lecturing' %}">PM</abbr>
-                    {% elif effective_class.is_practical %}
-                        <abbr title="{% trans 'Practical exercises' %}">PP</abbr>
-                    {% endif %}
+                    <abbr title="{% trans 'Lecturing' %}">PM</abbr>
+                </th>
+                <th>
+                    <abbr title="{% trans 'Practical exercises' %}">PP</abbr>
                 </th>
                 <th>{% trans 'Substitute' %}</th>
                 <th></th>
@@ -60,7 +59,16 @@
                                 <td>{{ attribution.start_year | default_if_none:'' }}</td>
                                 <td>{{ attribution.duration | default_if_none:'' }}</td>
 
-                                <td>{{ class_repartition.distributed_volume | floatformat:2 }}</td>
+                                <td>
+                                    {% if effective_class.is_lecturing %}
+                                        {{ class_repartition.distributed_volume | floatformat:2 }}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if effective_class.is_practical %}
+                                        {{ class_repartition.distributed_volume | floatformat:2 }}
+                                    {% endif %}
+                                </td>
 
                                 <td>{{ attribution.substitute | default_if_none:'' }}</td>
 

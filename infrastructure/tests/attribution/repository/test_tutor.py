@@ -27,7 +27,6 @@ from django.test import TestCase
 
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.attribution.domain.model.tutor import Tutor
@@ -55,40 +54,33 @@ class TutorRepositoryTestCase(TestCase):
         results = self.tutor_repository.search(learning_unit_identity=entity_id)
         self.assertEqual(len(results), 0)
 
-    def test_should_return_2_lecturing_attributions(self):
+    def test_should_return_2_attributions(self):
         ue_with_attributions = LearningUnitYearFactory(
             academic_year__current=True
         )
-        lecturing_attribution_1 = AttributionChargeNewFactory(
+        attribution_1 = AttributionChargeNewFactory(
             learning_component_year__learning_unit_year=ue_with_attributions,
-            learning_component_year__type=LECTURING,
             attribution__tutor__person__last_name='Dupont'
         )
-        lecturing_attribution_2 = AttributionChargeNewFactory(
+        attribution_2 = AttributionChargeNewFactory(
             learning_component_year__learning_unit_year=ue_with_attributions,
-            learning_component_year__type=LECTURING,
             attribution__tutor__person__last_name='Bastin'
-        )
-
-        AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year=ue_with_attributions,
-            learning_component_year__type=PRACTICAL_EXERCISES,
         )
 
         entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
             code=ue_with_attributions.acronym,
             year=ue_with_attributions.academic_year.year
         )
-        results = self.tutor_repository.search(learning_unit_identity=entity_id, class_type=LECTURING)
+        results = self.tutor_repository.search(learning_unit_identity=entity_id)
         self.assertEqual(len(results), 2)
         self._assert_should_correctly_map_database_fields_with_dto_fields(
             results[0],
-            lecturing_attribution_2.attribution,
+            attribution_2.attribution,
             ue_with_attributions
         )
         self._assert_should_correctly_map_database_fields_with_dto_fields(
             results[1],
-            lecturing_attribution_1.attribution,
+            attribution_1.attribution,
             ue_with_attributions
         )
 
