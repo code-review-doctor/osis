@@ -43,6 +43,7 @@ class AttributionFromRepositoryDTO(DTO):
     start_year = attr.ib(type=int)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
+    is_substitute = attr.ib(type=bool)
 
 
 @attr.s(frozen=True, slots=True)

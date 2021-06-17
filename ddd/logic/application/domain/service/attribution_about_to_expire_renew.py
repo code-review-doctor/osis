@@ -56,7 +56,7 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             learning_unit_service: ILearningUnitService,
     ) -> List[AttributionAboutToExpireDTO]:
         attributions_about_to_expire = applicant.get_attributions_about_to_expire(
-            application_calendar.authorized_target_year
+            AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
         )
         attributions_filtered = _filter_attribution_by_renewable_functions(attributions_about_to_expire)
         if not attributions_about_to_expire:
@@ -66,31 +66,31 @@ class AttributionAboutToExpireRenew(interface.DomainService):
         vacant_course_ids = [
             VacantCourseIdentity(
                 academic_year=AcademicYearIdentityBuilder.build_from_year(
-                    year=application_calendar.authorized_target_year.year + 1
+                    year=application_calendar.authorized_target_year.year
                 ),
                 code=attribution.course_id.code
             ) for attribution in attributions_filtered
         ]
-        vacant_courses_next_year = vacant_course_repository.search(vacant_course_ids)
+        vacant_courses = vacant_course_repository.search(vacant_course_ids)
 
         learning_unit_ids = [
             LearningUnitIdentity(academic_year=vacant_course_id.academic_year, code=vacant_course_id.code)
             for vacant_course_id in vacant_course_ids
         ]
-        vacant_courses_next_year_volumes = learning_unit_service.search_learning_unit_volumes_dto(learning_unit_ids)
+        vacant_courses_volumes = learning_unit_service.search_learning_unit_volumes_dto(learning_unit_ids)
 
         attributions_about_to_expire_dto = []
         for attribution_about_to_expire in attributions_filtered:
             unavailable_renewal_reason = _get_unavailable_renewal_reason(
                 attribution_about_to_expire,
-                vacant_courses_next_year,
+                vacant_courses,
                 all_existing_applications
             )
             vacant_course_next_year = _get_vacant_course_by_code(
-                attribution_about_to_expire.course_id.code, vacant_courses_next_year
+                attribution_about_to_expire.course_id.code, vacant_courses
             )
             vacant_course_next_year_volume = next((
-                vc_volume for vc_volume in vacant_courses_next_year_volumes
+                vc_volume for vc_volume in vacant_courses_volumes
                 if vc_volume.code == attribution_about_to_expire.course_id.code
             ), None)
 
@@ -124,7 +124,7 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             vacant_course_repository: IVacantCourseRepository
     ) -> Application:
         attributions_about_to_expire = applicant.get_attributions_about_to_expire(
-            application_calendar.authorized_target_year
+            AcademicYearIdentityBuilder.build_from_year(application_calendar.authorized_target_year.year - 1)
         )
         attributions_filtered = _filter_attribution_by_code(attributions_about_to_expire, learning_unit_code)
         attributions_filtered = _filter_attribution_by_renewable_functions(attributions_filtered)
@@ -132,11 +132,10 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             raise MultipleBusinessExceptions(exceptions={AttributionAboutToExpireFunctionException()})
         attribution_about_to_expire = attributions_filtered[0]
 
-        # Lookup vacant course on next year
-        vacant_course_next_year = vacant_course_repository.get(
+        vacant_courses = vacant_course_repository.get(
             VacantCourseIdentity(
                 academic_year=AcademicYearIdentityBuilder.build_from_year(
-                    year=application_calendar.authorized_target_year.year + 1
+                    year=application_calendar.authorized_target_year.year
                 ),
                 code=learning_unit_code
             )
@@ -144,7 +143,7 @@ class AttributionAboutToExpireRenew(interface.DomainService):
 
         return ApplicationBuilder.build_from_attribution_about_to_expire(
             applicant,
-            vacant_course_next_year,
+            vacant_courses,
             attribution_about_to_expire,
             all_existing_applications
         )

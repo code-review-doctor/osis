@@ -47,5 +47,6 @@ class AttributionBuilder(RootEntityBuilder):
             start_year=AcademicYearIdentityBuilder.build_from_year(year=dto.start_year),
             function=Functions[dto.function] if dto.function else None,
             lecturing_volume=dto.lecturing_volume,
-            practical_volume=dto.practical_volume
+            practical_volume=dto.practical_volume,
+            is_substitute=dto.is_substitute
         )

@@ -35,8 +35,11 @@ from ddd.logic.application.domain.model.attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
 from ddd.logic.application.domain.validator._should_be_the_author_of_the_application import \
     ShouldBeTheAuthorOfTheApplication
+from ddd.logic.application.domain.validator._should_attribution_about_to_expire_with_volume import \
+    ShouldAttributionAboutToExpireWithVolumeValidator
 from ddd.logic.application.domain.validator._should_lecturing_or_pratical_filled import \
     ShouldLecturingOrPracticalFilledValidator
+from ddd.logic.application.domain.validator._should_not_be_a_substitute import ShouldNotBeASubstituteValidator
 from ddd.logic.application.domain.validator._should_not_have_already_applied_on_vacant_course import \
     ShouldNotHaveAlreadyAppliedOnVacantCourse
 from ddd.logic.application.domain.validator._should_vacant_course_allowable_declaration_type import \
@@ -128,6 +131,9 @@ class RenewApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidat
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
+            ShouldAttributionAboutToExpireWithVolumeValidator(
+                attribution_about_to_expire=self.attribution_about_to_expire
+            ),
             ShouldVacantCourseAllowableDeclarationType(vacant_course=self.vacant_course),
             ShouldNotHaveAlreadyAppliedOnVacantCourse(
                 vacant_course=self.vacant_course, all_existing_applications=self.all_existing_applications
@@ -139,5 +145,6 @@ class RenewApplicationValidatorList(TwoStepsMultipleBusinessExceptionListValidat
             ),
             ShouldVacantCourseApplicationNotManagedInTeam(
                 vacant_course=self.vacant_course
-            )
+            ),
+            ShouldNotBeASubstituteValidator(attribution_about_to_expire=self.attribution_about_to_expire)
         ]

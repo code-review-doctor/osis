@@ -56,6 +56,7 @@ class ApplicantRepositoryGet(TestCase):
             attribution__tutor=cls.tutor_db,
             attribution__end_year=2020,
             attribution__learning_container_year=cls.ldroi1200.learning_container_year,
+            attribution__substitute=None,
             learning_component_year__learning_unit_year=cls.ldroi1200,
             learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES,
             allocation_charge=Decimal(9.5)
@@ -84,7 +85,8 @@ class ApplicantRepositoryGet(TestCase):
             end_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.end_year),
             start_year=AcademicYearIdentity(year=self.attribution_practical_ldroi1200.attribution.start_year),
             lecturing_volume=None,
-            practical_volume=self.attribution_practical_ldroi1200.allocation_charge
+            practical_volume=self.attribution_practical_ldroi1200.allocation_charge,
+            is_substitute=False
         )
         self.assertEqual(applicant.attributions[0], expected_attribution)
 

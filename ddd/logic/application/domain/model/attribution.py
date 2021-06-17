@@ -42,3 +42,4 @@ class Attribution(interface.ValueObject):
     start_year = attr.ib(type=AcademicYearIdentity)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
+    is_substitute = attr.ib(type=bool)

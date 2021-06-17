@@ -98,3 +98,19 @@ class NotAuthorOfApplicationException(BusinessException):
     def __init__(self, *args,  **kwargs):
         message = _("Cannot update an application which is not owned by you")
         super().__init__(message, **kwargs)
+
+
+class AttributionAboutToExpireWithoutVolumeException(BusinessException):
+    status_code = "APPLICATION-10"
+
+    def __init__(self, *args,  **kwargs):
+        message = _("Cannot renew an attribution without volumes")
+        super().__init__(message, **kwargs)
+
+
+class AttributionSubstituteException(BusinessException):
+    status_code = "APPLICATION-11"
+
+    def __init__(self, *args,  **kwargs):
+        message = _("A substitute can not renew his function of substitute")
+        super().__init__(message, **kwargs)

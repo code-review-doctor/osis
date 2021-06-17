@@ -27,7 +27,7 @@ from django.db import transaction
 
 from ddd.logic.application.commands import SendApplicationsSummaryCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
-from ddd.logic.application.domain.service.applications_summary import ApplicationsSummary
+from ddd.logic.application.domain.service.applications_summary import IApplicationsSummary
 from ddd.logic.application.repository.i_applicant_respository import IApplicantRepository
 from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
 from ddd.logic.application.repository.i_application_repository import IApplicationRepository
@@ -39,12 +39,12 @@ def send_applications_summary(
         application_repository: IApplicationRepository,
         application_calendar_repository: IApplicationCalendarRepository,
         applicant_repository: IApplicantRepository,
-        application_summary: ApplicationsSummary,
+        application_summary: IApplicationsSummary,
 ) -> None:
     # GIVEN
     application_calendar = application_calendar_repository.get_current_application_calendar()
     applicant = applicant_repository.get(entity_id=ApplicantIdentityBuilder.build_from_global_id(cmd.global_id))
-    applications = application_repository.search(
+    applications = application_repository.search_by_applicant_dto(
         applicant_id=applicant.entity_id,
         academic_year_id=application_calendar.authorized_target_year
     )

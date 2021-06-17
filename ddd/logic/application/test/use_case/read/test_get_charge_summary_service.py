@@ -50,6 +50,7 @@ class GetChargeSummary(TestCase):
                     start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
                     lecturing_volume=Decimal(10),
                     practical_volume=Decimal(15),
+                    is_substitute=False
                 )
             ]
         )

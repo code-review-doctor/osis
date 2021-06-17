@@ -25,33 +25,39 @@
 ##############################################################################
 from typing import List
 
+from django.utils import translation
 from django.utils.translation import pgettext_lazy
 
 from base.models.person import Person
 from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
-from ddd.logic.application.domain.service.applications_summary import ApplicationsSummary
+from ddd.logic.application.domain.service.applications_summary import IApplicationsSummary
+from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from osis_common.messaging import message_config, send_message as message_service
 
 
-class ApplicationsMailSummary(ApplicationsSummary):
+class ApplicationsMailSummary(IApplicationsSummary):
 
     @classmethod
-    def send(cls, applicant: Applicant, application_calendar: ApplicationCalendar, applications: List[Application]):
+    def send(
+            cls,
+            applicant: Applicant,
+            application_calendar: ApplicationCalendar,
+            applications: List[ApplicationByApplicantDTO]
+    ):
         html_template_ref = 'applications_confirmation_html'
         txt_template_ref = 'applications_confirmation_txt'
 
         person = Person.objects.get(global_id=applicant.entity_id.global_id)
         receivers = [
-            message_config.create_receiver(person.id, person.email, person.language)
+            message_config.create_receiver(person.id, person.email, translation.get_language())
         ]
 
         table_applications = message_config.create_table(
             'applications',
             [pgettext_lazy("applications", "Code"), 'Vol. 1', 'Vol. 2'],
             [
-                (application.vacant_course_id.code, application.lecturing_volume, application.practical_volume,)
+                (application.code, application.lecturing_volume, application.practical_volume,)
                 for application in applications
             ]
         )

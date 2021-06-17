@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-17 08:58+0200\n"
+"POT-Creation-Date: 2021-06-17 14:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,9 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "A substitute can not renew his function of substitute"
+msgstr "Un suppléant ne peut pas reconduire sa fonction de suppléant"
 
 msgid ""
 "Application on this vacant course is not reserved for interns/open for extern"
@@ -35,6 +38,10 @@ msgid ""
 msgstr ""
 "Impossible de renouveler une attribution avec une fonction différente de "
 "titulaire ou cotitulaire"
+
+msgid "Cannot renew an attribution without volumes"
+msgstr ""
+"Impossible de renouveler une attribution sans volume"
 
 msgid "Cannot update an application which is not owned by you"
 msgstr ""
@@ -80,6 +87,7 @@ msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
 
+#, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr "Le code %(ue_code)s - %(code)s existe déjà pour %(ue)s"
 
@@ -131,3 +139,6 @@ msgstr ""
 
 msgid "You have already applied on vacant course"
 msgstr "Vous avez déjà candidaté pour cette activité"
+
+#~ msgid "Lecturing charge or practical charge must be greater than zero"
+#~ msgstr "Le vol.1  ou le vol.2 doit être plus grand que zéro"

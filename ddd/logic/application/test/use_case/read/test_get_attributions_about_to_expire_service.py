@@ -24,6 +24,7 @@
 import datetime
 from decimal import Decimal
 
+import attr
 import mock
 import uuid
 from django.test import TestCase
@@ -40,7 +41,8 @@ from ddd.logic.application.domain.model.allocation_entity import AllocationEntit
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.domain.validator.exceptions import VacantCourseApplicationManagedInTeamException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable, \
-    VacantCourseNotAllowedDeclarationType, VacantCourseNotFound
+    VacantCourseNotAllowedDeclarationType, VacantCourseNotFound, AttributionSubstituteException, \
+    AttributionAboutToExpireWithoutVolumeException
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
@@ -65,14 +67,15 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(
                 code="LDROI1200",
-                academic_year=self.application_calendar.authorized_target_year
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             ),
             course_title="Introduction au droit",
             function=Functions.CO_HOLDER,
-            end_year=self.application_calendar.authorized_target_year,
+            end_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(15),
+            is_substitute=False
         )
         self.global_id = '123456789'
         self.applicant = Applicant(
@@ -85,7 +88,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.vacant_course_ldroi1200 = VacantCourse(
             entity_id=VacantCourseIdentity(
                 code='LDROI1200',
-                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2019)
+                academic_year=self.application_calendar.authorized_target_year
             ),
             lecturing_volume_available=Decimal(10),
             practical_volume_available=Decimal(50),
@@ -97,7 +100,7 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.vacant_course_lagro1510 = VacantCourse(
             entity_id=VacantCourseIdentity(
                 code='LAGRO1510',
-                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2019)
+                academic_year=self.application_calendar.authorized_target_year
             ),
             lecturing_volume_available=Decimal(50),
             practical_volume_available=Decimal(25),
@@ -138,14 +141,15 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.applicant.attributions = [Attribution(
             course_id=LearningUnitIdentity(
                 code="LAGRO1200",
-                academic_year=self.application_calendar.authorized_target_year
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2017)
             ),
             course_title="Introduction à l'agro",
             function=Functions.CO_HOLDER,
-            end_year=self.application_calendar.authorized_target_year,
+            end_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2016),
             lecturing_volume=Decimal(10),
             practical_volume=Decimal(15),
+            is_substitute=False
         )]
 
         cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
@@ -158,11 +162,11 @@ class TestGetAttributionsAboutToExpireService(TestCase):
 
         self.assertEqual(results[0].code, "LAGRO1200")
         self.assertEqual(results[0].title, "Introduction à l'agro")
-        self.assertEqual(results[0].year, self.application_calendar.authorized_target_year.year)
+        self.assertEqual(results[0].year, 2017)
         self.assertEqual(results[0].lecturing_volume, Decimal(10))
         self.assertEqual(results[0].practical_volume, Decimal(15))
         self.assertEqual(results[0].function, Functions.CO_HOLDER)
-        self.assertEqual(results[0].end_year, self.application_calendar.authorized_target_year.year)
+        self.assertEqual(results[0].end_year, 2017)
         self.assertEqual(results[0].start_year, 2016)
         self.assertIsNone(results[0].total_lecturing_volume_course)
         self.assertIsNone(results[0].total_practical_volume_course)
@@ -228,6 +232,38 @@ class TestGetAttributionsAboutToExpireService(TestCase):
         self.assertEqual(
             results[0].unavailable_renewal_reason,
             VacantCourseNotAllowedDeclarationType().message
+        )
+
+    def test_assert_unavailable_renewal_reason_case_attribution_about_to_expire_without_volume(self):
+        self.applicant.attributions = [
+            attr.evolve(self.attribution_about_to_expire, lecturing_volume=Decimal(0), practical_volume=Decimal(0))
+        ]
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(
+            results[0].unavailable_renewal_reason,
+            AttributionAboutToExpireWithoutVolumeException().message
+        )
+
+    def test_assert_unavailable_renewal_reason_case_attribution_about_to_expire_is_substitute(self):
+        self.applicant.attributions = [
+            attr.evolve(self.attribution_about_to_expire, is_substitute=True)
+        ]
+
+        cmd = GetAttributionsAboutToExpireCommand(global_id=self.global_id)
+        results = self.message_bus.invoke(cmd)
+
+        self.assertEqual(len(results), 1)
+        self.assertIsInstance(results[0], AttributionAboutToExpireDTO)
+        self.assertFalse(results[0].is_renewable)
+        self.assertEqual(
+            results[0].unavailable_renewal_reason,
+            AttributionSubstituteException().message
         )
 
     def test_assert_renewal_because_no_unavailable_renewal_reason(self):

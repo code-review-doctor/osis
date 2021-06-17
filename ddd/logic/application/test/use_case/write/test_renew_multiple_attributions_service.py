@@ -64,14 +64,15 @@ class TestRenewMultipleAttributionsService(TestCase):
         cls.attribution_about_to_expire = Attribution(
             course_id=LearningUnitIdentity(
                 code='LDROI1200',
-                academic_year=cls.application_calendar.authorized_target_year
+                academic_year=AcademicYearIdentityBuilder.build_from_year(year=2018)
             ),
             course_title="Introduction au droit",
             function=Functions.HOLDER,
-            end_year=cls.application_calendar.authorized_target_year,
+            end_year=AcademicYearIdentityBuilder.build_from_year(year=2018),
             start_year=AcademicYearIdentityBuilder.build_from_year(year=2017),
             lecturing_volume=Decimal(5),
             practical_volume=None,
+            is_substitute=False
         )
 
         cls.global_id = '123456789'
@@ -84,9 +85,7 @@ class TestRenewMultipleAttributionsService(TestCase):
         cls.vacant_course = VacantCourse(
             entity_id=VacantCourseIdentity(
                 code='LDROI1200',
-                academic_year=AcademicYearIdentityBuilder.build_from_year(
-                    year=cls.application_calendar.authorized_target_year.year + 1
-                )
+                academic_year=cls.application_calendar.authorized_target_year
             ),
             lecturing_volume_available=Decimal(10),
             practical_volume_available=Decimal(50),

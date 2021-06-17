@@ -28,7 +28,7 @@ import operator
 from typing import Optional, List
 
 from django.db import models
-from django.db.models import F, QuerySet, Q, Subquery, OuterRef
+from django.db.models import F, QuerySet, Q, Subquery, OuterRef, Case, When
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -93,7 +93,8 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
     subqs = AttributionChargeNew.objects.filter(attribution__id=OuterRef('id'))
 
     attributions_as_dict = AttributionNew.objects.filter(
-        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True)
+        tutor__person__global_id__in=applicant_qs.values_list('global_id', flat=True),
+        decision_making=''
     ).annotate(
         course_id_code=F('learning_container_year__acronym'),
         course_id_year=F('learning_container_year__academic_year__year'),
@@ -116,6 +117,11 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
                 learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES
             ).values('allocation_charge')[:1],
             output_field=models.DecimalField()
+        ),
+        is_substitute=Case(
+            When(substitute__isnull=False, then=True),
+            default=False,
+            output_field=models.BooleanField()
         )
     ).values(
         'course_id_code',
@@ -126,6 +132,7 @@ def _prefetch_attributions(applicant_qs) -> List[AttributionFromRepositoryDTO]:
         'start_year',
         'applicant_id_global_id',
         'lecturing_volume',
-        'practical_volume'
+        'practical_volume',
+        'is_substitute'
     )
     return [AttributionFromRepositoryDTO(**attribution_as_dict) for attribution_as_dict in attributions_as_dict]

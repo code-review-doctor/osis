@@ -23,24 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
+import attr
 
-from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.domain.model.application import Application
-from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
-from ddd.logic.application.dtos import ApplicationByApplicantDTO
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireWithoutVolumeException
 
 
-class IApplicationsSummary(interface.DomainService, abc.ABC):
+@attr.s(frozen=True, slots=True)
+class ShouldAttributionAboutToExpireWithVolumeValidator(BusinessValidator):
+    attribution_about_to_expire = attr.ib(type=Attribution)
 
-    @classmethod
-    @abc.abstractmethod
-    def send(
-            cls,
-            applicant: Applicant,
-            application_calendar: ApplicationCalendar,
-            applications: List[ApplicationByApplicantDTO]
-    ):
-        pass
+    def validate(self, *args, **kwargs):
+        if not self.attribution_about_to_expire.practical_volume and \
+                not self.attribution_about_to_expire.lecturing_volume:
+            raise AttributionAboutToExpireWithoutVolumeException()
