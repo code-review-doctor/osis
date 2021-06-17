@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from functools import cached_property
 from typing import List
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
@@ -40,27 +40,18 @@ from learning_unit.models.learning_class_year import LearningClassYear
 
 class ClassTutorsView(PermissionRequiredMixin, TemplateView):
     template_name = "class/tutors_tab.html"
-    permission_required = 'base.can_access_class'
+    permission_required = 'learning_unit.view_learningclassyear'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        effective_class = self.get_effective_class()
-        learning_unit = self.get_learning_unit()
         context.update(
             {
-                'learning_unit_year': self.get_learning_unit_year(),
-                'learning_unit': learning_unit,
-                'effective_class': effective_class,
-                'tutors': self.get_class_tutors(LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES),
+                'learning_unit': self.learning_unit,
+                'effective_class': self.effective_class,
+                'tutors': self.tutors,
             }
         )
         return context
-
-    def get_learning_unit_year(self):
-        return LearningUnitYear.objects.get(
-            acronym=self.kwargs['learning_unit_code'],
-            academic_year__year=self.kwargs['learning_unit_year']
-        )
 
     def get_permission_object(self):
         return LearningClassYear.objects.filter(
@@ -72,11 +63,13 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
             'learning_component_year__learning_unit_year__academic_year'
         )
 
-    def get_learning_unit(self) -> 'LearningUnit':
+    @cached_property
+    def learning_unit(self) -> 'LearningUnit':
         command = GetLearningUnitCommand(code=self.kwargs['learning_unit_code'], year=self.kwargs['learning_unit_year'])
         return message_bus_instance.invoke(command)
 
-    def get_effective_class(self) -> 'EffectiveClass':
+    @cached_property
+    def effective_class(self) -> 'EffectiveClass':
         command = GetEffectiveClassCommand(
             class_code=self.kwargs['class_code'],
             learning_unit_code=self.kwargs['learning_unit_code'],
@@ -84,10 +77,11 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
         )
         return message_bus_instance.invoke(command)
 
-    def get_class_tutors(self, class_type) -> List['Tutor']:
+    @cached_property
+    def tutors(self) -> List['Tutor']:
         command = SearchTutorAttributedToLearningUnitCommand(
             learning_unit_code=self.kwargs['learning_unit_code'],
             learning_unit_year=self.kwargs['learning_unit_year'],
-            class_type=class_type
+            class_type=LECTURING if self.effective_class.is_lecturing else PRACTICAL_EXERCISES
         )
         return message_bus_instance.invoke(command)
