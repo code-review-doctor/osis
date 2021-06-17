@@ -141,5 +141,5 @@ def main_postpone_programs():
 
 def main_postpone_cms():
     print('Copy cms')
-    for year in range(FROM_YEAR, FROM_YEAR+6):
+    for year in range(FROM_YEAR, FROM_YEAR+5):
         timeit(postpone_programs_until_n_plus_6.postpone_to_n_publication_datas)(year)
