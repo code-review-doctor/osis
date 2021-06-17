@@ -28,6 +28,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
+from education_group.models.cohort_year import CohortYear
 from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tasks import postpone_programs_until_n_plus_6
@@ -129,6 +130,15 @@ def delete_version(egy: 'EducationGroupVersion'):
         version.delete()
 
 
+def delete_cohorts_linked_to_11ba():
+    qs = CohortYear.objects.filter(
+        education_group_year__partial_acronym__contains='11BA'
+    )
+
+    for cohort in qs:
+        cohort.delete()
+
+
 def main_delete_datas():
     print('Delete datas')
     delete_datas(FROM_YEAR)
@@ -137,6 +147,9 @@ def main_delete_datas():
 def main_postpone_programs():
     print('Postpone programs until n+6')
     timeit(postpone_programs_until_n_plus_6.run)()
+
+    print('Delete cohorts linked to 11ba')
+    timeit(delete_cohorts_linked_to_11ba)()
 
 
 def main_postpone_cms():
