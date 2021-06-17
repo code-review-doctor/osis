@@ -27,8 +27,6 @@ from django.contrib import admin
 from django.core import validators
 from django.db import models
 
-from base.models.utils.utils import filter_with_list_or_object
-
 MIN_ALLOCATION_CHARGE = 0
 
 
@@ -49,17 +47,6 @@ class AttributionChargeNew(models.Model):
     learning_component_year = models.ForeignKey('base.LearningComponentYear', on_delete=models.CASCADE)
     allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
                                             validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
-    objects = models.Manager()
 
     def __str__(self):
         return u"%s" % self.attribution
-
-
-def search(*args, **kwargs):
-    qs = AttributionChargeNew.objects.all()
-    if "learning_component_year" in kwargs:
-        qs = filter_with_list_or_object('learning_component_year', AttributionChargeNew, **kwargs)
-    if "attribution" in kwargs:
-        qs = qs.filter(attribution=kwargs['attribution'])
-
-    return qs.select_related('learning_component_year', 'attribution')

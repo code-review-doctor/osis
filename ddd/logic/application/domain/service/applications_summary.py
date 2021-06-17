@@ -27,7 +27,6 @@ import abc
 from typing import List
 
 from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.dtos import ApplicationByApplicantDTO
 from osis_common.ddd import interface

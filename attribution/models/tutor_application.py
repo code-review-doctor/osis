@@ -28,11 +28,17 @@ from django.contrib import admin
 from django.db import models
 
 from attribution.models.enums.function import Functions
-from base.models.utils.utils import filter_with_list_or_object
 
 
 class TutorApplicationAdmin(admin.ModelAdmin):
-    list_display = ('tutor', 'function', 'learning_container_year', 'volume_lecturing', 'volume_pratical_exercice', 'changed')
+    list_display = (
+        'tutor',
+        'function',
+        'learning_container_year',
+        'volume_lecturing',
+        'volume_pratical_exercice',
+        'changed',
+    )
     list_filter = ('learning_container_year__academic_year', )
     fieldsets = ((None, {'fields': ('last_changed', 'learning_container_year',
                                     'tutor', 'function', 'volume_lecturing', 'volume_pratical_exercice',
@@ -57,17 +63,3 @@ class TutorApplication(models.Model):
 
     def __str__(self):
         return u"%s - %s" % (self.tutor, self.function)
-
-
-def search(*args, **kwargs):
-    qs = TutorApplication.objects.all()
-    if "learning_container_year" in kwargs:
-        qs = filter_with_list_or_object('learning_container_year', TutorApplication, **kwargs)
-    if "tutor" in kwargs:
-        qs = qs.filter(tutor=kwargs['tutor'])
-    if "global_id" in kwargs:
-        if isinstance(kwargs['global_id'], list):
-            qs = qs.filter(tutor__person__global_id__in=kwargs['global_id'])
-        else:
-            qs = qs.filter(tutor__person__global_id=kwargs['global_id'])
-    return qs.select_related('tutor__person', 'learning_container_year')
