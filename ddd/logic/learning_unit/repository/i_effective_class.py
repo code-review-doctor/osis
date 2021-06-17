@@ -23,14 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import abc
+from typing import List, Optional
 
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
 class IEffectiveClassRepository(interface.AbstractRepository):
 
     @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: EffectiveClassIdentity) -> EffectiveClass:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List[EffectiveClassIdentity]] = None, **kwargs) -> List[EffectiveClass]:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: EffectiveClassIdentity, **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: EffectiveClass) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
     def get_all_identities(cls) -> List['EffectiveClassIdentity']:
-        raise NotImplementedError
+        pass
