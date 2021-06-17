@@ -74,8 +74,14 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
 
 
 class PracticalEffectiveClass(EffectiveClass):
-    pass
+
+    @property
+    def is_practical(self):
+        return True
 
 
 class LecturingEffectiveClass(EffectiveClass):
-    pass
+
+    @property
+    def is_lecturing(self):
+        return True

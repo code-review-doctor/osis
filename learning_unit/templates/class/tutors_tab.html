@@ -35,10 +35,8 @@
             <tr>
                 <th>{% trans 'Tutors' %}</th>
                 <th>{% trans 'Function' %}</th>
-                {% if learning_unit_year.learning_container_year.container_type == "COURSE" and not learning_unit_year.is_partim %}
-                    <th>{% trans 'Start' %}</th>
-                    <th>{% trans 'Duration' %}</th>
-                {% endif %}
+                <th>{% trans 'Start' %}</th>
+                <th>{% trans 'Duration' %}</th>
                 <th>
                     <abbr title="{% trans 'Lecturing' %}">PM</abbr>
                 </th>
@@ -58,24 +56,20 @@
                                 <td>{{ tutor.first_name }}, {{ tutor.last_name }}</td>
                                 <td>{{ attribution.function }}</td>
 
-                                <!-- not available in model yet -->
-                                {% if learning_unit_year.learning_container_year.container_type == "COURSE" and not learning_unit_year.is_partim %}
-                                    <td>{{ attribution.start_year | default_if_none:'' }}</td>
-                                    <td>{{ attribution.duration | default_if_none:'' }}</td>
-                                {% endif %}
+                                <td>{{ attribution.start_year | default_if_none:'' }}</td>
+                                <td>{{ attribution.duration | default_if_none:'' }}</td>
 
                                 <td>
-                                    {% if effective_class.type == 'LecturingEffectiveClass' %}
+                                    {% if effective_class.is_lecturing %}
                                         {{ class_repartition.distributed_volume | floatformat:2 }}
                                     {% endif %}
                                 </td>
                                 <td>
-                                    {% if effective_class.type == 'PracticalEffectiveClass' %}
+                                    {% if effective_class.is_practical %}
                                         {{ class_repartition.distributed_volume | floatformat:2 }}
                                     {% endif %}
                                 </td>
 
-                                <!-- not available in model yet -->
                                 <td>{{ attribution.substitute | default_if_none:'' }}</td>
 
                                 {% comment %}
