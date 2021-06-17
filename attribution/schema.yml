@@ -736,6 +736,7 @@ components:
         - 'PROFESSOR'
         - 'INTERNSHIP_SUPERVISOR'
         - 'INTERNSHIP_CO_SUPERVISOR'
+        - 'DEPUTY_DISEASE_OR_MATERNITY'
     AttributionLinks:
       type: object
       properties:
