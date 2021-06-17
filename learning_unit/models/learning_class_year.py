@@ -26,12 +26,14 @@
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.enums import quadrimesters, learning_unit_year_session
+from base.models.enums.component_type import LECTURING
 from osis_common.models import osis_model_admin
 
 
-class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
+class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym')
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
 
@@ -80,3 +82,18 @@ class LearningClassYear(models.Model):
             self.acronym,
             self.learning_component_year.get_type_display()
         )
+
+    @property
+    def effective_class_complete_acronym(self):
+        return "{}{}{}".format(
+            self.learning_component_year.learning_unit_year.acronym,
+            '-' if self.learning_component_year.type == LECTURING else '_',
+            self.acronym
+        )
+
+    @property
+    def volume_annual(self):
+        volume_total_of_classes = 0
+        volume_total_of_classes += self.hourly_volume_partial_q1 or 0
+        volume_total_of_classes += self.hourly_volume_partial_q2 or 0
+        return volume_total_of_classes

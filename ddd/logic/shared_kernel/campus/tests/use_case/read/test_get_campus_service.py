@@ -23,16 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
-from osis_common.ddd import interface
+from django.test import SimpleTestCase
+
+from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
+from ddd.logic.shared_kernel.campus.tests.factory.campus import UCLCampusFactory
+from ddd.logic.shared_kernel.campus.use_case.read import get_campus_service
+from infrastructure.shared_kernel.campus.repository.in_memory.campus import UclouvainCampusRepository
 
 
-@attr.s(frozen=True, slots=True)
-class SearchUclouvainCampusesCommand(interface.CommandRequest):
-    pass  # Filters can ba added later when it's needed
+class TestGetCampusService(SimpleTestCase):
 
+    def setUp(self):
+        self.campus_repository = UclouvainCampusRepository()
+        self.campus = UCLCampusFactory()
+        self.campus_repository.save(self.campus)
+        self.command = GetCampusCommand(uuid=self.campus.entity_id.uuid)
 
-@attr.s(frozen=True, slots=True)
-class GetCampusCommand(interface.CommandRequest):
-    uuid = attr.ib(type=str)
+    def test_should_return_ucl_campus(self):
+        campus = get_campus_service.get_campus(
+            self.command,
+            self.campus_repository,
+        )
+        self.assertEqual(campus, self.campus)
+        self.assertEqual(campus.entity_id, self.campus.entity_id)
+        self.assertEqual(campus.name, self.campus.name)
+        self.assertEqual(campus.organization_name, self.campus.organization_name)
