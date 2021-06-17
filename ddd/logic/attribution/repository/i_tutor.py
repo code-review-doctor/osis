@@ -43,7 +43,8 @@ class ITutorRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['TutorIdentity']] = None,
-            learning_unit_identity: 'LearningUnitIdentity' = None
+            learning_unit_identity: 'LearningUnitIdentity' = None,
+            class_type: str = None
     ) -> List['Tutor']:
         pass
 

@@ -28,6 +28,7 @@ from typing import List
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.generic import TemplateView
 
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
 from ddd.logic.attribution.domain.model.tutor import Tutor
@@ -50,7 +51,7 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
                 'learning_unit_year': self.get_learning_unit_year(),
                 'learning_unit': learning_unit,
                 'effective_class': effective_class,
-                'tutors': self.get_class_tutors(),
+                'tutors': self.get_class_tutors(LECTURING if effective_class.is_lecturing else PRACTICAL_EXERCISES),
             }
         )
         return context
@@ -83,9 +84,10 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
         )
         return message_bus_instance.invoke(command)
 
-    def get_class_tutors(self) -> List['Tutor']:
+    def get_class_tutors(self, class_type) -> List['Tutor']:
         command = SearchTutorAttributedToLearningUnitCommand(
             learning_unit_code=self.kwargs['learning_unit_code'],
-            learning_unit_year=self.kwargs['learning_unit_year']
+            learning_unit_year=self.kwargs['learning_unit_year'],
+            class_type=class_type
         )
         return message_bus_instance.invoke(command)
