@@ -1,5 +1,5 @@
-{% load static %}
-{% load i18n %}
+{% load static i18n %}
+
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -24,20 +24,14 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% url 'entity_read' entity_version_id=entity_version.id as url_identification %}
-{% url 'entity_diagram' entity_version_id=entity_version.id as url_organogram %}
-{% url 'entities_version' entity_version_id=entity_version.id as url_versions %}
-
-<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" {% if request.path != url_organogram and request.path != url_versions %} class="active" {% endif %}>
-        <a href="{{ url_identification }}">{% trans 'Identification' %}</a>
-    </li>
-    {% if entity_version.descendants|length > 0 %}
-        <li role="presentation" {% if request.path == url_organogram %} class="active" {% endif %}>
-            <a href="{{ url_organogram }}">{% trans 'Organizational chart' %}</a>
-        </li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+{% with search_url=request.session.search_url search_tab=request.session.ue_search_type %}
+    {% if search_url and search_tab %}
+        <li><a href="{{ search_url }}" id="lnk_learning_units">{{ search_tab }}</a></li>
     {% endif %}
-    <li role="presentation" {% if request.path == url_versions %} class="active" {% endif %}>
-        <a href="{{ url_versions }}">{% trans 'Versions' %}</a>
-    </li>
-</ul>
+{% endwith %}
+<li>{% if learning_unit_year.id %}<a href="{% url 'learning_unit' learning_unit_year.id %}">{{ learning_unit_year.acronym }}</a>{% else %}{% trans 'Learning unit' %}{% endif %}</li>
+{% if effective_class %}
+    <li class="active">{{ effective_class.complete_acronym }}</li>
+{% endif %}
