@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:35+0100\n"
+"POT-Creation-Date: 2021-06-15 14:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,6 +81,9 @@ msgstr "Suppléant"
 
 msgid "Deputy authority"
 msgstr "Suppléant d'autorité"
+
+msgid "Deputy disease or maternity"
+msgstr "Suppléant maladie/maternité"
 
 msgid "Deputy sabbatical"
 msgstr "Suppléant sabbatique"
@@ -171,7 +174,8 @@ msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
 msgid "Not in period to edit force majeure section."
-msgstr "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
+msgstr ""
+"Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
 
 msgid "Part-time teaching supply"
