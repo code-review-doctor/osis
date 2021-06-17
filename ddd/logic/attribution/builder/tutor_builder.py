@@ -29,17 +29,17 @@ from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBu
 from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution, LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.dtos import LearningUnitAttributionFromRepositoryDTO
+from ddd.logic.attribution.dtos import LearningUnitAttributionFromRepositoryDTO, TutorSearchDTO, \
+    DistributedEffectiveClassesDTO
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-
 from osis_common.ddd import interface
 
 
 class TutorBuilder(interface.RootEntityBuilder):
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'TutorDTO') -> 'Tutor':
+    def build_from_repository_dto(cls, dto_object: 'TutorSearchDTO') -> 'Tutor':
         tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(
             personal_id_number=dto_object.personal_id_number
         )
@@ -51,7 +51,7 @@ class TutorBuilder(interface.RootEntityBuilder):
         )
 
 
-def build_attribution(attribution: LearningUnitAttributionFromRepositoryDTO):
+def build_attribution(attribution: 'LearningUnitAttributionFromRepositoryDTO') -> 'LearningUnitAttribution':
     return LearningUnitAttribution(
         entity_id=LearningUnitAttributionIdentity(uuid=attribution.attribution_uuid),
         function=attribution.function,
@@ -60,20 +60,22 @@ def build_attribution(attribution: LearningUnitAttributionFromRepositoryDTO):
             attribution.learning_unit_year
         ),
         distributed_effective_classes=_get_distributed_effective_classes(
-            attribution.attribution_volume, attribution.effective_classes)
+            attribution.attribution_volume,
+            attribution.effective_classes
+        )
     )
 
 
 def _get_distributed_effective_classes(
         volume: float,
-        effective_classes: List['EffectiveClass']
+        effective_classes: List['DistributedEffectiveClassesDTO']
 ) -> List[ClassVolumeRepartition]:
     return [
         ClassVolumeRepartition(
             effective_class=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-                class_code=effective_classe.entity_id.class_code,
-                learning_unit_code=effective_classe.entity_id.learning_unit_identity.code,
-                learning_unit_year=effective_classe.entity_id.learning_unit_identity.academic_year.year
+                class_code=effective_classe.class_code,
+                learning_unit_code=effective_classe.learning_unit_code,
+                learning_unit_year=effective_classe.learning_unit_year
             ),
             distributed_volume=volume
         ) for effective_classe in effective_classes
