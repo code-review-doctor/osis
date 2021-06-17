@@ -661,7 +661,7 @@ msgid ""
 msgstr ""
 
 msgid "date_format"
-msgstr ""
+msgstr "%d %b %Y"
 
 msgid "learning units in"
 msgstr ""
