@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from functools import cached_property
 from typing import List
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
