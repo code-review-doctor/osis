@@ -34,19 +34,16 @@
             <thead>
             <th>{% trans 'Tutor' %}</th>
             <th>{% trans 'Function' %}</th>
-                <th>
-                    <abbr title="{% trans class_type %}">{% if class_type == "LECTURING" %}PM{% else %}PP{% endif %}</abbr>
-                    ({% trans 'Class' %} : {{ form.class_volume.initial }})
-                </th>
-
-            <th>{% trans 'Substitute' %}</th>
+            <th>
+                <abbr title="{% trans class_type %}">{% if class_type == "LECTURING" %}PM{% else %}PP{% endif %}</abbr>
+                ({% trans 'Class' %} : {{ form.class_volume.initial }})
+            </th>
             </thead>
             <tbody>
             <tr>
                 <td>{{ form.full_name.initial }}</td>
                 <td>{{ form.function.initial }}</td>
                 <td>{{ form.volume }}</td>
-                <td>{{ form.substitute.initial }}</td>
             </tr>
             </tbody>
         </table>

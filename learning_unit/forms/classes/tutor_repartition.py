@@ -23,31 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
 from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import VolumeField
-from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, add_blank
-from base.models.enums import quadrimesters
-from base.models.enums.internship_subtypes import InternshipSubtype
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from base.models.enums.learning_unit_year_session import DerogationSession
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
-from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand
-from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
-from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand
-from ddd.logic.shared_kernel.language.domain.model.language import Language
-from education_group.forms.fields import UpperCaseCharField
-from infrastructure.messages_bus import message_bus_instance
 from osis_common.forms.widgets import DecimalFormatInput
 
 
@@ -59,7 +45,6 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     full_name = forms.CharField(max_length=255, required=False, label=_('Tutor (full)'))
     function = forms.CharField(max_length=255, required=False, label=_('Function'))
-    # attribution.models.enums.function.Functions
     class_volume = VolumeField(
         widget=DecimalFormatInput(render_value=True),
         required=False,
@@ -70,7 +55,6 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     )
 
     class_type = forms.CharField(required=False)
-    substitute = forms.CharField(required=False)
 
     def __init__(self,
                  *args,
@@ -95,7 +79,6 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             self.fields['class_volume'].initial = \
                 (self.effective_class.volumes.volume_first_quadrimester or 0) + \
                 (self.effective_class.volumes.volume_second_quadrimester or 0)
-        self.fields['substitute'].initial = '???'
 
     def get_command(self) -> DistributeClassToTutorCommand:
         return DistributeClassToTutorCommand(
