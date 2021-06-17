@@ -12,7 +12,7 @@ from ddd.logic.learning_unit.domain.model._titles import Titles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import LecturingPart, Volumes, PracticalPart
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit, LearningUnitIdentity, CourseLearningUnit, \
     ExternalLearningUnit
-from ddd.logic.learning_unit.test.factory.ucl_entity import UclEntityIdentityFactory, DRTEntityFactory
+from ddd.logic.learning_unit.tests.factory.ucl_entity import UclEntityIdentityFactory, DRTEntityFactory
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
