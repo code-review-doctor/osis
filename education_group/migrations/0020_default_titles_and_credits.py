@@ -60,6 +60,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_default_credits_to_minor_list_choices),
-        migrations.RunPython(add_default_titles_to_minor_option_list_choice_and_complementary_module),
+        migrations.RunPython(add_default_credits_to_minor_list_choices, elidable=True),
+        migrations.RunPython(add_default_titles_to_minor_option_list_choice_and_complementary_module, elidable=True),
     ]

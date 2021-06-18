@@ -27,8 +27,6 @@
 """
 Utility files for mail sending
 """
-import itertools
-from typing import List
 import datetime
 import itertools
 from typing import List, Set

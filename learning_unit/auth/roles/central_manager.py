@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from learning_unit.auth import predicates
 from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import models as osis_role_models
+from osis_role.contrib import predicates as osis_role_predicates
 
 
 class CentralManagerAdmin(osis_role_admin.EntityRoleModelAdmin):
@@ -110,9 +111,9 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 (predicates.is_not_proposal_of_type_suppression |
-                    (predicates.has_learning_unit_no_application_all_years &
-                     predicates.has_learning_unit_no_attribution_this_year
-                     )
+                 (predicates.has_learning_unit_no_application_now_and_in_future &
+                  predicates.has_learning_unit_no_attribution_now_and_future
+                  )
                  ),
             'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &
@@ -142,4 +143,8 @@ class CentralManager(osis_role_models.EntityRoleModel):
                     (predicates.has_learning_unit_no_attribution_this_year &
                      predicates.has_learning_unit_no_application_this_year)
                  ),
-        })
+            'base.can_create_class':
+                osis_role_predicates.always_deny(
+                    message=_('Classes can only be created by a faculty manager')
+                ),
+         })

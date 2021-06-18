@@ -101,10 +101,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(migrate_permissions),
-        migrations.RunPython(add_administrators_group),
-        migrations.RunPython(add_tutors_group),
-        migrations.RunPython(add_pgm_managers_group),
-        migrations.RunPython(add_students_group),
-        migrations.RunPython(add_init_institution_administration_group)
+        migrations.RunPython(migrate_permissions, elidable=True),
+        migrations.RunPython(add_administrators_group, elidable=True),
+        migrations.RunPython(add_tutors_group, elidable=True),
+        migrations.RunPython(add_pgm_managers_group, elidable=True),
+        migrations.RunPython(add_students_group, elidable=True),
+        migrations.RunPython(add_init_institution_administration_group, elidable=True)
     ]

@@ -44,5 +44,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(fix_order),
+        migrations.RunPython(fix_order, elidable=True),
     ]

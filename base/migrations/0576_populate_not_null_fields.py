@@ -97,7 +97,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(set_session_exam_education_group_year_field),
-        migrations.RunPython(populate_or_delete_offer_enrollment_education_group_year_id),
-        migrations.RunPython(populate_or_delete_offer_year_calendar_education_group_year_id),
+        migrations.RunPython(set_session_exam_education_group_year_field, elidable=True),
+        migrations.RunPython(populate_or_delete_offer_enrollment_education_group_year_id, elidable=True),
+        migrations.RunPython(populate_or_delete_offer_year_calendar_education_group_year_id, elidable=True),
     ]
