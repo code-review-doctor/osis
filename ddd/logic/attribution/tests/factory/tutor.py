@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import string
 
 import factory.fuzzy
@@ -32,9 +33,9 @@ from attribution.models.enums.function import Functions
 from ddd.logic.attribution.domain.model._attribution import LearningUnitAttributionIdentity, LearningUnitAttribution
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity, Tutor
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
-from ddd.logic.learning_unit.tests.factory.effective_class import _EffectiveClassIdentityFactory
-from ddd.logic.learning_unit.tests.factory.learning_unit import _LearningUnitIdentityFactory
 
 
 class _LearningUnitAttributionIdentityFactory(factory.Factory):
@@ -67,7 +68,11 @@ class _ClassVolumeRepartitionFactory(factory.Factory):
         model = ClassVolumeRepartition
         abstract = False
 
-    effective_class = factory.SubFactory(_EffectiveClassIdentityFactory)
+    effective_class = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code='X',
+        learning_unit_code='LTEST1001',
+        learning_unit_year=datetime.datetime.now().year
+    )
     distributed_volume = 0
 
 
@@ -78,7 +83,10 @@ class _LearningUnitAttributionFactory(factory.Factory):
 
     entity_id = factory.SubFactory(_LearningUnitAttributionIdentityFactory)
     function = factory.fuzzy.FuzzyChoice(choices=Functions)
-    learning_unit = factory.SubFactory(_LearningUnitIdentityFactory)
+    learning_unit = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code="LTEST1001",
+        year=datetime.datetime.now().year
+    )
     distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 
@@ -102,7 +110,7 @@ class TutorWithoutAttributionsFactory(_TutorFactory):
 
 
 class TutorWithAttributionWithoutDistributedEffectiveClassesFactory(_TutorFactory):
-    attributions = factory.SubFactory(_LearningUnitAttributionWithoutDistributedEffectiveClassesFactory)
+    attributions = factory.List([factory.SubFactory(_LearningUnitAttributionWithoutDistributedEffectiveClassesFactory)])
 
 
 class TutorWithAttributionAndDistributedEffectiveClassesFactory(_TutorFactory):

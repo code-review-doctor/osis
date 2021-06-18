@@ -165,7 +165,7 @@ class TutorRepositoryTestCase(TestCase):
             distributed_effective_classes.distributed_volume
         )
 
-    def test_should_correctly_map_tutor_aggregate_to_database_fields(self):
+    def test_should_correctly_map_database_fields_to_tutor_aggregate(self):
         person = PersonFactory()
         ue = LearningUnitYearFactory()
         learning_class_year = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
