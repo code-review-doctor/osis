@@ -178,11 +178,13 @@ class _ExternalLearningUnitFactory(_LearningUnitFactory):
         abstract = False
 
 
+class LDROI1001LearningUnitIdentityFactory(_LearningUnitIdentityFactory):
+    code = "LDROI1001",
+    academic_year = _AcademicYearIdentityFactory(year=datetime.datetime.now().year)
+
+
 class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
-        code="LDROI1001",
-        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
-    )
+    entity_id = LDROI1001LearningUnitIdentityFactory
     titles = _TitlesFactory(
         common_fr="Introduction au droit",
         specific_fr="Partie 1 : droit civil",
