@@ -90,7 +90,7 @@ class _LearningUnitAttributionFactory(factory.Factory):
     distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 
-class _LearningUnitAttributionWithoutDistributedEffectiveClassesFactory(_ClassVolumeRepartitionFactory):
+class _LearningUnitAttributionWithoutDistributedEffectiveClassesFactory(_LearningUnitAttributionFactory):
     distributed_effective_classes = []
 
 
