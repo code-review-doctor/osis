@@ -26,12 +26,14 @@
 from typing import List, Dict
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from reversion.models import Version
 
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES, COMPONENT_TYPES, DEFAULT_ACRONYM_COMPONENT
 from base.models.learning_unit_year import LearningUnitYear
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand, \
+    GetEffectiveClassWarningsCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
@@ -64,7 +66,7 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                         GetLanguageCommand(code_iso=learning_unit.language_id.code_iso)
                     ),  # type: Language
                 'teaching_place': get_teaching_place(effective_class.teaching_place),
-                'warnings': get_classes_warnings(learning_unit, effective_class)
+                'warnings': self.warnings
             }
         )
         return context
@@ -91,6 +93,15 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
 
     def get_effective_class(self) -> 'EffectiveClass':
         command = GetEffectiveClassCommand(
+            class_code=self.kwargs['class_code'],
+            learning_unit_code=self.kwargs['learning_unit_code'],
+            learning_unit_year=self.kwargs['learning_unit_year']
+        )
+        return message_bus_instance.invoke(command)
+
+    @cached_property
+    def warnings(self) -> List[str]:
+        command = GetEffectiveClassWarningsCommand(
             class_code=self.kwargs['class_code'],
             learning_unit_code=self.kwargs['learning_unit_code'],
             learning_unit_year=self.kwargs['learning_unit_year']
@@ -146,7 +157,3 @@ def get_teaching_place(teaching_place: 'UclouvainCampus') -> UclouvainCampus:
     return message_bus_instance.invoke(
         GetCampusCommand(uuid=teaching_place.uuid)
     )  # type: UclouvainCampus
-
-
-def get_classes_warnings(learning_unit: 'LearningUnit', effective_class: 'EffectiveClass') -> List[str]:
-    return effective_class.warnings(learning_unit)
