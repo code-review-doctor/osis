@@ -40,6 +40,7 @@ from education_group.ddd.validators._start_year_end_year import StartYearEndYear
 from education_group.ddd.validators._unique_code import UniqueCodeValidator
 from education_group.ddd.validators.start_and_end_year_validator import StartAndEndYearValidator
 from education_group.ddd.validators._hops_validator import HopsValuesValidator
+from program_management.ddd.validators._code_pattern import CodePatternValidator
 
 
 class CreateGroupValidatorList(MultipleExceptionBusinessListValidator):
@@ -162,5 +163,14 @@ class DeleteOrphanMiniTrainingValidatorList(business_validator.BusinessListValid
         self.validators = [
             MiniTrainingEnrollmentsValidator(mini_training.entity_id),
             MiniTrainingLinkWithEPCValidator(mini_training.entity_id)
+        ]
+        super().__init__()
+
+
+class CreateOrphanGroupValidatorList(MultipleExceptionBusinessListValidator):
+
+    def __init__(self, code: str, group_type: str):
+        self.validators = [
+            CodePatternValidator(code, group_type)
         ]
         super().__init__()

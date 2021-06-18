@@ -28,7 +28,7 @@ import warnings
 from typing import Optional, List
 
 from django.db import IntegrityError
-from django.db.models import F, Case, When, IntegerField, QuerySet
+from django.db.models import F, Case, When, IntegerField, QuerySet, Max, OuterRef, Exists, Subquery
 from django.db.models import Q
 
 from base.models.academic_year import AcademicYear
@@ -230,6 +230,28 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
                 tree_version.tree = next(tree for tree in trees if tree.entity_id == tree_version.program_tree_identity)
                 result.append(tree_version)
         return result
+
+    @classmethod
+    def search_last_occurence(cls, from_year: int) -> List['ProgramTreeVersion']:
+        subquery_max_existing_year_for_offer = EducationGroupVersion.objects.filter(
+            offer__academic_year__year__gte=from_year,
+            offer__education_group=OuterRef("offer__education_group")
+        ).values(
+            "offer__education_group"
+        ).annotate(
+            max_year=Max("offer__academic_year__year")
+        ).order_by(
+            "offer__education_group"
+        ).values("max_year")
+
+        qs = _get_common_queryset().filter(
+            offer__academic_year__year=Subquery(subquery_max_existing_year_for_offer[:1])
+        )
+
+        results = []
+        for record_dict in qs:
+            results.append(_instanciate_tree_version(record_dict))
+        return results
 
 
 def _update_start_year_and_end_year(

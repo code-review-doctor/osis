@@ -166,7 +166,7 @@ class TestSearchForm(TestCase):
         campus_form_choices = list(form.fields["campus"].choices)
         self.assertEqual(campus_form_choices[0], ('', '---------'))
         self.assertEqual(campus_form_choices[1][1], 'organization 1')
-        self.assertEqual(campus_form_choices[2], (campus_3.id, 'organization 2'))
+        self.assertEqual(campus_form_choices[2][1], 'organization 2')
 
         city_form_choices = list(form.fields['city'].choices)
         self.assertEqual(city_form_choices,

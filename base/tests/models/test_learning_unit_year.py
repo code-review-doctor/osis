@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,13 +26,10 @@
 from decimal import Decimal
 from unittest.mock import patch
 
-from django.db.models import QuerySet
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from attribution.models import attribution
-from attribution.models.enums.function import COORDINATOR, CO_HOLDER
-from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
@@ -55,6 +52,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory, cre
 from base.tests.factories.tutor import TutorFactory
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class LearningUnitYearTest(TestCase):
@@ -854,3 +852,22 @@ class LearningUnitYearDeleteCms(TestCase):
         luy_id = self.learning_unit_year_no_cms.id
         self.learning_unit_year_no_cms.delete()
         self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])
+
+
+class LearningUnitYearAndClassTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        luy_class = LearningClassYearFactory()
+        cls.learning_unit_year_with_class = luy_class.learning_component_year.learning_unit_year
+        cls.luy_without_class = LearningUnitYearFactory()
+
+    def test_has_class_this_year(self):
+        self.assertTrue(self.learning_unit_year_with_class.has_class_this_year_or_in_future())
+        self.assertFalse(self.luy_without_class.has_class_this_year_or_in_future())
+
+    def test_has_class_in_future(self):
+        luy_this_year = LearningUnitYearFactory()
+        next_year = AcademicYearFactory(year=luy_this_year.academic_year.year + 1)
+        luy_in_future = LearningUnitYearFactory(learning_unit=luy_this_year.learning_unit, academic_year=next_year)
+        LearningClassYearFactory(learning_component_year__learning_unit_year=luy_in_future)
+        self.assertTrue(luy_this_year.has_class_this_year_or_in_future())

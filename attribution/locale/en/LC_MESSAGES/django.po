@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:35+0100\n"
+"POT-Creation-Date: 2021-06-15 14:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,6 +81,9 @@ msgid "Deputy"
 msgstr ""
 
 msgid "Deputy authority"
+msgstr ""
+
+msgid "Deputy disease or maternity"
 msgstr ""
 
 msgid "Deputy sabbatical"
