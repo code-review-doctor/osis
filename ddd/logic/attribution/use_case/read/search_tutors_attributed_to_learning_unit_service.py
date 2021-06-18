@@ -33,11 +33,12 @@ from ddd.logic.learning_unit.builder.learning_unit_identity_builder import Learn
 
 def search_tutors_attributed_to_learning_unit(
         cmd: SearchTutorAttributedToLearningUnitCommand,
-        repository: 'ITutorRepository'
+        repository: 'ITutorRepository',
 ) -> List['Tutor']:
     return repository.search(
         learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
             code=cmd.learning_unit_code,
             year=cmd.learning_unit_year
-        )
+        ),
+        class_type=cmd.class_type
     )

@@ -47,3 +47,9 @@ class LearningUnitAttribution(interface.Entity):
 
     # def manage_distribution(self):
     #     pass
+    @property
+    def total_volume(self):
+        tot = 0
+        for volume in self.distributed_effective_classes:
+            tot += volume.distributed_volume
+        return tot

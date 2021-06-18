@@ -30,15 +30,21 @@ from learning_unit.views.learning_unit_class.identification_read import ClassIde
 from learning_unit.views.learning_unit_class.learning_unit_class_tutors import LearningUnitClassTutorsView
 from learning_unit.views.learning_unit_class.learning_unit_class_tutors_repartition import \
     LearningUnitClassRepartitionTutorsView
+from learning_unit.views.learning_unit_class.tutors import ClassTutorsView
+
 
 urlpatterns = [
     path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
         path('class/', include([
             path('create', CreateClass.as_view(), name='class_create'),
-            path('<str:class_code>/identification', ClassIdentificationView.as_view(), name='class_identification'),
-            path('<str:class_code>/tutors', LearningUnitClassTutorsView.as_view(), name='lu_class_tutors'),
-            path('<str:class_code>/tutors/<str:attribution_uuid>/repartition',
+        ])),
+        path('class/<str:class_code>/', include([
+            path('identification', ClassIdentificationView.as_view(), name='class_identification'),
+            path('tutors', ClassTutorsView.as_view(), name='class_tutors'),
+            path('lu_tutors', LearningUnitClassTutorsView.as_view(), name='lu_class_tutors'),
+            path('tutors/<str:attribution_uuid>/repartition',
                  LearningUnitClassRepartitionTutorsView.as_view(), name='edit_charge_repartition'),
         ]))
     ]))
 ]
+

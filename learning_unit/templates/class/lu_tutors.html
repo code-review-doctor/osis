@@ -27,7 +27,7 @@
 <table class="table">
     <thead>
     <tr>
-        <th>{% trans 'Tutors' %}</th>
+        <th>{% trans 'Tutors' %} {% trans 'Complete LU' %}</th>
         <th>{% trans 'Function' %}</th>
         <th>
             <abbr title="{% if class_type == "PP" %}{% trans 'Practical exercises' %}{% else %}{% trans 'Lecturing' %}{% endif %}">{{ class_type }}</abbr>
@@ -41,7 +41,7 @@
                 <tr>
                     <td>{{ tutor.first_name }}, {{ tutor.last_name }}</td>
                     <td>{% if attribution.function %}{% trans attribution.function %}{% endif %}</td>
-                    <td>{{ class_repartition.distributed_volume | floatformat:2 }}</td>
+                    <td>{{ attribution.total_volume | floatformat:2 }}</td>
                     <td>
 {#                        {% if can_change_attribution %}#}
 {#                            <a class="trigger_modal"#}

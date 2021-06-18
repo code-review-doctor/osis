@@ -50,7 +50,8 @@ class TutorRepository(ITutorRepository):
 
     @classmethod
     def search(cls, entity_ids: Optional[List['TutorIdentity']] = None,
-               learning_unit_identity: 'LearningUnitIdentity' = None) -> List['Tutor']:
+               learning_unit_identity: 'LearningUnitIdentity' = None,
+               class_type: str = None) -> List['Tutor']:
         qs = AttributionChargeNewDatabase.objects.all()
         qs = qs.filter(
             learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
@@ -59,7 +60,8 @@ class TutorRepository(ITutorRepository):
             'learning_component_year',
             'attribution'
         )
-
+        if class_type:
+            qs = qs.filter(learning_component_year__type=class_type)
         qs = qs.annotate(
             last_name=F('attribution__tutor__person__last_name'),
             first_name=F('attribution__tutor__person__first_name'),

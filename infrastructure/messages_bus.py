@@ -78,7 +78,7 @@ class MessageBus:
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
         SearchTutorAttributedToLearningUnitCommand: lambda cmd: search_tutors_attributed_to_learning_unit(
             cmd,
-            TutorRepository()
+            TutorRepository(),
         ),
         GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
         GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
