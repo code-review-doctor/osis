@@ -589,21 +589,20 @@ class LearningUnitYear(SerializableModel):
 def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear]):
     _warnings = []
     for learning_component_year in all_components:
-        classes = learning_component_year.classes
-        if classes:
-            for ue_class in classes:
-                total_class_volume = ue_class.hourly_volume_partial_q1 or 0 + ue_class.hourly_volume_partial_q2 or 0
-                if total_class_volume != learning_component_year.hourly_volume_total_annual:
-                    _warnings.append(
-                        _(
-                            'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
-                            '(Annual volume must be equal to the sum of volume Q1 and Q2)'
-                        ) % {
-                                'code_ue': learning_component_year.learning_unit_year.acronym,
-                                'separator': '-' if learning_component_year.type == LECTURING else '_',
-                                'code_class': ue_class.acronym
-                        }
-                    )
+        classes = learning_component_year.classes or []
+        for ue_class in classes:
+            total_class_volume = (ue_class.hourly_volume_partial_q1 or 0) + (ue_class.hourly_volume_partial_q2 or 0)
+            if total_class_volume != learning_component_year.hourly_volume_total_annual:
+                _warnings.append(
+                    _(
+                        'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
+                        '(Annual volume must be equal to the sum of volume Q1 and Q2)'
+                    ) % {
+                            'code_ue': learning_component_year.learning_unit_year.acronym,
+                            'separator': '-' if learning_component_year.type == LECTURING else '_',
+                            'code_class': ue_class.acronym
+                    }
+                )
     return _warnings
 
 
@@ -677,7 +676,7 @@ def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning
 
 def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_component_yr):
     class_sum_q1_q2 = (effective_class.hourly_volume_partial_q1 or 0) + (effective_class.hourly_volume_partial_q2 or 0)
-    return class_sum_q1_q2 > learning_component_yr.hourly_volume_total_annual
+    return class_sum_q1_q2 > (learning_component_yr.hourly_volume_total_annual or 0)
 
 
 def _check_number_of_classes(all_components) -> List[str]:
