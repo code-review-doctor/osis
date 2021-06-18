@@ -29,15 +29,12 @@ import factory.fuzzy
 import uuid
 
 from attribution.models.enums.function import Functions
-from base.models.enums.learning_unit_year_session import DerogationSession
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.attribution.domain.model._attribution import LearningUnitAttributionIdentity, LearningUnitAttribution
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.attribution.domain.model.tutor import TutorIdentity
+from ddd.logic.attribution.domain.model.tutor import TutorIdentity, Tutor
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.tests.factory.effective_class import _EffectiveClassIdentityFactory
-from ddd.logic.learning_unit.tests.factory.learning_unit import _LearningUnitFactory, _UclouvainCampusIdentityFactory
+from ddd.logic.learning_unit.tests.factory.learning_unit import _LearningUnitIdentityFactory
 
 
 class _LearningUnitAttributionIdentityFactory(factory.Factory):
@@ -81,18 +78,32 @@ class _LearningUnitAttributionFactory(factory.Factory):
 
     entity_id = factory.SubFactory(_LearningUnitAttributionIdentityFactory)
     function = factory.fuzzy.FuzzyChoice(choices=Functions)
-    learning_unit = factory.SubFactory(_LearningUnitFactory)
-    distributed_effective_classes = [factory.SubFactory(_ClassVolumeRepartitionFactory)]
+    learning_unit = factory.SubFactory(_LearningUnitIdentityFactory)
+    distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 
-class _EffectiveClassFactory(factory.Factory):
+class _LearningUnitAttributionnWithoutDistributedEffectiveClassesFactory(_ClassVolumeRepartitionFactory):
+    distributed_effective_classes = []
+
+
+class _TutorFactory(factory.Factory):
     class Meta:
-        model = EffectiveClass
+        model = Tutor
         abstract = False
 
-    entity_id = factory.SubFactory(_EffectiveClassIdentityFactory)
-    titles = factory.SubFactory(_ClassTitlesFactory)
-    teaching_place = factory.SubFactory(_UclouvainCampusIdentityFactory)
-    derogation_quadrimester = factory.fuzzy.FuzzyChoice(choices=DerogationQuadrimester)
-    session_derogation = factory.fuzzy.FuzzyChoice(choices=DerogationSession)
-    volumes = factory.SubFactory(_LearningUnitAttributionFactory)
+    entity_id = factory.SubFactory(_TutorIdentityFactory)
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
+    attributions = factory.List([factory.SubFactory(_LearningUnitAttributionFactory)])
+
+
+class TutorWithoutAttributionsFactory(_TutorFactory):
+    attributions = []
+
+
+class TutorWithAttributionWithoutDistributedEffectiveClassesFactory(_TutorFactory):
+    attributions = factory.SubFactory(_LearningUnitAttributionnWithoutDistributedEffectiveClassesFactory)
+
+
+class TutorWithAttributionAndDistributedEffectiveClassesFactory(_TutorFactory):
+    pass
