@@ -39,11 +39,11 @@ class ClassVolumes(interface.ValueObject):
 
 @attr.s(frozen=True, slots=True)
 class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit, default=0.0)
-    volume_second_quadrimester = attr.ib(type=DurationUnit, default=0.0)
     volume_annual = attr.ib(type=DurationUnit)
     planned_classes = attr.ib(type=int)
     volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
+    volume_first_quadrimester = attr.ib(type=DurationUnit, default=0.0)
+    volume_second_quadrimester = attr.ib(type=DurationUnit, default=0.0)
 
 
 @attr.s(frozen=True, slots=True)

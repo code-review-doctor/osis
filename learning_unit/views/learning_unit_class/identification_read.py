@@ -26,22 +26,19 @@
 from typing import List, Dict
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db import models
-from django.db.models import Prefetch
 from django.views.generic import TemplateView
 from reversion.models import Version
 
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES, COMPONENT_TYPES, DEFAULT_ACRONYM_COMPONENT
-from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
-from base.models.learning_unit_year import LearningUnitYear
 
 
 class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
@@ -67,7 +64,7 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                         GetLanguageCommand(code_iso=learning_unit.language_id.code_iso)
                     ),  # type: Language
                 'teaching_place': get_teaching_place(effective_class.teaching_place),
-                'warnings': get_classes_warnings(learning_unit_year, effective_class)
+                'warnings': get_classes_warnings(learning_unit, effective_class)
             }
         )
         return context
@@ -151,18 +148,5 @@ def get_teaching_place(teaching_place: 'UclouvainCampus') -> UclouvainCampus:
     )  # type: UclouvainCampus
 
 
-def get_classes_warnings(learning_unit_year: LearningUnitYear, effective_class: 'EffectiveClass') -> List[str]:
-    components_queryset = LearningComponentYear.objects.filter(
-        learning_unit_year__learning_container_year=learning_unit_year.learning_container_year
-    )
-    qs_learning_class_year_by_class_acronym = LearningClassYear.objects.filter(
-        acronym=effective_class.entity_id.class_code
-    )
-    all_components = components_queryset.order_by('acronym') \
-        .select_related('learning_unit_year') \
-        .prefetch_related(Prefetch('learningclassyear_set',
-                                   to_attr="classes",
-                                   queryset=qs_learning_class_year_by_class_acronym
-                                   )
-                          )
-    return learning_unit_year._check_classes(all_components)
+def get_classes_warnings(learning_unit: 'LearningUnit', effective_class: 'EffectiveClass') -> List[str]:
+    return effective_class.warnings(learning_unit)

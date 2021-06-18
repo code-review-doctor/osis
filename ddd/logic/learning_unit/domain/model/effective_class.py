@@ -36,7 +36,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester, LearningUnit
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from osis_common.ddd import interface
 
@@ -73,13 +73,13 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
             self.entity_id.class_code
         )
 
-    def warnings(self, learning_unit) -> List[str]:
+    def warnings(self, learning_unit: 'LearningUnit') -> List[str]:
         effective_class = self
 
         _warnings = []
         _warnings.extend(_check_classes_volumes(effective_class, learning_unit))
         if effective_class.derogation_quadrimester:
-            _warnings.extend(_check_classes_quadrimester(effective_class))
+            _warnings.extend(_check_classes_quadrimester(effective_class, learning_unit))
         if effective_class.session_derogation:
             _warnings.extend(_check_classes_session(effective_class, learning_unit))
         return _warnings
@@ -102,15 +102,16 @@ class LecturingEffectiveClass(EffectiveClass):
     pass
 
 
-def _check_classes_quadrimester(effective_class) -> List[str]:
+def _check_classes_quadrimester(effective_class, learning_unit) -> List[str]:
     _warnings = []
     message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '
                 '(should be %(should_be_values)s)')
     quadri = effective_class.derogation_quadrimester
-    if quadri and quadri not in QUADRIMESTER_CHECK_RULES[quadri]['correct_values']:
+    lu_quadri = learning_unit.derogation_quadrimester
+    if quadri and quadri not in QUADRIMESTER_CHECK_RULES[lu_quadri.name]['correct_values']:
         _warnings.append(message % {
-            'code_class': effective_class.effective_class_complete_acronym,
-            'should_be_values': QUADRIMESTER_CHECK_RULES[quadri]['available_values_str']
+            'code_class': effective_class.complete_acronym,
+            'should_be_values': QUADRIMESTER_CHECK_RULES[lu_quadri.name]['available_values_str']
         })
     _warnings.extend(_check_quadrimester_volume(effective_class, quadri))
 
@@ -122,12 +123,12 @@ def _check_classes_session(effective_class, learning_unit) -> List[str]:
     message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
                 '(should be %(should_be_values)s)')
 
-    session = effective_class.session
+    session = effective_class.session_derogation
     lu_session = learning_unit.derogation_session
-    if lu_session and session and session not in SESSION_CHECK_RULES[lu_session]['correct_values']:
+    if lu_session and session and session not in SESSION_CHECK_RULES[lu_session.value]['correct_values']:
         _warnings.append(message % {
-            'code_class': effective_class.effective_class_complete_acronym,
-            'should_be_values': SESSION_CHECK_RULES[lu_session]['available_values_str']
+            'code_class': effective_class.complete_acronym,
+            'should_be_values': SESSION_CHECK_RULES[lu_session.value]['available_values_str']
         })
 
     return _warnings
@@ -137,7 +138,7 @@ def _check_classes_volumes(effective_class, learning_unit) -> List[str]:
     _warnings = []
 
     inconsistent_msg = _('Volumes of {} are inconsistent').format(
-        effective_class.effective_class_complete_acronym
+        effective_class.complete_acronym
     )
 
     if _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_unit):
@@ -164,17 +165,18 @@ def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
     # TODO: create method (inside class) feed with primitive type (gathered from lu)
     return effective_class.is_volume_first_quadrimester_greater_than(
-        learning_unit_part.hourly_volume_partial_q1 or 0
+        learning_unit_part.volumes.volume_first_quadrimester or 0
     ) or effective_class.is_volume_second_quadrimester_greater_than(
-        learning_unit_part.hourly_volume_partial_q2 or 0
+        learning_unit_part.volumes.volume_second_quadrimester or 0
     )
 
 
 def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_unit):
     learning_unit_part = learning_unit.lecturing_part \
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
-    class_sum_q1_q2 = (effective_class.hourly_volume_partial_q1 or 0) + (effective_class.hourly_volume_partial_q2 or 0)
-    return class_sum_q1_q2 > (learning_unit_part.hourly_volume_total_annual or 0)
+    class_sum_q1_q2 = (effective_class.volumes.volume_first_quadrimester or 0) +\
+                      (effective_class.volumes.volume_second_quadrimester or 0)
+    return class_sum_q1_q2 > (learning_unit_part.volumes.volume_annual or 0)
 
 
 def _check_quadrimester_volume(effective_class: 'EffectiveClass', quadri: str) -> List[str]:
@@ -189,18 +191,22 @@ def _get_q1and2_q1or2_warnings(effective_class, quadri):
     q1and2 = LearningUnitYearQuadrimester.Q1and2.name
     q1or2 = LearningUnitYearQuadrimester.Q1or2.name
 
-    if quadri == q1and2 and not (effective_class.hourly_volume_partial_q1 and effective_class.hourly_volume_partial_q2):
+    if quadri == q1and2 and not (
+            effective_class.volumes.volume_first_quadrimester and effective_class.volumes.volume_second_quadrimester
+    ):
         warnings.append(
             _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 and Q2 volumes have to be '
               'completed)') % {
-                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
+                'effective_class_complete_acronym': effective_class.complete_acronym
             }
         )
-    elif quadri == q1or2 and not (effective_class.hourly_volume_partial_q1 or effective_class.hourly_volume_partial_q2):
+    elif quadri == q1or2 and not (
+            effective_class.volumes.volume_first_quadrimester or effective_class.volumes.volume_second_quadrimester
+    ):
         warnings.append(
             _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '
               'completed)') % {
-                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
+                'effective_class_complete_acronym': effective_class.complete_acronym
             }
         )
     return warnings
