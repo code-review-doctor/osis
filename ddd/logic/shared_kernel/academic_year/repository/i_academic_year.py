@@ -39,7 +39,7 @@ class IAcademicYearRepository(interface.AbstractRepository):
 
     @classmethod
     @abstractmethod
-    def search(cls, early_limit_year: Optional[int], **kwargs) -> List['AcademicYear']:
+    def search(cls, year: Optional[int], **kwargs) -> List['AcademicYear']:
         pass
 
     @classmethod
