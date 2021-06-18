@@ -23,7 +23,8 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% url 'class_identification' learning_unit_year=learning_unit_year.academic_year.year learning_unit_code=learning_unit_year.acronym class_code=effective_class.entity_id.class_code as url_class_identification %}
+{% url 'class_identification' learning_unit_year=learning_unit.entity_id.year learning_unit_code=learning_unit.entity_id.code class_code=effective_class.entity_id.class_code as url_class_identification %}
+{% url 'class_tutors' learning_unit_year=learning_unit.entity_id.year learning_unit_code=learning_unit.entity_id.code class_code=effective_class.entity_id.class_code as url_class_tutors %}
 
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" {% if request.path == url_class_identification %} class="active" {% endif %}>
@@ -31,16 +32,16 @@
             {% trans 'Identification' %}
         </a>
     </li>
-{#    <!-- TODO: fill with components tab -->#}
-{#    <li role="presentation" {% if False %} class="active" {% endif %}>#}
-{#        <a href="" role="tab">#}
-{#            {% trans 'Components' %}#}
-{#        </a>#}
-{#    </li>#}
-{##}
-{#    <li role="presentation" {% if request.path == url_class_tutors %} class="active" {% endif %}>#}
-{#        <a href="{{ url_class_tutors }}" role="tab">#}
-{#            {% trans 'Tutors' %}#}
-{#        </a>#}
-{#    </li>#}
+    <!-- TODO: fill with components tab -->
+    <li role="presentation" {% if False %} class="active" {% endif %}>
+        <a href="" role="tab">
+            {% trans 'Components' %}
+        </a>
+    </li>
+
+    <li role="presentation" {% if request.path == url_class_tutors %} class="active" {% endif %}>
+        <a href="{{ url_class_tutors }}" role="tab">
+            {% trans 'Tutors' %}
+        </a>
+    </li>
 </ul>
