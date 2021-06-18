@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 from django.db.models import Prefetch
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
@@ -85,6 +86,7 @@ class AddChargeRepartition(UpdateAttributionView):
         copy_attribution = self.attribution
         copy_attribution.id = None
         copy_attribution.external_id = None
+        copy_attribution.uuid = uuid.uuid4()
         copy_attribution.save()
         return copy_attribution
 
