@@ -39,10 +39,10 @@ class AcademicYearRepository(IAcademicYearRepository):
         raise NotImplementedError
 
     @classmethod
-    def search(cls, early_limit_year: Optional[int], **kwargs) -> List['AcademicYear']:
+    def search(cls, year: Optional[int], **kwargs) -> List['AcademicYear']:
         objects = _get_common_queryset()
-        if early_limit_year:
-            objects = objects.filter(year__gte=early_limit_year)
+        if year:
+            objects = objects.filter(year__gte=year)
         objects_as_dict = objects.values('year', 'start_date', 'end_date')
         return [
             AcademicYearBuilder.build_from_repository_dto(AcademicYearDataDTO(**obj_as_dict))

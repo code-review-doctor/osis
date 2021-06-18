@@ -34,4 +34,4 @@ from osis_common.ddd import interface
 
 @attr.s(frozen=True, slots=True)
 class SearchAcademicYearCommand(interface.CommandRequest):
-    early_limit_year = attr.ib(type=Optional[int], default=MINIMUM_SELECTABLE_YEAR)
+    year = attr.ib(type=Optional[int], default=MINIMUM_SELECTABLE_YEAR)
