@@ -179,7 +179,7 @@ class _ExternalLearningUnitFactory(_LearningUnitFactory):
 
 
 class LDROI1001LearningUnitIdentityFactory(_LearningUnitIdentityFactory):
-    code = "LDROI1001",
+    code = "LDROI1001"
     academic_year = _AcademicYearIdentityFactory(year=datetime.datetime.now().year)
 
 
