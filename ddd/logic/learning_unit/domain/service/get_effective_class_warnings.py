@@ -48,7 +48,7 @@ class EffectiveClassWarnings(interface.DomainService):
         return _warnings
 
 
-def _check_classes_quadrimester(effective_class, learning_unit) -> List[str]:
+def _check_classes_quadrimester(effective_class: 'EffectiveClass', learning_unit: 'LearningUnit') -> List[str]:
     _warnings = []
     message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '
                 '(should be %(should_be_values)s)')
@@ -64,7 +64,7 @@ def _check_classes_quadrimester(effective_class, learning_unit) -> List[str]:
     return _warnings
 
 
-def _check_classes_session(effective_class, learning_unit) -> List[str]:
+def _check_classes_session(effective_class: 'EffectiveClass', learning_unit: 'LearningUnit') -> List[str]:
     _warnings = []
     message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
                 '(should be %(should_be_values)s)')
@@ -80,7 +80,7 @@ def _check_classes_session(effective_class, learning_unit) -> List[str]:
     return _warnings
 
 
-def _check_classes_volumes(effective_class, learning_unit) -> List[str]:
+def _check_classes_volumes(effective_class: 'EffectiveClass', learning_unit: 'LearningUnit') -> List[str]:
     _warnings = []
 
     inconsistent_msg = _('Volumes of {} are inconsistent').format(
@@ -106,7 +106,10 @@ def _check_classes_volumes(effective_class, learning_unit) -> List[str]:
     return _warnings
 
 
-def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_unit):
+def _class_volume_exceeds_learning_unit_subtype_volume(
+        effective_class: 'EffectiveClass',
+        learning_unit: 'LearningUnit'
+) -> bool:
     learning_unit_part = learning_unit.lecturing_part \
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
     return effective_class.is_volume_first_quadrimester_greater_than(
@@ -116,10 +119,13 @@ def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning
     )
 
 
-def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_unit):
+def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(
+        effective_class: 'EffectiveClass',
+        learning_unit: 'LearningUnit'
+) -> bool:
     learning_unit_part = learning_unit.lecturing_part \
         if type(effective_class) == LecturingEffectiveClass else learning_unit.practical_part
-    class_sum_q1_q2 = (effective_class.volumes.volume_first_quadrimester or 0) +\
+    class_sum_q1_q2 = (effective_class.volumes.volume_first_quadrimester or 0) + \
                       (effective_class.volumes.volume_second_quadrimester or 0)
     return class_sum_q1_q2 > (learning_unit_part.volumes.volume_annual or 0)
 
@@ -130,7 +136,7 @@ def _check_quadrimester_volume(effective_class: 'EffectiveClass', quadri: str) -
     return q1_q2_warnings + q1and2_q1or2_warnings
 
 
-def _get_q1and2_q1or2_warnings(effective_class, quadri):
+def _get_q1and2_q1or2_warnings(effective_class: 'EffectiveClass', quadri: str) -> List[str]:
     warnings = []
 
     q1and2 = LearningUnitYearQuadrimester.Q1and2.name
@@ -157,7 +163,7 @@ def _get_q1and2_q1or2_warnings(effective_class, quadri):
     return warnings
 
 
-def _get_q1_q2_warnings(effective_class, quadri):
+def _get_q1_q2_warnings(effective_class: 'EffectiveClass', quadri: str) -> List[str]:
     warnings = []
 
     q1 = LearningUnitYearQuadrimester.Q1.name
