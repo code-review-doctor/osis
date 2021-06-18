@@ -1,3 +1,5 @@
+import datetime
+
 import factory.fuzzy
 import uuid
 
@@ -176,11 +178,13 @@ class _ExternalLearningUnitFactory(_LearningUnitFactory):
         abstract = False
 
 
+class LDROI1001LearningUnitIdentityFactory(_LearningUnitIdentityFactory):
+    code = "LDROI1001"
+    academic_year = _AcademicYearIdentityFactory(year=datetime.datetime.now().year)
+
+
 class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
-        code="LDROI1001",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
-    )
+    entity_id = LDROI1001LearningUnitIdentityFactory
     titles = _TitlesFactory(
         common_fr="Introduction au droit",
         specific_fr="Partie 1 : droit civil",
@@ -222,7 +226,7 @@ class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
 class LDROI1002ExternalLearningUnitFactory(_ExternalLearningUnitFactory):
     entity_id = _LearningUnitIdentityFactory(
         code="LDROI1002",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
+        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
     partims = []
 
@@ -230,7 +234,7 @@ class LDROI1002ExternalLearningUnitFactory(_ExternalLearningUnitFactory):
 class LDROI1003CourseWithPartimsLearningUnitFactory(_CourseLearningUnitFactory):
     entity_id = _LearningUnitIdentityFactory(
         code="LDROI1003",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
+        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
     partims = [_PartimFactory()]
 
@@ -238,7 +242,7 @@ class LDROI1003CourseWithPartimsLearningUnitFactory(_CourseLearningUnitFactory):
 class LDROI1004CourseWithoutVolumesLearningUnitFactory(_CourseLearningUnitFactory):
     entity_id = _LearningUnitIdentityFactory(
         code="LDROI1004",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
+        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
     lecturing_part = None
     practical_part = None
