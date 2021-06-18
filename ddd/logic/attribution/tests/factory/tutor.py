@@ -82,7 +82,7 @@ class _LearningUnitAttributionFactory(factory.Factory):
     distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 
-class _LearningUnitAttributionnWithoutDistributedEffectiveClassesFactory(_ClassVolumeRepartitionFactory):
+class _LearningUnitAttributionWithoutDistributedEffectiveClassesFactory(_ClassVolumeRepartitionFactory):
     distributed_effective_classes = []
 
 
@@ -102,7 +102,7 @@ class TutorWithoutAttributionsFactory(_TutorFactory):
 
 
 class TutorWithAttributionWithoutDistributedEffectiveClassesFactory(_TutorFactory):
-    attributions = factory.SubFactory(_LearningUnitAttributionnWithoutDistributedEffectiveClassesFactory)
+    attributions = factory.SubFactory(_LearningUnitAttributionWithoutDistributedEffectiveClassesFactory)
 
 
 class TutorWithAttributionAndDistributedEffectiveClassesFactory(_TutorFactory):
