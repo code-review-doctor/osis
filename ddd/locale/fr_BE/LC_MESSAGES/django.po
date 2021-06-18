@@ -17,6 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#, python-brace-format
+msgid "'{value}' is not a valid derogation quadrimester."
+msgstr "'{value}' n'est pas un quadrimestre valide"
+
+#, python-brace-format
+msgid "'{value}' is not a valid derogation session."
+msgstr "'{value}' n'est pas une session dérogation valide"
+
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr "On ne peut pas créer une UE avec une année inférieure à 2019-20"
 
@@ -54,8 +62,9 @@ msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
 
+#, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
-msgstr "Le code %('ue_code')s - %(code)s existe déjà pour %(ue)s"
+msgstr "Le code %(ue_code)s - %(code)s existe déjà pour l'UE %(ue)s"
 
 msgid "The code {} already exists"
 msgstr "Le code {} existe déjà"
@@ -76,6 +85,9 @@ msgid ""
 msgstr ""
 "La somme des volumes Q1 et Q2 doit être égale au volume annuel de l'unité "
 "d'enseignement ({}) "
+
+msgid "The teaching place is required."
+msgstr "Le lieu d'enseignement est obligatoire"
 
 msgid ""
 "You cannot create a class on this learning unit because it is in proposal "

@@ -18,6 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#, python-brace-format
+msgid "'{value}' is not a valid derogation quadrimester."
+msgstr ""
+
+#, python-brace-format
+msgid "'{value}' is not a valid derogation session."
+msgstr ""
+
 msgid "Can't create a learning unit lower than 2019-20"
 msgstr ""
 
@@ -71,6 +79,9 @@ msgstr ""
 msgid ""
 "The sum of first/second quadrimesters volumes should be equal to annual "
 "volume of the learning unit ({})"
+msgstr ""
+
+msgid "The teaching place is required."
 msgstr ""
 
 msgid ""

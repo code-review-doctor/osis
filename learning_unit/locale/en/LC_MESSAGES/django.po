@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-08 10:33+0200\n"
+"POT-Creation-Date: 2021-06-16 15:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,13 +20,25 @@ msgstr ""
 msgid "Academic year"
 msgstr ""
 
+msgid "Actions"
+msgstr ""
+
 msgid "Active"
+msgstr ""
+
+msgid "Additional requirement entity 1"
+msgstr ""
+
+msgid "Additional requirement entity 2"
 msgstr ""
 
 msgid "Allocation entity"
 msgstr ""
 
 msgid "Annual volume"
+msgstr ""
+
+msgid "Attribution entity"
 msgstr ""
 
 msgid "Central manager"
@@ -40,6 +52,10 @@ msgstr ""
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully updated."
 msgstr ""
 
 msgid "Class specific complement"
@@ -75,16 +91,28 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
+msgid "Full"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
 msgid "Institution"
 msgstr ""
 
 msgid "Internship subtype"
 msgstr ""
 
+msgid "LU"
+msgstr ""
+
 msgid "Language"
 msgstr ""
 
 msgid "Learning location"
+msgstr ""
+
+msgid "Learning unit credits"
 msgstr ""
 
 msgid "Learning unit is not full"
@@ -103,9 +131,6 @@ msgid "Learning units"
 msgstr ""
 
 msgid "Lecturing"
-msgstr ""
-
-msgid "New class"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -147,10 +172,19 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
+msgid "Refer to learning unit"
+msgstr ""
+
 msgid "Requirement entity"
 msgstr ""
 
 msgid "Session derogation"
+msgstr ""
+
+msgid "Specific complement (Full)"
+msgstr ""
+
+msgid "State"
 msgstr ""
 
 msgid ""
@@ -188,6 +222,9 @@ msgid "The learning unit's description fiche is not editable."
 msgstr ""
 
 msgid "The proposal is not on this academic year"
+msgstr ""
+
+msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 
 msgid "This learning unit has an application in the future"
@@ -253,6 +290,12 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "Update"
+msgstr ""
+
+msgid "Update class"
+msgstr ""
+
 msgid "Vol. Q1"
 msgstr ""
 
@@ -307,6 +350,9 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "You do not have sufficient access rights to update a class."
 msgstr ""
 
 msgid "external acronym rules"
