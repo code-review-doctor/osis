@@ -25,6 +25,7 @@
 ##############################################################################
 from unittest import mock
 
+import uuid
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -167,10 +168,12 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
 
         cls.attribution_partim_1 = cls.attribution_full
         cls.attribution_partim_1.id = None
+        cls.attribution_partim_1.uuid = uuid.uuid4()
         cls.attribution_partim_1.save()
 
         cls.attribution_partim_2 = cls.attribution_full
         cls.attribution_partim_2.id = None
+        cls.attribution_partim_2.uuid = uuid.uuid4()
         cls.attribution_partim_2.save()
 
     def setUp(self):

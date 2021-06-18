@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
 
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
@@ -76,6 +77,7 @@ class TestChargeRepartitionMixin:
 
         self.attribution_full = self.attribution
         self.attribution_full.id = None
+        self.attribution_full.uuid = uuid.uuid4()
         self.attribution_full.save()
         self.charge_lecturing_full = AttributionChargeNewFactory(
             attribution=self.attribution_full,
