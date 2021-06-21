@@ -35,7 +35,6 @@ from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex
 from base.models import campus
 from base.models import entity_version
-from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
