@@ -116,8 +116,7 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     def get_tutor_assign_to_class(cls, effective_class: 'EffectiveClass') -> str:
         results = AttributionClassDb.objects.filter(
             learning_component_year__learning_unit_year__acronym=effective_class.entity_id.learning_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=
-            effective_class.entity_id.learning_unit_identity.academic_year.year,
+            learning_component_year__learning_unit_year__academic_year__year=effective_class.entity_id.learning_unit_identity.academic_year.year,
             learning_class_year__acronym=effective_class.entity_id.code
         )
         if results:

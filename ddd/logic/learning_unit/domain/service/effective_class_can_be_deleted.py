@@ -49,5 +49,3 @@ class EffectiveClassCanBeDeleted(interface.DomainService):
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
-
-
