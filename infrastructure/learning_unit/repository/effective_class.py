@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from django.db.models import F, QuerySet
 
+from attribution.models.attribution_class import AttributionClass as AttributionClassDb
 from base.models.campus import Campus
 from base.models.enums import learning_component_year_type
 from base.models.enums.learning_unit_year_session import DerogationSession
@@ -110,6 +111,18 @@ class EffectiveClassRepository(IEffectiveClassRepository):
             )
             for learning_class in all_classes
         ]
+
+    @classmethod
+    def get_tutor_assign_to_class(cls, effective_class: 'EffectiveClass') -> str:
+        results = AttributionClassDb.objects.filter(
+            learning_component_year__learning_unit_year__acronym=effective_class.entity_id.learning_unit_identity.code,
+            learning_component_year__learning_unit_year__academic_year__year=
+            effective_class.entity_id.learning_unit_identity.academic_year.year,
+            learning_class_year__acronym=effective_class.entity_id.code
+        )
+        if results:
+            return results[0].attribution_charge.attribution.tutor.person.full_name
+        return ''
 
 
 def _get_learning_component_year_id_from_entity(entity: 'EffectiveClass') -> int:

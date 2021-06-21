@@ -202,3 +202,23 @@ class TeachingPlaceRequiredException(BusinessException):
     def __init__(self, **kwargs):
         message = _("The teaching place is required.")
         super().__init__(message, **kwargs)
+
+
+class EffectiveClassHasTutorAssignedException(BusinessException):
+    def __init__(self, effective_class: 'EffectiveClass', tutor_full_name: str,  **kwargs):
+        message = _("The class %(class_complete_code)s is assigned to %(tutor_full_name)s in %(year)s") % {
+            'class_complete_code': "{}{}".format(
+                effective_class.entity_id.learning_unit_identity.code,
+                effective_class.entity_id.class_code),
+            'tutor_full_name': tutor_full_name,
+            'year': effective_class.entity_id.learning_unit_identity.year,
+        }
+        super().__init__(message, **kwargs)
+
+
+class LearningUnitOfEffectiveClassHasEnrollmentException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Class of learning unit having enrollment can't be delete"
+        )
+        super().__init__(message, **kwargs)
