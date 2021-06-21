@@ -62,11 +62,10 @@ class _PracticalEffectiveClassFactory(_EffectiveClassFactory):
         abstract = False
 
 
-class SelfConsistentLecturingEffectiveClassFactory(_LecturingEffectiveClassFactory):
+class LecturingEffectiveClassFactory(_LecturingEffectiveClassFactory):
     session_derogation = DerogationSession.DEROGATION_SESSION_1XX
     derogation_quadrimester = DerogationQuadrimester.Q1
     volumes = _ClassVolumesFactory(
         volume_first_quadrimester=1,
         volume_second_quadrimester=0
     )
-

@@ -201,6 +201,7 @@ class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
     )
 
     derogation_quadrimester = DerogationQuadrimester.Q1and2
+    derogation_session = DerogationSession.DEROGATION_SESSION_1XX
 
     lecturing_part = _LecturingPartFactory(
         volumes=_VolumesFactory(
