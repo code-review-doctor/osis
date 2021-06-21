@@ -90,5 +90,3 @@ class PracticalEffectiveClass(EffectiveClass):
 
 class LecturingEffectiveClass(EffectiveClass):
     pass
-
-
