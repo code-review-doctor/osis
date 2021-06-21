@@ -47,4 +47,9 @@ def get_charge_summary(
     applicant_id = ApplicantIdentityBuilder.build_from_global_id(global_id=cmd.global_id)
     applicant = applicant_repository.get(applicant_id)
 
-    return ApplicantAttributionChargeSummary.get(application_calendar, applicant, vacant_course_repository, learning_unit_service)
+    return ApplicantAttributionChargeSummary.get(
+        application_calendar,
+        applicant,
+        vacant_course_repository,
+        learning_unit_service,
+    )

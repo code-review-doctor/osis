@@ -40,7 +40,6 @@ class AttributionChargeNewTest(TestCase):
         cls.attribution_new = AttributionNewFactory(tutor=cls.tutor, function=function.PROFESSOR)
         cls.attribution_charge_new_lecturing = AttributionChargeNewFactory(
             attribution=cls.attribution_new,
-            learning_component_year=cls.learning_component_year_lecturing,
             allocation_charge=10
         )
 
