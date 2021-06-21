@@ -856,7 +856,7 @@ def _get_q1and2_q1or2_warnings(effective_class, quadri):
     elif quadri == q1or2 and not (effective_class.hourly_volume_partial_q1 or effective_class.hourly_volume_partial_q2):
         warnings.append(
             _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '
-              'completed)') % {
+              'completed but not both)') % {
                 'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
             }
         )

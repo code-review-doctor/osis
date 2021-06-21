@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 13:49+0200\n"
+"POT-Creation-Date: 2021-06-21 11:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,42 @@ msgid "Subdivision should be one character A-Z or 0-9"
 msgstr ""
 
 #, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed but not both)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+#, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr ""
 
@@ -73,6 +109,9 @@ msgid ""
 "volume of the learning unit ({})"
 msgstr ""
 
+msgid "Volumes of {} are inconsistent"
+msgstr ""
+
 msgid ""
 "You cannot create a class on this learning unit because it is in proposal "
 "this year or in past."
@@ -82,4 +121,10 @@ msgid ""
 "You cannot create class on this learning unit because the component's annual "
 "volume [PM or default PP] is not greater than 0 and there are no planned "
 "class."
+msgstr ""
+
+msgid "at least one class volume is greater than the volume of the LU"
+msgstr ""
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr ""

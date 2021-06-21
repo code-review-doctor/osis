@@ -2446,8 +2446,8 @@ msgstr ""
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
-"Q2 volume has to be completed)"
-msgstr "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume Q1 ou Q2 doit avoir une valeur)"
+"Q2 volume has to be completed but not both)"
+msgstr "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
 
 #, python-format
 msgid ""

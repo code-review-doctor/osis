@@ -158,7 +158,7 @@ def _get_q1and2_q1or2_warnings(effective_class: 'EffectiveClass') -> List[str]:
     ):
         warnings.append(
             _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '
-              'completed)') % {
+              'completed but not both)') % {
                 'effective_class_complete_acronym': effective_class.complete_acronym
             }
         )
