@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 13:49+0200\n"
+"POT-Creation-Date: 2021-06-21 14:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,6 +38,9 @@ msgstr ""
 msgid "Class can't be neither mobility nor external"
 msgstr ""
 
+msgid "Class of learning unit having enrollment can't be delete"
+msgstr ""
+
 msgid "Credits should be greather than 0"
 msgstr ""
 
@@ -57,6 +60,12 @@ msgid "Selected entity {} is not an authorized responsible entity"
 msgstr ""
 
 msgid "Subdivision should be one character A-Z or 0-9"
+msgstr ""
+
+#, python-format
+msgid ""
+"The class %(class_complete_code)s is assigned to %(tutor_full_name)s in "
+"%(year)s"
 msgstr ""
 
 #, python-format
