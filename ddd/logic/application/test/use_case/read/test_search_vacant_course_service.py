@@ -32,7 +32,7 @@ from attribution.models.enums.function import Functions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import SearchVacantCoursesCommand
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
+from ddd.logic.application.domain.model._allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.dtos import VacantCourseSearchDTO, LearningUnitVolumeFromServiceDTO, \
     LearningUnitTutorAttributionFromServiceDTO, TutorAttributionDTO

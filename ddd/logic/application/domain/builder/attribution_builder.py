@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from attribution.models.enums.function import Functions
-from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.dtos import AttributionFromRepositoryDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder

@@ -25,7 +25,7 @@
 ##############################################################################
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.domain.builder.vacant_course_identity_builder import VacantCourseIdentityBuilder
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
+from ddd.logic.application.domain.model._allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
 from ddd.logic.application.dtos import VacantCourseFromRepositoryDTO
 from osis_common.ddd.interface import RootEntityBuilder

@@ -34,7 +34,7 @@ from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
+from ddd.logic.application.domain.model._allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
 from ddd.logic.application.domain.validator.exceptions import LecturingAndPracticalChargeNotFilledException, \
     ApplicationAlreadyExistsException, VolumesAskedShouldBeLowerOrEqualToVolumeAvailable

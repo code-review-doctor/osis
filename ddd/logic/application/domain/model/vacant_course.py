@@ -28,7 +28,7 @@ from decimal import Decimal
 import attr
 
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
+from ddd.logic.application.domain.model._allocation_entity import AllocationEntity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from osis_common.ddd import interface
 

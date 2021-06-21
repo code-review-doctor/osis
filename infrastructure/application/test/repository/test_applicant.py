@@ -34,7 +34,7 @@ from base.models.enums import learning_component_year_type
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
-from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from infrastructure.application.repository.applicant import ApplicantRepository

@@ -26,7 +26,7 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireWithoutVolumeException
 
 

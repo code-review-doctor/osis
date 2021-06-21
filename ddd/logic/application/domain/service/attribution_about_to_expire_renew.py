@@ -31,7 +31,7 @@ from ddd.logic.application.domain.builder.application_builder import Application
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
-from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \

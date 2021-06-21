@@ -31,12 +31,12 @@ from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
-from ddd.logic.application.dtos import ChargeSummaryDTO, TutorAttributionDTO
+from ddd.logic.application.dtos import ApplicantAttributionChargeSummaryDTO, TutorAttributionDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from osis_common.ddd import interface
 
 
-class ChargeSummary(interface.DomainService):
+class ApplicantAttributionChargeSummary(interface.DomainService):
     """
         This service aggregate multiple source in order to build the charge summary of the applicant
     """
@@ -48,7 +48,7 @@ class ChargeSummary(interface.DomainService):
             applicant: Applicant,
             vacant_course_repository: IVacantCourseRepository,
             learning_unit_service: ILearningUnitService,
-    ) -> List[ChargeSummaryDTO]:
+    ) -> List[ApplicantAttributionChargeSummaryDTO]:
         current_attribution = [
             attribution for attribution in applicant.attributions
             if attribution.course_id.academic_year == application_calendar.authorized_target_year
@@ -84,7 +84,7 @@ class ChargeSummary(interface.DomainService):
                 ) for t_dto in learning_unit_tutors if t_dto.code == attribution.course_id.code
             ]
             results.append(
-                ChargeSummaryDTO(
+                ApplicantAttributionChargeSummaryDTO(
                     code=attribution.course_id.code,
                     year=attribution.course_id.year,
                     title=attribution.course_title,

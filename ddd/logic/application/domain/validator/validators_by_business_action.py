@@ -31,7 +31,7 @@ from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionL
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand
 from ddd.logic.application.domain.model.application import Application
-from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse
 from ddd.logic.application.domain.validator._should_be_the_author_of_the_application import \
     ShouldBeTheAuthorOfTheApplication

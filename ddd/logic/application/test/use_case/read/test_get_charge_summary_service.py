@@ -9,12 +9,12 @@ from attribution.models.enums.function import Functions
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
 from ddd.logic.application.commands import GetChargeSummaryCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
-from ddd.logic.application.domain.model.allocation_entity import AllocationEntity
+from ddd.logic.application.domain.model._allocation_entity import AllocationEntity
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar, ApplicationCalendarIdentity
-from ddd.logic.application.domain.model.attribution import Attribution
+from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
-from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, ChargeSummaryDTO
+from ddd.logic.application.dtos import LearningUnitVolumeFromServiceDTO, ApplicantAttributionChargeSummaryDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from infrastructure.application.repository.applicant_in_memory import ApplicantInMemoryRepository
@@ -102,7 +102,7 @@ class GetChargeSummary(TestCase):
         self.assertIsInstance(results, list)
         self.assertEqual(len(results), 1)
 
-        self.assertIsInstance(results[0], ChargeSummaryDTO)
+        self.assertIsInstance(results[0], ApplicantAttributionChargeSummaryDTO)
         self.assertEqual(results[0].code, "LDROI1200")
         self.assertEqual(results[0].year, 2019)
         self.assertEqual(results[0].title, "Introduction au droit")
