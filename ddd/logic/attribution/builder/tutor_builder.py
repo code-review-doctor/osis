@@ -26,8 +26,7 @@
 from typing import List
 
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution, LearningUnitAttributionIdentity
-from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
+from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition, AttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.dtos import LearningUnitAttributionFromRepositoryDTO, TutorSearchDTO, \
     DistributedEffectiveClassesDTO
@@ -47,23 +46,23 @@ class TutorBuilder(interface.RootEntityBuilder):
             entity_id=tutor_identity,
             last_name=dto_object.last_name,
             first_name=dto_object.first_name,
-            attributions=[build_attribution(attribution) for attribution in dto_object.attributions]
+            attributions=[]
         )
 
 
-def build_attribution(attribution: 'LearningUnitAttributionFromRepositoryDTO') -> 'LearningUnitAttribution':
-    return LearningUnitAttribution(
-        entity_id=LearningUnitAttributionIdentity(uuid=attribution.attribution_uuid),
-        function=attribution.function,
-        learning_unit=LearningUnitIdentityBuilder.build_from_code_and_year(
-            attribution.learning_unit_code,
-            attribution.learning_unit_year
-        ),
-        distributed_effective_classes=_get_distributed_effective_classes(
-            attribution.attribution_volume,
-            attribution.effective_classes
-        )
-    )
+# def build_attribution(attribution: 'LearningUnitAttributionFromRepositoryDTO') -> 'LearningUnitAttribution':
+#     return LearningUnitAttribution(
+#         entity_id=AttributionIdentity(uuid=attribution.attribution_uuid),
+#         function=attribution.function,
+#         learning_unit=LearningUnitIdentityBuilder.build_from_code_and_year(
+#             attribution.learning_unit_code,
+#             attribution.learning_unit_year
+#         ),
+#         distributed_effective_classes=_get_distributed_effective_classes(
+#             attribution.attribution_volume,
+#             attribution.effective_classes
+#         )
+#     )
 
 
 def _get_distributed_effective_classes(
