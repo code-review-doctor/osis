@@ -84,6 +84,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
             entity_id.learning_unit_identity.year,
             self.ue_with_lecturing_and_practical_volumes.entity_id.academic_year.year
         )
+        self.assertEqual(len(self.effective_class_repository.entities), 0)
 
     def test_should_raise_LearningUnitOfEffectiveClassHasEnrollmentException(self):
         self.learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
