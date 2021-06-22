@@ -132,7 +132,7 @@ def delete_version(egy: 'EducationGroupVersion'):
 
 def delete_cohorts_linked_to_11ba():
     qs = CohortYear.objects.filter(
-        education_group_year__partial_acronym__contains='11BA'
+        education_group_year__acronym__contains='11BA'
     )
 
     for cohort in qs:
