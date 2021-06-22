@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 13:49+0200\n"
+"POT-Creation-Date: 2021-06-21 14:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,11 @@ msgstr ""
 msgid "Class can't be neither mobility nor external"
 msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
+msgid "Class of learning unit having enrollment can't be delete"
+msgstr ""
+"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne pouvez "
+"pas supprimer cette classe."
+
 msgid "Credits should be greather than 0"
 msgstr "Les crédits doivent être > 0"
 
@@ -61,6 +66,14 @@ msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée
 
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
+
+#, python-format
+msgid ""
+"The class %(class_complete_code)s is assigned to %(tutor_full_name)s in "
+"%(year)s"
+msgstr ""
+"La classe %(class_complete_code)s est attribuée à %(tutor_full_name)s en "
+"%(year)s"
 
 #, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"

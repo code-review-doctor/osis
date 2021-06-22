@@ -23,15 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
+    LearningUnitOfEffectiveClassHasEnrollmentException
+from osis_common.ddd import interface
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
+class EffectiveClassCanBeDeleted(interface.DomainService):
 
-class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
-    entities = list()  # type: List[EffectiveClass]
+    def validate(
+            self,
+            effective_class: 'EffectiveClass',
+            learning_unit: 'LearningUnit',
+            learning_unit_repository: 'LearningUnitRepository',
+            effective_class_repository: 'EffectiveClassRepository'
+    ):
+        exceptions = set()  # type Set[BusinessException]
+        if learning_unit_repository.has_enrollments(learning_unit):
+            exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
-    def get_tutor_assign_to_class(cls, effective_class: 'EffectiveClass') -> str:
-        pass
+        tutor_assign_to_class = effective_class_repository.get_tutor_assign_to_class(effective_class)
+        if tutor_assign_to_class:
+            exceptions.add(EffectiveClassHasTutorAssignedException(effective_class=effective_class,
+                                                                   tutor_full_name=tutor_assign_to_class))
+
+        if exceptions:
+            raise MultipleBusinessExceptions(exceptions=exceptions)
