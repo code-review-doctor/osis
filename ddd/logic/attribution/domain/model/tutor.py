@@ -28,7 +28,7 @@ from typing import List
 
 import attr
 
-from ddd.logic.attribution.domain.model._attribution import LearningUnitAttribution
+from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from osis_common.ddd import interface
 
 
@@ -37,12 +37,12 @@ class TutorIdentity(interface.EntityIdentity):
     personal_id_number = attr.ib(type=str)
 
 
+# TODO :: rename context to effective_class_distribution
+
 @attr.s(slots=True, hash=False, eq=False)
 class Tutor(interface.RootEntity):
     entity_id = attr.ib(type=TutorIdentity)
-    first_name = attr.ib(type=str)
-    last_name = attr.ib(type=str)
-    attributions = attr.ib(type=List[LearningUnitAttribution])
+    distributed_effective_classes = attr.ib(type=List[ClassVolumeRepartition])
 
     def assign_class(
             self,
@@ -50,7 +50,6 @@ class Tutor(interface.RootEntity):
             distributed_volume: Decimal,
             learning_unit_attribution_uuid: str
     ) -> None:
-        # TODO: reuse _tutor_should_be_attributed_to_learning_unit
         raise NotImplementedError
 
     def unassign_class(

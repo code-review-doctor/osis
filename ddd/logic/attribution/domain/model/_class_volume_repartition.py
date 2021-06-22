@@ -31,7 +31,13 @@ from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassI
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
+class AttributionIdentity(interface.EntityIdentity):
+    uuid = attr.ib(type=str)
+
+
 @attr.s(slots=True, hash=False, eq=False)
 class ClassVolumeRepartition(interface.ValueObject):
     effective_class = attr.ib(type=EffectiveClassIdentity)
     distributed_volume = attr.ib(type=Decimal)
+    attribution = attr.ib(type=AttributionIdentity)

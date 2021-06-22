@@ -26,14 +26,18 @@
 
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 
 
 def distribute_class_to_tutor(
         cmd: DistributeClassToTutorCommand,
-        repository: 'ITutorRepository'
+        repository: 'ITutorRepository',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
 ) -> 'TutorIdentity':
     # TODO: to implement
     # TODO: reuse check_class_belongs_to_learning_unit DomainService
     # Tutor().assign_class()
+    # if not tutor_attribution_translator.get_tutor_attribution_to_learning_unit():
+    #     raise BusinessException()
     return

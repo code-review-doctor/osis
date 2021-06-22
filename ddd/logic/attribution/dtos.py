@@ -62,3 +62,12 @@ class DistributedEffectiveClassesDTO(DTO):
     class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class TutorAttributionToLearningUnitDTO(DTO):
+    last_name = attr.ib(type=str)
+    first_name = attr.ib(type=str)
+    personal_id_number = attr.ib(type=str)
+    function = attr.ib(type=str)
+    attributed_volume_to_learning_unit = attr.ib(type=str)
