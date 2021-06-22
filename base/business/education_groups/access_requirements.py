@@ -119,6 +119,8 @@ def _postpone_admission_condition_line(
         egy: 'EducationGroupYear',
         admission_condition_lines_to_postpone: List['AdmissionConditionLine']
 ) -> None:
+    if not admission_condition_lines_to_postpone:
+        return
 
     egy_admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=egy
