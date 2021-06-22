@@ -29,33 +29,14 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models import Sum
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 
-from attribution.business import attribution_json, attribution_charge_new
+from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.enums.function import Functions
 from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
 from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year
-
-
-class RecomputePortalSerializer(serializers.Serializer):
-    global_ids = serializers.ListField(child=serializers.CharField(), required=False)
-
-
-@api_view(['POST'])
-def recompute_portal(request):
-    serializer = RecomputePortalSerializer(data=request.data)
-    if serializer.is_valid():
-        global_ids = serializer.data['global_ids'] if serializer.data['global_ids'] else None
-        result = attribution_json.publish_to_portal(global_ids)
-        if result:
-            return Response(status=status.HTTP_202_ACCEPTED)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @login_required

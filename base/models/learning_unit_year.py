@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -42,7 +43,7 @@ from base.business.learning_container_year import get_learning_container_year_wa
 from base.models import entity_version
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
-from base.models.enums import active_status, learning_container_year_types
+from base.models.enums import active_status, learning_container_year_types, learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
@@ -137,6 +138,12 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class LearningUnitYearQuerySet(SerializableQuerySet):
+    def annotate_volume_total(self):
+        return self.annotate_volume_total_class_method(self)
+
+    def annotate_volume_vacant_available(self):
+        return self.annotate_volume_vacant_available_class_method(self)
+
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
 
@@ -198,6 +205,78 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
     def annotate_entities_allocation_and_requirement_acronym(cls, queryset):
         return cls.annotate_entity_allocation_acronym(
             cls.annotate_entity_requirement_acronym(queryset)
+        )
+
+    @classmethod
+    def annotate_volume_total_class_method(cls, queryset):
+        subqs_volume_total = LearningComponentYear.objects.filter(
+            learning_unit_year_id=OuterRef('pk')
+        ).annotate(
+            hourly_volume_total_annual_casted=Case(
+                When(hourly_volume_total_annual__isnull=True, then=Decimal(0.0)),
+                default=F('hourly_volume_total_annual'),
+                output_field=fields.DecimalField()
+            )
+        ).values('hourly_volume_total_annual_casted')
+
+        return queryset.annotate(
+            lecturing_volume_total=Subquery(
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
+            ),
+            practical_volume_total=Subquery(
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume_total=Case(
+                When(lecturing_volume_total__isnull=False, then='lecturing_volume_total'),
+                default=Decimal(0.0)
+            ),
+            practical_volume_total=Case(
+                When(practical_volume_total__isnull=False, then='practical_volume_total'),
+                default=Decimal(0.0)
+            ),
+        )
+
+    @classmethod
+    def annotate_volume_vacant_available_class_method(cls, queryset):
+        subqs_volume_declared_vacant = LearningComponentYear.objects.filter(
+            learning_unit_year_id=OuterRef('pk')
+        ).annotate(
+            volume_declared_vacant_casted=Case(
+                When(volume_declared_vacant__isnull=True, then=Decimal(0.0)),
+                default=F('volume_declared_vacant'),
+                output_field=fields.DecimalField()
+            )
+        ).values('volume_declared_vacant_casted')
+
+        return queryset.annotate(
+            lecturing_volume_available=Subquery(
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
+            ),
+            practical_volume_available=Subquery(
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume_available=Case(
+                When(lecturing_volume_available__isnull=False, then='lecturing_volume_available'),
+                default=Decimal(0.0)
+            ),
+            practical_volume_available=Case(
+                When(practical_volume_available__isnull=False, then='practical_volume_available'),
+                default=Decimal(0.0)
+            ),
         )
 
 

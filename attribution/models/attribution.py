@@ -127,10 +127,3 @@ def clear_scores_responsible_by_learning_unit_year(learning_unit_year_pk):
     for attribution in attributions:
         setattr(attribution, 'score_responsible', False)
         attribution.save()
-
-
-def _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, field_to_clear):
-    attributions = Attribution.objects.filter(learning_unit_year__id=learning_unit_year_pk)
-    for attribution in attributions:
-        setattr(attribution, field_to_clear, False)
-        attribution.save()

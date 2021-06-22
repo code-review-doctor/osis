@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from typing import List
 
-from attribution.business import application_json
-
-
-class RecomputePortalSerializer(serializers.Serializer):
-    global_ids = serializers.ListField(child=serializers.CharField(), required=False)
+from ddd.logic.application.commands import SearchApplicationByApplicantCommand
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.dtos import ApplicationByApplicantDTO
+from ddd.logic.application.repository.i_application_calendar_repository import IApplicationCalendarRepository
+from ddd.logic.application.repository.i_application_repository import IApplicationRepository
 
 
-@api_view(['POST'])
-def recompute_portal(request):
-    serializer = RecomputePortalSerializer(data=request.data)
-    if serializer.is_valid():
-        global_ids = serializer.data['global_ids'] if serializer.data['global_ids'] else None
-        if application_json.publish_to_portal(global_ids):
-            return Response(status=status.HTTP_202_ACCEPTED)
-    return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+def search_applications_by_applicant(
+        cmd: SearchApplicationByApplicantCommand,
+        application_repository: IApplicationRepository,
+        application_calendar_repository: IApplicationCalendarRepository,
+) -> List[ApplicationByApplicantDTO]:
+    # Given
+    application_calendar = application_calendar_repository.get_current_application_calendar()
+    applicant_id = ApplicantIdentityBuilder.build_from_global_id(global_id=cmd.global_id)
+
+    # Then
+    return application_repository.search_by_applicant_dto(
+        applicant_id=applicant_id,
+        academic_year_id=application_calendar.authorized_target_year,
+    )
