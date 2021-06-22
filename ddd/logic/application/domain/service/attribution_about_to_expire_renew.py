@@ -23,20 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from functools import partial
 from typing import List
 
+import uuid
+
 from attribution.models.enums.function import Functions
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.application.domain.builder.application_builder import ApplicationBuilder
+from base.ddd.utils.business_validator import MultipleBusinessExceptions, execute_functions_and_aggregate_exceptions
 from ddd.logic.application.domain.model.applicant import Applicant
-from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
 from ddd.logic.application.domain.model.application_calendar import ApplicationCalendar
 from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourseIdentity, VacantCourse
+from ddd.logic.application.domain.service.apply_on_vacant_course import ApplyOnVacantCourse
 from ddd.logic.application.domain.service.i_learning_unit_service import ILearningUnitService
 from ddd.logic.application.domain.validator.exceptions import AttributionAboutToExpireNotFound, \
-    AttributionAboutToExpireFunctionException, VacantCourseNotFound
-from ddd.logic.application.domain.validator.validators_by_business_action import RenewApplicationValidatorList
+    AttributionAboutToExpireFunctionException, VacantCourseNotFound, AttributionSubstituteException, \
+    AttributionAboutToExpireWithoutVolumeException
 from ddd.logic.application.dtos import AttributionAboutToExpireDTO
 from ddd.logic.application.repository.i_vacant_course_repository import IVacantCourseRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -45,6 +48,25 @@ from osis_common.ddd import interface
 
 
 class AttributionAboutToExpireRenew(interface.DomainService):
+
+    @classmethod
+    def check_renew(
+            cls,
+            vacant_course: VacantCourse,
+            all_existing_applications: List[Application],
+            attribution_about_to_expire: Attribution
+    ):
+        execute_functions_and_aggregate_exceptions(
+            partial(_should_attribution_about_to_expire_with_volume, attribution_about_to_expire),
+            partial(_should_not_be_a_substitute, attribution_about_to_expire),
+            partial(
+                ApplyOnVacantCourse.check_apply,
+                vacant_course,
+                all_existing_applications,
+                attribution_about_to_expire.lecturing_volume,
+                attribution_about_to_expire.practical_volume
+            )
+        )
 
     @classmethod
     def get_list_with_renewal_availability(
@@ -132,7 +154,7 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             raise MultipleBusinessExceptions(exceptions={AttributionAboutToExpireFunctionException()})
         attribution_about_to_expire = attributions_filtered[0]
 
-        vacant_courses = vacant_course_repository.get(
+        vacant_course = vacant_course_repository.get(
             VacantCourseIdentity(
                 academic_year=AcademicYearIdentityBuilder.build_from_year(
                     year=application_calendar.authorized_target_year.year
@@ -141,11 +163,15 @@ class AttributionAboutToExpireRenew(interface.DomainService):
             )
         )
 
-        return ApplicationBuilder.build_from_attribution_about_to_expire(
-            applicant,
-            vacant_courses,
-            attribution_about_to_expire,
-            all_existing_applications
+        cls.check_renew(vacant_course, all_existing_applications, attribution_about_to_expire)
+        return Application(
+            entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
+            applicant_id=applicant.entity_id,
+            vacant_course_id=vacant_course.entity_id,
+            lecturing_volume=attribution_about_to_expire.lecturing_volume,
+            practical_volume=attribution_about_to_expire.practical_volume,
+            course_summary='',
+            remark=''
         )
 
 
@@ -178,11 +204,11 @@ def _get_unavailable_renewal_reason(
         return VacantCourseNotFound().message
 
     try:
-        RenewApplicationValidatorList(
-            vacant_course=vacant_course_next_year,
-            attribution_about_to_expire=attribution_about_to_expire,
-            all_existing_applications=all_existing_applications
-        ).validate()
+        AttributionAboutToExpireRenew.check_renew(
+            vacant_course_next_year,
+            all_existing_applications,
+            attribution_about_to_expire
+        )
     except MultipleBusinessExceptions as e:
         first_exception = next(iter(e.exceptions))
         return first_exception.message
@@ -190,3 +216,13 @@ def _get_unavailable_renewal_reason(
 
 def _get_vacant_course_by_code(code: str, vacant_courses: List[VacantCourse]):
     return next((vac_course for vac_course in vacant_courses if vac_course.code == code), None)
+
+
+def _should_attribution_about_to_expire_with_volume(attribution_about_to_expire: Attribution):
+    if not attribution_about_to_expire.practical_volume and not attribution_about_to_expire.lecturing_volume:
+        raise AttributionAboutToExpireWithoutVolumeException()
+
+
+def _should_not_be_a_substitute(attribution_about_to_expire: Attribution):
+    if attribution_about_to_expire.is_substitute:
+        raise AttributionSubstituteException()

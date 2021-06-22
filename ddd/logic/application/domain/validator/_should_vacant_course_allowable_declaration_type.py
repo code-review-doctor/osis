@@ -33,6 +33,9 @@ from ddd.logic.application.domain.validator.exceptions import VacantCourseNotAll
 
 @attr.s(frozen=True, slots=True)
 class ShouldVacantCourseAllowableDeclarationType(BusinessValidator):
+    """
+        Le cours est bien vacant (Au niveau métier) mais géré dans une procédure séparée
+    """
     vacant_course = attr.ib(type=VacantCourse)
 
     def validate(self, *args, **kwargs):

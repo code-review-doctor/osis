@@ -30,10 +30,7 @@ from ddd.logic.application.commands import ApplyOnVacantCourseCommand
 from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
 from ddd.logic.application.domain.model.applicant import Applicant
 from ddd.logic.application.domain.model.application import Application, ApplicationIdentity
-from ddd.logic.application.domain.model._attribution import Attribution
 from ddd.logic.application.domain.model.vacant_course import VacantCourse, VacantCourseIdentity
-from ddd.logic.application.domain.validator.validators_by_business_action import ApplyOnVacantCourseValidatorList, \
-    RenewApplicationValidatorList
 from ddd.logic.application.dtos import ApplicationFromRepositoryDTO
 from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
 from osis_common.ddd.interface import RootEntityBuilder
@@ -48,12 +45,6 @@ class ApplicationBuilder(RootEntityBuilder):
             cmd: ApplyOnVacantCourseCommand,
             all_existing_applications: List[Application]
     ) -> 'Application':
-        ApplyOnVacantCourseValidatorList(
-            command=cmd,
-            vacant_course=vacant_course,
-            all_existing_applications=all_existing_applications
-        ).validate()
-
         return Application(
             entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
             applicant_id=applicant.entity_id,
@@ -80,28 +71,4 @@ class ApplicationBuilder(RootEntityBuilder):
             practical_volume=dto.practical_volume,
             course_summary=dto.course_summary,
             remark=dto.remark
-        )
-
-    @classmethod
-    def build_from_attribution_about_to_expire(
-            cls,
-            applicant: Applicant,
-            vacant_course: VacantCourse,
-            attribution_about_to_expire: Attribution,
-            all_existing_applications: List[Application]
-    ):
-        RenewApplicationValidatorList(
-            vacant_course=vacant_course,
-            attribution_about_to_expire=attribution_about_to_expire,
-            all_existing_applications=all_existing_applications
-        ).validate()
-
-        return Application(
-            entity_id=ApplicationIdentity(uuid=uuid.uuid4()),
-            applicant_id=applicant.entity_id,
-            vacant_course_id=vacant_course.entity_id,
-            lecturing_volume=attribution_about_to_expire.lecturing_volume,
-            practical_volume=attribution_about_to_expire.practical_volume,
-            course_summary='',
-            remark=''
         )
