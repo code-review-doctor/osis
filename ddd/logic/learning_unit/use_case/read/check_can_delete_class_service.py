@@ -23,40 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import DeleteEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.service.effective_class_can_be_deleted import EffectiveClassCanBeDeleted
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-def delete_effective_class(
-        cmd: DeleteEffectiveClassCommand,
-        effective_class_repository: IEffectiveClassRepository,
-        learning_unit_repository: ILearningUnitRepository
-) -> EffectiveClassIdentity:
+def check_can_delete_effective_class(
+        cmd: 'CanDeleteEffectiveClassCommand',
+        effective_class_repository: 'IEffectiveClassRepository',
+        learning_unit_repository: 'ILearningUnitRepository'
+) -> None:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_code=cmd.learning_unit_code,
+        learning_unit_year=cmd.year
+    )
+    effective_class = effective_class_repository.get(entity_id=effective_class_identity)
 
-    # GIVEN
-    effective_class = effective_class_repository.get(
-        entity_id=EffectiveClassIdentityBuilder.build_from_command(
-            cmd
-        )
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.year
     )
-    learning_unit = learning_unit_repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+    learning_unit = learning_unit_repository.get(learning_unit_identity)
+
+    EffectiveClassCanBeDeleted().verify(
+        effective_class=effective_class,
+        learning_unit=learning_unit,
+        learning_unit_repository=learning_unit_repository,
+        effective_class_repository=effective_class_repository
     )
-    # WHEN
-    if effective_class:
-        EffectiveClassCanBeDeleted().verify(
-            effective_class=effective_class,
-            learning_unit=learning_unit,
-            learning_unit_repository=learning_unit_repository,
-            effective_class_repository=effective_class_repository
-        )
-    # THEN
-        effective_class_repository.delete(effective_class.entity_id)
-        return effective_class.entity_id
-    return None
+

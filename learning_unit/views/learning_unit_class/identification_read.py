@@ -37,6 +37,7 @@ from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
 from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
 from infrastructure.messages_bus import message_bus_instance
+from learning_unit.forms.classes.update import DeleteClassForm
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
@@ -62,7 +63,8 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                     message_bus_instance.invoke(
                         GetLanguageCommand(code_iso=learning_unit.language_id.code_iso)
                     ),  # type: Language
-                'teaching_place': get_teaching_place(effective_class.teaching_place)
+                'teaching_place': get_teaching_place(effective_class.teaching_place),
+                'form_delete': DeleteClassForm(effective_class=effective_class)
             }
         )
         return context

@@ -31,8 +31,9 @@ from osis_common.ddd import interface
 
 class EffectiveClassCanBeDeleted(interface.DomainService):
 
-    def validate(
-            self,
+    @classmethod
+    def verify(
+            cls,
             effective_class: 'EffectiveClass',
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'LearningUnitRepository',
