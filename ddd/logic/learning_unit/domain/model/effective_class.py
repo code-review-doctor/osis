@@ -30,6 +30,7 @@ import attr
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
@@ -61,12 +62,26 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     volumes = attr.ib(type=ClassVolumes)
 
     @property
+    def class_code(self):
+        return self.entity_id.class_code
+
+    @property
+    def learning_unit_identity(self):
+        return self.entity_id.learning_unit_identity
+
+    @property
     def complete_acronym(self):
         return "{}{}{}".format(
             self.entity_id.learning_unit_identity.code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
             self.entity_id.class_code
         )
+
+    def is_volume_first_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
+        return self.volumes.volume_first_quadrimester > volume
+
+    def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
+        return self.volumes.volume_second_quadrimester > volume
 
 
 class PracticalEffectiveClass(EffectiveClass):

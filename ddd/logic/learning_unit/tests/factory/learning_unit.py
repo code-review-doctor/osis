@@ -200,7 +200,8 @@ class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
         publication_en="Remark published"
     )
 
-    derogation_quadrimester = DerogationQuadrimester.Q1and2.name
+    derogation_quadrimester = DerogationQuadrimester.Q1and2
+    derogation_session = DerogationSession.DEROGATION_SESSION_1XX
 
     lecturing_part = _LecturingPartFactory(
         volumes=_VolumesFactory(

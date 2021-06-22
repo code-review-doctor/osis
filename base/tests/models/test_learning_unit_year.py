@@ -991,7 +991,7 @@ class LearningUnitYearCheckClassesVolumesWarnings(TestCase):
             messages[0],
             "{} ({}) ".format(
                 inconsistent_msg,
-                _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') % {
+                _('at least one class volume is greater than the volume of the LU (%(sub_type)s)') % {
                     'sub_type': self.lecturing_component.learning_unit_year.get_subtype_display().lower()
                 }
             )
@@ -1186,9 +1186,6 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
                          '(should be %(should_be_values)s)')
 
     def test_check_with_ue_quadrimester_q1(self):
-        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
-        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q1.name)
-
         luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1.value)
 
         component = LecturingLearningComponentYearFactory(
@@ -1196,7 +1193,7 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
         )
         effective_class = LearningClassYearFactory(
             learning_component_year=component,
-            quadrimester=random.choice(wrong_values)
+            quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1or2.value
         )
 
         messages = learning_unit_year._check_classes_quadrimester(
@@ -1207,9 +1204,6 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
         self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q1'))
 
     def test_check_with_ue_quadrimester_q2(self):
-        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
-        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q2.name)
-
         luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q2.value)
 
         component = LecturingLearningComponentYearFactory(
@@ -1217,7 +1211,7 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
         )
         effective_class = LearningClassYearFactory(
             learning_component_year=component,
-            quadrimester=random.choice(wrong_values)
+            quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1or2.value
         )
 
         messages = learning_unit_year._check_classes_quadrimester(
@@ -1228,9 +1222,6 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
         self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q2'))
 
     def test_check_with_ue_quadrimester_q3(self):
-        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
-        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q3.name)
-
         luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q3.value)
 
         component = LecturingLearningComponentYearFactory(
@@ -1238,13 +1229,14 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
         )
         effective_class = LearningClassYearFactory(
             learning_component_year=component,
-            quadrimester=random.choice(wrong_values)
+            quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1or2.value
         )
 
         messages = learning_unit_year._check_classes_quadrimester(
             luy.quadrimester,
             list(_get_components_with_classes())
         )
+
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q3'))
 

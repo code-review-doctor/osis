@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 13:49+0200\n"
+"POT-Creation-Date: 2021-06-21 11:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,6 +54,52 @@ msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr "Subdivision devrait être un caractère A-Z ou 0-9"
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+"La session de dérogation de %(code_class)s est incohérente avec celle de "
+"l'unité d'enseignement (la session de dérogation doit être "
+"%(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+"Le quadrimestre de %(code_class)s est incohérent avec celui de l'unité "
+"d'enseignement (le quadrimestre doit être %(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les volumes Q1 et Q2 doivent avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed but not both)"
+msgstr "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul le volume %(quadrimester)s doit avoir une "
+"valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume %(quadrimester)s doit avoir une "
+"valeur)"
+
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr "Le code %('ue_code')s - %(code)s existe déjà pour %(ue)s"
 
@@ -77,6 +123,9 @@ msgstr ""
 "La somme des volumes Q1 et Q2 doit être égale au volume annuel de l'unité "
 "d'enseignement ({}) "
 
+msgid "Volumes of {} are inconsistent"
+msgstr "Les volumes de {} sont incohérents"
+
 msgid ""
 "You cannot create a class on this learning unit because it is in proposal "
 "this year or in past."
@@ -92,3 +141,9 @@ msgstr ""
 "Vous ne pouvez pas créer une classe sur cette unité d'enseignement car le "
 "volume annuel du composant [PM ou à défaut PP] n'est pas supérieur à 0 et il "
 "n'y a pas de classe prévue."
+
+msgid "at least one class volume is greater than the volume of the LU"
+msgstr "au moins un des volumes de la classe est plus élevé que celui de l'unité d'enseignement"
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"

@@ -68,7 +68,7 @@
                                     </label>
                                     <br>
                                     <span class="text-muted">
-                                        {{ learning_unit.internship_subtype.value|default_if_none:'-' }}
+                                        {{ learning_unit.internship_subtype.value|default:'-' }}
                                     </span>
                                 </div>
                             {% endblock content_row1 %}

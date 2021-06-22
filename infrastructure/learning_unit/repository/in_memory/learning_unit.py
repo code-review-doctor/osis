@@ -47,6 +47,8 @@ class LearningUnitRepository(ILearningUnitRepository):
 
     @classmethod
     def save(cls, entity: 'LearningUnit') -> None:
+        if entity in cls.learning_units:
+            cls.learning_units.remove(entity)
         cls.learning_units.append(entity)
 
     @classmethod
