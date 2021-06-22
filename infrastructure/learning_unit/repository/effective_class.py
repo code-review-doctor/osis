@@ -114,10 +114,12 @@ class EffectiveClassRepository(IEffectiveClassRepository):
 
     @classmethod
     def get_tutor_assign_to_class(cls, effective_class: 'EffectiveClass') -> str:
+        entity_id = effective_class.entity_id
+        ue_identity = entity_id.learning_unit_identity
         results = AttributionClassDb.objects.filter(
-            learning_component_year__learning_unit_year__acronym=effective_class.entity_id.learning_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=effective_class.entity_id.learning_unit_identity.academic_year.year,
-            learning_class_year__acronym=effective_class.entity_id.code
+            learning_component_year__learning_unit_year__acronym=ue_identity.code,
+            learning_component_year__learning_unit_year__academic_year__year=ue_identity.academic_year.year,
+            learning_class_year__acronym=entity_id.code
         )
         if results:
             return results[0].attribution_charge.attribution.tutor.person.full_name
