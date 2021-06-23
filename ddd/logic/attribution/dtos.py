@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from decimal import Decimal
 from typing import List
 
 import attr
@@ -40,34 +41,34 @@ class AcademicYearDataDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class LearningUnitAttributionFromRepositoryDTO(DTO):
-    function = attr.ib(type=str)
-    attribution_uuid = attr.ib(type=str)
-    learning_unit_code = attr.ib(type=str)
-    learning_unit_year = attr.ib(type=int)
-    effective_classes = attr.ib(type=List[EffectiveClassFromRepositoryDTO])
-    attribution_volume = attr.ib(type=float)
-
-
-@attr.s(frozen=True, slots=True)
-class TutorSearchDTO(DTO):
-    last_name = attr.ib(type=str)
-    first_name = attr.ib(type=str)
-    personal_id_number = attr.ib(type=str)
-    attributions = attr.ib(type=List[LearningUnitAttributionFromRepositoryDTO])
-
-
-@attr.s(frozen=True, slots=True)
 class DistributedEffectiveClassesDTO(DTO):
     class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
+    distributed_volume = attr.ib(type=Decimal)
+    attribution_uuid = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class TutorSearchDTO(DTO):
+    personal_id_number = attr.ib(type=str)
+    distributed_classes = attr.ib(type=List[DistributedEffectiveClassesDTO])
 
 
 @attr.s(frozen=True, slots=True)
 class TutorAttributionToLearningUnitDTO(DTO):
+    attribution_uuid = attr.ib(type=str)
     last_name = attr.ib(type=str)
     first_name = attr.ib(type=str)
     personal_id_number = attr.ib(type=str)
     function = attr.ib(type=str)
-    attributed_volume_to_learning_unit = attr.ib(type=str)
+    attributed_volume_to_learning_unit = attr.ib(type=Decimal)
+
+
+@attr.s(frozen=True, slots=True)
+class TutorDTO(DTO):
+    attribution_uuid = attr.ib(type=str)
+    last_name = attr.ib(type=str)
+    first_name = attr.ib(type=str)
+    function = attr.ib(type=str)
+    distributed_volume_to_class = attr.ib(type=Decimal)

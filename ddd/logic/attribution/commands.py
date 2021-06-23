@@ -31,9 +31,16 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class SearchTutorAttributedToLearningUnitCommand(interface.CommandRequest):
+class SearchAttributionsToLearningUnitCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchTutorsDistributedToClassCommand(interface.CommandRequest):
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+    class_code = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

@@ -23,23 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
+from typing import List
 
-import attr
+from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.attribution.domain.service.class_distribution_with_attribution import ClassDistributionWithAttribution
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.attribution.dtos import TutorDTO
+from ddd.logic.attribution.repository.i_tutor import ITutorRepository
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 
-from ddd.logic.attribution.domain.model._learning_unit_attribution import AttributionIdentity
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from osis_common.ddd import interface
 
-
-@attr.s(slots=True, hash=False, eq=False)
-class ClassVolumeRepartition(interface.ValueObject):
-    effective_class = attr.ib(type=EffectiveClassIdentity)
-    distributed_volume = attr.ib(type=Decimal)
-    attribution = attr.ib(type=AttributionIdentity)
-
-    def __hash__(self):
-        return hash("{}{}".format(self.effective_class, self.attribution))
-
-    def __eq__(self, other):
-        return hash(self) == hash(other)
+# TODO :: unit test
+def search_tutors_distributed_to_class(
+        cmd: 'SearchTutorsDistributedToClassCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository'
+) -> List['TutorDTO']:
+    class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_year=cmd.learning_unit_year,
+        learning_unit_code=cmd.learning_unit_code,
+    )
+    return ClassDistributionWithAttribution().search_by_effective_class(
+        class_identity,
+        tutor_attribution_translator,
+        tutor_repository
+    )

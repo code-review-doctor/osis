@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
-from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
-from ddd.logic.attribution.use_case.read.search_tutors_attributed_to_learning_unit_service import \
-    search_tutors_attributed_to_learning_unit
+from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
+    SearchTutorsDistributedToClassCommand
+from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
+    search_attributions_to_learning_unit
+from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import search_tutors_distributed_to_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
@@ -43,6 +45,7 @@ from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_serv
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -76,12 +79,17 @@ class MessageBus:
         CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
-        SearchTutorAttributedToLearningUnitCommand: lambda cmd: search_tutors_attributed_to_learning_unit(
+        SearchAttributionsToLearningUnitCommand: lambda cmd: search_attributions_to_learning_unit(
             cmd,
-            TutorRepository()
+            TutorAttributionToLearningUnitTranslator(),
         ),
         GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
         GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
+        SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

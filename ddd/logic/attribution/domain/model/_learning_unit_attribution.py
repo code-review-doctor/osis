@@ -23,23 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 
 import attr
 
-from ddd.logic.attribution.domain.model._learning_unit_attribution import AttributionIdentity
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
-@attr.s(slots=True, hash=False, eq=False)
-class ClassVolumeRepartition(interface.ValueObject):
-    effective_class = attr.ib(type=EffectiveClassIdentity)
-    distributed_volume = attr.ib(type=Decimal)
-    attribution = attr.ib(type=AttributionIdentity)
-
-    def __hash__(self):
-        return hash("{}{}".format(self.effective_class, self.attribution))
-
-    def __eq__(self, other):
-        return hash(self) == hash(other)
+@attr.s(frozen=True, slots=True)
+class AttributionIdentity(interface.EntityIdentity):
+    uuid = attr.ib(type=str)

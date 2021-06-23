@@ -27,6 +27,7 @@ from abc import abstractmethod
 from typing import Optional, List
 
 from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
@@ -43,7 +44,8 @@ class ITutorRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['TutorIdentity']] = None,
-            learning_unit_identity: 'LearningUnitIdentity' = None
+            learning_unit_identity: 'LearningUnitIdentity' = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
     ) -> List['Tutor']:
         pass
 

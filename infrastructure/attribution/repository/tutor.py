@@ -23,16 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 from typing import List, Optional
 
-from django.db.models import F, QuerySet
+from django.db.models import F, QuerySet, Q
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
 from attribution.models.attribution_class import AttributionClass as AttributionClassDatabase
 from attribution.models.attribution_new import AttributionNew as AttributionNewDatabase
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
-from ddd.logic.attribution.dtos import TutorSearchDTO, LearningUnitAttributionFromRepositoryDTO, \
+from ddd.logic.attribution.dtos import TutorSearchDTO, \
     DistributedEffectiveClassesDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -44,166 +45,129 @@ class TutorRepository(ITutorRepository):
 
     @classmethod
     def delete(cls, entity_id: 'TutorIdentity', **kwargs: ApplicationService) -> None:
-        pass
+        raise NotImplementedError
 
     @classmethod
     def get(cls, entity_id: 'TutorIdentity') -> 'Tutor':
-        qs = _get_common_queryset().filter(
-            attribution__tutor__person__global_id=entity_id.personal_id_number
-        )
-        qs = _annotate_queryset(qs)
-        qs = _values_qs(qs)
-        attributions = [
-            LearningUnitAttributionFromRepositoryDTO(
-                function=attribution['attribution_function'],
-                attribution_uuid=attribution['attribution_uuid'],
-                learning_unit_code=attribution['learning_unit_code'],
-                learning_unit_year=attribution['learning_unit_year'],
-                effective_classes=cls._get_effective_classes(
-                    _get_effective_classes_queryset(
-                        attribution['learning_unit_code'],
-                        attribution['learning_unit_year']
-                    )
-                ),
-                attribution_volume=attribution['volume']
-            )
-            for attribution in qs
-        ]
-        data_dict = qs.get()
-        return TutorBuilder.build_from_repository_dto(
-            TutorSearchDTO(
-                last_name=data_dict['last_name'],
-                first_name=data_dict['first_name'],
-                personal_id_number=data_dict['personal_id_number'],
-                attributions=attributions
-            )
-        )
+        tutors = cls.search(entity_ids=[entity_id])
+        if tutors:
+            return tutors[0]
 
     @classmethod
     def search(
             cls,
             entity_ids: Optional[List['TutorIdentity']] = None,
-            learning_unit_identity: 'LearningUnitIdentity' = None
+            learning_unit_identity: 'LearningUnitIdentity' = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
     ) -> List['Tutor']:
-        qs = _get_common_queryset().filter(
-            learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
-        )
+
+        qs = _get_common_queryset()
+
+        if learning_unit_identity:
+            code = learning_unit_identity.code
+            year = learning_unit_identity.year
+            qs = qs.filter(
+                attribution_charge__learning_component_year__learning_unit_year__acronym=code,
+                attribution_charge__learning_component_year__learning_unit_year__academic_year__year=year,
+            )
+
+        if effective_class_identity:
+            learning_unit_code = effective_class_identity.learning_unit_identity.code
+            year = effective_class_identity.learning_unit_identity.year
+            qs = qs.filter(
+                learning_class_year__acronym=effective_class_identity.class_code,
+                learning_class_year__learning_component_year__learning_unit_year__acronym=learning_unit_code,
+                learning_class_year__learning_component_year__learning_unit_year__academic_year__year=year,
+            )
+
+        if entity_ids:
+            distinct_ids = {e.personal_id_number for e in entity_ids}
+            qs = qs.filter(attribution_charge__attribution__tutor__person__global_id__in=distinct_ids)
+
         qs = _annotate_queryset(qs)
         qs = _values_qs(qs).order_by(
-            'attribution__tutor__person__last_name',
-            'attribution__tutor__person__first_name'
-        )
+            'attribution_charge__attribution__tutor__person__last_name',
+            'attribution_charge__attribution__tutor__person__first_name'
+        )  # TODO :: unit test / deplacer dans Domainservice
+
         result = []
 
-        for data_dict in qs.values():
-            result.append(
-                TutorBuilder.build_from_repository_dto(
-                    TutorSearchDTO(
-                        last_name=data_dict['last_name'],
-                        first_name=data_dict['first_name'],
-                        personal_id_number=data_dict['personal_id_number'],
-                        attributions=[
-                            LearningUnitAttributionFromRepositoryDTO(
-                                function=data_dict['attribution_function'],
-                                attribution_uuid=data_dict['attribution_uuid'],
-                                learning_unit_code=learning_unit_identity.code,
-                                learning_unit_year=learning_unit_identity.year,
-                                effective_classes=cls._get_effective_classes(
-                                    _get_effective_classes_queryset(
-                                        learning_unit_identity.code,
-                                        learning_unit_identity.year
-                                    )
-                                ),
-                                attribution_volume=data_dict['volume']
-                            )
-                        ]
-                    )
+        classes_grouped_by_tutor = itertools.groupby(qs.values(), lambda obj: obj['personal_id_number'])
+        for personal_id_number, distributed_classes_as_dict in classes_grouped_by_tutor:
+            distributed_classes = [
+                DistributedEffectiveClassesDTO(
+                    class_code=distributed_class['class_code'],
+                    learning_unit_code=distributed_class['learning_unit_code'],
+                    learning_unit_year=distributed_class['learning_unit_year'],
+                    distributed_volume=distributed_class['volume'],
+                    attribution_uuid=distributed_class['attribution_uuid'],
+                )
+                for distributed_class in distributed_classes_as_dict
+            ]
+            tutor = TutorBuilder.build_from_repository_dto(
+                TutorSearchDTO(
+                    personal_id_number=personal_id_number,
+                    distributed_classes=distributed_classes
                 )
             )
+            result.append(tutor)
         return result
 
     @classmethod
-    def _get_effective_classes(cls, effective_classes: QuerySet) -> List['DistributedEffectiveClassesDTO']:
-        return [
-            DistributedEffectiveClassesDTO(**effective_class) for effective_class in effective_classes
-        ]
-
-    @classmethod
     def save(cls, entity: 'Tutor') -> None:
-        uuids = [attribution.entity_id.uuid for attribution in entity.attributions]
-        attributions_db = AttributionNewDatabase.objects.filter(
-            uuid__in=uuids
-        ).prefetch_related(
-            'attributionchargenew_set'
-        )
-        for attribution in entity.attributions:
-            attribution_db = attributions_db.get(uuid=attribution.entity_id.uuid)
-            for class_volume in attribution.distributed_effective_classes:
-                learning_class_year = LearningClassYearDatabase.objects.get(
-                    learning_component_year__learning_unit_year__acronym=attribution.learning_unit.code,
-                    learning_component_year__learning_unit_year__academic_year__year=attribution.learning_unit.year,
-                    acronym=class_volume.effective_class.class_code
-                )
+        for distributed_class in entity.distributed_effective_classes:
+            effective_class_identity = distributed_class.effective_class
+            learning_unit_identity = effective_class_identity.learning_unit_identity
+            learning_class_year = LearningClassYearDatabase.objects.get(
+                learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
+                learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
+                acronym=effective_class_identity.class_code
+            )
 
-                attribution_charge_id = attribution_db.attributionchargenew_set.filter(
-                    learning_component_year_id=learning_class_year.learning_component_year_id
-                ).values_list('pk', flat=True).get()
+            attribution_charge_id = AttributionChargeNewDatabase.objects.filter(
+                attribution__uuid=distributed_class.attribution.uuid,
+                learning_component_year_id=learning_class_year.learning_component_year_id,
+            ).values_list('pk', flat=True).get()
 
-                attribution_class, _ = AttributionClassDatabase.objects.update_or_create(
-                    attribution_charge_id=attribution_charge_id,
-                    learning_class_year=learning_class_year,
-                    defaults={
-                        'allocation_charge': class_volume.distributed_volume
-                    }
-                )
+            attribution_class, _ = AttributionClassDatabase.objects.update_or_create(
+                attribution_charge_id=attribution_charge_id,
+                learning_class_year=learning_class_year,
+                defaults={
+                    'allocation_charge': distributed_class.distributed_volume
+                }
+            )
 
-
-def _get_effective_classes_queryset(learning_unit_code: str, learning_unit_year: int) -> QuerySet:
-    return AttributionClassDatabase.objects.filter(
-        learning_class_year__learning_component_year__learning_unit_year__acronym=learning_unit_code,
-        learning_class_year__learning_component_year__learning_unit_year__academic_year__year=learning_unit_year
-    ).annotate(
-        class_code=F('learning_class_year__acronym'),
-        learning_unit_code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
-        learning_unit_year=F('learning_class_year__learning_component_year__learning_unit_year__academic_year__year'),
-    ).values(
-        'class_code',
-        'learning_unit_code',
-        'learning_unit_year',
-    )
+        persisted_tutor = cls.get(entity_id=entity.entity_id)
+        if persisted_tutor:
+            to_remove = set(persisted_tutor.distributed_effective_classes) - set(entity.distributed_effective_classes)
+            for distributed_class in to_remove:
+                _get_common_queryset().filter(
+                    attribution_charge__attribution__uuid=distributed_class.attribution.uuid,
+                    learning_class_year__acronym=distributed_class.effective_class.class_code,
+                ).delete()
 
 
 def _get_common_queryset() -> QuerySet:
-    return AttributionChargeNewDatabase.objects.all().select_related(
-        'learning_component_year__learning_unit_year',
-        'learning_component_year__learning_unit_year__academic_year',
-        'attribution',
-        'attribution__tutor__person'
-    )
+    return AttributionClassDatabase.objects.all()
 
 
 def _annotate_queryset(qs: QuerySet) -> QuerySet:
     return qs.annotate(
-        last_name=F('attribution__tutor__person__last_name'),
-        first_name=F('attribution__tutor__person__first_name'),
-        attribution_function=F('attribution__function'),
-        personal_id_number=F('attribution__tutor__person__global_id'),
-        attribution_uuid=F('attribution__uuid'),
+        personal_id_number=F('attribution_charge__attribution__tutor__person__global_id'),
+        attribution_uuid=F('attribution_charge__attribution__uuid'),
         volume=F('allocation_charge'),
-        learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
-        learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year')
+        learning_unit_code=F('attribution_charge__learning_component_year__learning_unit_year__acronym'),
+        learning_unit_year=F('attribution_charge__learning_component_year__learning_unit_year__academic_year__year'),
+        class_code=F('learning_class_year__acronym'),
     )
 
 
 def _values_qs(qs: QuerySet) -> QuerySet:
     return qs.values(
-        "last_name",
-        "first_name",
-        "attribution_function",
         "personal_id_number",
         "attribution_uuid",
         "volume",
         'learning_unit_code',
-        'learning_unit_year'
+        'learning_unit_year',
+        'class_code',
     )
