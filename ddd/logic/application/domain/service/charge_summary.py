@@ -53,6 +53,8 @@ class ApplicantAttributionChargeSummary(interface.DomainService):
             attribution for attribution in applicant.attributions
             if attribution.course_id.academic_year == application_calendar.authorized_target_year
         ]
+        if not current_attribution:
+            return []
 
         vacant_courses_ids = [
             VacantCourseIdentity(
