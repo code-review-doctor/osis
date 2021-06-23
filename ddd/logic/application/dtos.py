@@ -106,14 +106,14 @@ class ApplicationByApplicantDTO(DTO):
     lecturing_volume_available = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
     practical_volume_available = attr.ib(type=Decimal)
-    remark = attr.ib(type=str)
-    course_summary = attr.ib(type=str)
+    remark = attr.ib(type=str, converter=lambda value: value or '')
+    course_summary = attr.ib(type=str, converter=lambda value: value or '')
 
 
 @attr.s(frozen=True, slots=True)
 class TutorAttributionDTO(DTO):
-    first_name = attr.ib(type=str)
-    last_name = attr.ib(type=str)
+    first_name = attr.ib(type=str, converter=lambda value: value or '')
+    last_name = attr.ib(type=str, converter=lambda value: value or '')
     function = attr.ib(type=Functions)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
