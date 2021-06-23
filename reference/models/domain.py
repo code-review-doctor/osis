@@ -25,18 +25,18 @@
 ##############################################################################
 from django.db import models
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models import osis_model_admin
 from reference.models.enums import domain_type
 
 
-class DomainAdmin(SerializableModelAdmin):
+class DomainAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('code', 'name', 'parent', 'decree', 'type', )
     fieldsets = ((None, {'fields': ('code', 'name', 'parent', 'decree', 'type')}),)
     list_filter = ('type', 'national', 'adhoc')
     search_fields = ['code', 'name']
 
 
-class Domain(SerializableModel):
+class Domain(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
