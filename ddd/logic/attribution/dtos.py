@@ -66,7 +66,7 @@ class TutorAttributionToLearningUnitDTO(DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class TutorDTO(DTO):
+class TutorClassRepartitionDTO(DTO):
     attribution_uuid = attr.ib(type=str)
     last_name = attr.ib(type=str)
     first_name = attr.ib(type=str)

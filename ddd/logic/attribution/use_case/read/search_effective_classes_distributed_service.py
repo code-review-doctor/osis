@@ -28,7 +28,7 @@ from typing import List
 from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.attribution.domain.service.class_distribution_with_attribution import ClassDistributionWithAttribution
 from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
-from ddd.logic.attribution.dtos import TutorDTO
+from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 
@@ -38,7 +38,7 @@ def search_tutors_distributed_to_class(
         cmd: 'SearchTutorsDistributedToClassCommand',
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
         tutor_repository: 'ITutorRepository'
-) -> List['TutorDTO']:
+) -> List['TutorClassRepartitionDTO']:
     class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
         class_code=cmd.class_code,
         learning_unit_year=cmd.learning_unit_year,

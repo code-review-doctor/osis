@@ -27,7 +27,7 @@ import itertools
 from typing import List
 
 from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorDTO
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
@@ -41,7 +41,7 @@ class ClassDistributionWithAttribution(interface.DomainService):
             effective_class_identity: 'EffectiveClassIdentity',
             tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
             tutor_repository: 'ITutorRepository'
-    ) -> List['TutorDTO']:
+    ) -> List['TutorClassRepartitionDTO']:
         attributions = tutor_attribution_translator.search_attributions_to_learning_unit(
             effective_class_identity.learning_unit_identity
         )
@@ -53,7 +53,7 @@ class ClassDistributionWithAttribution(interface.DomainService):
                     att for att in attributions if att.attribution_uuid == effective_class.attribution.uuid
                 )
                 result.append(
-                    TutorDTO(
+                    TutorClassRepartitionDTO(
                         attribution_uuid=effective_class.attribution.id,
                         last_name=attribution.last_name,
                         first_name=attribution.first_name.id,

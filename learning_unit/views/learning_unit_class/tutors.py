@@ -31,7 +31,7 @@ from django.views.generic import TemplateView
 
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorDTO
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 
@@ -72,7 +72,7 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
         )
 
     @cached_property
-    def tutors(self) -> List['TutorDTO']:
+    def tutors(self) -> List['TutorClassRepartitionDTO']:
         command = SearchTutorsDistributedToClassCommand(
             learning_unit_code=self.learning_unit_code,
             learning_unit_year=self.learning_unit_year,
