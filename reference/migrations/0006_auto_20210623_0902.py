@@ -16,9 +16,5 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='decree',
             name='uuid',
-        ),
-        migrations.RemoveField(
-            model_name='domain',
-            name='uuid',
-        ),
+        )
     ]

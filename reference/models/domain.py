@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from django.db import models
 
 from osis_common.models import osis_model_admin
@@ -37,6 +39,7 @@ class DomainAdmin(osis_model_admin.OsisModelAdmin):
 
 
 class Domain(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
