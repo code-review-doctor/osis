@@ -311,12 +311,6 @@ msgstr ""
 msgid "Volume Q2"
 msgstr ""
 
-msgid "Title in English"
-msgstr ""
-
-msgid "Title in French"
-msgstr ""
-
 msgid "You are not allowed to create proposal during this academic year"
 msgstr ""
 
