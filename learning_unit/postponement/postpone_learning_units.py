@@ -30,10 +30,14 @@ from django.db.models import OuterRef, Max, Subquery, Exists, Model
 
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
+from base.models.learning_achievement import LearningAchievement
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.teaching_material import TeachingMaterial
+from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
 
 
 class PostponeLearningUnits:
@@ -65,7 +69,7 @@ class PostponeLearningUnits:
 
         qs = LearningContainerYear.objects.filter(
             academic_year__year=Subquery(last_occurence_qs[:1]),
-            acronym='LSINF1311'
+            acronym='LINFO2335'
         ).annotate(
             is_mobility=Exists(is_mobility_qs)
         ).exclude(
@@ -90,12 +94,31 @@ class PostponeLearningUnits:
                 create_learning_unit_year_from_template(luy, for_year)
 
                 self.produce_components(luy, for_year)
+                self.produce_teaching_materials(luy, for_year)
+                self.produce_learning_achievements(luy, for_year)
+                self.produce_cms(luy, for_year)
                 if luy.is_external():
                     self.produce_external_learnig_unit_year(luy, for_year)
 
     def produce_components(self, from_luy: LearningUnitYear, for_year: int):
         for component in from_luy.learningcomponentyear_set.all():
             create_component_year_from_template(component, for_year)
+
+    def produce_teaching_materials(self, from_luy: LearningUnitYear, for_year: int):
+        for material in from_luy.teachingmaterial_set.all():
+            create_teaching_material_from_template(material, for_year)
+
+    def produce_learning_achievements(self, from_luy: LearningUnitYear, for_year: int):
+        for achievement in from_luy.learningachievement_set.all():
+            create_learning_achievement_from_template(achievement, for_year)
+
+    def produce_cms(self, from_luy: LearningUnitYear, for_year: int):
+        cms_query = TranslatedText.objects.filter(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=from_luy.id
+        )
+        for cms in cms_query:
+            create_cms_from_template(cms, for_year)
 
     def produce_external_learnig_unit_year(self, from_luy: LearningUnitYear, for_year: int):
         external_learning_unit_year = from_luy.externallearningunityear
@@ -166,6 +189,45 @@ def create_component_year_from_template(
     field_values = get_fields_values(template_component_year)
     field_values['learning_unit_year_id'] = luy.id
     return LearningComponentYear.objects.create(**field_values)
+
+
+def create_teaching_material_from_template(
+        template_teaching_material: TeachingMaterial,
+        to_year: int
+) -> TeachingMaterial:
+    luy = LearningUnitYear.objects.get(
+        learning_unit=template_teaching_material.learning_unit_year.learning_unit,
+        academic_year__year=to_year
+    )
+    field_values = get_fields_values(template_teaching_material)
+    field_values['learning_unit_year_id'] = luy.id
+    return TeachingMaterial.objects.create(**field_values)
+
+
+def create_learning_achievement_from_template(
+        template_achievement: LearningAchievement,
+        to_year: int
+) -> LearningAchievement:
+    luy = LearningUnitYear.objects.get(
+        learning_unit=template_achievement.learning_unit_year.learning_unit,
+        academic_year__year=to_year
+    )
+    field_values = get_fields_values(template_achievement)
+    field_values['learning_unit_year_id'] = luy.id
+    return LearningAchievement.objects.create(**field_values)
+
+
+def create_cms_from_template(
+        template_cms: TranslatedText,
+        to_year: int
+) -> TranslatedText:
+    luy = LearningUnitYear.objects.get(
+        learning_unit__learningunityear__id=template_cms.reference,
+        academic_year__year=to_year
+    )
+    field_values = get_fields_values(template_cms)
+    field_values['reference'] = luy.id
+    return TranslatedText.objects.create(**field_values)
 
 
 def get_fields_values(model_obj: Model) -> dict:
