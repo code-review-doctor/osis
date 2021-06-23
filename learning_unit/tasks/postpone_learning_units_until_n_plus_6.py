@@ -29,6 +29,5 @@ from learning_unit.postponement import postpone_learning_units
 
 @celery_app.task
 def run() -> dict:
-    result = postpone_learning_units.postpone_learning_units_until_n_plus_6(2020)
-    print(result)
+    result = postpone_learning_units.PostponeLearningUnits().postpone()
     return {}
