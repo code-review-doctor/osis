@@ -35,10 +35,9 @@ from django.views.generic import FormView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages, display_error_messages
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand, \
+from ddd.logic.learning_unit.commands import GetEffectiveClassCommand, \
     CanDeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.update import DeleteClassForm
 
@@ -59,12 +58,6 @@ class DeleteClassView(PermissionRequiredMixin, FormView):
     @cached_property
     def class_code(self) -> int:
         return self.kwargs['class_code']
-
-    @cached_property
-    def learning_unit(self) -> 'LearningUnit':
-        return message_bus_instance.invoke(
-            GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
-        )
 
     @cached_property
     def effective_class(self) -> 'EffectiveClass':

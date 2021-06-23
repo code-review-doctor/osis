@@ -24,29 +24,36 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.domain.service.class_has_attribution import ClassHasAttribution
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
 
-class EffectiveClassCanBeDeleted(interface.DomainService):
+class CanEffectiveClassBeDeleted(interface.DomainService):
 
     @classmethod
     def verify(
             cls,
             effective_class: 'EffectiveClass',
             learning_unit: 'LearningUnit',
-            learning_unit_repository: 'LearningUnitRepository',
-            effective_class_repository: 'EffectiveClassRepository'
+            learning_unit_repository: 'ILearningUnitRepository'
     ):
         exceptions = set()  # type Set[BusinessException]
         if learning_unit_repository.has_enrollments(learning_unit):
             exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
-        tutor_assign_to_class = effective_class_repository.get_tutor_assign_to_class(effective_class)
+        tutor_assign_to_class = ClassHasAttribution.get_first_tutor_full_name_if_exists(effective_class.entity_id)
         if tutor_assign_to_class:
-            exceptions.add(EffectiveClassHasTutorAssignedException(effective_class=effective_class,
-                                                                   tutor_full_name=tutor_assign_to_class))
+            exceptions.add(
+                EffectiveClassHasTutorAssignedException(
+                    effective_class=effective_class,
+                    tutor_full_name=tutor_assign_to_class
+                )
+            )
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
