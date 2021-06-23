@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.learning_unit.domain.service.effective_class_can_be_deleted import EffectiveClassCanBeDeleted
-
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.commands import CanDeleteEffectiveClassCommand
+from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
@@ -48,9 +49,8 @@ def check_can_delete_effective_class(
     )
     learning_unit = learning_unit_repository.get(learning_unit_identity)
 
-    EffectiveClassCanBeDeleted().verify(
+    CanEffectiveClassBeDeleted().verify(
         effective_class=effective_class,
         learning_unit=learning_unit,
         learning_unit_repository=learning_unit_repository,
     )
-

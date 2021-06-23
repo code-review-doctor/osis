@@ -25,6 +25,7 @@
 ##############################################################################
 
 import attr
+import mock
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -112,9 +113,11 @@ class DeleteEffectiveClassService(SimpleTestCase):
 
         self.assertEqual(list(exceptions)[0].message, _("Class of learning unit having enrollment can't be delete"))
 
-    def test_should_raise_EffectiveClassHasTutorAssignedException(self):
+    @mock.patch('ddd.logic.learning_unit.domain.service.class_has_attribution.ClassHasAttribution.get_first_tutor_'
+                'full_name_if_exists')
+    def test_should_raise_EffectiveClassHasTutorAssignedException(self, mock_can_delete):
         tutor_full_name = 'Martin tom'
-        self.effective_class_repository.get_tutor_assign_to_class = lambda *args, **kwargs: tutor_full_name
+        mock_can_delete.return_value = tutor_full_name
 
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
