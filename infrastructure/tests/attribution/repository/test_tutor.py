@@ -28,16 +28,12 @@ from decimal import Decimal
 from django.test import TestCase
 
 from attribution.models.attribution_class import AttributionClass
-from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_class import AttributionClassFactory
-from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.tests.factory.tutor import TutorWithAttributionAndDistributedEffectiveClassesFactory
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -60,6 +56,19 @@ class TutorRepositoryTestCase(TestCase):
         )
         results = self.tutor_repository.search(learning_unit_identity=entity_id)
         self.assertEqual(len(results), 0)
+
+    def test_should_filter_on_effective_class(self):
+        # self.tutor_repository.search(effective_class_identity=...)
+        raise NotImplementedError  # TODO
+
+    def test_should_filter_on_learning_unit(self):
+        # TODO :: à supprimer si pas utilisé
+        # self.tutor_repository.search(learning_unit_identity=...)
+        raise NotImplementedError  # TODO
+
+    def test_should_filter_on_list_of_tutor_identities(self):
+        # self.tutor_repository.search(entity_ids=[...])
+        raise NotImplementedError  # TODO
 
     def test_should_correctly_map_tutor_aggregate_to_database_fields(self):
         tutor_to_persist = TutorWithAttributionAndDistributedEffectiveClassesFactory()
