@@ -23,15 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import attr
+
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class Entity(interface.ValueObject):
-    def __init__(self, acronym: str):
-        self.acronym = acronym
-
-    def __eq__(self, other):
-        return self.acronym == other.acronym
-
-    def __hash__(self):
-        return hash(self.acronym)
+    acronym = attr.ib(type=str)

@@ -31,6 +31,7 @@ import factory.fuzzy
 from base.models.enums import learning_unit_year_session, quadrimesters
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from continuing_education.tests.utils.utils import get_enum_keys
 
 
 class LearningClassYearFactory(factory.django.DjangoModelFactory):
@@ -40,6 +41,7 @@ class LearningClassYearFactory(factory.django.DjangoModelFactory):
     learning_component_year = factory.SubFactory(LearningComponentYearFactory)
     acronym = factory.fuzzy.FuzzyText(length=1,
                                       chars=string.ascii_uppercase + string.digits)
+
     hourly_volume_partial_q1 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
     hourly_volume_partial_q2 = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))

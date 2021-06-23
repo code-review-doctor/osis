@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-07 12:11+0200\n"
+"POT-Creation-Date: 2021-05-25 14:34+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -906,6 +906,9 @@ msgstr "Méthodes d'enseignement"
 
 msgid "Teaching methods (force majeure)"
 msgstr "Méthodes d'enseignement (force majeure)"
+
+msgid "The Code {} is invalid"
+msgstr "Le code {} est invalide."
 
 #, python-format
 msgid ""

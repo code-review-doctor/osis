@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 09:24+0200\n"
+"POT-Creation-Date: 2021-03-25 14:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,6 +80,9 @@ msgid "Deputy"
 msgstr ""
 
 msgid "Deputy authority"
+msgstr ""
+
+msgid "Deputy disease or maternity"
 msgstr ""
 
 msgid "Deputy sabbatical"
@@ -171,6 +173,9 @@ msgstr ""
 msgid "Part-time teaching supply"
 msgstr ""
 
+msgid "Please precise at least a faculty or a code (or a part of a code)"
+msgstr ""
+
 msgid "Practical exercises"
 msgstr ""
 
@@ -178,12 +183,6 @@ msgid "Professor"
 msgstr ""
 
 msgid "Program modification"
-msgstr ""
-
-msgid "Publish application to portal"
-msgstr ""
-
-msgid "Publish attribution to portal"
 msgstr ""
 
 #, python-format

@@ -3,29 +3,30 @@
 {% load learning_unit %}
 {% load components_classes %}
 {% load waffle_tags %}
+{% load osis_role %}
 
 {% comment "License" %}
-* OSIS stands for Open Student Information System. It's an application
-* designed to manage the core business of higher education institutions,
-* such as universities, faculties, institutes and professional schools.
-* The core business involves the administration of students, teachers,
-* courses, programs and so on.
-*
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* A copy of this license - GNU General Public License - is available
-* at the root of the source code of this program.  If not,
-* see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block action_top %}
@@ -98,7 +99,8 @@
                     {% endif %}
                 </td>
                 <td>{{ component.learning_component_year.learning_unit_year.acronym }}</td>
-                <td>{{ component.learning_component_year.learning_unit_year.learning_container_year.common_title }} - {{ component.learning_component_year.learning_unit_year.specific_title | default_if_none:'' }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.learning_container_year.common_title }} -
+                    {{ component.learning_component_year.learning_unit_year.specific_title | default_if_none:'' }}</td>
                 <td>{% if component.learning_component_year.type %}
                     {{ component.learning_component_year.get_type_display }}
                 {% endif %}
@@ -112,9 +114,10 @@
                 <td>{% dl_component_tooltip 'VOLUME_TOTAL' value=component.volumes.VOLUME_TOTAL default_if_none='' %}</td>
 
                 <td>
-                     {# FIXME :: Temporary solution - Waiting for real classes in OSIS #}
+                    {# FIXME :: Temporary solution - Waiting for real classes in OSIS #}
                     {% with component.learning_component_year.real_classes as real_classes %}
-                        <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:real_classes }}">
+                        <span class="badge fixed_width
+                                {{ component.learning_component_year.planned_classes |get_css_class:real_classes }}">
                                     {% if component.learning_component_year.planned_classes > 0 and real_classes == 0 %}
                                         1
                                     {% else %} {{ real_classes| default_if_none:'0' }}{% endif %} /
@@ -134,6 +137,7 @@
             </tr>
             {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
+                    {% url 'class_identification' learning_unit_year.academic_year.year learning_unit_year.acronym learning_class_year.acronym as class_identification_url %}
                     <tr class="class_year collapse collapse_classes{{ component_number }} in">
                         {% if forloop.first %}
                             <td><strong>{% trans 'Classes' %}</strong></td>
@@ -141,9 +145,12 @@
                             <td></td>
                         {% endif %}
                         <td colspan="1">
-                            {{ learning_class_year.used_by_learning_units_year }}
-                                    {% if  component.learning_component_year.type == 'LECTURING' %}-{% else %}
-                                        _{% endif %}{{ learning_class_year.acronym }}
+                            {% a_tag_has_perm class_identification_url learning_class_year.used_by_learning_units_year 'learning_unit.view_learningclassyear' user %}
+                        </td>
+                        <td colspan="2">
+                            {% with "/ "|add:component.learning_component_year.type_letter_acronym|add:" - "|add:learning_class_year.acronym as class_code %}
+                                {% a_tag_has_perm class_identification_url class_code 'learning_unit.view_learningclassyear' user %}
+                            {% endwith %}
                         </td>
                         <td>
                             {{ learning_class_year.title_fr }}

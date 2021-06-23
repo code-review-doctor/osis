@@ -39,5 +39,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_summary_submission_calendars, reverse_migration),
+        migrations.RunPython(update_summary_submission_calendars, reverse_migration, elidable=True),
     ]

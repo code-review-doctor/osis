@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from typing import List
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -45,7 +46,7 @@ from base.business.learning_units.session_strategy import SESSION_CHECK_RULES
 from base.models import entity_version
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
-from base.models.enums import active_status, learning_container_year_types
+from base.models.enums import active_status, learning_container_year_types, learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
 from base.models.enums.component_type import PRACTICAL_EXERCISES
@@ -55,10 +56,9 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, 
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -143,6 +143,12 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class LearningUnitYearQuerySet(SerializableQuerySet):
+    def annotate_volume_total(self):
+        return self.annotate_volume_total_class_method(self)
+
+    def annotate_volume_vacant_available(self):
+        return self.annotate_volume_vacant_available_class_method(self)
+
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
 
@@ -204,6 +210,78 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
     def annotate_entities_allocation_and_requirement_acronym(cls, queryset):
         return cls.annotate_entity_allocation_acronym(
             cls.annotate_entity_requirement_acronym(queryset)
+        )
+
+    @classmethod
+    def annotate_volume_total_class_method(cls, queryset):
+        subqs_volume_total = LearningComponentYear.objects.filter(
+            learning_unit_year_id=OuterRef('pk')
+        ).annotate(
+            hourly_volume_total_annual_casted=Case(
+                When(hourly_volume_total_annual__isnull=True, then=Decimal(0.0)),
+                default=F('hourly_volume_total_annual'),
+                output_field=fields.DecimalField()
+            )
+        ).values('hourly_volume_total_annual_casted')
+
+        return queryset.annotate(
+            lecturing_volume_total=Subquery(
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
+            ),
+            practical_volume_total=Subquery(
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume_total=Case(
+                When(lecturing_volume_total__isnull=False, then='lecturing_volume_total'),
+                default=Decimal(0.0)
+            ),
+            practical_volume_total=Case(
+                When(practical_volume_total__isnull=False, then='practical_volume_total'),
+                default=Decimal(0.0)
+            ),
+        )
+
+    @classmethod
+    def annotate_volume_vacant_available_class_method(cls, queryset):
+        subqs_volume_declared_vacant = LearningComponentYear.objects.filter(
+            learning_unit_year_id=OuterRef('pk')
+        ).annotate(
+            volume_declared_vacant_casted=Case(
+                When(volume_declared_vacant__isnull=True, then=Decimal(0.0)),
+                default=F('volume_declared_vacant'),
+                output_field=fields.DecimalField()
+            )
+        ).values('volume_declared_vacant_casted')
+
+        return queryset.annotate(
+            lecturing_volume_available=Subquery(
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
+            ),
+            practical_volume_available=Subquery(
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume_available=Case(
+                When(lecturing_volume_available__isnull=False, then='lecturing_volume_available'),
+                default=Decimal(0.0)
+            ),
+            practical_volume_available=Case(
+                When(practical_volume_available__isnull=False, then='practical_volume_available'),
+                default=Decimal(0.0)
+            ),
         )
 
 
@@ -574,6 +652,12 @@ class LearningUnitYear(SerializableModel):
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
 
+    def has_class_this_year_or_in_future(self):
+        return LearningClassYear.objects.filter(
+            learning_component_year__learning_unit_year__learning_unit=self.learning_unit,
+            learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year
+        ).exists()
+
     def _check_classes(self, all_components: List[LearningComponentYear]) -> List[str]:
         _warnings = []
         _warnings.extend(_check_classes_volumes(all_components))
@@ -849,4 +933,7 @@ def toggle_summary_locked(learning_unit_year_id):
 
 @receiver(post_delete, sender=LearningUnitYear)
 def _learningunityear_delete(sender, instance, **kwargs):
+    # local import because it blocks check_all_app_messages command otherwise
+    from cms.enums.entity_name import LEARNING_UNIT_YEAR
+    from cms.models.translated_text import TranslatedText
     TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()

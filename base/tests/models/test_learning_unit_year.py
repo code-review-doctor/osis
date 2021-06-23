@@ -1372,3 +1372,22 @@ def _build_effective_classes(component: LearningComponentYear, number_of_occuren
     factories = []
     for cpt in range(number_of_occurence):
         factories.append(LearningClassYearFactory(learning_component_year=component))
+
+
+class LearningUnitYearAndClassTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        luy_class = LearningClassYearFactory()
+        cls.learning_unit_year_with_class = luy_class.learning_component_year.learning_unit_year
+        cls.luy_without_class = LearningUnitYearFactory()
+
+    def test_has_class_this_year(self):
+        self.assertTrue(self.learning_unit_year_with_class.has_class_this_year_or_in_future())
+        self.assertFalse(self.luy_without_class.has_class_this_year_or_in_future())
+
+    def test_has_class_in_future(self):
+        luy_this_year = LearningUnitYearFactory()
+        next_year = AcademicYearFactory(year=luy_this_year.academic_year.year + 1)
+        luy_in_future = LearningUnitYearFactory(learning_unit=luy_this_year.learning_unit, academic_year=next_year)
+        LearningClassYearFactory(learning_component_year__learning_unit_year=luy_in_future)
+        self.assertTrue(luy_this_year.has_class_this_year_or_in_future())

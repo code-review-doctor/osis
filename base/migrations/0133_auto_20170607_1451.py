@@ -24,7 +24,8 @@ class Migration(migrations.Migration):
                 END LOOP;
             END;
             $$ language 'plpgsql';
-            """
+            """,
+            elidable=True
         ),
         migrations.AlterField(
             model_name='academiccalendar',

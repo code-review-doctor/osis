@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         # Remove all groupelementyear because it implements OrderModels
-        migrations.RunSQL("DELETE FROM base_groupelementyear;"),
+        migrations.RunSQL("DELETE FROM base_groupelementyear;", elidable=True),
         migrations.AlterModelOptions(
             name='groupelementyear',
             options={'ordering': ('order',)},

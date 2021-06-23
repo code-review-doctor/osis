@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-28 09:24+0200\n"
+"POT-Creation-Date: 2021-06-22 10:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -81,6 +81,9 @@ msgstr "Suppléant"
 
 msgid "Deputy authority"
 msgstr "Suppléant d'autorité"
+
+msgid "Deputy disease or maternity"
+msgstr "Suppléant maladie/maternité"
 
 msgid "Deputy sabbatical"
 msgstr "Suppléant sabbatique"
@@ -178,6 +181,11 @@ msgstr ""
 msgid "Part-time teaching supply"
 msgstr "Suppléance partielle"
 
+msgid "Please precise at least a faculty or a code (or a part of a code)"
+msgstr ""
+"Veuillez au minimum sélectionner une faculté ou introduire un code (complet "
+"ou partiel)"
+
 msgid "Practical exercises"
 msgstr "Partie pratique"
 
@@ -186,12 +194,6 @@ msgstr "Professeur"
 
 msgid "Program modification"
 msgstr "Modification de programme"
-
-msgid "Publish application to portal"
-msgstr "Publier la candidature sur portal"
-
-msgid "Publish attribution to portal"
-msgstr "Publier l'attribution sur portal"
 
 #, python-format
 msgid "Repartition added for %(tutor)s (%(function)s)"

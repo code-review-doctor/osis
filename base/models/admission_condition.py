@@ -105,8 +105,8 @@ class AdmissionConditionAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
 
 ACCESS_REQUIREMENTS_ACCESSES = [
     ('-', '-'),
-    ('on_the_file', _('On the file: direct access or access with additional training')),
     ('direct_access', _('Direct Access')),
+    ('on_the_file', _('Access based on application')),
     ('access_with_training', _('Access with additional training')),
 ]
 

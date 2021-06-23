@@ -26,13 +26,15 @@
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.enums import quadrimesters, learning_unit_year_session
 from base.models.enums.component_type import LECTURING
+from base.models.enums import quadrimesters, learning_unit_year_session
 from osis_common.models import osis_model_admin
 
 
-class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
+class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     list_display = ('learning_component_year', 'acronym')
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
 
@@ -57,10 +59,9 @@ class LearningClassYear(models.Model):
         on_delete=models.CASCADE
     )
     acronym = models.CharField(max_length=1, validators=[only_alphanumeric_validator])
-    description = models.CharField(max_length=100, blank=True)  # FIXME: to delete when classes development finished
 
     title_fr = models.CharField(max_length=255, blank=True, verbose_name=_('Title in French'))
-    title_en = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Title in English'))
+    title_en = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Title in English'))
 
     hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
                                                    verbose_name=_("hourly volume partial q1"))

@@ -23,6 +23,7 @@ from learning_unit.calendar.learning_unit_summary_edition_calendar import Learni
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
 
+
 FACULTY_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.COURSE,
     LearningContainerYearType.DISSERTATION,
@@ -35,6 +36,15 @@ FACULTY_DATE_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.MASTER_THESIS,
     LearningContainerYearType.EXTERNAL
 )
+
+CONTAINER_TYPES_TO_CREATE_CLASS = [
+    LearningContainerYearType.COURSE,
+    LearningContainerYearType.INTERNSHIP,
+    LearningContainerYearType.DISSERTATION,
+    LearningContainerYearType.OTHER_COLLECTIVE,
+    LearningContainerYearType.OTHER_INDIVIDUAL,
+    LearningContainerYearType.MASTER_THESIS,
+]
 
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
 
@@ -380,13 +390,25 @@ def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application this year or in the future"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_application_now_and_in_future(self, user, learning_unit_year):
+    if learning_unit_year and learning_unit_year.is_full():
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not TutorApplication.objects.filter(
+            learning_container_year__learning_container=learning_container,
+            learning_container_year__academic_year__year__gte=learning_unit_year.academic_year.year
+        ).exists()
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("This learning unit has application"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_application_all_years(self, user, learning_unit_year):
     if learning_unit_year and learning_unit_year.is_full():
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not TutorApplication.objects.filter(
-            learning_container_year__learning_container=learning_container
+            learning_container_year__learning_container=learning_container,
         ).exists()
 
 
@@ -469,6 +491,19 @@ def has_learning_unit_no_attribution_this_year(self, user, learning_unit_year):
         learning_container_year = learning_unit_year.learning_container_year
         return not AttributionChargeNew.objects.filter(
             learning_component_year__learning_unit_year__learning_container_year=learning_container_year
+        ).exists()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has attribution this year or in the future"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_attribution_now_and_future(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not AttributionChargeNew.objects.filter(
+            learning_component_year__learning_unit_year__learning_container_year__learning_container=learning_container,
+            learning_component_year__learning_unit_year__academic_year__year__gte=learning_unit_year.academic_year.year
         ).exists()
     return None
 
