@@ -44,8 +44,8 @@ class Application(interface.RootEntity):
     vacant_course_id = attr.ib(type=VacantCourseIdentity)
     lecturing_volume = attr.ib(type=Decimal)
     practical_volume = attr.ib(type=Decimal)
-    remark = attr.ib(type=str)
-    course_summary = attr.ib(type=str)
+    remark = attr.ib(type=str, converter=lambda value: value or '')
+    course_summary = attr.ib(type=str, converter=lambda value: value or '')
 
     def update(self, cmd: 'UpdateApplicationCommand'):
         # FIXME: Replace by setter/getter + validator on setter
