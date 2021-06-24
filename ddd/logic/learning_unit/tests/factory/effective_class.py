@@ -26,19 +26,19 @@
 import factory.fuzzy
 
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.tests.factory.learning_unit import _LearningUnitIdentityFactory, \
+from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIdentityFactory, \
     LDROI1001LearningUnitIdentityFactory
 
 
-class _EffectiveClassIdentityFactory(factory.Factory):
+class EffectiveClassIdentityFactory(factory.Factory):
     class Meta:
         model = EffectiveClassIdentity
         abstract = False
 
     class_code = factory.fuzzy.FuzzyText(length=1)
-    learning_unit_identity = factory.SubFactory(_LearningUnitIdentityFactory)
+    learning_unit_identity = factory.SubFactory(LearningUnitIdentityFactory)
 
 
-class LDROI1001XEffectiveClassIdentityFactory(_EffectiveClassIdentityFactory):
+class LDROI1001XEffectiveClassIdentityFactory(EffectiveClassIdentityFactory):
     class_code = 'X'
     learning_unit_identity = factory.SubFactory(LDROI1001LearningUnitIdentityFactory)

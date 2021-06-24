@@ -43,7 +43,7 @@ class _LearningUnitAttributionIdentityFactory(factory.Factory):
     uuid = uuid.uuid4()
 
 
-class _TutorIdentityFactory(factory.Factory):
+class TutorIdentityFactory(factory.Factory):
     class Meta:
         model = TutorIdentity
         abstract = False
@@ -66,7 +66,7 @@ class _TutorFactory(factory.Factory):
         model = Tutor
         abstract = False
 
-    entity_id = factory.SubFactory(_TutorIdentityFactory)
+    entity_id = factory.SubFactory(TutorIdentityFactory)
     distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 

@@ -85,10 +85,7 @@ class TutorRepository(ITutorRepository):
             qs = qs.filter(attribution_charge__attribution__tutor__person__global_id__in=distinct_ids)
 
         qs = _annotate_queryset(qs)
-        qs = _values_qs(qs).order_by(
-            'attribution_charge__attribution__tutor__person__last_name',
-            'attribution_charge__attribution__tutor__person__first_name'
-        )  # TODO :: unit test / deplacer dans Domainservice
+        qs = _values_qs(qs)
 
         result = []
 
