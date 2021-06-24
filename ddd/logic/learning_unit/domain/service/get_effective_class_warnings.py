@@ -163,7 +163,6 @@ def _get_q1and2_q1or2_warnings(effective_class: 'EffectiveClass') -> List[str]:
                 'effective_class_complete_acronym': effective_class.complete_acronym
             }
         )
-    print(quadri, effective_class.volumes)
     return warnings
 
 
