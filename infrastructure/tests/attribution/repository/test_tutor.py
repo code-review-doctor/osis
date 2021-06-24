@@ -33,7 +33,7 @@ from attribution.tests.factories.attribution_class import AttributionClassFactor
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.attribution.tests.factory.tutor import TutorWithAttributionAndDistributedEffectiveClassesFactory, \
+from ddd.logic.attribution.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
     Tutor9999IdentityFactory
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
@@ -82,7 +82,7 @@ class TutorRepositoryTestCase(TestCase):
         self.assertTrue(len(result) == 1)
 
     def test_should_correctly_map_tutor_aggregate_to_database_fields(self):
-        tutor_to_persist = TutorWithAttributionAndDistributedEffectiveClassesFactory()
+        tutor_to_persist = TutorWithDistributedEffectiveClassesFactory()
         first_distributed_class = tutor_to_persist.distributed_effective_classes[0]
         learning_unit_id = first_distributed_class.effective_class.learning_unit_identity
         person = PersonFactory(global_id=tutor_to_persist.entity_id.personal_id_number)

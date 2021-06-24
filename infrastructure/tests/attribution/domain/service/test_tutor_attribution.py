@@ -39,7 +39,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
 
     def test_should_order_by_last_name_and_first_name(self):
         identity = LDROI1001LearningUnitIdentityFactory()
-        for _ in range(5):
+        for _ in range(3):
             AttributionChargeNewFactory(
                 learning_component_year__learning_unit_year__acronym=identity.code,
                 learning_component_year__learning_unit_year__academic_year__year=identity.year,
@@ -54,7 +54,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
             learning_component_year__learning_unit_year__acronym=identity.code,
             learning_component_year__learning_unit_year__academic_year__year=identity.year,
         )
-        for _ in range(5):
+        for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
         result = self.translator.search_attributions_to_learning_unit(identity)
         self.assertTrue(len(result) == 1)
@@ -68,7 +68,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
             learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
             learning_component_year__learning_unit_year__academic_year__year=learn_unit_identity.year,
         )
-        for _ in range(5):
+        for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
         result = self.translator.get_tutor_attribution_to_learning_unit(tutor_identity, learn_unit_identity)
         self.assertEqual(result.personal_id_number, attribution_charge.attribution.tutor.person.global_id)
@@ -85,6 +85,9 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         result = self.translator.get_tutor_attribution_to_learning_unit(tutor_identity, learn_unit_identity)
         self.assertEqual(result.attribution_uuid, attribution_charge.attribution.uuid)
         person_database = attribution_charge.attribution.tutor.person
+        self.assertEqual(result.learning_unit_code, learn_unit_identity.code)
+        self.assertEqual(result.learning_unit_year, learn_unit_identity.year)
+        self.assertEqual(result.attribution_uuid, attribution_charge.attribution.uuid)
         self.assertEqual(result.last_name, person_database.last_name)
         self.assertEqual(result.first_name, person_database.first_name)
         self.assertEqual(result.personal_id_number, person_database.global_id)

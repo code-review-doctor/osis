@@ -45,6 +45,8 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
             learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
         ).annotate(
+            learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
+            learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
             attribution_uuid=F('attribution__uuid'),
             first_name=F('attribution__tutor__person__first_name'),
             last_name=F('attribution__tutor__person__last_name'),
@@ -52,6 +54,8 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             function=F('attribution__function'),
             attributed_volume_to_learning_unit=F('allocation_charge'),
         ).values(
+            'learning_unit_code',
+            'learning_unit_year',
             'attribution_uuid',
             'first_name',
             'last_name',

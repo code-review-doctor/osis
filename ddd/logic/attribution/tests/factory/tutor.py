@@ -70,7 +70,7 @@ class _TutorFactory(factory.Factory):
     distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 
-class TutorWithAttributionAndDistributedEffectiveClassesFactory(_TutorFactory):
+class TutorWithDistributedEffectiveClassesFactory(_TutorFactory):
     pass
 
 

@@ -57,6 +57,8 @@ class TutorSearchDTO(DTO):
 
 @attr.s(frozen=True, slots=True)
 class TutorAttributionToLearningUnitDTO(DTO):
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=str)
     attribution_uuid = attr.ib(type=str)
     last_name = attr.ib(type=str)
     first_name = attr.ib(type=str)
