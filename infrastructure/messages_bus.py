@@ -25,18 +25,34 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
+    DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
+    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
+    GetChargeSummaryCommand
+from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
+    get_attributions_about_to_expire
+from ddd.logic.application.use_case.read.get_charge_summary_service import get_charge_summary
+from ddd.logic.application.use_case.read.search_applications_by_applicant_service import \
+    search_applications_by_applicant
+from ddd.logic.application.use_case.read.search_vacant_courses_service import search_vacant_courses
+from ddd.logic.application.use_case.write.apply_on_vacant_course_service import apply_on_vacant_course
+from ddd.logic.application.use_case.write.delete_application_service import delete_application
+from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
+from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
+from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand
 from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
 from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import search_tutors_distributed_to_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
-    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand
+    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
+from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand, GetCampusCommand
@@ -47,6 +63,12 @@ from ddd.logic.shared_kernel.language.use_case.read.get_language_service import 
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 from infrastructure.attribution.repository.tutor import TutorRepository
+from infrastructure.application.repository.applicant import ApplicantRepository
+from infrastructure.application.repository.application import ApplicationRepository
+from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
+from infrastructure.application.repository.vacant_course import VacantCourseRepository
+from infrastructure.application.services.applications_summary import ApplicationsMailSummary
+from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -83,6 +105,11 @@ class MessageBus:
             cmd,
             TutorAttributionToLearningUnitTranslator(),
         ),
+        UpdateEffectiveClassCommand: lambda cmd: update_effective_class(
+            cmd,
+            LearningUnitRepository(),
+            EffectiveClassRepository()
+        ),
         GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
         GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
         SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
@@ -90,6 +117,36 @@ class MessageBus:
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),
         ),
+        ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
+        ),
+        UpdateApplicationCommand: lambda cmd: update_application(
+            cmd, ApplicationRepository(), VacantCourseRepository()
+        ),
+        RenewMultipleAttributionsCommand: lambda cmd: renew_multiple_attributions(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
+        ),
+        DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
+        SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository()
+        ),
+        SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(
+            cmd, ApplicationCalendarRepository(), VacantCourseRepository(), LearningUnitTranslator()
+        ),
+        GetChargeSummaryCommand: lambda cmd: get_charge_summary(
+            cmd, ApplicationCalendarRepository(), ApplicantRepository(), VacantCourseRepository(),
+            LearningUnitTranslator()
+        ),
+        GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository(), LearningUnitTranslator()
+        ),
+        SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
+            ApplicationsMailSummary()
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

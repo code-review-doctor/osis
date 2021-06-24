@@ -3078,10 +3078,10 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 msgid "biennial even"
-msgstr "bisannuelle paire"
+msgstr "Bisannuelle paire"
 
 msgid "biennial odd"
-msgstr "bisannuelle impaire"
+msgstr "Bisannuelle impaire"
 
 msgid "blocked update for tutor"
 msgstr "mise à jour bloquée pour l'enseignant"

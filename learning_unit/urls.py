@@ -28,6 +28,7 @@ from django.urls import include, path
 from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
 from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
 from learning_unit.views.learning_unit_class.tutors import ClassTutorsView
+from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
 
 urlpatterns = [
     path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
@@ -37,6 +38,7 @@ urlpatterns = [
         path('class/<str:class_code>/', include([
             path('identification', ClassIdentificationView.as_view(), name='class_identification'),
             path('tutors', ClassTutorsView.as_view(), name='class_tutors'),
+            path('update', UpdateClass.as_view(), name='class_update'),
         ]))
     ]))
 ]
