@@ -269,7 +269,7 @@ def create_external_learning_unit_year_from_template(
         to_year: int
 ) -> ExternalLearningUnitYear:
     luy = LearningUnitYear.objects.get(
-        learning_unit_year__learning_unit=template_external_luy.learning_unit_year.learning_unit,
+        learning_unit=template_external_luy.learning_unit_year.learning_unit,
         academic_year__year=to_year
     )
     field_values = get_fields_values(template_external_luy)
