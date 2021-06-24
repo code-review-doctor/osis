@@ -26,7 +26,7 @@
 
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.attribution.domain.model._learning_unit_attribution import AttributionIdentity
+from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.dtos import TutorSearchDTO, \
     DistributedEffectiveClassesDTO
@@ -57,5 +57,5 @@ def _build_repartition(dto: 'DistributedEffectiveClassesDTO') -> ClassVolumeRepa
             learning_unit_year=dto.learning_unit_year
         ),
         distributed_volume=dto.distributed_volume,
-        attribution=AttributionIdentity(uuid=dto.attribution_uuid),
+        attribution=LearningUnitAttributionIdentity(uuid=dto.attribution_uuid),
     )

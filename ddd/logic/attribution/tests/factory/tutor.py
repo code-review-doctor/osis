@@ -30,14 +30,14 @@ from decimal import Decimal
 import factory.fuzzy
 
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.attribution.domain.model._learning_unit_attribution import AttributionIdentity
+from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity, Tutor
 from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
 
 
 class _LearningUnitAttributionIdentityFactory(factory.Factory):
     class Meta:
-        model = AttributionIdentity
+        model = LearningUnitAttributionIdentity
         abstract = False
 
     uuid = uuid.uuid4()

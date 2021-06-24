@@ -27,7 +27,7 @@ from decimal import Decimal
 
 import attr
 
-from ddd.logic.attribution.domain.model._learning_unit_attribution import AttributionIdentity
+from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
@@ -36,7 +36,7 @@ from osis_common.ddd import interface
 class ClassVolumeRepartition(interface.ValueObject):
     effective_class = attr.ib(type=EffectiveClassIdentity)
     distributed_volume = attr.ib(type=Decimal)
-    attribution = attr.ib(type=AttributionIdentity)
+    attribution = attr.ib(type=LearningUnitAttributionIdentity)
 
     def __hash__(self):
         return hash("{}{}".format(self.effective_class, self.attribution))

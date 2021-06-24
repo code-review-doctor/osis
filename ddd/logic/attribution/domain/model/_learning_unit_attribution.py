@@ -30,5 +30,5 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class AttributionIdentity(interface.EntityIdentity):
+class LearningUnitAttributionIdentity(interface.EntityIdentity):
     uuid = attr.ib(type=str)
