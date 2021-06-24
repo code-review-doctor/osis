@@ -27,6 +27,7 @@ from ddd.logic.learning_unit.builder.effective_class_identity_builder import Eff
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CanDeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
+from ddd.logic.learning_unit.domain.service.i_tutor_distributed_to_class import ITutorDistributedToClass
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
@@ -34,7 +35,8 @@ from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepo
 def check_can_delete_effective_class(
         cmd: 'CanDeleteEffectiveClassCommand',
         effective_class_repository: 'IEffectiveClassRepository',
-        learning_unit_repository: 'ILearningUnitRepository'
+        learning_unit_repository: 'ILearningUnitRepository',
+        tutor_distributed_to_class: 'ITutorDistributedToClass'
 ) -> None:
     effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
         class_code=cmd.class_code,
@@ -53,4 +55,5 @@ def check_can_delete_effective_class(
         effective_class=effective_class,
         learning_unit=learning_unit,
         learning_unit_repository=learning_unit_repository,
+        tutor_distributed_to_class=tutor_distributed_to_class
     )

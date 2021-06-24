@@ -44,6 +44,7 @@ from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesComma
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorDistributedToClass
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -86,12 +87,14 @@ class MessageBus:
         DeleteEffectiveClassCommand: lambda cmd: delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            LearningUnitRepository()
+            LearningUnitRepository(),
+            TutorDistributedToClass()
         ),
         CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            LearningUnitRepository()
+            LearningUnitRepository(),
+            TutorDistributedToClass()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
