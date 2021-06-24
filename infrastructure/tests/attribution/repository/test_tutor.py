@@ -34,9 +34,9 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.attribution.tests.factory.tutor import TutorWithAttributionAndDistributedEffectiveClassesFactory, \
-    TutorIdentityFactory
+    Tutor9999IdentityFactory
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.tests.factory.effective_class import EffectiveClassIdentityFactory
+from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
 from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -60,7 +60,7 @@ class TutorRepositoryTestCase(TestCase):
         self.assertEqual(len(results), 0)
 
     def test_should_filter_on_effective_class(self):
-        class_identity = EffectiveClassIdentityFactory()
+        class_identity = LDROI1001XEffectiveClassIdentityFactory()
         AttributionClassFactory(
             learning_class_year__acronym=class_identity.class_code,
             learning_class_year__learning_component_year__learning_unit_year__acronym=class_identity.learning_unit_identity.code,
@@ -72,7 +72,7 @@ class TutorRepositoryTestCase(TestCase):
         self.assertTrue(len(result) == 1)
 
     def test_should_filter_on_list_of_tutor_identities(self):
-        tutor_identity = TutorIdentityFactory()
+        tutor_identity = Tutor9999IdentityFactory()
         AttributionClassFactory(
             attribution_charge__attribution__tutor__person__global_id=tutor_identity.personal_id_number,
         )

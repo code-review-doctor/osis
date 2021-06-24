@@ -35,7 +35,7 @@ from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIden
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 
 
-class EffectiveClassIdentityFactory(factory.Factory):
+class _EffectiveClassIdentityFactory(factory.Factory):
     class Meta:
         model = EffectiveClassIdentity
         abstract = False
@@ -49,7 +49,7 @@ class _EffectiveClassFactory(factory.Factory):
         model = EffectiveClass
         abstract = False
 
-    entity_id = factory.SubFactory(EffectiveClassIdentityFactory)
+    entity_id = factory.SubFactory(_EffectiveClassIdentityFactory)
     titles = ClassTitles(
         fr="Intitulé en français de la classe effective",
         en="English title",
@@ -71,6 +71,6 @@ class PracticalEffectiveClassFactory(_EffectiveClassFactory):
     pass
 
 
-class LDROI1001XEffectiveClassIdentityFactory(EffectiveClassIdentityFactory):
+class LDROI1001XEffectiveClassIdentityFactory(_EffectiveClassIdentityFactory):
     class_code = 'X'
     learning_unit_identity = factory.SubFactory(LDROI1001LearningUnitIdentityFactory)

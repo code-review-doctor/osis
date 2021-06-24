@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from ddd.logic.attribution.tests.factory.tutor import TutorIdentityFactory
-from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIdentityFactory
+from ddd.logic.attribution.tests.factory.tutor import Tutor9999IdentityFactory
+from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001LearningUnitIdentityFactory
 from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 
 
@@ -38,7 +38,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         cls.translator = TutorAttributionToLearningUnitTranslator()
 
     def test_should_order_by_last_name_and_first_name(self):
-        identity = LearningUnitIdentityFactory()
+        identity = LDROI1001LearningUnitIdentityFactory()
         for _ in range(5):
             AttributionChargeNewFactory(
                 learning_component_year__learning_unit_year__acronym=identity.code,
@@ -49,7 +49,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         self.assertListEqual(result, ordered_by_last_name_first_name)
 
     def test_should_filter_by_learning_unit(self):
-        identity = LearningUnitIdentityFactory()
+        identity = LDROI1001LearningUnitIdentityFactory()
         attribution_charge = AttributionChargeNewFactory(
             learning_component_year__learning_unit_year__acronym=identity.code,
             learning_component_year__learning_unit_year__academic_year__year=identity.year,
@@ -61,8 +61,8 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         self.assertEqual(result[0].attribution_uuid, attribution_charge.attribution.uuid)
 
     def test_should_get_by_tutor_and_learning_unit(self):
-        tutor_identity = TutorIdentityFactory()
-        learn_unit_identity = LearningUnitIdentityFactory()
+        tutor_identity = Tutor9999IdentityFactory()
+        learn_unit_identity = LDROI1001LearningUnitIdentityFactory()
         attribution_charge = AttributionChargeNewFactory(
             attribution__tutor__person__global_id=tutor_identity.personal_id_number,
             learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
@@ -75,8 +75,8 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         self.assertEqual(result.attributed_volume_to_learning_unit, attribution_charge.allocation_charge)
 
     def test_should_correctly_map_database_fields_to_dto(self):
-        tutor_identity = TutorIdentityFactory()
-        learn_unit_identity = LearningUnitIdentityFactory()
+        tutor_identity = Tutor9999IdentityFactory()
+        learn_unit_identity = LDROI1001LearningUnitIdentityFactory()
         attribution_charge = AttributionChargeNewFactory(
             attribution__tutor__person__global_id=tutor_identity.personal_id_number,
             learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
