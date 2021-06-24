@@ -31,7 +31,7 @@ from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClass
 
 
 class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
-    entities = list()  # type: List['EffectiveClass']
+    entities = list()  # type: List[EffectiveClass]
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
