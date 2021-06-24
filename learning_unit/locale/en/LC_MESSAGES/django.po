@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 10:13+0200\n"
+"POT-Creation-Date: 2021-06-16 15:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,10 @@ msgstr ""
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully updated."
 msgstr ""
 
 msgid "Class specific complement"
@@ -133,9 +137,6 @@ msgid "Learning units"
 msgstr ""
 
 msgid "Lecturing"
-msgstr ""
-
-msgid "New class"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -286,6 +287,12 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "Update"
+msgstr ""
+
+msgid "Update class"
+msgstr ""
+
 msgid "Vol. Q1"
 msgstr ""
 
@@ -340,6 +347,9 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "You do not have sufficient access rights to update a class."
 msgstr ""
 
 msgid "external acronym rules"

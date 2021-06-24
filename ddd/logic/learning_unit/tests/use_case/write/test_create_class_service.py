@@ -25,347 +25,260 @@
 ##############################################################################
 
 import attr
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
-from base.models.enums.quadrimesters import DerogationQuadrimester
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.builder.learning_unit_builder import LearningUnitBuilder
-from ddd.logic.learning_unit.builder.ucl_entity_identity_builder import UclEntityIdentityBuilder
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, CreateLearningUnitCommand, CreatePartimCommand
-from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass, \
-    EffectiveClass
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import LecturingEffectiveClass, PracticalEffectiveClass
 from ddd.logic.learning_unit.domain.validator.exceptions import ShouldBeAlphanumericException, \
     CodeClassAlreadyExistForUeException, ClassTypeInvalidException, AnnualVolumeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, LearningUnitHasEnrollmentException, \
-    LearningUnitHasNoVolumeException
+    LearningUnitHasNoVolumeException, TeachingPlaceRequiredException, DerogationQuadrimesterInvalidChoiceException, \
+    DerogationSessionInvalidChoiceException
+from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithPracticalVolumesOnly, \
+    CourseWithLecturingVolumesOnly, CourseWithLecturingAndPracticalVolumes, \
+    LDROI1002ExternalLearningUnitFactory, CourseWithOnePartim, LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
-YEAR = 2020
 
-
-class TestCreateClassServiceEffectiveClassType(TestCase):
-
+class CreateEffectiveClassService(SimpleTestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
-        self.effective_class_repository = EffectiveClassRepository()
-        self.command = _build_create_learning_unit_command()
-
-    def test_effective_class_type_lecturing(self):
-        ue_with_lecturing_and_practical_volumes = _create_lu(self.command)
-        self.learning_unit_repository.save(ue_with_lecturing_and_practical_volumes)
-        effective_class_id = create_effective_class(
-            _build_create_effective_class_command(
-                learning_unit_code=ue_with_lecturing_and_practical_volumes.code,
-                class_code='A'
-            ),
-            self.learning_unit_repository,
-            self.effective_class_repository
-        )
-        effective_class = self.effective_class_repository.get(effective_class_id)
-        self.assertIsInstance(effective_class, LecturingEffectiveClass)
-
-    def test_effective_class_type_practical(self):
-        command = attr.evolve(
-            self.command,
-            lecturing_volume_annual=0.0, lecturing_volume_q2=0.0, lecturing_volume_q1=0.0, code='LTEST2022'
-        )
-        ue_with_practical_volumes_only = _create_lu(command)
-        self.learning_unit_repository.save(ue_with_practical_volumes_only)
-        effective_class_id = create_effective_class(
-            _build_create_effective_class_command(
-                learning_unit_code=ue_with_practical_volumes_only.code,
-                class_code='C'
-            ),
-            self.learning_unit_repository,
-            self.effective_class_repository
-        )
-        effective_class = self.effective_class_repository.get(effective_class_id)
-        self.assertIsInstance(effective_class, PracticalEffectiveClass)
-
-    def test_effective_class_type_lecturing_only(self):
-        command = attr.evolve(
-            self.command,
-            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0, code='LTEST2023'
-        )
-        ue_with_lecturing_volumes_only = _create_lu(command)
-        self.learning_unit_repository.save(ue_with_lecturing_volumes_only)
-        effective_class_id = create_effective_class(
-            _build_create_effective_class_command(
-                learning_unit_code=ue_with_lecturing_volumes_only.code,
-                class_code='B'
-            ),
-            self.learning_unit_repository,
-            self.effective_class_repository
-        )
-        effective_class = self.effective_class_repository.get(effective_class_id)
-        self.assertIsInstance(effective_class, LecturingEffectiveClass)
-
-
-class TestCreateClassServiceValidator(TestCase):
-    def setUp(self):
-        self.learning_unit_repository = LearningUnitRepository()
-        self.command = _build_create_learning_unit_command()
-        self.ue_with_lecturing_and_practical_volumes = _create_lu(self.command)
+        self.ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
         self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
 
         self.effective_class_repository = EffectiveClassRepository()
-        effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            class_code='A',
+
+        self.create_class_cmd = CreateEffectiveClassCommand(
+            class_code="A",
             learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-            learning_unit_year=YEAR
+            year=self.ue_with_lecturing_and_practical_volumes.year,
+            volume_first_quadrimester=15.0,
+            volume_second_quadrimester=5.0,
+            title_fr='Fr',
+            title_en='en',
+            derogation_quadrimester='Q1',
+            session_derogation=DerogationSession.DEROGATION_SESSION_123.value,
+            teaching_place_uuid="35bbb236-7de6-4322-a496-fa8397054305"
         )
 
-        self.effective_class = EffectiveClass(
-            entity_id=effective_class_identity,
-            titles=None,
-            teaching_place=None,
-            derogation_quadrimester=None,
-            session_derogation=None,
-            volumes=None
-        )
-        self.effective_class_repository.save(self.effective_class)
+    def test_should_save_type_practical(self):
+        ue_with_practical_volumes_only = CourseWithPracticalVolumesOnly()
+        self.learning_unit_repository.save(ue_with_practical_volumes_only)
 
-    def test_class_code_raise_should_be_alphanumeric_exception(self):
-        cmd = _build_create_effective_class_command(
-            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code, class_code='*'
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            year=ue_with_practical_volumes_only.year,
+            learning_unit_code=ue_with_practical_volumes_only.code,
+        )
+        effective_class_id = create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        effective_class = self.effective_class_repository.get(effective_class_id)
+        self.assertIsInstance(effective_class, PracticalEffectiveClass)
+
+    def test_should_save_type_lecturing(self):
+        ue_with_lecturing_volumes_only = CourseWithLecturingVolumesOnly()
+        self.learning_unit_repository.save(ue_with_lecturing_volumes_only)
+
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            year=ue_with_lecturing_volumes_only.year,
+            learning_unit_code=ue_with_lecturing_volumes_only.code,
+        )
+        effective_class_id = create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        effective_class = self.effective_class_repository.get(effective_class_id)
+        self.assertIsInstance(effective_class, LecturingEffectiveClass)
+
+    def test_should_save_type_lecturing_when_both_volumes_are_filled(self):
+        ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
+        self.learning_unit_repository.save(ue_with_lecturing_and_practical_volumes)
+
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            year=ue_with_lecturing_and_practical_volumes.year,
+            learning_unit_code=ue_with_lecturing_and_practical_volumes.code,
+        )
+        effective_class_id = create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        effective_class = self.effective_class_repository.get(effective_class_id)
+        self.assertIsInstance(effective_class, LecturingEffectiveClass)
+
+    def test_should_class_code_be_alphanumeric(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code='*',
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                self.learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             ShouldBeAlphanumericException
         )
 
-    def test_class_code_raise_class_code_should_be_unique_for_ue_exception(self):
-        already_existing_class_code = self.effective_class.entity_id.class_code
-        cmd = _build_create_effective_class_command(
-            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-            class_code=already_existing_class_code
+    def test_should_class_code_be_unique_for_ue(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="B",
         )
+        # Creates the class
+        create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                self.learning_unit_repository,
-                self.effective_class_repository
-            )
+            # Trying to create the same class a second time
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             CodeClassAlreadyExistForUeException
         )
 
-    def test_raise_should_not_be_type_mobility_or_external_exception(self):
-        command = attr.evolve(self.command, type=LearningContainerYearType.EXTERNAL.name, code='LEXTE2021')
-        ue_external = _create_lu(command=command)
+    def test_should_not_be_type_mobility_or_external(self):
+        ue_external = LDROI1002ExternalLearningUnitFactory()
         self.learning_unit_repository.save(ue_external)
-        cmd = _build_create_effective_class_command(learning_unit_code=ue_external.code, class_code='B')
+
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            learning_unit_code=ue_external.code,
+            year=ue_external.year,
+            class_code="A",
+        )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                self.learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             ClassTypeInvalidException
         )
 
-    def test_raise_should_learning_unit_not_have_proposal_exception(self):
+    def test_should_learning_unit_not_have_proposal(self):
         learning_unit_repository = LearningUnitRepository()
         learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
-        cmd = _build_create_effective_class_command(
-            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-            class_code='Z'
+
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="Z",
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             LearningUnitHasProposalException
         )
 
-    def test_raise_should_learning_unit_not_have_enrollment_exception(self):
+    def test_should_learning_unit_not_have_enrollment(self):
         learning_unit_repository = LearningUnitRepository()
         learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
-        cmd = _build_create_effective_class_command(
-            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-            class_code='Z'
+
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="Z",
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             LearningUnitHasEnrollmentException
         )
 
-    def test_raise_should_learning_unit_not_have_partim_exception(self):
-        command = attr.evolve(self.command, code='LPART2021')
-        ue_with_partims = _create_lu(command=command)
+    def test_should_learning_unit_not_have_partim(self):
+        ue_with_one_partim = CourseWithOnePartim()
+        self.learning_unit_repository.save(ue_with_one_partim)
 
-        partim_cmd = CreatePartimCommand(
-            learning_unit_code=ue_with_partims.code,
-            learning_unit_year=ue_with_partims.academic_year.year,
-            subdivision='T',
-            title_fr='Partim FR',
-            title_en='Partim EN',
-            credits=20,
-            periodicity=PeriodicityEnum.ANNUAL.name,
-            iso_code='fr-be',
-            remark_faculty='Remark Fac',
-            remark_publication_fr='Remark FR',
-            remark_publication_en='Remark EN',
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            learning_unit_code=ue_with_one_partim.code,
+            year=ue_with_one_partim.year,
+            class_code="B",
         )
-        ue_with_partims.create_partim(partim_cmd)
-        self.learning_unit_repository.save(ue_with_partims)
-        cmd = _build_create_effective_class_command(learning_unit_code=ue_with_partims.code, class_code='B')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                self.learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             LearningUnitHasPartimException
         )
 
-    def test_raise_check_learning_unit_has_no_volume_exception(self):
-        command = attr.evolve(
-            self.command,
-            lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=0.0,
-            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
-            code='LTEST2025'
+    def test_should_learning_unit_have_volumes(self):
+        ue_without_volumes = LDROI1004CourseWithoutVolumesLearningUnitFactory(partims=[])
+        self.learning_unit_repository.save(ue_without_volumes)
+
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            learning_unit_code=ue_without_volumes.code,
+            year=ue_without_volumes.year,
+            class_code="B",
         )
-        ue_no_volumes = _create_lu(command)
-        self.learning_unit_repository.save(ue_no_volumes)
-        cmd = _build_create_effective_class_command(learning_unit_code=ue_no_volumes.code, class_code='C')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                self.learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             LearningUnitHasNoVolumeException
         )
 
-    def test_raise_check_partim_volume_inconsistent_exception(self):
-        command = attr.evolve(
-            self.command,
-            lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=10.0,
-            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
-            code='LTEST2026'
+    def test_should_class_volumes_be_consistent_with_learning_unit(self):
+        annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
+        bad_repartition = annual_volume + 10.0
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="C",
+            volume_first_quadrimester=bad_repartition,
+            volume_second_quadrimester=bad_repartition,
         )
-        ue = _create_lu(command)
-        self.learning_unit_repository.save(ue)
-        cmd = _build_create_effective_class_command(learning_unit_code=ue.code, class_code='T')
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            create_effective_class(
-                cmd,
-                self.learning_unit_repository,
-                self.effective_class_repository
-            )
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             AnnualVolumeInvalidException
         )
 
-    def test_not_raise_check_volume_inconsistent_exception_because_no_volumes_encoded(self):
-        ue_command = attr.evolve(
-            self.command,
-            lecturing_volume_q1=0.0, lecturing_volume_q2=0.0, lecturing_volume_annual=10.0,
-            practical_volume_annual=0.0, practical_volume_q2=0.0, practical_volume_q1=0.0,
-            code='LTEST2026'
+    def test_should_ignore_volumes_consistency_when_no_volumes_encoded(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="D",
+            volume_first_quadrimester=0.0,
+            volume_second_quadrimester=0.0,
         )
-        ue = _create_lu(ue_command)
-        self.learning_unit_repository.save(ue)
-        cmd = _build_create_effective_class_command(
-            learning_unit_code=ue.code,
-            class_code='T',
-            volume_first_quadrimester=0,
-            volume_second_quadrimester=0,
+        self.assertTrue(
+            create_effective_class(
+                cmd,
+                self.learning_unit_repository,
+                self.effective_class_repository
+            )
         )
-        new_effective_class_identity = create_effective_class(
-            cmd,
-            self.learning_unit_repository,
-            self.effective_class_repository
+
+    def test_should_teaching_place_be_required(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="B",
+            teaching_place_uuid=None
         )
-        self.assertEqual(new_effective_class_identity.class_code, cmd.class_code)
-        self.assertEqual(new_effective_class_identity.learning_unit_identity.code, ue_command.code)
-        self.assertEqual(new_effective_class_identity.learning_unit_identity.year, ue_command.academic_year)
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            TeachingPlaceRequiredException
+        )
 
+    def test_should_quadrimester_be_valid_choice(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="B",
+            derogation_quadrimester="invalid choice",
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            DerogationQuadrimesterInvalidChoiceException
+        )
 
-def _build_create_effective_class_command(
-        learning_unit_code: str,
-        class_code: str,
-        volume_first_quadrimester: int = 10,
-        volume_second_quadrimester: int = 10
-) -> 'CreateEffectiveClassCommand':
-    cmd = CreateEffectiveClassCommand(
-        class_code=class_code,
-        learning_unit_code=learning_unit_code,
-        year=YEAR,
-        volume_first_quadrimester=volume_first_quadrimester,
-        volume_second_quadrimester=volume_second_quadrimester,
-        title_fr='Fr',
-        title_en='en',
-        derogation_quadrimester='Q1',
-        session_derogation=DerogationSession.DEROGATION_SESSION_123.value,
-        teaching_place_uuid=None
-    )
-    return cmd
-
-
-def _create_lu(command) -> 'LearningUnit':
-    return LearningUnitBuilder.build_from_command(
-        cmd=command,
-        all_existing_identities=[],
-        responsible_entity_identity=UclEntityIdentityBuilder.build_from_code(code='UCL')
-    )
-
-
-def _build_create_learning_unit_command() -> 'CreateLearningUnitCommand':
-    return CreateLearningUnitCommand(
-        code='LTEST2021',
-        academic_year=YEAR,
-        type=LearningContainerYearType.COURSE.name,
-        common_title_fr='Common FR',
-        specific_title_fr='Specific FR',
-        common_title_en='Common EN',
-        specific_title_en='Specific EN',
-        credits=20,
-        internship_subtype=None,
-        responsible_entity_code='DRT',
-        periodicity=PeriodicityEnum.ANNUAL.name,
-        iso_code='fr-be',
-        remark_faculty=None,
-        remark_publication_fr=None,
-        remark_publication_en=None,
-        practical_volume_q1=10.0,
-        practical_volume_q2=10.0,
-        practical_volume_annual=20.0,
-        lecturing_volume_q1=10.0,
-        lecturing_volume_q2=10.0,
-        lecturing_volume_annual=20.0,
-        derogation_quadrimester=DerogationQuadrimester.Q1.name,
-        teaching_place_uuid=None
-    )
+    def test_should_session_be_valid_choice(self):
+        cmd = attr.evolve(
+            self.create_class_cmd,
+            class_code="B",
+            session_derogation="invalid choice",
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
+        self.assertIsInstance(
+            class_exceptions.exception.exceptions.pop(),
+            DerogationSessionInvalidChoiceException
+        )

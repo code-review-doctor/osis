@@ -45,8 +45,5 @@ admin.site.register(domain.Domain,
 admin.site.register(domain_isced.DomainIsced,
                     domain_isced.DomainIscedAdmin)
 
-admin.site.register(grade_type.GradeType,
-                    grade_type.GradeTypeAdmin)
-
 admin.site.register(language.Language,
                     language.LanguageAdmin)

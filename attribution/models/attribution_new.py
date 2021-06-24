@@ -30,7 +30,6 @@ from django.utils.translation import gettext_lazy as _
 
 from attribution.models.enums.decision_making import DecisionMakings
 from attribution.models.enums.function import Functions
-from base.models.utils.utils import filter_with_list_or_object
 
 
 class AttributionNewAdmin(admin.ModelAdmin):
@@ -43,14 +42,6 @@ class AttributionNewAdmin(admin.ModelAdmin):
     raw_id_fields = ('learning_container_year', 'tutor', 'substitute')
     search_fields = ['tutor__person__first_name', 'tutor__person__last_name', 'learning_container_year__acronym',
                      'tutor__person__global_id', 'function']
-    actions = ['publish_attribution_to_portal']
-
-    def publish_attribution_to_portal(self, request, queryset):
-        from attribution.business import attribution_json
-        queryset = queryset.filter(decision_making='')
-        global_ids = list(queryset.values_list('tutor__person__global_id', flat=True))
-        return attribution_json.publish_to_portal(global_ids)
-    publish_attribution_to_portal.short_description = _("Publish attribution to portal")
 
 
 class AttributionNew(models.Model):
@@ -69,8 +60,6 @@ class AttributionNew(models.Model):
     decision_making = models.CharField(max_length=40, blank=True, null=False, choices=DecisionMakings.choices(),
                                        default='')
 
-    objects = models.Manager()
-
     def __str__(self):
         return u"%s - %s" % (self.tutor.person, self.function)
 
@@ -79,20 +68,3 @@ class AttributionNew(models.Model):
         if self.start_year and self.end_year:
             return (self.end_year - self.start_year) + 1
         return None
-
-
-def search(*args, **kwargs):
-    qs = AttributionNew.objects.all()
-    if "learning_container_year" in kwargs:
-        qs = filter_with_list_or_object('learning_container_year', AttributionNew, **kwargs)
-    if "tutor" in kwargs:
-        qs = qs.filter(tutor=kwargs['tutor'])
-    if "score_responsible" in kwargs:
-        qs = qs.filter(score_responsible=kwargs['score_responsible'])
-    if "global_id" in kwargs:
-        if isinstance(kwargs['global_id'], list):
-            qs = qs.filter(tutor__person__global_id__in=kwargs['global_id'])
-        else:
-            qs = qs.filter(tutor__person__global_id=kwargs['global_id'])
-
-    return qs.select_related('tutor__person', 'learning_container_year')

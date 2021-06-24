@@ -24,8 +24,10 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block action_top %}
+    {% include "class/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" %}
 {% endblock %}
 {% block action_bottom %}
+    {% include "class/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropup" %}
 {% endblock %}
 
 {% block content_tab %}
@@ -42,7 +44,7 @@
                                         {% trans 'Code' %}
                                     </label>
                                     <br>
-                                    {{ effective_class.complete_acronym }}
+                                    {{ effective_class.complete_code }}
                                 </div>
                                 <div class="col-md-3">
                                     <label>
