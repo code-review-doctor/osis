@@ -151,7 +151,7 @@ class _PracticalPartFactory(factory.Factory):
     volumes = factory.SubFactory(_VolumesFactory)
 
 
-class _LearningUnitIdentityFactory(factory.Factory):
+class LearningUnitIdentityFactory(factory.Factory):
     class Meta:
         model = LearningUnitIdentity
         abstract = False
@@ -165,7 +165,7 @@ class _LearningUnitFactory(factory.Factory):
         model = LearningUnit
         abstract = False
 
-    entity_id = factory.SubFactory(_LearningUnitIdentityFactory)
+    entity_id = factory.SubFactory(LearningUnitIdentityFactory)
     titles = factory.SubFactory(_TitlesFactory)
     credits = factory.fuzzy.FuzzyInteger(low=1, high=180)
     internship_subtype = factory.fuzzy.FuzzyChoice(InternshipSubtype)
@@ -202,7 +202,7 @@ class _ExternalLearningUnitFactory(_LearningUnitFactory):
         abstract = False
 
 
-class LDROI1001LearningUnitIdentityFactory(_LearningUnitIdentityFactory):
+class LDROI1001LearningUnitIdentityFactory(LearningUnitIdentityFactory):
     code = "LDROI1001"
     academic_year = _AcademicYearIdentityFactory(year=datetime.datetime.now().year)
 
@@ -248,7 +248,7 @@ class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
 
 
 class LDROI1002ExternalLearningUnitFactory(_ExternalLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
+    entity_id = LearningUnitIdentityFactory(
         code="LDROI1002",
         academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
@@ -256,7 +256,7 @@ class LDROI1002ExternalLearningUnitFactory(_ExternalLearningUnitFactory):
 
 
 class LDROI1003CourseWithPartimsLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
+    entity_id = LearningUnitIdentityFactory(
         code="LDROI1003",
         academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
@@ -264,7 +264,7 @@ class LDROI1003CourseWithPartimsLearningUnitFactory(_CourseLearningUnitFactory):
 
 
 class LDROI1004CourseWithoutVolumesLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
+    entity_id = LearningUnitIdentityFactory(
         code="LDROI1004",
         academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )

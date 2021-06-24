@@ -24,17 +24,15 @@
 #
 ##############################################################################
 import string
+import uuid
+from decimal import Decimal
 
 import factory.fuzzy
-import uuid
 
-from attribution.models.enums.function import Functions
-from ddd.logic.attribution.domain.model._attribution import LearningUnitAttributionIdentity, LearningUnitAttribution
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
+from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity, Tutor
-from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
-from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001LearningUnitIdentityFactory
 
 
 class _LearningUnitAttributionIdentityFactory(factory.Factory):
@@ -53,37 +51,14 @@ class _TutorIdentityFactory(factory.Factory):
     personal_id_number = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
 
 
-class _ClassTitlesFactory(factory.Factory):
-    class Meta:
-        model = ClassTitles
-        abstract = False
-
-    fr = factory.fuzzy.FuzzyText(length=240)
-    en = factory.fuzzy.FuzzyText(length=240)
-
-
 class _ClassVolumeRepartitionFactory(factory.Factory):
     class Meta:
         model = ClassVolumeRepartition
         abstract = False
 
     effective_class = factory.SubFactory(LDROI1001XEffectiveClassIdentityFactory)
-    distributed_volume = 0
-
-
-class _LearningUnitAttributionFactory(factory.Factory):
-    class Meta:
-        model = LearningUnitAttribution
-        abstract = False
-
-    entity_id = factory.SubFactory(_LearningUnitAttributionIdentityFactory)
-    function = factory.fuzzy.FuzzyChoice(choices=Functions)
-    learning_unit = factory.SubFactory(LDROI1001LearningUnitIdentityFactory)
-    distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
-
-
-class _LearningUnitAttributionWithoutDistributedEffectiveClassesFactory(_LearningUnitAttributionFactory):
-    distributed_effective_classes = []
+    distributed_volume = Decimal(0.0)
+    attribution = factory.SubFactory(_LearningUnitAttributionIdentityFactory)
 
 
 class _TutorFactory(factory.Factory):
@@ -92,18 +67,12 @@ class _TutorFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_TutorIdentityFactory)
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
-    attributions = factory.List([factory.SubFactory(_LearningUnitAttributionFactory)])
+    distributed_effective_classes = factory.List([factory.SubFactory(_ClassVolumeRepartitionFactory)])
 
 
-class TutorWithoutAttributionsFactory(_TutorFactory):
-    attributions = []
-
-
-class TutorWithAttributionWithoutDistributedEffectiveClassesFactory(_TutorFactory):
-    attributions = factory.List([factory.SubFactory(_LearningUnitAttributionWithoutDistributedEffectiveClassesFactory)])
-
-
-class TutorWithAttributionAndDistributedEffectiveClassesFactory(_TutorFactory):
+class TutorWithDistributedEffectiveClassesFactory(_TutorFactory):
     pass
+
+
+class Tutor9999IdentityFactory(_TutorIdentityFactory):
+    personal_id_number = "9999"

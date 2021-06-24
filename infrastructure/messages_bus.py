@@ -40,9 +40,11 @@ from ddd.logic.application.use_case.write.delete_application_service import dele
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
-from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
-from ddd.logic.attribution.use_case.read.search_tutors_attributed_to_learning_unit_service import \
-    search_tutors_attributed_to_learning_unit
+from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
+    SearchTutorsDistributedToClassCommand
+from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
+    search_attributions_to_learning_unit
+from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import search_tutors_distributed_to_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
@@ -59,6 +61,7 @@ from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_serv
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
@@ -98,9 +101,9 @@ class MessageBus:
         CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
-        SearchTutorAttributedToLearningUnitCommand: lambda cmd: search_tutors_attributed_to_learning_unit(
+        SearchAttributionsToLearningUnitCommand: lambda cmd: search_attributions_to_learning_unit(
             cmd,
-            TutorRepository()
+            TutorAttributionToLearningUnitTranslator(),
         ),
         UpdateEffectiveClassCommand: lambda cmd: update_effective_class(
             cmd,
@@ -109,6 +112,11 @@ class MessageBus:
         ),
         GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
         GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
+        SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
+        ),
         ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
             ApplicantRepository(), VacantCourseRepository()

@@ -30,7 +30,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
-from ddd.logic.learning_unit.tests.factory.learning_unit import _LearningUnitIdentityFactory, \
+from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIdentityFactory, \
     LDROI1001LearningUnitIdentityFactory
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 
@@ -41,7 +41,7 @@ class _EffectiveClassIdentityFactory(factory.Factory):
         abstract = False
 
     class_code = factory.fuzzy.FuzzyText(length=1)
-    learning_unit_identity = factory.SubFactory(_LearningUnitIdentityFactory)
+    learning_unit_identity = factory.SubFactory(LearningUnitIdentityFactory)
 
 
 class _EffectiveClassFactory(factory.Factory):

@@ -23,30 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List
 
-from ddd.logic.attribution.domain.model.tutor import TutorIdentity
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
+from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.attribution.domain.service.class_distribution_with_attribution import ClassDistributionWithAttribution
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
+from ddd.logic.attribution.repository.i_tutor import ITutorRepository
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 
 
-class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def get_tutor_attribution_to_learning_unit(
-            cls,
-            tutor_identity: 'TutorIdentity',
-            learning_unit_identity: 'LearningUnitIdentity'
-    ) -> 'TutorAttributionToLearningUnitDTO':
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_to_learning_unit(
-            cls,
-            learning_unit_identity: 'LearningUnitIdentity'
-    ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
+# TODO :: unit test
+def search_tutors_distributed_to_class(
+        cmd: 'SearchTutorsDistributedToClassCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository'
+) -> List['TutorClassRepartitionDTO']:
+    class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_year=cmd.learning_unit_year,
+        learning_unit_code=cmd.learning_unit_code,
+    )
+    return ClassDistributionWithAttribution().search_by_effective_class(
+        class_identity,
+        tutor_attribution_translator,
+        tutor_repository
+    )

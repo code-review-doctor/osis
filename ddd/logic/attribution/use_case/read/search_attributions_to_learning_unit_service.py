@@ -25,19 +25,20 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.attribution.commands import SearchTutorAttributedToLearningUnitCommand
-from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.repository.i_tutor import ITutorRepository
+from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
-def search_tutors_attributed_to_learning_unit(
-        cmd: SearchTutorAttributedToLearningUnitCommand,
-        repository: 'ITutorRepository'
-) -> List['Tutor']:
-    return repository.search(
-        learning_unit_identity=LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=cmd.learning_unit_code,
-            year=cmd.learning_unit_year
-        )
+# TODO :: unit test
+# FIXME :: should be moved in another context "attribution_to_learning_unit"
+def search_attributions_to_learning_unit(
+        cmd: SearchAttributionsToLearningUnitCommand,
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
+) -> List['TutorAttributionToLearningUnitDTO']:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.learning_unit_year,
     )
+    return tutor_attribution_translator.search_attributions_to_learning_unit(learning_unit_identity)

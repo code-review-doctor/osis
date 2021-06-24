@@ -23,20 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 from django.test import TestCase
 
 from attribution.models.attribution_class import AttributionClass
-from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_class import AttributionClassFactory
-from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.attribution.domain.model.tutor import Tutor
-from ddd.logic.attribution.tests.factory.tutor import TutorWithAttributionAndDistributedEffectiveClassesFactory
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.attribution.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
+    Tutor9999IdentityFactory
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
 from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -59,101 +59,45 @@ class TutorRepositoryTestCase(TestCase):
         results = self.tutor_repository.search(learning_unit_identity=entity_id)
         self.assertEqual(len(results), 0)
 
-    def test_should_return_2_attributions(self):
-        ue_with_attributions = LearningUnitYearFactory(
-            academic_year__current=True
-        )
-        attribution_1 = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year=ue_with_attributions,
-            attribution__tutor__person__last_name='Dupont'
-        )
-        attribution_2 = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year=ue_with_attributions,
-            attribution__tutor__person__last_name='Bastin'
-        )
-
-        entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=ue_with_attributions.acronym,
-            year=ue_with_attributions.academic_year.year
-        )
-        results = self.tutor_repository.search(learning_unit_identity=entity_id)
-        self.assertEqual(len(results), 2)
-        self._assert_should_correctly_map_database_fields_with_dto_fields(
-            results[0],
-            attribution_2.attribution,
-            ue_with_attributions
-        )
-        self._assert_should_correctly_map_database_fields_with_dto_fields(
-            results[1],
-            attribution_1.attribution,
-            ue_with_attributions
-        )
-
-    def _assert_should_correctly_map_database_fields_with_dto_fields(
-            self,
-            ddd_tutor_attribution: Tutor,
-            db_attribution: AttributionNew,
-            ue: LearningUnitYear
-    ):
-        self.assertEqual(
-            ddd_tutor_attribution.last_name,
-            db_attribution.tutor.person.last_name
-        )
-        self.assertEqual(
-            ddd_tutor_attribution.first_name,
-            db_attribution.tutor.person.first_name
-        )
-        self.assertEqual(len(ddd_tutor_attribution.attributions), 1)
-        a_ddd_attribution = ddd_tutor_attribution.attributions[0]
-        self.assertEqual(a_ddd_attribution.function, db_attribution.function)
-        self.assertEqual(a_ddd_attribution.entity_id.uuid, db_attribution.uuid)
-        self.assertEqual(a_ddd_attribution.learning_unit.code, ue.acronym)
-        self.assertEqual(a_ddd_attribution.learning_unit.year, ue.academic_year.year)
-
-    def test_should_correctly_map_database_fields_with_dto_fields_for_effective_class(self):
-        ue = LearningUnitYearFactory(academic_year__current=True)
-        attribution_1 = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year=ue,
-            attribution__tutor__person__last_name='Dupont',
-            allocation_charge=10
-        )
-
-        effective_class = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+    def test_should_filter_on_effective_class(self):
+        class_identity = LDROI1001XEffectiveClassIdentityFactory()
         AttributionClassFactory(
-            learning_class_year=effective_class,
-            attribution_charge=attribution_1
+            learning_class_year__acronym=class_identity.class_code,
+            learning_class_year__learning_component_year__learning_unit_year__acronym=class_identity.learning_unit_identity.code,
+            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=class_identity.learning_unit_identity.year,
         )
-        effective_class_id = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            class_code=effective_class.acronym,
-            learning_unit_code=ue.acronym,
-            learning_unit_year=ue.academic_year.year,
+        for _ in range(5):
+            AttributionClassFactory()
+        result = self.tutor_repository.search(effective_class_identity=class_identity)
+        self.assertTrue(len(result) == 1)
+
+    def test_should_filter_on_list_of_tutor_identities(self):
+        tutor_identity = Tutor9999IdentityFactory()
+        AttributionClassFactory(
+            attribution_charge__attribution__tutor__person__global_id=tutor_identity.personal_id_number,
         )
-        entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=ue.acronym,
-            year=ue.academic_year.year
-        )
-        results = self.tutor_repository.search(learning_unit_identity=entity_id)
-        self.assertEqual(len(results), 1)
-        effective_classes = results[0].attributions[0].distributed_effective_classes
-        self.assertEqual(effective_classes[0].distributed_volume, attribution_1.allocation_charge)
-        self.assertEqual(effective_classes[0].effective_class, effective_class_id)
+        for _ in range(5):
+            AttributionClassFactory()
+        result = self.tutor_repository.search(entity_ids=[tutor_identity])
+        self.assertTrue(len(result) == 1)
 
     def test_should_correctly_map_tutor_aggregate_to_database_fields(self):
-        tutor_to_persist = TutorWithAttributionAndDistributedEffectiveClassesFactory()
-        learning_unit_id = tutor_to_persist.attributions[0].learning_unit
+        tutor_to_persist = TutorWithDistributedEffectiveClassesFactory()
+        first_distributed_class = tutor_to_persist.distributed_effective_classes[0]
+        learning_unit_id = first_distributed_class.effective_class.learning_unit_identity
         person = PersonFactory(global_id=tutor_to_persist.entity_id.personal_id_number)
         ue = LearningUnitYearFactory(
             academic_year__year=learning_unit_id.year,
             acronym=learning_unit_id.code
         )
-        distributed_effective_classes = tutor_to_persist.attributions[0].distributed_effective_classes[0]
+        distributed_effective_classes = first_distributed_class
         learning_class_year = LearningClassYearFactory(
             learning_component_year__learning_unit_year=ue,
             acronym=distributed_effective_classes.effective_class.class_code
         )
         AttributionChargeNewFactory(
             learning_component_year=learning_class_year.learning_component_year,
-            attribution__uuid=tutor_to_persist.attributions[0].entity_id.uuid,
+            attribution__uuid=first_distributed_class.attribution.uuid,
             attribution__tutor__person=person
         )
 
@@ -166,35 +110,52 @@ class TutorRepositoryTestCase(TestCase):
         )
 
     def test_should_correctly_map_database_fields_to_tutor_aggregate(self):
-        person = PersonFactory()
+        person = PersonFactory(global_id="123456")
         ue = LearningUnitYearFactory()
         learning_class_year = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
         attribution_charge = AttributionChargeNewFactory(
             learning_component_year=learning_class_year.learning_component_year,
-            attribution__tutor__person=person
+            attribution__tutor__person=person,
         )
         attribution_class = AttributionClassFactory(
             learning_class_year=learning_class_year,
-            attribution_charge=attribution_charge
+            attribution_charge=attribution_charge,
+            allocation_charge=Decimal(5.0),
         )
         tutor = self.tutor_repository.get(
             entity_id=TutorIdentityBuilder.build_from_personal_id_number(personal_id_number=person.global_id)
         )
 
         self.assertEqual(tutor.entity_id.personal_id_number, person.global_id)
-        self.assertEqual(tutor.first_name, person.first_name)
-        self.assertEqual(tutor.last_name, person.last_name)
 
-        attribution_object = tutor.attributions[0]
-        self.assertEqual(attribution_object.entity_id.uuid, attribution_charge.attribution.uuid)
-        self.assertEqual(attribution_object.function, attribution_charge.attribution.function)
-
-        learning_unit_id = attribution_object.learning_unit
+        learning_unit_id = tutor.distributed_effective_classes[0].effective_class.learning_unit_identity
         self.assertEqual(learning_unit_id.code, ue.acronym)
         self.assertEqual(learning_unit_id.year, ue.academic_year.year)
 
-        distributed_effective_class = attribution_object.distributed_effective_classes[0]
+        distributed_effective_class = tutor.distributed_effective_classes[0]
         self.assertEqual(distributed_effective_class.effective_class.class_code, learning_class_year.acronym)
         self.assertEqual(distributed_effective_class.effective_class.learning_unit_identity.code, ue.acronym)
         self.assertEqual(distributed_effective_class.effective_class.learning_unit_identity.year, ue.academic_year.year)
         self.assertEqual(distributed_effective_class.distributed_volume, attribution_class.allocation_charge)
+
+    def test_should_correctly_unassign_class_from_tutor(self):
+        person = PersonFactory(global_id="123456")
+        ue = LearningUnitYearFactory()
+        learning_class_year = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
+        attribution_charge = AttributionChargeNewFactory(
+            learning_component_year=learning_class_year.learning_component_year,
+            attribution__tutor__person=person,
+        )
+        distrubuted_class_db = AttributionClassFactory(
+            learning_class_year=learning_class_year,
+            attribution_charge=attribution_charge,
+            allocation_charge=Decimal(5.0),
+        )
+        tutor = self.tutor_repository.get(
+            entity_id=TutorIdentityBuilder.build_from_personal_id_number(personal_id_number=person.global_id)
+        )
+
+        self.assertTrue(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())
+        tutor.distributed_effective_classes = []
+        self.tutor_repository.save(tutor)
+        self.assertFalse(AttributionClass.objects.filter(pk=distrubuted_class_db.pk).exists())

@@ -35,33 +35,17 @@
             <tr>
                 <th>{% trans 'Tutors' %}</th>
                 <th>{% trans 'Function' %}</th>
-                <th>{% trans 'Start' %}</th>
-                <th>{% trans 'Duration' %}</th>
-                {% if effective_class.is_lecturing %}
-                <th>
-                    <abbr title="{% trans 'Lecturing' %}">PM</abbr>
-                </th>
-                {% elif effective_class.is_practical %}
-                <th>
-                    <abbr title="{% trans 'Practical exercises' %}">PP</abbr>
-                </th>
-                {% endif %}
+                <th>{% trans 'Volume' %}</th>
                 <th></th>
             </tr>
             </thead>
             <tbody>
-            {% for tutor in tutors %}
-                {% for attribution in tutor.attributions %}
-                    {% for class_repartition in attribution.distributed_effective_classes %}
-                        {% if class_repartition.effective_class == effective_class.entity_id %}
+                {% for tutor in tutors %}
                             <tr>
                                 <td>{{ tutor.first_name }}, {{ tutor.last_name }}</td>
-                                <td>{{ attribution.function }}</td>
-
-                                <td>{{ attribution.start_year | default_if_none:'' }}</td>
-                                <td>{{ attribution.duration | default_if_none:'' }}</td>
+                                <td>{{ tutor.function }}</td>
                                 <td>
-                                    {{ class_repartition.distributed_volume | floatformat:2 }}
+                                    {{ tutor.distributed_volume_to_class | floatformat:2 }}
                                 </td>
 
                                 {% comment %}
@@ -90,10 +74,7 @@
                                 </td>
                                 {% endcomment %}
                             </tr>
-                        {% endif %}
-                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
             </tbody>
         </table>
     </div>
