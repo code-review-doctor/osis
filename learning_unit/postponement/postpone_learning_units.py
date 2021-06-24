@@ -75,6 +75,11 @@ class PostponeLearningUnits:
             is_mobility=Exists(is_mobility_qs)
         ).exclude(
             is_mobility=True
+        ).prefetch_related(
+            'learningunityear_set',
+            'learningunityear_set__externallearningunityear',
+            'learningunityear_set__learningcomponentyear_set',
+            'learningunityear_set__learningachievement_set'
         )
 
     def postpone(self):
