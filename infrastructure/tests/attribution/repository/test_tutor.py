@@ -71,11 +71,6 @@ class TutorRepositoryTestCase(TestCase):
         result = self.tutor_repository.search(effective_class_identity=class_identity)
         self.assertTrue(len(result) == 1)
 
-    def test_should_filter_on_learning_unit(self):
-        # TODO :: à supprimer si pas utilisé
-        # self.tutor_repository.search(learning_unit_identity=...)
-        raise NotImplementedError  # TODO
-
     def test_should_filter_on_list_of_tutor_identities(self):
         tutor_identity = TutorIdentityFactory()
         AttributionClassFactory(

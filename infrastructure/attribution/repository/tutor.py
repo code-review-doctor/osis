@@ -26,17 +26,16 @@
 import itertools
 from typing import List, Optional
 
-from django.db.models import F, QuerySet, Q
+from django.db.models import F, QuerySet
 
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDatabase
 from attribution.models.attribution_class import AttributionClass as AttributionClassDatabase
-from attribution.models.attribution_new import AttributionNew as AttributionNewDatabase
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.domain.model.tutor import Tutor, TutorIdentity
 from ddd.logic.attribution.dtos import TutorSearchDTO, \
     DistributedEffectiveClassesDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from learning_unit.models.learning_class_year import LearningClassYear as LearningClassYearDatabase
 from osis_common.ddd.interface import ApplicationService
 
@@ -57,19 +56,10 @@ class TutorRepository(ITutorRepository):
     def search(
             cls,
             entity_ids: Optional[List['TutorIdentity']] = None,
-            learning_unit_identity: 'LearningUnitIdentity' = None,
             effective_class_identity: 'EffectiveClassIdentity' = None,
     ) -> List['Tutor']:
 
         qs = _get_common_queryset()
-
-        if learning_unit_identity:
-            code = learning_unit_identity.code
-            year = learning_unit_identity.year
-            qs = qs.filter(
-                attribution_charge__learning_component_year__learning_unit_year__acronym=code,
-                attribution_charge__learning_component_year__learning_unit_year__academic_year__year=year,
-            )
 
         if effective_class_identity:
             learning_unit_code = effective_class_identity.learning_unit_identity.code
