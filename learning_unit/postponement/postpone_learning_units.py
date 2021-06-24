@@ -24,9 +24,9 @@
 ##############################################################################
 import math
 from functools import cached_property
-from typing import Optional
+from typing import Optional, Dict, Type, List
 
-from django.db.models import OuterRef, Max, Subquery, Exists, Model
+from django.db.models import OuterRef, Max, Subquery, Exists, Model, ForeignKey
 
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
@@ -35,6 +35,7 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
@@ -69,7 +70,7 @@ class PostponeLearningUnits:
 
         qs = LearningContainerYear.objects.filter(
             academic_year__year=Subquery(last_occurence_qs[:1]),
-            acronym='LINFO2335'
+            acronym='LINFO2992'
         ).annotate(
             is_mobility=Exists(is_mobility_qs)
         ).exclude(
@@ -81,28 +82,33 @@ class PostponeLearningUnits:
     def postpone(self):
         for lcy in self.get_queryset():
             for year in range(lcy.academic_year.year + 1, self.compute_container_year_end_year(lcy) + 1):
-                self.produce_learning_container_year(lcy, year)
+                default_values = self.load_default_values(lcy)
+                self.produce_learning_container_year(lcy, year, default_values)
 
-    def produce_learning_container_year(self, from_lcy: LearningContainerYear, for_year: int):
-        create_learning_container_year_from_template(from_lcy, for_year)
+    def produce_learning_container_year(self, from_lcy: LearningContainerYear, for_year: int, defaults: Dict):
+        create_learning_container_year_from_template(from_lcy, for_year, defaults[LearningContainerYear.__name__])
 
-        self.produce_learning_unit_years(from_lcy, for_year)
+        self.produce_learning_unit_years(from_lcy, for_year, defaults)
 
-    def produce_learning_unit_years(self, from_lcy: LearningContainerYear, for_year: int):
+    def produce_learning_unit_years(self, from_lcy: LearningContainerYear, for_year: int, defaults: Dict):
         for luy in from_lcy.learningunityear_set.all():
             if self.normalize_year(luy.learning_unit.end_year) >= for_year:
-                create_learning_unit_year_from_template(luy, for_year)
+                create_learning_unit_year_from_template(luy, for_year, defaults[LearningUnitYear.__name__])
 
-                self.produce_components(luy, for_year)
+                self.produce_components(luy, for_year, defaults)
                 self.produce_teaching_materials(luy, for_year)
                 self.produce_learning_achievements(luy, for_year)
                 self.produce_cms(luy, for_year)
                 if luy.is_external():
                     self.produce_external_learnig_unit_year(luy, for_year)
 
-    def produce_components(self, from_luy: LearningUnitYear, for_year: int):
+    def produce_components(self, from_luy: LearningUnitYear, for_year: int, defaults: Dict):
         for component in from_luy.learningcomponentyear_set.all():
-            create_component_year_from_template(component, for_year)
+            create_component_year_from_template(
+                component,
+                for_year,
+                defaults[LearningComponentYear.__name__].get(component.type)
+            )
 
     def produce_teaching_materials(self, from_luy: LearningUnitYear, for_year: int):
         for material in from_luy.teachingmaterial_set.all():
@@ -124,6 +130,49 @@ class PostponeLearningUnits:
         external_learning_unit_year = from_luy.externallearningunityear
         create_external_learning_unit_year_from_template(external_learning_unit_year, for_year)
 
+    def load_default_values(self, lcy: LearningContainerYear) -> Dict:
+        proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_container_year=lcy).first()
+        default_values = proposal.initial_data if proposal else {}
+
+        cleaned_default_values = {
+            LearningContainerYear.__name__: self._clean_model_default_values(
+                LearningContainerYear,
+                default_values.get('learning_container_year', {})
+            ),
+            LearningUnitYear.__name__: self._clean_model_default_values(
+                LearningUnitYear,
+                default_values.get('learning_unit_year', {})
+            ),
+            LearningComponentYear.__name__: self._clean_component_years_default_values(
+                default_values.get('learning_component_years', [])
+            )
+        }
+
+        return cleaned_default_values
+
+    def _clean_component_years_default_values(self, default_values: List[Dict]) -> Dict:
+        return {
+            component_type_default_values['type']: self._clean_model_default_values(
+                LearningComponentYear,
+                component_type_default_values
+            )
+            for component_type_default_values
+            in default_values
+        }
+
+    def _clean_model_default_values(self, model: Type[Model], default_values) -> Dict:
+        exclude = ('id', )
+        return {
+            self._clean_field_name(model, field_name): field_value
+            for field_name, field_value
+            in default_values.items() if field_name not in exclude
+        }
+
+    def _clean_field_name(self, model: Type[Model], field_name: str) -> str:
+        if isinstance(model._meta.get_field(field_name), ForeignKey):
+            return "{}_id".format(field_name)
+        return field_name
+
     def normalize_year(self, academic_year: Optional[AcademicYear]) -> float:
         if academic_year is None:
             return math.inf
@@ -142,17 +191,20 @@ class PostponeLearningUnits:
 
 def create_learning_container_year_from_template(
         template_lcy: LearningContainerYear,
-        to_year: int
+        to_year: int,
+        defaults: Dict
 ) -> LearningContainerYear:
     acy = AcademicYear.objects.get(year=to_year)
     field_values = get_fields_values(template_lcy)
     field_values['academic_year_id'] = acy.id
+    field_values.update(defaults)
     return LearningContainerYear.objects.create(**field_values)
 
 
 def create_learning_unit_year_from_template(
         template_luy: LearningUnitYear,
-        to_year: int
+        to_year: int,
+        defaults: Dict
 ) -> LearningUnitYear:
     acy = AcademicYear.objects.get(year=to_year)
     lcy = LearningContainerYear.objects.get(
@@ -162,6 +214,7 @@ def create_learning_unit_year_from_template(
     field_values = get_fields_values(template_luy)
     field_values['academic_year_id'] = acy.id
     field_values['learning_container_year_id'] = lcy.id
+    field_values.update(defaults)
     return LearningUnitYear.objects.create(**field_values)
 
 
@@ -180,7 +233,8 @@ def create_external_learning_unit_year_from_template(
 
 def create_component_year_from_template(
         template_component_year: LearningComponentYear,
-        to_year: int
+        to_year: int,
+        defaults: Dict
 ) -> LearningComponentYear:
     luy = LearningUnitYear.objects.get(
         learning_unit=template_component_year.learning_unit_year.learning_unit,
@@ -188,6 +242,7 @@ def create_component_year_from_template(
     )
     field_values = get_fields_values(template_component_year)
     field_values['learning_unit_year_id'] = luy.id
+    field_values.update(defaults)
     return LearningComponentYear.objects.create(**field_values)
 
 
