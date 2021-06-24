@@ -78,10 +78,10 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         )
 
     def is_volume_first_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
-        return self.volumes.volume_first_quadrimester > volume
+        return self.volumes.volume_first_quadrimester and self.volumes.volume_first_quadrimester > volume
 
     def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
-        return self.volumes.volume_second_quadrimester > volume
+        return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
 
 
 class PracticalEffectiveClass(EffectiveClass):

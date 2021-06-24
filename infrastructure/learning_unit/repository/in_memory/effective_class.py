@@ -9,24 +9,23 @@ class EffectiveClassRepository(IEffectiveClassRepository):
     effective_classes = list()
 
     @classmethod
-    def get(cls, entity_id: EffectiveClassIdentity) -> EffectiveClass:
+    def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
         for effective_class in cls.effective_classes:
             if effective_class.entity_id == entity_id:
                 return effective_class
-        return None
 
     @classmethod
-    def search(cls, entity_ids: Optional[List[EffectiveClassIdentity]] = None, **kwargs) -> List[EffectiveClass]:
+    def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
         pass
 
     @classmethod
-    def delete(cls, entity_id: EffectiveClassIdentity, **kwargs: ApplicationService) -> None:
+    def delete(cls, entity_id: 'EffectiveClassIdentity', **kwargs: ApplicationService) -> None:
         pass
 
     @classmethod
-    def save(cls, entity: EffectiveClass) -> None:
+    def save(cls, entity: 'EffectiveClass') -> None:
         cls.effective_classes.append(entity)
 
     @classmethod
-    def get_all_identities(self) -> List['EffectiveClassIdentity']:
-        return [effective_class.entity_id for effective_class in self.effective_classes]
+    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
+        return [effective_class.entity_id for effective_class in cls.effective_classes]
