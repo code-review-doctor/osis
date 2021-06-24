@@ -31,6 +31,7 @@ from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
+from backoffice.settings.base import MINIMUM_EDG_YEAR
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex
 from base.models import campus
@@ -166,7 +167,7 @@ class GroupFilter(FilterSet):
         self.form.fields["version"].initial = kwargs.pop('version', None)
 
     def __init_academic_year_field(self):
-        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand())
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_EDG_YEAR))
         choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
         self.form.fields['academic_year__year'].choices = choices
         self.form.fields['academic_year__year'].initial = \
