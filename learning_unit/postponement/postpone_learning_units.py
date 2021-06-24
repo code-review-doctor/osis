@@ -82,43 +82,61 @@ class PostponeLearningUnits:
     def postpone(self):
         for lcy in self.get_queryset():
             for year in range(lcy.academic_year.year + 1, self.compute_container_year_end_year(lcy) + 1):
-                default_values = self.load_default_values(lcy)
-                self.produce_learning_container_year(lcy, year, default_values)
+                default_values = self.load_initial_values_before_proposal(lcy)
+                self.postpone_learning_container_year(lcy, year, default_values)
 
-    def produce_learning_container_year(self, from_lcy: LearningContainerYear, for_year: int, defaults: Dict):
-        create_learning_container_year_from_template(from_lcy, for_year, defaults[LearningContainerYear.__name__])
+    def postpone_learning_container_year(
+            self,
+            from_lcy: LearningContainerYear,
+            for_year: int,
+            initial_values_before_proposal: Dict
+            ):
+        create_learning_container_year_from_template(
+            from_lcy,
+            for_year,
+            initial_values_before_proposal[LearningContainerYear.__name__]
+        )
 
-        self.produce_learning_unit_years(from_lcy, for_year, defaults)
+        self.postpone_learning_unit_years(from_lcy, for_year, initial_values_before_proposal)
 
-    def produce_learning_unit_years(self, from_lcy: LearningContainerYear, for_year: int, defaults: Dict):
+    def postpone_learning_unit_years(
+            self,
+            from_lcy: LearningContainerYear,
+            for_year: int,
+            initial_values_before_proposal: Dict
+            ):
         for luy in from_lcy.learningunityear_set.all():
             if self.compute_learning_unit_year_end_year(luy) >= for_year:
-                create_learning_unit_year_from_template(luy, for_year, defaults[LearningUnitYear.__name__])
+                create_learning_unit_year_from_template(
+                    luy,
+                    for_year,
+                    initial_values_before_proposal[LearningUnitYear.__name__]
+                )
 
-                self.produce_components(luy, for_year, defaults)
-                self.produce_teaching_materials(luy, for_year)
-                self.produce_learning_achievements(luy, for_year)
-                self.produce_cms(luy, for_year)
+                self.postpone_components(luy, for_year, initial_values_before_proposal)
+                self.postpone_teaching_materials(luy, for_year)
+                self.postopne_learning_achievements(luy, for_year)
+                self.postone_cms(luy, for_year)
                 if luy.is_external():
-                    self.produce_external_learnig_unit_year(luy, for_year)
+                    self.postpone_external_learnig_unit_year(luy, for_year)
 
-    def produce_components(self, from_luy: LearningUnitYear, for_year: int, defaults: Dict):
+    def postpone_components(self, from_luy: LearningUnitYear, for_year: int, initial_values_before_proposal: Dict):
         for component in from_luy.learningcomponentyear_set.all():
             create_component_year_from_template(
                 component,
                 for_year,
-                defaults[LearningComponentYear.__name__].get(component.type, {})
+                initial_values_before_proposal[LearningComponentYear.__name__].get(component.type, {})
             )
 
-    def produce_teaching_materials(self, from_luy: LearningUnitYear, for_year: int):
+    def postpone_teaching_materials(self, from_luy: LearningUnitYear, for_year: int):
         for material in from_luy.teachingmaterial_set.all():
             create_teaching_material_from_template(material, for_year)
 
-    def produce_learning_achievements(self, from_luy: LearningUnitYear, for_year: int):
+    def postopne_learning_achievements(self, from_luy: LearningUnitYear, for_year: int):
         for achievement in from_luy.learningachievement_set.all():
             create_learning_achievement_from_template(achievement, for_year)
 
-    def produce_cms(self, from_luy: LearningUnitYear, for_year: int):
+    def postone_cms(self, from_luy: LearningUnitYear, for_year: int):
         cms_query = TranslatedText.objects.filter(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=from_luy.id
@@ -126,33 +144,33 @@ class PostponeLearningUnits:
         for cms in cms_query:
             create_cms_from_template(cms, for_year)
 
-    def produce_external_learnig_unit_year(self, from_luy: LearningUnitYear, for_year: int):
+    def postpone_external_learnig_unit_year(self, from_luy: LearningUnitYear, for_year: int):
         external_learning_unit_year = from_luy.externallearningunityear
         create_external_learning_unit_year_from_template(external_learning_unit_year, for_year)
 
-    def load_default_values(self, lcy: LearningContainerYear) -> Dict:
+    def load_initial_values_before_proposal(self, lcy: LearningContainerYear) -> Dict:
         proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_container_year=lcy).first()
-        default_values = proposal.initial_data if proposal else {}
+        initial_values = proposal.initial_data if proposal else {}
 
-        cleaned_default_values = {
-            LearningContainerYear.__name__: self._clean_model_default_values(
+        cleaned_initial_values = {
+            LearningContainerYear.__name__: self._clean_model_initial_values(
                 LearningContainerYear,
-                default_values.get('learning_container_year', {})
+                initial_values.get('learning_container_year', {})
             ),
-            LearningUnitYear.__name__: self._clean_model_default_values(
+            LearningUnitYear.__name__: self._clean_model_initial_values(
                 LearningUnitYear,
-                default_values.get('learning_unit_year', {})
+                initial_values.get('learning_unit_year', {})
             ),
-            LearningComponentYear.__name__: self._clean_component_years_default_values(
-                default_values.get('learning_component_years', [])
+            LearningComponentYear.__name__: self._clean_component_years_initial_values(
+                initial_values.get('learning_component_years', [])
             )
         }
 
-        return cleaned_default_values
+        return cleaned_initial_values
 
-    def _clean_component_years_default_values(self, default_values: List[Dict]) -> Dict:
+    def _clean_component_years_initial_values(self, default_values: List[Dict]) -> Dict:
         return {
-            component_type_default_values['type']: self._clean_model_default_values(
+            component_type_default_values['type']: self._clean_model_initial_values(
                 LearningComponentYear,
                 component_type_default_values
             )
@@ -160,7 +178,7 @@ class PostponeLearningUnits:
             in default_values
         }
 
-    def _clean_model_default_values(self, model: Type[Model], default_values) -> Dict:
+    def _clean_model_initial_values(self, model: Type[Model], default_values) -> Dict:
         exclude = ('id', )
         return {
             self._clean_field_name(model, field_name): field_value
