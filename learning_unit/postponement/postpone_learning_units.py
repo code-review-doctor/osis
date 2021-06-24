@@ -24,7 +24,7 @@
 ##############################################################################
 import math
 from functools import cached_property
-from typing import Optional, Dict, Type, List
+from typing import Optional, Dict, Type, List, Iterable
 
 from django.db.models import OuterRef, Max, Subquery, Exists, Model, ForeignKey, Q
 
@@ -51,7 +51,7 @@ class PostponeLearningUnits:
     def until_year(self) -> int:
         return self.from_year + 7
 
-    def get_queryset(self):
+    def load_container_years_to_postpone(self) -> Iterable[LearningContainerYear]:
         last_occurence_qs = LearningContainerYear.objects.filter(
             Q(academic_year__year__gte=self.from_year) & Q(learningunityear__proposallearningunit__isnull=True),
             learning_container=OuterRef("learning_container")
@@ -68,7 +68,7 @@ class PostponeLearningUnits:
             learning_unit_year=OuterRef('learningunityear')
         )
 
-        qs = LearningContainerYear.objects.filter(
+        return LearningContainerYear.objects.filter(
             academic_year__year=Subquery(last_occurence_qs[:1]),
             acronym='LECGE1112'
         ).annotate(
@@ -77,10 +77,8 @@ class PostponeLearningUnits:
             is_mobility=True
         )
 
-        return qs
-
     def postpone(self):
-        for lcy in self.get_queryset():
+        for lcy in self.load_container_years_to_postpone():
             for year in range(lcy.academic_year.year + 1, self.compute_container_year_end_year(lcy) + 1):
                 default_values = self.load_initial_values_before_proposal(lcy)
                 self.postpone_learning_container_year(lcy, year, default_values)
@@ -90,37 +88,31 @@ class PostponeLearningUnits:
             from_lcy: LearningContainerYear,
             for_year: int,
             initial_values_before_proposal: Dict
-            ):
+    ):
         create_learning_container_year_from_template(
             from_lcy,
             for_year,
             initial_values_before_proposal[LearningContainerYear.__name__]
         )
 
-        self.postpone_learning_unit_years(from_lcy, for_year, initial_values_before_proposal)
+        for luy in from_lcy.learningunityear_set.all():
+            self.postpone_learning_unit_year(luy, for_year, initial_values_before_proposal)
 
-    def postpone_learning_unit_years(
+    def postpone_learning_unit_year(
             self,
-            from_lcy: LearningContainerYear,
+            from_luy: LearningUnitYear,
             for_year: int,
             initial_values_before_proposal: Dict
-            ):
-        for luy in from_lcy.learningunityear_set.all():
-            if self.compute_learning_unit_year_end_year(luy) >= for_year:
-                create_learning_unit_year_from_template(
-                    luy,
-                    for_year,
-                    initial_values_before_proposal[LearningUnitYear.__name__]
-                )
+    ):
+        if not self.compute_learning_unit_year_end_year(from_luy) >= for_year:
+            return
 
-                self.postpone_components(luy, for_year, initial_values_before_proposal)
-                self.postpone_teaching_materials(luy, for_year)
-                self.postopne_learning_achievements(luy, for_year)
-                self.postone_cms(luy, for_year)
-                if luy.is_external():
-                    self.postpone_external_learnig_unit_year(luy, for_year)
+        create_learning_unit_year_from_template(
+            from_luy,
+            for_year,
+            initial_values_before_proposal[LearningUnitYear.__name__]
+        )
 
-    def postpone_components(self, from_luy: LearningUnitYear, for_year: int, initial_values_before_proposal: Dict):
         for component in from_luy.learningcomponentyear_set.all():
             create_component_year_from_template(
                 component,
@@ -128,25 +120,21 @@ class PostponeLearningUnits:
                 initial_values_before_proposal[LearningComponentYear.__name__].get(component.type, {})
             )
 
-    def postpone_teaching_materials(self, from_luy: LearningUnitYear, for_year: int):
         for material in from_luy.teachingmaterial_set.all():
             create_teaching_material_from_template(material, for_year)
 
-    def postopne_learning_achievements(self, from_luy: LearningUnitYear, for_year: int):
         for achievement in from_luy.learningachievement_set.all():
             create_learning_achievement_from_template(achievement, for_year)
 
-    def postone_cms(self, from_luy: LearningUnitYear, for_year: int):
-        cms_query = TranslatedText.objects.filter(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=from_luy.id
-        )
+        if from_luy.is_external():
+            create_external_learning_unit_year_from_template(from_luy.externallearningunityear, for_year)
+
+        self.postpone_cms(from_luy, for_year)
+
+    def postpone_cms(self, from_luy: LearningUnitYear, for_year: int):
+        cms_query = TranslatedText.objects.filter(entity=entity_name.LEARNING_UNIT_YEAR, reference=from_luy.id)
         for cms in cms_query:
             create_cms_from_template(cms, for_year)
-
-    def postpone_external_learnig_unit_year(self, from_luy: LearningUnitYear, for_year: int):
-        external_learning_unit_year = from_luy.externallearningunityear
-        create_external_learning_unit_year_from_template(external_learning_unit_year, for_year)
 
     def load_initial_values_before_proposal(self, lcy: LearningContainerYear) -> Dict:
         proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_container_year=lcy).first()
@@ -337,7 +325,7 @@ def create_cms_from_template(
     return TranslatedText.objects.create(**field_values)
 
 
-def get_fields_values(model_obj: Model) -> dict:
+def get_fields_values(model_obj: Model) -> Dict:
     exclude = ('external_id', 'id', 'uuid', 'changed')
     model_fields = type(model_obj)._meta.get_fields()
     return {
