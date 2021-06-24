@@ -26,14 +26,15 @@
 from typing import List
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
-from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
-    SearchTutorsDistributedToClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
+from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.views.learning_unit_class.common import common_url_tabs
 
 
 class ClassTutorsView(PermissionRequiredMixin, TemplateView):
@@ -59,6 +60,7 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
                 'tutors': self.tutors,
             }
         )
+        context.update(common_url_tabs(self.learning_unit_code, self.learning_unit_year, self.class_code))
         return context
 
     def get_permission_object(self):
@@ -79,3 +81,13 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
             class_code=self.class_code,
         )
         return message_bus_instance.invoke(command)
+
+    def get_url_class_tutors(self):
+        url_kwargs = {
+            'learning_unit_year': self.learning_unit_year,
+            'learning_unit_code': self.learning_unit_code,
+            'class_code': self.class_code
+        }
+        url =  reverse("class_tutors", kwargs=url_kwargs)
+        print(url)
+        return url

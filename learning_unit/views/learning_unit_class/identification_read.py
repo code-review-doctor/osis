@@ -26,7 +26,6 @@
 from typing import List, Dict
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 from reversion.models import Version
 
@@ -39,6 +38,7 @@ from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import Uclouva
 from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.views.learning_unit_class.common import common_url_tabs
 
 
 class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
@@ -67,6 +67,7 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                 'warnings': learning_unit_year.warnings
             }
         )
+        context.update(common_url_tabs(learning_unit.code, learning_unit.year, effective_class.entity_id.class_code))
         return context
 
     def get_learning_unit_year(self):

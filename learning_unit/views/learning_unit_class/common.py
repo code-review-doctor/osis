@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,21 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 
-from attribution.models import *
+from typing import Dict
 
-admin.site.register(attribution.Attribution,
-                    attribution.AttributionAdmin)
+from django.urls import reverse
 
-admin.site.register(attribution_new.AttributionNew,
-                    attribution_new.AttributionNewAdmin)
 
-admin.site.register(attribution_charge_new.AttributionChargeNew,
-                    attribution_charge_new.AttributionChargeNewAdmin)
-
-admin.site.register(tutor_application.TutorApplication,
-                    tutor_application.TutorApplicationAdmin)
-
-admin.site.register(attribution_class.AttributionClass,
-                    attribution_class.AttributionClassAdmin)
+def common_url_tabs(code: str, year: str, class_code: str) -> Dict[str, str]:
+    url_kwargs = {
+        'learning_unit_year': year,
+        'learning_unit_code': code,
+        'class_code': class_code
+    }
+    return {
+        'url_class_tutors': reverse("class_tutors", kwargs=url_kwargs),
+        'url_class_identification': reverse("class_identification", kwargs=url_kwargs),
+    }
