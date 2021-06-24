@@ -26,7 +26,7 @@ import math
 from functools import cached_property
 from typing import Optional, Dict, Type, List
 
-from django.db.models import OuterRef, Max, Subquery, Exists, Model, ForeignKey
+from django.db.models import OuterRef, Max, Subquery, Exists, Model, ForeignKey, Q
 
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
@@ -53,7 +53,7 @@ class PostponeLearningUnits:
 
     def get_queryset(self):
         last_occurence_qs = LearningContainerYear.objects.filter(
-            academic_year__year__gte=self.from_year,
+            Q(academic_year__year__gte=self.from_year) & Q(learningunityear__proposallearningunit__isnull=True),
             learning_container=OuterRef("learning_container")
         ).values(
             "learning_container"
@@ -70,7 +70,7 @@ class PostponeLearningUnits:
 
         qs = LearningContainerYear.objects.filter(
             academic_year__year=Subquery(last_occurence_qs[:1]),
-            acronym='LINFO2992'
+            acronym='LECGE1112'
         ).annotate(
             is_mobility=Exists(is_mobility_qs)
         ).exclude(
@@ -92,7 +92,7 @@ class PostponeLearningUnits:
 
     def produce_learning_unit_years(self, from_lcy: LearningContainerYear, for_year: int, defaults: Dict):
         for luy in from_lcy.learningunityear_set.all():
-            if self.normalize_year(luy.learning_unit.end_year) >= for_year:
+            if self.compute_learning_unit_year_end_year(luy) >= for_year:
                 create_learning_unit_year_from_template(luy, for_year, defaults[LearningUnitYear.__name__])
 
                 self.produce_components(luy, for_year, defaults)
@@ -107,7 +107,7 @@ class PostponeLearningUnits:
             create_component_year_from_template(
                 component,
                 for_year,
-                defaults[LearningComponentYear.__name__].get(component.type)
+                defaults[LearningComponentYear.__name__].get(component.type, {})
             )
 
     def produce_teaching_materials(self, from_luy: LearningUnitYear, for_year: int):
@@ -186,7 +186,41 @@ class PostponeLearningUnits:
         )
         years = [year or math.inf for year in years]
         max_year = max(years)
+
+        proposal_end_year = self._compute_proposal_end_year(lcy)
+        if proposal_end_year:
+            return min(
+                max(max_year, proposal_end_year),
+                self.until_year
+            )
+
         return min(max_year, self.until_year)
+
+    def _compute_proposal_end_year(self, lcy: LearningContainerYear) -> Optional[float]:
+        proposal = ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_container_year__learning_container=lcy.learning_container
+        ).first()
+        if not proposal:
+            return None
+
+        end_year_id = proposal.initial_data['learning_unit']['end_year']
+        if not end_year_id:
+            return math.inf
+
+        return AcademicYear.objects.get(id=end_year_id).year
+
+    def compute_learning_unit_year_end_year(self, luy: LearningUnitYear) -> float:
+        proposal = ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=luy.learning_unit
+        ).first()
+        if not proposal:
+            return self.normalize_year(luy.learning_unit.end_year)
+
+        end_year_id = proposal.initial_data['learning_unit']['end_year']
+        if not end_year_id:
+            return math.inf
+
+        return self.normalize_year(AcademicYear.objects.get(id=end_year_id))
 
 
 def create_learning_container_year_from_template(
