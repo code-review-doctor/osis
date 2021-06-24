@@ -40,6 +40,8 @@ from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 
+POSTPONEMENT_RANGE = 6
+
 
 class PostponeLearningUnits:
 
@@ -49,7 +51,7 @@ class PostponeLearningUnits:
 
     @property
     def until_year(self) -> int:
-        return self.from_year + 7
+        return self.from_year + POSTPONEMENT_RANGE
 
     def load_container_years_to_postpone(self) -> Iterable[LearningContainerYear]:
         last_occurence_qs = LearningContainerYear.objects.filter(
@@ -70,7 +72,6 @@ class PostponeLearningUnits:
 
         return LearningContainerYear.objects.filter(
             academic_year__year=Subquery(last_occurence_qs[:1]),
-            acronym='LECGE1112'
         ).annotate(
             is_mobility=Exists(is_mobility_qs)
         ).exclude(
