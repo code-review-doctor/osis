@@ -25,10 +25,9 @@
 ##############################################################################
 from unittest.mock import patch
 
-from django.test import SimpleTestCase, TestCase
+from django.test import TestCase
 
 import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree import build_path, ProgramTree
@@ -58,18 +57,18 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self.node_to_detach = self.link.child
         self.path_to_detach = build_path(self.link.parent, self.link.child)
 
-        self.detach_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=True)
+        self.detach_command = DetachNodeCommandFactory(path=self.path_to_detach, commit=True)
 
         self._patch_persist_tree()
         self._patch_search_tree_identity()
         self._patch_get_tree()
-        self._patch_load_tree()
-        self._patch_load_trees_from_children()
+        self._patch_search_from_children()
 
     def _patch_persist_tree(self):
-        patcher_persist = patch("program_management.ddd.repositories.persist_tree.persist")
+        patcher_persist = patch("program_management.ddd.repositories.program_tree.ProgramTreeRepository.update")
         self.addCleanup(patcher_persist.stop)
         self.mock_persist = patcher_persist.start()
+        self.mock_persist.return_value = self.tree.entity_id
 
     def _patch_search_tree_identity(self):
         patcher_search_identity = patch("program_management.ddd.domain.service.identity_search."
@@ -84,20 +83,17 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
         self.mock_get = patcher_load.start()
         self.mock_get.return_value = self.tree
 
-    def _patch_load_tree(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load")
-        self.addCleanup(patcher_load.stop)
-        self.mock_load = patcher_load.start()
-        self.mock_load.return_value = self.tree
-
-    def _patch_load_trees_from_children(self):
-        patcher_load = patch("program_management.ddd.repositories.load_tree.load_trees_from_children")
+    def _patch_search_from_children(self):
+        patcher_load = patch(
+            "program_management.ddd.repositories.program_tree.ProgramTreeRepository.search_from_children"
+        )
         self.addCleanup(patcher_load.stop)
         self.mock_load_tress_from_children = patcher_load.start()
         self.mock_load_tress_from_children.return_value = [self.tree]
 
     @patch.object(program_tree.ProgramTree, 'detach_node')
-    def test_should_return_link_created_identity_and_persist_it_when_valid_and_commit_set_to_true(self, mock_detach_node):
+    def test_should_return_link_created_identity_and_persist_it_when_valid_and_commit_set_to_true(self,
+                                                                                                  mock_detach_node):
         mock_detach_node.return_value = self.link
         link_identity = detach_node_service.detach_node(self.detach_command)
 
@@ -107,7 +103,7 @@ class TestDetachNode(TestCase, ValidatorPatcherMixin):
     @patch.object(ProgramTree, 'detach_node')
     def test_should_return_link_identity_and_not_persist_when_valid_and_commit_set_to_false(self, mock_detach_node):
         mock_detach_node.return_value = self.link
-        detach_node_command = DetachNodeCommandFactory(path_where_to_detach=self.path_to_detach, commit=False)
+        detach_node_command = DetachNodeCommandFactory(path=self.path_to_detach, commit=False)
         detach_node_service.detach_node(detach_node_command)
         assertion_message = "Should not persist any data into database. " \
                             "It only tests and applies detach action on the in-memory object."

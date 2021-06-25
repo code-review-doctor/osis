@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-04 15:00+0100\n"
+"POT-Creation-Date: 2021-05-31 09:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Abbreviated title"
 msgstr ""
 
 msgid "Ac yr."
@@ -246,13 +249,16 @@ msgstr ""
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
+msgid "Cohort year"
+msgstr ""
+
 msgid "Comment"
 msgstr ""
 
-msgid "Common admission conditions can only be edited by central manager"
+msgid "Common access requirements can only be edited by central manager"
 msgstr ""
 
-msgid "Common admission conditions will be published soon"
+msgid "Common access requirements will be published soon"
 msgstr ""
 
 msgid "Common general informations will be published soon"
@@ -300,6 +306,12 @@ msgid "Contact has been created (with postpone)"
 msgstr ""
 
 msgid "Contact has been created (without postpone)"
+msgstr ""
+
+msgid "Contact has been moved (with postpone)"
+msgstr ""
+
+msgid "Contact has been moved (without postpone)"
 msgstr ""
 
 msgid "Contact has been removed (with postpone)"
@@ -440,11 +452,19 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
-msgid ""
-"For formation PhD the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+msgid "Fill program tree content from last year"
+msgstr ""
+
+msgid "First year bachelor"
 msgstr ""
 
 msgid "For all students"
+msgstr ""
+
+msgid ""
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -565,7 +585,7 @@ msgstr ""
 
 msgid ""
 "Management common topics in the context of training's general informations "
-"and access conditions"
+"and access requirements"
 msgstr ""
 
 msgid "Management entity"
@@ -621,8 +641,14 @@ msgstr ""
 msgid "Modify order of condition"
 msgstr ""
 
+msgid "Modify order of the contacts"
+msgstr ""
+
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "New Education Group"
@@ -643,7 +669,7 @@ msgstr ""
 msgid "Number of elements"
 msgstr ""
 
-msgid "Opening to Adults"
+msgid "Open to adults"
 msgstr ""
 
 msgid "Other academic responsibles"
@@ -656,9 +682,6 @@ msgid "Other languages activities"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
-msgstr ""
-
-msgid "Own comment"
 msgstr ""
 
 msgid "Partial deliberation"
@@ -700,7 +723,7 @@ msgstr ""
 msgid "Rate code"
 msgstr ""
 
-msgid "Reduction"
+msgid "Reduced credit registration"
 msgstr ""
 
 msgid "Reference institution"
@@ -900,6 +923,11 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
+msgid ""
+"Transition version of finalities must be filled from transition version of "
+"master"
+msgstr ""
+
 msgid "Type of constraint"
 msgstr ""
 
@@ -913,7 +941,7 @@ msgid "UCL Diploma"
 msgstr ""
 
 #, python-brace-format
-msgid "Unable to publish common admission conditions for {year}"
+msgid "Unable to publish common access requirements for {year}"
 msgstr ""
 
 #, python-brace-format

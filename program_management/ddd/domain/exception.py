@@ -180,19 +180,6 @@ class ProgramTreeVersionMismatch(BusinessException):
             if version_identity.is_official_standard else version_label(version_identity, only_label=True)
 
 
-class CannotExtendTransitionDueToExistenceOfOtherTransitionException(BusinessException):
-    def __init__(self, version: 'ProgramTreeVersion', transition_year: int, *args, **kwargs):
-        message = _(
-            "You can't extend the program tree '{code}' in {year} as other transition version exists in "
-            "{transition_year}"
-        ).format(
-            code=version.program_tree_identity.code,
-            year=version.end_year_of_existence,
-            transition_year=transition_year
-        )
-        super().__init__(message, **kwargs)
-
-
 class Program2MEndDateLowerThanItsFinalitiesException(BusinessException):
     def __init__(self, node_2m: 'Node', **kwargs):
         message = _("The end date of %(acronym)s must be higher or equal to its finalities") % {
@@ -325,7 +312,8 @@ class ChildTypeNotAuthorizedException(BusinessException):
         }
         super().__init__(message)
 
-    def _format_node(self, node: 'Node') -> str:
+    @staticmethod
+    def _format_node(node: 'Node') -> str:
         return "{} ({})".format(str(node), node.node_type.value)
 
 
@@ -406,21 +394,70 @@ class InvalidVersionNameException(BusinessException):
         super().__init__(message)
 
 
+class InvalidVersionNameWithTransitionException(BusinessException):
+    def __init__(self):
+        message = _("Name version cannot contain TRANSITION. Please create a transition version if necessary")
+        super().__init__(message)
+
+
 class InvalidTransitionNameException(BusinessException):
     def __init__(self):
         message = _("This value is invalid.")
         super().__init__(message)
 
 
-class VersionNameAlreadyExist(BusinessException):
+class VersionNameExistsCurrentYearAndInFuture(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} already exists").format(version_name)
         super().__init__(message, **kwargs)
 
 
-class VersionNameExistedException(BusinessException):
+class VersionNameExistsInPast(BusinessException):
     def __init__(self, version_name: str, *args, **kwargs):
         message = _("Version name {} existed").format(version_name)
+        super().__init__(message, **kwargs)
+
+
+class TransitionNameExistsCurrentYearAndInFuture(BusinessException):
+    def __init__(self, transition_name: str, *args, **kwargs):
+        message = _("Transition name {} already exists").format(transition_name)
+        super().__init__(message, **kwargs)
+
+
+class TransitionNameExistsInPast(BusinessException):
+    def __init__(self, transition_name: str, *args, **kwargs):
+        message = _("Transition name {} existed").format(transition_name)
+        super().__init__(message, **kwargs)
+
+
+class TransitionNameExistsInPastButExistenceOfOtherTransitionException(BusinessException):
+    def __init__(
+            self,
+            offer_acronym: str,
+            year: int,
+            transition_year: int,
+            transition_name: str,
+            version_name: str,
+            **kwargs
+    ):
+        if version_name:
+            full_code = offer_acronym + "[" + version_name+" - " + transition_name + "]"
+        else:
+            full_code = offer_acronym + "[" + transition_name + "]"
+        message = _(
+            "You can't create/extend the transition version '{full_code}' in {year} as other transition version exists "
+            "in {transition_year}"
+        ).format(
+            full_code=full_code,
+            year=year,
+            transition_year=transition_year
+        )
+        super().__init__(message, **kwargs)
+
+
+class CodePatternException(BusinessException):
+    def __init__(self, code: str, **kwargs):
+        message = _("The Code {} is invalid").format(code)
         super().__init__(message, **kwargs)
 
 
@@ -439,4 +476,23 @@ class InvalidTreeVersionToFillTo(BusinessException):
 class CannotCopyPrerequisiteException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Cannot copy prerequisite")
+        super().__init__(message, **kwargs)
+
+
+class CannotFillContentOfProgramTreeOfTypeFinalityException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Tree is finality")
+        super().__init__(message, **kwargs)
+
+
+class NoFinalitiesHaveCorrespondingTransitionVersionException(BusinessException):
+    def __init__(self, finalities: Set['NodeGroupYear'], to_tree: 'ProgramTree', **kwargs):
+        message = _(
+            "Please create at least a transition version [%(transition_name)s] for one of the finalities %(finalities)s"
+            " in %(academic_year)s."
+        ) % {
+            "transition_name": to_tree.root_node.transition_name,
+            "finalities": ", ".join([str(finality.full_acronym()) for finality in finalities]),
+            "academic_year": to_tree.root_node.academic_year
+        }
         super().__init__(message, **kwargs)

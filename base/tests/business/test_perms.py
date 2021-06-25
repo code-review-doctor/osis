@@ -496,8 +496,7 @@ class TestIsEligibleToCreateModificationProposal(TestCase):
         person = CentralManagerFactory().person
         self.assertFalse(person.user.has_perm('base.can_propose_learningunit', self.luy))
 
-    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=True)
-    def test_all_requirements_are_met_to_propose_modification(self, mock_is_open):
+    def test_all_requirements_are_met_to_propose_modification(self):
         for luy_container_type in [type.name for type in FACULTY_EDITABLE_CONTAINER_TYPES]:
             with self.subTest(luy_container_type=luy_container_type):
                 self.luy.learning_container_year.container_type = luy_container_type
@@ -586,7 +585,10 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
 
     def test_is_not_eligible_consolidate_delete_proposal_if_has_applications(self):
         requirement_entity = EntityFactory()
-        luy = LearningUnitYearFactory(learning_container_year__requirement_entity=requirement_entity)
+        luy = LearningUnitYearFactory(
+            learning_container_year__requirement_entity=requirement_entity,
+            subtype=learning_unit_year_subtypes.FULL
+        )
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=luy,
             type=ProposalType.SUPPRESSION.name,

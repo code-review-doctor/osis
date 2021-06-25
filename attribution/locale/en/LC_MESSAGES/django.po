@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-04 11:10+0100\n"
+"POT-Creation-Date: 2021-03-25 14:35+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -159,10 +159,13 @@ msgstr ""
 msgid "Manage repartition"
 msgstr ""
 
-msgid "No attributions exist for the full UE"
+msgid "No attributions exist for the UE"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
+msgstr ""
+
+msgid "Not in period to edit force majeure section."
 msgstr ""
 
 msgid "Part-time teaching supply"
@@ -181,9 +184,6 @@ msgid "Publish application to portal"
 msgstr ""
 
 msgid "Publish attribution to portal"
-msgstr ""
-
-msgid "Refresh and visualize publication"
 msgstr ""
 
 #, python-format
@@ -227,13 +227,16 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for UE full"
+msgid "Tutor for UE "
 msgstr ""
 
 msgid "Tutors"
 msgstr ""
 
 msgid "Yes, I confirm."
+msgstr ""
+
+msgid "You are not attributed to this learning unit."
 msgstr ""
 
 msgid "delete"

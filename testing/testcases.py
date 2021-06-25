@@ -26,11 +26,11 @@ from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from education_group.tests.ddd.factories.repository.fake import get_fake_group_repository
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.ddd.business_types import *
+from program_management.tests.ddd.factories.program_tree_version import ProgramTreeVersionFactory
 from program_management.tests.ddd.factories.repository.fake import get_fake_program_tree_version_repository, \
     get_fake_program_tree_repository, get_fake_node_repository
 from testing.mocks import MockPatcherMixin
-from program_management.ddd.business_types import *
 
 
 class DDDTestCase(MockPatcherMixin, TestCase):
@@ -61,20 +61,33 @@ class DDDTestCase(MockPatcherMixin, TestCase):
 
     def add_tree_version_to_repo(self, tree_version: 'ProgramTreeVersion'):
         self.fake_program_tree_version_repository.root_entities.append(tree_version)
-        self.add_tree_to_repo(tree_version.get_tree())
+        self.add_tree_to_repo(tree_version.get_tree(), create_tree_version=False)
 
-    def add_tree_to_repo(self, tree: 'ProgramTree'):
+    def add_tree_to_repo(self, tree: 'ProgramTree', create_tree_version=True):
         self.fake_program_tree_repository.root_entities.append(tree)
 
-        self.add_node_to_repo(tree.root_node)
+        self.add_node_to_repo(tree.root_node, create_tree_version=create_tree_version, create_tree=False)
         for node in tree.root_node.get_all_children_as_nodes():
-            self.add_node_to_repo(node)
+            self.add_node_to_repo(node, create_tree_version=True, create_tree=True)
 
-    def add_node_to_repo(self, node: 'Node'):
+    def add_node_to_repo(self, node: 'Node', create_tree_version=True, create_tree=True):
         self.fake_node_repository.root_entities.append(node)
-        self.fake_program_tree_repository.root_entities.append(
-            ProgramTreeFactory(root_node=node)
+
+        if node.is_learning_unit():
+            return
+
+        tree_version = ProgramTreeVersionFactory(
+            tree__root_node=node,
+            entity_id__version_name=node.version_name
         )
+        if create_tree_version:
+            self.fake_program_tree_version_repository.root_entities.append(
+                tree_version
+            )
+        if create_tree:
+            self.fake_program_tree_repository.root_entities.append(
+                tree_version.tree
+            )
 
     def assertRaisesBusinessException(self, exception, func, *args, **kwargs):
         with self.assertRaises(MultipleBusinessExceptions) as e:

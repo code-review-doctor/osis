@@ -22,18 +22,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+
 from django.db import transaction
 
-from education_group.ddd.service.write import copy_group_service
-from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand, \
-    CopyTreeCmsFromPastYear, CopyProgramTreePrerequisitesFromProgramTreeCommand
+from education_group.ddd.service.write import create_group_service, copy_group_service
+from program_management.ddd.command import FillProgramTreeVersionContentFromProgramTreeVersionCommand
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, ProgramTreeVersionBuilder
+from program_management.ddd.domain.report import Report, ReportIdentity
+from program_management.ddd.domain.service import generate_node_code, copy_tree_cms
+from program_management.ddd.domain.service.get_next_year_node import GetNextYearNode
 from program_management.ddd.repositories import program_tree_version as program_tree_version_repository, \
-    program_tree as program_tree_repository, node as node_repository
-from program_management.ddd.service.write import copy_program_tree_cms_from_past_year_service, \
-    copy_program_tree_prerequisites_from_program_tree_service
+    program_tree as program_tree_repository, node as node_repository, report
 
 
 @transaction.atomic()
@@ -43,6 +43,7 @@ def fill_program_tree_version_content_from_program_tree_version(
     tree_version_repository = program_tree_version_repository.ProgramTreeVersionRepository()
     tree_repository = program_tree_repository.ProgramTreeRepository()
     node_repo = node_repository.NodeRepository()
+    report_repo = report.ReportRepository()
 
     from_tree_version = tree_version_repository.get(
         entity_id=ProgramTreeVersionIdentity(
@@ -60,43 +61,56 @@ def fill_program_tree_version_content_from_program_tree_version(
             transition_name=cmd.to_transition_name
         )
     )
+    to_tree_version.get_tree().report = Report(entity_id=ReportIdentity(transaction_id=cmd.transaction_id))
 
+    existing_transition_tree_versions = tree_version_repository.search(
+        version_name=to_tree_version.version_name,
+        transition_name=to_tree_version.transition_name,
+        year=cmd.to_year
+    ) if not to_tree_version.is_official_standard else []
     existing_trees = tree_repository.search(
         entity_ids=[
             program_tree.ProgramTreeIdentity(code=node.code, year=cmd.to_year)
             for node in from_tree_version.get_tree().root_node.get_all_children_as_nodes()
         ]
     )
-    existing_learning_unit_nodes = node_repo.search(
-        [
-            attr.evolve(node.entity_id, year=cmd.to_year)
-            for node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
-        ]
-    )
+    if cmd.to_year == cmd.from_year:
+        learning_unit_nodes = {
+            learning_unit_node.entity_id: learning_unit_node
+            for learning_unit_node in from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes()
+        }
+    else:
+        learning_unit_nodes = GetNextYearNode().search_for_learning_unit_years(
+            from_tree_version.get_tree().root_node.get_all_children_as_learning_unit_nodes(),
+            node_repo
+        )
+    existing_group_nodes = [tree_version.get_tree().root_node for tree_version in existing_transition_tree_versions] +\
+        [tree.root_node for tree in existing_trees]
+
+    existing_codes = [identity.code for identity in tree_repository.get_all_identities()]
+    node_code_generator = generate_node_code.GenerateNodeCode(existing_codes=existing_codes)
 
     ProgramTreeVersionBuilder().fill_from_program_tree_version(
         from_tree_version,
         to_tree_version,
-        set(existing_learning_unit_nodes),
-        set(existing_trees)
+        set(existing_group_nodes),
+        learning_unit_nodes,
+        node_code_generator,
     )
+    ProgramTreeVersionBuilder().copy_prerequisites_from_tree_version(from_tree_version, to_tree_version)
 
     identity = tree_version_repository.update(to_tree_version)
-    tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
+    if from_tree_version.program_tree_identity.code == to_tree_version.program_tree_identity.code:
+        tree_repository.create(to_tree_version.get_tree(), copy_group_service=copy_group_service.copy_group)
+    else:
+        tree_repository.create(
+            to_tree_version.get_tree(),
+            create_orphan_group_service=create_group_service.create_orphan_group,
+            copy_group_service=copy_group_service.copy_group
+        )
 
-    copy_program_tree_prerequisites_from_program_tree_service.copy_program_tree_prerequisites_from_program_tree(
-        CopyProgramTreePrerequisitesFromProgramTreeCommand(
-            from_code=from_tree_version.program_tree_identity.code,
-            from_year=from_tree_version.program_tree_identity.year,
-            to_code=to_tree_version.program_tree_identity.code,
-            to_year=to_tree_version.program_tree_identity.year
-        )
-    )
-    copy_program_tree_cms_from_past_year_service.copy_program_tree_cms_from_past_year(
-        CopyTreeCmsFromPastYear(
-            code=to_tree_version.program_tree_identity.code,
-            year=to_tree_version.program_tree_identity.year
-        )
-    )
+    copy_tree_cms.CopyCms().from_tree(from_tree_version.get_tree(), to_tree_version.get_tree())
+
+    report_repo.create(to_tree_version.get_tree().report)
 
     return identity

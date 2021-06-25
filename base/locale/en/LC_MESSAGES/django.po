@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-16 13:18+0100\n"
+"POT-Creation-Date: 2021-06-03 13:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,6 +137,9 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
+msgid "Ac. yr., acronym/short title, title, category, type, credits, code"
+msgstr ""
+
 msgid "Academic"
 msgstr ""
 
@@ -152,7 +155,7 @@ msgstr ""
 msgid "Academic calendar management"
 msgstr ""
 
-msgid "Academic calendars"
+msgid "Academic nature, category of decree and university certificate"
 msgstr ""
 
 msgid "Academic partner"
@@ -168,6 +171,9 @@ msgid "Academic year"
 msgstr ""
 
 msgid "Accepted"
+msgstr ""
+
+msgid "Access based on application"
 msgstr ""
 
 msgid "Access condition"
@@ -645,9 +651,7 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
-msgid ""
-"Default information (ac. yr., acronym/short title, title, category, type, "
-"credits)"
+msgid "Default information"
 msgstr ""
 
 msgid "Default learning unit enrollment"
@@ -692,6 +696,9 @@ msgstr ""
 msgid "Diploma title"
 msgstr ""
 
+msgid "Diploma title, professionnal title and aims"
+msgstr ""
+
 msgid "Diploma/certificat"
 msgstr ""
 
@@ -714,6 +721,9 @@ msgid "Dissertation presentation"
 msgstr ""
 
 msgid "Dissertation submission"
+msgstr ""
+
+msgid "Dissertations"
 msgstr ""
 
 msgid "Do not assign"
@@ -843,9 +853,6 @@ msgstr ""
 msgid "Enrolled to learning unit"
 msgstr ""
 
-msgid "Enrollment"
-msgstr ""
-
 msgid "Enrollment campus"
 msgstr ""
 
@@ -853,6 +860,9 @@ msgid "Enrollment date"
 msgstr ""
 
 msgid "Enrollment enabled"
+msgstr ""
+
+msgid "Enrollment, partial deliberation and admission exam"
 msgstr ""
 
 msgid "Enrollments to learning unit"
@@ -891,6 +901,11 @@ msgid "Entity manager"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid ""
+"Entity, location, language, duration, schedule and types of activities "
+"present in the training"
 msgstr ""
 
 msgid "Entrepreneur"
@@ -966,6 +981,9 @@ msgid "Failure"
 msgstr ""
 
 msgid "Female"
+msgstr ""
+
+msgid "Fill this transition version"
 msgstr ""
 
 msgid "Finality 120 list choice"
@@ -1059,7 +1077,7 @@ msgstr ""
 msgid "General configuration"
 msgstr ""
 
-msgid "General information and Admission condition"
+msgid "General information and Access requirements"
 msgstr ""
 
 msgid "Generate PDF not available. Please use EPC."
@@ -1343,6 +1361,9 @@ msgstr ""
 msgid "List of teachers"
 msgstr ""
 
+msgid "List of teachers (email)"
+msgstr ""
+
 msgid "List of trainings with administrative data"
 msgstr ""
 
@@ -1358,13 +1379,13 @@ msgstr ""
 msgid "Local credits"
 msgstr ""
 
+msgid "Location, language and types of activities present in the training"
+msgstr ""
+
 msgid "Lock"
 msgstr ""
 
 msgid "Login"
-msgstr ""
-
-msgid "Logistic"
 msgstr ""
 
 msgid "Logistics entity"
@@ -1453,9 +1474,6 @@ msgstr ""
 msgid "Marks presentation"
 msgstr ""
 
-msgid "Master"
-msgstr ""
-
 msgid "Master MA 120"
 msgstr ""
 
@@ -1483,9 +1501,6 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
 msgid "Maximum number of permitted relationships"
 msgstr ""
 
@@ -1496,9 +1511,6 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method not allowed"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Minerval complete"
@@ -1532,10 +1544,6 @@ msgid "Mobility partnership list choice"
 msgstr ""
 
 msgid "Modification"
-msgstr ""
-
-#, python-format
-msgid "Modifications should be made in EPC for year %(year)d"
 msgstr ""
 
 msgid "Modified"
@@ -1640,12 +1648,6 @@ msgstr ""
 msgid "Not enrolled"
 msgstr ""
 
-msgid "Not in period to edit description fiche."
-msgstr ""
-
-msgid "Not in period to edit force majeure section."
-msgstr ""
-
 msgid "Not modified"
 msgstr ""
 
@@ -1667,11 +1669,10 @@ msgstr ""
 msgid "Ok"
 msgstr ""
 
-msgid "On the file: direct access or access with additional training"
-msgstr ""
-"Based on application: accepted, conditional on further training, or refusal"
-
 msgid "One of the partial volumes must have a value to 0."
+msgstr ""
+
+msgid "Only proposals"
 msgstr ""
 
 msgid "Only the volume Q1 must have a value"
@@ -1705,9 +1706,6 @@ msgid "Organizational chart"
 msgstr ""
 
 msgid "Organizations"
-msgstr ""
-
-msgid "Osis code"
 msgstr ""
 
 msgid "Other academic responsible"
@@ -1805,9 +1803,6 @@ msgid "Periodicity"
 msgstr ""
 
 msgid "Person with reduced mobility"
-msgstr ""
-
-msgid "Ph.D"
 msgstr ""
 
 msgctxt "Ph.D for education group"
@@ -1929,9 +1924,6 @@ msgstr ""
 msgid "Program Managers"
 msgstr ""
 
-msgid "Program commission"
-msgstr ""
-
 msgid "Program manager"
 msgstr ""
 
@@ -2051,9 +2043,6 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
-msgid "Quadrimester derogation"
-msgstr ""
-
 msgid "Rate code"
 msgstr ""
 
@@ -2086,6 +2075,9 @@ msgstr ""
 
 msgctxt "Submission email table header"
 msgid "Registration number"
+msgstr ""
+
+msgid "Remarks, comments and constraints"
 msgstr ""
 
 msgid "Req. Entities"
@@ -2164,6 +2156,9 @@ msgid "Scores must be between 0 and 20"
 msgstr ""
 
 msgid "Scores responsibles"
+msgstr ""
+
+msgid "Scores responsibles (emails)"
 msgstr ""
 
 msgid "Search for an entity"
@@ -2272,6 +2267,9 @@ msgstr ""
 msgid "Student search"
 msgstr ""
 
+msgid "Student's dissertations management"
+msgstr ""
+
 msgid "Students"
 msgstr ""
 
@@ -2327,9 +2325,6 @@ msgid "Teaching profile"
 msgstr ""
 
 msgid "Team management"
-msgstr ""
-
-msgid "Technologic platform"
 msgstr ""
 
 msgid "Termination"
@@ -2451,9 +2446,6 @@ msgid ""
 "done at consolidation"
 msgstr ""
 
-msgid "The learning unit's description fiche is not editable."
-msgstr ""
-
 msgid "The learning units"
 msgstr ""
 
@@ -2479,6 +2471,9 @@ msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
 msgid "The partim"
+msgstr ""
+
+msgid "The period to edit scores responsibles is not opened yet"
 msgstr ""
 
 #, python-format
@@ -2581,7 +2576,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application"
+msgid "This learning unit has application this year or in the future"
 msgstr ""
 
 #, python-format
@@ -2637,13 +2632,13 @@ msgstr ""
 msgid "Training management entity"
 msgstr ""
 
+msgid "Training management entity faculty"
+msgstr ""
+
 msgid "Training title"
 msgstr ""
 
 msgid "Trainings"
-msgstr ""
-
-msgid "Trainings/gathering"
 msgstr ""
 
 msgid "Transformation"
@@ -2667,6 +2662,9 @@ msgstr ""
 msgid "Tutors"
 msgstr ""
 
+msgid "Tutors (scores responsibles included)"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -2679,9 +2677,6 @@ msgstr ""
 msgid "UCL Diploma"
 msgstr ""
 
-msgid "UE full"
-msgstr ""
-
 msgid "URL of the learning unit"
 msgstr ""
 
@@ -2689,9 +2684,6 @@ msgstr ""
 msgid ""
 "Unable to publish pedagogy information for the learning unit %(code)s - "
 "%(year)s"
-msgstr ""
-
-msgid "Undefined"
 msgstr ""
 
 msgid "Unique"
@@ -2722,6 +2714,9 @@ msgid "Update for teacher locked"
 msgstr ""
 
 msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Updated"
 msgstr ""
 
 msgid "Url"
@@ -2818,14 +2813,12 @@ msgstr ""
 msgid "Yes, I confirm."
 msgstr ""
 
-msgid "You are not attributed to this learning unit."
-msgstr ""
-
 msgid "You are succesfully logout."
 msgstr ""
 
-#, python-format
-msgid "You can't modify learning unit under year : %(year)d"
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year "
+"or in the future"
 msgstr ""
 
 msgid ""
@@ -2842,14 +2835,6 @@ msgstr ""
 msgid ""
 "You cannot put in proposal for ending date on the first year of the learning "
 "unit."
-msgstr ""
-
-msgid ""
-"You do not have the permission to refresh the publication for this learning "
-"unit"
-msgstr ""
-
-msgid "You do not have the permission to refresh the publication for this year"
 msgstr ""
 
 msgid "You have the choice between"
@@ -2899,9 +2884,6 @@ msgid "and postponed until %(year)s"
 msgstr ""
 
 msgid "author"
-msgstr ""
-
-msgid "bachelor"
 msgstr ""
 
 msgid "bibliography"
@@ -3168,3 +3150,4 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
+

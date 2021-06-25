@@ -21,12 +21,15 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List, Type, Optional
+from typing import List, Type, Optional, Set
+
+import attr
 
 from osis_common.ddd import interface
 from program_management.ddd import command
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import exception
+from program_management.ddd.domain import exception, program_tree
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 from testing.mocks import FakeRepository
 
 
@@ -36,6 +39,7 @@ def get_fake_node_repository(root_entities: List['Node']) -> Type['FakeRepositor
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.NodeNotFoundException,
         "search": _search_nodes,
+        "get_next_learning_unit_year_node": _get_next_learning_unit_year_node
     })
 
 
@@ -47,7 +51,8 @@ def get_fake_program_tree_repository(root_entities: List['ProgramTree']) -> Type
         "root_entities": root_entities.copy(),
         "not_found_exception_class": exception.ProgramTreeNotFoundException,
         "delete": _delete_program_tree,
-        "search_from_children": _search_from_children
+        "search_from_children": _search_from_children,
+        "get_all_identities": _get_all_identities,
     })
 
 
@@ -115,10 +120,17 @@ def _delete_program_tree(
 
 
 @classmethod
-def _search_program_trees(cls, entity_ids: List['ProgramTreeIdentity'] = None, **kwargs) -> List['ProgramTree']:
+def _search_program_trees(
+        cls,
+        entity_ids: List['ProgramTreeIdentity'] = None,
+        code: str = None,
+        **kwargs
+) -> List['ProgramTree']:
     result = []
     if entity_ids:
         return [root_entity for root_entity in cls.root_entities if root_entity.entity_id in entity_ids]
+    if code:
+        return [root_entity for root_entity in cls.root_entities if code in root_entity.entity_id.code]
     return result
 
 
@@ -128,7 +140,8 @@ def _search_program_tree_version(
         entity_ids: Optional[List['ProgramTreeVersionIdentity']] = None,
         version_name: str = None,
         offer_acronym: str = None,
-        is_transition: bool = False,
+        transition_name: str = None,
+        year: int = None,
         **kwargs
 ) -> List['ProgramTreeVersion']:
     result = cls.root_entities  # type: List[ProgramTreeVersion]
@@ -136,8 +149,10 @@ def _search_program_tree_version(
         result = (tree_version for tree_version in result if tree_version.version_name == version_name)
     if offer_acronym is not None:
         result = (tree_version for tree_version in result if tree_version.entity_id.offer_acronym == offer_acronym)
-    if is_transition is not None:
-        result = (tree_version for tree_version in result if tree_version.is_transition == is_transition)
+    if transition_name is not None:
+        result = (tree_version for tree_version in result if tree_version.transition_name == transition_name)
+    if year:
+        result = (tree_version for tree_version in result if tree_version.entity_id.year == year)
     return list(result)
 
 
@@ -160,5 +175,27 @@ def _search_versions_from_trees(cls, trees: List['ProgramTree']) -> List['Progra
 
 
 @classmethod
-def _search_nodes(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['Node']:
-    return [node for node in cls.root_entities if node.entity_id in node_ids]
+def _search_nodes(cls, node_ids: List['NodeIdentity'] = None, year: int = None, **kwargs) -> List['Node']:
+    if node_ids:
+        return [node for node in cls.root_entities if node.entity_id in node_ids]
+    if year:
+        return [node for node in cls.root_entities if node.entity_id.year == year]
+    return []
+
+
+@classmethod
+def _get_next_learning_unit_year_node(cls, entity_id: 'NodeIdentity') -> Optional['Node']:
+    return next(
+        (node for node in cls.root_entities if node.entity_id == attr.evolve(entity_id, year=entity_id.year + 1)),
+        None
+    )
+
+
+@classmethod
+def _get_all_identities(cls) -> Set['ProgramTreeIdentity']:
+    result = set()
+    for tree in cls.root_entities:
+        identities = {program_tree.ProgramTreeIdentity(node.code, node.year) for node in tree.get_all_nodes()
+                      if not node.is_learning_unit()}
+        result.union(identities)
+    return result

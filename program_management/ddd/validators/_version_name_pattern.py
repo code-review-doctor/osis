@@ -26,9 +26,11 @@
 import re
 
 from base.ddd.utils.business_validator import BusinessValidator
-from program_management.ddd.domain.exception import InvalidVersionNameException
+from program_management.ddd.domain.exception import InvalidVersionNameException, \
+    InvalidVersionNameWithTransitionException
 
-VERSION_NAME_REGEX = "^[A-Z]{0,15}$"
+VERSION_NAME_REGEX = "^[A-Z0-9]{0,15}$"
+HAVE_NOT_TRANSITION = "^((?!TRANSITION).)*$"
 
 
 class VersionNamePatternValidator(BusinessValidator):
@@ -38,5 +40,7 @@ class VersionNamePatternValidator(BusinessValidator):
         self.version_name = version_name
 
     def validate(self, *args, **kwargs):
+        if not bool(re.match(HAVE_NOT_TRANSITION, self.version_name.upper())):
+            raise InvalidVersionNameWithTransitionException()
         if not bool(re.match(VERSION_NAME_REGEX, self.version_name.upper())):
             raise InvalidVersionNameException()

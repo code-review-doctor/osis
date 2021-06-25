@@ -45,7 +45,8 @@ from education_group.ddd.domain.exception import ContentConstraintTypeMissing, \
     HopsFieldsAllOrNone, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999, \
     AresAuthorizationShouldBeGreaterOrEqualsThanZeroAndLessThan9999, StartYearGreaterThanEndYearException, \
-    ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid, HopsFields2OrNoneForFormationPhd
+    ContentConstraintMinimumInvalid, ContentConstraintMaximumInvalid, \
+    HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES
 from education_group.ddd.domain.training import TrainingIdentity
 from education_group.ddd.service.read import get_group_service
 from education_group.forms.training import CreateTrainingForm
@@ -55,6 +56,7 @@ from education_group.views.proxy.read import Tab
 from osis_common.ddd.interface import BusinessExceptions
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd import command as command_pgrm
+from program_management.ddd.domain.exception import CodePatternException
 from program_management.ddd.domain.program_tree import Path
 from program_management.ddd.domain.service.element_id_search import ElementIdSearch
 from program_management.ddd.domain.service.identity_search import NodeIdentitySearch
@@ -167,7 +169,7 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         training_form.add_error('academic_year', '')
                     elif isinstance(e, HopsFieldsAllOrNone) or \
                             isinstance(e, AresCodeShouldBeGreaterOrEqualsThanZeroAndLessThan9999) or \
-                            isinstance(e, HopsFields2OrNoneForFormationPhd):
+                            isinstance(e, HopsFields2OrNoneForFormationPhdAttestationCertificatCAPAES):
                         training_form.add_error('ares_code', e.message)
                     elif isinstance(e, AresGracaShouldBeGreaterOrEqualsThanZeroAndLessThan9999):
                         training_form.add_error('ares_graca', e.message)
@@ -175,6 +177,8 @@ class TrainingCreateView(LoginRequiredMixin, PermissionRequiredMixin, View):
                         training_form.add_error('ares_authorization', e.message)
                     else:
                         training_form.add_error(None, e.message)
+            except CodePatternException as e:
+                training_form.add_error('code', e.message)
             except BusinessExceptions as e:
                 display_error_messages(request, e.messages)
                 return render(request, self.template_name, self.get_context(training_form))

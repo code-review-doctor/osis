@@ -25,15 +25,15 @@
 ##############################################################################
 import datetime
 
-from base.business.event_perms import AcademicEventSessionCalendarHelper
+from base.business.academic_calendar import AcademicEventSessionCalendarHelper
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.session_exam_calendar import SessionExamCalendar
 
 
 class DissertationSubmissionCalendar(AcademicEventSessionCalendarHelper):
-    event_reference = academic_calendar_type.DISSERTATION_SUBMISSION
+    event_reference = AcademicCalendarTypes.DISSERTATION_SUBMISSION.name
 
     @classmethod
     def ensure_consistency_until_n_plus_6(cls):
@@ -60,7 +60,6 @@ class DissertationSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Remise du mémoire - Session 1",
                 start_date=datetime.date(academic_year.year, 12, 1),
                 end_date=datetime.date(academic_year.year + 1, 1, 31),
-                academic_year=academic_year  # To remove after refactoring
             )
             SessionExamCalendar.objects.create(number_session=1, academic_calendar=academic_calendar)
 
@@ -79,8 +78,6 @@ class DissertationSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Remise du mémoire - Session 2",
                 start_date=datetime.date(academic_year.year + 1, 5, 1),
                 end_date=datetime.date(academic_year.year + 1, 7, 15),
-                academic_year=academic_year  # To remove after refactoring
-
             )
             SessionExamCalendar.objects.create(number_session=2, academic_calendar=academic_calendar)
 
@@ -98,7 +95,5 @@ class DissertationSubmissionCalendar(AcademicEventSessionCalendarHelper):
                 title="Remise du mémoire - Session 3",
                 start_date=datetime.date(academic_year.year + 1, 8, 1),
                 end_date=datetime.date(academic_year.year + 1, 9, 15),
-                academic_year=academic_year  # To remove after refactoring
-
             )
             SessionExamCalendar.objects.create(number_session=3, academic_calendar=academic_calendar)

@@ -12,12 +12,14 @@ if TYPE_CHECKING:
     from program_management.ddd.domain.prerequisite import PrerequisiteExpression, Prerequisite, Prerequisites, \
         PrerequisiteItem
 
-    from program_management.ddd.repositories.load_tree import NodeKey
+    from program_management.ddd.repositories.program_tree import NodeKey
 
     from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
     from program_management.ddd.repositories.program_tree import ProgramTreeRepository
     from program_management.ddd.repositories.node import NodeRepository
     from program_management.ddd.repositories.tree_prerequisites import TreePrerequisitesRepository
+
+    from program_management.ddd.domain.service.generate_node_code import BGenerateNodeCode
 
     from base.ddd.utils.validation_message import BusinessValidationMessage
 

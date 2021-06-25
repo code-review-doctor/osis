@@ -12,8 +12,10 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.auth import predicates
+from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
@@ -532,6 +534,7 @@ class TestAreAllEducationGroupRemovable(TestCase):
 
     def test_case_all_trainings_are_not_removable(self):
         training_roots = [GroupYearFactory(group=self.group, academic_year__year=2020)]
+        ElementFactory(group_year=training_roots[0])
         person = FacultyManagerFactory(entity=training_roots[0].management_entity).person
         self.assertFalse(
             predicates.are_all_trainings_removable(
@@ -617,4 +620,42 @@ class TestIsElementOnlyInsideStandardProgram(TestCase):
 
         self.assertTrue(
             predicates.is_element_only_inside_standard_program(self.user, self.group_year)
+        )
+
+
+class TestIsUserAttachedToAllScopes(TestCase):
+    def setUp(self):
+        self.predicate_context_mock = mock.patch(
+            "rules.Predicate.context",
+            new_callable=mock.PropertyMock,
+            return_value={
+                'perm_name': 'dummy-perm'
+            }
+        )
+        self.predicate_context_mock.start()
+        self.addCleanup(self.predicate_context_mock.stop)
+
+    def test_case_is_linked_to_all_scopes(self):
+        person = CentralManagerFactory(scopes=[Scope.ALL.name]).person
+
+        self.predicate_context_mock.target.context['role_qs'] = CentralManager.objects.filter(person=person)
+        self.assertTrue(
+            predicates.is_user_attached_to_all_scopes(person.user)
+        )
+
+    def test_case_is_not_linked_to_all_scopes(self):
+        person = CentralManagerFactory(scopes=[Scope.IUFC.name]).person
+
+        self.predicate_context_mock.target.context['role_qs'] = CentralManager.objects.filter(person=person)
+        self.assertFalse(
+            predicates.is_user_attached_to_all_scopes(person.user)
+        )
+
+    def test_case_is_linked_to_all_scopes_multiple_rows(self):
+        person = CentralManagerFactory(scopes=[Scope.ALL.name]).person
+        CentralManagerFactory(person=person, scopes=[Scope.IUFC.name])
+
+        self.predicate_context_mock.target.context['role_qs'] = CentralManager.objects.filter(person=person)
+        self.assertTrue(
+            predicates.is_user_attached_to_all_scopes(person.user)
         )

@@ -35,6 +35,7 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_start_year_after_year_limit &
                 predicates.is_learning_unit_edition_for_central_manager_period_open &
                 predicates.has_learning_unit_prerequisite_dependencies &
+                predicates.has_learning_unit_partim_no_application_all_years &
                 predicates.has_learning_unit_no_application_all_years,
             'base.can_edit_learningunit':
                 predicates.is_user_attached_to_current_requirement_entity &
@@ -95,6 +96,10 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
                 predicates.is_learning_unit_edition_for_central_manager_period_open &
                 predicates.is_user_attached_to_current_requirement_entity,
+            'base.can_edit_learningunit_pedagogy_force_majeur':
+                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year &
+                predicates.is_learning_unit_edition_for_central_manager_period_open &
+                predicates.is_user_attached_to_current_requirement_entity,
             'base.can_edit_learningunit_specification':
                 predicates.is_learning_unit_edition_for_central_manager_period_open,
             'base.can_consolidate_learningunit_proposal':
@@ -105,9 +110,9 @@ class CentralManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 (predicates.is_not_proposal_of_type_suppression |
-                    (predicates.has_learning_unit_no_application_all_years &
-                     predicates.has_learning_unit_no_attribution_this_year
-                     )
+                 (predicates.has_learning_unit_no_application_now_and_in_future &
+                  predicates.has_learning_unit_no_attribution_now_and_future
+                  )
                  ),
             'base.can_add_charge_repartition':
                 predicates.is_learning_unit_year_a_partim &

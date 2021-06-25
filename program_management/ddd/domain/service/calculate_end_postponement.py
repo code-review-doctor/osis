@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
 
 from base.models import academic_year
 from education_group.ddd.business_types import *
@@ -31,9 +30,7 @@ from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.domain.service.identity_search import TrainingOrMiniTrainingOrGroupIdentitySearch, \
-    ProgramTreeVersionIdentitySearch, ProgramTreeIdentitySearch
-from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.service import identity_search
 from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
 DEFAULT_YEARS_TO_POSTPONE = 6
@@ -64,8 +61,18 @@ class CalculateEndPostponement(interface.DomainService):
             repository: 'ProgramTreeVersionRepository'
     ):
         # Postponement for orphan groups only works if it is the root group of a program tree
-        tree_identity = ProgramTreeVersionIdentitySearch.get_from_group_identity(identity)
+        tree_identity = identity_search.ProgramTreeVersionIdentitySearch.get_from_group_identity(identity)
         return _calculate_end_postponement(tree_identity, repository)
+
+    @classmethod
+    def calculate_end_postponement_year_for_orphan_group(
+            cls,
+            group: 'Group',
+    ):
+        limit = cls.calculate_end_postponement_limit()
+        if group.end_year is None:
+            return limit
+        return min(limit, group.end_year)
 
     @classmethod
     def calculate_end_postponement_year_program_tree(
@@ -73,7 +80,7 @@ class CalculateEndPostponement(interface.DomainService):
             identity: 'ProgramTreeIdentity',
             repository: 'ProgramTreeVersionRepository'
     ):
-        version_identity = ProgramTreeVersionIdentitySearch.get_from_program_tree_identity(identity)
+        version_identity = identity_search.ProgramTreeVersionIdentitySearch.get_from_program_tree_identity(identity)
         return cls.calculate_end_postponement_year_program_tree_version(version_identity, repository)
 
     @classmethod

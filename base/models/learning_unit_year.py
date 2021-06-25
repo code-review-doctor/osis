@@ -54,6 +54,7 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -115,10 +116,23 @@ def academic_year_validator(value):
 
 
 class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
-                    'status')
+    list_display = (
+        'external_id',
+        'acronym',
+        'specific_title',
+        'academic_year',
+        'credits',
+        'requirement_entity',
+        'status',
+        'changed',
+    )
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
+    search_fields = [
+        'acronym',
+        'learning_container_year__requirement_entity__entityversion__acronym',
+        'external_id',
+        'id'
+    ]
     actions = [
         'resend_messages_to_queue',
     ]
@@ -222,7 +236,6 @@ class LearningUnitYear(SerializableModel):
                                   validators=[MinValueValidator(MINIMUM_CREDITS), MaxValueValidator(MAXIMUM_CREDITS)],
                                   verbose_name=_('Credits'))
     decimal_scores = models.BooleanField(default=False)
-    structure = models.ForeignKey('Structure', blank=True, null=True, on_delete=models.CASCADE)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
                                           verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
@@ -553,6 +566,12 @@ class LearningUnitYear(SerializableModel):
 
     def get_absolute_url(self):
         return reverse('learning_unit', args=[self.pk])
+
+    def has_class_this_year_or_in_future(self):
+        return LearningClassYear.objects.filter(
+            learning_component_year__learning_unit_year__learning_unit=self.learning_unit,
+            learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year
+        ).exists()
 
 
 def get_by_id(learning_unit_year_id):
