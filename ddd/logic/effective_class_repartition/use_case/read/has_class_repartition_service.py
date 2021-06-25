@@ -23,15 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import Optional
 
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from infrastructure.learning_unit.domain.service import tutor_distributed_to_class
 
 
-class ITutorDistributedToClass(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def get_first_tutor_full_name_if_exists(cls, effective_class_identity: 'EffectiveClassIdentity') -> Optional[str]:
-        pass
+def has_class_repartition_service(
+        cmd: 'HasClassRepartitionCommand'
+) -> Optional[str]:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
+    return tutor_distributed_to_class.get_first_tutor_full_name_if_exists(
+        effective_class_identity
+    )

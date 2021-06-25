@@ -25,9 +25,11 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_service import \
+    has_class_repartition_service
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
-    UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand
+    UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, HasClassRepartitionCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -44,7 +46,6 @@ from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesComma
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
-from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorDistributedToClass
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -87,15 +88,14 @@ class MessageBus:
         DeleteEffectiveClassCommand: lambda cmd: delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            LearningUnitRepository(),
-            TutorDistributedToClass()
+            LearningUnitRepository()
         ),
         CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            LearningUnitRepository(),
-            TutorDistributedToClass()
+            LearningUnitRepository()
         ),
+        HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

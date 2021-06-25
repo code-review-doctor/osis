@@ -31,14 +31,12 @@ from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassI
 from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
-from ddd.logic.learning_unit.domain.service.i_tutor_distributed_to_class import ITutorDistributedToClass
 
 
 def delete_effective_class(
         cmd: DeleteEffectiveClassCommand,
         effective_class_repository: IEffectiveClassRepository,
-        learning_unit_repository: ILearningUnitRepository,
-        tutor_distributed_to_class: ITutorDistributedToClass
+        learning_unit_repository: ILearningUnitRepository
 ) -> EffectiveClassIdentity:
 
     # GIVEN
@@ -55,8 +53,7 @@ def delete_effective_class(
         CanEffectiveClassBeDeleted().verify(
             effective_class=effective_class,
             learning_unit=learning_unit,
-            learning_unit_repository=learning_unit_repository,
-            tutor_distributed_to_class=tutor_distributed_to_class
+            learning_unit_repository=learning_unit_repository
         )
     # THEN
         effective_class_repository.delete(effective_class.entity_id)

@@ -73,8 +73,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
             delete_effective_class(
                 cmd,
                 self.effective_class_repository,
-                self.learning_unit_repository,
-                self.tutor_distributed_to_class
+                self.learning_unit_repository
             )
         )
 
@@ -85,8 +84,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
         entity_id = delete_effective_class(
             cmd=self.delete_class_cmd,
             effective_class_repository=self.effective_class_repository,
-            learning_unit_repository=self.learning_unit_repository,
-            tutor_distributed_to_class=self.tutor_distributed_to_class
+            learning_unit_repository=self.learning_unit_repository
         )
 
         self.assertEqual(entity_id.class_code, self.existing_class.class_code)
@@ -119,8 +117,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
             delete_effective_class(
                 cmd=self.delete_class_cmd,
                 effective_class_repository=self.effective_class_repository,
-                learning_unit_repository=self.learning_unit_repository,
-                tutor_distributed_to_class=self.tutor_distributed_to_class
+                learning_unit_repository=self.learning_unit_repository
             )
         exceptions = class_exceptions.exception.exceptions.copy()
         self.assertIsInstance(
@@ -154,8 +151,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
             delete_effective_class(
                 cmd=cmd,
                 effective_class_repository=self.effective_class_repository,
-                learning_unit_repository=self.learning_unit_repository,
-                tutor_distributed_to_class=self.tutor_distributed_to_class
+                learning_unit_repository=self.learning_unit_repository
             )
         exceptions = class_exceptions.exception.exceptions.copy()
         self.assertIsInstance(

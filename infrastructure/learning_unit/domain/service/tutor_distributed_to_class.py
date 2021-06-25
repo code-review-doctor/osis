@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from typing import Union, Optional
 
 from attribution.models.attribution_class import AttributionClass as AttributionClassDb
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
