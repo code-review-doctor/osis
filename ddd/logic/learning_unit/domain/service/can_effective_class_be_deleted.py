@@ -30,7 +30,6 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
-from infrastructure.messages_bus import message_bus_instance
 from osis_common.ddd import interface
 
 
@@ -47,6 +46,7 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
         if learning_unit_repository.has_enrollments(learning_unit):
             exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
+        from infrastructure.messages_bus import message_bus_instance
         tutor_assign_to_class = message_bus_instance.invoke(
             HasClassRepartitionCommand(
                 class_code=effective_class.class_code,

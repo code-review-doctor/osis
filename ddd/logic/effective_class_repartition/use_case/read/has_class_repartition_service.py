@@ -26,13 +26,14 @@
 from typing import Optional
 
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from infrastructure.learning_unit.domain.service import tutor_distributed_to_class
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorDistributedToClass
 
 
 def has_class_repartition_service(
         cmd: 'HasClassRepartitionCommand'
 ) -> Optional[str]:
     effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
-    return tutor_distributed_to_class.get_first_tutor_full_name_if_exists(
+    return TutorDistributedToClass.get_first_tutor_full_name_if_exists(
         effective_class_identity
     )
+
