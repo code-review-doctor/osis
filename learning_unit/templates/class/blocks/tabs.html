@@ -36,7 +36,7 @@
         </a>
     </li>
 
-    <li role="presentation" {% if request.path == url_class_tutors %} class="active" {% endif %}>
+    <li role="presentation" {% if request.path == url_class_tutors or request.path == url_lu_tutors %} class="active" {% endif %}>
         <a href="{{ url_class_tutors }}" role="tab">
             {% trans 'Tutors' %}
         </a>

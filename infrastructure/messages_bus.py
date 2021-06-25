@@ -41,7 +41,8 @@ from ddd.logic.application.use_case.write.renew_multiple_attributions_service im
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
-    SearchTutorsDistributedToClassCommand
+    SearchTutorsDistributedToClassCommand, SearchAttributionCommand
+from ddd.logic.attribution.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
 from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import search_tutors_distributed_to_class
@@ -146,7 +147,11 @@ class MessageBus:
         SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
             ApplicationsMailSummary()
-        )
+        ),
+        SearchAttributionCommand: lambda cmd: get_attribution(
+            cmd,
+            TutorAttributionToLearningUnitTranslator()
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
