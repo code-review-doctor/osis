@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -18,7 +17,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#, python-brace-format
+msgid "'{value}' is not a valid derogation quadrimester."
+msgstr ""
+
+#, python-brace-format
+msgid "'{value}' is not a valid derogation session."
+msgstr ""
+
+msgid "A substitute can not renew his function of substitute"
+msgstr ""
+
+msgid ""
+"Application on this vacant course is not reserved for interns/open for extern"
+msgstr ""
+
 msgid "Can't create a learning unit lower than 2019-20"
+msgstr ""
+
+msgid "Cannot found attribution about to expire with code: {}"
+msgstr ""
+
+msgid ""
+"Cannot renew an attribution with a function different from holder or coholder"
+msgstr ""
+
+msgid "Cannot renew an attribution without volumes"
+msgstr ""
+
+msgid "Cannot update an application which is not owned by you"
 msgstr ""
 
 msgid "Class can't be created on learning unit having enrollment"
@@ -43,6 +70,12 @@ msgid "Learning unit {} already exists next year"
 msgstr ""
 
 msgid "Learning unit {} is used in following programs : {}"
+msgstr ""
+
+msgid "Lecturing charge or practical charge must be filled"
+msgstr ""
+
+msgid "No vacant corresponding activity"
 msgstr ""
 
 msgid "Selected entity {} is not an authorized responsible entity"
@@ -109,6 +142,18 @@ msgid ""
 "volume of the learning unit ({})"
 msgstr ""
 
+
+msgid "The teaching place is required."
+msgstr ""
+
+msgid ""
+"This course is team-managed. The application to this activity is based on a "
+"paper transmission."
+msgstr ""
+
+msgid "Volumes asked should be lower or equal to volume available"
+msgstr ""
+
 msgid "Volumes of {} are inconsistent"
 msgstr ""
 
@@ -121,6 +166,9 @@ msgid ""
 "You cannot create class on this learning unit because the component's annual "
 "volume [PM or default PP] is not greater than 0 and there are no planned "
 "class."
+msgstr ""
+
+msgid "You have already applied on vacant course"
 msgstr ""
 
 msgid "at least one class volume is greater than the volume of the LU"

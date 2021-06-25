@@ -30,6 +30,7 @@ from reversion.admin import VersionAdmin
 
 from base.models.enums import quadrimesters, learning_unit_year_session
 from base.models.enums.component_type import LECTURING
+from base.models.enums import quadrimesters, learning_unit_year_session
 from osis_common.models import osis_model_admin
 
 

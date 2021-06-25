@@ -39,11 +39,11 @@ from ddd.logic.learning_unit.commands import GetLearningUnitCommand, CanCreateEf
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
-from learning_unit.forms.classes.create import ClassForm
+from learning_unit.forms.classes.update import ClassForm
 
 
 class CreateClassView(PermissionRequiredMixin, FormView):
-    template_name = "class/creation.html"
+    template_name = "class/update.html"
     form_class = ClassForm
     permission_required = 'base.can_create_class'
 
@@ -60,6 +60,21 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         return message_bus_instance.invoke(
             GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
         )
+
+    @cached_property
+    def cancel_url(self):
+        return reverse(
+            'learning_unit',
+            kwargs={
+                'acronym': self.learning_unit_code,
+                'year': self.learning_unit.year,
+            }
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cancel_url'] = self.cancel_url
+        return context
 
     def get(self, request, *args, **kwargs):
         try:
@@ -117,5 +132,5 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             )
         )
         return _("Class %(effective_class_complete_acronym)s successfully created.") % {
-            "effective_class_complete_acronym": effective_class.complete_acronym
+            "effective_class_complete_acronym": effective_class.complete_code
         }

@@ -54,6 +54,10 @@ msgstr ""
 msgid "Class %(effective_class_complete_acronym)s successfully created."
 msgstr ""
 
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully updated."
+msgstr ""
+
 msgid "Class specific complement"
 msgstr ""
 
@@ -133,9 +137,6 @@ msgid "Learning units"
 msgstr ""
 
 msgid "Lecturing"
-msgstr ""
-
-msgid "New class"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -292,6 +293,12 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
+msgid "Update"
+msgstr ""
+
+msgid "Update class"
+msgstr ""
+
 msgid "Vol. Q1"
 msgstr ""
 
@@ -346,6 +353,9 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "You do not have sufficient access rights to update a class."
 msgstr ""
 
 msgid "external acronym rules"

@@ -1,3 +1,28 @@
+##############################################################################
+#
+#    OSIS stands for Open Student Information System. It's an application
+#    designed to manage the core business of higher education institutions,
+#    such as universities, faculties, institutes and professional schools.
+#    The core business involves the administration of students, teachers,
+#    courses, programs and so on.
+#
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    A copy of this license - GNU General Public License - is available
+#    at the root of the source code of this program.  If not,
+#    see http://www.gnu.org/licenses/.
+#
+##############################################################################
 import factory.fuzzy
 import uuid
 
@@ -67,7 +92,7 @@ class _PartimIdentityFactory(factory.Factory):
         model = PartimIdentity
         abstract = False
 
-    subdivision = factory.fuzzy.FuzzyText(length=10)
+    subdivision = factory.fuzzy.FuzzyText(length=1)
 
 
 class _PartimFactory(factory.Factory):
@@ -243,3 +268,63 @@ class LDROI1004CourseWithoutVolumesLearningUnitFactory(_CourseLearningUnitFactor
     )
     lecturing_part = None
     practical_part = None
+
+
+class CourseWithPracticalVolumesOnly(_CourseLearningUnitFactory):
+    lecturing_part = None
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = []
+
+
+class CourseWithLecturingVolumesOnly(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = None
+    partims = []
+
+
+class CourseWithLecturingAndPracticalVolumes(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = []
+
+
+class CourseWithOnePartim(_CourseLearningUnitFactory):
+    lecturing_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    practical_part = _LecturingPartFactory(
+        volumes=_VolumesFactory(
+            volume_first_quadrimester=5.0,
+            volume_second_quadrimester=15.0,
+            volume_annual=20.0
+        )
+    )
+    partims = factory.List([factory.SubFactory(_PartimFactory)])
