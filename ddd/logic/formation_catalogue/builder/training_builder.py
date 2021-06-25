@@ -96,7 +96,7 @@ class TrainingBuilder(RootEntityBuilder):
                 is_reference_institution=co_organization.enrollment_place,
                 certificate_type=DiplomaCoorganizationTypes[co_organization.diploma]
                 if co_organization.diploma else None,
-                is_producing_certificate=co_organization.is_producing_cerfificate,
+                is_producing_certificate=co_organization.is_producing_certificate,
                 is_producing_certificate_annexes=co_organization.is_producing_annexe,
             )
             for co_organization in dto_object.co_organizations
