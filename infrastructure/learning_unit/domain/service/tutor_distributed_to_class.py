@@ -36,7 +36,7 @@ class TutorDistributedToClass(ITutorDistributedToClass):
     def get_first_tutor_full_name_if_exists(
             cls,
             effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Union[str, None]:
+    ) -> Optional[str]:
         ue_identity = effective_class_identity.learning_unit_identity
         results = AttributionClassDb.objects.filter(
             learning_class_year__learning_component_year__learning_unit_year__acronym=ue_identity.code,
