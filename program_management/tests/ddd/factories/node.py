@@ -104,7 +104,6 @@ class NodeGroupYearFactory(NodeFactory):
     max_constraint = 5
     version_name = STANDARD
     transition_name = NOT_A_TRANSITION
-    category = GroupType.SUB_GROUP
 
     class Params:
         minitraining = factory.Trait(
