@@ -23,10 +23,10 @@
 #
 ##############################################################################
 import math
-from functools import cached_property
 from typing import Optional, Dict, Type, List, Iterable
 
 from django.db.models import OuterRef, Max, Subquery, Exists, Model, ForeignKey, Q
+from django.utils.functional import cached_property
 
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
