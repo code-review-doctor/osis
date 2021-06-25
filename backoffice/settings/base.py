@@ -405,6 +405,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'EXCEPTION_HANDLER': 'backoffice.settings.rest_framework.exception_handler.handle',
     'DEFAULT_PAGINATION_CLASS': 'backoffice.settings.rest_framework.pagination.LimitOffsetPaginationWithUpperBound',
     'PAGE_SIZE': 25,
     'DEFAULT_FILTER_BACKENDS':	(

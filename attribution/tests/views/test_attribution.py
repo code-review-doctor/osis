@@ -23,49 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
-
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import status
-from rest_framework.test import APIClient
+
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from attribution.views.attribution import get_charge_repartition_warning_messages
+from attribution.views.attribution import get_charge_repartition_warning_messages, \
+    _get_classes_charge_repartition_warning_messages
 from base.models.person import Person
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
-from base.tests.factories.user import UserFactory
-
-
-class RecomputePortalTestCase(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.global_ids = ['12348', '565656', '5888']
-        self.url = reverse('recompute_attribution_portal')
-
-        self.client = APIClient()
-        self.client.force_authenticate(user=self.user)
-
-    def test_recompute_portal_without_authentification(self):
-        self.client.force_authenticate(user=None)
-        response = self.client.post(self.url, {'global_ids': self.global_ids})
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_recompute_portal_not_valid_http_method(self):
-        response = self.client.get(self.url, {'global_ids': self.global_ids})
-        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
-
-    @mock.patch('attribution.business.attribution_json.publish_to_portal', side_effect=lambda global_ids: True)
-    def test_recompute_portal_success_test_case(self, mock_publish_to_portal):
-        response = self.client.post(self.url, {'global_ids': self.global_ids})
-        self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
-        mock_publish_to_portal.assert_called_with(self.global_ids)
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class TestViewAttributions(TestCase):
@@ -173,6 +146,15 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         cls.attribution_partim_2.id = None
         cls.attribution_partim_2.save()
 
+        cls.lect_learning_class_year = LearningClassYearFactory(
+            learning_component_year=cls.full_lecturing_component,
+            hourly_volume_partial_q1=20
+        )
+        cls.pract_learning_class_year = LearningClassYearFactory(
+            learning_component_year=cls.full_practical_component,
+            hourly_volume_partial_q1=20
+        )
+
     def setUp(self):
         self.charge_lecturing_1 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_1,
@@ -229,3 +211,26 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
                                       "volume of full UE for this professor") % {
                                         "tutor": tutor_name_with_function}])
 
+    def test_should_give_warning_messages_when_component_volume_total_of_classes_exceeds_learning_unit_volume(self):
+        msgs = _get_classes_charge_repartition_warning_messages(self.full_luy)
+        tutor_person = self.attribution_full.tutor.person
+        tutor_name = Person.get_str(tutor_person.first_name, tutor_person.last_name)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
+        self.assertSetEqual(
+            msgs, {
+                _("The sum of volumes for the classes for professor %(tutor)s is superior to the volume of "
+                  "UE(%(ue_type)s) for this professor") % {
+                    "tutor": tutor_name_with_function,
+                    "ue_type": self.full_luy.get_subtype_display().lower()
+                }
+            }
+        )
+
+    def test_should_not_give_warning_messages_when_component_volume_total_of_classes_under_learning_unit_volume(self):
+        self.charge_lecturing.allocation_charge = 50
+        self.charge_lecturing.save()
+        self.charge_practical.allocation_charge = 50
+        self.charge_practical.save()
+
+        msgs = _get_classes_charge_repartition_warning_messages(self.full_luy)
+        self.assertFalse(msgs)
