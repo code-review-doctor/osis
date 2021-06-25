@@ -26,7 +26,6 @@
 from typing import List
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
@@ -81,13 +80,3 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
             class_code=self.class_code,
         )
         return message_bus_instance.invoke(command)
-
-    def get_url_class_tutors(self):
-        url_kwargs = {
-            'learning_unit_year': self.learning_unit_year,
-            'learning_unit_code': self.learning_unit_code,
-            'class_code': self.class_code
-        }
-        url =  reverse("class_tutors", kwargs=url_kwargs)
-        print(url)
-        return url
