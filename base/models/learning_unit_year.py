@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 from decimal import Decimal
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
@@ -683,9 +683,9 @@ def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear
                         'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
                         '(Annual volume must be equal to the sum of volume Q1 and Q2)'
                     ) % {
-                            'code_ue': learning_component_year.learning_unit_year.acronym,
-                            'separator': '-' if learning_component_year.type == LECTURING else '_',
-                            'code_class': ue_class.acronym
+                        'code_ue': learning_component_year.learning_unit_year.acronym,
+                        'separator': '-' if learning_component_year.type == LECTURING else '_',
+                        'code_class': ue_class.acronym
                     }
                 )
     return _warnings

@@ -154,7 +154,8 @@ def _get_q1and2_q1or2_warnings(effective_class: 'EffectiveClass') -> List[str]:
             }
         )
     elif quadri == q1or2 and not (
-            effective_class.volumes.volume_first_quadrimester or effective_class.volumes.volume_second_quadrimester
+            bool(effective_class.volumes.volume_first_quadrimester) ^  # It is equivalent to a XOR
+            bool(effective_class.volumes.volume_second_quadrimester)
     ):
         warnings.append(
             _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '

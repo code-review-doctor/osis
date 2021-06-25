@@ -64,7 +64,7 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     session_derogation = attr.ib(type=DerogationSession, default=None)
 
     def __str__(self):
-        return "{} ({})".format(self.complete_code, self.entity_id.learning_unit_identity.academic_year)
+        return "{} ({})".format(self.complete_acronym, self.entity_id.learning_unit_identity.academic_year)
 
     @property
     def class_code(self):
@@ -75,16 +75,12 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         return self.entity_id.learning_unit_identity
 
     @property
-    def complete_code(self) -> str:
+    def complete_acronym(self) -> str:
         return "{}{}{}".format(
             self.learning_unit_code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
             self.class_code
         )
-
-    @property
-    def class_code(self) -> str:
-        return self.entity_id.class_code
 
     @property
     def learning_unit_code(self) -> str:
@@ -107,10 +103,10 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         )
 
     def is_volume_first_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
-        return self.volumes.volume_first_quadrimester > volume
+        return self.volumes.volume_first_quadrimester and self.volumes.volume_first_quadrimester > volume
 
     def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
-        return self.volumes.volume_second_quadrimester > volume
+        return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
 
 
 class PracticalEffectiveClass(EffectiveClass):

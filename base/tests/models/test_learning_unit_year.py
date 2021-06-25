@@ -1049,7 +1049,7 @@ class LearningUnitYearCheckClassesVolumesWarnings(TestCase):
             messages[0],
             "{} ({}) ".format(
                 inconsistent_msg,
-                _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') % {
+                _('at least one class volume is greater than the volume of the LU (%(sub_type)s)') % {
                     'sub_type': self.lecturing_component.learning_unit_year.get_subtype_display().lower()
                 }
             )
