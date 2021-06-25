@@ -32,6 +32,7 @@ register = template.Library()
 
 @register.filter
 def function_text(function):
+    #  TODO : On pourrait pas en faire une property dans Tutor ?
     if function:
         return Functions.get_value(function)
     return ''
