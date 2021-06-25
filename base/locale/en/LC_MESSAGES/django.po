@@ -524,6 +524,12 @@ msgstr ""
 msgid "City of institution"
 msgstr ""
 
+#, python-format
+msgid ""
+"Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
+"inconsistent (Annual volume must be equal to the sum of volume Q1 and Q2)"
+msgstr ""
+
 msgid "Classes"
 msgstr ""
 
@@ -694,6 +700,9 @@ msgid "Delete tree version permanently"
 msgstr ""
 
 msgid "Deliberation"
+msgstr ""
+
+msgid "Derogation's session"
 msgstr ""
 
 msgid "Description"
@@ -1234,9 +1243,6 @@ msgid "Justification"
 msgstr ""
 
 msgid "Keywords"
-msgstr ""
-
-msgid "LU"
 msgstr ""
 
 msgid "Language"
@@ -2396,6 +2402,7 @@ msgid ""
 "%(quadrimester)s volume has to be completed)"
 msgstr ""
 
+
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
@@ -2957,7 +2964,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
+"at least one class volume is greater than the volume of the LU "
+"(%(sub_type)s)"
 msgstr ""
 
 msgid "author"

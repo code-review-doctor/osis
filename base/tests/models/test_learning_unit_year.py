@@ -546,7 +546,6 @@ class LearningUnitYearWarningsTest(TestCase):
 
     @mock.patch('base.models.learning_unit_year.LearningUnitYear._check_classes')
     def test_warning_planned_classes_zero_and_volume(self, mock_check_classes_warnings=[]):
-
         self.luy_full.credits = self.luy_full.credits + 1
         self.luy_full.save()
 
@@ -701,9 +700,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('Only the volume Q1 must have a value'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('Only the volume Q1 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -743,9 +742,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('Only the volume Q2 must have a value'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('Only the volume Q2 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -777,9 +776,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volumes Q1 and Q2 must have a value'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('The volumes Q1 and Q2 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -812,9 +811,9 @@ class TestQuadriConsistency(TestCase):
             self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
-                _('Volumes of {} are inconsistent').format(
-                    self.learning_component_year_full_lecturing.complete_acronym),
-                _('The volume Q1 or Q2 must have a value but not both'))
+            _('Volumes of {} are inconsistent').format(
+                self.learning_component_year_full_lecturing.complete_acronym),
+            _('The volume Q1 or Q2 must have a value but not both'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
 
@@ -884,6 +883,495 @@ class LearningUnitYearDeleteCms(TestCase):
         luy_id = self.learning_unit_year_no_cms.id
         self.learning_unit_year_no_cms.delete()
         self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])
+
+
+class LearningUnitYearCheckVolumeConsistencyWithUeWarnings(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year,
+            planned_classes=1
+        )
+
+    def test_check_with_no_classes(self):
+        LearningUnitYearFactory()
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_volume_consistency_with_ue(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def test_check_with_class_volume_inconsistent(self):
+        learning_class = LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_total_annual + 1
+        )
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_volume_consistency_with_ue(list(query_components))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            self._build_check_consistency_volume_message(learning_class)
+        )
+
+    def test_check_with_class_volume_consistent(self):
+        LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_total_annual,
+            hourly_volume_partial_q2=0
+        )
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_volume_consistency_with_ue(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def _build_check_consistency_volume_message(self, learning_class):
+        return _(
+            'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
+            '(Annual volume must be equal to the sum of volume Q1 and Q2)'
+        ) % {
+            'code_ue': self.learning_unit_year.acronym,
+            'separator': '-' if learning_class.learning_component_year.type == LECTURING else '_',
+            'code_class': learning_class.acronym
+        }
+
+    def test_check_number_of_classes_correct(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(
+            component=self.lecturing_component,
+            number_of_occurence=self.lecturing_component.planned_classes
+        )
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def test_check_number_of_classes_inconsistent(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(
+            component=self.lecturing_component,
+            number_of_occurence=self.lecturing_component.planned_classes + 1
+        )
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _(
+                'The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
+                'is not consistent'
+            ) % {
+                'code_ue': self.learning_unit_year.acronym,
+                'component_code': 'PM'
+            }
+        )
+
+
+class LearningUnitYearCheckNumberOfClassesWarnings(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year,
+            planned_classes=2
+        )
+
+    def test_check_number_of_classes_not_enough(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(component=self.lecturing_component, number_of_occurence=1)
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            self._build_check_number_of_classes_message()
+        )
+
+    def test_check_number_of_classes_too_much(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(component=self.lecturing_component, number_of_occurence=3)
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            self._build_check_number_of_classes_message()
+        )
+
+    def _build_check_number_of_classes_message(self):
+        return _('The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
+                 'is not consistent') % \
+               {
+                   'code_ue': self.learning_unit_year.acronym,
+                   'component_code': 'PM'
+               }
+
+    def test_check_number_of_classes_correct(self):
+        query_components = _get_components_with_classes()
+        _build_effective_classes(
+            component=self.lecturing_component,
+            number_of_occurence=self.lecturing_component.planned_classes
+        )
+        messages = learning_unit_year._check_number_of_classes(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+
+class LearningUnitYearCheckClassesVolumesWarnings(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year,
+            hourly_volume_total_annual=30,
+            hourly_volume_partial_q1=10,
+            hourly_volume_partial_q2=20,
+        )
+
+    def test_check_quadrimester_volume_consistent(self):
+        LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_partial_q1,
+            hourly_volume_partial_q2=self.lecturing_component.hourly_volume_partial_q2
+        )
+        query_components = _get_components_with_classes()
+
+        messages = learning_unit_year._check_classes_volumes(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+    def test_check_quadrimester_volume_inconsistent_too_high(self):
+        too_high_volume = self.lecturing_component.hourly_volume_partial_q2 * 2
+        effective_class = LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_partial_q1,
+            hourly_volume_partial_q2=too_high_volume
+        )
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_classes_volumes(list(query_components))
+        self.assertEqual(len(messages), 2)
+        inconsistent_msg = _('Volumes of {} are inconsistent').format(
+            effective_class.effective_class_complete_acronym
+        )
+
+        self.assertEqual(
+            messages[0],
+            "{} ({}) ".format(
+                inconsistent_msg,
+                _('at least one classe volume is greater than the volume of the LU (%(sub_type)s)') % {
+                    'sub_type': self.lecturing_component.learning_unit_year.get_subtype_display().lower()
+                }
+            )
+
+        )
+        self.assertEqual(
+            messages[1],
+            "{} ({}) ".format(
+                inconsistent_msg,
+                _('the annual volume must be equal to the sum of the volumes Q1 and Q2')
+            )
+
+        )
+
+    def test_check_quadrimester_volume_inconsistent_too_low(self):
+        too_high_volume = self.lecturing_component.hourly_volume_partial_q2 / 2
+        LearningClassYearFactory(
+            learning_component_year=self.lecturing_component,
+            hourly_volume_partial_q1=self.lecturing_component.hourly_volume_partial_q1,
+            hourly_volume_partial_q2=too_high_volume
+        )
+        query_components = _get_components_with_classes()
+        messages = learning_unit_year._check_classes_volumes(list(query_components))
+        self.assertEqual(len(messages), 0)
+
+
+class LearningUnitYearCheckClassesSessionWarnings(TestCase):
+
+    def setUp(self):
+        self.message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
+                         '(should be %(should_be_values)s)')
+
+    def test_check_with_ue_session_1xx(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_1XX)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_1XX)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '1'))
+
+    def test_check_with_ue_session_x2x(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_X2X)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_X2X)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '2'))
+
+    def test_check_with_ue_session_xx3(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_XX3)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_XX3)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, '3'))
+
+    def test_check_with_ue_session_12X(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_1XX)
+        wrong_values.remove(learning_unit_year_session.SESSION_X2X)
+        wrong_values.remove(learning_unit_year_session.SESSION_12X)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_12X)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '1, 2 {} 12'.format(_('or')))
+        )
+
+    def test_check_with_ue_session_1x3(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_1X3)
+        wrong_values.remove(learning_unit_year_session.SESSION_1XX)
+        wrong_values.remove(learning_unit_year_session.SESSION_XX3)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_1X3)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '1, 3 {} 13'.format(_('or')))
+        )
+
+    def test_check_with_ue_session_x23(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_X2X)
+        wrong_values.remove(learning_unit_year_session.SESSION_XX3)
+        wrong_values.remove(learning_unit_year_session.SESSION_X23)
+        wrong_values.remove(learning_unit_year_session.SESSION_P23)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_X23)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '2, 3, 23 {} P23'.format(_('or')))
+        )
+
+    def test_check_with_ue_session_p23(self):
+        wrong_values = ALL_SESSION_VALUES.copy()
+        wrong_values.remove(learning_unit_year_session.SESSION_X2X)
+        wrong_values.remove(learning_unit_year_session.SESSION_XX3)
+        wrong_values.remove(learning_unit_year_session.SESSION_X23)
+        wrong_values.remove(learning_unit_year_session.SESSION_P23)
+
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_P23)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            session=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, '2, 3, 23 {} P23'.format(_('or')))
+        )
+
+    def test_check_with_ue_session_correct(self):
+        luy = LearningUnitYearFactory(session=learning_unit_year_session.SESSION_1XX)
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        LearningClassYearFactory(
+            learning_component_year=component,
+            session=learning_unit_year_session.SESSION_1XX
+        )
+
+        messages = learning_unit_year._check_classes_session(luy.session, list(_get_components_with_classes()))
+        self.assertEqual(len(messages), 0)
+
+
+class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
+
+    def setUp(self):
+        self.message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '
+                         '(should be %(should_be_values)s)')
+
+    def test_check_with_ue_quadrimester_q1(self):
+        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
+        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q1.name)
+
+        luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1.value)
+
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            quadrimester=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q1'))
+
+    def test_check_with_ue_quadrimester_q2(self):
+        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
+        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q2.name)
+
+        luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q2.value)
+
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            quadrimester=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q2'))
+
+    def test_check_with_ue_quadrimester_q3(self):
+        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
+        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q3.name)
+
+        luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q3.value)
+
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            quadrimester=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0], _build_expected_message(self.message, effective_class, 'Q3'))
+
+    def test_check_with_ue_quadrimester_q1_and_q2(self):
+        wrong_values = [quadrimesters.LearningUnitYearQuadrimester.Q3.name]
+        luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1and2.name)
+
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            quadrimester=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, 'Q1 {}/{} Q2'.format(_('and'), _('or')))
+        )
+
+    def test_check_with_ue_quadrimester_q1_or_q2(self):
+        wrong_values = ALL_QUADRIMESTER_VALUES.copy()
+        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q1or2.name)
+        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q1.name)
+        wrong_values.remove(quadrimesters.LearningUnitYearQuadrimester.Q2.name)
+
+        luy = LearningUnitYearFactory(quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1or2.name)
+
+        component = LecturingLearningComponentYearFactory(
+            learning_unit_year=luy
+        )
+        effective_class = LearningClassYearFactory(
+            learning_component_year=component,
+            quadrimester=random.choice(wrong_values)
+        )
+
+        messages = learning_unit_year._check_classes_quadrimester(
+            luy.quadrimester,
+            list(_get_components_with_classes())
+        )
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            messages[0],
+            _build_expected_message(self.message, effective_class, 'Q1 {} Q2'.format(_('or')))
+        )
+
+
+def _build_expected_message(message, effective_class, should_be_values_str):
+    return message % {
+        'code_class': effective_class.effective_class_complete_acronym,
+        'should_be_values': should_be_values_str
+    }
+
+
+def _get_components_with_classes():
+    return LearningComponentYear.objects.all().prefetch_related(
+        models.Prefetch('learningclassyear_set', to_attr="classes")
+    )
+
+
+def _build_effective_classes(component: LearningComponentYear, number_of_occurence: int) -> None:
+    factories = []
+    for cpt in range(number_of_occurence):
+        factories.append(LearningClassYearFactory(learning_component_year=component))
 
 
 class LearningUnitYearAndClassTest(TestCase):

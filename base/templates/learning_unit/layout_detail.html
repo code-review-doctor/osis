@@ -26,7 +26,7 @@
 {% endcomment %}
 
 {% block title %}
-    <title>OSIS - {{ learning_unit_year.acronym }}</title>
+    <title>OSIS{% if learning_unit_year %} - {{ learning_unit_year.acronym }}{% endif %}</title>
 {% endblock %}
 
 {% block breadcrumb %}

@@ -92,6 +92,14 @@ class LearningUnit(interface.RootEntity):
     def code(self) -> str:
         return self.entity_id.code
 
+    @property
+    def complete_title_fr(self) -> str:
+        return self.titles.complete_fr
+
+    @property
+    def complete_title_en(self) -> str:
+        return self.titles.complete_en
+
     def contains_partim_subdivision(self, subdivision: str) -> bool:
         return subdivision in {p.subdivision for p in self.partims}
 

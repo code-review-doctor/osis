@@ -54,6 +54,11 @@ msgid "Class %(effective_class_complete_acronym)s successfully created."
 msgstr ""
 "La classe %(effective_class_complete_acronym)s a été créée avec succès."
 
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully updated."
+msgstr ""
+"La classe %(effective_class_complete_acronym)s a été modifiée avec succès."
+
 msgid "Class specific complement"
 msgstr "Complément spécifique à la classe"
 
@@ -136,9 +141,6 @@ msgstr "Unités d'enseignement"
 
 msgid "Lecturing"
 msgstr "Partie magistrale"
-
-msgid "New class"
-msgstr "Nouvelle classe"
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
@@ -305,13 +307,19 @@ msgid "Title"
 msgstr "Intitulé"
 
 msgid "Title in English"
-msgstr "Titre en anglais"
+msgstr "Intitulé en anglais"
 
 msgid "Title in French"
-msgstr "Titre en français"
+msgstr "Intitulé en français"
 
 msgid "Type"
 msgstr "Type"
+
+msgid "Update"
+msgstr "Modifier"
+
+msgid "Update class"
+msgstr "Modifier classe"
 
 msgid "Vol. Q1"
 msgstr "Vol. Q1"
@@ -382,6 +390,9 @@ msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
 
+msgid "You do not have sufficient access rights to update a class."
+msgstr "Vous n'avez pas les droits nécessaires pour modifier une classe."
+
 msgid "external acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -395,3 +406,5 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
+
+
