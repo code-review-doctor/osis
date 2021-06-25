@@ -42,7 +42,7 @@
             <tbody>
                 {% for tutor in tutors %}
                             <tr>
-                                <td>{{ tutor.first_name }}, {{ tutor.last_name }}</td>
+                                <td>{{ tutor.full_name }}</td>
                                 <td>{{ tutor.function|function_text }}</td>
                                 <td>
                                     {{ tutor.distributed_volume_to_class | floatformat:2 }}

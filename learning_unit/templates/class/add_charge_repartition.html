@@ -53,5 +53,5 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
     <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
-           onclick="$('#form_change_attribution').submit();"/>
+           onclick="$('#form_change_attribution').submit();$('.modal.in').modal('hide');"/>
 </div>

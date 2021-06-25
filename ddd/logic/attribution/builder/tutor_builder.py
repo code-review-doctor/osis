@@ -25,11 +25,12 @@
 ##############################################################################
 
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
+from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.dtos import TutorSearchDTO, \
-    DistributedEffectiveClassesDTO
+    DistributedEffectiveClassesDTO, TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from osis_common.ddd import interface
 
@@ -45,6 +46,25 @@ class TutorBuilder(interface.RootEntityBuilder):
             entity_id=tutor_identity,
             distributed_effective_classes=[
                 _build_repartition(dto) for dto in dto_object.distributed_classes
+            ]
+        )
+
+    @classmethod
+    def build_from_command(cls, cmd: 'DistributeClassToTutorCommand') -> 'Tutor':
+        tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(
+            personal_id_number=cmd.tutor_personal_id_number
+        )
+        return Tutor(
+            entity_id=tutor_identity,
+            distributed_effective_classes=[
+                ClassVolumeRepartition(
+                    effective_class=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+                        class_code=cmd.class_code,
+                        learning_unit_year=cmd.learning_unit_year,
+                        learning_unit_code=cmd.learning_unit_code),
+                    distributed_volume=cmd.distributed_volume,
+                    attribution=LearningUnitAttributionIdentity(uuid=cmd.learning_unit_attribution_uuid)
+                )
             ]
         )
 

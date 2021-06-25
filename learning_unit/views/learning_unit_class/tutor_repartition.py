@@ -29,6 +29,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
+from django.utils.translation import gettext_lazy as _
 
 from base.views.common import display_success_messages
 from ddd.logic.attribution.commands import SearchAttributionCommand
@@ -106,10 +107,11 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
             tutor=self.get_tutor(attribution_uuid),
             effective_class=self.effective_class
         )
-        repartition_identity = form.save()
+
+        form.save()
         if not form.errors:
-            display_success_messages(request, self.get_success_msg(repartition_identity), extra_tags='safe')
-            return self.redirect_to_learning_unit_identification()
+            display_success_messages(request, self.get_success_msg(), extra_tags='safe')
+            return self.redirect_to_learning_unit_tutors()
 
         return render(request, self.template_name, {
             "form": form,
@@ -127,10 +129,10 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
         context.update({'form': form})
         return render(request, self.template_name, context)
 
-    def redirect_to_learning_unit_identification(self):
+    def redirect_to_learning_unit_tutors(self):
         return redirect(
             reverse(
-                'lu_class_tutors',
+                'lu_tutors',
                 kwargs={
                     'learning_unit_code': self.learning_unit.code,
                     'learning_unit_year': self.learning_unit.year,
@@ -138,3 +140,6 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
                 }
             )
         )
+
+    def get_success_msg(self) -> str:
+        return _("Class repartition successfully updated.")

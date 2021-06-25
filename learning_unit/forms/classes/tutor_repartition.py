@@ -89,4 +89,22 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
             class_code=self.effective_class.entity_id.class_code,
             distributed_volume=self.cleaned_data['volume'] or 0,
+            learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+            learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year
         )
+    # TODO : je pense qu'il faut ici un minimum de validation, mais je n'arrive pas à faire fonctionner ???
+    # def clean_volume(self):
+    #     print('clean_volume')
+    #     volume = self.cleaned_data['volume']
+    #     print(volume)
+    #     if volume:
+    #         if volume < 0:
+    #             raise ValidationError(_('The volume value should be greather or equal to 0'))
+    #         if volume > 10:
+    #             print('ici')
+    #             raise ValidationError(
+    #                 _('The volume should be less than the class volume (%(class_volume)d)') %{
+    #                     'class_volume': self.fields['class_volume'].initial
+    #                 }
+    #             )
+    #     return volume
