@@ -132,5 +132,5 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             )
         )
         return _("Class %(effective_class_complete_acronym)s successfully created.") % {
-            "effective_class_complete_acronym": effective_class.complete_code
+            "effective_class_complete_acronym": effective_class.complete_acronym
         }
