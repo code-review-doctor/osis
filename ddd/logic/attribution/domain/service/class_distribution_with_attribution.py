@@ -54,9 +54,9 @@ class ClassDistributionWithAttribution(interface.DomainService):
                 )
                 result.append(
                     TutorClassRepartitionDTO(
-                        attribution_uuid=effective_class.attribution.id,
+                        attribution_uuid=effective_class.attribution.uuid,
                         last_name=attribution.last_name,
-                        first_name=attribution.first_name.id,
+                        first_name=attribution.first_name,
                         function=attribution.function,
                         distributed_volume_to_class=effective_class.distributed_volume,
                     )
