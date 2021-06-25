@@ -82,3 +82,19 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             ),
             None
         )
+
+    @classmethod
+    def get_learning_unit_attribution(
+            cls,
+            attribution_uuid: str,
+            learning_unit_identity: 'LearningUnitIdentity'
+    ) -> 'TutorAttributionToLearningUnitDTO':
+        # TODO : ??? pq ne pas ajouter le uuid dans le search
+        attributions_to_learn_unit = cls.search_attributions_to_learning_unit(learning_unit_identity)
+        return next(
+            (
+                att for att in attributions_to_learn_unit
+                if str(att.attribution_uuid) == attribution_uuid
+            ),
+            None
+        )

@@ -23,38 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List
 
-from ddd.logic.attribution.domain.model.tutor import TutorIdentity
+from ddd.logic.attribution.commands import SearchAttributionCommand
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
 from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
-class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def get_tutor_attribution_to_learning_unit(
-            cls,
-            tutor_identity: 'TutorIdentity',
-            learning_unit_identity: 'LearningUnitIdentity'
-    ) -> 'TutorAttributionToLearningUnitDTO':
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_to_learning_unit(
-            cls,
-            learning_unit_identity: 'LearningUnitIdentity'
-    ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
-
-    @classmethod
-    def get_learning_unit_attribution(
-            cls,
-            attribution_uuid: str,
-            learning_unit_identity: 'LearningUnitIdentity'
-    ) -> 'TutorAttributionToLearningUnitDTO':
-        pass
+def get_attribution(
+        cmd: SearchAttributionCommand,
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
+) -> TutorAttributionToLearningUnitDTO:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.learning_unit_year,
+    )
+    return tutor_attribution_translator.get_learning_unit_attribution(
+        cmd.learning_unit_attribution_uuid,
+        learning_unit_identity
+    )

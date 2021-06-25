@@ -66,6 +66,13 @@ class TutorAttributionToLearningUnitDTO(DTO):
     function = attr.ib(type=str)
     attributed_volume_to_learning_unit = attr.ib(type=Decimal)
 
+    @property
+    def full_name(self):
+        return "".join([
+            (self.last_name or "").upper(),
+            self.first_name or ""
+        ]).strip()
+
 
 @attr.s(frozen=True, slots=True)
 class TutorClassRepartitionDTO(DTO):

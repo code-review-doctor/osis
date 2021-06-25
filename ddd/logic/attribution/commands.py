@@ -63,3 +63,10 @@ class UnassignTutorClassCommand(interface.CommandRequest):
     tutor_personal_id_number = attr.ib(type=str)
     learning_unit_attribution_uuid = attr.ib(type=str)
     class_code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchAttributionCommand(interface.CommandRequest):
+    learning_unit_attribution_uuid = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
