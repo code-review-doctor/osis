@@ -81,7 +81,7 @@ class PostponeLearningUnits:
             'learningunityear_set__externallearningunityear',
             'learningunityear_set__learningcomponentyear_set',
             'learningunityear_set__learningachievement_set'
-        )
+        ).distinct()
 
     def postpone(self):
         for lcy in self.load_container_years_to_postpone():
