@@ -54,7 +54,7 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
                 year=effective_class.entity_id.learning_unit_identity.year
             )
         )
-        tutor_assign_to_class = None
+
         if tutor_assign_to_class:
             exceptions.add(
                 EffectiveClassHasTutorAssignedException(
