@@ -11,15 +11,157 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.12'
+  version: '1.13'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
 paths:
+  /application/:
+    get:
+      description: 'Return all applications of connected user of the current application period'
+      operationId: application_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+    post:
+      description: 'Create an application on the current application period'
+      operationId: application_create
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCreateCommand'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCreateCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+  /application/my_charges:
+    get:
+      description: 'Return charge summary of connected user of the current application period'
+      operationId: my_charge_summary
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyChargeSummaryList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+  /application/send_summary:
+    post:
+      description: 'Send an applications summary on the current application period'
+      operationId: applications_summary_send
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      responses:
+        '204':
+          description: 'The summary email has been sent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+  /application/{application_uuid}/:
+    put:
+      description: 'Update an application on the current application period'
+      operationId: application_update
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - in: path
+          name: application_uuid
+          required: true
+          schema:
+            description: 'The uuid of the application'
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationUpdateCommand'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationUpdateCommand'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+    delete:
+      description: 'Delete an application on the current application period'
+      operationId: application_delete
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - in: path
+          name: application_uuid
+          required: true
+          schema:
+            description: 'The uuid of the application'
+            type: string
+      responses:
+        '204':
+          description: 'The resource was deleted successfully.'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
   /application/calendars:
     get:
       description: Return all calendars related to application courses.
       operationId: applicationcoursescalendars_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
       responses:
         '200':
           description: OK
@@ -37,11 +179,86 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - application
+  /application/vacant_courses:
+    get:
+      description: 'Return vacant courses available filtered by criteria'
+      operationId: vacantcourses_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - in: query
+          name: code
+          schema:
+            description: 'Query parameter to filter by vacant course code'
+            type: string
+        - in: query
+          name: allocation_faculty
+          schema:
+            description: 'Query parameter to filter by allocation faculty'
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VacantCourseList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+  /application/renewal:
+    get:
+      description: 'Get all attributions about to expire during current application period'
+      operationId: attributionsabouttoexpire_list
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttributionAboutToExpireList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
+    post:
+      description: ' Renew multiple attributions about to expire application during current application period'
+      operationId: attributionsabouttoexpire_renew
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewAttributionAboutToExpireCommand'
+      responses:
+        '201':
+          description: Created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - application
   /{year}/me:
     get:
       description: Return all attributions of connected user in a specific year.
       operationId: myattributions_list
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: path
           name: year
           required: true
@@ -75,6 +292,7 @@ paths:
       description: Return all attributions of specific user in a specific year.
       operationId: attributions_list
       parameters:
+        - $ref: '#/components/parameters/Accept-Language'
         - in: path
           name: year
           required: true
@@ -116,6 +334,15 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
   responses:
     Unauthorized:
       description: Unauthorized
@@ -155,6 +382,274 @@ components:
           example: 2022
         is_open:
           type: boolean
+    RenewAttributionAboutToExpireCommand:
+      type: object
+      properties:
+        codes:
+          type: array
+          items:
+            type: string
+    ApplicationCreateCommand:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "Candidature aux cours vacants"
+        lecturing_volume:
+          type: string
+          example: '10.0'
+        practical_volume:
+          type: string
+          example: '15.0'
+        remark:
+          type: string
+        course_summary:
+          type: string
+      required:
+        - code
+        - lecturing_volume
+        - practical_volume
+        - remark
+        - course_summary
+    ApplicationUpdateCommand:
+      type: object
+      properties:
+        lecturing_volume:
+          type: string
+          example: '10.0'
+        practical_volume:
+          type: string
+          example: '15.0'
+        remark:
+          type: string
+        course_summary:
+          type: string
+      required:
+        - lecturing_volume
+        - practical_volume
+        - remark
+        - course_summary
+    MyChargeSummaryList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MyChargeSummary'
+        count:
+          type: integer
+          example: 3
+    MyChargeSummary:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "LDROI1200"
+        year:
+          type: integer
+          example: 2020
+        title:
+          type: string
+          example: "Introduction au droit"
+        start_year:
+          type: integer
+          example: 2018
+          description: 'Start year of attribution'
+          nullable: true
+        end_year:
+          type: integer
+          example: 2018
+          description: 'End year of attribution'
+          nullable: true
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+          example: 'Coordinateur'
+        lecturing_volume:
+          type: string
+          example: '10.0'
+        practical_volume:
+          type: string
+          example: '10.0'
+        lecturing_volume_available:
+          type: string
+          example: '15.0'
+        practical_volume_available:
+          type: string
+          example: '10.5'
+        total_lecturing_volume_course:
+          type: string
+          example: '30.0'
+        total_practical_volume_course:
+          type: string
+          example: '30.0'
+        tutors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TutorAttribution'
+    VacantCourseList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VacantCourse'
+        count:
+          type: integer
+          example: 3
+        previous:
+          type: string
+          nullable: true
+        next:
+          type: string
+          nullable: true
+    VacantCourse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "LDROI1200"
+        year:
+          type: integer
+          example: 2020
+        lecturing_volume_total:
+          type: string
+          example: '20.0'
+        practical_volume_total:
+          type: string
+          example: '50.0'
+        lecturing_volume_available:
+          type: string
+          example: '10.0'
+        practical_volume_available:
+          type: string
+          example: '40.0'
+        title:
+          type: string
+          example: "Introduction au droit"
+        vacant_declaration_type:
+          $ref: '#/components/schemas/VacantDeclarationTypeEnum'
+        vacant_declaration_type_text:
+          type: string
+          example: 'Réservé aux internes'
+        is_in_team:
+          type: boolean
+        allocation_entity:
+          type: string
+          example: 'DRT'
+        tutors:
+          type: array
+          items:
+            $ref: '#/components/schemas/TutorAttribution'
+    AttributionAboutToExpireList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttributionAboutToExpire'
+        count:
+          type: integer
+          example: 3
+    AttributionAboutToExpire:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "LDROI1200"
+        year:
+          type: integer
+          example: 2020
+        title:
+          type: string
+          example: "Introduction au droit"
+        lecturing_volume:
+          type: string
+          example: '10.0'
+        practical_volume:
+          type: string
+          example: '15.0'
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+          example: 'Coordinateur'
+        end_year:
+          type: integer
+          example: 2020
+          description: 'End year of attribution'
+        start_year:
+          type: integer
+          example: 2018
+          description: 'Start year of attribution'
+          nullable: true
+        total_lecturing_volume_course:
+          type: string
+          example: '50.0'
+          nullable: true
+        total_practical_volume_course:
+          type: string
+          example: '30.0'
+          nullable: true
+        lecturing_volume_available:
+          type: string
+          example: '50.0'
+          nullable: true
+        practical_volume_available:
+          type: string
+          example: '30.0'
+          nullable: true
+        unavailable_renewal_reason:
+          type: string
+          nullable: true
+        is_renewable:
+          type: boolean
+    ApplicationList:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Application'
+        count:
+          type: integer
+          example: 3
+    Application:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        code:
+          type: string
+          example: "LDROI1200"
+        year:
+          type: integer
+          example: 2020
+        course_title:
+          type: string
+          example: "Introduction au droit"
+        lecturing_volume:
+          type: string
+          example: '10.0'
+        practical_volume:
+          type: string
+          example: '15.0'
+        remark:
+          type: string
+          example: "Remarque "
+        course_summary:
+          type: string
+          example: "Le droit est l'ensemble des règles...."
+        lecturing_volume_available:
+          type: string
+          example: '50.0'
+          nullable: true
+        practical_volume_available:
+          type: string
+          example: '30.0'
+          nullable: true
     Attribution:
       type: object
       properties:
@@ -206,6 +701,28 @@ components:
           nullable: true
         links:
           $ref: '#/components/schemas/AttributionLinks'
+    TutorAttribution:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: 'Thomas'
+        last_name:
+          type: string
+          example: 'Durant'
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+          example: 'Coordinateur'
+        lecturing_volume:
+          type: string
+          example: '15.0'
+          nullable: true
+        practical_volume:
+          type: string
+          example: '10.5'
+          nullable: true
     AttributionFunctionEnum:
       type: string
       enum:
@@ -239,6 +756,19 @@ components:
         - 'OTHER_INDIVIDUAL'
         - 'MASTER_THESIS'
         - 'EXTERNAL'
+    VacantDeclarationTypeEnum:
+      type: string
+      enum:
+        - 'RESEVED_FOR_INTERNS'
+        - 'OPEN_FOR_EXTERNS'
+        - 'EXCEPTIONAL_PROCEDURE'
+        - 'VACANT_NOT_PUBLISH'
+        - 'DO_NOT_ASSIGN'
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
     Error:
       type: object
       properties:

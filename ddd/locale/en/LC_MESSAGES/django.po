@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-11 13:49+0200\n"
+"POT-Creation-Date: 2021-06-17 17:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +25,27 @@ msgstr ""
 msgid "'{value}' is not a valid derogation session."
 msgstr ""
 
+msgid "A substitute can not renew his function of substitute"
+msgstr ""
+
+msgid ""
+"Application on this vacant course is not reserved for interns/open for extern"
+msgstr ""
+
 msgid "Can't create a learning unit lower than 2019-20"
+msgstr ""
+
+msgid "Cannot found attribution about to expire with code: {}"
+msgstr ""
+
+msgid ""
+"Cannot renew an attribution with a function different from holder or coholder"
+msgstr ""
+
+msgid "Cannot renew an attribution without volumes"
+msgstr ""
+
+msgid "Cannot update an application which is not owned by you"
 msgstr ""
 
 msgid "Class can't be created on learning unit having enrollment"
@@ -51,6 +70,12 @@ msgid "Learning unit {} already exists next year"
 msgstr ""
 
 msgid "Learning unit {} is used in following programs : {}"
+msgstr ""
+
+msgid "Lecturing charge or practical charge must be filled"
+msgstr ""
+
+msgid "No vacant corresponding activity"
 msgstr ""
 
 msgid "Selected entity {} is not an authorized responsible entity"
@@ -85,6 +110,14 @@ msgid "The teaching place is required."
 msgstr ""
 
 msgid ""
+"This course is team-managed. The application to this activity is based on a "
+"paper transmission."
+msgstr ""
+
+msgid "Volumes asked should be lower or equal to volume available"
+msgstr ""
+
+msgid ""
 "You cannot create a class on this learning unit because it is in proposal "
 "this year or in past."
 msgstr ""
@@ -93,4 +126,7 @@ msgid ""
 "You cannot create class on this learning unit because the component's annual "
 "volume [PM or default PP] is not greater than 0 and there are no planned "
 "class."
+msgstr ""
+
+msgid "You have already applied on vacant course"
 msgstr ""

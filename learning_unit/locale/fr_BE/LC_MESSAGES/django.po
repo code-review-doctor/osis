@@ -304,10 +304,10 @@ msgid "Title"
 msgstr "Intitulé"
 
 msgid "Title in English"
-msgstr "Titre en anglais"
+msgstr "Intitulé en anglais"
 
 msgid "Title in French"
-msgstr "Titre en français"
+msgstr "Intitulé en français"
 
 msgid "Type"
 msgstr "Type"
@@ -403,3 +403,5 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
+
+
