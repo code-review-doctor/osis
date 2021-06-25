@@ -503,6 +503,7 @@ URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/pr
 
 MINIMUM_SELECTABLE_YEAR = int(os.environ.get("MINIMUM_SELECTABLE_YEAR", 0))
 MINIMUM_EDG_YEAR = int(os.environ.get("MINIMUM_EDG_YEAR", 0))
+MINIMUM_LUE_YEAR = int(os.environ.get("MINIMUM_LUE_YEAR", 0))
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 0))
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 0))  # By default, no restriction
