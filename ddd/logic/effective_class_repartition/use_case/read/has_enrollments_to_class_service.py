@@ -41,4 +41,3 @@ def has_enrollments_to_class_service(
     return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
         learning_unit_identity
     )
-
