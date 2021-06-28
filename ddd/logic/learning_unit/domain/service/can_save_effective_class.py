@@ -25,6 +25,7 @@
 ##############################################################################
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, \
@@ -51,7 +52,14 @@ class CanCreateEffectiveClass(interface.DomainService):
         if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
             exceptions.add(LearningUnitHasProposalException())
 
-        if learning_unit_repository.has_enrollments(learning_unit):
+        from infrastructure.messages_bus import message_bus_instance
+        learning_unit_has_enrollments = message_bus_instance.invoke(
+            HasEnrollmentsToClassCommand(
+                learning_unit_code=learning_unit.code,
+                year=learning_unit.year
+            )
+        )
+        if learning_unit_has_enrollments:
             exceptions.add(LearningUnitHasEnrollmentException())
 
         if not learning_unit.has_volume():
