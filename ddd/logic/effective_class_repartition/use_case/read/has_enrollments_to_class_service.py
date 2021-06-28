@@ -24,35 +24,19 @@
 #
 ##############################################################################
 
-from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import DeleteEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsToEffectiveClass
 
 
-def delete_effective_class(
-        cmd: DeleteEffectiveClassCommand,
-        effective_class_repository: IEffectiveClassRepository,
-        learning_unit_repository: ILearningUnitRepository
-) -> EffectiveClassIdentity:
-
-    # GIVEN
-    effective_class = effective_class_repository.get(
-        entity_id=EffectiveClassIdentityBuilder.build_from_command(
-            cmd
-        )
+def has_enrollments_to_class_service(
+        cmd: 'HasEnrollmentsToClassCommand'
+) -> bool:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.year
     )
-    learning_unit = learning_unit_repository.get(
-        entity_id=LearningUnitIdentityBuilder.build_from_code_and_year(cmd.learning_unit_code, cmd.year)
+    return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
+        learning_unit_identity
     )
-    # WHEN
-    if effective_class:
-        CanEffectiveClassBeDeleted().verify(
-            effective_class=effective_class
-        )
-    # THEN
-        effective_class_repository.delete(effective_class.entity_id)
-        return effective_class.entity_id

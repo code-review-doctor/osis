@@ -79,7 +79,9 @@ class DeleteEffectiveClassService(SimpleTestCase):
 
     @mock.patch('infrastructure.learning_unit.domain.service.tutor_distributed_to_class.TutorDistributedToClass.'
                 'get_first_tutor_full_name_if_exists')
-    def test_delete_existing_class(self, mock_can_delete):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class', return_value=False)
+    def test_delete_existing_class(self, mock_has_enrollments_to_class, mock_can_delete):
         mock_can_delete.return_value = None
         entity_id = delete_effective_class(
             cmd=self.delete_class_cmd,
@@ -99,9 +101,14 @@ class DeleteEffectiveClassService(SimpleTestCase):
         self.assertEqual(len(self.effective_class_repository.entities), 0)
 
     @mock.patch('infrastructure.learning_unit.domain.service.tutor_distributed_to_class.TutorDistributedToClass.'
-                'get_first_tutor_full_name_if_exists')
-    def test_should_raise_LearningUnitOfEffectiveClassHasEnrollmentException(self, mock_can_delete):
-        mock_can_delete.return_value = None
+                'get_first_tutor_full_name_if_exists', return_value=None)
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class', return_value=True)
+    def test_should_raise_LearningUnitOfEffectiveClassHasEnrollmentException(
+            self,
+            mock_has_enrollments_to_class,
+            mock_can_delete
+    ):
         self.learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
 
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
@@ -129,7 +136,9 @@ class DeleteEffectiveClassService(SimpleTestCase):
 
     @mock.patch('infrastructure.learning_unit.domain.service.tutor_distributed_to_class.TutorDistributedToClass.'
                 'get_first_tutor_full_name_if_exists')
-    def test_should_raise_EffectiveClassHasTutorAssignedException(self, mock_can_delete):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class', return_value=False)
+    def test_should_raise_EffectiveClassHasTutorAssignedException(self, mock_has_enrollments, mock_can_delete):
         tutor_full_name = 'Martin tom'
         mock_can_delete.return_value = tutor_full_name
 

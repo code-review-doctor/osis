@@ -24,12 +24,10 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.learning_unit.commands import HasClassRepartitionCommand
+from ddd.logic.learning_unit.commands import HasClassRepartitionCommand, HasEnrollmentsToClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 from osis_common.ddd import interface
 
 
@@ -38,15 +36,19 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
     @classmethod
     def verify(
             cls,
-            effective_class: 'EffectiveClass',
-            learning_unit: 'LearningUnit',
-            learning_unit_repository: 'ILearningUnitRepository'
+            effective_class: 'EffectiveClass'
     ):
         exceptions = set()  # type Set[BusinessException]
-        if learning_unit_repository.has_enrollments(learning_unit):
+        from infrastructure.messages_bus import message_bus_instance
+        learning_unit_has_enrollments = message_bus_instance.invoke(
+            HasEnrollmentsToClassCommand(
+                learning_unit_code=effective_class.entity_id.learning_unit_identity.code,
+                year=effective_class.entity_id.learning_unit_identity.year
+            )
+        )
+        if learning_unit_has_enrollments:
             exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
-        from infrastructure.messages_bus import message_bus_instance
         tutor_assign_to_class = message_bus_instance.invoke(
             HasClassRepartitionCommand(
                 class_code=effective_class.class_code,
