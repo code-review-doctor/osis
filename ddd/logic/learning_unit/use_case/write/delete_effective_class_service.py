@@ -53,7 +53,7 @@ def delete_effective_class(
         CanEffectiveClassBeDeleted().verify(
             effective_class=effective_class,
             learning_unit=learning_unit,
-            learning_unit_repository=learning_unit_repository,
+            learning_unit_repository=learning_unit_repository
         )
     # THEN
         effective_class_repository.delete(effective_class.entity_id)
