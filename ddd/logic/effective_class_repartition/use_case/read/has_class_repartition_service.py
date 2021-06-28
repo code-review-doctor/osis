@@ -23,12 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Optional
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorDistributedToClass
 
 
-class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
-    entities = list()  # type: List[EffectiveClass]
+def has_class_repartition_service(
+        cmd: 'HasClassRepartitionCommand'
+) -> Optional[str]:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
+    return TutorDistributedToClass.get_first_tutor_full_name_if_exists(
+        effective_class_identity
+    )

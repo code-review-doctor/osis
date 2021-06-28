@@ -23,12 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsToEffectiveClass
 
 
-class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
-    entities = list()  # type: List[EffectiveClass]
+def has_enrollments_to_class_service(
+        cmd: 'HasEnrollmentsToClassCommand'
+) -> bool:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.year
+    )
+    return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
+        learning_unit_identity
+    )

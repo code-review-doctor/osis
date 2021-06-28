@@ -23,12 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Union, Optional
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from attribution.models.attribution_class import AttributionClass as AttributionClassDb
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.service.i_tutor_distributed_to_class import ITutorDistributedToClass
 
 
-class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
-    entities = list()  # type: List[EffectiveClass]
+class TutorDistributedToClass(ITutorDistributedToClass):
+
+    @classmethod
+    def get_first_tutor_full_name_if_exists(
+            cls,
+            effective_class_identity: 'EffectiveClassIdentity'
+    ) -> Optional[str]:
+        ue_identity = effective_class_identity.learning_unit_identity
+        results = AttributionClassDb.objects.filter(
+            learning_class_year__learning_component_year__learning_unit_year__acronym=ue_identity.code,
+            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=ue_identity.year,
+            learning_class_year__acronym=effective_class_identity.class_code
+        )
+        if results:
+            return results[0].attribution_charge.attribution.tutor.person.full_name
+        return None

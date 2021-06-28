@@ -23,47 +23,47 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
-    LearningUnitHasPartimException, LearningUnitHasProposalException, \
-    LearningUnitHasEnrollmentException, LearningUnitHasNoVolumeException
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from ddd.logic.learning_unit.commands import HasClassRepartitionCommand, HasEnrollmentsToClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
+    LearningUnitOfEffectiveClassHasEnrollmentException
 from osis_common.ddd import interface
 
 
-class CanCreateEffectiveClass(interface.DomainService):
+class CanEffectiveClassBeDeleted(interface.DomainService):
 
     @classmethod
     def verify(
             cls,
-            learning_unit: 'LearningUnit',
-            learning_unit_repository: 'ILearningUnitRepository',
+            effective_class: 'EffectiveClass'
     ):
         exceptions = set()  # type Set[BusinessException]
-        if learning_unit.is_external():
-            exceptions.add(ClassTypeInvalidException())
-
-        if learning_unit.has_partim():
-            exceptions.add(LearningUnitHasPartimException())
-
-        if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
-            exceptions.add(LearningUnitHasProposalException())
-
         from infrastructure.messages_bus import message_bus_instance
         learning_unit_has_enrollments = message_bus_instance.invoke(
             HasEnrollmentsToClassCommand(
-                learning_unit_code=learning_unit.code,
-                year=learning_unit.year
+                learning_unit_code=effective_class.entity_id.learning_unit_identity.code,
+                year=effective_class.entity_id.learning_unit_identity.year
             )
         )
         if learning_unit_has_enrollments:
-            exceptions.add(LearningUnitHasEnrollmentException())
+            exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
-        if not learning_unit.has_volume():
-            exceptions.add(LearningUnitHasNoVolumeException())
+        tutor_assign_to_class = message_bus_instance.invoke(
+            HasClassRepartitionCommand(
+                class_code=effective_class.class_code,
+                learning_unit_code=effective_class.entity_id.learning_unit_identity.code,
+                year=effective_class.entity_id.learning_unit_identity.year
+            )
+        )
+
+        if tutor_assign_to_class:
+            exceptions.add(
+                EffectiveClassHasTutorAssignedException(
+                    effective_class=effective_class,
+                    tutor_full_name=tutor_assign_to_class
+                )
+            )
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)

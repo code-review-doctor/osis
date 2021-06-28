@@ -23,29 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
-    LearningUnitOfEffectiveClassHasEnrollmentException
+import abc
+
 from osis_common.ddd import interface
 
 
-class EffectiveClassCanBeDeleted(interface.DomainService):
+class IStudentEnrollmentsToEffectiveClass(interface.DomainService):
 
-    def validate(
-            self,
-            effective_class: 'EffectiveClass',
-            learning_unit: 'LearningUnit',
-            learning_unit_repository: 'LearningUnitRepository',
-            effective_class_repository: 'EffectiveClassRepository'
-    ):
-        exceptions = set()  # type Set[BusinessException]
-        if learning_unit_repository.has_enrollments(learning_unit):
-            exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
-
-        tutor_assign_to_class = effective_class_repository.get_tutor_assign_to_class(effective_class)
-        if tutor_assign_to_class:
-            exceptions.add(EffectiveClassHasTutorAssignedException(effective_class=effective_class,
-                                                                   tutor_full_name=tutor_assign_to_class))
-
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
+    @classmethod
+    @abc.abstractmethod
+    def has_enrollments_to_class(cls, learning_unit_identity: 'LearningUnitIdentity') -> bool:
+        pass

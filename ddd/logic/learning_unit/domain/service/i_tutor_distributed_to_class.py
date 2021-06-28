@@ -23,12 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import abc
+from typing import Optional
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from osis_common.ddd import interface
 
 
-class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
-    entities = list()  # type: List[EffectiveClass]
+class ITutorDistributedToClass(interface.DomainService):
+
+    @classmethod
+    @abc.abstractmethod
+    def get_first_tutor_full_name_if_exists(cls, effective_class_identity: 'EffectiveClassIdentity') -> Optional[str]:
+        pass

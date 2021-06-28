@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 14:13+0200\n"
+"POT-Creation-Date: 2021-06-22 13:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,8 +37,18 @@ msgstr "Entité d'attribution"
 msgid "Annual volume"
 msgstr "Volume annuel"
 
+#, python-format
+msgid ""
+"Are you certain that you want to definitively delete the class in %(year)s ?"
+msgstr ""
+"Etes-vous certain de vouloir supprimer définitivement cette classe en "
+"%(year)s ?"
+
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Central manager"
 msgstr "Gestionnaire central"
@@ -53,6 +63,11 @@ msgstr "Classe"
 msgid "Class %(effective_class_complete_acronym)s successfully created."
 msgstr ""
 "La classe %(effective_class_complete_acronym)s a été créée avec succès."
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully deleted."
+msgstr ""
+"La classe %(effective_class_complete_acronym)s a été supprimée avec succès."
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully updated."
@@ -74,8 +89,14 @@ msgstr "Partie commune"
 msgid "Components"
 msgstr "Composants"
 
+msgid "Confirm"
+msgstr "Confirmer"
+
 msgid "Credits"
 msgstr "Crédits"
+
+msgid "Delete class definitively"
+msgstr "Supprimer la classe définitivement"
 
 msgid "Derogation's session"
 msgstr "Session de dérogation"
