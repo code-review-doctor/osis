@@ -100,7 +100,11 @@ class DeleteClassView(PermissionRequiredMixin, FormView):
 
         try:
             message_bus_instance.invoke(
-                CanDeleteEffectiveClassCommand(learning_unit_code=self.learning_unit_code, year=self.year, class_code=self.effective_class.class_code)
+                CanDeleteEffectiveClassCommand(
+                    learning_unit_code=self.learning_unit_code,
+                    year=self.year,
+                    class_code=self.effective_class.class_code
+                )
             )
             form = DeleteClassForm(
                 request.POST,
@@ -109,7 +113,11 @@ class DeleteClassView(PermissionRequiredMixin, FormView):
             )
             form.save()
             if not form.errors:
-                display_success_messages(request, self.get_success_msg(effective_class_to_delete_complete_code), extra_tags='safe')
+                display_success_messages(
+                    request,
+                    self.get_success_msg(effective_class_to_delete_complete_code),
+                    extra_tags='safe'
+                )
                 return self.redirect_to_learning_unit_identification()
 
             return render(request, self.template_name, {

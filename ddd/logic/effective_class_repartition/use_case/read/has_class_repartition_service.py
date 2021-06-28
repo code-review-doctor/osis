@@ -36,4 +36,3 @@ def has_class_repartition_service(
     return TutorDistributedToClass.get_first_tutor_full_name_if_exists(
         effective_class_identity
     )
-
