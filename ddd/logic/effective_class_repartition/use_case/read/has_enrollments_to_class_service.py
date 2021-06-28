@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
 
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
@@ -33,7 +32,7 @@ from infrastructure.learning_unit.domain.service.student_enrollments_to_effectiv
 
 def has_enrollments_to_class_service(
         cmd: 'HasEnrollmentsToClassCommand'
-) -> Optional[str]:
+) -> bool:
     learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
         code=cmd.learning_unit_code,
         year=cmd.year
