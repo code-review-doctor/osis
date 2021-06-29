@@ -115,7 +115,8 @@ class CreateClassView(PermissionRequiredMixin, FormView):
                     kwargs={
                         'learning_unit_code': self.learning_unit_code,
                         'learning_unit_year': self.year,
-                        'class_code': effective_class_identity.class_code}
+                        'class_code': effective_class_identity.class_code
+                    }
                 )
             )
 

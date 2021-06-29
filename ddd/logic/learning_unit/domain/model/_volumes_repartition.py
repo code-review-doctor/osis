@@ -33,8 +33,8 @@ from osis_common.ddd import interface
 
 @attr.s(frozen=True, slots=True)
 class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit, default=0.0)
-    volume_second_quadrimester = attr.ib(type=DurationUnit, default=0.0)
+    volume_first_quadrimester = attr.ib(type=DurationUnit)
+    volume_second_quadrimester = attr.ib(type=DurationUnit)
 
 
 @attr.s(frozen=True, slots=True)
