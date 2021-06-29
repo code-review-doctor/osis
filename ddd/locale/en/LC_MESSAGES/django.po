@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-17 17:21+0200\n"
+"POT-Creation-Date: 2021-06-29 10:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,6 +112,27 @@ msgstr ""
 msgid ""
 "This course is team-managed. The application to this activity is based on a "
 "paper transmission."
+msgstr ""
+
+msgid ""
+"Volume of %(assigned_volume)d is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the attribution volume "
+"(%(attribution_volume))"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)d is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the class volume (%(class_volume)d)"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volume should be a greater than 0 and less than or equal to effective class "
+"volume (%(class_volume)s)"
+msgstr ""
+
+msgid "Volume should be a number"
 msgstr ""
 
 msgid "Volumes asked should be lower or equal to volume available"

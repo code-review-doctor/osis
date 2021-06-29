@@ -68,12 +68,9 @@ def as_messages_error(context):
 def as_messages_success(context):
     request = context['request']
     msgs = messages.get_messages(request)
-    print('*******************')
-    print(len(msgs))
+
     for m in msgs:
-        print(m.message)
         if 'success' in m.tags:
-            print('yess')
             return True
     return False
 

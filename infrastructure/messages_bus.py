@@ -45,7 +45,8 @@ from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitComma
 from ddd.logic.attribution.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
-from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import search_tutors_distributed_to_class
+from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import \
+    search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
@@ -156,7 +157,6 @@ class MessageBus:
         DistributeClassToTutorCommand: lambda cmd: distribute_class_to_tutor(
             cmd,
             TutorRepository(),
-            TutorAttributionToLearningUnitTranslator(),
             EffectiveClassRepository()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

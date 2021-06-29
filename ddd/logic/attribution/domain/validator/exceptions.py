@@ -31,20 +31,20 @@ from osis_common.ddd.interface import BusinessException
 
 class AssignedVolumeInvalidValueException(BusinessException):
     def __init__(self, assigned_volume: float, class_volume: float, **kwargs):
-        message = _("Volume of '{assigned_volume}' is not a valid volume. It should be greather or equal than 0 and "
-                    "less or equal than the class volume ({class_volume})").format(
-            assigned_volume=assigned_volume,
-            class_volume=class_volume
-        )
+        message = _("Volume of %(assigned_volume)d is not a valid volume. It should be greater or equal than 0 and "
+                    "less or equal than the class volume (%(class_volume)d)") % {
+            'assigned_volume': assigned_volume,
+            'class_volume': class_volume
+        }
         super().__init__(message, **kwargs)
 
 
 class AssignedVolumeTooHighException(BusinessException):
     def __init__(self, assigned_volume: float, attribution_volume: float, **kwargs):
         message = _(
-            "Volume of '{assigned_volume}' is not a valid volume. It should be greather or equal than 0 and "
-            "less or equal than the attributuion volume ({attribution_volume})").format(
-            assigned_volume=assigned_volume,
-            attribution_volume=attribution_volume
-        )
+            "Volume of %(assigned_volume)d is not a valid volume. It should be greater or equal than 0 and "
+            "less or equal than the attribution volume (%(attribution_volume))") % {
+            'assigned_volume': assigned_volume,
+            'attribution_volume': attribution_volume
+        }
         super().__init__(message, **kwargs)

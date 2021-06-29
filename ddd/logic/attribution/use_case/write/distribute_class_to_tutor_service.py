@@ -29,30 +29,21 @@ from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
-from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
     DistributeClassToTutorValidatorList
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
 def distribute_class_to_tutor(
         cmd: DistributeClassToTutorCommand,
         repository: 'ITutorRepository',
-        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
         effective_class_repository: 'IEffectiveClassRepository'
 ) -> 'TutorIdentity':
-    print('distribute_class_to_tutor')
     # TODO: to implement
     # TODO: reuse check_class_belongs_to_learning_unit DomainService
     tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.year,
-    )
-
     tutor = repository.get(tutor_identity)
     if not tutor:
         # first_attribution_to_class
@@ -62,22 +53,7 @@ def distribute_class_to_tutor(
         _build_class_volume_repartition(cmd)
     )
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
-    print('ici1*************')
-    val = DistributeClassToTutorValidatorList(cmd, effective_class).validate()
-
-    print(val)
-    print('ici11************')
-    # tutor = tutor.assign_class(
-    #     class_code=cmd.class_code,
-    #     distributed_volume=cmd.distributed_volume,
-    #     learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid
-    # )
-
-    # if not tutor_attribution_translator.get_tutor_attribution_to_learning_unit(
-    #         tutor_identity=tutor_identity,
-    #         learning_unit_identity=learning_unit_identity
-    # ):
-    #     raise BusinessException()
+    DistributeClassToTutorValidatorList(cmd, effective_class).validate()
     repository.save(tutor)
     return tutor.entity_id
 

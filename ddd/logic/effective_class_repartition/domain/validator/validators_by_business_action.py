@@ -42,13 +42,11 @@ class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListV
     effective_class = attr.ib(type=EffectiveClass)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
-        print('get_data1')
         return [
             ShouldBeNumericValidator(self.command.distributed_volume)
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
-        print('get_data2')
         return [
             ShouldBeAnAvailableVolume(self.command, self.effective_class),
         ]

@@ -58,7 +58,6 @@ class DisplayExceptionsByFieldNameMixin:
         # return self.get_colmmand_class(**self.validated_data)  # FIXME ::
 
     def save(self):
-        print('ici save')
         try:
             if self.is_valid():
                 return message_bus_instance.invoke(self.get_command())

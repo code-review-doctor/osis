@@ -39,7 +39,7 @@ class VolumeShouldBeNumericException(BusinessException):
 class InvalidVolumeException(BusinessException):
     def __init__(self, class_volume: float, *args, **kwargs):
         message = _(
-            "Volume should be a greater than 0 and less than or equal to effective class volume (%(class_volume)d)"
+            "Volume should be a greater than 0 and less than or equal to effective class volume (%(class_volume)s)"
         ) % {
             'class_volume': class_volume
         }
