@@ -53,6 +53,7 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             personal_id_number=F('attribution__tutor__person__global_id'),
             function=F('attribution__function'),
             attributed_volume_to_learning_unit=F('allocation_charge'),
+            component_type=F('learning_component_year__type'),
         ).values(
             'learning_unit_code',
             'learning_unit_year',
@@ -62,6 +63,7 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             'personal_id_number',
             'function',
             'attributed_volume_to_learning_unit',
+            'component_type'
         ).order_by(
             'last_name',
             'first_name',
