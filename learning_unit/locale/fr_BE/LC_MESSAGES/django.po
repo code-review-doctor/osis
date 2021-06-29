@@ -437,6 +437,3 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
-
-#~ msgid "Class repartition successfully updated."
-#~ msgstr "La répartition a été modifiée avec succès."
