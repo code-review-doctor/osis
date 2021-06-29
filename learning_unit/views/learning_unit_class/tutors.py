@@ -69,7 +69,7 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
             {
                 'effective_class': self.effective_class,
                 'tutors': self.tutors,
-                'can_delete_attribution': True  #  todo je ne sais pas trop quel droit on doit vérifier ici
+                'can_delete_attribution': True  # todo je ne sais pas trop quel droit on doit vérifier ici
             }
         )
         context.update(common_url_tabs(self.learning_unit_code, self.learning_unit_year, self.class_code))
