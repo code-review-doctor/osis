@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Union
 
+from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClassCode
@@ -35,7 +36,7 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_command(
             cls,
-            cmd: Union['CreateEffectiveClassCommand', 'UpdateEffectiveClassCommand']
+            cmd: Union['CreateEffectiveClassCommand', 'UpdateEffectiveClassCommand', 'DistributeClassToTutorCommand']
     ) -> 'EffectiveClassIdentity':
         return EffectiveClassIdentity(
             class_code=cmd.class_code,

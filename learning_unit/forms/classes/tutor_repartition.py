@@ -41,7 +41,6 @@ from osis_common.forms.widgets import DecimalFormatInput
 class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     field_name_by_exception = {
-        exceptions.AnnualVolumeInvalidException: ('volume',),
     }
 
     full_name = forms.CharField(max_length=255, required=False)
@@ -70,13 +69,12 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.effective_class = effective_class
         self.tutor = tutor
 
-        if self.tutor:
-            self.fields['full_name'].initial = tutor.full_name
+        self.fields['full_name'].initial = tutor.full_name
         self.__init_function()
-        if self.effective_class:
-            self.fields['class_volume'].initial = \
-                (self.effective_class.volumes.volume_first_quadrimester or 0) + \
-                (self.effective_class.volumes.volume_second_quadrimester or 0)
+
+        self.fields['class_volume'].initial = \
+            (self.effective_class.volumes.volume_first_quadrimester or 0) + \
+            (self.effective_class.volumes.volume_second_quadrimester or 0)
 
     def __init_function(self):
         if self.tutor:
@@ -90,21 +88,5 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             class_code=self.effective_class.entity_id.class_code,
             distributed_volume=self.cleaned_data['volume'] or 0,
             learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
-            learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year
+            year=self.effective_class.entity_id.learning_unit_identity.year
         )
-    # TODO : je pense qu'il faut ici un minimum de validation, mais je n'arrive pas à faire fonctionner ???
-    # def clean_volume(self):
-    #     print('clean_volume')
-    #     volume = self.cleaned_data['volume']
-    #     print(volume)
-    #     if volume:
-    #         if volume < 0:
-    #             raise ValidationError(_('The volume value should be greather or equal to 0'))
-    #         if volume > 10:
-    #             print('ici')
-    #             raise ValidationError(
-    #                 _('The volume should be less than the class volume (%(class_volume)d)') %{
-    #                     'class_volume': self.fields['class_volume'].initial
-    #                 }
-    #             )
-    #     return volume

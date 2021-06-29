@@ -50,7 +50,7 @@ class DistributeClassToTutorCommand(interface.CommandRequest):
     class_code = attr.ib(type=str)
     distributed_volume = attr.ib(type=Decimal)
     learning_unit_code = attr.ib(type=str)
-    learning_unit_year = attr.ib(type=int)
+    year = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

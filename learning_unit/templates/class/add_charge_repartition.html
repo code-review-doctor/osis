@@ -26,6 +26,7 @@
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">×</button>
 </div>
+<div id="modalTutorRepartition">
 <div id="form-modal-body" class="modal-body">
     <form method="post" id="form_change_attribution" action="{{ request.path }}">
         {% csrf_token %}
@@ -49,9 +50,16 @@
         </table>
     </form>
 </div>
-
+</div>
 <div class="modal-footer">
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
     <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
-           onclick="$('#form_change_attribution').submit();$('.modal.in').modal('hide');"/>
+           onclick="$('#form_change_attribution').submit();$('.modal.in').modal('hide');test();"/>
 </div>
+
+    <script>
+        function test(){
+            {#console.log('iiiiii2');#}
+            {#document.location.reload();#}
+        }
+    </script>

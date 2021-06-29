@@ -23,40 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from osis_common.ddd.interface import BusinessException
 
-import attr
-
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
+from django.utils.translation import gettext_lazy as _
 
 
-@attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-
-    @property
-    def total_volume(self) -> float:
-        return (self.volume_first_quadrimester or 0) + (self.volume_second_quadrimester or 0)
+class VolumeShouldBeNumericException(BusinessException):
+    def __init__(self, *args, **kwargs):
+        message = _(
+            "Volume should be a number"
+        )
+        super().__init__(message, **kwargs)
 
 
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+class InvalidVolumeException(BusinessException):
+    def __init__(self, class_volume: float, *args, **kwargs):
+        message = _(
+            "Volume should be a greater than 0 and less than or equal to effective class volume (%(class_volume)d)"
+        ) % {
+            'class_volume': class_volume
+        }
+        super().__init__(message, **kwargs)
