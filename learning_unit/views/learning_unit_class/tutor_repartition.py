@@ -94,19 +94,17 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
         return message_bus_instance.invoke(cmd)
 
     def get_form_kwargs(self):
-        attribution_uuid = self.kwargs['attribution_uuid']
         kwargs = super().get_form_kwargs()
         kwargs['effective_class'] = self.effective_class
-        kwargs['tutor'] = self.get_tutor(attribution_uuid)
+        kwargs['tutor'] = self.get_tutor(self.kwargs['attribution_uuid'])
         kwargs['user'] = self.request.user
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        attribution_uuid = self.kwargs['attribution_uuid']
         form = ClassTutorRepartitionForm(
             request.POST,
             user=request.user,
-            tutor=self.get_tutor(attribution_uuid),
+            tutor=self.get_tutor(self.kwargs['attribution_uuid']),
             effective_class=self.effective_class
         )
         try:
@@ -123,7 +121,7 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
     def redirect_to_learning_unit_tutors(self):
         return redirect(
             reverse(
-                'lu_tutors',
+                'learning_unit_tutors',
                 kwargs={
                     'learning_unit_code': self.learning_unit.code,
                     'learning_unit_year': self.learning_unit.year,
