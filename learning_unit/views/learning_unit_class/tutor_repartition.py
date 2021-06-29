@@ -25,17 +25,14 @@
 ##############################################################################
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import TemplateView, UpdateView
 from django.utils.translation import gettext_lazy as _
-from django.contrib import messages
+from django.views.generic import FormView
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
-from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.attribution.commands import SearchAttributionCommand
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
@@ -44,15 +41,11 @@ from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm
 from learning_unit.models.learning_class_year import LearningClassYear
 
-# class CreateAccessRequirementsLine(SuccessMessageMixin, AccessRequirementsMixin, PermissionRequiredMixin,
-#                                    AjaxTemplateMixin, CreateView):
 
-
-class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
+class TutorRepartitionView(PermissionRequiredMixin, FormView):
     template_name = "class/add_charge_repartition.html"
     permission_required = 'base.can_access_class'
     form_class = ClassTutorRepartitionForm
-    force_reload = True
 
     @cached_property
     def effective_class(self) -> 'EffectiveClass':
@@ -101,9 +94,10 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
         return message_bus_instance.invoke(cmd)
 
     def get_form_kwargs(self):
+        attribution_uuid = self.kwargs['attribution_uuid']
         kwargs = super().get_form_kwargs()
         kwargs['effective_class'] = self.effective_class
-        kwargs['tutor'] = None
+        kwargs['tutor'] = self.get_tutor(attribution_uuid)
         kwargs['user'] = self.request.user
         return kwargs
 
@@ -115,33 +109,16 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
             tutor=self.get_tutor(attribution_uuid),
             effective_class=self.effective_class
         )
-        print('avt save')
-        form.save()
+        try:
+            form.save()
+        except MultipleBusinessExceptions as e:
+            display_error_messages(request, [exc.message for exc in e.exceptions])
 
         if not form.errors:
-            print('no eeor')
             display_success_messages(request, _("Class repartition successfully updated."))
-        else:
-            print('error')
-            display_error_messages(request, "ooo")
-
         return render(request, self.template_name, {
             "form": form,
         })
-
-        # return self.redirect_to_learning_unit_tutors()
-
-    def get(self, request, *args, **kwargs):
-        attribution_uuid = self.kwargs['attribution_uuid']
-
-        form = ClassTutorRepartitionForm(
-            user=self.request.user,
-            tutor=self.get_tutor(attribution_uuid),
-            effective_class=self.effective_class,
-        )
-        context = self.get_context_data()
-        context.update({'form': form})
-        return render(request, self.template_name, context)
 
     def redirect_to_learning_unit_tutors(self):
         return redirect(
@@ -154,23 +131,3 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
                 }
             )
         )
-
-    def get_success_msg(self) -> str:
-        print('ici4 sup')
-        return _("Class repartition successfully updated.")
-
-    def get_success_message(self):
-        print('ici3 sup')
-        return _("Condition has been reordered (without postpone)")
-
-    def get_success_message(self, cleaned_data):
-        print('ici sup')
-        return _("Condition has been reordered (without postpone)")
-
-    def get_success_url(self):
-        print('ici2 sup')
-        return reverse("lu_tutors", kwargs={
-                    'learning_unit_code': self.learning_unit.code,
-                    'learning_unit_year': self.learning_unit.year,
-                    'class_code': self.effective_class.entity_id.class_code
-                })

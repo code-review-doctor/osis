@@ -67,14 +67,12 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         super().__init__(*args, **kwargs)
 
         self.effective_class = effective_class
+
         self.tutor = tutor
 
         self.fields['full_name'].initial = tutor.full_name
         self.__init_function()
-
-        self.fields['class_volume'].initial = \
-            (self.effective_class.volumes.volume_first_quadrimester or 0) + \
-            (self.effective_class.volumes.volume_second_quadrimester or 0)
+        self.fields['class_volume'].initial = self.effective_class.volumes.total_volume
 
     def __init_function(self):
         if self.tutor:

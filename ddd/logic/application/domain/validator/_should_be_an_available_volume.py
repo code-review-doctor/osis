@@ -40,7 +40,6 @@ class ShouldBeAnAvailableVolume(BusinessValidator):
     effective_class = attr.ib(type=EffectiveClass)
 
     def validate(self, *args, **kwargs):
-        print('ici')
         if self.command.distributed_volume > self.effective_class.volumes.total_volume or \
                 self.command.distributed_volume < 0:
             raise InvalidVolumeException(self.effective_class.volumes.total_volume)
