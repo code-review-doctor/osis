@@ -35,6 +35,5 @@ class ShouldBeNumericValidator(BusinessValidator):
     volume_to_distribute = attr.ib(type=float)
 
     def validate(self, *args, **kwargs):
-        print('self.volume_to_distribute {}'.format(self.volume_to_distribute))
         if not str(self.volume_to_distribute).isnumeric():
             raise VolumeShouldBeNumericException()

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-29 09:55+0200\n"
+"POT-Creation-Date: 2021-06-29 10:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,24 +127,30 @@ msgstr ""
 "Ce cours est géré en équipe. La candidature des équipes d'enseignants "
 "s'effectue via la procédure papier."
 
-#, python-brace-format
+#, python-format
 msgid ""
-"Volume of '{assigned_volume}' is not a valid volume. It should be greather "
-"or equal than 0 and less or equal than the attributuion volume "
-"({attribution_volume})"
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the attribution volume "
+"(%(attribution_volume)s)"
 msgstr ""
+"Le volume de %(assigned_volume)s est invalide. Il doit être >= 0, et <= au volume de la classe "
+"(%(attribution_volume)s)"
 
-#, python-brace-format
+#, python-format
 msgid ""
-"Volume of '{assigned_volume}' is not a valid volume. It should be greather "
-"or equal than 0 and less or equal than the class volume ({class_volume})"
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the class volume (%(class_volume)s)"
 msgstr ""
+"Le volume de %(assigned_volume)s est invalide. Il doit être >= à 0, et <= volume de la "
+"classe (%(class_volume)s)"
 
 #, python-format
 msgid ""
 "Volume should be a greater than 0 and less than or equal to effective class "
 "volume (%(class_volume)s)"
-msgstr "Le volume doit être supérieur à 0, et être inférieur ou égal au volume de la classe (%(class_volume)s)"
+msgstr ""
+"Le volume doit être supérieur à 0, et être inférieur ou égal au volume de la "
+"classe (%(class_volume)s)"
 
 msgid "Volume should be a number"
 msgstr "Le volume doit être une nombre"
