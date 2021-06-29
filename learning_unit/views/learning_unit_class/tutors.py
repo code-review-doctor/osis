@@ -31,6 +31,7 @@ from django.views.generic import TemplateView
 
 from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
+from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.views.learning_unit_class.common import common_url_tabs
@@ -52,11 +53,23 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
     def learning_unit_year(self) -> str:
         return self.kwargs['learning_unit_year']
 
+    @cached_property
+    def effective_class(self) -> 'EffectiveClass':
+        # Mandatory to display the complete_code of effective_class in html page title
+        command = GetEffectiveClassCommand(
+            class_code=self.kwargs['class_code'],
+            learning_unit_code=self.kwargs['learning_unit_code'],
+            learning_unit_year=self.kwargs['learning_unit_year']
+        )
+        return message_bus_instance.invoke(command)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
+                'effective_class': self.effective_class,
                 'tutors': self.tutors,
+                'can_delete_attribution': True  #  todo je ne sais pas trop quel droit on doit vérifier ici
             }
         )
         context.update(common_url_tabs(self.learning_unit_code, self.learning_unit_year, self.class_code))

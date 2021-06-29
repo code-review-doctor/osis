@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-29 11:38+0200\n"
+"POT-Creation-Date: 2021-06-29 15:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,6 +39,9 @@ msgid "Allocation entity"
 msgstr ""
 
 msgid "Annual volume"
+msgstr ""
+
+msgid "Are you sure?"
 msgstr ""
 
 msgid "Attribution entity"
@@ -83,6 +86,9 @@ msgid "Components"
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Delete"
 msgstr ""
 
 msgid "Derogation's session"
@@ -340,6 +346,9 @@ msgid "Volume Q1"
 msgstr ""
 
 msgid "Volume Q2"
+msgstr ""
+
+msgid "Yes, I confirm."
 msgstr ""
 
 msgid "You are not allowed to create proposal during this academic year"
