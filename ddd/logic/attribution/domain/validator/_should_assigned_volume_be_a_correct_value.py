@@ -23,40 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 import attr
 
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from base.models.enums.learning_unit_year_session import DerogationSession
+from ddd.logic.attribution.domain.validator.exceptions import AssignedVolumeInvalidValueException, \
+    AssignedVolumeTooHighException
+from ddd.logic.learning_unit.domain.validator.exceptions import DerogationSessionInvalidChoiceException
+
+MINIMUM_VALUE = 0
 
 
 @attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+class ShouldAssignedVolumeBeACorrectValue(BusinessValidator):
 
-    @property
-    def total_volume(self) -> float:
-        return (self.volume_first_quadrimester or 0) + (self.volume_second_quadrimester or 0)
+    class_volume = attr.ib(type=float)
+    assigned_volume = attr.ib(type=float)
+    attribution_volume = attr.ib(type=float)
 
-
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+    def validate(self, *args, **kwargs):
+        if self.assigned_volume:
+            if self.assigned_volume < MINIMUM_VALUE or self.assigned_volume > self.class_volume:
+                raise AssignedVolumeInvalidValueException(self.assigned_volume, self.class_volume)
+            if self.assigned_volume > self.attribution_volume:
+                raise AssignedVolumeTooHighException(self.assigned_volume, self.attribution_volume)

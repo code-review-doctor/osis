@@ -28,10 +28,14 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import TemplateView
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
 
-from base.views.common import display_success_messages
+from attribution.models.enums.function import Functions
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.attribution.commands import SearchAttributionCommand
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -40,7 +44,7 @@ from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionF
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
-class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
+class TutorRepartitionView(PermissionRequiredMixin, FormView):
     template_name = "class/add_charge_repartition.html"
     permission_required = 'base.can_access_class'
     form_class = ClassTutorRepartitionForm
@@ -82,9 +86,10 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
             'learning_component_year__learning_unit_year__academic_year'
         )
 
-    def get_tutor(self, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
+    @cached_property
+    def tutor(self) -> 'TutorAttributionToLearningUnitDTO':
         cmd = SearchAttributionCommand(
-            learning_unit_attribution_uuid=attribution_uuid,
+            learning_unit_attribution_uuid=self.kwargs['attribution_uuid'],
             learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year,
             learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code
 
@@ -94,43 +99,36 @@ class TutorRepartitionView(PermissionRequiredMixin, TemplateView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['effective_class'] = self.effective_class
-        kwargs['tutor'] = None
+        kwargs['tutor'] = self.tutor
         kwargs['user'] = self.request.user
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        attribution_uuid = self.kwargs['attribution_uuid']
+        tutor = self.tutor
         form = ClassTutorRepartitionForm(
             request.POST,
             user=request.user,
-            tutor=self.get_tutor(attribution_uuid),
+            tutor=tutor,
             effective_class=self.effective_class
         )
-        repartition_identity = form.save()
-        if not form.errors:
-            display_success_messages(request, self.get_success_msg(repartition_identity), extra_tags='safe')
-            return self.redirect_to_learning_unit_identification()
+        try:
+            form.save()
+        except MultipleBusinessExceptions as e:
+            display_error_messages(request, [exc.message for exc in e.exceptions])
 
+        if not form.errors:
+            display_success_messages(request, _("Repartition added for %(tutor)s (%(function)s)") % {
+                'tutor': tutor.full_name,
+                'function': Functions.get_value(tutor.function)
+            })
         return render(request, self.template_name, {
             "form": form,
         })
 
-    def get(self, request, *args, **kwargs):
-        attribution_uuid = self.kwargs['attribution_uuid']
-
-        form = ClassTutorRepartitionForm(
-            user=self.request.user,
-            tutor=self.get_tutor(attribution_uuid),
-            effective_class=self.effective_class,
-        )
-        context = self.get_context_data()
-        context.update({'form': form})
-        return render(request, self.template_name, context)
-
-    def redirect_to_learning_unit_identification(self):
+    def redirect_to_learning_unit_tutors(self):
         return redirect(
             reverse(
-                'lu_class_tutors',
+                'learning_unit_tutors',
                 kwargs={
                     'learning_unit_code': self.learning_unit.code,
                     'learning_unit_year': self.learning_unit.year,

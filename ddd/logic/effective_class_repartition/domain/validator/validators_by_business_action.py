@@ -23,40 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 import attr
 
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
+from ddd.logic.application.domain.validator._should_be_an_available_volume import ShouldBeAnAvailableVolume
+from ddd.logic.application.domain.validator._should_be_the_author_of_the_application import \
+    ShouldBeTheAuthorOfTheApplication
+from ddd.logic.attribution.commands import DistributeClassToTutorCommand
+from ddd.logic.effective_class_repartition.domain.validator._should_be_numeric_validator import ShouldBeNumericValidator
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 
 
 @attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    command = attr.ib(type=DistributeClassToTutorCommand)
+    effective_class = attr.ib(type=EffectiveClass)
 
-    @property
-    def total_volume(self) -> float:
-        return (self.volume_first_quadrimester or 0) + (self.volume_second_quadrimester or 0)
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldBeNumericValidator(self.command.distributed_volume)
+        ]
 
-
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldBeAnAvailableVolume(self.command, self.effective_class),
+        ]

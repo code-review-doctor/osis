@@ -41,11 +41,13 @@ from ddd.logic.application.use_case.write.renew_multiple_attributions_service im
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
-    SearchTutorsDistributedToClassCommand, SearchAttributionCommand
+    SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand
 from ddd.logic.attribution.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
-from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import search_tutors_distributed_to_class
+from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import \
+    search_tutors_distributed_to_class
+from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
@@ -151,6 +153,11 @@ class MessageBus:
         SearchAttributionCommand: lambda cmd: get_attribution(
             cmd,
             TutorAttributionToLearningUnitTranslator()
+        ),
+        DistributeClassToTutorCommand: lambda cmd: distribute_class_to_tutor(
+            cmd,
+            TutorRepository(),
+            EffectiveClassRepository()
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

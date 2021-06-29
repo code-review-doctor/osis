@@ -23,40 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 import attr
 
-from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
-    DurationUnit
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
+from ddd.logic.application.domain.model.application import Application
+from ddd.logic.application.domain.validator.exceptions import NotAuthorOfApplicationException
+from ddd.logic.attribution.commands import DistributeClassToTutorCommand
+from ddd.logic.effective_class_repartition.domain.validator.exceptions import InvalidVolumeException
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 
 
 @attr.s(frozen=True, slots=True)
-class ClassVolumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
+class ShouldBeAnAvailableVolume(BusinessValidator):
+    command = attr.ib(type=DistributeClassToTutorCommand)
+    effective_class = attr.ib(type=EffectiveClass)
 
-    @property
-    def total_volume(self) -> float:
-        return (self.volume_first_quadrimester or 0) + (self.volume_second_quadrimester or 0)
-
-
-@attr.s(frozen=True, slots=True)
-class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=DurationUnit)
-    volume_second_quadrimester = attr.ib(type=DurationUnit)
-    volume_annual = attr.ib(type=DurationUnit)
-    planned_classes = attr.ib(type=int)
-    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
-
-
-@attr.s(frozen=True, slots=True)
-class LecturingPart(interface.ValueObject):
-    acronym = 'PM'
-    volumes = attr.ib(type=Volumes)
-
-
-@attr.s(frozen=True, slots=True)
-class PracticalPart(interface.ValueObject):
-    acronym = 'PP'
-    volumes = attr.ib(type=Volumes)
+    def validate(self, *args, **kwargs):
+        if self.command.distributed_volume > self.effective_class.volumes.total_volume or \
+                self.command.distributed_volume < 0:
+            raise InvalidVolumeException(self.effective_class.volumes.total_volume)

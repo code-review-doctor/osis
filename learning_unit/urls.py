@@ -41,7 +41,7 @@ urlpatterns = [
             path('identification', ClassIdentificationView.as_view(), name='class_identification'),
             path('tutors', ClassTutorsView.as_view(), name='class_tutors'),
             path('update', UpdateClass.as_view(), name='class_update'),
-            path('lu_tutors', LearningUnitTutorsView.as_view(), name='lu_tutors'),
+            path('lu_tutors', LearningUnitTutorsView.as_view(), name='learning_unit_tutors'),
             path('tutors/<str:attribution_uuid>/repartition',
                  TutorRepartitionView.as_view(), name='edit_charge_repartition'),
         ]))

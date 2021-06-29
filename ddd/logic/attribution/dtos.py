@@ -68,10 +68,7 @@ class TutorAttributionToLearningUnitDTO(DTO):
 
     @property
     def full_name(self):
-        return "".join([
-            (self.last_name or "").upper(),
-            self.first_name or ""
-        ]).strip()
+        return ", ".join([self.last_name.upper() or "", self.first_name or ""]).strip()
 
 
 @attr.s(frozen=True, slots=True)
@@ -81,3 +78,7 @@ class TutorClassRepartitionDTO(DTO):
     first_name = attr.ib(type=str)
     function = attr.ib(type=str)
     distributed_volume_to_class = attr.ib(type=Decimal)
+
+    @property
+    def full_name(self):
+        return ", ".join([self.last_name.upper() or "", self.first_name or ""]).strip()

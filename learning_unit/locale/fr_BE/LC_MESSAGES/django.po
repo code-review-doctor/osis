@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:12+0200\n"
+"POT-Creation-Date: 2021-06-29 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -201,6 +201,10 @@ msgstr "Quadrimestre"
 msgid "Refer to learning unit"
 msgstr "Voir unité d'enseignement"
 
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
+
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
@@ -277,7 +281,9 @@ msgid "This learning unit has application this year"
 msgstr "L'unité d'enseignement a au moins une candidature cette année"
 
 msgid "This learning unit has application this year or in the future"
-msgstr "L'unité d'enseignement possède au moins une candidature cette année ou dans le futur"
+msgstr ""
+"L'unité d'enseignement possède au moins une candidature cette année ou dans "
+"le futur"
 
 msgid "This learning unit has attribution"
 msgstr "L'unité d'enseignement a au moins une attribution"
@@ -286,7 +292,9 @@ msgid "This learning unit has attribution this year"
 msgstr "L'unité d'enseignement a au moins une attribution cette année"
 
 msgid "This learning unit has attribution this year or in the future"
-msgstr "L'unité d'enseignement possède au moins une attribution cette année ou dans le futur"
+msgstr ""
+"L'unité d'enseignement possède au moins une attribution cette année ou dans "
+"le futur"
 
 msgid "This learning unit has teachers"
 msgstr "L'unité d'enseignement a au moins un·e enseignant·e"

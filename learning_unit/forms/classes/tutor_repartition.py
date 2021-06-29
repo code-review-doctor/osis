@@ -41,7 +41,6 @@ from osis_common.forms.widgets import DecimalFormatInput
 class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     field_name_by_exception = {
-        exceptions.AnnualVolumeInvalidException: ('volume',),
     }
 
     full_name = forms.CharField(max_length=255, required=False)
@@ -68,15 +67,12 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         super().__init__(*args, **kwargs)
 
         self.effective_class = effective_class
+
         self.tutor = tutor
 
-        if self.tutor:
-            self.fields['full_name'].initial = tutor.full_name
+        self.fields['full_name'].initial = tutor.full_name
         self.__init_function()
-        if self.effective_class:
-            self.fields['class_volume'].initial = \
-                (self.effective_class.volumes.volume_first_quadrimester or 0) + \
-                (self.effective_class.volumes.volume_second_quadrimester or 0)
+        self.fields['class_volume'].initial = self.effective_class.volumes.total_volume
 
     def __init_function(self):
         if self.tutor:
@@ -89,4 +85,6 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
             class_code=self.effective_class.entity_id.class_code,
             distributed_volume=self.cleaned_data['volume'] or 0,
+            learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+            year=self.effective_class.entity_id.learning_unit_identity.year
         )
