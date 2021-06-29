@@ -31,9 +31,11 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
+from attribution.models.enums.function import Functions
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.attribution.commands import SearchAttributionCommand
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -84,9 +86,10 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
             'learning_component_year__learning_unit_year__academic_year'
         )
 
-    def get_tutor(self, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
+    @cached_property
+    def tutor(self) -> 'TutorAttributionToLearningUnitDTO':
         cmd = SearchAttributionCommand(
-            learning_unit_attribution_uuid=attribution_uuid,
+            learning_unit_attribution_uuid=self.kwargs['attribution_uuid'],
             learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year,
             learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code
 
@@ -96,15 +99,16 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['effective_class'] = self.effective_class
-        kwargs['tutor'] = self.get_tutor(self.kwargs['attribution_uuid'])
+        kwargs['tutor'] = self.tutor
         kwargs['user'] = self.request.user
         return kwargs
 
     def post(self, request, *args, **kwargs):
+        tutor = self.tutor
         form = ClassTutorRepartitionForm(
             request.POST,
             user=request.user,
-            tutor=self.get_tutor(self.kwargs['attribution_uuid']),
+            tutor=tutor,
             effective_class=self.effective_class
         )
         try:
@@ -113,7 +117,10 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
             display_error_messages(request, [exc.message for exc in e.exceptions])
 
         if not form.errors:
-            display_success_messages(request, _("Class repartition successfully updated."))
+            display_success_messages(request, _("Repartition added for %(tutor)s (%(function)s)") % {
+                'tutor': tutor.full_name,
+                'function': Functions.get_value(tutor.function)
+            })
         return render(request, self.template_name, {
             "form": form,
         })

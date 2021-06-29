@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-29 09:53+0200\n"
+"POT-Creation-Date: 2021-06-29 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,9 +62,6 @@ msgstr ""
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully updated."
-msgstr ""
-
-msgid "Class repartition successfully updated."
 msgstr ""
 
 msgid "Class specific complement"
@@ -197,6 +194,10 @@ msgid "Quadrimester"
 msgstr ""
 
 msgid "Refer to learning unit"
+msgstr ""
+
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Requirement entity"

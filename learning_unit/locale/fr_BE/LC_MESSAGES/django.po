@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-29 09:53+0200\n"
+"POT-Creation-Date: 2021-06-29 11:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,10 +64,6 @@ msgstr ""
 msgid "Class %(effective_class_complete_acronym)s successfully updated."
 msgstr ""
 "La classe %(effective_class_complete_acronym)s a été modifiée avec succès."
-
-msgid "Class repartition successfully updated."
-msgstr ""
-"La répartition a été modifiée avec succès."
 
 msgid "Class specific complement"
 msgstr "Complément spécifique à la classe"
@@ -204,6 +200,10 @@ msgstr "Quadrimestre"
 
 msgid "Refer to learning unit"
 msgstr "Voir unité d'enseignement"
+
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
 
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
@@ -437,3 +437,6 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
+
+#~ msgid "Class repartition successfully updated."
+#~ msgstr "La répartition a été modifiée avec succès."
