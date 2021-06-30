@@ -32,11 +32,6 @@ class Migration(migrations.Migration):
             name='uuid',
             field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)
         ),
-        migrations.AddField(
-            model_name='attributionnew',
-            name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True),
-        ),
         migrations.CreateModel(
             name='AttributionClass',
             fields=[
