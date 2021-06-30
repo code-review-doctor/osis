@@ -70,7 +70,7 @@
                                     </label>
                                     <br>
                                     <span>
-                                        {{ learning_unit.internship_subtype|default_if_none:'-' }}
+                                        {{ learning_unit.internship_subtype.value|default_if_none:'-' }}
                                     </span>
                                 </div>
                             {% endblock content_row1 %}
