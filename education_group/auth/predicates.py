@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
+from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
@@ -14,7 +15,6 @@ from education_group.calendar.education_group_extended_daily_management import \
 from education_group.calendar.education_group_limited_daily_management import \
     EducationGroupLimitedDailyManagementCalendar
 from education_group.calendar.education_group_preparation_calendar import EducationGroupPreparationCalendar
-from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from osis_role.cache import predicate_cache
@@ -264,4 +264,13 @@ def is_group_year_an_eligible_transition(
             all_parents_transition = all(parent.partial_acronym.upper().startswith('T') for parent in parents)
             return is_transition and all_parents_transition
         return is_transition
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This education group is not editable in the past."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_education_group_year_not_in_past(self, user, obj: Union['GroupYear', 'EducationGroupYear']):
+    if obj:
+        return obj.academic_year.year >= current_academic_year().year
     return None
