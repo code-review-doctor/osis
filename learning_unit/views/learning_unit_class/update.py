@@ -142,5 +142,5 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             )
         )
         return _("Class %(effective_class_complete_acronym)s successfully updated.") % {
-            "effective_class_complete_acronym": effective_class.complete_code
+            "effective_class_complete_acronym": effective_class.complete_acronym
         }
