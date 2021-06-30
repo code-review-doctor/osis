@@ -44,7 +44,7 @@
                                         {% trans 'Code' %}
                                     </label>
                                     <br>
-                                    {{ effective_class.complete_code }}
+                                    {{ effective_class.complete_acronym }}
                                 </div>
                                 <div class="col-md-3">
                                     <label>
@@ -65,12 +65,12 @@
                                     </span>
                                 </div>
                                 <div class="col-md-3">
-                                    <label id="id_internship_subtype">
+                                    <label id="id_internship_subtype" class="text-muted">
                                         {% trans 'Internship subtype' %}
                                     </label>
                                     <br>
-                                    <span>
-                                        {{ learning_unit.internship_subtype.value|default_if_none:'-' }}
+                                    <span class="text-muted">
+                                        {{ learning_unit.internship_subtype.value|default:'-' }}
                                     </span>
                                 </div>
                             {% endblock content_row1 %}
@@ -84,14 +84,14 @@
                                     </label>
                                     <br>
                                     <span id="id_credits" class="text-muted">
-                                        {{ learning_unit.credits }}
+                                        {{ learning_unit.credits| floatformat }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
                                     <label class="text-muted">{% trans 'Periodicity' %}</label>
                                     <br>
                                     <span id="id_periodicity" class="text-muted">
-                                        {{ learning_unit.periodicity.value }}
+                                        {{ learning_unit.periodicity.value|capfirst }}
                                     </span>
                                 </div>
                                 <div class="col-md-3">
@@ -136,8 +136,6 @@
                             <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title" %}</label><br>
                             <label class="text-muted">{% trans 'Common part' %}</label><br>
                             <span class="text-muted">{{ learning_unit.titles.common_fr|default_if_none:'-'}}</span><br>
-                            <label class="text-muted">{% trans 'Specific complement (Full)' %}</label><br>
-                            <span class="text-muted">{{ learning_unit.titles.specific_fr|default_if_none:'-'}}</span><br>
                             <label>{% trans 'Class specific complement' %}</label><br>
                             {{ effective_class.titles.fr|default_if_none:'-' }}
                         </div>
@@ -148,8 +146,6 @@
                             <label title="{% trans "The title is made up of the common part and / or any supplement" %}">{% trans "Title in English" %}</label><br>
                             <label class="text-muted">{% trans 'Common part' %}</label><br>
                             <span class="text-muted">{{ learning_unit.titles.common_en|default_if_none:'-'}}</span><br>
-                            <label class="text-muted">{% trans 'Specific complement (Full)' %}</label><br>
-                            <span class="text-muted">{{ learning_unit.titles.specific_en|default_if_none:'-'}}</span><br>
                             <label>{% trans 'Class specific complement' %}</label><br>
                             {{ effective_class.titles.en|default_if_none:'-' }}
                         </div>
@@ -165,7 +161,7 @@
                             </label>
                             <br>
                             <span id="id_quadrimester">
-                                {{ effective_class.derogation_quadrimester.value |default_if_none:'-'}}
+                                {{ effective_class.derogation_quadrimester.value |default:'-'}}
                             </span>
                         </div>
                         <div class="col-md-6">
@@ -174,7 +170,7 @@
                             </label>
                             <br>
                             <span id="id_session_derogation">
-                                {{ effective_class.session_derogation.value |default_if_none:'-'}}
+                                {{ effective_class.session_derogation.value |default:'-'}}
                             </span>
                         </div>
                     </div>
@@ -192,12 +188,12 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <input type="text" value="{{ class_type }}" style="background: rgba(0, 0, 0, 0);border: none;"/>
+                                    <input type="text" value="{{ class_type.type_title }}" style="background: rgba(0, 0, 0, 0);border: none;"/>
                                 </td>
-                                <td>/{% if class_type == 'LECTURING' %}PM{% else %}PP{% endif %}</td>
-                                <td style="text-align: center">{{ effective_class.volumes.volume_first_quadrimester|default_if_none:''}}</td>
-                                <td style="text-align: center">{{ effective_class.volumes.volume_second_quadrimester|default_if_none:''}}</td>
-                                <td style="text-align: center"  class="text-muted">{{ volumes.volume_annual|default_if_none:'' }}</td>
+                                <td>/{{ class_type.acronym }}</td>
+                                <td style="text-align: center">{{ effective_class.volumes.volume_first_quadrimester| floatformat|default_if_none:''}}</td>
+                                <td style="text-align: center">{{ effective_class.volumes.volume_second_quadrimester| floatformat|default_if_none:''}}</td>
+                                <td style="text-align: center"  class="text-muted">{{ volumes.volume_annual| floatformat|default_if_none:'' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -214,7 +210,7 @@
                             </label>
                             <br>
                             <span id="id_faculty_remark" class="text-muted">
-                                {{ learning_unit.remarks.faculty |default_if_none:'-'}}
+                                {{ learning_unit.remarks.faculty |default:'-'}}
                             </span>
                         </div>
                         <br>
@@ -224,16 +220,17 @@
                             </label>
                             <br>
                             <span id="id_other_remark" class="text-muted">
-                                {{ learning_unit.remarks.publication_fr|default_if_none:'-' }}
+                                {{ learning_unit.remarks.publication_fr|default:'-' }}
                             </span>
                         </div>
+                        <br>
                         <div>
                             <label class="text-muted">
                                 {% trans 'Other remark in english (intended for publication)' %}
                             </label>
                             <br>
                             <span id="id_other_remark_en" class="text-muted">
-                                {{ learning_unit.remarks.publication_en|default_if_none:'-' }}
+                                {{ learning_unit.remarks.publication_en|default:'-' }}
                             </span>
                         </div>
                     </div>
