@@ -6,6 +6,14 @@ import uuid
 from django.db import migrations, models
 
 
+def create_uuid(apps, schema_editor):
+    AttributionNew = apps.get_model('attribution', 'AttributionNew')
+    attributions = AttributionNew.objects.all()
+    for attribution in attributions:
+        attribution.uuid = uuid.uuid4()
+    AttributionNew.objects.bulk_update(attributions, ['uuid'], batch_size=1000)
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ('learning_unit', '0014_auto_20210604_1537'),
@@ -13,6 +21,17 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AddField(
+            model_name='attributionnew',
+            name='uuid',
+            field=models.UUIDField(blank=True, null=True),
+        ),
+        migrations.RunPython(create_uuid),
+        migrations.AlterField(
+            model_name='attributionnew',
+            name='uuid',
+            field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)
+        ),
         migrations.AddField(
             model_name='attributionnew',
             name='uuid',
