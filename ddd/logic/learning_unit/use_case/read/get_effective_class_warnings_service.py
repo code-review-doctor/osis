@@ -23,37 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+from typing import List
 
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.commands import GetEffectiveClassWarningsCommand
+from ddd.logic.learning_unit.domain.service.get_effective_class_warnings import EffectiveClassWarnings
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
+from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
-class IEffectiveClassRepository(interface.AbstractRepository):
+def get_effective_class_warnings(
+        cmd: 'GetEffectiveClassWarningsCommand',
+        effective_class_repository: 'IEffectiveClassRepository',
+        learning_unit_repository: 'ILearningUnitRepository'
+) -> List[str]:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_code=cmd.learning_unit_code,
+        learning_unit_year=cmd.learning_unit_year
+    )
 
-    @classmethod
-    @abc.abstractmethod
-    def search(cls, entity_ids: Optional[List[EffectiveClassIdentity]] = None, **kwargs) -> List[EffectiveClass]:
-        pass
+    effective_class = effective_class_repository.get(entity_id=effective_class_identity)
+    learning_unit = learning_unit_repository.get(entity_id=effective_class_identity.learning_unit_identity)
 
-    @classmethod
-    @abc.abstractmethod
-    def delete(cls, entity_id: EffectiveClassIdentity, **kwargs: ApplicationService) -> None:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def save(cls, entity: EffectiveClass) -> None:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_all_identities(cls) -> List['EffectiveClassIdentity']:
-        raise NotImplementedError
-
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
-        raise NotImplementedError
+    return EffectiveClassWarnings.get(effective_class=effective_class, learning_unit=learning_unit)

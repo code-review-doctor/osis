@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-16 15:24+0200\n"
+"POT-Creation-Date: 2021-06-15 10:13+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,6 +94,9 @@ msgstr ""
 msgid "Full"
 msgstr ""
 
+msgid "Identification"
+msgstr ""
+
 msgid "Inactive"
 msgstr ""
 
@@ -110,6 +113,9 @@ msgid "Language"
 msgstr ""
 
 msgid "Learning location"
+msgstr ""
+
+msgid "Learning unit"
 msgstr ""
 
 msgid "Learning unit credits"
@@ -179,9 +185,6 @@ msgid "Requirement entity"
 msgstr ""
 
 msgid "Session derogation"
-msgstr ""
-
-msgid "Specific complement (Full)"
 msgstr ""
 
 msgid "State"
