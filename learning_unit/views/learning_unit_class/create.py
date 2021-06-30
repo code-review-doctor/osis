@@ -74,6 +74,7 @@ class CreateClassView(PermissionRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cancel_url'] = self.cancel_url
+        context['learning_unit'] = self.learning_unit
         return context
 
     def get(self, request, *args, **kwargs):
@@ -118,7 +119,8 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
         )
 
-    def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
+    @staticmethod
+    def get_success_msg(effective_class_identity: 'EffectiveClassIdentity') -> str:
         effective_class = message_bus_instance.invoke(
             GetEffectiveClassCommand(
                 class_code=effective_class_identity.class_code,
