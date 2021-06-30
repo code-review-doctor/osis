@@ -116,6 +116,9 @@ msgstr "Catalogue des formations"
 msgid "Full"
 msgstr "Complet"
 
+msgid "Identification"
+msgstr "Identification"
+
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -134,8 +137,11 @@ msgstr "Langue"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
+msgid "Learning unit"
+msgstr "Unité d'enseignement"
+
 msgid "Learning unit credits"
-msgstr "Crédits"
+msgstr "Crédits de l'UE"
 
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
@@ -206,9 +212,6 @@ msgstr "Entité resp. cahier des charges"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
-
-msgid "Specific complement (Full)"
-msgstr "Complément spécifique à l'UE (complet)"
 
 msgid "State"
 msgstr "Etat"

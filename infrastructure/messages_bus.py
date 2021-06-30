@@ -47,10 +47,11 @@ from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_clas
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasClassRepartitionCommand, HasEnrollmentsToClassCommand
+    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
+from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -120,6 +121,9 @@ class MessageBus:
         ),
         HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
         HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
+        GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
+            cmd, EffectiveClassRepository(), LearningUnitRepository()
+        ),
         ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
             ApplicantRepository(), VacantCourseRepository()

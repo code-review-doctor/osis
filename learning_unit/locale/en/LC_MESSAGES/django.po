@@ -112,6 +112,9 @@ msgstr ""
 msgid "Full"
 msgstr ""
 
+msgid "Identification"
+msgstr ""
+
 msgid "Inactive"
 msgstr ""
 
@@ -128,6 +131,9 @@ msgid "Language"
 msgstr ""
 
 msgid "Learning location"
+msgstr ""
+
+msgid "Learning unit"
 msgstr ""
 
 msgid "Learning unit credits"
@@ -197,9 +203,6 @@ msgid "Requirement entity"
 msgstr ""
 
 msgid "Session derogation"
-msgstr ""
-
-msgid "Specific complement (Full)"
 msgstr ""
 
 msgid "State"

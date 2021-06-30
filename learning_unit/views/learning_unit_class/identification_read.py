@@ -23,15 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Dict
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.utils.translation import gettext_lazy as _
+from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from reversion.models import Version
 
+from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES, COMPONENT_TYPES, DEFAULT_ACRONYM_COMPONENT
 from base.models.learning_unit_year import LearningUnitYear
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
+from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand, \
+    GetEffectiveClassWarningsCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
 from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
@@ -64,7 +67,8 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
                         GetLanguageCommand(code_iso=learning_unit.language_id.code_iso)
                     ),  # type: Language
                 'teaching_place': get_teaching_place(effective_class.teaching_place),
-                'form_delete': DeleteClassForm(effective_class=effective_class)
+                'form_delete': DeleteClassForm(effective_class=effective_class),
+                'warnings': self.warnings
             }
         )
         return context
@@ -97,11 +101,24 @@ class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
         )
         return message_bus_instance.invoke(command)
 
+    @cached_property
+    def warnings(self) -> List[str]:
+        command = GetEffectiveClassWarningsCommand(
+            class_code=self.kwargs['class_code'],
+            learning_unit_code=self.kwargs['learning_unit_code'],
+            learning_unit_year=self.kwargs['learning_unit_year']
+        )
+        return message_bus_instance.invoke(command)
 
-def get_class_type(learning_unit: 'LearningUnit') -> str:
+
+def get_class_type(learning_unit: 'LearningUnit') -> Dict[str, str]:
+    class_type = LECTURING
     if learning_unit.has_practical_volume() and not learning_unit.has_lecturing_volume():
-        return _('Practical exercises')
-    return _('Lecturing')
+        class_type = PRACTICAL_EXERCISES
+    return {
+        'type_title': dict(COMPONENT_TYPES).get(class_type),
+        'acronym': DEFAULT_ACRONYM_COMPONENT[class_type]
+    }
 
 
 def get_volumes(learning_unit: 'LearningUnit') -> 'Volumes':
