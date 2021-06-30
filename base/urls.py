@@ -43,7 +43,7 @@ import base.views.learning_units.search.proposal
 import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
-from attribution.views import attribution, tutor_application
+from attribution.views import attribution
 from base.views import geocoding
 from base.views import learning_achievement, search, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
@@ -112,13 +112,6 @@ urlpatterns = [
         url(r'^data/maintenance$', common.data_maintenance, name='data_maintenance'),
         url(r'^storage/$', common.storage, name='storage'),
     ])),
-
-    url(r'^api/v1/', include([
-        url(r'^tutor_application/recompute_portal$', tutor_application.recompute_portal,
-            name='recompute_tutor_application_portal'),
-        url(r'^attribution/recompute_portal$', attribution.recompute_portal, name='recompute_attribution_portal'),
-    ])),
-
     url(r'^catalog/$', common.catalog, name='catalog'),
 
     url(r'^entities/', include([

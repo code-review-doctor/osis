@@ -29,6 +29,21 @@ from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_s
     has_class_repartition_service
 from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
     has_enrollments_to_class_service
+from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
+    DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
+    RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
+    GetChargeSummaryCommand
+from ddd.logic.application.use_case.read.get_attributions_about_to_expire_service import \
+    get_attributions_about_to_expire
+from ddd.logic.application.use_case.read.get_charge_summary_service import get_charge_summary
+from ddd.logic.application.use_case.read.search_applications_by_applicant_service import \
+    search_applications_by_applicant
+from ddd.logic.application.use_case.read.search_vacant_courses_service import search_vacant_courses
+from ddd.logic.application.use_case.write.apply_on_vacant_course_service import apply_on_vacant_course
+from ddd.logic.application.use_case.write.delete_application_service import delete_application
+from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
+from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
+from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -49,6 +64,12 @@ from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesComma
 from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_service import search_uclouvain_campuses
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from infrastructure.application.repository.applicant import ApplicantRepository
+from infrastructure.application.repository.application import ApplicationRepository
+from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
+from infrastructure.application.repository.vacant_course import VacantCourseRepository
+from infrastructure.application.services.applications_summary import ApplicationsMailSummary
+from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -100,6 +121,36 @@ class MessageBus:
         ),
         HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
         HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
+        ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
+        ),
+        UpdateApplicationCommand: lambda cmd: update_application(
+            cmd, ApplicationRepository(), VacantCourseRepository()
+        ),
+        RenewMultipleAttributionsCommand: lambda cmd: renew_multiple_attributions(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository()
+        ),
+        DeleteApplicationCommand: lambda cmd: delete_application(cmd, ApplicationRepository()),
+        SearchApplicationByApplicantCommand: lambda cmd: search_applications_by_applicant(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository()
+        ),
+        SearchVacantCoursesCommand: lambda cmd: search_vacant_courses(
+            cmd, ApplicationCalendarRepository(), VacantCourseRepository(), LearningUnitTranslator()
+        ),
+        GetChargeSummaryCommand: lambda cmd: get_charge_summary(
+            cmd, ApplicationCalendarRepository(), ApplicantRepository(), VacantCourseRepository(),
+            LearningUnitTranslator()
+        ),
+        GetAttributionsAboutToExpireCommand: lambda cmd: get_attributions_about_to_expire(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(),
+            ApplicantRepository(), VacantCourseRepository(), LearningUnitTranslator()
+        ),
+        SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
+            cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
+            ApplicationsMailSummary()
+        )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
