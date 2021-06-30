@@ -24,17 +24,14 @@
 #
 ##############################################################################
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CanDeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
 def check_can_delete_effective_class(
         cmd: 'CanDeleteEffectiveClassCommand',
         effective_class_repository: 'IEffectiveClassRepository',
-        learning_unit_repository: 'ILearningUnitRepository'
 ) -> None:
     effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
         class_code=cmd.class_code,
@@ -43,14 +40,4 @@ def check_can_delete_effective_class(
     )
     effective_class = effective_class_repository.get(entity_id=effective_class_identity)
 
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.year
-    )
-    learning_unit = learning_unit_repository.get(learning_unit_identity)
-
-    CanEffectiveClassBeDeleted().verify(
-        effective_class=effective_class,
-        learning_unit=learning_unit,
-        learning_unit_repository=learning_unit_repository
-    )
+    CanEffectiveClassBeDeleted().verify(effective_class=effective_class)
