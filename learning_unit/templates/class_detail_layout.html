@@ -25,19 +25,20 @@
 {% endcomment %}
 
 {% block title %}
-    <title>OSIS - {{ effective_class.complete_code }}</title>
+    <title>OSIS - {{ effective_class.complete_acronym }}</title>
 {% endblock %}
 
 {% block breadcrumb %}
-    {% include "learning_unit/breadcrumb.html" %}
+    {% include "class/breadcrumb.html" %}
 {% endblock %}
 
 {% block header_content %}
     <div class="row" style="margin:0 -15px 5px; padding:0;">
         <div class="col-md-10 col-md-offset-1">
-            <h2>{{ effective_class.complete_code|default_if_none:'' }}
+            <h2>{{ effective_class.complete_acronym|default_if_none:'' }}
                 &mdash; {{ effective_class.entity_id.learning_unit_identity.academic_year }}</h2>
-            <h4 style="margin-top: 0;">{{ learning_unit_year.complete_title }}</h4>
+            <h4 style="margin-top: 0;">{{ learning_unit.titles.common_fr|default_if_none:' '}} -
+                {{ effective_class.titles.fr|default_if_none:'-' }}</h4>
         </div>
     </div>
 {% endblock header_content %}
@@ -54,6 +55,9 @@
             </div>
         </div>
         <div class="panel-body" id="tabs">
+            {% block tabs %}
+                {% include "class/blocks/tabs.html" %}
+            {% endblock tabs %}
             <div class="tab-content">
                 {% block content_tab %}{% endblock %}
             </div>
