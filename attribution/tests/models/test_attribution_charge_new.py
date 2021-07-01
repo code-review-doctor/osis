@@ -25,12 +25,9 @@
 ##############################################################################
 from django.test import TestCase
 
-from attribution.models import attribution_charge_new
 from attribution.models.enums import function
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.models.enums import component_type
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -41,31 +38,10 @@ class AttributionChargeNewTest(TestCase):
         cls.person = PersonFactory(first_name="John", last_name="Doe")
         cls.tutor = TutorFactory(person=cls.person)
         cls.attribution_new = AttributionNewFactory(tutor=cls.tutor, function=function.PROFESSOR)
-        cls.attribution_new_without_attribution_charge = AttributionNewFactory(tutor=cls.tutor,
-                                                                               function=function.PROFESSOR)
-        cls.learning_component_year_lecturing = LearningComponentYearFactory(type=component_type.LECTURING)
-        cls.learning_component_year_practical = LearningComponentYearFactory(type=component_type.PRACTICAL_EXERCISES)
-        cls.attribution_charge_new_lecturing = \
-            AttributionChargeNewFactory(attribution=cls.attribution_new,
-                                        learning_component_year=cls.learning_component_year_lecturing,
-                                        allocation_charge=10)
-        cls.attribution_charge_new_practical = \
-            AttributionChargeNewFactory(attribution=cls.attribution_new,
-                                        learning_component_year=cls.learning_component_year_practical,
-                                        allocation_charge=20)
-
-    def test_search_with_attribution(self):
-        result = attribution_charge_new.search(attribution=self.attribution_new)
-        self.assertCountEqual(result, [self.attribution_charge_new_lecturing, self.attribution_charge_new_practical])
-
-    def test_search_with_learning_component_year(self):
-        result = attribution_charge_new.search(learning_component_year=self.learning_component_year_practical)
-        self.assertCountEqual(result, [self.attribution_charge_new_practical])
-
-    def test_search_with_learning_component_year_list(self):
-        learning_component_year_list = [self.learning_component_year_lecturing, self.learning_component_year_practical]
-        result = attribution_charge_new.search(learning_component_year=learning_component_year_list)
-        self.assertCountEqual(result, [self.attribution_charge_new_practical, self.attribution_charge_new_lecturing])
+        cls.attribution_charge_new_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution_new,
+            allocation_charge=10
+        )
 
     def test_str_function(self):
         self.assertEqual(self.attribution_charge_new_lecturing.__str__(), "DOE, John - PROFESSOR")
