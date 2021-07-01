@@ -575,7 +575,7 @@ def _get_teachers(learning_unit_yr: LearningUnitYear) -> List[Person]:
     for k, attribution in attributions.items():
         if attribution.get('person'):
             teachers.add(attribution.get('person'))
-    return teachers
+    return sorted(list(teachers), key=lambda person: person.full_name)
 
 
 def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:

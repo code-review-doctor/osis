@@ -54,5 +54,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_events_lu_edition_fac_mgr, reverse_migration),
+        migrations.RunPython(create_events_lu_edition_fac_mgr, reverse_migration, elidable=True),
     ]

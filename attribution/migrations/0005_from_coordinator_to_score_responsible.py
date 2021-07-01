@@ -21,5 +21,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(set_coordinators_as_score_responsible),
+        migrations.RunPython(set_coordinators_as_score_responsible, elidable=True),
     ]

@@ -61,6 +61,11 @@ class PersonFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     global_id = None
 
+    class Params:
+        french = factory.Trait(language=settings.LANGUAGE_CODE_FR)
+        english = factory.Trait(language=settings.LANGUAGE_CODE_EN)
+
+
 
 class SuperUserPersonFactory(PersonFactory):
     user = factory.SubFactory(UserFactory, superuser=True)

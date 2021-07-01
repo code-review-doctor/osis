@@ -23,19 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
-from django.urls import path
+from django.urls import path, include
 
+from attribution.api.views.application import ApplicationUpdateDeleteView, ApplicationListCreateView, \
+    RenewAttributionsAboutToExpire, SendApplicationsSummary, MyChargeSummaryView
+from attribution.api.views.vacant_course import VacantCourseListView
 from attribution.api.views.attribution import AttributionListView, MyAttributionListView
 from attribution.api.views.calendar import ApplicationCoursesCalendarListView
 
 app_name = "attribution"
 urlpatterns = [
-    url(
-        r'^application/calendars$',
-        ApplicationCoursesCalendarListView.as_view(),
-        name=ApplicationCoursesCalendarListView.name
-    ),
+    path('application/', include([
+        path('calendars', ApplicationCoursesCalendarListView.as_view(), name=ApplicationCoursesCalendarListView.name),
+        path('my_charges', MyChargeSummaryView.as_view(), name=MyChargeSummaryView.name),
+        path('vacant_courses', VacantCourseListView.as_view(), name=VacantCourseListView.name),
+        path('renewal', RenewAttributionsAboutToExpire.as_view(), name=RenewAttributionsAboutToExpire.name),
+        path('<str:application_uuid>/', ApplicationUpdateDeleteView.as_view(), name=ApplicationUpdateDeleteView.name),
+        path('send_summary', SendApplicationsSummary.as_view(), name=SendApplicationsSummary.name),
+        path('', ApplicationListCreateView.as_view(), name=ApplicationListCreateView.name),
+    ])),
+
     path('<int:year>/me/', MyAttributionListView.as_view(), name=MyAttributionListView.name),
     path('<int:year>/<str:global_id>/', AttributionListView.as_view(), name=AttributionListView.name),
 ]

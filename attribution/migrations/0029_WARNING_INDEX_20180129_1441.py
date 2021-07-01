@@ -20,12 +20,14 @@ class Migration(migrations.Migration):
             """CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted
                     ON attribution_attributionnew
                 (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));""",
-            "DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted"
+            "DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted",
+            elidable=True
         ),
         migrations.RunSQL(
             """CREATE UNIQUE INDEX tutorapplication_learningcontaineryearid_tutorid_function_deleted
                     ON attribution_tutorapplication
                 (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));""",
-            "DROP INDEX tutorapplication_learningcontaineryearid_tutorid_function_deleted"
+            "DROP INDEX tutorapplication_learningcontaineryearid_tutorid_function_deleted",
+            elidable=True
         ),
     ]
