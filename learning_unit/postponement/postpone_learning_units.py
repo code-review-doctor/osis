@@ -28,6 +28,7 @@ from typing import Optional, Dict, Type, List, Iterable
 from django.db.models import OuterRef, Max, Subquery, Exists, Model, ForeignKey, Q
 from django.utils.functional import cached_property
 
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_achievement import LearningAchievement
@@ -138,7 +139,12 @@ class PostponeLearningUnits:
         self.postpone_cms(from_luy, for_year)
 
     def postpone_cms(self, from_luy: LearningUnitYear, for_year: int):
-        cms_query = TranslatedText.objects.filter(entity=entity_name.LEARNING_UNIT_YEAR, reference=from_luy.id)
+        cms_query = TranslatedText.objects.filter(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=from_luy.id
+        ).exclude(
+            text_label__label__in=CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
+        )
         for cms in cms_query:
             create_cms_from_template(cms, for_year)
 
