@@ -28,7 +28,6 @@ from django import forms
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
-from attribution.models.enums.function import Functions
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
@@ -72,8 +71,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
 
     def __init_function(self):
         if self.tutor:
-            self.fields['function'].initial = Functions.get_value(
-                self.tutor.function) if self.tutor.function else ''
+            self.fields['function'].initial = self.tutor.function_text
 
     def get_command(self) -> DistributeClassToTutorCommand:
         return DistributeClassToTutorCommand(
@@ -105,7 +103,7 @@ class ClassRemoveTutorRepartitionForm(forms.Form):
         self.tutor = tutor
 
         self.fields['full_name'].initial = tutor.full_name
-        self.fields['function'].initial = Functions.get_value(self.tutor.function) if self.tutor.function else ''
+        self.fields['function'].initial = self.tutor.function_text
 
     def get_command(self) -> UnassignTutorClassCommand:
         return UnassignTutorClassCommand(
