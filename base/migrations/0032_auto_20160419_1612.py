@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             field=models.CharField(blank=True, max_length=100, null=True),
         ),
         migrations.RunSQL(
-            "delete from base_organizationaddress;"
+            "delete from base_organizationaddress;", elidable=True
         ),
         migrations.AlterField(
             model_name='organizationaddress',
@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='reference.Country'),
         ),
         migrations.RunSQL(
-            "delete from base_personaddress;"
+            "delete from base_personaddress;",elidable=True
         ),
         migrations.AlterField(
             model_name='personaddress',

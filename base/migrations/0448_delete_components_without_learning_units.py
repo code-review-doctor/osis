@@ -18,7 +18,8 @@ class Migration(migrations.Migration):
                 USING base_learningcomponentyear 
                  where base_learningcomponentyear.id = base_entitycomponentyear.learning_component_year_id
                  and base_learningcomponentyear.learning_unit_year_id is null
-            """
+            """,
+            elidable=True
         ),
         migrations.RunSQL(
             """
@@ -26,11 +27,13 @@ class Migration(migrations.Migration):
                 USING base_learningcomponentyear 
                  where base_learningcomponentyear.id = base_learningclassyear.learning_component_year_id
                  and base_learningcomponentyear.learning_unit_year_id is null
-            """
+            """,
+            elidable=True
         ),
         migrations.RunSQL(
             """
                 DELETE from base_learningcomponentyear where learning_unit_year_id is null
-            """
+            """,
+            elidable=True
         ),
     ]

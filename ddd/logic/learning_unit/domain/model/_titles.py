@@ -34,3 +34,21 @@ class Titles(interface.ValueObject):
     specific_fr = attr.ib(type=str)
     common_en = attr.ib(type=str)
     specific_en = attr.ib(type=str)
+
+    @property
+    def complete_fr(self) -> str:
+        if self.common_fr and self.specific_fr:
+            return self.common_fr + " - " + self.specific_fr
+        elif self.common_fr:
+            return self.common_fr
+        else:
+            return self.specific_fr
+
+    @property
+    def complete_en(self) -> str:
+        if self.common_en and self.specific_en:
+            return self.common_en + " - " + self.specific_en
+        elif self.common_en:
+            return self.common_en
+        else:
+            return self.specific_en

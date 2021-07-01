@@ -28,10 +28,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(_round_credits_in_education_group_year()),
-        migrations.RunSQL(_round_credits_in_group_elemement_year()),
-        migrations.RunSQL(_round_credits_in_learning_unit_year()),
-        migrations.RunSQL(_round_credits_in_external_learning_unit_year()),
+        migrations.RunSQL(_round_credits_in_education_group_year(), elidable=True),
+        migrations.RunSQL(_round_credits_in_group_elemement_year(), elidable=True),
+        migrations.RunSQL(_round_credits_in_learning_unit_year(), elidable=True),
+        migrations.RunSQL(_round_credits_in_external_learning_unit_year(), elidable=True),
     ]
 
 

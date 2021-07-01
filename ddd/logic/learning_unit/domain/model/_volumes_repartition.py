@@ -23,34 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 
 import attr
 
-from base.models.enums.quadrimesters import DerogationQuadrimester
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import FinancialVolumesRepartition, \
+    DurationUnit
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class Duration(interface.ValueObject):
-    hours = attr.ib(type=int)
-    minutes = attr.ib(type=int)
-
-    @property
-    def quantity_in_hours(self) -> Decimal:
-        minutes_in_1_hour = 60
-        minutes_from_hours = self.hours * minutes_in_1_hour
-        total_minutes = minutes_from_hours + self.minutes
-        number_of_decimals = 2
-        return round(Decimal(total_minutes / minutes_in_1_hour), number_of_decimals)
+class ClassVolumes(interface.ValueObject):
+    volume_first_quadrimester = attr.ib(type=DurationUnit)
+    volume_second_quadrimester = attr.ib(type=DurationUnit)
 
 
 @attr.s(frozen=True, slots=True)
 class Volumes(interface.ValueObject):
-    volume_first_quadrimester = attr.ib(type=Duration)
-    volume_second_quadrimester = attr.ib(type=Duration)
-    volume_annual = attr.ib(type=Duration)
-    derogation_quadrimester = attr.ib(type=DerogationQuadrimester)
+    volume_annual = attr.ib(type=DurationUnit)
+    planned_classes = attr.ib(type=int)
+    volumes_repartition = attr.ib(type=FinancialVolumesRepartition)
+    volume_first_quadrimester = attr.ib(type=DurationUnit, default=0.0)
+    volume_second_quadrimester = attr.ib(type=DurationUnit, default=0.0)
 
 
 @attr.s(frozen=True, slots=True)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-03 13:47+0200\n"
+"POT-Creation-Date: 2021-06-25 11:03+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -94,11 +94,32 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
+msgid "1"
+msgstr "1"
+
+msgid "12"
+msgstr "12"
+
+msgid "123"
+msgstr "123"
+
+msgid "13"
+msgstr "13"
+
 msgid "1st quadri"
 msgstr "1er quadri"
 
+msgid "2"
+msgstr "2"
+
+msgid "23"
+msgstr "23"
+
 msgid "2nd quadri"
 msgstr "2e quadri"
+
+msgid "3"
+msgstr "3"
 
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
@@ -522,6 +543,14 @@ msgstr "Ville"
 msgid "City of institution"
 msgstr "Ville de l'institution"
 
+#, python-format
+msgid ""
+"Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
+"inconsistent (Annual volume must be equal to the sum of volume Q1 and Q2)"
+msgstr ""
+"Les volumes de la classe %(code_ue)s%(separator)s%(code_class)s sont "
+"incohérents (Volume annuel doit être égal à la somme des volumes Q1 et Q2)"
+
 msgid "Classes"
 msgstr "Classes"
 
@@ -693,6 +722,9 @@ msgstr "Supprimer cette version définitivement"
 
 msgid "Deliberation"
 msgstr "Délibération"
+
+msgid "Derogation's session"
+msgstr "Session de dérogation"
 
 msgid "Description"
 msgstr "Description"
@@ -1245,9 +1277,6 @@ msgstr "Justification"
 msgid "Keywords"
 msgstr "Mots clés"
 
-msgid "LU"
-msgstr "UE"
-
 msgid "Language"
 msgstr "Langue"
 
@@ -1622,6 +1651,9 @@ msgstr "Nouvelle Mini-Formation"
 msgid "New Training"
 msgstr "Nouvelle Formation"
 
+msgid "New class"
+msgstr "Nouvelle classe"
+
 msgid "New external learning unit"
 msgstr "Nouvelle unité d'enseignement externe"
 
@@ -1783,6 +1815,9 @@ msgstr "Composants propres"
 
 msgid "P."
 msgstr "P."
+
+msgid "P23"
+msgstr "P23"
 
 msgid "Page not found."
 msgstr "Page inexistante."
@@ -2392,6 +2427,55 @@ msgstr "Clôturé"
 msgid "The"
 msgstr "Le"
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+"La session de dérogation de %(code_class)s est incohérente avec celle de "
+"l'unité d'enseignement (la session de dérogation doit être "
+"%(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+"Le quadrimestre de %(code_class)s est incohérent avec celui de l'unité "
+"d'enseignement (le quadrimestre doit être %(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les "
+"volumes Q1 et Q2 doivent avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed but not both)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul "
+"le volume %(quadrimester)s doit avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume %(quadrimester)s doit avoir une valeur)"
+
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
@@ -2562,6 +2646,14 @@ msgstr ""
 "La période d'édition des responsables de notes n'est pas encore ouverte."
 
 #, python-format
+msgid ""
+"The planned classes number and the effective classes number of %(code_ue)s/"
+"%(component_code)s is not consistent"
+msgstr ""
+"Le nombre de classes prévues et de classes effectives de %(code_ue)s/"
+"%(component_code)s est incohérent."
+
+#, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
 msgstr "La répartition des volumes de %(col_name)s a déjà été modifiée."
 
@@ -2616,7 +2708,7 @@ msgstr ""
 "l'année %(next_year)s - %(next_value)s"
 
 msgid "The volume Q1 or Q2 must have a value but not both"
-msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
+msgstr "Le volume Q1 ou Q2 doit avoir une valeur mais pas les deux"
 
 msgid "The volume can not be set to 0."
 msgstr "Le volume ne peut pas être mis à 0."
@@ -3008,9 +3100,19 @@ msgstr "activités en anglais"
 msgid "aim number"
 msgstr "numéro de l'attendu"
 
+msgid "and"
+msgstr "et"
+
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr "et reportée jusque %(year)s"
+
+#, python-format
+msgid ""
+"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
+msgstr ""
+"au moins une valeur de volume de classe est supérieure à celle du volume "
+"correspondant de l'UE(%(sub_type)s)"
 
 msgid "author"
 msgstr "auteur"
@@ -3019,10 +3121,10 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 msgid "biennial even"
-msgstr "bisannuelle paire"
+msgstr "Bisannuelle paire"
 
 msgid "biennial odd"
-msgstr "bisannuelle impaire"
+msgstr "Bisannuelle impaire"
 
 msgid "blocked update for tutor"
 msgstr "mise à jour bloquée pour l'enseignant"
@@ -3137,6 +3239,9 @@ msgstr "ressources en ligne"
 msgid "optional"
 msgstr "optionnel"
 
+msgid "or"
+msgstr "ou"
+
 msgid "parameters"
 msgstr "paramètres"
 
@@ -3216,6 +3321,9 @@ msgstr "texte en français"
 
 msgid "the"
 msgstr "le"
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr "le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
 #, python-format
 msgid ""

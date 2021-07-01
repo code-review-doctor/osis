@@ -89,6 +89,13 @@ if hasattr(settings, 'QUEUES') and settings.QUEUES:
             queue_name='SCORE_ENCODING_PDF_REQUEST'
         )
 
+    if 'attribution' in settings.INSTALLED_APPS:
+        from infrastructure.application.queue import application_response_callback
+        _listen_to_queue_with_callback(
+            callback=application_response_callback,
+            queue_name='APPLICATION_RESPONSE'
+        )
+
     if 'continuing_education' in settings.INSTALLED_APPS:
         from continuing_education.business.registration_queue import save_role_registered_in_admission
 

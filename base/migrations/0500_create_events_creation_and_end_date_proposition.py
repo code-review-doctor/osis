@@ -142,5 +142,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_calendar_events_propositions, reverse_migration),
+        migrations.RunPython(create_calendar_events_propositions, reverse_migration, elidable=True),
     ]
