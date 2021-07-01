@@ -40,7 +40,7 @@ from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiv
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
-from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm
+from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm, ClassRemoveTutorRepartitionForm
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
@@ -136,3 +136,24 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
                 }
             )
         )
+
+
+class TutorRepartitionRemoveView(TutorRepartitionView):
+    template_name = "class/remove_charge_repartition.html"
+    permission_required = 'base.can_access_class'
+    form_class = ClassRemoveTutorRepartitionForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['tutor'] = self.tutor
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        tutor = self.tutor
+        form = ClassRemoveTutorRepartitionForm(
+            request.POST,
+            user=request.user,
+            tutor=tutor
+        )
+        pass  # TODO : complete when service/domain reade OSIS-5906

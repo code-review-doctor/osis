@@ -49,7 +49,8 @@ class LearningUnitTutorsView(PermissionRequiredMixin, TemplateView):
                 'effective_class': effective_class,
                 'tutors':
                     self.get_ue_tutors(),
-                'can_add_charge_repartition': True  # TODO je ne connais pas la condition
+                'can_add_charge_repartition': True,   # TODO je ne connais pas la condition,
+                'can_delete_attribution': True  # TODO je ne connais pas la condition,
             }
         )
         context.update(

@@ -31,17 +31,13 @@ from django.utils.translation import gettext_lazy as _
 from attribution.models.enums.function import Functions
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
-from ddd.logic.attribution.commands import DistributeClassToTutorCommand
+from ddd.logic.attribution.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
 from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.domain.validator import exceptions
 from osis_common.forms.widgets import DecimalFormatInput
 
 
 class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
-
-    field_name_by_exception = {
-    }
 
     full_name = forms.CharField(max_length=255, required=False)
     function = forms.CharField(max_length=255, required=False, label=_('Function'))
@@ -87,4 +83,33 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             distributed_volume=self.cleaned_data['volume'] or 0,
             learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
             year=self.effective_class.entity_id.learning_unit_identity.year
+        )
+
+
+class ClassRemoveTutorRepartitionForm(forms.Form):
+
+    full_name = forms.CharField(max_length=255, required=False)
+    function = forms.CharField(max_length=255, required=False, label=_('Function'))
+
+    def __init__(self,
+                 *args,
+                 effective_class: 'EffectiveClass' = None,
+                 tutor: 'TutorAttributionToLearningUnitDTO' = None,
+                 user: User,
+                 **kwargs
+                 ):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+        self.effective_class = effective_class
+        self.tutor = tutor
+
+        self.fields['full_name'].initial = tutor.full_name
+        self.fields['function'].initial = Functions.get_value(self.tutor.function) if self.tutor.function else ''
+
+    def get_command(self) -> UnassignTutorClassCommand:
+        return UnassignTutorClassCommand(
+            tutor_personal_id_number=self.tutor.personal_id_number,
+            learning_unit_attribution_uuid=self.tutor.attribution_uuid,
+            class_code=self.effective_class.entity_id.class_code
         )

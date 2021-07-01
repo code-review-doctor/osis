@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-29 11:38+0200\n"
+"POT-Creation-Date: 2021-06-29 15:07+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,6 +39,9 @@ msgstr "Entité d'attribution"
 
 msgid "Annual volume"
 msgstr "Volume annuel"
+
+msgid "Are you sure?"
+msgstr "Êtes-vous sûr·e?"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
@@ -85,6 +88,9 @@ msgstr "Composants"
 
 msgid "Credits"
 msgstr "Crédits"
+
+msgid "Delete"
+msgstr "Supprimer"
 
 msgid "Derogation's session"
 msgstr "Session de dérogation"
@@ -363,6 +369,9 @@ msgstr "Volume Q1"
 
 msgid "Volume Q2"
 msgstr "Volume Q2"
+
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
 
 msgid "You are not allowed to create proposal during this academic year"
 msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"
