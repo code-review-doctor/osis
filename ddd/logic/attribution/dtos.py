@@ -66,6 +66,7 @@ class TutorAttributionToLearningUnitDTO(DTO):
     function = attr.ib(type=str)
     attributed_volume_to_learning_unit = attr.ib(type=Decimal)
     component_type = attr.ib(type=str)
+    number_of_assigned_to_class = attr.ib(type=bool)
 
     @property
     def full_name(self):
