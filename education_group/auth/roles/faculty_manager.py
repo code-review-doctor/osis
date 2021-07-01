@@ -153,10 +153,12 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_training_transition_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_education_group_year_not_in_past &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.fill_training_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_education_group_year_not_in_past &
                 predicates.is_education_group_extended_daily_management_calendar_open &
                 predicates.is_education_group_type_eligible_to_be_filled,
             'program_management.change_training_version':
@@ -176,10 +178,12 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
             'base.add_minitraining_transition_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_education_group_year_not_in_past &
                 predicates.is_education_group_extended_daily_management_calendar_open,
             'base.fill_minitraining_version':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_user_linked_to_all_scopes_of_management_entity &
+                predicates.is_education_group_year_not_in_past &
                 predicates.is_education_group_extended_daily_management_calendar_open &
                 predicates.is_education_group_type_eligible_to_be_filled,
             'program_management.change_minitraining_version':
