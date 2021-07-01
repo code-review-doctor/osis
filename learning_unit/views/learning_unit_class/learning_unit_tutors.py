@@ -26,12 +26,14 @@
 from typing import List
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
+from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, PracticalEffectiveClass
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.views.learning_unit_class.common import common_url_tabs
@@ -43,7 +45,7 @@ class LearningUnitTutorsView(PermissionRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        effective_class = self.get_effective_class()
+        effective_class = self.effective_class
         context.update(
             {
                 'effective_class': effective_class,
@@ -71,7 +73,8 @@ class LearningUnitTutorsView(PermissionRequiredMixin, TemplateView):
             'learning_component_year__learning_unit_year__academic_year'
         )
 
-    def get_effective_class(self) -> 'EffectiveClass':
+    @cached_property
+    def effective_class(self) -> 'EffectiveClass':
         command = GetEffectiveClassCommand(
             class_code=self.kwargs['class_code'],
             learning_unit_code=self.kwargs['learning_unit_code'],
@@ -80,10 +83,15 @@ class LearningUnitTutorsView(PermissionRequiredMixin, TemplateView):
         return message_bus_instance.invoke(command)
 
     def get_ue_tutors(self) -> List['Tutor']:
-        # TODO : ici on a le double d'attribution on devrait filtrer par type (PP ou PM) à discuter
-        return message_bus_instance.invoke(
+        tutors = message_bus_instance.invoke(
             SearchAttributionsToLearningUnitCommand(
-                learning_unit_code=self.get_effective_class().entity_id.learning_unit_identity.code,
-                learning_unit_year=self.get_effective_class().entity_id.learning_unit_identity.year,
+                learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+                learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year,
             )
         )
+        return self._filter_tutors_by_class_type(tutors)
+
+    def _filter_tutors_by_class_type(self, tutors):
+        effective_class_type = \
+            PRACTICAL_EXERCISES if isinstance(self.effective_class, PracticalEffectiveClass) else LECTURING
+        return [tutor for tutor in tutors if effective_class_type == tutor.component_type]
