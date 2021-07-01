@@ -87,6 +87,7 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['effective_class'] = self.effective_class
+        context['learning_unit'] = self.learning_unit
         context['cancel_url'] = self.cancel_url
         return context
 
@@ -131,7 +132,8 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
                     )
         )
 
-    def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
+    @staticmethod
+    def get_success_msg(effective_class_identity: 'EffectiveClassIdentity') -> str:
         effective_class = message_bus_instance.invoke(
             GetEffectiveClassCommand(
                 class_code=effective_class_identity.class_code,
@@ -140,5 +142,5 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
             )
         )
         return _("Class %(effective_class_complete_acronym)s successfully updated.") % {
-            "effective_class_complete_acronym": effective_class.complete_code
+            "effective_class_complete_acronym": effective_class.complete_acronym
         }

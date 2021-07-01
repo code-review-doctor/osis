@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-16 15:24+0200\n"
+"POT-Creation-Date: 2021-06-30 13:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,6 +95,9 @@ msgstr "Catalogue des formations"
 msgid "Full"
 msgstr "Complet"
 
+msgid "Identification"
+msgstr "Identification"
+
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -113,8 +116,11 @@ msgstr "Langue"
 msgid "Learning location"
 msgstr "Lieu d'enseignement"
 
+msgid "Learning unit"
+msgstr "Unité d'enseignement"
+
 msgid "Learning unit credits"
-msgstr "Crédits"
+msgstr "Crédits de l'UE"
 
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
@@ -135,6 +141,9 @@ msgstr "Unités d'enseignement"
 
 msgid "Lecturing"
 msgstr "Partie magistrale"
+
+msgid "New class"
+msgstr "Nouvelle classe"
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
@@ -185,9 +194,6 @@ msgstr "Entité resp. cahier des charges"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
-
-msgid "Specific complement (Full)"
-msgstr "Complément spécifique à l'UE (complet)"
 
 msgid "State"
 msgstr "Etat"
@@ -315,9 +321,6 @@ msgstr "Type"
 msgid "Update"
 msgstr "Modifier"
 
-msgid "Update class"
-msgstr "Modifier classe"
-
 msgid "Vol. Q1"
 msgstr "Vol. Q1"
 
@@ -403,5 +406,3 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
-
-
