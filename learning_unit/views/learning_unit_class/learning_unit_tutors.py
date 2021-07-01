@@ -31,7 +31,7 @@ from django.views.generic import TemplateView
 
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand
-from ddd.logic.attribution.domain.model.tutor import Tutor
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, PracticalEffectiveClass
 from infrastructure.messages_bus import message_bus_instance
@@ -82,16 +82,18 @@ class LearningUnitTutorsView(PermissionRequiredMixin, TemplateView):
         )
         return message_bus_instance.invoke(command)
 
-    def get_ue_tutors(self) -> List['Tutor']:
+    def get_ue_tutors(self) -> List['TutorAttributionToLearningUnitDTO']:
         tutors = message_bus_instance.invoke(
             SearchAttributionsToLearningUnitCommand(
                 learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
                 learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year,
             )
         )
+
         return self._filter_tutors_by_class_type(tutors)
 
-    def _filter_tutors_by_class_type(self, tutors):
+    def _filter_tutors_by_class_type(self, tutors: List['TutorAttributionToLearningUnitDTO']) \
+            -> List['TutorAttributionToLearningUnitDTO']:
         effective_class_type = \
             PRACTICAL_EXERCISES if isinstance(self.effective_class, PracticalEffectiveClass) else LECTURING
         return [tutor for tutor in tutors if effective_class_type == tutor.component_type]
