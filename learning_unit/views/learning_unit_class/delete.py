@@ -96,7 +96,7 @@ class DeleteClassView(PermissionRequiredMixin, FormView):
         )
 
     def post(self, request, *args, **kwargs):
-        effective_class_to_delete_complete_code = self.effective_class.complete_code
+        effective_class_to_delete_complete_acronym = self.effective_class.complete_acronym
 
         try:
             message_bus_instance.invoke(
@@ -115,7 +115,7 @@ class DeleteClassView(PermissionRequiredMixin, FormView):
             if not form.errors:
                 display_success_messages(
                     request,
-                    self.get_success_msg(effective_class_to_delete_complete_code),
+                    self.get_success_msg(effective_class_to_delete_complete_acronym),
                     extra_tags='safe'
                 )
                 return self.redirect_to_learning_unit_identification()
