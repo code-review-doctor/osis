@@ -3,12 +3,18 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.learning_unit.commands import CreateLearningUnitCommand
+from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, CreateEffectiveClassCommand, \
+    UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.validator._should_academic_year_be_greater_than_2019 import \
     ShouldAcademicYearGreaterThan2019
+from ddd.logic.learning_unit.domain.validator._should_be_alphanumeric import ShouldBeAlphanumericValidator
 from ddd.logic.learning_unit.domain.validator._should_code_not_exist import ShouldCodeAlreadyExistsValidator
 from ddd.logic.learning_unit.domain.validator._should_credits_respect_minimum_value import \
     ShouldCreditsRespectMinimumValueValidator
+from ddd.logic.learning_unit.domain.validator._should_derogation_quadrimester_be_valid_choice import \
+    ShouldDerogationQuadrimesterBeValidChoice
+from ddd.logic.learning_unit.domain.validator._should_derogation_session_be_valid_choice import \
+    ShouldDerogationSessionBeValidChoice
 from ddd.logic.learning_unit.domain.validator._should_fields_be_required import ShouldFieldsBeRequiredValidator
 from ddd.logic.learning_unit.domain.validator._should_internship_subtype_be_mandatory import \
     ShouldInternshipSubtypeBeMandatoryValidator
@@ -16,6 +22,7 @@ from ddd.logic.learning_unit.domain.validator._should_learning_unit_code_respect
     ShouldCodeRespectNamingConventionValidator
 from ddd.logic.learning_unit.domain.validator._should_learning_unit_not_exists_in_next_year import \
     ShouldLearningUnitNotExistNextYearValidator
+from ddd.logic.learning_unit.domain.validator._should_teaching_place_be_required import ShouldTeachingPlaceBeRequired
 from ddd.logic.learning_unit.domain.validator._subdivision_should_contain_only_one_letter import \
     SubdivisionShouldContainOnlyOneLetterValidator
 from ddd.logic.learning_unit.domain.validator._subdivision_should_not_exist import SubdivisionShouldNotExistValidator
@@ -62,8 +69,7 @@ class CopyLearningUnitToNextYearValidatorList(TwoStepsMultipleBusinessExceptionL
 
 @attr.s(frozen=True, slots=True)
 class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-
-    learning_unit = attr.ib(type='LearningUnit')  # type: LearningUnit
+    learning_unit = attr.ib(type='LearningUnit')  # type: 'LearningUnit'
     subdivision = attr.ib(type=str)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
@@ -74,3 +80,35 @@ class CreatePartimValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
             SubdivisionShouldContainOnlyOneLetterValidator(self.subdivision),
             SubdivisionShouldNotExistValidator(self.subdivision, self.learning_unit),
         ]
+
+
+@attr.s(frozen=True, slots=True)
+class CreateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    command = attr.ib(type=CreateEffectiveClassCommand)
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldBeAlphanumericValidator(self.command.class_code),
+            ShouldTeachingPlaceBeRequired(self.command.teaching_place_uuid),
+            ShouldDerogationSessionBeValidChoice(self.command.session_derogation),
+            ShouldDerogationQuadrimesterBeValidChoice(self.command.derogation_quadrimester),
+        ]
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return []
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateEffectiveClassValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    command = attr.ib(type=UpdateEffectiveClassCommand)
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldBeAlphanumericValidator(self.command.class_code),
+            ShouldTeachingPlaceBeRequired(self.command.teaching_place_uuid),
+            ShouldDerogationSessionBeValidChoice(self.command.session_derogation),
+            ShouldDerogationQuadrimesterBeValidChoice(self.command.derogation_quadrimester),
+        ]
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return []

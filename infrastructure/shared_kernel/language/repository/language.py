@@ -28,7 +28,7 @@ from typing import Optional, List
 from django.db.models import F
 
 from ddd.logic.shared_kernel.language.builder.language_builder import LanguageBuilder
-from ddd.logic.shared_kernel.language.domain.model.language import Language
+from ddd.logic.shared_kernel.language.domain.model.language import Language, LanguageIdentity
 from ddd.logic.shared_kernel.language.dtos import LanguageDataDTO
 from ddd.logic.shared_kernel.language.repository.i_language import ILanguageRepository
 from osis_common.ddd.interface import RootEntity, EntityIdentity, ApplicationService
@@ -37,8 +37,15 @@ from reference.models.language import Language as LanguageDatabase
 
 class LanguageRepository(ILanguageRepository):
     @classmethod
-    def get(cls, entity_id: EntityIdentity) -> RootEntity:
-        raise NotImplementedError
+    def get(cls, entity_id: LanguageIdentity) -> Language:
+        qs = LanguageDatabase.objects.filter(code=entity_id.code_iso).annotate(
+            code_iso=F('code'),
+        ).values(
+            'code_iso',
+            'name',
+        )
+        obj_as_dict = qs.get()
+        return LanguageBuilder.build_from_repository_dto(LanguageDataDTO(**obj_as_dict))
 
     @classmethod
     def search(cls, entity_ids: Optional[List[EntityIdentity]] = None, **kwargs) -> List[Language]:

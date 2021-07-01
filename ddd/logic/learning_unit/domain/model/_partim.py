@@ -26,13 +26,14 @@
 import attr
 
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
-from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
-from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
-from osis_common.ddd import interface
+from ddd.logic.learning_unit.business_types import *
 from ddd.logic.learning_unit.commands import CreatePartimCommand
 from ddd.logic.learning_unit.domain.model._remarks import Remarks
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import CreatePartimValidatorList
-from ddd.logic.learning_unit.business_types import *
+from ddd.logic.learning_unit.dtos import PartimFromRepositoryDTO
+from ddd.logic.shared_kernel.language.builder.language_identity_builder import LanguageIdentityBuilder
+from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdentity
+from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
@@ -64,6 +65,21 @@ class PartimBuilder:
             ),
         )
 
+    @classmethod
+    def build_from_dto(cls, dto: 'PartimFromRepositoryDTO') -> 'Partim':
+        return Partim(
+            entity_id=PartimIdentity(subdivision=dto.subdivision),
+            title_fr=dto.title_fr,
+            title_en=dto.title_en,
+            credits=dto.credits,
+            periodicity=PeriodicityEnum[dto.periodicity],
+            language_id=LanguageIdentityBuilder.build_from_code_iso(dto.iso_code),
+            remarks=Remarks(
+                faculty=dto.remark_faculty,
+                publication_fr=dto.remark_publication_fr,
+                publication_en=dto.remark_publication_en,
+            ),
+        )
 
 @attr.s(slots=True, hash=False, eq=False)
 class Partim(interface.Entity):

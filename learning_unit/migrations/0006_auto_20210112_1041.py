@@ -66,5 +66,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_learning_unit_academic_calendar, remove_learning_unit_academic_calendar),
+        migrations.RunPython(create_learning_unit_academic_calendar, remove_learning_unit_academic_calendar, elidable=True),
     ]
