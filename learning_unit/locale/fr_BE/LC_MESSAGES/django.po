@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-15 10:13+0200\n"
+"POT-Creation-Date: 2021-06-30 13:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -141,6 +141,9 @@ msgstr "Unités d'enseignement"
 
 msgid "Lecturing"
 msgstr "Partie magistrale"
+
+msgid "New class"
+msgstr "Nouvelle classe"
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
@@ -318,9 +321,6 @@ msgstr "Type"
 msgid "Update"
 msgstr "Modifier"
 
-msgid "Update class"
-msgstr "Modifier classe"
-
 msgid "Vol. Q1"
 msgstr "Vol. Q1"
 
@@ -406,5 +406,3 @@ msgstr "volume horaire partiel q1"
 
 msgid "hourly volume partial q2"
 msgstr "volume horaire partiel q2"
-
-
