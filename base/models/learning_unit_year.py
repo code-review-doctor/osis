@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef, F, fields
 from django.db.models.functions import Concat
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -39,19 +41,22 @@ from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
+from base.business.learning_units.quadrimester_strategy import QUADRIMESTER_CHECK_RULES
+from base.business.learning_units.session_strategy import SESSION_CHECK_RULES
 from base.models import entity_version
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear
 from base.models.entity_version import get_entity_version_parent_or_itself_from_type
-from base.models.enums import active_status, learning_container_year_types
+from base.models.enums import active_status, learning_container_year_types, learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
+from base.models.enums.component_type import PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import LECTURING
 from base.models.enums.learning_container_year_types import COURSE, INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, ANNUAL, BIENNIAL_EVEN, BIENNIAL_ODD
+from base.models.enums.quadrimesters import LearningUnitYearQuadrimester
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
-from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from cms.models.translated_text import TranslatedText
 from education_group import publisher
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.models.learning_class_year import LearningClassYear
@@ -139,6 +144,12 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class LearningUnitYearQuerySet(SerializableQuerySet):
+    def annotate_volume_total(self):
+        return self.annotate_volume_total_class_method(self)
+
+    def annotate_volume_vacant_available(self):
+        return self.annotate_volume_vacant_available_class_method(self)
+
     def annotate_full_title(self):
         return self.annotate_full_title_class_method(self)
 
@@ -202,6 +213,78 @@ class LearningUnitYearQuerySet(SerializableQuerySet):
             cls.annotate_entity_requirement_acronym(queryset)
         )
 
+    @classmethod
+    def annotate_volume_total_class_method(cls, queryset):
+        subqs_volume_total = LearningComponentYear.objects.filter(
+            learning_unit_year_id=OuterRef('pk')
+        ).annotate(
+            hourly_volume_total_annual_casted=Case(
+                When(hourly_volume_total_annual__isnull=True, then=Decimal(0.0)),
+                default=F('hourly_volume_total_annual'),
+                output_field=fields.DecimalField()
+            )
+        ).values('hourly_volume_total_annual_casted')
+
+        return queryset.annotate(
+            lecturing_volume_total=Subquery(
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
+            ),
+            practical_volume_total=Subquery(
+                subqs_volume_total.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('hourly_volume_total_annual_casted')[:1],
+                output_field=fields.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume_total=Case(
+                When(lecturing_volume_total__isnull=False, then='lecturing_volume_total'),
+                default=Decimal(0.0)
+            ),
+            practical_volume_total=Case(
+                When(practical_volume_total__isnull=False, then='practical_volume_total'),
+                default=Decimal(0.0)
+            ),
+        )
+
+    @classmethod
+    def annotate_volume_vacant_available_class_method(cls, queryset):
+        subqs_volume_declared_vacant = LearningComponentYear.objects.filter(
+            learning_unit_year_id=OuterRef('pk')
+        ).annotate(
+            volume_declared_vacant_casted=Case(
+                When(volume_declared_vacant__isnull=True, then=Decimal(0.0)),
+                default=F('volume_declared_vacant'),
+                output_field=fields.DecimalField()
+            )
+        ).values('volume_declared_vacant_casted')
+
+        return queryset.annotate(
+            lecturing_volume_available=Subquery(
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.LECTURING
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
+            ),
+            practical_volume_available=Subquery(
+                subqs_volume_declared_vacant.filter(
+                    type=learning_component_year_type.PRACTICAL_EXERCISES
+                ).values('volume_declared_vacant_casted')[:1],
+                output_field=fields.DecimalField()
+            )
+        ).annotate(
+            lecturing_volume_available=Case(
+                When(lecturing_volume_available__isnull=False, then='lecturing_volume_available'),
+                default=Decimal(0.0)
+            ),
+            practical_volume_available=Case(
+                When(practical_volume_available__isnull=False, then='practical_volume_available'),
+                default=Decimal(0.0)
+            ),
+        )
+
 
 class BaseLearningUnitYearManager(SerializableModelManager):
     def get_queryset(self):
@@ -211,7 +294,7 @@ class BaseLearningUnitYearManager(SerializableModelManager):
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
-        return super().get_queryset().select_related('learning_container_year')\
+        return super().get_queryset().select_related('learning_container_year') \
             .filter(learning_container_year__isnull=False)
 
 
@@ -348,7 +431,7 @@ class LearningUnitYear(SerializableModel):
             complete_title = ' - '.join(filter(None, [self.learning_container_year.common_title, self.specific_title]))
         return complete_title
 
-    @property    # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def complete_title_english(self):
         complete_title_english = self.specific_title_english
         if self.learning_container_year:
@@ -539,12 +622,15 @@ class LearningUnitYear(SerializableModel):
         components_queryset = LearningComponentYear.objects.filter(
             learning_unit_year__learning_container_year=self.learning_container_year
         )
+
         all_components = components_queryset.order_by('acronym') \
-            .select_related('learning_unit_year')
+            .select_related('learning_unit_year') \
+            .prefetch_related(models.Prefetch('learningclassyear_set', to_attr="classes"))
+
         for learning_component_year in all_components:
             if not self.is_partim() or learning_component_year.learning_unit_year == self:
                 _warnings.extend(learning_component_year.warnings)
-
+        _warnings.extend(self._check_classes(list(all_components)))
         return _warnings
 
     def _check_learning_container_year_warnings(self):
@@ -572,6 +658,130 @@ class LearningUnitYear(SerializableModel):
             learning_component_year__learning_unit_year__learning_unit=self.learning_unit,
             learning_component_year__learning_unit_year__academic_year__year__gte=self.academic_year.year
         ).exists()
+
+    def _check_classes(self, all_components: List[LearningComponentYear]) -> List[str]:
+        _warnings = []
+        _warnings.extend(_check_classes_volumes(all_components))
+        if self.quadrimester:
+            _warnings.extend(_check_classes_quadrimester(self.quadrimester, all_components))
+        if self.session:
+            _warnings.extend(_check_classes_session(self.session, all_components))
+        _warnings.extend(_check_number_of_classes(all_components))
+        _warnings.extend(_check_volume_consistency_with_ue(all_components))
+        return _warnings
+
+
+def _check_volume_consistency_with_ue(all_components: List[LearningComponentYear]):
+    _warnings = []
+    for learning_component_year in all_components:
+        classes = learning_component_year.classes or []
+        for ue_class in classes:
+            total_class_volume = (ue_class.hourly_volume_partial_q1 or 0) + (ue_class.hourly_volume_partial_q2 or 0)
+            if total_class_volume != learning_component_year.hourly_volume_total_annual:
+                _warnings.append(
+                    _(
+                        'Class volumes of class %(code_ue)s%(separator)s%(code_class)s are inconsistent '
+                        '(Annual volume must be equal to the sum of volume Q1 and Q2)'
+                    ) % {
+                        'code_ue': learning_component_year.learning_unit_year.acronym,
+                        'separator': '-' if learning_component_year.type == LECTURING else '_',
+                        'code_class': ue_class.acronym
+                    }
+                )
+    return _warnings
+
+
+def _check_classes_quadrimester(ue_quadrimester, all_components: List[LearningComponentYear]) -> List[str]:
+    _warnings = []
+    message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '
+                '(should be %(should_be_values)s)')
+
+    for learning_component_year in all_components:
+        for effective_class in learning_component_year.classes:
+            quadri = effective_class.quadrimester
+            if ue_quadrimester and quadri and quadri not in QUADRIMESTER_CHECK_RULES[ue_quadrimester]['correct_values']:
+                _warnings.append(message % {
+                    'code_class': effective_class.effective_class_complete_acronym,
+                    'should_be_values': QUADRIMESTER_CHECK_RULES[ue_quadrimester]['available_values_str']
+                })
+            _warnings.extend(_check_quadrimester_volume(effective_class, quadri))
+
+    return _warnings
+
+
+def _check_classes_session(ue_session, all_components: List[LearningComponentYear]) -> List[str]:
+    _warnings = []
+    message = _('The %(code_class)s derogation session is inconsistent with the LU derogation session '
+                '(should be %(should_be_values)s)')
+
+    for learning_component_year in all_components:
+        for effective_class in learning_component_year.classes:
+            session = effective_class.session
+            if ue_session and session and session not in SESSION_CHECK_RULES[ue_session]['correct_values']:
+                _warnings.append(message % {
+                    'code_class': effective_class.effective_class_complete_acronym,
+                    'should_be_values': SESSION_CHECK_RULES[ue_session]['available_values_str']
+                })
+
+    return _warnings
+
+
+def _check_classes_volumes(all_components: List[LearningComponentYear]) -> List[str]:
+    _warnings = []
+    for learning_component_yr in all_components:
+        for effective_class in learning_component_yr.classes:
+
+            inconsistent_msg = _('Volumes of {} are inconsistent').format(
+                effective_class.effective_class_complete_acronym
+            )
+
+            if _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_component_yr):
+                _warnings.append(
+                    "{} ({}) ".format(
+                        inconsistent_msg,
+                        _('at least one class volume is greater than the volume of the LU (%(sub_type)s)') %
+                        {'sub_type': learning_component_yr.learning_unit_year.get_subtype_display().lower()}
+                    )
+                )
+
+            if _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_component_yr):
+                _warnings.append(
+                    "{} ({}) ".format(
+                        inconsistent_msg,
+                        _('the annual volume must be equal to the sum of the volumes Q1 and Q2')
+                    )
+                )
+
+    return _warnings
+
+
+def _class_volume_exceeds_learning_unit_subtype_volume(effective_class, learning_component_yr):
+    return (effective_class.hourly_volume_partial_q1 or 0) > (learning_component_yr.hourly_volume_partial_q1 or 0) or \
+           (effective_class.hourly_volume_partial_q2 or 0) > (learning_component_yr.hourly_volume_partial_q2 or 0)
+
+
+def _class_volumes_sum_in_q1_and_q2_exceeds_annual_volume(effective_class, learning_component_yr):
+    class_sum_q1_q2 = (effective_class.hourly_volume_partial_q1 or 0) + (effective_class.hourly_volume_partial_q2 or 0)
+    return class_sum_q1_q2 > (learning_component_yr.hourly_volume_total_annual or 0)
+
+
+def _check_number_of_classes(all_components) -> List[str]:
+    _warnings = []
+    for learning_component_year in all_components:
+        number_of_classes = len(learning_component_year.classes)
+        if learning_component_year.planned_classes:
+            # consider at least one effective class if planned classes
+            number_of_classes = number_of_classes or 1
+        if (learning_component_year.planned_classes or 0) != number_of_classes:
+            _warnings.append(
+                _(
+                    'The planned classes number and the effective classes number of %(code_ue)s/%(component_code)s '
+                    'is not consistent') % {
+                    'code_ue': learning_component_year.learning_unit_year.acronym,
+                    'component_code': 'PP' if learning_component_year.type == PRACTICAL_EXERCISES else 'PM'
+                }
+            )
+    return _warnings
 
 
 def get_by_id(learning_unit_year_id):
@@ -725,4 +935,67 @@ def toggle_summary_locked(learning_unit_year_id):
 
 @receiver(post_delete, sender=LearningUnitYear)
 def _learningunityear_delete(sender, instance, **kwargs):
+    # local import because it blocks check_all_app_messages command otherwise
+    from cms.enums.entity_name import LEARNING_UNIT_YEAR
+    from cms.models.translated_text import TranslatedText
     TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()
+
+
+def _check_quadrimester_volume(effective_class: LearningClassYear, quadri: str) -> List[str]:
+    q1_q2_warnings = _get_q1_q2_warnings(effective_class, quadri)
+    q1and2_q1or2_warnings = _get_q1and2_q1or2_warnings(effective_class, quadri)
+    return q1_q2_warnings + q1and2_q1or2_warnings
+
+
+def _get_q1and2_q1or2_warnings(effective_class, quadri):
+    warnings = []
+
+    q1and2 = LearningUnitYearQuadrimester.Q1and2.name
+    q1or2 = LearningUnitYearQuadrimester.Q1or2.name
+
+    if quadri == q1and2 and not (effective_class.hourly_volume_partial_q1 and effective_class.hourly_volume_partial_q2):
+        warnings.append(
+            _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 and Q2 volumes have to be '
+              'completed)') % {
+                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
+            }
+        )
+    elif quadri == q1or2 and not (effective_class.hourly_volume_partial_q1 or effective_class.hourly_volume_partial_q2):
+        warnings.append(
+            _('The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or Q2 volume has to be '
+              'completed but not both)') % {
+                'effective_class_complete_acronym': effective_class.effective_class_complete_acronym
+            }
+        )
+    return warnings
+
+
+def _get_q1_q2_warnings(effective_class, quadri):
+    warnings = []
+
+    q1 = LearningUnitYearQuadrimester.Q1.name
+    q2 = LearningUnitYearQuadrimester.Q2.name
+
+    if quadri in [q1, q2]:
+        other_quadri_partial_volume = effective_class.hourly_volume_partial_q2 \
+            if quadri == q1 else effective_class.hourly_volume_partial_q1
+        quadri_volume = effective_class.hourly_volume_partial_q1 \
+            if quadri == q1 else effective_class.hourly_volume_partial_q2
+
+        if other_quadri_partial_volume and other_quadri_partial_volume > 0:
+            warnings.append(
+                _('The %(effective_class_complete_acronym)s volumes are inconsistent(only the %(quadrimester)s '
+                  'volume has to be completed)') % {
+                    'effective_class_complete_acronym': effective_class.effective_class_complete_acronym,
+                    'quadrimester': quadri
+                }
+            )
+        elif not quadri_volume or quadri_volume < 0:
+            warnings.append(
+                _('The %(effective_class_complete_acronym)s volumes are inconsistent(the %(quadrimester)s '
+                  'volume has to be completed)') % {
+                    'effective_class_complete_acronym': effective_class.effective_class_complete_acronym,
+                    'quadrimester': quadri
+                }
+            )
+    return warnings

@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 import attr
 
+from ddd.logic.learning_unit.domain.model.responsible_entity import EntityCode
 from osis_common.ddd import interface
 
 
@@ -39,12 +42,32 @@ class CreateLearningUnitCommand(interface.CommandRequest):
     specific_title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     internship_subtype = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
+    responsible_entity_code = attr.ib(type=EntityCode)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
     remark_faculty = attr.ib(type=str)
     remark_publication_fr = attr.ib(type=str)
     remark_publication_en = attr.ib(type=str)
+
+    # repartition_entity_2 = attr.ib(type=Optional[EntityCode])  # TODO :: to implement and unit test
+    # repartition_entity_3 = attr.ib(type=Optional[EntityCode])  # TODO :: to implement and unit test
+
+    practical_volume_q1 = attr.ib(type=Decimal)
+    practical_volume_q2 = attr.ib(type=Decimal)
+    practical_volume_annual = attr.ib(type=Decimal)
+    # practical_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: implement + unit test
+    # practical_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # practical_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+
+    lecturing_volume_q1 = attr.ib(type=Decimal)
+    lecturing_volume_q2 = attr.ib(type=Decimal)
+    lecturing_volume_annual = attr.ib(type=Decimal)
+    # lecturing_volume_repartition_responsible_entity = attr.ib(type=Optional[Decimal])  # TODO :: implement + unit test
+    # lecturing_volume_repartition_entity_2 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+    # lecturing_volume_repartition_entity_3 = attr.ib(type=Optional[Decimal])  # TODO :: to implement and unit test
+
+    derogation_quadrimester = attr.ib(type=str)
+    teaching_place_uuid = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -52,14 +75,14 @@ class CreatePartimCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
     subdivision = attr.ib(type=int)
-    title_fr = attr.ib(type=str)
-    title_en = attr.ib(type=str)
     credits = attr.ib(type=int)
     periodicity = attr.ib(type=str)
     iso_code = attr.ib(type=str)
-    remark_faculty = attr.ib(type=str)
-    remark_publication_fr = attr.ib(type=str)
-    remark_publication_en = attr.ib(type=str)
+    title_fr = attr.ib(type=str, default="")
+    title_en = attr.ib(type=str, default="")
+    remark_faculty = attr.ib(type=str, default=None)
+    remark_publication_fr = attr.ib(type=str, default=None)
+    remark_publication_en = attr.ib(type=str, default=None)
 
 
 @attr.s(frozen=True, slots=True)
@@ -82,8 +105,62 @@ class CreateCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitSearchCommand(interface.CommandRequest):
+    code = attr.ib(type=str, default=None)
+    year = attr.ib(type=int, default=None)
+    type = attr.ib(type=str, default=None)
+    full_title = attr.ib(type=str, default=None)
+    responsible_entity_code = attr.ib(type=str, default=None)
+
+
+@attr.s(frozen=True, slots=True)
+class CreateEffectiveClassCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    teaching_place_uuid = attr.ib(type=str)
+    title_fr = attr.ib(type=str, default="")
+    title_en = attr.ib(type=str, default="")
+    derogation_quadrimester = attr.ib(type=str, default=None)
+    session_derogation = attr.ib(type=str, default=None)
+    volume_first_quadrimester = attr.ib(type=float, default=None)
+    volume_second_quadrimester = attr.ib(type=float, default=None)
+
+
+@attr.s(frozen=True, slots=True)
+class GetLearningUnitCommand(interface.CommandRequest):
     code = attr.ib(type=str)
     year = attr.ib(type=int)
-    type = attr.ib(type=str)
-    full_title = attr.ib(type=str)
-    responsible_entity_code = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class CanCreateEffectiveClassCommand(interface.CommandRequest):
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetEffectiveClassCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class GetEffectiveClassWarningsCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    learning_unit_year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class UpdateEffectiveClassCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+    teaching_place_uuid = attr.ib(type=str)
+    title_fr = attr.ib(type=str, default="")
+    title_en = attr.ib(type=str, default="")
+    derogation_quadrimester = attr.ib(type=str, default=None)
+    session_derogation = attr.ib(type=str, default=None)
+    volume_first_quadrimester = attr.ib(type=float, default=None)
+    volume_second_quadrimester = attr.ib(type=float, default=None)

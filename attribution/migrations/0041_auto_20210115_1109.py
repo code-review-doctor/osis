@@ -40,5 +40,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_application_courses_calendar, remove_application_courses_calendar),
+        migrations.RunPython(create_application_courses_calendar, remove_application_courses_calendar, elidable=True),
     ]

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-03 13:47+0200\n"
+"POT-Creation-Date: 2021-06-25 11:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,10 +83,31 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr ""
 
+msgid "1"
+msgstr ""
+
+msgid "12"
+msgstr ""
+
+msgid "123"
+msgstr ""
+
+msgid "13"
+msgstr ""
+
 msgid "1st quadri"
 msgstr ""
 
+msgid "2"
+msgstr ""
+
+msgid "23"
+msgstr ""
+
 msgid "2nd quadri"
+msgstr ""
+
+msgid "3"
 msgstr ""
 
 msgid "<b>create</b> a new learning unit using that acronym"
@@ -503,6 +524,12 @@ msgstr ""
 msgid "City of institution"
 msgstr ""
 
+#, python-format
+msgid ""
+"Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
+"inconsistent (Annual volume must be equal to the sum of volume Q1 and Q2)"
+msgstr ""
+
 msgid "Classes"
 msgstr ""
 
@@ -673,6 +700,9 @@ msgid "Delete tree version permanently"
 msgstr ""
 
 msgid "Deliberation"
+msgstr ""
+
+msgid "Derogation's session"
 msgstr ""
 
 msgid "Description"
@@ -1215,9 +1245,6 @@ msgstr ""
 msgid "Keywords"
 msgstr ""
 
-msgid "LU"
-msgstr ""
-
 msgid "Language"
 msgstr ""
 
@@ -1582,6 +1609,9 @@ msgstr ""
 msgid "New Training"
 msgstr ""
 
+msgid "New class"
+msgstr ""
+
 msgid "New external learning unit"
 msgstr ""
 
@@ -1742,6 +1772,9 @@ msgid "Own components"
 msgstr ""
 
 msgid "P."
+msgstr ""
+
+msgid "P23"
 msgstr ""
 
 msgid "Page not found."
@@ -2333,6 +2366,42 @@ msgstr ""
 msgid "The"
 msgstr ""
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed but not both)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
@@ -2474,6 +2543,12 @@ msgid "The partim"
 msgstr ""
 
 msgid "The period to edit scores responsibles is not opened yet"
+msgstr ""
+
+#, python-format
+msgid ""
+"The planned classes number and the effective classes number of %(code_ue)s/"
+"%(component_code)s is not consistent"
 msgstr ""
 
 #, python-format
@@ -2879,8 +2954,16 @@ msgstr ""
 msgid "aim number"
 msgstr ""
 
+msgid "and"
+msgstr ""
+
 #, python-format
 msgid "and postponed until %(year)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
 msgstr ""
 
 msgid "author"
@@ -3008,6 +3091,9 @@ msgstr ""
 msgid "optional"
 msgstr ""
 
+msgid "or"
+msgstr ""
+
 msgid "parameters"
 msgstr ""
 
@@ -3085,6 +3171,9 @@ msgstr ""
 msgid "the"
 msgstr ""
 
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr ""
+
 #, python-format
 msgid ""
 "the report has not been done from %(proposal_year)s because the LU is in "
@@ -3150,4 +3239,3 @@ msgstr ""
 
 msgid "yes,no"
 msgstr ""
-

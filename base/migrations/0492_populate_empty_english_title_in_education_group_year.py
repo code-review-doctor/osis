@@ -19,6 +19,7 @@ class Migration(migrations.Migration):
             "WHERE base_educationgroupyear.academic_year_id=ay.id "
             "AND (title_english is null or title_english = '' ) AND ay.year >= 2019 "
             "AND egt.category in ('" + TRAINING + "', '" + MINI_TRAINING+"') "
-            "AND base_educationgroupyear.education_group_type_id=egt.id;"
+            "AND base_educationgroupyear.education_group_type_id=egt.id;",
+            elidable=True
         )
     ]

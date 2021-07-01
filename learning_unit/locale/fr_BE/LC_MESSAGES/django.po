@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-18 17:09+0200\n"
+"POT-Creation-Date: 2021-06-30 13:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,17 +16,111 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Academic year"
+msgstr "Année académique"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Additional requirement entity 1"
+msgstr "Entité resp. cahier des charges complémentaire 1"
+
+msgid "Additional requirement entity 2"
+msgstr "Entité resp. cahier des charges complémentaire 2"
+
+msgid "Allocation entity"
+msgstr "Entité d'attribution"
+
+msgid "Annual volume"
+msgstr "Volume annuel"
+
+msgid "Attribution entity"
+msgstr "Entité d'attribution"
+
 msgid "Central manager"
 msgstr "Gestionnaire central"
 
 msgid "Central managers"
 msgstr "Gestionnaires centraux"
 
+msgid "Class"
+msgstr "Classe"
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr ""
+"La classe %(effective_class_complete_acronym)s a été créée avec succès."
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully updated."
+msgstr ""
+"La classe %(effective_class_complete_acronym)s a été modifiée avec succès."
+
+msgid "Class specific complement"
+msgstr "Complément spécifique à la classe"
+
+msgid "Classes can only be created by a faculty manager"
+msgstr "Les classes ne peuvent être créées que par un gestionnaire facultaire"
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Common part"
+msgstr "Partie commune"
+
+msgid "Components"
+msgstr "Composants"
+
+msgid "Credits"
+msgstr "Crédits"
+
+msgid "Derogation's session"
+msgstr "Session de dérogation"
+
 msgid "Faculty manager"
 msgstr "Gestionnaire facultaire"
 
 msgid "Faculty managers"
 msgstr "Gestionnaires facultaires"
+
+msgid "Faculty remark (unpublished)"
+msgstr "Remarque de faculté (non publiée)"
+
+msgid "Formation catalogue"
+msgstr "Catalogue des formations"
+
+msgid "Full"
+msgstr "Complet"
+
+msgid "Identification"
+msgstr "Identification"
+
+msgid "Inactive"
+msgstr "Inactif"
+
+msgid "Institution"
+msgstr "Institution"
+
+msgid "Internship subtype"
+msgstr "Sous-type de stage"
+
+msgid "LU"
+msgstr "UE"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Learning location"
+msgstr "Lieu d'enseignement"
+
+msgid "Learning unit"
+msgstr "Unité d'enseignement"
+
+msgid "Learning unit credits"
+msgstr "Crédits de l'UE"
 
 msgid "Learning unit is not full"
 msgstr "L'unité d'enseignement n'est pas un cours complet"
@@ -42,6 +136,15 @@ msgstr ""
 "L'unité d'enseignement ne peut pas être supprimée car il s'agit soit d'un "
 "cours complet, soit d'un des types suivants: %(types)s"
 
+msgid "Learning units"
+msgstr "Unités d'enseignement"
+
+msgid "Lecturing"
+msgstr "Partie magistrale"
+
+msgid "New class"
+msgstr "Nouvelle classe"
+
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
@@ -50,17 +153,59 @@ msgstr ""
 "Vous n'êtes pas en période de modification des fiches descriptives (Cas de "
 "force majeure)."
 
-msgid "Only letters are allowed."
-msgstr "Seulement des lettres sont acceptées."
+msgid "Only alphanumeric characters are allowed."
+msgstr "Seuls les caractères alphanumériques sont acceptés."
+
+msgid "Other remark (intended for publication)"
+msgstr "Autre remarque (destinée à la publication)"
+
+msgid "Other remark in english (intended for publication)"
+msgstr "Autre remarque en anglais (destinée à la publication)"
+
+msgid "Periodicity"
+msgstr "Périodicité"
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
+
+msgid "Planned classes"
+msgstr "Classes prévues"
+
+msgid "Practical exercises"
+msgstr "Partie pratique"
+
+msgid "Professional integration"
+msgstr "Intégration professionnelle"
 
 msgid "Proposal is of modification type"
 msgstr "La proposition est une proposition de modification"
 
 msgid "Proposal not in eligible state for consolidation"
 msgstr "La proposition n'est pas dans un état éligible à la consolidation"
+
+msgid "Quadrimester"
+msgstr "Quadrimestre"
+
+msgid "Refer to learning unit"
+msgstr "Voir unité d'enseignement"
+
+msgid "Requirement entity"
+msgstr "Entité resp. cahier des charges"
+
+msgid "Session derogation"
+msgstr "Session dérogation"
+
+msgid "State"
+msgstr "Etat"
+
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
+msgstr ""
+"Le champ session dérogation doit être complété UNIQUEMENT si l'on veut "
+"encoder une exception par rapport aux sessions calculées en fonction des "
+"quadrimestres."
 
 #, python-format
 msgid ""
@@ -99,6 +244,10 @@ msgstr ""
 
 msgid "The proposal is not on this academic year"
 msgstr "La proposition n'est pas sur cette année académique"
+
+msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+"L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
 msgid "This learning unit has an application in the future"
 msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
@@ -157,6 +306,36 @@ msgstr ""
 "Cette unité d'enseignement n'est pas éligible en raison de son type qui "
 "n'est pas parmi les types suivants: %(types)s"
 
+msgid "Title"
+msgstr "Intitulé"
+
+msgid "Title in English"
+msgstr "Intitulé en anglais"
+
+msgid "Title in French"
+msgstr "Intitulé en français"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Update"
+msgstr "Modifier"
+
+msgid "Vol. Q1"
+msgstr "Vol. Q1"
+
+msgid "Vol. Q2"
+msgstr "Vol. Q2"
+
+msgid "Vol. annual"
+msgstr "Vol. annuel"
+
+msgid "Volume Q1"
+msgstr "Volume Q1"
+
+msgid "Volume Q2"
+msgstr "Volume Q2"
+
 msgid "You are not allowed to create proposal during this academic year"
 msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"
 
@@ -210,3 +389,20 @@ msgstr "Vous ne pouvez pas modifier ce type d'unité d'enseignement"
 msgid "You cannot modify a learning unit of a previous year"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement d'une année dans le passé"
+
+msgid "You do not have sufficient access rights to update a class."
+msgstr "Vous n'avez pas les droits nécessaires pour modifier une classe."
+
+msgid "external acronym rules"
+msgstr ""
+"Code composé de:\n"
+"site: 1 lettre\n"
+"partie alphabétique: 2 à 4 lettres\n"
+"partie numérique: 4 chiffres , dont le premier ne peut pas être 0\n"
+"Subdivision: 1 caractère"
+
+msgid "hourly volume partial q1"
+msgstr "volume horaire partiel q1"
+
+msgid "hourly volume partial q2"
+msgstr "volume horaire partiel q2"

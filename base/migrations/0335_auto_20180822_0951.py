@@ -27,5 +27,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(convert_none_to_empty),
+        migrations.RunPython(convert_none_to_empty, elidable=True),
     ]
