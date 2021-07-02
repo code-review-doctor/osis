@@ -34,7 +34,7 @@ from django.views.generic import FormView
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.attribution.commands import SearchAttributionCommand, SearchTutorsDistributedToClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
@@ -164,7 +164,7 @@ class TutorRepartitionEditView(TutorRepartitionView):
     form_class = ClassEditTutorRepartitionForm
 
     @cached_property
-    def tutor(self):
+    def tutor(self) -> 'TutorClassRepartitionDTO':
         command = SearchTutorsDistributedToClassCommand(
             learning_unit_code=self.learning_unit.code,
             learning_unit_year=self.learning_unit.year,
