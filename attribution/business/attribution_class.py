@@ -27,6 +27,7 @@ from collections import OrderedDict
 from typing import List
 
 from attribution.models.attribution_class import AttributionClass
+from base.models.enums.component_type import LECTURING
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
@@ -42,18 +43,22 @@ def find_class_attribution_charge_new_by_learning_unit_year_as_dict(effective_cl
     return create_attributions_dictionary(attribution_charges)
 
 
-def create_attributions_dictionary(attribution_charges: List[AttributionClass]) -> OrderedDict():
+def create_attributions_dictionary(class_attribution_charges: List[AttributionClass]) -> OrderedDict():
     attributions = OrderedDict()
 
-    for attribution in attribution_charges:
+    for attribution in class_attribution_charges:
         attribution_charge = attribution.attribution_charge
         key = attribution_charge.attribution.id
-        attribution_dict = {"person": attribution_charge.attribution.tutor.person,
-                            "function": attribution_charge.attribution.function,
-                            "start_year": attribution_charge.attribution.start_year,
-                            "duration": attribution_charge.attribution.duration,
-                            "substitute": attribution_charge.attribution.substitute,
-                            "score_responsible": attribution_charge.attribution.score_responsible}
+        attribution_dict = {
+            "person": attribution_charge.attribution.tutor.person,
+            "function": attribution_charge.attribution.function,
+            "start_year": attribution_charge.attribution.start_year,
+            "duration": attribution_charge.attribution.duration,
+            "substitute": attribution_charge.attribution.substitute,
+            "score_responsible": attribution_charge.attribution.score_responsible,
+            "pm_allocation_charge": attribution.allocation_charge if not attribution.learning_class_year.is_practical() else None,
+            "pp_allocation_charge": attribution.allocation_charge if attribution.learning_class_year.is_practical() else None
+        }
         attributions.setdefault(key, attribution_dict) \
             .update({attribution_charge.learning_component_year.type: attribution_charge.allocation_charge})
     return attributions
