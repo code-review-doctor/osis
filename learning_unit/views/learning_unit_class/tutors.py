@@ -29,9 +29,11 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
 from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.views.learning_unit_class.common import common_url_tabs
@@ -50,7 +52,7 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
         return self.kwargs['learning_unit_code']
 
     @property
-    def learning_unit_year(self) -> str:
+    def year(self) -> str:
         return self.kwargs['learning_unit_year']
 
     @cached_property
@@ -67,18 +69,20 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(
             {
+                'year': self.year,
+                'learning_unit_year': self.learning_unit_year,
                 'effective_class': self.effective_class,
                 'tutors': self.tutors,
                 'can_delete_attribution': True  # todo je ne sais pas trop quel droit on doit vérifier ici
             }
         )
-        context.update(common_url_tabs(self.learning_unit_code, self.learning_unit_year, self.class_code))
+        context.update(common_url_tabs(self.learning_unit_code, self.year, self.class_code))
         return context
 
     def get_permission_object(self):
         return LearningClassYear.objects.filter(
             acronym=self.kwargs['class_code'],
-            learning_component_year__learning_unit_year__academic_year__year=self.learning_unit_year,
+            learning_component_year__learning_unit_year__academic_year__year=self.year,
             learning_component_year__learning_unit_year__acronym=self.learning_unit_code,
         ).select_related(
             'learning_component_year__learning_unit_year',
@@ -89,7 +93,14 @@ class ClassTutorsView(PermissionRequiredMixin, TemplateView):
     def tutors(self) -> List['TutorClassRepartitionDTO']:
         command = SearchTutorsDistributedToClassCommand(
             learning_unit_code=self.learning_unit_code,
-            learning_unit_year=self.learning_unit_year,
+            learning_unit_year=self.year,
             class_code=self.class_code,
         )
         return message_bus_instance.invoke(command)
+
+    @cached_property
+    def learning_unit_year(self):
+        return LearningUnitYear.objects.get(
+            acronym=self.kwargs['learning_unit_code'],
+            academic_year__year=self.kwargs['learning_unit_year']
+        )
