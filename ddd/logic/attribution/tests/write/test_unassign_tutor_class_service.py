@@ -45,7 +45,7 @@ class UnassignTutorClassService(SimpleTestCase):
             tutor_personal_id_number=self.tutor.entity_id.personal_id_number,
         )
 
-    def test_should_distribute_effective_class(self):
+    def test_should_unassign_effective_class(self):
         unassign_tutor_class(self.unassign_class_cmd, self.tutor_repository)
         tutor = self.tutor_repository.get(self.tutor.entity_id)
         class_volume = tutor.distributed_effective_classes
