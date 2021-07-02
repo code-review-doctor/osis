@@ -33,7 +33,7 @@ from django.views.generic import FormView
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
-from ddd.logic.attribution.commands import SearchAttributionCommand
+from ddd.logic.attribution.commands import SearchAttributionCommand, SearchTutorsDistributedToClassCommand
 from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
@@ -165,8 +165,15 @@ class TutorRepartitionEditView(TutorRepartitionView):
 
     @cached_property
     def tutor(self):
-        # TODO: Get tutor
-        pass
+        command = SearchTutorsDistributedToClassCommand(
+            learning_unit_code=self.learning_unit.code,
+            learning_unit_year=self.learning_unit.year,
+            class_code=self.effective_class.class_code,
+        )
+        tutors = message_bus_instance.invoke(command)
+        for tutor in tutors:
+            if str(tutor.attribution_uuid) == str(self.kwargs['attribution_uuid']):
+                return tutor
 
     def get_success_msg(self) -> str:
         return _("Repartition edited for %(tutor)s (%(function)s)") % {

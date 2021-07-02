@@ -73,7 +73,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         if self.tutor:
             self.fields['function'].initial = self.tutor.function_text
 
-    def get_command(self) -> DistributeClassToTutorCommand:
+    def get_command(self) -> 'DistributeClassToTutorCommand':
         return DistributeClassToTutorCommand(
             tutor_personal_id_number=self.tutor.personal_id_number,
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
@@ -88,13 +88,14 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
     full_name = forms.CharField(max_length=255, required=False)
     function = forms.CharField(max_length=255, required=False, label=_('Function'))
 
-    def __init__(self,
-                 *args,
-                 effective_class: 'EffectiveClass' = None,
-                 tutor: 'TutorAttributionToLearningUnitDTO' = None,
-                 user: User,
-                 **kwargs
-                 ):
+    def __init__(
+            self,
+            *args,
+            effective_class: 'EffectiveClass' = None,
+            tutor: 'TutorAttributionToLearningUnitDTO' = None,
+            user: User,
+            **kwargs
+    ):
         self.user = user
         super().__init__(*args, **kwargs)
 
@@ -104,7 +105,7 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
         self.fields['full_name'].initial = tutor.full_name
         self.fields['function'].initial = self.tutor.function_text
 
-    def get_command(self) -> UnassignTutorClassCommand:
+    def get_command(self) -> 'UnassignTutorClassCommand':
         return UnassignTutorClassCommand(
             tutor_personal_id_number=self.tutor.personal_id_number,
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
@@ -115,16 +116,14 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
 class ClassEditTutorRepartitionForm(ClassTutorRepartitionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        print(self.tutor)
-        self.fields['volume'].initial = 0  # TODO: get tutor to have volume
+        self.fields['volume'].initial = self.tutor.distributed_volume_to_class
 
-    def get_command(self) -> DistributeClassToTutorCommand:
-        pass
-        # return DistributeClassToTutorCommand(
-        #     tutor_personal_id_number=self.tutor.personal_id_number,
-        #     learning_unit_attribution_uuid=self.tutor.attribution_uuid,
-        #     class_code=self.effective_class.entity_id.class_code,
-        #     distributed_volume=self.cleaned_data['volume'] or 0,
-        #     learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
-        #     year=self.effective_class.entity_id.learning_unit_identity.year
-        # )
+    def get_command(self) -> 'DistributeClassToTutorCommand':
+        return DistributeClassToTutorCommand(
+            tutor_personal_id_number=self.tutor.personal_id_number,
+            learning_unit_attribution_uuid=self.tutor.attribution_uuid,
+            class_code=self.effective_class.entity_id.class_code,
+            distributed_volume=self.cleaned_data['volume'] or 0,
+            learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+            year=self.effective_class.entity_id.learning_unit_identity.year
+        )

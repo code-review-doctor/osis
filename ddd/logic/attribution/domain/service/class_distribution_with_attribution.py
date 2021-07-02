@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
 from typing import List
 
 from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
@@ -59,6 +58,7 @@ class ClassDistributionWithAttribution(interface.DomainService):
                         first_name=attribution.first_name,
                         function=attribution.function,
                         distributed_volume_to_class=effective_class.distributed_volume,
+                        personal_id_number=tutor.entity_id.personal_id_number
                     )
                 )
 
