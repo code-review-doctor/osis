@@ -1,5 +1,5 @@
 {% extends "class_detail_layout.html" %}
-{% load i18n static function %}
+{% load i18n static %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -43,7 +43,7 @@
             {% for tutor in tutors %}
                 <tr>
                     <td>{{ tutor.full_name }}</td>
-                    <td>{{ tutor.function|function_text }}</td>
+                    <td>{{ tutor.function_text }}</td>
                     <td>
                         {{ tutor.distributed_volume_to_class | floatformat:2 }}
                     </td>

@@ -88,3 +88,7 @@ class TutorClassRepartitionDTO(DTO):
     @property
     def full_name(self):
         return ", ".join([self.last_name.upper() or "", self.first_name or ""]).strip()
+
+    @property
+    def function_text(self):
+        return Functions.get_value(self.function) if self.function else ''
