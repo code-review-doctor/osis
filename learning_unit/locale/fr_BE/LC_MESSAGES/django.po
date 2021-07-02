@@ -163,6 +163,9 @@ msgstr "Partie magistrale"
 msgid "Manage repartition"
 msgstr "Gérer la répartition"
 
+msgid "New class"
+msgstr "Nouvelle classe"
+
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
 
@@ -339,10 +342,10 @@ msgid "Title"
 msgstr "Intitulé"
 
 msgid "Title in English"
-msgstr "Titre en anglais"
+msgstr "Intitulé en anglais"
 
 msgid "Title in French"
-msgstr "Titre en français"
+msgstr "Intitulé en français"
 
 msgid "Tutor"
 msgstr "Enseignant·e"

@@ -23,12 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Optional, List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
 
 class EffectiveClassRepository(InMemoryGenericRepository, IEffectiveClassRepository):
     entities = list()  # type: List[EffectiveClass]
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List['EffectiveClassIdentity']] = None, **kwargs) -> List['EffectiveClass']:
+        raise NotImplementedError

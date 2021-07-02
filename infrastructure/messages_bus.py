@@ -51,9 +51,11 @@ from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_se
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
-    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
+    CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
+    GetEffectiveClassWarningsCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
+from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
@@ -117,6 +119,9 @@ class MessageBus:
         ),
         GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
         GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
+        GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
+            cmd, EffectiveClassRepository(), LearningUnitRepository()
+        ),
         SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
             cmd,
             TutorAttributionToLearningUnitTranslator(),

@@ -220,6 +220,14 @@ msgstr "Suppléance"
 
 #, python-format
 msgid ""
+"The sum of volumes for the classes for professor %(tutor)s is superior to "
+"the volume of UE(%(ue_type)s) for this professor"
+msgstr ""
+"La somme des volumes des classes pour le professeur %(tutor)s est supérieure "
+"au volume de l'unité d'apprentissage(%(ue_type)s) pour ce professeur"
+
+#, python-format
+msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
 "the volume of full UE for this professor"
 msgstr ""

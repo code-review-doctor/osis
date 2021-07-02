@@ -44,7 +44,7 @@
                                         {% trans 'Code' %}
                                     </label>
                                     <br>
-                                    {{ effective_class.complete_code }}
+                                    {{ effective_class.complete_acronym }}
                                 </div>
                                 <div class="col-md-3">
                                     <label>
@@ -70,7 +70,7 @@
                                     </label>
                                     <br>
                                     <span class="text-muted">
-                                        {{ learning_unit.internship_subtype.value|default_if_none:'-' }}
+                                        {{ learning_unit.internship_subtype.value|default:'-' }}
                                     </span>
                                 </div>
                             {% endblock content_row1 %}

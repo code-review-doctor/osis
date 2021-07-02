@@ -31,6 +31,7 @@ from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.domain.validator.validators_by_business_action import UpdateEffectiveClassValidatorList
@@ -63,19 +64,23 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
     session_derogation = attr.ib(type=DerogationSession, default=None)
 
     def __str__(self):
-        return "{} ({})".format(self.complete_code, self.entity_id.learning_unit_identity.academic_year)
+        return "{} ({})".format(self.complete_acronym, self.entity_id.learning_unit_identity.academic_year)
 
     @property
-    def complete_code(self) -> str:
+    def class_code(self):
+        return self.entity_id.class_code
+
+    @property
+    def learning_unit_identity(self):
+        return self.entity_id.learning_unit_identity
+
+    @property
+    def complete_acronym(self) -> str:
         return "{}{}{}".format(
             self.learning_unit_code,
             '-' if isinstance(self, LecturingEffectiveClass) else '_',
             self.class_code
         )
-
-    @property
-    def class_code(self) -> str:
-        return self.entity_id.class_code
 
     @property
     def learning_unit_code(self) -> str:
@@ -96,6 +101,12 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
             volume_first_quadrimester=cmd.volume_first_quadrimester,
             volume_second_quadrimester=cmd.volume_second_quadrimester
         )
+
+    def is_volume_first_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
+        return self.volumes.volume_first_quadrimester and self.volumes.volume_first_quadrimester > volume
+
+    def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
+        return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
 
 
 class PracticalEffectiveClass(EffectiveClass):

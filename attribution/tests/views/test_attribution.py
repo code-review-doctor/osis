@@ -32,12 +32,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from attribution.views.attribution import get_charge_repartition_warning_messages
+from attribution.views.attribution import get_charge_repartition_warning_messages, \
+    _get_classes_charge_repartition_warning_messages
 from base.models.person import Person
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class TestViewAttributions(TestCase):
@@ -147,6 +149,15 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         cls.attribution_partim_2.uuid = uuid.uuid4()
         cls.attribution_partim_2.save()
 
+        cls.lect_learning_class_year = LearningClassYearFactory(
+            learning_component_year=cls.full_lecturing_component,
+            hourly_volume_partial_q1=20
+        )
+        cls.pract_learning_class_year = LearningClassYearFactory(
+            learning_component_year=cls.full_practical_component,
+            hourly_volume_partial_q1=20
+        )
+
     def setUp(self):
         self.charge_lecturing_1 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_1,
@@ -203,3 +214,26 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
                                       "volume of full UE for this professor") % {
                                         "tutor": tutor_name_with_function}])
 
+    def test_should_give_warning_messages_when_component_volume_total_of_classes_exceeds_learning_unit_volume(self):
+        msgs = _get_classes_charge_repartition_warning_messages(self.full_luy)
+        tutor_person = self.attribution_full.tutor.person
+        tutor_name = Person.get_str(tutor_person.first_name, tutor_person.last_name)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
+        self.assertSetEqual(
+            msgs, {
+                _("The sum of volumes for the classes for professor %(tutor)s is superior to the volume of "
+                  "UE(%(ue_type)s) for this professor") % {
+                    "tutor": tutor_name_with_function,
+                    "ue_type": self.full_luy.get_subtype_display().lower()
+                }
+            }
+        )
+
+    def test_should_not_give_warning_messages_when_component_volume_total_of_classes_under_learning_unit_volume(self):
+        self.charge_lecturing.allocation_charge = 50
+        self.charge_lecturing.save()
+        self.charge_practical.allocation_charge = 50
+        self.charge_practical.save()
+
+        msgs = _get_classes_charge_repartition_warning_messages(self.full_luy)
+        self.assertFalse(msgs)

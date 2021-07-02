@@ -195,8 +195,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.fields['learning_unit_remarks_publication_en'].initial = learning_unit.remarks.publication_en
 
     def __init_titles(self, learning_unit):
-        self.fields['learning_unit_common_title_fr'].initial = learning_unit.complete_title_fr
-        self.fields['learning_unit_common_title_en'].initial = learning_unit.complete_title_en
+        self.fields['learning_unit_common_title_fr'].initial = learning_unit.titles.common_fr
+        self.fields['learning_unit_common_title_en'].initial = learning_unit.titles.common_en
 
     def __init_periodicity(self, learning_unit):
         self.fields['learning_unit_periodicity'].choices = add_blank(PeriodicityEnum.choices())
@@ -221,7 +221,7 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         )
         self.initial['learning_unit_campus'] = campus.entity_id.uuid
 
-    def get_command(self) -> CreateEffectiveClassCommand:
+    def get_command(self) -> 'CreateEffectiveClassCommand':
         return CreateEffectiveClassCommand(
             class_code=self.cleaned_data['class_code'],
             learning_unit_code=self.learning_unit.code,
@@ -231,8 +231,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
             teaching_place_uuid=self.cleaned_data['learning_unit_campus'],
             derogation_quadrimester=self.cleaned_data['quadrimester'],
             session_derogation=self.cleaned_data['session'],
-            volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'] or 0,
-            volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'] or 0,
+            volume_first_quadrimester=self.cleaned_data['hourly_volume_partial_q1'],
+            volume_second_quadrimester=self.cleaned_data['hourly_volume_partial_q2'],
         )
 
     def __init_language_choices(self):
