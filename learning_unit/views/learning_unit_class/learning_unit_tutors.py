@@ -91,12 +91,13 @@ class LearningUnitTutorsView(PermissionRequiredMixin, TemplateView):
             )
         )
 
-        return self._filter_tutors_by_class_type(tutors)
+        return _filter_tutors_by_class_type(self.effective_class, tutors)
 
-    def _filter_tutors_by_class_type(
-            self,
-            tutors: List['TutorAttributionToLearningUnitDTO']
-    ) -> List['TutorAttributionToLearningUnitDTO']:
-        effective_class_type = \
-            PRACTICAL_EXERCISES if isinstance(self.effective_class, PracticalEffectiveClass) else LECTURING
-        return [tutor for tutor in tutors if effective_class_type == tutor.component_type]
+
+def _filter_tutors_by_class_type(
+        effective_class: 'EffectiveClass',
+        tutors: List['TutorAttributionToLearningUnitDTO']
+) -> List['TutorAttributionToLearningUnitDTO']:
+    effective_class_type = \
+        PRACTICAL_EXERCISES if isinstance(effective_class, PracticalEffectiveClass) else LECTURING
+    return [tutor for tutor in tutors if effective_class_type == tutor.component_type]
