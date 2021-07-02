@@ -218,10 +218,9 @@ msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
 msgid "Repartition deleted for %(tutor)s (%(function)s)"
 msgstr "Répartition supprimée pour %(tutor)s (%(function)s)"
 
-#, fuzzy, python-format
-#| msgid "Repartition deleted for %(tutor)s (%(function)s)"
+#, python-format
 msgid "Repartition edited for %(tutor)s (%(function)s)"
-msgstr "Répartition supprimée pour %(tutor)s (%(function)s)"
+msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
 
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
