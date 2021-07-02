@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block content_tab %}
-<div role="tabpanel" class="tab-pane active" id="tutors">
+    <div role="tabpanel" class="tab-pane active" id="tutors">
         <table class="table">
             <thead>
             <tr>
@@ -48,23 +48,12 @@
                         {{ tutor.distributed_volume_to_class | floatformat:2 }}
                     </td>
                     <td>
-                        {% comment %}
-                            <!-- TODO: uncomment with actions on tutors attribution -->
-                            {% if can_change_attribution %}
-                                <a class="trigger_modal"
-                                   data-url="{% url "update_attribution" learning_unit_year.id attribution.pk %}"
-                                   data-modal_class="modal-lg">
-                                                <span class="glyphicon glyphicon-edit"></span>
-                                            </a>
-                                        {% endif %}
-                            {% if can_add_charge_repartition %}
-                                <a class="trigger_modal"
-                                   data-url="{% url "edit_charge_repartition" learning_unit_year.id attribution.pk %}"
-                                   data-modal_class="modal-lg">
-                                    <span class="glyphicon glyphicon-edit"></span>
-                                </a>
-                            {% endif %}
-                        {% endcomment %}
+                        {% if can_change_attribution %}
+                            <a class="trigger_modal"
+                               data-url="{% url "edit_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                        {% endif %}
                         {% if can_delete_attribution %}
                             <a class="trigger_modal"
                                data-url="{% url "remove_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
@@ -77,7 +66,7 @@
             </tbody>
         </table>
 
-    <a href="{{ url_lu_tutors }}" id="manage_repartition"
+        <a href="{{ url_lu_tutors }}" id="manage_repartition"
            class="btn btn-default"
            role="button">
             {% trans "Manage repartition" %}

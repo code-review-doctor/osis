@@ -110,3 +110,21 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
             class_code=self.effective_class.entity_id.class_code
         )
+
+
+class ClassEditTutorRepartitionForm(ClassTutorRepartitionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        print(self.tutor)
+        self.fields['volume'].initial = 0  # TODO: get tutor to have volume
+
+    def get_command(self) -> DistributeClassToTutorCommand:
+        pass
+        # return DistributeClassToTutorCommand(
+        #     tutor_personal_id_number=self.tutor.personal_id_number,
+        #     learning_unit_attribution_uuid=self.tutor.attribution_uuid,
+        #     class_code=self.effective_class.entity_id.class_code,
+        #     distributed_volume=self.cleaned_data['volume'] or 0,
+        #     learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+        #     year=self.effective_class.entity_id.learning_unit_identity.year
+        # )

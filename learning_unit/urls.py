@@ -28,7 +28,8 @@ from django.urls import include, path
 from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
 from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
 from learning_unit.views.learning_unit_class.learning_unit_tutors import LearningUnitTutorsView
-from learning_unit.views.learning_unit_class.tutor_repartition import TutorRepartitionView, TutorRepartitionRemoveView
+from learning_unit.views.learning_unit_class.tutor_repartition import TutorRepartitionView, TutorRepartitionRemoveView, \
+    TutorRepartitionEditView
 from learning_unit.views.learning_unit_class.tutors import ClassTutorsView
 from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
 
@@ -46,6 +47,8 @@ urlpatterns = [
                  TutorRepartitionView.as_view(), name='edit_charge_repartition'),
             path('tutors/<str:attribution_uuid>/repartition/remove',
                  TutorRepartitionRemoveView.as_view(), name='remove_class_attribution'),
+            path('tutors/<str:attribution_uuid>/repartition/edit',
+                 TutorRepartitionEditView.as_view(), name='edit_class_attribution'),
         ]))
     ]))
 ]

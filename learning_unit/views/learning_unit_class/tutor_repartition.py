@@ -39,7 +39,8 @@ from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiv
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
-from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm, ClassRemoveTutorRepartitionForm
+from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm, ClassRemoveTutorRepartitionForm, \
+    ClassEditTutorRepartitionForm
 from learning_unit.models.learning_class_year import LearningClassYear
 
 
@@ -103,11 +104,10 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        tutor = self.tutor
-        form = ClassTutorRepartitionForm(
+        form = self.form_class(
             request.POST,
             user=request.user,
-            tutor=tutor,
+            tutor=self.tutor,
             effective_class=self.effective_class
         )
         try:
@@ -116,13 +116,16 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
             display_error_messages(request, [exc.message for exc in e.exceptions])
 
         if not form.errors:
-            display_success_messages(request, _("Repartition added for %(tutor)s (%(function)s)") % {
-                'tutor': tutor.full_name,
-                'function': tutor.function_text
-            })
+            display_success_messages(request, self.get_success_msg())
         return render(request, self.template_name, {
             "form": form,
         })
+
+    def get_success_msg(self) -> str:
+        return _("Repartition added for %(tutor)s (%(function)s)") % {
+            'tutor': self.tutor.full_name,
+            'function': self.tutor.function_text
+        }
 
     def redirect_to_learning_unit_tutors(self):
         return redirect(
@@ -148,23 +151,25 @@ class TutorRepartitionRemoveView(TutorRepartitionView):
         kwargs['user'] = self.request.user
         return kwargs
 
-    def post(self, request, *args, **kwargs):
-        form = ClassRemoveTutorRepartitionForm(
-            request.POST,
-            effective_class=self.effective_class,
-            user=request.user,
-            tutor=self.tutor
-        )
-        try:
-            form.save()
-        except MultipleBusinessExceptions as e:
-            display_error_messages(request, [exc.message for exc in e.exceptions])
+    def get_success_msg(self) -> str:
+        return _("Repartition deleted for %(tutor)s (%(function)s)") % {
+            'tutor': self.tutor.full_name,
+            'function': self.tutor.function_text
+        }
 
-        if not form.errors:
-            display_success_messages(request, _("Repartition deleted for %(tutor)s (%(function)s)") % {
-                'tutor': self.tutor.full_name,
-                'function': self.tutor.function_text
-            })
-        return render(request, self.template_name, {
-            "form": form,
-        })
+
+class TutorRepartitionEditView(TutorRepartitionView):
+    template_name = "class/add_charge_repartition.html"
+    permission_required = 'base.can_access_class'
+    form_class = ClassEditTutorRepartitionForm
+
+    @cached_property
+    def tutor(self):
+        # TODO: Get tutor
+        pass
+
+    def get_success_msg(self) -> str:
+        return _("Repartition edited for %(tutor)s (%(function)s)") % {
+            'tutor': self.tutor.full_name,
+            'function': self.tutor.function_text
+        }
