@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 
 import attr
 
@@ -35,5 +36,5 @@ class ShouldBeNumericValidator(BusinessValidator):
     volume_to_distribute = attr.ib(type=float)
 
     def validate(self, *args, **kwargs):
-        if not str(self.volume_to_distribute).isnumeric():
+        if not str(self.volume_to_distribute).isnumeric() and not isinstance(self.volume_to_distribute, Decimal):
             raise VolumeShouldBeNumericException()

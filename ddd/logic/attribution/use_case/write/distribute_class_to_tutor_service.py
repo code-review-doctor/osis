@@ -49,9 +49,9 @@ def distribute_class_to_tutor(
         # first_attribution_to_class
         tutor = TutorBuilder.build_from_command(cmd)
 
-    tutor.distributed_effective_classes.append(
-        _build_class_volume_repartition(cmd)
-    )
+    class_volume = _build_class_volume_repartition(cmd)
+    tutor.assign_class(class_volume)
+
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
     DistributeClassToTutorValidatorList(cmd, effective_class).validate()
     repository.save(tutor)

@@ -41,13 +41,15 @@ from ddd.logic.application.use_case.write.renew_multiple_attributions_service im
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
-    SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand
+    SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
+    UnassignTutorClassCommand
 from ddd.logic.attribution.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
 from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
+from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
@@ -64,14 +66,14 @@ from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_serv
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
-from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
-from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
+from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
+from infrastructure.attribution.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -150,15 +152,13 @@ class MessageBus:
             cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
             ApplicationsMailSummary()
         ),
-        SearchAttributionCommand: lambda cmd: get_attribution(
-            cmd,
-            TutorAttributionToLearningUnitTranslator()
-        ),
+        SearchAttributionCommand: lambda cmd: get_attribution(cmd, TutorAttributionToLearningUnitTranslator()),
         DistributeClassToTutorCommand: lambda cmd: distribute_class_to_tutor(
             cmd,
             TutorRepository(),
             EffectiveClassRepository()
         ),
+        UnassignTutorClassCommand: lambda cmd: unassign_tutor_class(cmd, TutorRepository()),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:
