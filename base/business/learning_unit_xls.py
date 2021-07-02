@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from collections import defaultdict
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 from django.db.models import QuerySet
 from django.db.models import Subquery, OuterRef
@@ -35,6 +35,7 @@ from openpyxl.styles import Alignment, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
+from attribution.business.attribution_class import find_class_attribution_charge_new_by_learning_unit_year_as_dict
 from attribution.models.attribution import search as search_attributions
 from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
@@ -44,6 +45,7 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS, LearningUnitYear
 from base.models.person import Person
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.document import xls_build
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity, version_label
 
@@ -114,8 +116,8 @@ def prepare_xls_content(learning_unit_years: QuerySet,
     result = []
 
     for learning_unit_yr in qs:
-        lu_data_part1 = get_data_part1(learning_unit_yr, is_external_ue_list)
-        lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions)
+        lu_data_part1 = get_data_part1(learning_unit_yr, is_external_ue_list, None)
+        lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions, None)
 
         if with_grp:
             lu_data_part2.append(_add_training_data(learning_unit_yr))
@@ -124,6 +126,20 @@ def prepare_xls_content(learning_unit_years: QuerySet,
         if is_external_ue_list:
             lu_data_part1.extend(_get_external_ue_data(learning_unit_yr))
         result.append(lu_data_part1)
+
+        effective_classes = LearningClassYear.objects.all().select_related(
+            'learning_component_year',
+            'learning_component_year__learning_unit_year',
+            'learning_component_year__learning_unit_year__academic_year'
+        ).filter(
+            learning_component_year__learning_unit_year__pk=learning_unit_yr.pk,
+        ).order_by('acronym')
+
+        for effective_classe in effective_classes:
+            effective_classe_data_part1 = get_data_part1(learning_unit_yr, is_external_ue_list, effective_classe)
+            effective_classe_data_part2 = get_data_part2(learning_unit_yr, with_attributions, effective_classe)
+            effective_classe_data_part1.extend(effective_classe_data_part2)
+            result.append(effective_classe_data_part1)
 
     return result
 
@@ -301,52 +317,84 @@ def title_with_version_title(title_fr: str, version_title_fr: str) -> str:
     return title_fr + (' [{}]'.format(version_title_fr) if version_title_fr else '')
 
 
-def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) -> List[str]:
+def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool, effective_class: LearningClassYear) \
+        -> List[str]:
     lu_data_part2 = []
     if with_attributions:
-        teachers = _get_teachers(learning_unit_yr)
+        if effective_class:
+            teachers = _get_effective_class_teachers(effective_class)
+            # TODO : mais je pense qu'il faut attendre un refactoring pour avoir les scores responsibles
+            #  de la classe et non de l'ue
+            score_responsibles = []
+        else:
+            teachers = _get_teachers(learning_unit_yr)
+            score_responsibles = _get_score_responsibles(learning_unit_yr)
+
         lu_data_part2.append(';'.join(_build_complete_name(person) for person in teachers))
         lu_data_part2.append(';'.join(person.email if person.email else '-' for person in teachers))
-        score_responsibles = _get_score_responsibles(learning_unit_yr)
+
         lu_data_part2.append(';'.join(_build_complete_name(person) for person in score_responsibles))
         lu_data_part2.append(';'.join(person.email if person.email else '-' for person in score_responsibles))
 
     lu_data_part2.append(learning_unit_yr.get_periodicity_display())
     lu_data_part2.append(yesno(learning_unit_yr.status))
-    lu_data_part2.extend(volume_information(learning_unit_yr))
-    lu_data_part2.extend([
-        learning_unit_yr.get_quadrimester_display() or '',
-        learning_unit_yr.get_session_display() or '',
-        learning_unit_yr.language or "",
-    ])
+    if effective_class:
+        lu_data_part2.extend(effective_class_volume_information(effective_class))
+    else:
+        lu_data_part2.extend(volume_information(learning_unit_yr))
+    if effective_class:
+        lu_data_part2.extend([
+            effective_class.get_quadrimester_display() or '',
+            effective_class.get_session_display() or '',
+        ])
+    else:
+        lu_data_part2.extend([
+            learning_unit_yr.get_quadrimester_display() or '',
+            learning_unit_yr.get_session_display() or '',
+        ])
+
+    lu_data_part2.append(learning_unit_yr.language or "",)
     return lu_data_part2
 
 
-def get_data_part1(learning_unit_yr: LearningUnitYear, is_external_ue_list: bool) -> List[str]:
+def get_data_part1(
+        learning_unit_yr: LearningUnitYear, is_external_ue_list: bool, effective_classe: Optional[LearningClassYear]
+) -> List[str]:
     proposal = getattr(learning_unit_yr, "proposallearningunit", None)
     requirement_acronym = learning_unit_yr.entity_requirement
     allocation_acronym = learning_unit_yr.entity_allocation
 
+    title = learning_unit_yr.complete_title
+    if effective_classe and effective_classe.title_fr:
+        title += " - ".format(effective_classe.title_fr)
+
     lu_common_data_part1 = [
-        learning_unit_yr.acronym,
+        effective_classe.effective_class_complete_acronym if effective_classe else learning_unit_yr.acronym,
         learning_unit_yr.academic_year.name,
-        learning_unit_yr.complete_title,
-        learning_unit_yr.get_container_type_display(),
+        title,
+        _("Class") if effective_classe else learning_unit_yr.get_container_type_display(),
         learning_unit_yr.get_subtype_display(),
         requirement_acronym,
         ]
     if is_external_ue_list:
         lu_proposal_data = []
     else:
-        lu_proposal_data = [
-            proposal.get_type_display() if proposal else '',
-            proposal.get_state_display() if proposal else '',
-        ]
+        if effective_classe:
+            lu_proposal_data = ['', '']
+        else:
+            lu_proposal_data = [
+                proposal.get_type_display() if proposal else '',
+                proposal.get_state_display() if proposal else '',
+            ]
+
+    title_english = learning_unit_yr.complete_title_english
+    if effective_classe and effective_classe.title_en:
+        title_english += " - ".format(effective_classe.title_en)
 
     lu_common_data_part2 = [
         learning_unit_yr.credits,
         allocation_acronym,
-        learning_unit_yr.complete_title_english,
+        title_english,
     ]
     return lu_common_data_part1 + lu_proposal_data + lu_common_data_part2
 
@@ -584,3 +632,43 @@ def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
     for attribution in attributions:
         score_responsibles.add(attribution.tutor.person)
     return score_responsibles
+
+
+def _get_effective_class_teachers(effective_class: LearningClassYear) -> List[Person]:
+    attributions = find_class_attribution_charge_new_by_learning_unit_year_as_dict(
+        effective_class)
+
+    teachers = set()
+    for k, attribution in attributions.items():
+        if attribution.get('person'):
+            teachers.add(attribution.get('person'))
+    return sorted(list(teachers), key=lambda person: person.full_name)
+
+
+def effective_class_volume_information(effective_class: LearningClassYear) -> dict():
+    pm_vol_annuel = ''
+    pm_hourly_volume_partial_q1 = ''
+    pm_hourly_volume_partial_q2 = ''
+    pp_vol_annuel = ''
+    pp_hourly_volume_partial_q1 = ''
+    pp_hourly_volume_partial_q2 = ''
+
+    if effective_class.learning_component_year.type == PRACTICAL_EXERCISES:
+        pp_vol_annuel = get_significant_volume(effective_class.volume_annual or 0)
+        pp_hourly_volume_partial_q1 = get_significant_volume(effective_class.hourly_volume_partial_q1 or 0)
+        pp_hourly_volume_partial_q2 = get_significant_volume(effective_class.hourly_volume_partial_q2 or 0)
+    else:
+        pm_vol_annuel = get_significant_volume(effective_class.volume_annual or 0)
+        pm_hourly_volume_partial_q1 = get_significant_volume(effective_class.hourly_volume_partial_q1 or 0)
+        pm_hourly_volume_partial_q2 = get_significant_volume(effective_class.hourly_volume_partial_q2 or 0)
+
+    return [
+        pm_vol_annuel,
+        pm_hourly_volume_partial_q1,
+        pm_hourly_volume_partial_q2,
+        '',
+        pp_vol_annuel,
+        pp_hourly_volume_partial_q1,
+        pp_hourly_volume_partial_q2,
+        ''
+    ]
