@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningunityear',
             name='stage_dimona',
-            field=models.BooleanField(default=False, verbose_name='Stage - Dimona'),
+            field=models.BooleanField(default=False, verbose_name='Stage-Dimona'),
         ),
     ]
