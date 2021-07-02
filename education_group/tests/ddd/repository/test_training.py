@@ -34,7 +34,8 @@ from base.tests.factories.certificate_aim import CertificateAimFactory as Certif
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
     BachelorEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory, \
+    EducationGroupYearMasterFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
@@ -61,7 +62,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         cls.repository = TrainingRepository()
 
         BachelorEducationGroupTypeFactory()
-        cls.education_group_type = TrainingEducationGroupTypeFactory()
+        cls.education_group_type = TrainingEducationGroupTypeFactory(name=TrainingType.MASTER_MA_120.name)
         cls.language = LanguageModelDbFactory()
         cls.study_domain = DomainModelDbFactory()
         cls.secondary_study_domain = DomainModelDbFactory()
@@ -152,7 +153,7 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.entity_version = EntityVersionModelDbFactory()
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.education_group_year = EducationGroupYearMasterFactory(
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
             academic_year__current=True
