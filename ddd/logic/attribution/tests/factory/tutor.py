@@ -24,10 +24,10 @@
 #
 ##############################################################################
 import string
-import uuid
 from decimal import Decimal
 
 import factory.fuzzy
+import uuid
 
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
@@ -72,6 +72,10 @@ class _TutorFactory(factory.Factory):
 
 class TutorWithDistributedEffectiveClassesFactory(_TutorFactory):
     pass
+
+
+class TutorWithoutDistributedEffectiveClassesFactory(_TutorFactory):
+    distributed_effective_classes = []
 
 
 class Tutor9999IdentityFactory(_TutorIdentityFactory):

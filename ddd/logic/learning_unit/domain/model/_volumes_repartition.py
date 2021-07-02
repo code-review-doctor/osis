@@ -37,7 +37,7 @@ class ClassVolumes(interface.ValueObject):
     volume_second_quadrimester = attr.ib(type=DurationUnit)
 
     @property
-    def total_volume(self) -> float:
+    def total_volume(self) -> DurationUnit:
         return (self.volume_first_quadrimester or 0) + (self.volume_second_quadrimester or 0)
 
 

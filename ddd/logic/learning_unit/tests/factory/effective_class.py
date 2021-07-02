@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
+
 import factory.fuzzy
 
 from base.models.enums.learning_unit_year_session import DerogationSession
@@ -56,8 +58,8 @@ class _EffectiveClassFactory(factory.Factory):
     )
     teaching_place = UclouvainCampusIdentity(uuid='33afea7a-9e80-4384-86df-392e3fb171c6')
     volumes = ClassVolumes(
-        volume_first_quadrimester=10.0,
-        volume_second_quadrimester=10.0,
+        volume_first_quadrimester=Decimal(10.0),
+        volume_second_quadrimester=Decimal(10.0),
     )
     derogation_quadrimester = factory.fuzzy.FuzzyChoice(DerogationQuadrimester)
     session_derogation = factory.fuzzy.FuzzyChoice(DerogationSession)

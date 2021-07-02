@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.attribution.commands import UnassignTutorClassCommand
+from typing import List
+
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 
 
-def unassign_tutor_class(cmd: 'UnassignTutorClassCommand', repository: 'ITutorRepository') -> None:
-    tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
-    tutor = repository.get(tutor_identity)
-
-    tutor.unassign_class(class_code=cmd.class_code, learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid)
-    repository.save(tutor)
+class TutorRepository(InMemoryGenericRepository, ITutorRepository):
+    entities = list()  # type: List[Tutor]

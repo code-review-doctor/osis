@@ -149,10 +149,22 @@ class TutorRepartitionRemoveView(TutorRepartitionView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        tutor = self.tutor
         form = ClassRemoveTutorRepartitionForm(
             request.POST,
+            effective_class=self.effective_class,
             user=request.user,
-            tutor=tutor
+            tutor=self.tutor
         )
-        pass  # TODO : complete when service/domain reade OSIS-5906
+        try:
+            form.save()
+        except MultipleBusinessExceptions as e:
+            display_error_messages(request, [exc.message for exc in e.exceptions])
+
+        if not form.errors:
+            display_success_messages(request, _("Repartition deleted for %(tutor)s (%(function)s)") % {
+                'tutor': self.tutor.full_name,
+                'function': self.tutor.function_text
+            })
+        return render(request, self.template_name, {
+            "form": form,
+        })

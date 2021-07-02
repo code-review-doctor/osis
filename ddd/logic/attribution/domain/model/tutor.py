@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List
 
 import attr
@@ -44,17 +43,12 @@ class Tutor(interface.RootEntity):
     entity_id = attr.ib(type=TutorIdentity)
     distributed_effective_classes = attr.ib(type=List[ClassVolumeRepartition])
 
-    def assign_class(
-            self,
-            class_code: str,
-            distributed_volume: Decimal,
-            learning_unit_attribution_uuid: str
-    ) -> None:
-        raise NotImplementedError
+    def assign_class(self, class_volume: 'ClassVolumeRepartition') -> None:
+        self.distributed_effective_classes.append(class_volume)
 
-    def unassign_class(
-            self,
-            class_code: str,
-            learning_unit_attribution_uuid: str
-    ) -> None:
-        raise NotImplementedError
+    def unassign_class(self, class_code: str, learning_unit_attribution_uuid: str) -> None:
+        for class_volume in self.distributed_effective_classes:
+            attribution_uuid = class_volume.attribution.uuid
+            effective_class_code = class_volume.effective_class.class_code
+            if attribution_uuid == learning_unit_attribution_uuid and class_code == effective_class_code:
+                self.distributed_effective_classes.remove(class_volume)

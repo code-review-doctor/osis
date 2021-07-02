@@ -84,8 +84,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         )
 
 
-class ClassRemoveTutorRepartitionForm(forms.Form):
-
+class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     full_name = forms.CharField(max_length=255, required=False)
     function = forms.CharField(max_length=255, required=False, label=_('Function'))
 
