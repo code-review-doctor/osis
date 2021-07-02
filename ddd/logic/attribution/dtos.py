@@ -29,7 +29,7 @@ from typing import List
 
 import attr
 
-from ddd.logic.learning_unit.dtos import EffectiveClassFromRepositoryDTO
+from attribution.models.enums.function import Functions
 from osis_common.ddd.interface import DTO
 
 
@@ -66,11 +66,15 @@ class TutorAttributionToLearningUnitDTO(DTO):
     function = attr.ib(type=str)
     attributed_volume_to_learning_unit = attr.ib(type=Decimal)
     component_type = attr.ib(type=str)
-    number_of_assigned_to_class = attr.ib(type=bool)
+    classes = attr.ib(type=List[str])
 
     @property
     def full_name(self):
         return ", ".join([self.last_name.upper() or "", self.first_name or ""]).strip()
+
+    @property
+    def function_text(self):
+        return Functions.get_value(self.function) if self.function else ''
 
 
 @attr.s(frozen=True, slots=True)

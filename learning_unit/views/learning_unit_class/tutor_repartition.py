@@ -31,7 +31,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from attribution.models.enums.function import Functions
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.attribution.commands import SearchAttributionCommand
@@ -119,7 +118,7 @@ class TutorRepartitionView(PermissionRequiredMixin, FormView):
         if not form.errors:
             display_success_messages(request, _("Repartition added for %(tutor)s (%(function)s)") % {
                 'tutor': tutor.full_name,
-                'function': Functions.get_value(tutor.function)
+                'function': tutor.function_text
             })
         return render(request, self.template_name, {
             "form": form,
