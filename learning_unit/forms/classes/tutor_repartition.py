@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
 from django import forms
 from django.contrib.auth.models import User
@@ -31,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.forms.widgets import DecimalFormatInput
 
@@ -54,7 +55,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     def __init__(self,
                  *args,
                  effective_class: 'EffectiveClass' = None,
-                 tutor: 'TutorAttributionToLearningUnitDTO' = None,
+                 tutor: Union['TutorAttributionToLearningUnitDTO', 'TutorClassRepartitionDTO'] = None,
                  user: User,
                  **kwargs
                  ):
