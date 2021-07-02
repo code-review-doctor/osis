@@ -60,7 +60,7 @@ class TutorBuilder(interface.RootEntityBuilder):
                 ClassVolumeRepartition(
                     effective_class=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
                         class_code=cmd.class_code,
-                        learning_unit_year=cmd.learning_unit_year,
+                        learning_unit_year=cmd.year,
                         learning_unit_code=cmd.learning_unit_code),
                     distributed_volume=cmd.distributed_volume,
                     attribution=LearningUnitAttributionIdentity(uuid=cmd.learning_unit_attribution_uuid)
