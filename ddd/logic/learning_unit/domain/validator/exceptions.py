@@ -205,13 +205,11 @@ class TeachingPlaceRequiredException(BusinessException):
 
 
 class EffectiveClassHasTutorAssignedException(BusinessException):
-    def __init__(self, effective_class: 'EffectiveClass', tutor_full_name: str,  **kwargs):
+    def __init__(self, effective_class_complete_code: str, tutor_full_name: str, learning_unit_year: int,  **kwargs):
         message = _("The class %(class_complete_code)s is assigned to %(tutor_full_name)s in %(year)s") % {
-            'class_complete_code': "{}{}".format(
-                effective_class.entity_id.learning_unit_identity.code,
-                effective_class.entity_id.class_code),
+            'class_complete_code': effective_class_complete_code,
             'tutor_full_name': tutor_full_name,
-            'year': effective_class.entity_id.learning_unit_identity.year,
+            'year': learning_unit_year,
         }
         super().__init__(message, **kwargs)
 
