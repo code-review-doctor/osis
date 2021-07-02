@@ -196,8 +196,8 @@ class ClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         self.fields['learning_unit_remarks_publication_en'].initial = learning_unit.remarks.publication_en
 
     def __init_titles(self, learning_unit):
-        self.fields['learning_unit_common_title_fr'].initial = learning_unit.complete_title_fr
-        self.fields['learning_unit_common_title_en'].initial = learning_unit.complete_title_en
+        self.fields['learning_unit_common_title_fr'].initial = learning_unit.titles.common_fr
+        self.fields['learning_unit_common_title_en'].initial = learning_unit.titles.common_en
 
     def __init_periodicity(self, learning_unit):
         self.fields['learning_unit_periodicity'].choices = add_blank(PeriodicityEnum.choices())
