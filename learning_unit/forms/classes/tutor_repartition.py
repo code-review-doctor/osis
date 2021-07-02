@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
 from django import forms
 from django.contrib.auth.models import User
@@ -31,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
+from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.forms.widgets import DecimalFormatInput
 
@@ -54,7 +55,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
     def __init__(self,
                  *args,
                  effective_class: 'EffectiveClass' = None,
-                 tutor: 'TutorAttributionToLearningUnitDTO' = None,
+                 tutor: Union['TutorAttributionToLearningUnitDTO', 'TutorClassRepartitionDTO'] = None,
                  user: User,
                  **kwargs
                  ):
@@ -73,7 +74,7 @@ class ClassTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.Form):
         if self.tutor:
             self.fields['function'].initial = self.tutor.function_text
 
-    def get_command(self) -> DistributeClassToTutorCommand:
+    def get_command(self) -> 'DistributeClassToTutorCommand':
         return DistributeClassToTutorCommand(
             tutor_personal_id_number=self.tutor.personal_id_number,
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
@@ -88,13 +89,14 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
     full_name = forms.CharField(max_length=255, required=False)
     function = forms.CharField(max_length=255, required=False, label=_('Function'))
 
-    def __init__(self,
-                 *args,
-                 effective_class: 'EffectiveClass' = None,
-                 tutor: 'TutorAttributionToLearningUnitDTO' = None,
-                 user: User,
-                 **kwargs
-                 ):
+    def __init__(
+            self,
+            *args,
+            effective_class: 'EffectiveClass' = None,
+            tutor: 'TutorAttributionToLearningUnitDTO' = None,
+            user: User,
+            **kwargs
+    ):
         self.user = user
         super().__init__(*args, **kwargs)
 
@@ -104,9 +106,15 @@ class ClassRemoveTutorRepartitionForm(DisplayExceptionsByFieldNameMixin, forms.F
         self.fields['full_name'].initial = tutor.full_name
         self.fields['function'].initial = self.tutor.function_text
 
-    def get_command(self) -> UnassignTutorClassCommand:
+    def get_command(self) -> 'UnassignTutorClassCommand':
         return UnassignTutorClassCommand(
             tutor_personal_id_number=self.tutor.personal_id_number,
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
             class_code=self.effective_class.entity_id.class_code
         )
+
+
+class ClassEditTutorRepartitionForm(ClassTutorRepartitionForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['volume'].initial = self.tutor.distributed_volume_to_class

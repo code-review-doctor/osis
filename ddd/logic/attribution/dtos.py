@@ -84,6 +84,7 @@ class TutorClassRepartitionDTO(DTO):
     first_name = attr.ib(type=str)
     function = attr.ib(type=str)
     distributed_volume_to_class = attr.ib(type=Decimal)
+    personal_id_number = attr.ib(type=str)
 
     @property
     def full_name(self):
