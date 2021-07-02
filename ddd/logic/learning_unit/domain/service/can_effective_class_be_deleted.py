@@ -60,8 +60,9 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
         if tutor_assign_to_class:
             exceptions.add(
                 EffectiveClassHasTutorAssignedException(
-                    effective_class=effective_class,
-                    tutor_full_name=tutor_assign_to_class
+                    effective_class_complete_code=effective_class.complete_acronym,
+                    tutor_full_name=tutor_assign_to_class,
+                    learning_unit_year=effective_class.entity_id.learning_unit_identity.year
                 )
             )
 
