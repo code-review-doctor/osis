@@ -44,8 +44,7 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
         context.update(
             {
                 'effective_class': self.effective_class,
-                'tutors':
-                    self.get_ue_tutors(),
+                'tutors': self.get_ue_tutors(),
                 'can_add_charge_repartition': True,  # TODO je ne connais pas la condition,
                 'can_delete_attribution': True  # TODO je ne connais pas la condition,
             }

@@ -73,9 +73,9 @@ class ClassIdentificationView(CommonClassView, TemplateView):
     @cached_property
     def warnings(self) -> List[str]:
         command = GetEffectiveClassWarningsCommand(
-            class_code=self.kwargs['class_code'],
-            learning_unit_code=self.kwargs['learning_unit_code'],
-            learning_unit_year=self.kwargs['learning_unit_year']
+            class_code=self.class_code,
+            learning_unit_code=self.learning_unit_code,
+            learning_unit_year=self.year
         )
         return message_bus_instance.invoke(command)
 

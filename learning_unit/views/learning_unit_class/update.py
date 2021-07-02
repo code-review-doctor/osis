@@ -69,10 +69,12 @@ class UpdateClassView(CommonClassView, FormView):
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        form = UpdateClassForm(request.POST,
-                               learning_unit=self.learning_unit,
-                               effective_class=self.effective_class,
-                               user=request.user)
+        form = UpdateClassForm(
+            request.POST,
+            learning_unit=self.learning_unit,
+            effective_class=self.effective_class,
+            user=request.user
+        )
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
@@ -84,13 +86,14 @@ class UpdateClassView(CommonClassView, FormView):
 
     def redirect_to_effective_class_identification(self):
         return redirect(
-            reverse('class_identification',
-                    kwargs={
-                        'learning_unit_year': self.year,
-                        'learning_unit_code': self.learning_unit_code,
-                        'class_code': self.effective_class.entity_id.class_code
-                    }
-                    )
+            reverse(
+                'class_identification',
+                kwargs={
+                    'learning_unit_year': self.year,
+                    'learning_unit_code': self.learning_unit_code,
+                    'class_code': self.effective_class.entity_id.class_code
+                }
+            )
         )
 
     @staticmethod
