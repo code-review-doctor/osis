@@ -29,7 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.enums import quadrimesters, learning_unit_year_session
-from base.models.enums.component_type import LECTURING
+from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums import quadrimesters, learning_unit_year_session
 from osis_common.models import osis_model_admin
 
@@ -98,3 +98,6 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
+
+    def is_practical(self):
+        return self.learning_component_year.type == PRACTICAL_EXERCISES
