@@ -27,7 +27,7 @@ import itertools
 from typing import List
 
 from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
+from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface

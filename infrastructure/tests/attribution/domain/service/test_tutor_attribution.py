@@ -93,3 +93,4 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         self.assertEqual(result.personal_id_number, person_database.global_id)
         self.assertEqual(result.function, attribution_charge.attribution.function)
         self.assertEqual(result.attributed_volume_to_learning_unit, attribution_charge.allocation_charge)
+        self.assertEqual(result.classes, [])

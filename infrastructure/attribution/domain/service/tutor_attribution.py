@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import F, Q
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
@@ -54,6 +55,7 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             function=F('attribution__function'),
             attributed_volume_to_learning_unit=F('allocation_charge'),
             component_type=F('learning_component_year__type'),
+            classes=ArrayAgg('attributionclass__learning_class_year__acronym', filter=~Q(attributionclass=None))
         ).values(
             'learning_unit_code',
             'learning_unit_year',
@@ -63,11 +65,13 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             'personal_id_number',
             'function',
             'attributed_volume_to_learning_unit',
-            'component_type'
+            'component_type',
+            'classes'
         ).order_by(
             'last_name',
             'first_name',
         )
+
         return [TutorAttributionToLearningUnitDTO(**data_as_dict) for data_as_dict in qs]
 
     @classmethod

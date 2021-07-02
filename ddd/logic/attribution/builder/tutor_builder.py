@@ -30,7 +30,7 @@ from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVo
 from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.dtos import TutorSearchDTO, \
-    DistributedEffectiveClassesDTO, TutorAttributionToLearningUnitDTO
+    DistributedEffectiveClassesDTO
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from osis_common.ddd import interface
 
