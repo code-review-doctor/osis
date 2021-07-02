@@ -117,13 +117,3 @@ class ClassEditTutorRepartitionForm(ClassTutorRepartitionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['volume'].initial = self.tutor.distributed_volume_to_class
-
-    def get_command(self) -> 'DistributeClassToTutorCommand':
-        return DistributeClassToTutorCommand(
-            tutor_personal_id_number=self.tutor.personal_id_number,
-            learning_unit_attribution_uuid=self.tutor.attribution_uuid,
-            class_code=self.effective_class.entity_id.class_code,
-            distributed_volume=self.cleaned_data['volume'] or 0,
-            learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
-            year=self.effective_class.entity_id.learning_unit_identity.year
-        )
