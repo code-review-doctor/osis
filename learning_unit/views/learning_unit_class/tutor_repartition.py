@@ -24,7 +24,6 @@
 #
 ##############################################################################
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -35,56 +34,27 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
 from ddd.logic.attribution.commands import SearchAttributionCommand, SearchTutorsDistributedToClassCommand
 from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm, ClassRemoveTutorRepartitionForm, \
     ClassEditTutorRepartitionForm
-from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.views.learning_unit_class.common import CommonClassView
 
 
-class TutorRepartitionView(PermissionRequiredMixin, FormView):
+class TutorRepartitionView(CommonClassView, FormView):
     template_name = "class/add_charge_repartition.html"
     permission_required = 'base.can_access_class'
     form_class = ClassTutorRepartitionForm
 
-    @cached_property
-    def effective_class(self) -> 'EffectiveClass':
-        command = GetEffectiveClassCommand(
-            class_code=self.kwargs['class_code'],
-            learning_unit_code=self.kwargs['learning_unit_code'],
-            learning_unit_year=self.kwargs['learning_unit_year']
-        )
-        return message_bus_instance.invoke(command)
-
-    @cached_property
-    def learning_unit(self) -> 'LearningUnit':
-        command = GetLearningUnitCommand(code=self.kwargs['learning_unit_code'], year=self.kwargs['learning_unit_year'])
-        return message_bus_instance.invoke(command)
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        effective_class = self.effective_class
-        learning_unit = self.learning_unit
         context.update(
             {
-                'learning_unit': learning_unit,
-                'effective_class': effective_class,
+                'learning_unit': self.learning_unit,
+                'effective_class': self.effective_class,
                 'can_add_charge_repartition': True  # TODO je ne connais pas la condition
             }
         )
         return context
-
-    def get_permission_object(self):
-        return LearningClassYear.objects.filter(
-            acronym=self.kwargs['class_code'],
-            learning_component_year__learning_unit_year__academic_year__year=self.kwargs['learning_unit_year'],
-            learning_component_year__learning_unit_year__acronym=self.kwargs['learning_unit_code']
-        ).select_related(
-            'learning_component_year__learning_unit_year',
-            'learning_component_year__learning_unit_year__academic_year'
-        )
 
     @cached_property
     def tutor(self) -> 'TutorAttributionToLearningUnitDTO':

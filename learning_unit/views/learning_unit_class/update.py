@@ -24,54 +24,24 @@
 #
 ##############################################################################
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.update import UpdateClassForm
+from learning_unit.views.learning_unit_class.common import CommonClassView
 
 
-class UpdateClassView(PermissionRequiredMixin, FormView):
+class UpdateClassView(CommonClassView, FormView):
     template_name = "class/update.html"
     form_class = UpdateClassForm
     permission_required = 'learning_unit.change_learningclassyear'
-
-    @cached_property
-    def year(self) -> int:
-        return self.kwargs['learning_unit_year']
-
-    @cached_property
-    def learning_unit_code(self) -> int:
-        return self.kwargs['learning_unit_code']
-
-    @cached_property
-    def class_code(self) -> int:
-        return self.kwargs['class_code']
-
-    @cached_property
-    def learning_unit(self) -> 'LearningUnit':
-        return message_bus_instance.invoke(
-            GetLearningUnitCommand(code=self.learning_unit_code, year=self.year)
-        )
-
-    @cached_property
-    def effective_class(self) -> 'EffectiveClass':
-        return message_bus_instance.invoke(
-            GetEffectiveClassCommand(
-                class_code=self.class_code,
-                learning_unit_code=self.learning_unit_code,
-                learning_unit_year=self.year
-            )
-        )
 
     @cached_property
     def cancel_url(self):
@@ -97,15 +67,6 @@ class UpdateClassView(PermissionRequiredMixin, FormView):
         kwargs['effective_class'] = self.effective_class
         kwargs['user'] = self.request.user
         return kwargs
-
-    def get_permission_object(self):
-        return LearningUnitYear.objects.filter(
-            academic_year__year=self.year,
-            acronym=self.learning_unit_code
-        ).select_related(
-            'learning_container_year',
-            'academic_year',
-        )
 
     def post(self, request, *args, **kwargs):
         form = UpdateClassForm(request.POST,
