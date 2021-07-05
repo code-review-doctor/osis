@@ -37,7 +37,7 @@ from learning_unit.views.learning_unit_class.common import CommonClassView
 
 class LearningUnitTutorsView(CommonClassView, TemplateView):
     template_name = "class/lu_tutors.html"
-    permission_required = 'attribution.can_change_class_attribution'
+    permission_required = 'attribution.can_change_class_repartition'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
