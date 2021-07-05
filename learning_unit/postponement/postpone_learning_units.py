@@ -30,6 +30,7 @@ from django.utils.functional import cached_property
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_achievement import LearningAchievement
@@ -90,11 +91,45 @@ class PostponeLearningUnits:
             'learningunityear_set__learningachievement_set'
         ).distinct()
 
+    def load_partims_not_aligned_with_full(self) -> Iterable[LearningUnitYear]:
+        last_occurence_qs = LearningUnitYear.objects.filter(
+            academic_year__year__gte=self.from_year,
+            learning_unit=OuterRef("learning_unit")
+        ).values(
+            "learning_unit"
+        ).annotate(
+            max_year=Max("academic_year__year")
+        ).order_by(
+            "learning_unit"
+        ).values("max_year")
+
+        is_mobility_qs = ExternalLearningUnitYear.objects.filter(
+            mobility=True,
+            learning_unit_year=OuterRef('id')
+        )
+        return LearningUnitYear.objects.filter(
+            academic_year__year=Subquery(last_occurence_qs[:1]),
+            subtype=learning_unit_year_subtypes.PARTIM,
+        ).annotate(
+            is_mobility=Exists(is_mobility_qs),
+        ).exclude(
+            is_mobility=True
+        ).prefetch_related(
+            'externallearningunityear',
+            'learningcomponentyear_set',
+            'learningachievement_set'
+        ).distinct()
+
     def postpone(self):
         for lcy in self.load_container_years_to_postpone():
             for year in range(lcy.academic_year.year + 1, self.compute_container_year_end_year(lcy) + 1):
                 default_values = self.load_initial_values_before_proposal(lcy)
                 self.postpone_learning_container_year(lcy, year, default_values)
+
+    def postpone_partims(self):
+        for luy in self.load_partims_not_aligned_with_full():
+            for year in range(luy.academic_year.year + 1, self.compute_learning_unit_year_end_year(luy) + 1):
+                self.postpone_learning_unit_year(luy, year, self.get_empty_initial_values())
 
     def postpone_learning_container_year(
             self,
@@ -174,6 +209,13 @@ class PostponeLearningUnits:
 
         return cleaned_initial_values
 
+    def get_empty_initial_values(self):
+        return {
+            LearningContainerYear.__name__: {},
+            LearningUnitYear.__name__: {},
+            LearningComponentYear.__name__: {}
+        }
+
     def _clean_component_years_initial_values(self, default_values: List[Dict]) -> Dict:
         return {
             component_type_default_values['type']: self._clean_model_initial_values(
@@ -233,18 +275,18 @@ class PostponeLearningUnits:
 
         return AcademicYear.objects.get(id=end_year_id).year
 
-    def compute_learning_unit_year_end_year(self, luy: LearningUnitYear) -> float:
+    def compute_learning_unit_year_end_year(self, luy: LearningUnitYear) -> int:
         proposal = ProposalLearningUnit.objects.filter(
             learning_unit_year__learning_unit=luy.learning_unit
         ).first()
         if not proposal:
-            return self.normalize_year(luy.learning_unit.end_year)
+            return min(self.normalize_year(luy.learning_unit.end_year), self.until_year)
 
         end_year_id = proposal.initial_data['learning_unit']['end_year']
         if not end_year_id:
-            return math.inf
+            return self.until_year
 
-        return self.normalize_year(AcademicYear.objects.get(id=end_year_id))
+        return int(self.normalize_year(AcademicYear.objects.get(id=end_year_id)))
 
 
 def create_learning_container_year_from_template(

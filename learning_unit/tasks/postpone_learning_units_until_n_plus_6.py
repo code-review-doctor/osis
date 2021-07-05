@@ -30,4 +30,5 @@ from learning_unit.postponement import postpone_learning_units
 @celery_app.task
 def run() -> dict:
     postpone_learning_units.PostponeLearningUnits().postpone()
+    postpone_learning_units.PostponeLearningUnits().postpone_partims()
     return {}
