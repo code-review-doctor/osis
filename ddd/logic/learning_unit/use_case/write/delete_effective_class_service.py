@@ -28,6 +28,7 @@ from ddd.logic.learning_unit.builder.effective_class_identity_builder import Eff
 from ddd.logic.learning_unit.commands import DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollments
 from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClass
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
@@ -35,7 +36,8 @@ from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClass
 def delete_effective_class(
         cmd: DeleteEffectiveClassCommand,
         effective_class_repository: IEffectiveClassRepository,
-        has_assigned_tutor_service: 'ITutorAssignedToClass'
+        has_assigned_tutor_service: 'ITutorAssignedToClass',
+        has_enrollments_service: 'IStudentEnrollments'
 ) -> EffectiveClassIdentity:
 
     # GIVEN
@@ -46,10 +48,11 @@ def delete_effective_class(
     )
 
     # WHEN
-    if effective_class:  # FIXME :: why use this "if" ?
+    if effective_class:  # FIXME :: What is the pertinence of this "if" ?
         CanEffectiveClassBeDeleted().verify(
             effective_class=effective_class,
             has_assigned_tutor_service=has_assigned_tutor_service,
+            has_enrollments_service=has_enrollments_service,
         )
     # THEN
         effective_class_repository.delete(effective_class.entity_id)

@@ -37,6 +37,7 @@ from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffec
 from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithLecturingVolumesOnly, \
     LDROI1001CourseLearningUnitFactory
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollments
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClass
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
@@ -44,25 +45,23 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 
 class DeleteEffectiveClassService(SimpleTestCase):
     def setUp(self):
-        self.learning_unit_repository = LearningUnitRepository()
-        self.ue_with_lecturing_and_practical_volumes = CourseWithLecturingVolumesOnly()
-        self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
-
         self.effective_class_repository = EffectiveClassRepository()
         class_code = 'A'
         self.existing_class = LecturingEffectiveClassFactory(
             entity_id__class_code=class_code,
-            entity_id__learning_unit_identity=self.ue_with_lecturing_and_practical_volumes.entity_id,
         )
         self.effective_class_repository.save(self.existing_class)
 
         self.delete_class_cmd = DeleteEffectiveClassCommand(
             class_code=class_code,
-            learning_unit_code=self.ue_with_lecturing_and_practical_volumes.code,
-            year=self.ue_with_lecturing_and_practical_volumes.entity_id.academic_year.year
+            learning_unit_code=self.existing_class.learning_unit_code,
+            year=self.existing_class.year
         )
         self.tutor_distributed_to_class = TutorAssignedToClass()
         self.tutor_distributed_to_class.get_first_tutor_full_name_if_exists = lambda *args: None
+
+        self.has_enrollments_service = StudentEnrollments()
+        self.has_enrollments_service.has_enrollments_to_class = lambda *args: False
 
     def test_should_class_exists(self):
         inexisting_class_code = "W"
@@ -74,42 +73,34 @@ class DeleteEffectiveClassService(SimpleTestCase):
             delete_effective_class(
                 cmd,
                 self.effective_class_repository,
-                self.tutor_distributed_to_class
+                self.tutor_distributed_to_class,
+                self.has_enrollments_service,
             )
         )
 
-    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
-                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class', return_value=False)
-    def test_should_delete_existing_class(self, mock_has_enrollments_to_class):
-        learning_unit = LDROI1001CourseLearningUnitFactory()
-        self.learning_unit_repository.save(learning_unit)
-        effective_class = LecturingEffectiveClassFactory(
-            entity_id__class_code="A",
-            entity_id__learning_unit_identity=learning_unit.entity_id,
-        )
+    def test_should_delete_existing_class(self):
+        effective_class = LecturingEffectiveClassFactory()
         self.effective_class_repository.save(effective_class)
 
         self.assertIn(effective_class, self.effective_class_repository.entities)
         entity_id = delete_effective_class(
             cmd=self.delete_class_cmd,
             effective_class_repository=self.effective_class_repository,
-            has_assigned_tutor_service=self.tutor_distributed_to_class
+            has_assigned_tutor_service=self.tutor_distributed_to_class,
+            has_enrollments_service=self.has_enrollments_service,
         )
         self.assertNotIn(self.existing_class, self.effective_class_repository.entities)
 
-    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
-                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class', return_value=True)
-    def test_should_raise_LearningUnitOfEffectiveClassHasEnrollmentException(
-            self,
-            mock_has_enrollments_to_class
-    ):
-        self.learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
+    # TODO :: rename test
+    def test_should_raise_LearningUnitOfEffectiveClassHasEnrollmentException(self):
+        self.has_enrollments_service.has_enrollments_to_class = lambda *args: True
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             delete_effective_class(
                 cmd=self.delete_class_cmd,
                 effective_class_repository=self.effective_class_repository,
-                has_assigned_tutor_service=self.tutor_distributed_to_class
+                has_assigned_tutor_service=self.tutor_distributed_to_class,
+                has_enrollments_service=self.has_enrollments_service,
             )
         exceptions = class_exceptions.exception.exceptions.copy()
         self.assertIsInstance(
@@ -119,9 +110,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
 
         self.assertEqual(list(exceptions)[0].message, _("Class of learning unit having enrollment can't be delete"))
 
-    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
-                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class', return_value=False)
-    def test_should_raise_EffectiveClassHasTutorAssignedException(self, mock_has_enrollments):
+    def test_should_raise_EffectiveClassHasTutorAssignedException(self):
         tutor_full_name = 'Martin tom'
         self.tutor_distributed_to_class.get_first_tutor_full_name_if_exists = lambda *args: tutor_full_name
 
@@ -130,6 +119,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
                 cmd=self.delete_class_cmd,
                 effective_class_repository=self.effective_class_repository,
                 has_assigned_tutor_service=self.tutor_distributed_to_class,
+                has_enrollments_service=self.has_enrollments_service,
             )
         exceptions = class_exceptions.exception.exceptions.copy()
         self.assertIsInstance(

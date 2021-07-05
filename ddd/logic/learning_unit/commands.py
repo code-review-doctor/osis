@@ -185,9 +185,3 @@ class SearchTutorsDistributedToEffectiveClassCommand(interface.CommandRequest):
     class_code = attr.ib(type=str)
     learning_unit_code = attr.ib(type=str)
     year = attr.ib(type=int)
-
-
-@attr.s(frozen=True, slots=True)
-class HasEnrollmentsToClassCommand(interface.CommandRequest):
-    learning_unit_code = attr.ib(type=str)
-    year = attr.ib(type=int)

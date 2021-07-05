@@ -50,12 +50,11 @@ from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_se
     search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
-    has_enrollments_to_class_service
+
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
+    GetEffectiveClassWarningsCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -81,6 +80,7 @@ from infrastructure.application.services.applications_summary import Application
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 from infrastructure.attribution.repository.tutor import TutorRepository
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollments
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClass
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -129,13 +129,14 @@ class MessageBus:
             cmd,
             EffectiveClassRepository(),
             TutorAssignedToClass(),
+            StudentEnrollments(),
         ),
         CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
             cmd,
             EffectiveClassRepository(),
             TutorAssignedToClass(),
+            StudentEnrollments(),
         ),
-        HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
         GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
             cmd, EffectiveClassRepository(), LearningUnitRepository()
         ),

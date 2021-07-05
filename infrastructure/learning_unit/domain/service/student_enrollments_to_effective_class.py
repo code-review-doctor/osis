@@ -25,16 +25,25 @@
 ##############################################################################
 
 from base.models.learning_unit_enrollment import LearningUnitEnrollment as LearningUnitEnrollmentDatabase
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from ddd.logic.learning_unit.domain.service.i_student_enrollments_to_effective_class import \
-    IStudentEnrollmentsToEffectiveClass
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
+    IStudentEnrollments
 
 
-class StudentEnrollmentsToEffectiveClass(IStudentEnrollmentsToEffectiveClass):
+class StudentEnrollments(IStudentEnrollments):
 
     @classmethod
-    def has_enrollments_to_class(cls, learning_unit_identity: 'LearningUnitIdentity') -> bool:
+    def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
+        # TODO :: check the enrollment to the effective class instead of learning unit
         return LearningUnitEnrollmentDatabase.objects.filter(
-            learning_unit_year__acronym=learning_unit_identity.code,
-            learning_unit_year__academic_year__year=learning_unit_identity.year
+            learning_unit_year__acronym=class_identity.learning_unit_identity.code,
+            learning_unit_year__academic_year__year=class_identity.learning_unit_identity.year
+        ).exists()
+
+    @classmethod
+    def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
+        return LearningUnitEnrollmentDatabase.objects.filter(
+            learning_unit_year__acronym=learning_unit_id.code,
+            learning_unit_year__academic_year__year=learning_unit_id.year
         ).exists()
