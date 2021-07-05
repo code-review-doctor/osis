@@ -72,7 +72,7 @@ class PostponeLearningUnits:
             learning_unit_year=OuterRef('learningunityear')
         )
         is_proposal_creation = ProposalLearningUnit.objects.filter(
-            learning_unit_year=OuterRef('learningunityear'),
+            learning_unit_year__learning_container_year__id=OuterRef('id'),
             type=ProposalType.CREATION.name
         )
 
@@ -82,8 +82,7 @@ class PostponeLearningUnits:
             is_mobility=Exists(is_mobility_qs),
             is_proposal_creation=Exists(is_proposal_creation)
         ).exclude(
-            is_mobility=True,
-            is_proposal_creation=True
+            Q(is_mobility=True) | Q(is_proposal_creation=True)
         ).prefetch_related(
             'learningunityear_set',
             'learningunityear_set__externallearningunityear',
