@@ -313,7 +313,7 @@ Examples: <i>LBIOL100B</i>","Code d’un Bachelier est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
-<li>partie numérique: 3 chiffres</li>
+<li>partie numérique: 3 chiffres dont le premier ne peut pas être 0</li>
 <li><b>B</b></li>
 </ul>
 Exemples: <i>LBIOL100B</i>",Ex: LBIOL100B
