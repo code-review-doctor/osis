@@ -72,7 +72,7 @@ class PostponeLearningUnits:
             learning_unit_year=OuterRef('learningunityear')
         )
         is_proposal_creation = ProposalLearningUnit.objects.filter(
-            learning_unit_year=OuterRef('learningunityear'),
+            learning_unit_year__learning_container_year__id=OuterRef('id'),
             type=ProposalType.CREATION.name
         )
 
@@ -82,8 +82,7 @@ class PostponeLearningUnits:
             is_mobility=Exists(is_mobility_qs),
             is_proposal_creation=Exists(is_proposal_creation)
         ).exclude(
-            is_mobility=True,
-            is_proposal_creation=True
+            Q(is_mobility=True) | Q(is_proposal_creation=True)
         ).prefetch_related(
             'learningunityear_set',
             'learningunityear_set__externallearningunityear',
@@ -93,6 +92,7 @@ class PostponeLearningUnits:
 
     def postpone(self):
         for lcy in self.load_container_years_to_postpone():
+            print(lcy.is_proposal_creation)
             for year in range(lcy.academic_year.year + 1, self.compute_container_year_end_year(lcy) + 1):
                 default_values = self.load_initial_values_before_proposal(lcy)
                 self.postpone_learning_container_year(lcy, year, default_values)
