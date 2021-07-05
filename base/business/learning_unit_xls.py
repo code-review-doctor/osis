@@ -542,8 +542,9 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             lu_data_part1.extend(lu_data_part2)
             attributions = find_class_attribution_charge_new_by_learning_unit_year_as_dict(effective_class).values()
             first_attribution = True
-            cells_with_top_border.extend(
-                ["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
+            if attributions:
+                cells_with_top_border.extend(
+                    ["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
             for attribution in attributions:
                 data.append(lu_data_part1 + _get_attribution_detail(attribution, True))
                 line += 1
