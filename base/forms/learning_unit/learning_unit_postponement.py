@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ from base.models import academic_year
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import quadrimesters
+from base.models.enums.internship_subtypes import INTERNSHIP_SUBTYPES
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.learning_component_year import LearningComponentYear
@@ -389,6 +390,8 @@ class LearningUnitPostponementForm:
             return _("yes") if value else _("no")
 
         if value:
+            if field_name == 'internship_subtype':
+                return dict(INTERNSHIP_SUBTYPES)[value].lower()
             if field_name == 'periodicity':
                 return dict(PERIODICITY_TYPES)[value].lower()
             elif field_name == 'quadrimester':
