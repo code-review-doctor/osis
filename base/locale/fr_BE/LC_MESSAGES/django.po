@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:03+0200\n"
+"POT-Creation-Date: 2021-07-05 13:50+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -542,6 +542,9 @@ msgstr "Ville"
 
 msgid "City of institution"
 msgstr "Ville de l'institution"
+
+msgid "Class"
+msgstr "Classe"
 
 #, python-format
 msgid ""
