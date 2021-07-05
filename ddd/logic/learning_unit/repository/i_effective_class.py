@@ -35,11 +35,6 @@ class IEffectiveClassRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def get(cls, entity_id: EffectiveClassIdentity) -> EffectiveClass:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
     def search(cls, entity_ids: Optional[List[EffectiveClassIdentity]] = None, **kwargs) -> List[EffectiveClass]:
         pass
 
@@ -56,4 +51,9 @@ class IEffectiveClassRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def get_all_identities(cls) -> List['EffectiveClassIdentity']:
-        pass
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'EffectiveClassIdentity') -> 'EffectiveClass':
+        raise NotImplementedError

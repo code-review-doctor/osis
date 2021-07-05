@@ -74,6 +74,7 @@ class CreateClassView(PermissionRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cancel_url'] = self.cancel_url
+        context['learning_unit'] = self.learning_unit
         return context
 
     def get(self, request, *args, **kwargs):
@@ -83,7 +84,9 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             )
         except MultipleBusinessExceptions as e:
             display_error_messages(request, [exc.message for exc in e.exceptions])
-            return self.redirect_to_learning_unit_identification()
+            return redirect(
+                reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
+            )
 
         return super().get(request, *args, **kwargs)
 
@@ -107,18 +110,23 @@ class CreateClassView(PermissionRequiredMixin, FormView):
         effective_class_identity = form.save()
         if not form.errors:
             display_success_messages(request, self.get_success_msg(effective_class_identity), extra_tags='safe')
-            return self.redirect_to_learning_unit_identification()
+            return redirect(
+                reverse(
+                    'class_identification',
+                    kwargs={
+                        'learning_unit_code': self.learning_unit_code,
+                        'learning_unit_year': self.year,
+                        'class_code': effective_class_identity.class_code
+                    }
+                )
+            )
 
         return render(request, self.template_name, {
             "form": form,
         })
 
-    def redirect_to_learning_unit_identification(self):
-        return redirect(
-            reverse('learning_unit', kwargs={'acronym': self.learning_unit_code, 'year': self.year})
-        )
-
-    def get_success_msg(self, effective_class_identity: 'EffectiveClassIdentity') -> str:
+    @staticmethod
+    def get_success_msg(effective_class_identity: 'EffectiveClassIdentity') -> str:
         effective_class = message_bus_instance.invoke(
             GetEffectiveClassCommand(
                 class_code=effective_class_identity.class_code,
@@ -127,5 +135,5 @@ class CreateClassView(PermissionRequiredMixin, FormView):
             )
         )
         return _("Class %(effective_class_complete_acronym)s successfully created.") % {
-            "effective_class_complete_acronym": effective_class.complete_code
+            "effective_class_complete_acronym": effective_class.complete_acronym
         }
