@@ -32,6 +32,7 @@ from learning_unit.views.learning_unit_class.tutor_repartition import TutorRepar
     TutorRepartitionRemoveView, TutorRepartitionEditView
 from learning_unit.views.learning_unit_class.tutors import ClassTutorsView
 from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
+from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
 
 urlpatterns = [
     path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
@@ -49,6 +50,7 @@ urlpatterns = [
                  TutorRepartitionRemoveView.as_view(), name='remove_class_attribution'),
             path('tutors/<str:attribution_uuid>/repartition/edit',
                  TutorRepartitionEditView.as_view(), name='edit_class_attribution'),
+            path('delete', DeleteClass.as_view(), name='class_delete'),
         ]))
     ]))
 ]

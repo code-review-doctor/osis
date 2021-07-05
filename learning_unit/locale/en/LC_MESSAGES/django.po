@@ -41,6 +41,11 @@ msgstr ""
 msgid "Annual volume"
 msgstr ""
 
+#, python-format
+msgid ""
+"Are you certain that you want to definitively delete the class in %(year)s ?"
+msgstr ""
+
 msgid "Are you sure?"
 msgstr ""
 
@@ -61,6 +66,10 @@ msgstr ""
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully deleted."
 msgstr ""
 
 #, python-format
@@ -85,10 +94,16 @@ msgstr ""
 msgid "Components"
 msgstr ""
 
+msgid "Confirm"
+msgstr ""
+
 msgid "Credits"
 msgstr ""
 
 msgid "Delete"
+msgstr ""
+
+msgid "Delete class definitively"
 msgstr ""
 
 msgid "Derogation's session"

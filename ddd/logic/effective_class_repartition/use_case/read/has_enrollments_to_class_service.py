@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 
-from attribution.models import *
-from attribution.models import attribution_class
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsToEffectiveClass
 
-admin.site.register(attribution.Attribution,
-                    attribution.AttributionAdmin)
 
-admin.site.register(attribution_new.AttributionNew,
-                    attribution_new.AttributionNewAdmin)
-
-admin.site.register(attribution_charge_new.AttributionChargeNew,
-                    attribution_charge_new.AttributionChargeNewAdmin)
-
-admin.site.register(tutor_application.TutorApplication,
-                    tutor_application.TutorApplicationAdmin)
-
-admin.site.register(attribution_class.AttributionClass,
-                    attribution_class.AttributionClassAdmin)
+def has_enrollments_to_class_service(
+        cmd: 'HasEnrollmentsToClassCommand'
+) -> bool:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.year
+    )
+    return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
+        learning_unit_identity
+    )

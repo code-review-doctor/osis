@@ -63,7 +63,7 @@ class TestChargeRepartitionMixin:
 
     def setUp(self):
         self.attribution = AttributionNewFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year
+            learning_container_year=self.learning_unit_year.learning_container_year,
         )
         attribution_id = self.attribution.id
         self.charge_lecturing = AttributionChargeNewFactory(

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+from typing import Optional
 
-from attribution.models import *
-from attribution.models import attribution_class
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorDistributedToClass
 
-admin.site.register(attribution.Attribution,
-                    attribution.AttributionAdmin)
 
-admin.site.register(attribution_new.AttributionNew,
-                    attribution_new.AttributionNewAdmin)
-
-admin.site.register(attribution_charge_new.AttributionChargeNew,
-                    attribution_charge_new.AttributionChargeNewAdmin)
-
-admin.site.register(tutor_application.TutorApplication,
-                    tutor_application.TutorApplicationAdmin)
-
-admin.site.register(attribution_class.AttributionClass,
-                    attribution_class.AttributionClassAdmin)
+def has_class_repartition_service(
+        cmd: 'HasClassRepartitionCommand'
+) -> Optional[str]:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
+    return TutorDistributedToClass.get_first_tutor_full_name_if_exists(
+        effective_class_identity
+    )

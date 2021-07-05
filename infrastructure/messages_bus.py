@@ -50,15 +50,22 @@ from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_se
     search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
+from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_service import \
+    has_class_repartition_service
+from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
+    has_enrollments_to_class_service
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand, UpdateEffectiveClassCommand
+    UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
+    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
+from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
+from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
@@ -119,6 +126,17 @@ class MessageBus:
         ),
         GetLanguageCommand: lambda cmd: get_language(cmd, LanguageRepository()),
         GetCampusCommand: lambda cmd: get_campus(cmd, UclouvainCampusRepository()),
+        DeleteEffectiveClassCommand: lambda cmd: delete_effective_class(
+            cmd,
+            EffectiveClassRepository(),
+            LearningUnitRepository()
+        ),
+        CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
+            cmd,
+            EffectiveClassRepository(),
+        ),
+        HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
+        HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
         GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
             cmd, EffectiveClassRepository(), LearningUnitRepository()
         ),

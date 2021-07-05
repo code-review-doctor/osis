@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+from typing import Union, Optional
 
-from attribution.models import *
-from attribution.models import attribution_class
+from attribution.models.attribution_class import AttributionClass as AttributionClassDb
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.service.i_tutor_distributed_to_class import ITutorDistributedToClass
 
-admin.site.register(attribution.Attribution,
-                    attribution.AttributionAdmin)
 
-admin.site.register(attribution_new.AttributionNew,
-                    attribution_new.AttributionNewAdmin)
+class TutorDistributedToClass(ITutorDistributedToClass):
 
-admin.site.register(attribution_charge_new.AttributionChargeNew,
-                    attribution_charge_new.AttributionChargeNewAdmin)
-
-admin.site.register(tutor_application.TutorApplication,
-                    tutor_application.TutorApplicationAdmin)
-
-admin.site.register(attribution_class.AttributionClass,
-                    attribution_class.AttributionClassAdmin)
+    @classmethod
+    def get_first_tutor_full_name_if_exists(
+            cls,
+            effective_class_identity: 'EffectiveClassIdentity'
+    ) -> Optional[str]:
+        ue_identity = effective_class_identity.learning_unit_identity
+        results = AttributionClassDb.objects.filter(
+            learning_class_year__learning_component_year__learning_unit_year__acronym=ue_identity.code,
+            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=ue_identity.year,
+            learning_class_year__acronym=effective_class_identity.class_code
+        )
+        if results:
+            return results[0].attribution_charge.attribution.tutor.person.full_name
+        return None

@@ -43,6 +43,13 @@ msgstr "Volume annuel"
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
 
+#, python-format
+msgid ""
+"Are you certain that you want to definitively delete the class in %(year)s ?"
+msgstr ""
+"Etes-vous certain de vouloir supprimer définitivement cette classe en "
+"%(year)s ?"
+
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
 
@@ -62,6 +69,11 @@ msgstr "Classe"
 msgid "Class %(effective_class_complete_acronym)s successfully created."
 msgstr ""
 "La classe %(effective_class_complete_acronym)s a été créée avec succès."
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully deleted."
+msgstr ""
+"La classe %(effective_class_complete_acronym)s a été supprimée avec succès."
 
 #, python-format
 msgid "Class %(effective_class_complete_acronym)s successfully updated."
@@ -86,8 +98,14 @@ msgstr "UE complète"
 msgid "Components"
 msgstr "Composants"
 
+msgid "Confirm"
+msgstr "Confirmer"
+
 msgid "Credits"
 msgstr "Crédits"
+
+msgid "Delete class definitively"
+msgstr "Supprimer la classe définitivement"
 
 msgid "Delete"
 msgstr "Supprimer"

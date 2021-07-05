@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.commands import CanDeleteEffectiveClassCommand
+from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
-from attribution.models import *
-from attribution.models import attribution_class
 
-admin.site.register(attribution.Attribution,
-                    attribution.AttributionAdmin)
+def check_can_delete_effective_class(
+        cmd: 'CanDeleteEffectiveClassCommand',
+        effective_class_repository: 'IEffectiveClassRepository',
+) -> None:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_code=cmd.learning_unit_code,
+        learning_unit_year=cmd.year
+    )
+    effective_class = effective_class_repository.get(entity_id=effective_class_identity)
 
-admin.site.register(attribution_new.AttributionNew,
-                    attribution_new.AttributionNewAdmin)
-
-admin.site.register(attribution_charge_new.AttributionChargeNew,
-                    attribution_charge_new.AttributionChargeNewAdmin)
-
-admin.site.register(tutor_application.TutorApplication,
-                    tutor_application.TutorApplicationAdmin)
-
-admin.site.register(attribution_class.AttributionClass,
-                    attribution_class.AttributionClassAdmin)
+    CanEffectiveClassBeDeleted().verify(effective_class=effective_class)

@@ -66,6 +66,11 @@ msgstr ""
 msgid "Class can't be neither mobility nor external"
 msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
+msgid "Class of learning unit having enrollment can't be delete"
+msgstr ""
+"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne pouvez "
+"pas supprimer cette classe."
+
 msgid "Credits should be greather than 0"
 msgstr "Les crédits doivent être > 0"
 
@@ -138,6 +143,14 @@ msgid ""
 msgstr ""
 "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume %(quadrimester)s doit avoir une "
 "valeur)"
+
+#, python-format
+msgid ""
+"The class %(class_complete_code)s is assigned to %(tutor_full_name)s in "
+"%(year)s"
+msgstr ""
+"La classe %(class_complete_code)s est attribuée à %(tutor_full_name)s en "
+"%(year)s"
 
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr "Le code %(ue_code)s - %(code)s existe déjà pour l'UE %(ue)s"

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,22 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 
-from attribution.models import *
-from attribution.models import attribution_class
+from base.models.learning_unit_enrollment import LearningUnitEnrollment as LearningUnitEnrollmentDatabase
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.i_student_enrollments_to_effective_class import \
+    IStudentEnrollmentsToEffectiveClass
 
-admin.site.register(attribution.Attribution,
-                    attribution.AttributionAdmin)
 
-admin.site.register(attribution_new.AttributionNew,
-                    attribution_new.AttributionNewAdmin)
+class StudentEnrollmentsToEffectiveClass(IStudentEnrollmentsToEffectiveClass):
 
-admin.site.register(attribution_charge_new.AttributionChargeNew,
-                    attribution_charge_new.AttributionChargeNewAdmin)
-
-admin.site.register(tutor_application.TutorApplication,
-                    tutor_application.TutorApplicationAdmin)
-
-admin.site.register(attribution_class.AttributionClass,
-                    attribution_class.AttributionClassAdmin)
+    @classmethod
+    def has_enrollments_to_class(cls, learning_unit_identity: 'LearningUnitIdentity') -> bool:
+        return LearningUnitEnrollmentDatabase.objects.filter(
+            learning_unit_year__acronym=learning_unit_identity.code,
+            learning_unit_year__academic_year__year=learning_unit_identity.year
+        ).exists()
