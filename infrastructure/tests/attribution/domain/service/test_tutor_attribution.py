@@ -43,6 +43,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
             AttributionChargeNewFactory(
                 learning_component_year__learning_unit_year__acronym=identity.code,
                 learning_component_year__learning_unit_year__academic_year__year=identity.year,
+                allocation_charge=10.0,
             )
         result = self.translator.search_attributions_to_learning_unit(identity)
         ordered_by_last_name_first_name = list(sorted(result, key=lambda elem: (elem.last_name, elem.first_name)))
@@ -53,6 +54,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         attribution_charge = AttributionChargeNewFactory(
             learning_component_year__learning_unit_year__acronym=identity.code,
             learning_component_year__learning_unit_year__academic_year__year=identity.year,
+            allocation_charge=10.0,
         )
         for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
@@ -67,6 +69,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
             attribution__tutor__person__global_id=tutor_identity.personal_id_number,
             learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
             learning_component_year__learning_unit_year__academic_year__year=learn_unit_identity.year,
+            allocation_charge=10.0,
         )
         for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
@@ -81,6 +84,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
             attribution__tutor__person__global_id=tutor_identity.personal_id_number,
             learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
             learning_component_year__learning_unit_year__academic_year__year=learn_unit_identity.year,
+            allocation_charge=10.0,
         )
         result = self.translator.get_tutor_attribution_to_learning_unit(tutor_identity, learn_unit_identity)
         self.assertEqual(result.attribution_uuid, attribution_charge.attribution.uuid)
@@ -93,4 +97,3 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         self.assertEqual(result.personal_id_number, person_database.global_id)
         self.assertEqual(result.function, attribution_charge.attribution.function)
         self.assertEqual(result.attributed_volume_to_learning_unit, attribution_charge.allocation_charge)
-        self.assertEqual(result.classes, [])

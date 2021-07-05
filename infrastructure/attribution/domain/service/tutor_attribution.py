@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 from typing import List
 
-from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import F, Q
+from django.db.models import F
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
@@ -45,6 +45,8 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
         qs = AttributionChargeNew.objects.filter(
             learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
             learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
+            allocation_charge__isnull=False,
+            allocation_charge__gt=Decimal(0.0),
         ).annotate(
             learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
             learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
@@ -54,8 +56,6 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             personal_id_number=F('attribution__tutor__person__global_id'),
             function=F('attribution__function'),
             attributed_volume_to_learning_unit=F('allocation_charge'),
-            component_type=F('learning_component_year__type'),
-            classes=ArrayAgg('attributionclass__learning_class_year__acronym', filter=~Q(attributionclass=None))
         ).values(
             'learning_unit_code',
             'learning_unit_year',
@@ -65,12 +65,10 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             'personal_id_number',
             'function',
             'attributed_volume_to_learning_unit',
-            'component_type',
-            'classes'
         ).order_by(
             'last_name',
             'first_name',
-        )
+        ).distinct()
 
         return [TutorAttributionToLearningUnitDTO(**data_as_dict) for data_as_dict in qs]
 
