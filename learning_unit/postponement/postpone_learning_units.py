@@ -92,7 +92,6 @@ class PostponeLearningUnits:
 
     def postpone(self):
         for lcy in self.load_container_years_to_postpone():
-            print(lcy.is_proposal_creation)
             for year in range(lcy.academic_year.year + 1, self.compute_container_year_end_year(lcy) + 1):
                 default_values = self.load_initial_values_before_proposal(lcy)
                 self.postpone_learning_container_year(lcy, year, default_values)
