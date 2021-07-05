@@ -24,7 +24,8 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.learning_unit.commands import HasClassRepartitionCommand, HasEnrollmentsToClassCommand
+from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
@@ -49,19 +50,19 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
         if learning_unit_has_enrollments:
             exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
-        tutor_assign_to_class = message_bus_instance.invoke(
-            HasClassRepartitionCommand(
+        tutors_assigned_to_class = message_bus_instance.invoke(
+            SearchTutorsDistributedToClassCommand(
                 class_code=effective_class.class_code,
                 learning_unit_code=effective_class.entity_id.learning_unit_identity.code,
-                year=effective_class.entity_id.learning_unit_identity.year
+                learning_unit_year=effective_class.entity_id.learning_unit_identity.year
             )
         )
 
-        if tutor_assign_to_class:
+        if tutors_assigned_to_class:
             exceptions.add(
                 EffectiveClassHasTutorAssignedException(
                     effective_class_complete_code=effective_class.complete_acronym,
-                    tutor_full_name=tutor_assign_to_class,
+                    tutor_full_name=tutors_assigned_to_class[0].full_name,
                     learning_unit_year=effective_class.entity_id.learning_unit_identity.year
                 )
             )

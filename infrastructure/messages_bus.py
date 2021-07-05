@@ -50,14 +50,12 @@ from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_se
     search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_service import \
-    has_class_repartition_service
 from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
     has_enrollments_to_class_service
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
+    HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -135,7 +133,6 @@ class MessageBus:
             cmd,
             EffectiveClassRepository(),
         ),
-        HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
         HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
         GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
             cmd, EffectiveClassRepository(), LearningUnitRepository()
