@@ -25,7 +25,6 @@
 ##############################################################################
 
 import attr
-import mock
 from django.test import SimpleTestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -34,13 +33,11 @@ from ddd.logic.learning_unit.commands import DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
-from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithLecturingVolumesOnly, \
-    LDROI1001CourseLearningUnitFactory
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsTranslator
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
-from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
 class DeleteEffectiveClassService(SimpleTestCase):
