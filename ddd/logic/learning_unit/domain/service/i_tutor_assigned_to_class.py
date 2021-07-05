@@ -26,10 +26,11 @@
 import abc
 from typing import Optional
 
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
-class ITutorDistributedToClass(interface.DomainService):
+class ITutorAssignedToClass(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod

@@ -30,9 +30,12 @@ import attr
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, eq=False)
 class AcademicYearIdentity(interface.EntityIdentity):
     year = attr.ib(type=int)
+
+    def __eq__(self, other):
+        return self.year == other.year
 
     def __str__(self):
         return self.get_verbose_year(self.year)

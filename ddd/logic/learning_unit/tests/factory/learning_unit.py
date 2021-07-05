@@ -208,7 +208,7 @@ class LDROI1001LearningUnitIdentityFactory(LearningUnitIdentityFactory):
 
 
 class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = LDROI1001LearningUnitIdentityFactory
+    entity_id = LDROI1001LearningUnitIdentityFactory()
     titles = _TitlesFactory(
         common_fr="Introduction au droit",
         specific_fr="Partie 1 : droit civil",

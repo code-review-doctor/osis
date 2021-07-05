@@ -45,10 +45,13 @@ class EffectiveClassCode(str):
         assert len(self) == 1
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, eq=False)
 class EffectiveClassIdentity(interface.EntityIdentity):
     class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
+
+    def __eq__(self, other):
+        return self.class_code == other.class_code and self.learning_unit_identity == other.learning_unit_identity
 
     def __str__(self):
         return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))

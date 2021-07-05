@@ -27,6 +27,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClass
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
 from osis_common.ddd import interface
@@ -37,7 +38,8 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
     @classmethod
     def verify(
             cls,
-            effective_class: 'EffectiveClass'
+            effective_class: 'EffectiveClass',
+            has_assigned_tutor_service: 'ITutorAssignedToClass'
     ):
         exceptions = set()  # type Set[BusinessException]
         from infrastructure.messages_bus import message_bus_instance
@@ -50,19 +52,12 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
         if learning_unit_has_enrollments:
             exceptions.add(LearningUnitOfEffectiveClassHasEnrollmentException())
 
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class.class_code,
-                learning_unit_code=effective_class.entity_id.learning_unit_identity.code,
-                learning_unit_year=effective_class.entity_id.learning_unit_identity.year
-            )
-        )
-
-        if tutors_assigned_to_class:
+        first_tutor_name = has_assigned_tutor_service.get_first_tutor_full_name_if_exists(effective_class.entity_id)
+        if first_tutor_name:
             exceptions.add(
                 EffectiveClassHasTutorAssignedException(
                     effective_class_complete_code=effective_class.complete_acronym,
-                    tutor_full_name=tutors_assigned_to_class[0].full_name,
+                    tutor_full_name=first_tutor_name,
                     learning_unit_year=effective_class.entity_id.learning_unit_identity.year
                 )
             )
