@@ -944,4 +944,4 @@ def _build_cells_ref(columns, line_numbers: List[int]):
     for line_number in line_numbers:
         for letter in columns:
             references.append("{}{}".format(letter, line_number))
-    return references
+    return set(references)

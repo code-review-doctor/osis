@@ -555,8 +555,8 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
 
     return {
         'data': data,
-        'cells_with_top_border': cells_with_top_border or None,
-        'cells_with_white_font': cells_with_white_font or None,
+        'cells_with_top_border': set(cells_with_top_border) or set(),
+        'cells_with_white_font': set(cells_with_white_font) or set(),
     }
 
 
