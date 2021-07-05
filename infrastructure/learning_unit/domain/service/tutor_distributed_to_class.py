@@ -27,10 +27,10 @@ from typing import Optional
 
 from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClass
+from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
 
 
-class TutorAssignedToClass(ITutorAssignedToClass):
+class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
 
     @classmethod
     def get_first_tutor_full_name_if_exists(

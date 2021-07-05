@@ -30,8 +30,7 @@ from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdent
 from osis_common.ddd import interface
 
 
-# TODO :: Suffix with "Translator"
-class IStudentEnrollments(interface.DomainService):
+class IStudentEnrollmentsTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod

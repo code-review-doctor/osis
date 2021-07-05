@@ -35,7 +35,7 @@ from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1002Externa
     LDROI1001CourseLearningUnitFactory, LDROI1003CourseWithPartimsLearningUnitFactory, \
     LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollments
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollmentsTranslator
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
@@ -43,7 +43,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
 
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
-        self.has_enrollments_service = StudentEnrollments()
+        self.has_enrollments_service = StudentEnrollmentsTranslator()
         self.has_enrollments_service.has_enrollments_to_class = lambda *args: False
         self.has_enrollments_service.has_enrollments_to_learning_unit = lambda *args: False
 

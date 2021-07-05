@@ -28,10 +28,10 @@ from base.models.learning_unit_enrollment import LearningUnitEnrollment as Learn
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
-    IStudentEnrollments
+    IStudentEnrollmentsTranslator
 
 
-class StudentEnrollments(IStudentEnrollments):
+class StudentEnrollmentsTranslator(IStudentEnrollmentsTranslator):
 
     @classmethod
     def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:

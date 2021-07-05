@@ -80,8 +80,8 @@ from infrastructure.application.services.applications_summary import Application
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 from infrastructure.attribution.repository.tutor import TutorRepository
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollments
-from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClass
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -128,14 +128,14 @@ class MessageBus:
         DeleteEffectiveClassCommand: lambda cmd: delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            TutorAssignedToClass(),
-            StudentEnrollments(),
+            TutorAssignedToClassTranslator(),
+            StudentEnrollmentsTranslator(),
         ),
         CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            TutorAssignedToClass(),
-            StudentEnrollments(),
+            TutorAssignedToClassTranslator(),
+            StudentEnrollmentsTranslator(),
         ),
         GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
             cmd, EffectiveClassRepository(), LearningUnitRepository()

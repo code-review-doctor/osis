@@ -28,8 +28,8 @@ from typing import Set
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.service.i_student_enrollments import \
-    IStudentEnrollments
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClass
+    IStudentEnrollmentsTranslator
+from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
 from ddd.logic.learning_unit.domain.validator.exceptions import EffectiveClassHasTutorAssignedException, \
     LearningUnitOfEffectiveClassHasEnrollmentException
 from osis_common.ddd import interface
@@ -42,8 +42,8 @@ class CanEffectiveClassBeDeleted(interface.DomainService):
     def verify(
             cls,
             effective_class: 'EffectiveClass',
-            has_assigned_tutor_service: 'ITutorAssignedToClass',
-            has_enrollments_service: 'IStudentEnrollments'
+            has_assigned_tutor_service: 'ITutorAssignedToClassTranslator',
+            has_enrollments_service: 'IStudentEnrollmentsTranslator'
     ):
         exceptions = set()  # type: Set[BusinessException]
 

@@ -30,7 +30,7 @@ from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassI
 from osis_common.ddd import interface
 
 
-class ITutorAssignedToClass(interface.DomainService):
+class ITutorAssignedToClassTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod

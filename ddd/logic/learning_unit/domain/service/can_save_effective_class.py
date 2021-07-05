@@ -26,7 +26,7 @@
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
-from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollments
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, \
     LearningUnitHasEnrollmentException, LearningUnitHasNoVolumeException
@@ -41,7 +41,7 @@ class CanCreateEffectiveClass(interface.DomainService):
             cls,
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'ILearningUnitRepository',
-            has_enrollments_service: 'IStudentEnrollments',
+            has_enrollments_service: 'IStudentEnrollmentsTranslator',
     ):
         exceptions = set()  # type Set[BusinessException]
         if learning_unit.is_external():

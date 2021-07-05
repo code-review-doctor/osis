@@ -37,8 +37,8 @@ from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffec
 from ddd.logic.learning_unit.tests.factory.learning_unit import CourseWithLecturingVolumesOnly, \
     LDROI1001CourseLearningUnitFactory
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollments
-from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClass
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
@@ -57,10 +57,10 @@ class DeleteEffectiveClassService(SimpleTestCase):
             learning_unit_code=self.existing_class.learning_unit_code,
             year=self.existing_class.year
         )
-        self.tutor_distributed_to_class = TutorAssignedToClass()
+        self.tutor_distributed_to_class = TutorAssignedToClassTranslator()
         self.tutor_distributed_to_class.get_first_tutor_full_name_if_exists = lambda *args: None
 
-        self.has_enrollments_service = StudentEnrollments()
+        self.has_enrollments_service = StudentEnrollmentsTranslator()
         self.has_enrollments_service.has_enrollments_to_class = lambda *args: False
 
     def test_should_class_exists(self):
