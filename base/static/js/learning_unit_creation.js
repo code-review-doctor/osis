@@ -28,6 +28,12 @@ function isDisabledField(html_id){
 }
 
 
+function setDefaultStageDomina() {
+    let containerTypeValue = document.getElementById('id_container_type').value;
+    document.getElementById('id_stage_dimona').checked = containerTypeValue === internship ? true : false;
+}
+
+
 function showInternshipSubtype(){
     if (isLearningUnitSubtypeFull() && document.getElementById('id_internship_subtype')) {
         var container_type_value = document.getElementById('id_container_type').value;
@@ -210,4 +216,6 @@ $(document).ready(function() {
         }
     });
     $('#id_credits').removeAttr('required');
+
+    document.getElementById('id_container_type').addEventListener("change", setDefaultStageDomina);
 });
