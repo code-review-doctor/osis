@@ -45,6 +45,7 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
             {
                 'effective_class': self.effective_class,
                 'tutors': self.get_ue_tutors(),
+                'learning_unit': self.learning_unit,
                 'can_add_charge_repartition': True,  # TODO je ne connais pas la condition,
             }
         )
