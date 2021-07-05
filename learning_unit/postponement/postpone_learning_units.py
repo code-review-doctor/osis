@@ -30,6 +30,7 @@ from django.utils.functional import cached_property
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FORCE_MAJEURE
 from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.enums.proposal_type import ProposalType
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_component_year import LearningComponentYear
@@ -56,7 +57,7 @@ class PostponeLearningUnits:
 
     def load_container_years_to_postpone(self) -> Iterable[LearningContainerYear]:
         last_occurence_qs = LearningContainerYear.objects.filter(
-            Q(academic_year__year__gte=self.from_year) & Q(learningunityear__proposallearningunit__isnull=True),
+            academic_year__year__gte=self.from_year,
             learning_container=OuterRef("learning_container")
         ).values(
             "learning_container"
@@ -70,13 +71,19 @@ class PostponeLearningUnits:
             mobility=True,
             learning_unit_year=OuterRef('learningunityear')
         )
+        is_proposal_creation = ProposalLearningUnit.objects.filter(
+            learning_unit_year=OuterRef('learningunityear'),
+            type=ProposalType.CREATION.name
+        )
 
         return LearningContainerYear.objects.filter(
             academic_year__year=Subquery(last_occurence_qs[:1]),
         ).annotate(
-            is_mobility=Exists(is_mobility_qs)
+            is_mobility=Exists(is_mobility_qs),
+            is_proposal_creation=Exists(is_proposal_creation)
         ).exclude(
-            is_mobility=True
+            is_mobility=True,
+            is_proposal_creation=True
         ).prefetch_related(
             'learningunityear_set',
             'learningunityear_set__externallearningunityear',
