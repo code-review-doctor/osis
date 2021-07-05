@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -342,10 +341,12 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
 
     lu_data_part2.append(learning_unit_yr.get_periodicity_display())
     lu_data_part2.append(yesno(learning_unit_yr.status))
+
     if effective_class:
         lu_data_part2.extend(effective_class_volume_information(effective_class))
     else:
         lu_data_part2.extend(volume_information(learning_unit_yr))
+
     if effective_class:
         lu_data_part2.extend([
             effective_class.get_quadrimester_display() or '',
@@ -370,7 +371,7 @@ def get_data_part1(
 
     title = learning_unit_yr.complete_title
     if effective_class and effective_class.title_fr:
-        title += " - ".format(effective_class.title_fr)
+        title = "{} - {}".format(title, effective_class.title_fr)
 
     lu_common_data_part1 = [
         effective_class.effective_class_complete_acronym if effective_class else learning_unit_yr.acronym,
@@ -393,7 +394,7 @@ def get_data_part1(
 
     title_english = learning_unit_yr.complete_title_english
     if effective_class and effective_class.title_en:
-        title_english += " - ".format(effective_class.title_en)
+        title_english = "{} - {}".format(title_english, effective_class.title_en)
 
     lu_common_data_part2 = [
         learning_unit_yr.credits,
@@ -522,7 +523,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             learning_unit_yr).values()
         if attributions_values:
             for value in attributions_values:
-                data.append(lu_data_part1 + _get_attribution_detail(value))
+                data.append(lu_data_part1 + _get_attribution_detail(value, is_attribution_class=False))
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
@@ -575,8 +576,8 @@ def _get_attribution_detail(an_attribution: dict, is_attribution_class=False) ->
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         an_attribution.get('start_year'),
         an_attribution.get('duration') if an_attribution.get('duration') else '',
-        volume_lecturing,
-        volume_practical
+        _get_attribution_volume(volume_lecturing),
+        _get_attribution_volume(volume_practical)
     ]
 
 
@@ -715,3 +716,7 @@ def _get_class_attribution_detail(an_attribution):
         an_attribution.get('pm_allocation_charge'),
         an_attribution.get('pp_allocation_charge')
     ]
+
+
+def _get_attribution_volume(volume):
+    return volume if volume and volume > 0 else 0
