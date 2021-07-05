@@ -834,11 +834,11 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         # UE attr 4- line 5
         # Class A attr 1- line 6
         # Class A attr 2 - line 7
-        self.assertCountEqual(
+        self.assertEqual(
             cells_with_top_border,
             _build_cells_ref(ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST, [2, 6, 8, 9])
         )
-        self.assertCountEqual(
+        self.assertEqual(
             cells_with_white_font,
             _build_cells_ref(
                 ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
