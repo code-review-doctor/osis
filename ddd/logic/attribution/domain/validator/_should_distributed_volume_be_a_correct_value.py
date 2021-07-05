@@ -23,21 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.effective_class_repartition.domain.validator.exceptions import InvalidVolumeException
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.attribution.domain.validator.exceptions import AssignedVolumeInvalidValueException, \
+    AssignedVolumeTooHighException
+
+MINIMUM_VALUE = 0
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldBeAnAvailableVolume(BusinessValidator):
-    distributed_volume = attr.ib(type=Decimal)
-    effective_class = attr.ib(type=EffectiveClass)
+class ShouldDistributedVolumeBeACorrectValue(BusinessValidator):
+
+    class_volume = attr.ib(type=float)
+    assigned_volume = attr.ib(type=float)
+    attribution_volume = attr.ib(type=float)
 
     def validate(self, *args, **kwargs):
-        if self.distributed_volume > self.effective_class.volumes.total_volume or \
-                self.distributed_volume < 0:
-            raise InvalidVolumeException(self.effective_class.volumes.total_volume)
+        if self.assigned_volume:
+            if self.assigned_volume < MINIMUM_VALUE or self.assigned_volume > self.class_volume:
+                raise AssignedVolumeInvalidValueException(self.assigned_volume, self.class_volume)
+            if self.assigned_volume > self.attribution_volume:
+                raise AssignedVolumeTooHighException(self.assigned_volume, self.attribution_volume)

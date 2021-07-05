@@ -48,3 +48,15 @@ class AssignedVolumeTooHighException(BusinessException):
             'attribution_volume': attribution_volume
         }
         super().__init__(message, **kwargs)
+
+
+class TutorAlreadyAssignedException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Tutor already assigned to the class")
+        super().__init__(message, **kwargs)
+
+
+class InvalidDistributedVolumeValueException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Distributed volume should be filled in and be greater than 0")
+        super().__init__(message, **kwargs)

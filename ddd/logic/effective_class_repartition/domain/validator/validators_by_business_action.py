@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 from typing import List
 
 import attr
@@ -32,21 +33,28 @@ from ddd.logic.application.domain.validator._should_be_an_available_volume impor
 from ddd.logic.application.domain.validator._should_be_the_author_of_the_application import \
     ShouldBeTheAuthorOfTheApplication
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
+from ddd.logic.attribution.domain.validator._should_distributed_volume_be_greater_than_0 import \
+    ShouldAssignedVolumeBeACorrectValue
+from ddd.logic.attribution.domain.validator._should_tutor_not_be_already_assigned_to_class import \
+    ShouldTutorNotBeAlreadyAssignedToClass
 from ddd.logic.effective_class_repartition.domain.validator._should_be_numeric_validator import ShouldBeNumericValidator
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 
 
 @attr.s(frozen=True, slots=True)
 class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-    command = attr.ib(type=DistributeClassToTutorCommand)
+    tutor = attr.ib(type='Tutor')
+    distributed_volume = attr.ib(type=Decimal)
     effective_class = attr.ib(type=EffectiveClass)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldBeNumericValidator(self.command.distributed_volume)
+            ShouldBeNumericValidator(self.distributed_volume)
         ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldBeAnAvailableVolume(self.command, self.effective_class),
+            ShouldAssignedVolumeBeACorrectValue(self.distributed_volume),
+            ShouldTutorNotBeAlreadyAssignedToClass(self.effective_class, self.tutor),
+            ShouldBeAnAvailableVolume(self.distributed_volume, self.effective_class),
         ]

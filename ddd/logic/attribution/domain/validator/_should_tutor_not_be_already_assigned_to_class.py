@@ -26,24 +26,19 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from base.models.enums.learning_unit_year_session import DerogationSession
-from ddd.logic.attribution.domain.validator.exceptions import AssignedVolumeInvalidValueException, \
-    AssignedVolumeTooHighException
-from ddd.logic.learning_unit.domain.validator.exceptions import DerogationSessionInvalidChoiceException
-
-MINIMUM_VALUE = 0
+from ddd.logic.attribution.domain.validator.exceptions import TutorAlreadyAssignedException
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldAssignedVolumeBeACorrectValue(BusinessValidator):
+class ShouldTutorNotBeAlreadyAssignedToClass(BusinessValidator):
 
-    class_volume = attr.ib(type=float)
-    assigned_volume = attr.ib(type=float)
-    attribution_volume = attr.ib(type=float)
+    class_identity_to_assign = attr.ib(type='EffectiveClassIdentity')  # type: EffectiveClassIdentity
+    tutor = attr.ib(type='Tutor')  # type: Tutor
 
     def validate(self, *args, **kwargs):
-        if self.assigned_volume:
-            if self.assigned_volume < MINIMUM_VALUE or self.assigned_volume > self.class_volume:
-                raise AssignedVolumeInvalidValueException(self.assigned_volume, self.class_volume)
-            if self.assigned_volume > self.attribution_volume:
-                raise AssignedVolumeTooHighException(self.assigned_volume, self.attribution_volume)
+        effective_classes_already_distributed = [
+            distributed_class.effective_class for distributed_class in self.tutor.distributed_effective_classes
+        ]
+        if self.class_identity_to_assign in effective_classes_already_distributed:
+            raise TutorAlreadyAssignedException()

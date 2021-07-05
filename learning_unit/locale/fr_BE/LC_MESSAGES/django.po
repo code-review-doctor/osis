@@ -373,7 +373,7 @@ msgid "Tutor"
 msgstr "Enseignant·e"
 
 msgid "Tutor already assigned to the class"
-msgstr "Le tuteur est déjà assigné à la classe"
+msgstr "L'enseignant est déjà assigné à cette classe"
 
 msgid "Tutors"
 msgstr "Enseignant·e·s"

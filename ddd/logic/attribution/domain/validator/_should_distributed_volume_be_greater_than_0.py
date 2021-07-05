@@ -23,21 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
-
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.effective_class_repartition.domain.validator.exceptions import InvalidVolumeException
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.attribution.domain.validator.exceptions import InvalidDistributedVolumeValueException
+
+MINIMUM_VALUE = 0
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldBeAnAvailableVolume(BusinessValidator):
-    distributed_volume = attr.ib(type=Decimal)
-    effective_class = attr.ib(type=EffectiveClass)
+class ShouldAssignedVolumeBeACorrectValue(BusinessValidator):
+    distributed_volume = attr.ib(type=float)
 
     def validate(self, *args, **kwargs):
-        if self.distributed_volume > self.effective_class.volumes.total_volume or \
-                self.distributed_volume < 0:
-            raise InvalidVolumeException(self.effective_class.volumes.total_volume)
+        if not self.distributed_volume or self.distributed_volume <= 0.0:
+            raise InvalidDistributedVolumeValueException()
