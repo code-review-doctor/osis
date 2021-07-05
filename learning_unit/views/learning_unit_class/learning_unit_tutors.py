@@ -37,7 +37,7 @@ from learning_unit.views.learning_unit_class.common import CommonClassView
 
 class LearningUnitTutorsView(CommonClassView, TemplateView):
     template_name = "class/lu_tutors.html"
-    permission_required = 'base.can_access_class'
+    permission_required = 'attribution.can_change_class_attribution'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +46,6 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
                 'effective_class': self.effective_class,
                 'tutors': self.get_ue_tutors(),
                 'can_add_charge_repartition': True,  # TODO je ne connais pas la condition,
-                'can_delete_attribution': True  # TODO je ne connais pas la condition,
             }
         )
         context.update(self.common_url_tabs())

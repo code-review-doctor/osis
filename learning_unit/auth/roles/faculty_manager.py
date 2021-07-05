@@ -142,8 +142,8 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                 (predicates.is_user_attached_to_current_requirement_entity |
                  predicates.is_user_attached_to_requirement_entity) &
                 (predicates.is_not_proposal_of_type_creation |
-                    (predicates.has_learning_unit_no_attribution_this_year &
-                     predicates.has_learning_unit_no_application_this_year)
+                 (predicates.has_learning_unit_no_attribution_this_year &
+                  predicates.has_learning_unit_no_application_this_year)
                  ),
             'base.can_create_class':
                 predicates.is_user_attached_to_current_requirement_entity &
@@ -152,4 +152,10 @@ class FacultyManager(osis_role_models.EntityRoleModel):
             'learning_unit.change_learningclassyear':
                 predicates.is_user_attached_to_current_requirement_entity &
                 predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year,
+            'attribution.can_change_class_attribution':
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
+                predicates.is_user_attached_to_current_requirement_entity,
+            'attribution.can_delete_class_attribution':
+                predicates.is_learning_unit_edition_for_faculty_manager_period_open &
+                predicates.is_user_attached_to_current_requirement_entity,
         })

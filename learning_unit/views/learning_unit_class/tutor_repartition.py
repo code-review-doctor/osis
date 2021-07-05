@@ -42,7 +42,7 @@ from learning_unit.views.learning_unit_class.common import CommonClassView
 
 class TutorRepartitionView(CommonClassView, FormView):
     template_name = "class/add_charge_repartition.html"
-    permission_required = 'base.can_access_class'
+    permission_required = 'attribution.can_change_class_attribution'
     form_class = ClassTutorRepartitionForm
 
     def get_context_data(self, **kwargs):
@@ -112,7 +112,7 @@ class TutorRepartitionView(CommonClassView, FormView):
 
 class TutorRepartitionRemoveView(TutorRepartitionView):
     template_name = "class/remove_charge_repartition.html"
-    permission_required = 'base.can_access_class'
+    permission_required = 'attribution.can_delete_class_attribution'
     form_class = ClassRemoveTutorRepartitionForm
 
     def get_form_kwargs(self):
@@ -130,7 +130,7 @@ class TutorRepartitionRemoveView(TutorRepartitionView):
 
 class TutorRepartitionEditView(TutorRepartitionView):
     template_name = "class/add_charge_repartition.html"
-    permission_required = 'base.can_access_class'
+    permission_required = 'attribution.can_change_class_attribution'
     form_class = ClassEditTutorRepartitionForm
 
     @cached_property
