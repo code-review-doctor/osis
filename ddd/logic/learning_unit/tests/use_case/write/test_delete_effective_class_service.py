@@ -91,8 +91,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
         )
         self.assertNotIn(self.existing_class, self.effective_class_repository.entities)
 
-    # TODO :: rename test
-    def test_should_raise_LearningUnitOfEffectiveClassHasEnrollmentException(self):
+    def test_should_not_delete_if_has_enrollments_to_class(self):
         self.has_enrollments_service.has_enrollments_to_class = lambda *args: True
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
@@ -110,7 +109,7 @@ class DeleteEffectiveClassService(SimpleTestCase):
 
         self.assertEqual(list(exceptions)[0].message, _("Class of learning unit having enrollment can't be delete"))
 
-    def test_should_raise_EffectiveClassHasTutorAssignedException(self):
+    def test_should_not_delete_if_has_tutors_assigned(self):
         tutor_full_name = 'Martin tom'
         self.tutor_distributed_to_class.get_first_tutor_full_name_if_exists = lambda *args: tutor_full_name
 
