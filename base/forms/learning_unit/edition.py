@@ -134,8 +134,9 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
             if not max_year and applications:
                 max_year = applications.first().learning_container_year.academic_year.year
         else:
-            lu_parent = self.learning_unit.parent
-            max_year = lu_parent.end_year.year if lu_parent and lu_parent.end_year else None
+            luy_parent = self.learning_unit_year.parent
+            max_year = luy_parent.learning_unit.end_year.year \
+                if luy_parent and luy_parent.learning_unit.end_year else None
         academic_years = AcademicYear.objects.filter(year__gte=self.luy_current_year, year__in=target_years_opened)
         return academic_years.filter(year__lte=max_year) if max_year else academic_years
 

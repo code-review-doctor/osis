@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         url = reverse("learning_unit_pedagogy", args=[self.learning_unit_year.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(response.context['cms_labels_translated'])
+        self.assertTrue('cms_labels_translated' in response.context.keys())
 
     def test_learning_unit_pedagogy_read_with_code_and_year(self):
         url = reverse("learning_unit_pedagogy", args=[
@@ -187,7 +187,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         ])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(response.context['cms_labels_translated'])
+        self.assertTrue('cms_labels_translated' in response.context.keys())
 
 
 class LearningUnitPedagogyExportXLSTestCase(TestCase):
