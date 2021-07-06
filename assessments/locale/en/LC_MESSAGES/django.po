@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-29 15:47+0200\n"
+"POT-Creation-Date: 2021-07-06 15:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -447,6 +447,9 @@ msgstr ""
 
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
+msgstr ""
+
+msgid "Score responsible should be link to an attribution"
 msgstr ""
 
 msgid "Score sheet address was successfully saved."
