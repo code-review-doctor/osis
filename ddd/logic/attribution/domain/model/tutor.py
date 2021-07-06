@@ -32,7 +32,7 @@ from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVo
 from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
     DistributeClassToTutorValidatorList
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClass
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
@@ -50,13 +50,14 @@ class Tutor(interface.RootEntity):
 
     def assign_class(
             self,
-            effective_class: 'EffectiveClass',  # FIXME :: domain is not pure
+            effective_class_id: 'EffectiveClassIdentity',
             learning_unit_attribution_uuid: str,
-            distributed_volume: Decimal
+            distributed_volume: Decimal,
+            total_class_volume: Decimal
     ) -> None:
-        DistributeClassToTutorValidatorList(self, distributed_volume, effective_class).validate()
+        DistributeClassToTutorValidatorList(self, distributed_volume, effective_class_id, total_class_volume).validate()
         class_volume = ClassVolumeRepartition(
-            effective_class=effective_class.entity_id,
+            effective_class=effective_class_id,
             distributed_volume=distributed_volume,
             attribution=LearningUnitAttributionIdentity(uuid=learning_unit_attribution_uuid),
         )

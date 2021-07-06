@@ -29,15 +29,13 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import InvalidVolumeException
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldBeAnAvailableVolume(BusinessValidator):
     distributed_volume = attr.ib(type=Decimal)
-    effective_class = attr.ib(type=EffectiveClass)
+    total_class_volume = attr.ib(type=Decimal)
 
     def validate(self, *args, **kwargs):
-        if self.distributed_volume > self.effective_class.volumes.total_volume or \
-                self.distributed_volume < 0:
-            raise InvalidVolumeException(self.effective_class.volumes.total_volume)
+        if self.distributed_volume > self.total_class_volume or self.distributed_volume < 0:
+            raise InvalidVolumeException(self.total_class_volume)

@@ -26,12 +26,8 @@
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
-from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
-    DistributeClassToTutorValidatorList
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
@@ -48,9 +44,10 @@ def distribute_class_to_tutor(
 
     # WHEN
     tutor.assign_class(
-        effective_class=effective_class,
+        effective_class_id=effective_class.entity_id,
         learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid,
         distributed_volume=cmd.distributed_volume,
+        total_class_volume=effective_class.volumes.total_volume
     )
 
     # THEN
