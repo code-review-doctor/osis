@@ -27,43 +27,28 @@ from collections import OrderedDict
 from typing import List
 
 from attribution.models.attribution_class import AttributionClass
-from base.models.enums.component_type import LECTURING
-from learning_unit.models.learning_class_year import LearningClassYear
-
-
-def find_attribution(effective_class: LearningClassYear):
-    return AttributionClass.objects \
-        .filter(learning_class_year=effective_class) \
-        .select_related(
-            'attribution_charge__learning_component_year',
-            'attribution_charge__attribution__tutor__person'
-        )\
-        .order_by('attribution_charge__attribution__tutor__person')
-
-
-def find_class_attribution_charge_new_by_learning_unit_year_as_dict(effective_class):
-    attribution_charges = find_attribution(effective_class)
-
-    return create_attributions_dictionary(attribution_charges)
+from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 
 
 def create_attributions_dictionary(class_attribution_charges: List[AttributionClass]) -> OrderedDict():
     attributions = OrderedDict()
 
-    for attribution in class_attribution_charges:
-        attribution_charge = attribution.attribution_charge
-        key = attribution_charge.attribution.id
+    for class_attribution in class_attribution_charges:
+        attribution_charge = class_attribution.attribution_charge
+        attribution = attribution_charge.attribution
+        key = attribution.id
+        component_type = class_attribution.learning_class_year.learning_component_year.type
         attribution_dict = {
-            "person": attribution_charge.attribution.tutor.person,
-            "function": attribution_charge.attribution.function,
-            "start_year": attribution_charge.attribution.start_year,
-            "duration": attribution_charge.attribution.duration,
-            "substitute": attribution_charge.attribution.substitute,
-            "score_responsible": attribution_charge.attribution.score_responsible,
+            "person": attribution.tutor.person,
+            "function": attribution.function,
+            "start_year": attribution.start_year,
+            "duration": attribution.duration,
+            "substitute": attribution.substitute,
+            "score_responsible": attribution.score_responsible,
             "pm_allocation_charge":
-                attribution.allocation_charge if not attribution.learning_class_year.is_practical() else None,
+                class_attribution.allocation_charge if component_type == LECTURING else None,
             "pp_allocation_charge":
-                attribution.allocation_charge if attribution.learning_class_year.is_practical() else None
+                class_attribution.allocation_charge if component_type == PRACTICAL_EXERCISES else None
         }
         attributions.setdefault(key, attribution_dict) \
             .update({attribution_charge.learning_component_year.type: attribution_charge.allocation_charge})

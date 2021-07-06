@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -25,17 +26,18 @@
 from collections import defaultdict
 from typing import List, Dict, Optional
 
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Prefetch
 from django.db.models import Subquery, OuterRef
-from django.db.models.expressions import RawSQL
+from django.db.models.expressions import RawSQL, F
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
-from attribution.business.attribution_class import find_class_attribution_charge_new_by_learning_unit_year_as_dict
+from attribution.business.attribution_class import create_attributions_dictionary
 from attribution.models.attribution import search as search_attributions
+from attribution.models.attribution_class import AttributionClass
 from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -126,25 +128,36 @@ def prepare_xls_content(learning_unit_years: QuerySet,
             lu_data_part1.extend(_get_external_ue_data(learning_unit_yr))
         result.append(lu_data_part1)
         # TODO :: Uncomment when refactoring score_responsible done.  Score_responsible assign to classes
-        # effective_classes = _get_effective_classes(learning_unit_yr)
-        #
-        # for effective_classe in effective_classes:
-        #     effective_classe_data_part1 = get_data_part1(learning_unit_yr, effective_classe, is_external_ue_list)
-        #     effective_classe_data_part2 = get_data_part2(learning_unit_yr, effective_classe, with_attributions)
-        #     effective_classe_data_part1.extend(effective_classe_data_part2)
-        #     result.append(effective_classe_data_part1)
+        effective_classes = _get_effective_classes(learning_unit_yr)
+
+        for effective_classe in effective_classes:
+            effective_classe_data_part1 = get_data_part1(learning_unit_yr, effective_classe, is_external_ue_list)
+            effective_classe_data_part2 = get_data_part2(learning_unit_yr, effective_classe, with_attributions)
+            effective_classe_data_part1.extend(effective_classe_data_part2)
+            result.append(effective_classe_data_part1)
 
     return result
 
 
 def _get_effective_classes(learning_unit_yr) -> List[LearningClassYear]:
+    class_attributions_queryset = AttributionClass.objects.all() \
+        .select_related(
+        'attribution_charge__learning_component_year',
+        'attribution_charge__attribution__tutor__person').order_by('attribution_charge__attribution__tutor__person')
+
     effective_classes = LearningClassYear.objects.all().select_related(
         'learning_component_year',
         'learning_component_year__learning_unit_year',
         'learning_component_year__learning_unit_year__academic_year'
     ).filter(
         learning_component_year__learning_unit_year__pk=learning_unit_yr.pk,
+    ).prefetch_related(
+        Prefetch('attributionclass_set',
+                 to_attr='class_attributions',
+                 queryset=class_attributions_queryset
+                 )
     ).order_by('acronym')
+
     return effective_classes
 
 
@@ -506,6 +519,7 @@ def create_xls_attributions(user, found_learning_units, filters):
 def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_columns: int) -> Dict:
     data = []
     qs = annotate_qs(found_learning_units)
+    # ici
     cells_with_top_border = []
     cells_with_white_font = []
     line = 2
@@ -540,7 +554,9 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             lu_data_part1 = get_data_part1(learning_unit_yr, effective_class, is_external_ue_list=False)
             lu_data_part2 = get_data_part2(learning_unit_yr, effective_class, with_attributions=False)
             lu_data_part1.extend(lu_data_part2)
-            attributions = find_class_attribution_charge_new_by_learning_unit_year_as_dict(effective_class).values()
+
+            attributions = create_attributions_dictionary(effective_class.class_attributions).values()
+
             first_attribution = True
             if attributions:
                 cells_with_top_border.extend(
@@ -582,7 +598,7 @@ def _get_attribution_detail(an_attribution: dict, is_attribution_class=False) ->
     ]
 
 
-def volume_information(learning_unit_yr):
+def volume_information(learning_unit_yr: LearningUnitYear) -> List:
     return [
         get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
         get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
@@ -668,7 +684,7 @@ def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
 
 
 def _get_effective_class_teachers(effective_class: LearningClassYear) -> List[Person]:
-    attributions = find_class_attribution_charge_new_by_learning_unit_year_as_dict(effective_class)
+    attributions = create_attributions_dictionary(effective_class.class_attributions)
 
     teachers = set()
     for k, attribution in attributions.items():
@@ -721,3 +737,21 @@ def _get_class_attribution_detail(an_attribution):
 
 def _get_attribution_volume(volume):
     return volume if volume and volume > 0 else 0
+
+
+def _get_effective_classes_qs() -> QuerySet:
+    class_attributions_queryset = AttributionClass.objects.all() \
+        .select_related(
+        'attribution_charge__learning_component_year',
+        'attribution_charge__attribution__tutor__person').order_by('attribution_charge__attribution__tutor__person')
+
+    return LearningClassYear.objects.all().select_related(
+        'learning_component_year',
+        'learning_component_year__learning_unit_year',
+        'learning_component_year__learning_unit_year__academic_year'
+    ).prefetch_related(
+        Prefetch('attributionclass_set',
+                 to_attr='class_attributions',
+                 queryset=class_attributions_queryset
+                 )
+    ).order_by('acronym')

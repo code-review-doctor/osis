@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -28,8 +28,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models.enums import quadrimesters, learning_unit_year_session
-from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.component_type import LECTURING
 from base.models.enums import quadrimesters, learning_unit_year_session
 from osis_common.models import osis_model_admin
 
@@ -99,5 +98,3 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
 
-    def is_practical(self):
-        return self.learning_component_year.type == PRACTICAL_EXERCISES

@@ -811,15 +811,15 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         self.assertEqual(len(result.get('data')), 7)
 
         # Check classes content
-        class_a_attribution_1 = data[4]
-        self.assertEqual(class_a_attribution_1[0], "{}-{}".format(self.luy.acronym, self.class_a.acronym))
-        self.assertEqual(class_a_attribution_1[2], "{} - {}".format(self.luy.complete_title, self.class_a.title_fr))
-        self.assertEqual(class_a_attribution_1[3], _('Class'))
-        self.assertEqual(class_a_attribution_1[10],
+        xls_class_a_attribution_1 = data[4]
+        self.assertEqual(xls_class_a_attribution_1[0], "{}-{}".format(self.luy.acronym, self.class_a.acronym))
+        self.assertEqual(xls_class_a_attribution_1[2], "{} - {}".format(self.luy.complete_title, self.class_a.title_fr))
+        self.assertEqual(xls_class_a_attribution_1[3], _('Class'))
+        self.assertEqual(xls_class_a_attribution_1[10],
                          "{} - {}".format(self.luy.complete_title_english, self.class_a.title_en)
                          )
         # Check classes attributions volumes
-        self._assert_class_attribution_volumes(class_a_attribution_1, self.attribution_1_on_class_a)
+        self._assert_class_attribution_volumes(xls_class_a_attribution_1, self.attribution_1_on_class_a)
         self._assert_class_attribution_volumes(data[5], self.attribution_2_on_class_a)
         self._assert_class_attribution_volumes(data[6], self.attribution_3_on_class_b)
 
@@ -845,9 +845,9 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             )
         )
 
-    def _assert_class_attribution_volumes(self, class_a_attribution_1, attribution_class):
-        self.assertEqual(class_a_attribution_1[30], attribution_class.allocation_charge)
-        self.assertEqual(class_a_attribution_1[31], 0)
+    def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
+        self.assertEqual(class_attribution_line_data[30], attribution_class.allocation_charge)
+        self.assertEqual(class_attribution_line_data[31], 0)
 
 
 def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:
