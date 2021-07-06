@@ -519,7 +519,7 @@ def create_xls_attributions(user, found_learning_units, filters):
 def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_columns: int) -> Dict:
     data = []
     qs = annotate_qs(found_learning_units)
-    # ici
+
     cells_with_top_border = []
     cells_with_white_font = []
     line = 2
@@ -737,21 +737,3 @@ def _get_class_attribution_detail(an_attribution):
 
 def _get_attribution_volume(volume):
     return volume if volume and volume > 0 else 0
-
-
-def _get_effective_classes_qs() -> QuerySet:
-    class_attributions_queryset = AttributionClass.objects.all() \
-        .select_related(
-        'attribution_charge__learning_component_year',
-        'attribution_charge__attribution__tutor__person').order_by('attribution_charge__attribution__tutor__person')
-
-    return LearningClassYear.objects.all().select_related(
-        'learning_component_year',
-        'learning_component_year__learning_unit_year',
-        'learning_component_year__learning_unit_year__academic_year'
-    ).prefetch_related(
-        Prefetch('attributionclass_set',
-                 to_attr='class_attributions',
-                 queryset=class_attributions_queryset
-                 )
-    ).order_by('acronym')
