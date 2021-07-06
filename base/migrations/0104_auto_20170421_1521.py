@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
          migrations.RunSQL(
             """
             DROP VIEW IF EXISTS app_scores_encoding;
-            """
+            """,
+             elidable=True
         ),
     ]

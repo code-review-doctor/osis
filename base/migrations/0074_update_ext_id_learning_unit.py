@@ -27,6 +27,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_external_id_field),
+        migrations.RunPython(update_external_id_field, elidable=True),
     ]
 

@@ -31,5 +31,5 @@ class Migration(migrations.Migration):
             "UPDATE base_admissionconditionline SET access='on_the_file' WHERE access='Sur dossier: accès direct ou moyennant compléments de formation'",
             "UPDATE base_admissionconditionline SET access='direct_access' WHERE access='Accès direct'",
             "UPDATE base_admissionconditionline SET access='access_with_training' WHERE access='Accès moyennant compléments de formation'",
-        ])
+        ], elidable=True)
     ]

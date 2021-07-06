@@ -38,3 +38,25 @@ class LanguageContextSerializerMixin:
         if language_code not in language_codes_supported:
             return settings.LANGUAGE_CODE_FR
         return language_code
+
+
+class DisplayExceptionsByFieldNameAPIMixin:
+    """
+       This Mixin is used to display business validation messages (business Exceptions)
+       inside defined fields in the attribute 'field_name_by_exception'
+    """
+
+    # Dict[Exception, Tuple[FormFieldNameStr]]
+    # Example : {CodeAlreadyExistException: ('code',), AcronymAlreadyExist: ('acronym',)}
+    field_name_by_exception = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.field_name_by_exception is None:
+            self.field_name_by_exception = {}
+
+    def get_exception_handler_context(self):
+        return {
+            **super().get_exception_handler_context(),
+            'field_name_by_exception': self.field_name_by_exception
+        }

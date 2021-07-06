@@ -34,19 +34,20 @@ from base.tests.factories.certificate_aim import CertificateAimFactory as Certif
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_type import TrainingEducationGroupTypeFactory, \
     BachelorEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory, \
+    EducationGroupYearMasterFactory
 from base.tests.factories.education_group_year import TrainingFactory as TrainingDBFactory
 from base.tests.factories.entity_version import EntityVersionFactory as EntityVersionModelDbFactory
 from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
+from education_group.tests.ddd.factories.domain.campus import CampusFactory
 from education_group.models.cohort_year import CohortYear as CohortYearModelDb
-from education_group.tests.ddd.factories.campus import CampusIdentityFactory
-from education_group.tests.ddd.factories.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
-from education_group.tests.ddd.factories.isced_domain import IscedDomainIdentityFactory
-from education_group.tests.ddd.factories.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
-from education_group.tests.ddd.factories.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
+from education_group.tests.ddd.factories.domain.isced_domain import IscedDomainIdentityFactory
+from education_group.tests.ddd.factories.domain.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
 from reference.models.domain import Domain
 from reference.tests.factories.domain import DomainFactory as DomainModelDbFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory as DomainIscedFactoryModelDb
@@ -61,7 +62,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
         cls.repository = TrainingRepository()
 
         BachelorEducationGroupTypeFactory()
-        cls.education_group_type = TrainingEducationGroupTypeFactory()
+        cls.education_group_type = TrainingEducationGroupTypeFactory(name=TrainingType.MASTER_MA_120.name)
         cls.language = LanguageModelDbFactory()
         cls.study_domain = DomainModelDbFactory()
         cls.secondary_study_domain = DomainModelDbFactory()
@@ -73,7 +74,7 @@ class TestTrainingRepositoryCreateMethod(TestCase):
             decree_name=cls.study_domain.decree.name,
             code=cls.study_domain.code
         )
-        campus_identity = CampusIdentityFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
+        campus_identity = CampusFactory(name=cls.campus.name, university_name=cls.campus.organization.name)
         training_identity = TrainingIdentityFactory(year=cls.year)
         cls.training = TrainingFactory(
             entity_id=training_identity,
@@ -152,7 +153,7 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.entity_version = EntityVersionModelDbFactory()
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.education_group_year = EducationGroupYearMasterFactory(
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
             academic_year__current=True
@@ -212,7 +213,7 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             isced_domain__entity_id__code=self.isced_domain.code,
             management_entity=self.training.management_entity,
             administration_entity=self.training.administration_entity,
-            enrollment_campus=CampusIdentityFactory(
+            enrollment_campus=CampusFactory(
                 name=self.campus.name,
                 university_name=self.campus.organization.name
             ),
@@ -221,7 +222,7 @@ class TestTrainingRepositoryUpdateMethod(TestCase):
             ],
             diploma__aims=[
                 DiplomaAimFactory(entity_id=diploma_aim_identity)
-            ]
+            ],
         )
 
         TrainingRepository.update(updated_training)

@@ -83,6 +83,6 @@ class Migration(migrations.Migration):
             name='entity',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Entity'),
         ),
-        migrations.RunPython(entity_manager_entities),
+        migrations.RunPython(entity_manager_entities, elidable=True),
 
     ]

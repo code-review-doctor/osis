@@ -18,5 +18,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(remove_prerequisites_without_item, reverse_migration),
+        migrations.RunPython(remove_prerequisites_without_item, reverse_migration, elidable=True),
     ]

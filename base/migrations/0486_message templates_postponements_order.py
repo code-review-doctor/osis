@@ -120,7 +120,7 @@ class Migration(migrations.Migration):
              {% endautoescape %}''',
                'luy_after_auto_postponement_html',
                'HTML',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -174,7 +174,7 @@ class Migration(migrations.Migration):
              ''',
                'luy_after_auto_postponement_txt',
                'PLAIN',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -285,7 +285,7 @@ class Migration(migrations.Migration):
              {% endautoescape off %}''',
                'luy_after_auto_postponement_html',
                'HTML',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -339,7 +339,7 @@ class Migration(migrations.Migration):
              ''',
                'luy_after_auto_postponement_txt',
                'PLAIN',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -477,7 +477,7 @@ class Migration(migrations.Migration):
             {% endautoescape %}''',
                'egy_after_auto_postponement_html',
                'HTML',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -542,7 +542,7 @@ class Migration(migrations.Migration):
                 ''',
                'egy_after_auto_postponement_txt',
                'PLAIN',
-               'fr-be'])],
+               'fr-be'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -681,7 +681,7 @@ class Migration(migrations.Migration):
             {% endautoescape %}''',
                'egy_after_auto_postponement_html',
                'HTML',
-               'en'])],
+               'en'])], elidable=True
         ),
         migrations.RunSQL(
             [("UPDATE osis_common_messagetemplate SET template=%s WHERE reference=%s AND format=%s AND language=%s;",
@@ -751,6 +751,6 @@ class Migration(migrations.Migration):
                 ''',
                'egy_after_auto_postponement_txt',
                'PLAIN',
-               'en'])],
+               'en'])], elidable=True
         ),
     ]
