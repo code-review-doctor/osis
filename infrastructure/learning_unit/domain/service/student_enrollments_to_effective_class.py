@@ -23,20 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import include, path
 
-from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
-from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
-from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
-from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
+from base.models.learning_unit_enrollment import LearningUnitEnrollment as LearningUnitEnrollmentDatabase
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
+from ddd.logic.learning_unit.domain.service.i_student_enrollments_to_effective_class import \
+    IStudentEnrollmentsToEffectiveClass
 
-urlpatterns = [
-    path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
-        path('class/', include([
-            path('create', CreateClass.as_view(), name='class_create'),
-            path('<str:class_code>/identification', ClassIdentificationView.as_view(), name='class_identification'),
-            path('<str:class_code>/update', UpdateClass.as_view(), name='class_update'),
-            path('<str:class_code>/delete', DeleteClass.as_view(), name='class_delete'),
-        ]))
-    ]))
-]
+
+class StudentEnrollmentsToEffectiveClass(IStudentEnrollmentsToEffectiveClass):
+
+    @classmethod
+    def has_enrollments_to_class(cls, learning_unit_identity: 'LearningUnitIdentity') -> bool:
+        return LearningUnitEnrollmentDatabase.objects.filter(
+            learning_unit_year__acronym=learning_unit_identity.code,
+            learning_unit_year__academic_year__year=learning_unit_identity.year
+        ).exists()

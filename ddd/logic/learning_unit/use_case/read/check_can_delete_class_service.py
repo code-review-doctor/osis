@@ -23,20 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import include, path
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
+from ddd.logic.learning_unit.commands import CanDeleteEffectiveClassCommand
+from ddd.logic.learning_unit.domain.service.can_effective_class_be_deleted import CanEffectiveClassBeDeleted
+from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
-from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
-from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
-from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
-from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
 
-urlpatterns = [
-    path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
-        path('class/', include([
-            path('create', CreateClass.as_view(), name='class_create'),
-            path('<str:class_code>/identification', ClassIdentificationView.as_view(), name='class_identification'),
-            path('<str:class_code>/update', UpdateClass.as_view(), name='class_update'),
-            path('<str:class_code>/delete', DeleteClass.as_view(), name='class_delete'),
-        ]))
-    ]))
-]
+def check_can_delete_effective_class(
+        cmd: 'CanDeleteEffectiveClassCommand',
+        effective_class_repository: 'IEffectiveClassRepository',
+) -> None:
+    effective_class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_code=cmd.learning_unit_code,
+        learning_unit_year=cmd.year
+    )
+    effective_class = effective_class_repository.get(entity_id=effective_class_identity)
+
+    CanEffectiveClassBeDeleted().verify(effective_class=effective_class)
