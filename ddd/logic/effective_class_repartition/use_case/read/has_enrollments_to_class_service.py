@@ -23,20 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import include, path
 
-from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
-from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
-from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
-from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
+from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsToEffectiveClass
 
-urlpatterns = [
-    path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
-        path('class/', include([
-            path('create', CreateClass.as_view(), name='class_create'),
-            path('<str:class_code>/identification', ClassIdentificationView.as_view(), name='class_identification'),
-            path('<str:class_code>/update', UpdateClass.as_view(), name='class_update'),
-            path('<str:class_code>/delete', DeleteClass.as_view(), name='class_delete'),
-        ]))
-    ]))
-]
+
+def has_enrollments_to_class_service(
+        cmd: 'HasEnrollmentsToClassCommand'
+) -> bool:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.year
+    )
+    return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
+        learning_unit_identity
+    )
