@@ -133,6 +133,7 @@ class GroupUpdateForm(PermissionFieldMixin, GroupForm):
         self.fields['academic_year'].required = False
         self.fields['code'].disabled = True
         self.fields['code'].required = False
+        self.fields['code'].validators = []  # Group with dirty code could exist OSIS-5297
 
     # PermissionFieldMixin
     def get_context(self) -> str:
