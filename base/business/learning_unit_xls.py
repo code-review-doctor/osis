@@ -28,7 +28,7 @@ from typing import List, Dict, Optional
 
 from django.db.models import QuerySet, Prefetch
 from django.db.models import Subquery, OuterRef
-from django.db.models.expressions import RawSQL, F
+from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Alignment, PatternFill, Color, Font
@@ -158,7 +158,11 @@ def _get_effective_classes(learning_unit_yr) -> List[LearningClassYear]:
                  )
     ).order_by('acronym')
 
-    return effective_classes
+    return [
+        effective_class
+        for component in learning_unit_yr.learningcomponentyear_set.all().order_by('acronym')
+        for effective_class in component.learningclassyear_set.all().order_by('acronym')
+    ]
 
 
 def annotate_qs(learning_unit_years: QuerySet) -> QuerySet:
@@ -371,7 +375,7 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
             learning_unit_yr.get_session_display() or '',
         ])
 
-    lu_data_part2.append(learning_unit_yr.language or "",)
+    lu_data_part2.append(learning_unit_yr.language or "", )
     return lu_data_part2
 
 
@@ -393,7 +397,7 @@ def get_data_part1(
         _("Class") if effective_class else learning_unit_yr.get_container_type_display(),
         learning_unit_yr.get_subtype_display(),
         requirement_acronym,
-        ]
+    ]
     if is_external_ue_list:
         lu_proposal_data = []
     else:
@@ -448,7 +452,7 @@ def learning_unit_titles_part_1(display_proposal: bool) -> List[str]:
         proposal_titles = [
             str(_('Proposal type')),
             str(_('Proposal status')),
-            ]
+        ]
     else:
         proposal_titles = []
     common_title_part2 = [
@@ -541,7 +545,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
-                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(24)]
+                        ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24)]
                     )
                 first = False
         else:
@@ -555,7 +559,9 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             lu_data_part2 = get_data_part2(learning_unit_yr, effective_class, with_attributions=False)
             lu_data_part1.extend(lu_data_part2)
 
-            attributions = create_attributions_dictionary(effective_class.class_attributions).values()
+            attributions = create_attributions_dictionary(
+                effective_class.attributionclass_set.all().order_by('attribution_charge__attribution__tutor__person')
+            ).values()
 
             first_attribution = True
             if attributions:
@@ -577,8 +583,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
     }
 
 
-def _get_attribution_detail(an_attribution: dict, is_attribution_class=False) -> dict:
-
+def _get_attribution_detail(an_attribution: dict, is_attribution_class=False) -> List:
     if is_attribution_class:
         volume_lecturing = an_attribution.get('pm_allocation_charge')
         volume_practical = an_attribution.get('pp_allocation_charge')
