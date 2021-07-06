@@ -31,6 +31,7 @@ from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
+from ddd.logic.attribution.domain.validator.exceptions import TutorAlreadyAssignedException
 from ddd.logic.attribution.tests.factory.tutor import TutorWithoutDistributedEffectiveClassesFactory
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import VolumeShouldBeNumericException, \
@@ -88,3 +89,17 @@ class DistributeClassToTutorService(SimpleTestCase):
             e.exception.exceptions.pop(),
             InvalidVolumeException
         )
+
+    def test_should_tutor_not_be_already_assigned(self):
+        distribute_class_to_tutor(
+            self.distribute_class_cmd,
+            self.tutor_repository,
+            self.effective_class_repository
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as e:
+            distribute_class_to_tutor(
+                self.distribute_class_cmd,
+                self.tutor_repository,
+                self.effective_class_repository
+            )
+        self.assertIsInstance(e.exception.exceptions.pop(), TutorAlreadyAssignedException)
