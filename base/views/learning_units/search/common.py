@@ -38,6 +38,7 @@ from base.business.learning_unit_xls import create_xls, create_xls_with_paramete
 from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
 from base.business.learning_units.xls_educational_information_and_specifications import \
     create_xls_educational_information_and_specifications
+from base.business.list.ue_utilizations import create_xls_ue_utilizations_with_one_training_per_line
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
@@ -45,7 +46,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
 from base.views.common import remove_from_session
-from base.business.list.ue_utilizations import create_xls_ue_utilizations_with_one_training_per_line
 
 
 class SearchTypes(Enum):
@@ -166,7 +166,10 @@ def _create_xls_ue_utilizations_with_one_training_per_line(view_obj, context, **
 
 def _create_ue_list_with_parameters(context, view_obj, is_external_ue_list=False):
     user = view_obj.request.user
-    luys = context["filter"].qs
+    luys = context["filter"].qs.prefetch_related(
+        'learningcomponentyear_set__learningclassyear_set',
+        'learningcomponentyear_set__learningclassyear_set__attributionclass_set'
+    )
     filters = _get_filter(context["form"], view_obj.search_type)
     other_params = {
         WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
