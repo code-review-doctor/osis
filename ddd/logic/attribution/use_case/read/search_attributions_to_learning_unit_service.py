@@ -41,4 +41,4 @@ def search_attributions_to_learning_unit(
         code=cmd.learning_unit_code,
         year=cmd.learning_unit_year,
     )
-    return tutor_attribution_translator.search_attributions_to_learning_unit(learning_unit_identity, cmd.class_type)
+    return tutor_attribution_translator.search_attributions_to_learning_unit(learning_unit_identity)
