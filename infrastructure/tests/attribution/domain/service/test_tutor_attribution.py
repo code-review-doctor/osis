@@ -40,8 +40,8 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         identity = LDROI1001LearningUnitIdentityFactory()
         for _ in range(3):
             AttributionChargeNewFactory(
-                learning_component_year__learning_unit_year__acronym=identity.code,
-                learning_component_year__learning_unit_year__academic_year__year=identity.year,
+                attribution__learning_container_year__acronym=identity.code,
+                attribution__learning_container_year__academic_year__year=identity.year,
                 allocation_charge=10.0,
             )
         result = self.translator.search_attributions_to_learning_unit(identity)
@@ -51,8 +51,8 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
     def test_should_filter_by_learning_unit(self):
         identity = LDROI1001LearningUnitIdentityFactory()
         attribution_charge = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year__acronym=identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=identity.year,
+            attribution__learning_container_year__acronym=identity.code,
+            attribution__learning_container_year__academic_year__year=identity.year,
             allocation_charge=10.0,
         )
         for _ in range(3):

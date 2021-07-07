@@ -83,7 +83,6 @@ def _annotate_qs(qs: QuerySet) -> QuerySet:
         first_name=F('tutor__person__first_name'),
         last_name=F('tutor__person__last_name'),
         personal_id_number=F('tutor__person__global_id'),
-        function=F('function'),
         lecturing_volume_attributed=Subquery(lecturing_charge.values('allocation_charge')[:1]),
         practical_volume_attributed=Subquery(practical_charge.values('allocation_charge')[:1])
     )
@@ -93,10 +92,11 @@ def _value_qs(qs: QuerySet) -> QuerySet:
     return qs.values(
         'learning_unit_code',
         'learning_unit_year',
-        'attribution_charge_uuid',
+        'attribution_uuid',
         'first_name',
         'last_name',
         'personal_id_number',
         'function',
-        'charge_volume_attributed',
+        'lecturing_volume_attributed',
+        'practical_volume_attributed',
     )
