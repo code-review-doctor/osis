@@ -23,27 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import List
 
-from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 
 
-class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
-
-    @classmethod
-    def get_first_tutor_full_name_if_exists(
-            cls,
-            effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Optional[str]:
-        from infrastructure.messages_bus import message_bus_instance
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class_identity.class_code,
-                learning_unit_code=effective_class_identity.learning_unit_identity.code,
-                learning_unit_year=effective_class_identity.learning_unit_identity.year
-            )
-        )
-        if tutors_assigned_to_class:
-            return tutors_assigned_to_class[0].full_name
+class TutorRepository(InMemoryGenericRepository, ITutorRepository):
+    entities = list()  # type: List[Tutor]

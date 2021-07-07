@@ -29,7 +29,7 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.attribution.domain.validator._should_tutor_not_be_already_assigned_to_class import \
+from ddd.logic.effective_class_repartition.domain.validator._should_tutor_not_be_already_assigned_to_class import \
     ShouldTutorNotBeAlreadyAssignedToClass
 from ddd.logic.effective_class_repartition.domain.validator._should_be_numeric_validator import ShouldBeNumericValidator
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity

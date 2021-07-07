@@ -40,16 +40,16 @@ from ddd.logic.application.use_case.write.delete_application_service import dele
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
-from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
     UnassignTutorClassCommand
-from ddd.logic.attribution.use_case.read.get_attribution_service import get_attribution
-from ddd.logic.attribution.use_case.read.search_attributions_to_learning_unit_service import \
+from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
-from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_service import \
+from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
-from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
-from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
+from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
+from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -77,8 +77,8 @@ from infrastructure.application.repository.application_calendar import Applicati
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
-from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
-from infrastructure.attribution.repository.tutor import TutorRepository
+from infrastructure.effective_class_repartition.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
+from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator
 from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator

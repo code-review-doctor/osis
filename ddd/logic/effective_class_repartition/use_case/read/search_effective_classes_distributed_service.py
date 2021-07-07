@@ -23,27 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import List
 
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
+from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import ClassDistributionWithAttribution
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
+from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 
 
-class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
-
-    @classmethod
-    def get_first_tutor_full_name_if_exists(
-            cls,
-            effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Optional[str]:
-        from infrastructure.messages_bus import message_bus_instance
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class_identity.class_code,
-                learning_unit_code=effective_class_identity.learning_unit_identity.code,
-                learning_unit_year=effective_class_identity.learning_unit_identity.year
-            )
-        )
-        if tutors_assigned_to_class:
-            return tutors_assigned_to_class[0].full_name
+# TODO :: unit test
+def search_tutors_distributed_to_class(
+        cmd: 'SearchTutorsDistributedToClassCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository'
+) -> List['TutorClassRepartitionDTO']:
+    class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_year=cmd.learning_unit_year,
+        learning_unit_code=cmd.learning_unit_code,
+    )
+    return ClassDistributionWithAttribution().search_by_effective_class(
+        class_identity,
+        tutor_attribution_translator,
+        tutor_repository
+    )
