@@ -44,10 +44,16 @@ from ddd.logic.shared_kernel.language.domain.model.language import LanguageIdent
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(frozen=True, slots=True, eq=False)
 class LearningUnitIdentity(interface.EntityIdentity):
+
     academic_year = attr.ib(type=AcademicYearIdentity)
     code = attr.ib(type=str)
+
+    def __eq__(self, other):
+        return type(other) == LearningUnitIdentity \
+               and self.code == other.code \
+               and self.academic_year == other.academic_year
 
     def __str__(self):
         return "{} - ({})".format(self.code, self.academic_year)

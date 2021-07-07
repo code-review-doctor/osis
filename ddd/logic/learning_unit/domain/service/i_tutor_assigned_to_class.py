@@ -23,20 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import abc
+from typing import Optional
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
-    StudentEnrollmentsToEffectiveClass
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from osis_common.ddd import interface
 
 
-def has_enrollments_to_class_service(
-        cmd: 'HasEnrollmentsToClassCommand'
-) -> bool:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.year
-    )
-    return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
-        learning_unit_identity
-    )
+class ITutorAssignedToClassTranslator(interface.DomainService):
+
+    @classmethod
+    @abc.abstractmethod
+    def get_first_tutor_full_name_if_exists(cls, effective_class_identity: 'EffectiveClassIdentity') -> Optional[str]:
+        pass
