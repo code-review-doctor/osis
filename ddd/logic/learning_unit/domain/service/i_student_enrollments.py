@@ -25,12 +25,19 @@
 ##############################################################################
 import abc
 
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 from osis_common.ddd import interface
 
 
-class IStudentEnrollmentsToEffectiveClass(interface.DomainService):
+class IStudentEnrollmentsTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def has_enrollments_to_class(cls, learning_unit_identity: 'LearningUnitIdentity') -> bool:
+    def has_enrollments_to_class(cls, class_identity: 'EffectiveClassIdentity') -> bool:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def has_enrollments_to_learning_unit(cls, learning_unit_id: 'LearningUnitIdentity') -> bool:
         pass

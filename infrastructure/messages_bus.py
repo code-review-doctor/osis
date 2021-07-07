@@ -50,14 +50,11 @@ from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_se
     search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_service import \
-    has_class_repartition_service
-from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
-    has_enrollments_to_class_service
+
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
+    GetEffectiveClassWarningsCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -83,6 +80,9 @@ from infrastructure.application.services.applications_summary import Application
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 from infrastructure.attribution.repository.tutor import TutorRepository
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -129,14 +129,15 @@ class MessageBus:
         DeleteEffectiveClassCommand: lambda cmd: delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            LearningUnitRepository()
+            TutorAssignedToClassTranslator(),
+            StudentEnrollmentsTranslator(),
         ),
         CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
             cmd,
             EffectiveClassRepository(),
+            TutorAssignedToClassTranslator(),
+            StudentEnrollmentsTranslator(),
         ),
-        HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
-        HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
         GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
             cmd, EffectiveClassRepository(), LearningUnitRepository()
         ),

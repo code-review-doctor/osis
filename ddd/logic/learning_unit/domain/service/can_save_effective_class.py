@@ -25,8 +25,8 @@
 ##############################################################################
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
 from ddd.logic.learning_unit.domain.validator.exceptions import ClassTypeInvalidException, \
     LearningUnitHasPartimException, LearningUnitHasProposalException, \
     LearningUnitHasEnrollmentException, LearningUnitHasNoVolumeException
@@ -41,6 +41,7 @@ class CanCreateEffectiveClass(interface.DomainService):
             cls,
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'ILearningUnitRepository',
+            has_enrollments_service: 'IStudentEnrollmentsTranslator',
     ):
         exceptions = set()  # type Set[BusinessException]
         if learning_unit.is_external():
@@ -52,14 +53,7 @@ class CanCreateEffectiveClass(interface.DomainService):
         if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
             exceptions.add(LearningUnitHasProposalException())
 
-        from infrastructure.messages_bus import message_bus_instance
-        learning_unit_has_enrollments = message_bus_instance.invoke(
-            HasEnrollmentsToClassCommand(
-                learning_unit_code=learning_unit.code,
-                year=learning_unit.year
-            )
-        )
-        if learning_unit_has_enrollments:
+        if has_enrollments_service.has_enrollments_to_learning_unit(learning_unit.entity_id):
             exceptions.add(LearningUnitHasEnrollmentException())
 
         if not learning_unit.has_volume():
