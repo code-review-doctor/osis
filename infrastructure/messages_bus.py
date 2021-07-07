@@ -50,7 +50,6 @@ from ddd.logic.attribution.use_case.read.search_effective_classes_distributed_se
     search_tutors_distributed_to_class
 from ddd.logic.attribution.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
 from ddd.logic.attribution.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -110,9 +109,11 @@ class MessageBus:
         ),
         GetLearningUnitCommand: lambda cmd: get_learning_unit(cmd, LearningUnitRepository()),
         CreateEffectiveClassCommand: lambda cmd: create_effective_class(
-            cmd, LearningUnitRepository(), EffectiveClassRepository()
+            cmd, LearningUnitRepository(), EffectiveClassRepository(), StudentEnrollmentsTranslator()
         ),
-        CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
+        CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(
+            cmd, LearningUnitRepository(), StudentEnrollmentsTranslator()
+        ),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
         SearchAttributionsToLearningUnitCommand: lambda cmd: search_attributions_to_learning_unit(
