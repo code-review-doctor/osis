@@ -51,7 +51,9 @@ class LearningUnitIdentity(interface.EntityIdentity):
     code = attr.ib(type=str)
 
     def __eq__(self, other):
-        return self.code == other.code and self.academic_year == other.academic_year
+        return type(other) == LearningUnitIdentity \
+               and self.code == other.code \
+               and self.academic_year == other.academic_year
 
     def __str__(self):
         return "{} - ({})".format(self.code, self.academic_year)

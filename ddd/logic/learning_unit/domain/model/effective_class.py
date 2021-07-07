@@ -51,7 +51,9 @@ class EffectiveClassIdentity(interface.EntityIdentity):
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
 
     def __eq__(self, other):
-        return self.class_code == other.class_code and self.learning_unit_identity == other.learning_unit_identity
+        return type(other) == EffectiveClassIdentity \
+               and self.class_code == other.class_code \
+               and self.learning_unit_identity == other.learning_unit_identity
 
     def __str__(self):
         return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))
