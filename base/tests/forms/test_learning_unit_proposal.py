@@ -360,6 +360,7 @@ def build_initial_data(learning_unit_year, entity):
             "quadrimester": learning_unit_year.quadrimester,
             "specific_title_english": learning_unit_year.specific_title_english,
             "professional_integration": learning_unit_year.professional_integration,
+            "stage_dimona": learning_unit_year.stage_dimona,
             "other_remark": learning_unit_year.other_remark,
             'other_remark_english': learning_unit_year.other_remark_english,
             "faculty_remark": learning_unit_year.faculty_remark,
