@@ -64,7 +64,8 @@ class TutorAttributionToLearningUnitDTO(DTO):
     first_name = attr.ib(type=str)
     personal_id_number = attr.ib(type=str)
     function = attr.ib(type=str)
-    attributed_volume_to_learning_unit = attr.ib(type=Decimal)
+    lecturing_volume_attributed = attr.ib(type=Decimal)
+    practical_volume_attributed = attr.ib(type=Decimal)
 
     @property
     def full_name(self):

@@ -27,7 +27,6 @@ import abc
 
 import attr
 
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
@@ -110,8 +109,12 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
 
     @property
-    def class_type(self):
-        return LECTURING if self.__class__ == LecturingEffectiveClass else PRACTICAL_EXERCISES
+    def is_practical(self):
+        return False
+
+    @property
+    def is_lecturing(self):
+        return False
 
 
 class PracticalEffectiveClass(EffectiveClass):

@@ -25,10 +25,11 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F
+from django.db.models import F, QuerySet, OuterRef, Subquery
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
-from ddd.logic.attribution.domain.model.tutor import TutorIdentity
+from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDb
+from attribution.models.attribution_new import AttributionNew as AttributionNewDb
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
 from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
@@ -40,64 +41,62 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
     def search_attributions_to_learning_unit(
             cls,
             learning_unit_identity: 'LearningUnitIdentity',
-            class_type: str = None
     ) -> List['TutorAttributionToLearningUnitDTO']:
-        qs = AttributionChargeNew.objects.filter(
-            learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
-        ).annotate(
-            learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
-            learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
-            attribution_uuid=F('attribution__uuid'),
-            first_name=F('attribution__tutor__person__first_name'),
-            last_name=F('attribution__tutor__person__last_name'),
-            personal_id_number=F('attribution__tutor__person__global_id'),
-            function=F('attribution__function'),
-            attributed_volume_to_learning_unit=F('allocation_charge'),
-        ).values(
-            'learning_unit_code',
-            'learning_unit_year',
-            'attribution_uuid',
-            'first_name',
-            'last_name',
-            'personal_id_number',
-            'function',
-            'attributed_volume_to_learning_unit',
-        ).order_by(
+        qs = _get_common_qs().filter(
+            learning_container_year__acronym=learning_unit_identity.code,
+            learning_container_year__academic_year__year=learning_unit_identity.year,
+        )
+        qs = _annotate_qs(qs)
+        qs = _value_qs(qs).order_by(
             'last_name',
             'first_name',
         ).distinct()
-        if class_type:
-            qs = qs.filter(learning_component_year__type=class_type)
+
         return [TutorAttributionToLearningUnitDTO(**data_as_dict) for data_as_dict in qs]
 
     @classmethod
-    def get_tutor_attribution_to_learning_unit(
-            cls,
-            tutor_identity: 'TutorIdentity',
-            learning_unit_identity: 'LearningUnitIdentity',
-    ) -> 'TutorAttributionToLearningUnitDTO':
-        attributions_to_learn_unit = cls.search_attributions_to_learning_unit(learning_unit_identity)
-        return next(
-            (
-                att for att in attributions_to_learn_unit
-                if att.personal_id_number == tutor_identity.personal_id_number
-            ),
-            None
-        )
+    def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
+        qs = _get_common_qs().filter(uuid=attribution_uuid)
+        qs = _annotate_qs(qs)
+        qs = _value_qs(qs)
+        tutor_attribution_db = qs.get()
+        return TutorAttributionToLearningUnitDTO(**tutor_attribution_db)
 
-    @classmethod
-    def get_learning_unit_attribution(
-            cls,
-            attribution_uuid: str,
-            learning_unit_identity: 'LearningUnitIdentity',
-    ) -> 'TutorAttributionToLearningUnitDTO':
-        # TODO : ??? pq ne pas ajouter le uuid dans le search
-        attributions_to_learn_unit = cls.search_attributions_to_learning_unit(learning_unit_identity)
-        return next(
-            (
-                att for att in attributions_to_learn_unit
-                if str(att.attribution_uuid) == attribution_uuid
-            ),
-            None
-        )
+
+def _get_common_qs() -> QuerySet:
+    return AttributionNewDb.objects.all()
+
+
+def _annotate_qs(qs: QuerySet) -> QuerySet:
+    lecturing_charge = AttributionChargeNewDb.objects.filter(
+        attribution_id=OuterRef('pk'),
+        learning_component_year__type=LECTURING
+    )
+    practical_charge = AttributionChargeNewDb.objects.filter(
+        attribution_id=OuterRef('pk'),
+        learning_component_year__type=PRACTICAL_EXERCISES
+    )
+    return qs.annotate(
+        learning_unit_code=F('learning_container_year__acronym'),
+        learning_unit_year=F('learning_container_year__academic_year__year'),
+        attribution_uuid=F('uuid'),
+        first_name=F('tutor__person__first_name'),
+        last_name=F('tutor__person__last_name'),
+        personal_id_number=F('tutor__person__global_id'),
+        function=F('function'),
+        lecturing_volume_attributed=Subquery(lecturing_charge.values('allocation_charge')[:1]),
+        practical_volume_attributed=Subquery(practical_charge.values('allocation_charge')[:1])
+    )
+
+
+def _value_qs(qs: QuerySet) -> QuerySet:
+    return qs.values(
+        'learning_unit_code',
+        'learning_unit_year',
+        'attribution_charge_uuid',
+        'first_name',
+        'last_name',
+        'personal_id_number',
+        'function',
+        'charge_volume_attributed',
+    )

@@ -35,29 +35,35 @@
                 {% trans 'Volume' %}
             </th>
             <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for tutor in tutors %}
-        <tr>
-            <td>{{ tutor.full_name }}</td>
-            <td>{{ tutor.function_text }}</td>
-            <td>{{ tutor.attributed_volume_to_learning_unit | floatformat:2 }}</td>
-            <td>
-                {% if can_add_charge_repartition %}
-                    <a class="btn btn-primary trigger_modal"
-                       role="button"
-                       data-url="{% url "edit_charge_repartition" learning_unit_year=tutor.learning_unit_year learning_unit_code=tutor.learning_unit_code class_code=effective_class.entity_id.class_code attribution_uuid=tutor.attribution_uuid %}"
-                       data-modal_class="modal-lg"
-                       {% if tutor.personal_id_number in personal_id_numbers_already_assigned %}disabled
-                       title="{% trans 'Tutor already assigned to the class' %}"{% endif %}>
-                        {% trans "Add over the current year" %}
-                    </a>
-                {% endif %}
-            </td>
         </tr>
+        </thead>
+        <tbody>
+        {% for learning_unit_attribution in learning_unit_attributions %}
+            <tr>
+                <td>{{ learning_unit_attribution.full_name }}</td>
+                <td>{{ learning_unit_attribution.function_text }}</td>
+                <td>
+                    {% if effective_class.is_lecturing %}
+                        {{ learning_unit_attribution.lecturing_attributed_volume | floatformat:2 }}
+                    {% else %}
+                        {{ learning_unit_attribution.practical_attributed_volume | floatformat:2 }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if can_add_charge_repartition %}
+                        <a class="btn btn-primary trigger_modal"
+                           role="button"
+                           data-url="{% url "edit_charge_repartition" learning_unit_year=learning_unit_attribution.learning_unit_year learning_unit_code=learning_unit_attribution.learning_unit_code class_code=effective_class.entity_id.class_code attribution_uuid=learning_unit_attribution.attribution_uuid %}"
+                           data-modal_class="modal-lg"
+                           {% if learning_unit_attribution.personal_id_number in personal_id_numbers_already_assigned %}disabled
+                           title="{% trans 'Tutor already assigned to the class' %}"{% endif %}>
+                            {% trans "Add over the current year" %}
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
 
-    {% endfor %}
-    </tbody>
-</table>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

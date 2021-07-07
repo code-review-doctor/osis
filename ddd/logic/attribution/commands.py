@@ -34,7 +34,6 @@ from osis_common.ddd import interface
 class SearchAttributionsToLearningUnitCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
-    class_type = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

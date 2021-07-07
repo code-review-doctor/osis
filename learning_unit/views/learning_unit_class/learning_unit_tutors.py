@@ -45,7 +45,7 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
         context.update(
             {
                 'effective_class': self.effective_class,
-                'tutors': self.get_ue_tutors(),
+                'learning_unit_attributions': self.get_learning_unit_attributions(),
                 'learning_unit': self.learning_unit,
                 'personal_id_numbers_already_assigned': self.get_personal_id_numbers_assigned_to_class(),
                 'can_add_charge_repartition': True,  # TODO je ne connais pas la condition,
@@ -54,12 +54,11 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
         context.update(self.common_url_tabs())
         return context
 
-    def get_ue_tutors(self) -> List['TutorAttributionToLearningUnitDTO']:
+    def get_learning_unit_attributions(self) -> List['TutorAttributionToLearningUnitDTO']:
         return message_bus_instance.invoke(
             SearchAttributionsToLearningUnitCommand(
                 learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
-                learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year,
-                class_type=self.effective_class.class_type
+                learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year
             )
         )
 

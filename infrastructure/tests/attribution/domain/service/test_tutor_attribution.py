@@ -26,7 +26,6 @@
 from django.test import TestCase
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from ddd.logic.attribution.tests.factory.tutor import Tutor9999IdentityFactory
 from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001LearningUnitIdentityFactory
 from infrastructure.attribution.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
 
@@ -39,13 +38,20 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
 
     def test_should_order_by_last_name_and_first_name(self):
         identity = LDROI1001LearningUnitIdentityFactory()
-        for _ in range(3):
+        attribution_charge = AttributionChargeNewFactory(
+            learning_component_year__learning_unit_year__acronym=identity.code,
+            learning_component_year__learning_unit_year__academic_year__year=identity.year,
+            allocation_charge=10.0,
+        )
+        for _ in range(2):
             AttributionChargeNewFactory(
-                learning_component_year__learning_unit_year__acronym=identity.code,
-                learning_component_year__learning_unit_year__academic_year__year=identity.year,
+                learning_component_year=attribution_charge.learning_component_year,
                 allocation_charge=10.0,
             )
-        result = self.translator.search_attributions_to_learning_unit(identity)
+        result = self.translator.search_attributions_to_learning_unit(
+            identity,
+            attribution_charge.learning_component_year.type
+        )
         ordered_by_last_name_first_name = list(sorted(result, key=lambda elem: (elem.last_name, elem.first_name)))
         self.assertListEqual(result, ordered_by_last_name_first_name)
 
@@ -58,42 +64,9 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         )
         for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
-        result = self.translator.search_attributions_to_learning_unit(identity)
+        result = self.translator.search_attributions_to_learning_unit(
+            identity,
+            attribution_charge.learning_component_year.type
+        )
         self.assertTrue(len(result) == 1)
         self.assertEqual(result[0].attribution_uuid, attribution_charge.attribution.uuid)
-
-    def test_should_get_by_tutor_and_learning_unit(self):
-        tutor_identity = Tutor9999IdentityFactory()
-        learn_unit_identity = LDROI1001LearningUnitIdentityFactory()
-        attribution_charge = AttributionChargeNewFactory(
-            attribution__tutor__person__global_id=tutor_identity.personal_id_number,
-            learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=learn_unit_identity.year,
-            allocation_charge=10.0,
-        )
-        for _ in range(3):
-            AttributionChargeNewFactory()  # Build other attributions
-        result = self.translator.get_tutor_attribution_to_learning_unit(tutor_identity, learn_unit_identity)
-        self.assertEqual(result.personal_id_number, attribution_charge.attribution.tutor.person.global_id)
-        self.assertEqual(result.attributed_volume_to_learning_unit, attribution_charge.allocation_charge)
-
-    def test_should_correctly_map_database_fields_to_dto(self):
-        tutor_identity = Tutor9999IdentityFactory()
-        learn_unit_identity = LDROI1001LearningUnitIdentityFactory()
-        attribution_charge = AttributionChargeNewFactory(
-            attribution__tutor__person__global_id=tutor_identity.personal_id_number,
-            learning_component_year__learning_unit_year__acronym=learn_unit_identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=learn_unit_identity.year,
-            allocation_charge=10.0,
-        )
-        result = self.translator.get_tutor_attribution_to_learning_unit(tutor_identity, learn_unit_identity)
-        self.assertEqual(result.attribution_uuid, attribution_charge.attribution.uuid)
-        person_database = attribution_charge.attribution.tutor.person
-        self.assertEqual(result.learning_unit_code, learn_unit_identity.code)
-        self.assertEqual(result.learning_unit_year, learn_unit_identity.year)
-        self.assertEqual(result.attribution_uuid, attribution_charge.attribution.uuid)
-        self.assertEqual(result.last_name, person_database.last_name)
-        self.assertEqual(result.first_name, person_database.first_name)
-        self.assertEqual(result.personal_id_number, person_database.global_id)
-        self.assertEqual(result.function, attribution_charge.attribution.function)
-        self.assertEqual(result.attributed_volume_to_learning_unit, attribution_charge.allocation_charge)
