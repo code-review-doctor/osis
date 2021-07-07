@@ -27,6 +27,7 @@ import abc
 
 import attr
 
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
