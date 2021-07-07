@@ -179,7 +179,8 @@ class MessageBus:
         DistributeClassToTutorCommand: lambda cmd: distribute_class_to_tutor(
             cmd,
             TutorRepository(),
-            EffectiveClassRepository()
+            EffectiveClassRepository(),
+            TutorAttributionToLearningUnitTranslator()
         ),
         UnassignTutorClassCommand: lambda cmd: unassign_tutor_class(cmd, TutorRepository()),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

@@ -53,9 +53,8 @@ class Tutor(interface.RootEntity):
             effective_class_id: 'EffectiveClassIdentity',
             learning_unit_attribution_uuid: str,
             distributed_volume: Decimal,
-            total_class_volume: Decimal
     ) -> None:
-        DistributeClassToTutorValidatorList(self, distributed_volume, effective_class_id, total_class_volume).validate()
+        DistributeClassToTutorValidatorList(self, distributed_volume, effective_class_id).validate()
         class_volume = ClassVolumeRepartition(
             effective_class=effective_class_id,
             distributed_volume=distributed_volume,

@@ -27,6 +27,8 @@ from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.attribution.domain.service.is_distributed_volume_correct import IsDistributedVolumeCorrect
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
@@ -35,7 +37,8 @@ from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClass
 def distribute_class_to_tutor(
         cmd: DistributeClassToTutorCommand,
         repository: 'ITutorRepository',
-        effective_class_repository: 'IEffectiveClassRepository'
+        effective_class_repository: 'IEffectiveClassRepository',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
 ) -> 'TutorIdentity':
     # GIVEN
     tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
@@ -43,11 +46,11 @@ def distribute_class_to_tutor(
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
 
     # WHEN
+    IsDistributedVolumeCorrect().verify(cmd, tutor, effective_class, tutor_attribution_translator)
     tutor.assign_class(
         effective_class_id=effective_class.entity_id,
         learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid,
         distributed_volume=cmd.distributed_volume,
-        total_class_volume=effective_class.volumes.total_volume
     )
 
     # THEN

@@ -26,7 +26,6 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.attribution.domain.model.tutor import Tutor
 from ddd.logic.attribution.domain.validator.exceptions import TutorAlreadyAssignedException
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
