@@ -10070,7 +10070,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "COURSE_FULL",
             "content_type": [
                 "base",
@@ -10095,7 +10095,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "COURSE_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10120,7 +10120,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "COURSE_PARTIM",
             "content_type": [
                 "base",
@@ -10145,7 +10145,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "COURSE_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
@@ -10170,7 +10170,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "INTERNSHIP_FULL",
             "content_type": [
                 "base",
@@ -10195,7 +10195,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "INTERNSHIP_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10220,7 +10220,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "INTERNSHIP_PARTIM",
             "content_type": [
                 "base",
@@ -10245,7 +10245,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "INTERNSHIP_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
@@ -10270,7 +10270,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "DISSERTATION_FULL",
             "content_type": [
                 "base",
@@ -10295,7 +10295,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "DISSERTATION_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10320,7 +10320,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "DISSERTATION_PARTIM",
             "content_type": [
                 "base",
@@ -10345,7 +10345,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "DISSERTATION_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
@@ -10370,7 +10370,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_COLLECTIVE_FULL",
             "content_type": [
                 "base",
@@ -10395,7 +10395,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_COLLECTIVE_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10420,7 +10420,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_COLLECTIVE_PARTIM",
             "content_type": [
                 "base",
@@ -10445,7 +10445,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_COLLECTIVE_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
@@ -10470,7 +10470,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_INDIVIDUAL_FULL",
             "content_type": [
                 "base",
@@ -10495,7 +10495,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_INDIVIDUAL_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10520,7 +10520,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_INDIVIDUAL_PARTIM",
             "content_type": [
                 "base",
@@ -10545,7 +10545,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "OTHER_INDIVIDUAL_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
@@ -10570,7 +10570,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "MASTER_THESIS_FULL",
             "content_type": [
                 "base",
@@ -10595,7 +10595,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "MASTER_THESIS_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10620,7 +10620,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "MASTER_THESIS_PARTIM",
             "content_type": [
                 "base",
@@ -10645,7 +10645,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "MASTER_THESIS_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
@@ -10670,7 +10670,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "EXTERNAL_FULL",
             "content_type": [
                 "base",
@@ -10695,7 +10695,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "EXTERNAL_FULL_PROPOSAL",
             "content_type": [
                 "base",
@@ -10720,7 +10720,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "EXTERNAL_PARTIM",
             "content_type": [
                 "base",
@@ -10745,7 +10745,7 @@
     },
     {
         "fields": {
-            "field_name": "stage_domina",
+            "field_name": "stage_dimona",
             "context": "EXTERNAL_PARTIM_PROPOSAL",
             "content_type": [
                 "base",
