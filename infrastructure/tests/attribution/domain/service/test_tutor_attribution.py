@@ -27,7 +27,8 @@ from django.test import TestCase
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001LearningUnitIdentityFactory
-from infrastructure.effective_class_repartition.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
+from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
+    TutorAttributionToLearningUnitTranslator
 
 
 class TestTutorAttributionToLearningUnitTranslator(TestCase):

@@ -30,7 +30,9 @@ from django.db.models import F, QuerySet, OuterRef, Subquery
 from attribution.models.attribution_charge_new import AttributionChargeNew as AttributionChargeNewDb
 from attribution.models.attribution_new import AttributionNew as AttributionNewDb
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
-from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.domain.model.tutor import TutorIdentity
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 

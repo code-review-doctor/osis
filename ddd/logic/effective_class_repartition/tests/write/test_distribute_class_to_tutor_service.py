@@ -33,9 +33,13 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import TutorAlreadyAssignedException, \
     VolumeShouldBeNumericException, InvalidVolumeException
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithoutDistributedEffectiveClassesFactory
-from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
+from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
+    distribute_class_to_tutor
 from ddd.logic.learning_unit.tests.factory.effective_class import LecturingEffectiveClassFactory
+from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
+    TutorAttributionToLearningUnitTranslator
 from infrastructure.effective_class_repartition.repository.in_memory.tutor import TutorRepository
 from infrastructure.learning_unit.repository.in_memory.effective_class import EffectiveClassRepository
 
@@ -56,12 +60,29 @@ class DistributeClassToTutorService(SimpleTestCase):
             tutor_personal_id_number=self.tutor.entity_id.personal_id_number,
             distributed_volume=self.effective_class.volumes.volume_first_quadrimester
         )
+        self._mock_attribution_translator()
+
+    def _mock_attribution_translator(self):
+        self.tutor_attribution_translator = TutorAttributionToLearningUnitTranslator()
+        attribution_dto = TutorAttributionToLearningUnitDTO(
+            learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+            learning_unit_year=self.effective_class.entity_id.learning_unit_identity.academic_year.year,
+            attribution_uuid="uuid",
+            last_name="Dupont",
+            first_name="Charles",
+            personal_id_number="9999",
+            function="FUNCTION",
+            lecturing_volume_attributed=self.effective_class.volumes.total_volume,
+            practical_volume_attributed=None,
+        )
+        self.tutor_attribution_translator.get_learning_unit_attribution = lambda *args: attribution_dto
 
     def test_should_distribute_effective_class(self):
         tutor_id = distribute_class_to_tutor(
             self.distribute_class_cmd,
             self.tutor_repository,
-            self.effective_class_repository
+            self.effective_class_repository,
+            self.tutor_attribution_translator,
         )
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[0]
@@ -73,7 +94,12 @@ class DistributeClassToTutorService(SimpleTestCase):
         bad_volume = random.choice(['aaa', '12ab', True])
         cmd = attr.evolve(self.distribute_class_cmd, distributed_volume=bad_volume)
         with self.assertRaises(MultipleBusinessExceptions) as e:
-            distribute_class_to_tutor(cmd, self.tutor_repository, self.effective_class_repository)
+            distribute_class_to_tutor(
+                cmd,
+                self.tutor_repository,
+                self.effective_class_repository,
+                self.tutor_attribution_translator,
+            )
         self.assertIsInstance(
             e.exception.exceptions.pop(),
             VolumeShouldBeNumericException
@@ -83,7 +109,12 @@ class DistributeClassToTutorService(SimpleTestCase):
         bad_volume = random.choice([Decimal(-5.0), self.effective_class.volumes.total_volume + 5])
         cmd = attr.evolve(self.distribute_class_cmd, distributed_volume=bad_volume)
         with self.assertRaises(MultipleBusinessExceptions) as e:
-            distribute_class_to_tutor(cmd, self.tutor_repository, self.effective_class_repository)
+            distribute_class_to_tutor(
+                cmd,
+                self.tutor_repository,
+                self.effective_class_repository,
+                self.tutor_attribution_translator,
+            )
         self.assertIsInstance(
             e.exception.exceptions.pop(),
             InvalidVolumeException
@@ -93,12 +124,14 @@ class DistributeClassToTutorService(SimpleTestCase):
         distribute_class_to_tutor(
             self.distribute_class_cmd,
             self.tutor_repository,
-            self.effective_class_repository
+            self.effective_class_repository,
+            self.tutor_attribution_translator,
         )
         with self.assertRaises(MultipleBusinessExceptions) as e:
             distribute_class_to_tutor(
                 self.distribute_class_cmd,
                 self.tutor_repository,
-                self.effective_class_repository
+                self.effective_class_repository,
+                self.tutor_attribution_translator,
             )
         self.assertIsInstance(e.exception.exceptions.pop(), TutorAlreadyAssignedException)
