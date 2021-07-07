@@ -27,7 +27,6 @@ import abc
 
 import attr
 
-from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
@@ -46,15 +45,10 @@ class EffectiveClassCode(str):
         assert len(self) == 1
 
 
-@attr.s(frozen=True, slots=True, eq=False)
+@attr.s(frozen=True, slots=True)
 class EffectiveClassIdentity(interface.EntityIdentity):
     class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
-
-    def __eq__(self, other):
-        return type(other) == EffectiveClassIdentity \
-               and self.class_code == other.class_code \
-               and self.learning_unit_identity == other.learning_unit_identity
 
     def __str__(self):
         return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))

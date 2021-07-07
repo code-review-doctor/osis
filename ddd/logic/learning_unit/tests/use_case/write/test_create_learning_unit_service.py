@@ -27,6 +27,7 @@
 import attr
 from django.test import SimpleTestCase
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -47,7 +48,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
         self.entity_repository.save(self.fac_drt)
         campus = UCLCampusFactory()
         self.command = CreateLearningUnitCommand(
-            code="LDROI1001",
+            code="LDROI1010",
             academic_year=2020,
             type=LearningContainerYearType.COURSE.name,
             common_title_fr="Introduction au droit",
@@ -112,7 +113,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
     def test_mapping_when_practical_volume_is_none(self):
         cmd = attr.evolve(
             self.command,
-            code="LDROI1002",
+            code="LDROI1011",
             practical_volume_q1=None,
             practical_volume_q2=None,
             practical_volume_annual=None,
@@ -128,7 +129,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
     def test_mapping_when_practical_volume_is_0(self):
         cmd = attr.evolve(
             self.command,
-            code="LDROI1003",
+            code="LDROI1012",
             practical_volume_q1=0.0,
             practical_volume_q2=0.0,
             practical_volume_annual=0.0,
