@@ -27,11 +27,12 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def search_donnees_administratives_feuille_de_notes(
         cmd: 'SearchAdressesFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNoteRepository',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
 ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
     # Given
 

@@ -25,11 +25,12 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def soumettre_feuille_de_notes(
         cmd: 'SoumettreFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNoteRepository',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
 
