@@ -11,13 +11,13 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 def set_stage_dimona_to_true_for_internship_type(apps, schema_editor):
     LearningUnitYear = apps.get_model('base', 'learningunityear')
 
-    all_interniships_to_update = LearningUnitYear.objects.filter(
+    all_internships_to_update = LearningUnitYear.objects.filter(
         academic_year__year__gte=LIMIT_START_YEAR,
         learning_container_year__container_type='INTERNSHIP'
     ).update(
         stage_dimona=True
     )
-    logger.info('Stage-Dimona field has been updated for {} Learning Unit Year'.format(all_interniships_to_update))
+    logger.info('Stage-Dimona field has been updated for {} Learning Unit Year'.format(all_internships_to_update))
 
 
 class Migration(migrations.Migration):
