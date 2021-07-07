@@ -27,22 +27,19 @@ from decimal import Decimal
 from typing import List
 
 import attr
-from ddd.logic.attribution.domain.validator._should_distributed_volume_be_greater_than_0 import \
-    ShouldAssignedVolumeBeACorrectValue
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.application.domain.validator._should_be_an_available_volume import ShouldBeAnAvailableVolume
 from ddd.logic.attribution.domain.validator._should_tutor_not_be_already_assigned_to_class import \
     ShouldTutorNotBeAlreadyAssignedToClass
 from ddd.logic.effective_class_repartition.domain.validator._should_be_numeric_validator import ShouldBeNumericValidator
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
 
 @attr.s(frozen=True, slots=True)
 class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     tutor = attr.ib(type='Tutor')
     distributed_volume = attr.ib(type=Decimal)
-    effective_class = attr.ib(type=EffectiveClass)
+    effective_class_id = attr.ib(type=EffectiveClassIdentity)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return [
@@ -51,7 +48,5 @@ class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListV
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldAssignedVolumeBeACorrectValue(self.distributed_volume),
-            ShouldTutorNotBeAlreadyAssignedToClass(self.effective_class.entity_id, self.tutor),
-            ShouldBeAnAvailableVolume(self.distributed_volume, self.effective_class),
+            ShouldTutorNotBeAlreadyAssignedToClass(self.effective_class_id, self.tutor),
         ]
