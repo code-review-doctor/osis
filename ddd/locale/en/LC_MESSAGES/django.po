@@ -63,6 +63,9 @@ msgstr ""
 msgid "Credits should be greather than 0"
 msgstr ""
 
+msgid "Distributed volume should be filled in and be greater than 0"
+msgstr ""
+
 msgid "Following fields are required : {}"
 msgstr ""
 
@@ -87,6 +90,7 @@ msgstr ""
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr ""
 
+#, python-format
 msgid ""
 "The %(code_class)s derogation session is inconsistent with the LU derogation "
 "session (should be %(should_be_values)s)"
@@ -150,13 +154,15 @@ msgid ""
 "volume of the learning unit ({})"
 msgstr ""
 
-
 msgid "The teaching place is required."
 msgstr ""
 
 msgid ""
 "This course is team-managed. The application to this activity is based on a "
 "paper transmission."
+msgstr ""
+
+msgid "Tutor already assigned to the class"
 msgstr ""
 
 #, python-format

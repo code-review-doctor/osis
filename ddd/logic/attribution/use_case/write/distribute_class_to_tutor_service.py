@@ -26,12 +26,10 @@
 from ddd.logic.attribution.builder.tutor_builder import TutorBuilder
 from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
-from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
 from ddd.logic.attribution.domain.model.tutor import TutorIdentity
+from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.attribution.domain.service.is_distributed_volume_correct import IsDistributedVolumeCorrect
 from ddd.logic.attribution.repository.i_tutor import ITutorRepository
-from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
-    DistributeClassToTutorValidatorList
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 
@@ -39,31 +37,28 @@ from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClass
 def distribute_class_to_tutor(
         cmd: DistributeClassToTutorCommand,
         repository: 'ITutorRepository',
-        effective_class_repository: 'IEffectiveClassRepository'
+        effective_class_repository: 'IEffectiveClassRepository',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
 ) -> 'TutorIdentity':
-    # TODO: to implement
-    # TODO: reuse check_class_belongs_to_learning_unit DomainService
+    # GIVEN
     tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
-    tutor = repository.get(tutor_identity)
-    if not tutor:
-        # first_attribution_to_class
-        tutor = TutorBuilder.build_from_command(cmd)
-
-    class_volume = _build_class_volume_repartition(cmd)
-    tutor.assign_class(class_volume)
-
+    tutor = repository.get(tutor_identity) or TutorBuilder.build_from_command(cmd)
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
-    DistributeClassToTutorValidatorList(cmd, effective_class).validate()
-    repository.save(tutor)
-    return tutor.entity_id
 
-
-def _build_class_volume_repartition(cmd):
-    return ClassVolumeRepartition(
-        effective_class=EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
-            class_code=cmd.class_code,
-            learning_unit_year=cmd.year,
-            learning_unit_code=cmd.learning_unit_code),
+    # WHEN
+    IsDistributedVolumeCorrect().verify(
         distributed_volume=cmd.distributed_volume,
-        attribution=LearningUnitAttributionIdentity(uuid=cmd.learning_unit_attribution_uuid)
+        tutor_id=tutor.entity_id,
+        effective_class=effective_class,
+        tutor_attribution_translator=tutor_attribution_translator
     )
+    tutor.assign_class(
+        effective_class_id=effective_class.entity_id,
+        learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid,
+        distributed_volume=cmd.distributed_volume,
+    )
+
+    # THEN
+    repository.save(tutor)
+
+    return tutor.entity_id

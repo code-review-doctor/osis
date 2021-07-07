@@ -23,11 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from decimal import Decimal
 from typing import List
 
 import attr
 
 from ddd.logic.attribution.domain.model._class_volume_repartition import ClassVolumeRepartition
+from ddd.logic.attribution.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
+from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
+    DistributeClassToTutorValidatorList
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 
 
@@ -43,7 +48,18 @@ class Tutor(interface.RootEntity):
     entity_id = attr.ib(type=TutorIdentity)
     distributed_effective_classes = attr.ib(type=List[ClassVolumeRepartition])
 
-    def assign_class(self, class_volume: 'ClassVolumeRepartition') -> None:
+    def assign_class(
+            self,
+            effective_class_id: 'EffectiveClassIdentity',
+            learning_unit_attribution_uuid: str,
+            distributed_volume: Decimal,
+    ) -> None:
+        DistributeClassToTutorValidatorList(self, distributed_volume, effective_class_id).validate()
+        class_volume = ClassVolumeRepartition(
+            effective_class=effective_class_id,
+            distributed_volume=distributed_volume,
+            attribution=LearningUnitAttributionIdentity(uuid=learning_unit_attribution_uuid),
+        )
         self.distributed_effective_classes.append(class_volume)
 
     def unassign_class(self, class_code: str, learning_unit_attribution_uuid: str) -> None:

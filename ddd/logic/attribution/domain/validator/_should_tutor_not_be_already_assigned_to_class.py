@@ -26,20 +26,19 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.application.domain.builder.applicant_identity_builder import ApplicantIdentityBuilder
-from ddd.logic.application.domain.model.application import Application
-from ddd.logic.application.domain.validator.exceptions import NotAuthorOfApplicationException
-from ddd.logic.attribution.commands import DistributeClassToTutorCommand
-from ddd.logic.effective_class_repartition.domain.validator.exceptions import InvalidVolumeException
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
+from ddd.logic.attribution.domain.validator.exceptions import TutorAlreadyAssignedException
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldBeAnAvailableVolume(BusinessValidator):
-    command = attr.ib(type=DistributeClassToTutorCommand)
-    effective_class = attr.ib(type=EffectiveClass)
+class ShouldTutorNotBeAlreadyAssignedToClass(BusinessValidator):
+
+    class_identity_to_assign = attr.ib(type='EffectiveClassIdentity')  # type: EffectiveClassIdentity
+    tutor = attr.ib(type='Tutor')  # type: Tutor
 
     def validate(self, *args, **kwargs):
-        if self.command.distributed_volume > self.effective_class.volumes.total_volume or \
-                self.command.distributed_volume < 0:
-            raise InvalidVolumeException(self.effective_class.volumes.total_volume)
+        effective_classes_already_distributed = [
+            distributed_class.effective_class for distributed_class in self.tutor.distributed_effective_classes
+        ]
+        if self.class_identity_to_assign in effective_classes_already_distributed:
+            raise TutorAlreadyAssignedException()
