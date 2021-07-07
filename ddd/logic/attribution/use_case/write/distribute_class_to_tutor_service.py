@@ -46,7 +46,12 @@ def distribute_class_to_tutor(
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
 
     # WHEN
-    IsDistributedVolumeCorrect().verify(cmd, tutor, effective_class, tutor_attribution_translator)
+    IsDistributedVolumeCorrect().verify(
+        distributed_volume=cmd.distributed_volume,
+        tutor_id=tutor.entity_id,
+        effective_class=effective_class,
+        tutor_attribution_translator=tutor_attribution_translator
+    )
     tutor.assign_class(
         effective_class_id=effective_class.entity_id,
         learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid,

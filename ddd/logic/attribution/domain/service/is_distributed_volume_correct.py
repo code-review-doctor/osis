@@ -24,12 +24,12 @@
 #
 ##############################################################################
 
-from ddd.logic.attribution.commands import DistributeClassToTutorCommand
-from ddd.logic.attribution.domain.model.tutor import Tutor
+from ddd.logic.attribution.domain.model.tutor import TutorIdentity
 from ddd.logic.attribution.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
 from ddd.logic.attribution.domain.validator.exceptions import AssignedVolumeInvalidValueException, \
     AssignedVolumeTooHighException
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import InvalidVolumeException
+from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.ddd import interface
 
@@ -41,15 +41,14 @@ class IsDistributedVolumeCorrect(interface.DomainService):
     @classmethod
     def verify(
             cls,
-            cmd: 'DistributeClassToTutorCommand',
-            tutor: 'Tutor',
+            distributed_volume: 'DurationUnit',
+            tutor_id: 'TutorIdentity',
             effective_class: 'EffectiveClass',
             tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
     ):
         total_class_volume = effective_class.volumes.total_volume
-        distributed_volume = cmd.distributed_volume
         attribution_volume = tutor_attribution_translator.get_tutor_attribution_to_learning_unit(
-            tutor.entity_id,
+            tutor_id,
             effective_class.entity_id.learning_unit_identity
         ).attributed_volume_to_learning_unit
 
