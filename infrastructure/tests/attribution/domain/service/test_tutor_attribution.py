@@ -38,14 +38,10 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
 
     def test_should_order_by_last_name_and_first_name(self):
         identity = LDROI1001LearningUnitIdentityFactory()
-        attribution_charge = AttributionChargeNewFactory(
-            learning_component_year__learning_unit_year__acronym=identity.code,
-            learning_component_year__learning_unit_year__academic_year__year=identity.year,
-            allocation_charge=10.0,
-        )
-        for _ in range(2):
+        for _ in range(3):
             AttributionChargeNewFactory(
-                learning_component_year=attribution_charge.learning_component_year,
+                learning_component_year__learning_unit_year__acronym=identity.code,
+                learning_component_year__learning_unit_year__academic_year__year=identity.year,
                 allocation_charge=10.0,
             )
         result = self.translator.search_attributions_to_learning_unit(identity)
