@@ -32,6 +32,7 @@ def encoder_feuille_de_notes(
         feuille_de_note_repo: 'IFeuilleDeNoteRepository',
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
+    # Anticorruption layer : réutiliser un DomainService/repository interface pour récupérer le current numéro de session + le current year (data_target_year)
 
     # When
 
