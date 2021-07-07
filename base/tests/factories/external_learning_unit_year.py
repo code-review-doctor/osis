@@ -50,4 +50,5 @@ class ExternalLearningUnitYearFactory(DjangoModelFactory):
     author = factory.SubFactory(PersonFactory)
     co_graduation = True
     url = factory.Faker('url')
+    mobility = False
 
