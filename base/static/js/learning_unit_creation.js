@@ -28,7 +28,7 @@ function isDisabledField(html_id){
 }
 
 
-function setDefaultStageDomina() {
+function setDefaultStageDimona() {
     let containerTypeValue = document.getElementById('id_container_type').value;
     document.getElementById('id_stage_dimona').checked = containerTypeValue === internship ? true : false;
 }
@@ -217,5 +217,5 @@ $(document).ready(function() {
     });
     $('#id_credits').removeAttr('required');
 
-    document.getElementById('id_container_type').addEventListener("change", setDefaultStageDomina);
+    document.getElementById('id_container_type').addEventListener("change", setDefaultStageDimona);
 });
