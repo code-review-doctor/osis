@@ -28,7 +28,7 @@ from typing import Union
 from ddd.logic.attribution.commands import DistributeClassToTutorCommand
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand, \
-    DeleteEffectiveClassCommand, HasClassRepartitionCommand
+    DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity, EffectiveClassCode
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
@@ -41,7 +41,6 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
                 'CreateEffectiveClassCommand',
                 'UpdateEffectiveClassCommand',
                 'DeleteEffectiveClassCommand',
-                'HasClassRepartitionCommand',
                 'DistributeClassToTutorCommand'
             ]
     ) -> 'EffectiveClassIdentity':
