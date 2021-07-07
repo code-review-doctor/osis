@@ -45,15 +45,10 @@ class EffectiveClassCode(str):
         assert len(self) == 1
 
 
-@attr.s(frozen=True, slots=True, eq=False)
+@attr.s(frozen=True, slots=True)
 class EffectiveClassIdentity(interface.EntityIdentity):
     class_code = attr.ib(type=EffectiveClassCode)
     learning_unit_identity = attr.ib(type=LearningUnitIdentity)
-
-    def __eq__(self, other):
-        return type(other) == EffectiveClassIdentity \
-               and self.class_code == other.class_code \
-               and self.learning_unit_identity == other.learning_unit_identity
 
     def __str__(self):
         return "{} - ({})".format(self.class_code, str(self.learning_unit_identity.academic_year))
@@ -112,6 +107,14 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
 
     def is_volume_second_quadrimester_greater_than(self, volume: DurationUnit) -> bool:
         return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
+
+    @property
+    def is_practical(self):
+        return False
+
+    @property
+    def is_lecturing(self):
+        return False
 
 
 class PracticalEffectiveClass(EffectiveClass):

@@ -41,7 +41,7 @@ class CanCreateEffectiveClass(interface.DomainService):
             cls,
             learning_unit: 'LearningUnit',
             learning_unit_repository: 'ILearningUnitRepository',
-            has_enrollments_service: 'IStudentEnrollmentsTranslator',
+            student_enrollment_translator: 'IStudentEnrollmentsTranslator',
     ):
         exceptions = set()  # type Set[BusinessException]
         if learning_unit.is_external():
@@ -53,7 +53,7 @@ class CanCreateEffectiveClass(interface.DomainService):
         if learning_unit_repository.has_proposal_this_year_or_in_past(learning_unit):
             exceptions.add(LearningUnitHasProposalException())
 
-        if has_enrollments_service.has_enrollments_to_learning_unit(learning_unit.entity_id):
+        if student_enrollment_translator.has_enrollments_to_learning_unit(learning_unit.entity_id):
             exceptions.add(LearningUnitHasEnrollmentException())
 
         if not learning_unit.has_volume():
