@@ -33,10 +33,12 @@ from osis_common.ddd import interface
 Noma = str
 
 
+@attr.s(frozen=True, slots=True)
 class IdentiteNoteEtudiant(interface.EntityIdentity):
     noma = attr.ib(type=Noma)
 
 
+@attr.s(frozen=True, slots=True)
 class NoteEtudiant(interface.Entity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)

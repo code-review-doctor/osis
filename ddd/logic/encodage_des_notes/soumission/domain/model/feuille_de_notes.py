@@ -31,12 +31,14 @@ from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import 
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class IdentiteFeuilleDeNotes(interface.EntityIdentity):
     numero_session = attr.ib(type=int)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
     notes = attr.ib(type=Set[NoteEtudiant])

@@ -35,13 +35,16 @@ class Note(interface.ValueObject, abc.ABC):
     value = attr.ib(type=Any)
 
 
+@attr.s(frozen=True, slots=True)
 class NoteChiffree(Note):
     value = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class NoteManquante(Note):
     value = ""
 
 
+@attr.s(frozen=True, slots=True)
 class Justification(Note):
     value = attr.ib(type=str)  # TODO : remplacer avec Enum (sans "absence justifiée")

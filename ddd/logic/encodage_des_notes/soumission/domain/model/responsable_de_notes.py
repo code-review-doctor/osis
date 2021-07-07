@@ -30,16 +30,19 @@ import attr
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class IdentiteResponsableDeNotes(interface.EntityIdentity):
     matricule_fgs_enseignant = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class UniteEnseignementIdentite(interface.EntityIdentity):
     """Identifie un cours, stage, mémoire partim, classe..."""
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class ResponsableDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteResponsableDeNotes)
     unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
