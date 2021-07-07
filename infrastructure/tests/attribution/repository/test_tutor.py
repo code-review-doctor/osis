@@ -49,14 +49,8 @@ class TutorRepositoryTestCase(TestCase):
         self.learning_rep = LearningUnitRepository()
 
     def test_should_return_empty_list_when_no_attribution_found(self):
-        ue_without_attribution = LearningUnitYearFactory(
-            academic_year__current=True
-        )
-        entity_id = LearningUnitIdentityBuilder.build_from_code_and_year(
-            code=ue_without_attribution.acronym,
-            year=ue_without_attribution.academic_year.year
-        )
-        results = self.tutor_repository.search(learning_unit_identity=entity_id)
+        tutor_identity_without_class_repartition = Tutor9999IdentityFactory()
+        results = self.tutor_repository.search(entity_ids=[tutor_identity_without_class_repartition])
         self.assertEqual(len(results), 0)
 
     def test_should_filter_on_effective_class(self):

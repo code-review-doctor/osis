@@ -35,7 +35,8 @@ from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1002Externa
     LDROI1001CourseLearningUnitFactory, LDROI1003CourseWithPartimsLearningUnitFactory, \
     LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsTranslator
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
@@ -60,7 +61,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
             check_can_create_effective_class(
                 cmd=self.cmd,
                 learning_unit_repository=self.learning_unit_repository,
-                has_enrollments_service=self.has_enrollments_service,
+                student_enrollment_translator=self.has_enrollments_service,
             )
         )
 
@@ -77,7 +78,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
             check_can_create_effective_class(
                 cmd=self.cmd,
                 learning_unit_repository=self.learning_unit_repository,
-                has_enrollments_service=self.has_enrollments_service,
+                student_enrollment_translator=self.has_enrollments_service,
             )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(ClassTypeInvalidException, raised_exceptions)
@@ -96,7 +97,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
             check_can_create_effective_class(
                 cmd=cmd,
                 learning_unit_repository=self.learning_unit_repository,
-                has_enrollments_service=self.has_enrollments_service,
+                student_enrollment_translator=self.has_enrollments_service,
             )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasPartimException, raised_exceptions)
@@ -114,7 +115,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
             check_can_create_effective_class(
                 cmd=cmd,
                 learning_unit_repository=self.learning_unit_repository,
-                has_enrollments_service=self.has_enrollments_service,
+                student_enrollment_translator=self.has_enrollments_service,
             )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasNoVolumeException, raised_exceptions)
@@ -134,7 +135,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
             check_can_create_effective_class(
                 cmd=cmd,
                 learning_unit_repository=self.learning_unit_repository,
-                has_enrollments_service=self.has_enrollments_service,
+                student_enrollment_translator=self.has_enrollments_service,
             )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasEnrollmentException, raised_exceptions)
@@ -154,7 +155,7 @@ class TestCheckCanCreateEffectiveClass(SimpleTestCase):
             check_can_create_effective_class(
                 cmd=cmd,
                 learning_unit_repository=self.learning_unit_repository,
-                has_enrollments_service=self.has_enrollments_service,
+                student_enrollment_translator=self.has_enrollments_service,
             )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasProposalException, raised_exceptions)

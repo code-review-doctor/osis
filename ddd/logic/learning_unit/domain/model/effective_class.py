@@ -115,8 +115,12 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         return self.volumes.volume_second_quadrimester and self.volumes.volume_second_quadrimester > volume
 
     @property
-    def class_type(self):
-        return LECTURING if self.__class__ == LecturingEffectiveClass else PRACTICAL_EXERCISES
+    def is_practical(self):
+        return False
+
+    @property
+    def is_lecturing(self):
+        return False
 
 
 class PracticalEffectiveClass(EffectiveClass):

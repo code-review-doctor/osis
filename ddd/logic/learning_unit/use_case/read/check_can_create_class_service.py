@@ -34,7 +34,7 @@ from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepo
 def check_can_create_effective_class(
         cmd: 'CanCreateEffectiveClassCommand',
         learning_unit_repository: 'ILearningUnitRepository',
-        has_enrollments_service: 'IStudentEnrollmentsTranslator',
+        student_enrollment_translator: 'IStudentEnrollmentsTranslator',
 ) -> None:
     learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
         code=cmd.learning_unit_code,
@@ -44,5 +44,5 @@ def check_can_create_effective_class(
     CanCreateEffectiveClass().verify(
         learning_unit=learning_unit,
         learning_unit_repository=learning_unit_repository,
-        has_enrollments_service=has_enrollments_service,
+        student_enrollment_translator=student_enrollment_translator,
     )
