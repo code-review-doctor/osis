@@ -19,4 +19,4 @@ class NoteManquante(Note):
 
 
 class Justification(Note):
-    value = attr.ib(type=str)  # TODO : remplacer avec Enum
+    value = attr.ib(type=str)  # TODO : remplacer avec Enum (sans "absence justifiée")
