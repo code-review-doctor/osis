@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List
 
 from django.db.models import F
@@ -40,13 +39,12 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
     @classmethod
     def search_attributions_to_learning_unit(
             cls,
-            learning_unit_identity: 'LearningUnitIdentity'
+            learning_unit_identity: 'LearningUnitIdentity',
+            class_type: str = None
     ) -> List['TutorAttributionToLearningUnitDTO']:
         qs = AttributionChargeNew.objects.filter(
             learning_component_year__learning_unit_year__acronym=learning_unit_identity.code,
             learning_component_year__learning_unit_year__academic_year__year=learning_unit_identity.year,
-            allocation_charge__isnull=False,
-            allocation_charge__gt=Decimal(0.0),
         ).annotate(
             learning_unit_code=F('learning_component_year__learning_unit_year__acronym'),
             learning_unit_year=F('learning_component_year__learning_unit_year__academic_year__year'),
@@ -69,14 +67,15 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
             'last_name',
             'first_name',
         ).distinct()
-
+        if class_type:
+            qs = qs.filter(learning_component_year__type=class_type)
         return [TutorAttributionToLearningUnitDTO(**data_as_dict) for data_as_dict in qs]
 
     @classmethod
     def get_tutor_attribution_to_learning_unit(
             cls,
             tutor_identity: 'TutorIdentity',
-            learning_unit_identity: 'LearningUnitIdentity'
+            learning_unit_identity: 'LearningUnitIdentity',
     ) -> 'TutorAttributionToLearningUnitDTO':
         attributions_to_learn_unit = cls.search_attributions_to_learning_unit(learning_unit_identity)
         return next(
@@ -91,7 +90,7 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
     def get_learning_unit_attribution(
             cls,
             attribution_uuid: str,
-            learning_unit_identity: 'LearningUnitIdentity'
+            learning_unit_identity: 'LearningUnitIdentity',
     ) -> 'TutorAttributionToLearningUnitDTO':
         # TODO : ??? pq ne pas ajouter le uuid dans le search
         attributions_to_learn_unit = cls.search_attributions_to_learning_unit(learning_unit_identity)

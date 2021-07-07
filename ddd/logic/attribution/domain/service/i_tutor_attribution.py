@@ -47,7 +47,8 @@ class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
     @abc.abstractmethod
     def search_attributions_to_learning_unit(
             cls,
-            learning_unit_identity: 'LearningUnitIdentity'
+            learning_unit_identity: 'LearningUnitIdentity',
+            class_type: str = None
     ) -> List['TutorAttributionToLearningUnitDTO']:
         pass
 

@@ -59,6 +59,7 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
             SearchAttributionsToLearningUnitCommand(
                 learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
                 learning_unit_year=self.effective_class.entity_id.learning_unit_identity.year,
+                class_type=self.effective_class.class_type
             )
         )
 
