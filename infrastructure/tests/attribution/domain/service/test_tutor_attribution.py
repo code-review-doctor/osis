@@ -48,10 +48,7 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
                 learning_component_year=attribution_charge.learning_component_year,
                 allocation_charge=10.0,
             )
-        result = self.translator.search_attributions_to_learning_unit(
-            identity,
-            attribution_charge.learning_component_year.type
-        )
+        result = self.translator.search_attributions_to_learning_unit(identity)
         ordered_by_last_name_first_name = list(sorted(result, key=lambda elem: (elem.last_name, elem.first_name)))
         self.assertListEqual(result, ordered_by_last_name_first_name)
 
@@ -64,9 +61,6 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
         )
         for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
-        result = self.translator.search_attributions_to_learning_unit(
-            identity,
-            attribution_charge.learning_component_year.type
-        )
+        result = self.translator.search_attributions_to_learning_unit(identity)
         self.assertTrue(len(result) == 1)
         self.assertEqual(result[0].attribution_uuid, attribution_charge.attribution.uuid)
