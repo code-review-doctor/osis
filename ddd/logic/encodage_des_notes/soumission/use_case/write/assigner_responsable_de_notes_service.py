@@ -25,11 +25,12 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def assigner_responsable_de_notes(
         cmd: 'AssignerResponsableDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNoteRepository',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
 

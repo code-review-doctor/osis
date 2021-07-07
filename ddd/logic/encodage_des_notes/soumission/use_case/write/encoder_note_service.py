@@ -25,11 +25,12 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def encoder_feuille_de_notes(
         cmd: 'EncoderFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNoteRepository',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
     # Anticorruption layer : réutiliser un DomainService/repository interface pour récupérer le current numéro de session + le current year (data_target_year)

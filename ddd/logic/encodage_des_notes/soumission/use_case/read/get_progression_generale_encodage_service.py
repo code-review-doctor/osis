@@ -25,11 +25,12 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def get_progression_generale(
         cmd: 'GetProgressionGeneraleCommand',
-        feuille_de_note_repo: 'IFeuilleDeNoteRepository',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
 ) -> 'ProgressionGeneraleEncodageNotesDTO':
     # Given
 
