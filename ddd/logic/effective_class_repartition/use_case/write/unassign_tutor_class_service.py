@@ -23,27 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
-
-from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
+from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
+from ddd.logic.effective_class_repartition.commands import UnassignTutorClassCommand
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 
 
-class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
+def unassign_tutor_class(cmd: 'UnassignTutorClassCommand', repository: 'ITutorRepository') -> None:
+    tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
+    tutor = repository.get(tutor_identity)
 
-    @classmethod
-    def get_first_tutor_full_name_if_exists(
-            cls,
-            effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Optional[str]:
-        from infrastructure.messages_bus import message_bus_instance
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class_identity.class_code,
-                learning_unit_code=effective_class_identity.learning_unit_identity.code,
-                learning_unit_year=effective_class_identity.learning_unit_identity.year
-            )
-        )
-        if tutors_assigned_to_class:
-            return tutors_assigned_to_class[0].full_name
+    tutor.unassign_class(class_code=cmd.class_code, learning_unit_attribution_uuid=cmd.learning_unit_attribution_uuid)
+    repository.save(tutor)

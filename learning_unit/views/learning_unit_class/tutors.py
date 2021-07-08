@@ -29,8 +29,8 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from attribution.views.attribution import _get_classes_charge_repartition_warning_messages
-from ddd.logic.attribution.commands import SearchTutorsDistributedToClassCommand
-from ddd.logic.attribution.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.views.learning_unit_class.common import CommonClassView
 

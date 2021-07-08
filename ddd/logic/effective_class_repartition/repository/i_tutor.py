@@ -23,27 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from abc import abstractmethod
+from typing import Optional, List
 
-from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor, TutorIdentity
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
+class ITutorRepository(interface.AbstractRepository):
+    @classmethod
+    @abstractmethod
+    def get(cls, entity_id: 'TutorIdentity') -> 'Tutor':
+        pass
 
     @classmethod
-    def get_first_tutor_full_name_if_exists(
+    @abstractmethod
+    def search(
             cls,
-            effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Optional[str]:
-        from infrastructure.messages_bus import message_bus_instance
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class_identity.class_code,
-                learning_unit_code=effective_class_identity.learning_unit_identity.code,
-                learning_unit_year=effective_class_identity.learning_unit_identity.year
-            )
-        )
-        if tutors_assigned_to_class:
-            return tutors_assigned_to_class[0].full_name
+            entity_ids: Optional[List['TutorIdentity']] = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
+    ) -> List['Tutor']:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def delete(cls, entity_id: 'TutorIdentity', **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def save(cls, entity: 'Tutor') -> None:
+        pass

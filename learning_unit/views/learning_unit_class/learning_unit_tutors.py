@@ -27,9 +27,9 @@ from typing import List
 
 from django.views.generic import TemplateView
 
-from ddd.logic.attribution.commands import SearchAttributionsToLearningUnitCommand, \
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.views.learning_unit_class.common import CommonClassView
 

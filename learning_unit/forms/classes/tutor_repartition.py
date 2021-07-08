@@ -31,8 +31,8 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
-from ddd.logic.attribution.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.forms.widgets import DecimalFormatInput
 

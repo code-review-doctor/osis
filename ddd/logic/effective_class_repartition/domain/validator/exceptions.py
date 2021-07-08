@@ -23,16 +23,43 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.ddd.interface import BusinessException
+from decimal import Decimal
 
 from django.utils.translation import gettext_lazy as _
 
+from osis_common.ddd.interface import BusinessException
 
-class VolumeShouldBeNumericException(BusinessException):
-    def __init__(self, *args, **kwargs):
+
+class AssignedVolumeInvalidValueException(BusinessException):
+    def __init__(self, assigned_volume: Decimal, class_volume: Decimal, **kwargs):
+        message = _("Volume of %(assigned_volume)s is not a valid volume. It should be greater or equal than 0 and "
+                    "less or equal than the class volume (%(class_volume)s)") % {
+                      'assigned_volume': assigned_volume,
+                      'class_volume': class_volume
+                  }
+        super().__init__(message, **kwargs)
+
+
+class AssignedVolumeTooHighException(BusinessException):
+    def __init__(self, assigned_volume: Decimal, attribution_volume: Decimal, **kwargs):
         message = _(
-            "Volume should be a number"
-        )
+            "Volume of %(assigned_volume)s is not a valid volume. It should be greater or equal than 0 and "
+            "less or equal than the attribution volume (%(attribution_volume)s)") % {
+                      'assigned_volume': assigned_volume,
+                      'attribution_volume': attribution_volume
+                  }
+        super().__init__(message, **kwargs)
+
+
+class TutorAlreadyAssignedException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Tutor already assigned to the class")
+        super().__init__(message, **kwargs)
+
+
+class InvalidDistributedVolumeValueException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Distributed volume should be filled in and be greater than 0")
         super().__init__(message, **kwargs)
 
 

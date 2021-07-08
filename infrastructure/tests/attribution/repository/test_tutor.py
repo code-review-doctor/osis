@@ -32,12 +32,12 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_class import AttributionClassFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from ddd.logic.attribution.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.attribution.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
+from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
+from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
     Tutor9999IdentityFactory
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.tests.factory.effective_class import LDROI1001XEffectiveClassIdentityFactory
-from infrastructure.attribution.repository.tutor import TutorRepository
+from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 

@@ -23,27 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import List
 
-from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
+from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
-class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
-
-    @classmethod
-    def get_first_tutor_full_name_if_exists(
-            cls,
-            effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Optional[str]:
-        from infrastructure.messages_bus import message_bus_instance
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class_identity.class_code,
-                learning_unit_code=effective_class_identity.learning_unit_identity.code,
-                learning_unit_year=effective_class_identity.learning_unit_identity.year
-            )
-        )
-        if tutors_assigned_to_class:
-            return tutors_assigned_to_class[0].full_name
+# TODO :: unit test
+# FIXME :: should be moved in another context "attribution_to_learning_unit"
+def search_attributions_to_learning_unit(
+        cmd: SearchAttributionsToLearningUnitCommand,
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
+) -> List['TutorAttributionToLearningUnitDTO']:
+    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
+        code=cmd.learning_unit_code,
+        year=cmd.learning_unit_year,
+    )
+    return tutor_attribution_translator.search_attributions_to_learning_unit(learning_unit_identity)

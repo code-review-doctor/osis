@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import Type
 
-from base.business.learning_unit_proposal import _get_value_from_enum
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester

@@ -23,27 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+import attr
 
-from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.effective_class_repartition.domain.validator.exceptions import TutorAlreadyAssignedException
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
 
 
-class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
+@attr.s(frozen=True, slots=True)
+class ShouldTutorNotBeAlreadyAssignedToClass(BusinessValidator):
 
-    @classmethod
-    def get_first_tutor_full_name_if_exists(
-            cls,
-            effective_class_identity: 'EffectiveClassIdentity'
-    ) -> Optional[str]:
-        from infrastructure.messages_bus import message_bus_instance
-        tutors_assigned_to_class = message_bus_instance.invoke(
-            SearchTutorsDistributedToClassCommand(
-                class_code=effective_class_identity.class_code,
-                learning_unit_code=effective_class_identity.learning_unit_identity.code,
-                learning_unit_year=effective_class_identity.learning_unit_identity.year
-            )
-        )
-        if tutors_assigned_to_class:
-            return tutors_assigned_to_class[0].full_name
+    class_identity_to_assign = attr.ib(type='EffectiveClassIdentity')  # type: EffectiveClassIdentity
+    tutor = attr.ib(type='Tutor')  # type: Tutor
+
+    def validate(self, *args, **kwargs):
+        effective_classes_already_distributed = [
+            distributed_class.effective_class for distributed_class in self.tutor.distributed_effective_classes
+        ]
+        if self.class_identity_to_assign in effective_classes_already_distributed:
+            raise TutorAlreadyAssignedException()

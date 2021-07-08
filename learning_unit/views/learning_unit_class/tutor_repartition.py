@@ -32,8 +32,9 @@ from django.views.generic import FormView
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
-from ddd.logic.attribution.commands import SearchAttributionCommand, SearchTutorsDistributedToClassCommand
-from ddd.logic.attribution.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.commands import SearchAttributionCommand, \
+    SearchTutorsDistributedToClassCommand
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionForm, ClassRemoveTutorRepartitionForm, \
     ClassEditTutorRepartitionForm
