@@ -63,14 +63,6 @@ class InvalidDistributedVolumeValueException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class VolumeShouldBeNumericException(BusinessException):
-    def __init__(self, *args, **kwargs):
-        message = _(
-            "Volume should be a number"
-        )
-        super().__init__(message, **kwargs)
-
-
 class InvalidVolumeException(BusinessException):
     def __init__(self, class_volume: float, *args, **kwargs):
         message = _(

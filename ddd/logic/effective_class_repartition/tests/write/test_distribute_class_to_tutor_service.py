@@ -32,7 +32,7 @@ from django.test import SimpleTestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import TutorAlreadyAssignedException, \
-    VolumeShouldBeNumericException, InvalidVolumeException
+    InvalidVolumeException
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithoutDistributedEffectiveClassesFactory
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
@@ -89,21 +89,6 @@ class DistributeClassToTutorService(SimpleTestCase):
         self.assertEqual(class_volume.distributed_volume, self.distribute_class_cmd.distributed_volume)
         self.assertEqual(class_volume.attribution.uuid, 'uuid')
         self.assertEqual(class_volume.effective_class, self.effective_class.entity_id)
-
-    def test_should_have_number_or_decimal_distributed_volume(self):
-        bad_volume = random.choice(['aaa', '12ab', True])
-        cmd = attr.evolve(self.distribute_class_cmd, distributed_volume=bad_volume)
-        with self.assertRaises(MultipleBusinessExceptions) as e:
-            distribute_class_to_tutor(
-                cmd,
-                self.tutor_repository,
-                self.effective_class_repository,
-                self.tutor_attribution_translator,
-            )
-        self.assertIsInstance(
-            e.exception.exceptions.pop(),
-            VolumeShouldBeNumericException
-        )
 
     def test_should_have_available_and_greater_than_0_distributed_volume(self):
         bad_volume = random.choice([Decimal(-5.0), self.effective_class.volumes.total_volume + 5])
