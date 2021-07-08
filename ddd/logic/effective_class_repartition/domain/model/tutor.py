@@ -29,7 +29,8 @@ from typing import List
 import attr
 
 from ddd.logic.effective_class_repartition.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
+from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import \
+    LearningUnitAttributionIdentity
 from ddd.logic.effective_class_repartition.domain.validator.validators_by_business_action import \
     DistributeClassToTutorValidatorList
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
