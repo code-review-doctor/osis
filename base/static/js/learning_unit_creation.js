@@ -217,5 +217,6 @@ $(document).ready(function() {
     });
     $('#id_credits').removeAttr('required');
 
+    setDefaultStageDimona();
     document.getElementById('id_container_type').addEventListener("change", setDefaultStageDimona);
 });
