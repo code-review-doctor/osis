@@ -26,8 +26,10 @@
 from typing import List
 
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
-from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import ClassDistributionWithAttribution
-from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import \
+    ClassDistributionWithAttribution
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder

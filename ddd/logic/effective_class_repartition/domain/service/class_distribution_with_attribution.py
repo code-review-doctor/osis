@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity

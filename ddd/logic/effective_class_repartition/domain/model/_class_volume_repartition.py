@@ -27,7 +27,8 @@ from decimal import Decimal
 
 import attr
 
-from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
+from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import \
+    LearningUnitAttributionIdentity
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 from osis_common.ddd import interface
 

@@ -25,7 +25,6 @@
 ##############################################################################
 from typing import Type
 
-from base.business.learning_unit_proposal import _get_value_from_enum
 from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -77,7 +76,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         return _get_effective_class_type_with_dto(dto_object)(
             entity_id=class_identity,
             titles=ClassTitles(
-                fr=dto_object.title_fr,
+                frtutor_builder=dto_object.title_fr,
                 en=dto_object.title_en
             ),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.teaching_place_uuid),

@@ -48,7 +48,8 @@ from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
-from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import distribute_class_to_tutor
+from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
+    distribute_class_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
@@ -77,7 +78,8 @@ from infrastructure.application.repository.application_calendar import Applicati
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
-from infrastructure.effective_class_repartition.domain.service.tutor_attribution import TutorAttributionToLearningUnitTranslator
+from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
+    TutorAttributionToLearningUnitTranslator
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator

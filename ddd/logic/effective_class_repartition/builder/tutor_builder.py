@@ -27,7 +27,8 @@
 from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
 from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
 from ddd.logic.effective_class_repartition.domain.model._class_volume_repartition import ClassVolumeRepartition
-from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import LearningUnitAttributionIdentity
+from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import \
+    LearningUnitAttributionIdentity
 from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor
 from ddd.logic.effective_class_repartition.dtos import TutorSearchDTO, \
     DistributedEffectiveClassesDTO
