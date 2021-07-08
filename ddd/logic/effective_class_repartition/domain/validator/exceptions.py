@@ -61,13 +61,3 @@ class InvalidDistributedVolumeValueException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Distributed volume should be filled in and be greater than 0")
         super().__init__(message, **kwargs)
-
-
-class InvalidVolumeException(BusinessException):
-    def __init__(self, class_volume: float, *args, **kwargs):
-        message = _(
-            "Volume should be a greater than 0 and less than or equal to effective class volume (%(class_volume)s)"
-        ) % {
-            'class_volume': class_volume
-        }
-        super().__init__(message, **kwargs)

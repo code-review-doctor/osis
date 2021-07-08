@@ -28,18 +28,10 @@ from ddd.logic.effective_class_repartition.commands import SearchAttributionComm
 from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
     ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
 def get_attribution(
         cmd: SearchAttributionCommand,
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
 ) -> TutorAttributionToLearningUnitDTO:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.learning_unit_year,
-    )
-    return tutor_attribution_translator.get_learning_unit_attribution(
-        cmd.learning_unit_attribution_uuid,
-        learning_unit_identity
-    )
+    return tutor_attribution_translator.get_learning_unit_attribution(cmd.learning_unit_attribution_uuid)

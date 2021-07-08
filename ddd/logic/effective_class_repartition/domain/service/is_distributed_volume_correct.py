@@ -27,7 +27,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
     ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import AssignedVolumeInvalidValueException, \
-    AssignedVolumeTooHighException, InvalidVolumeException
+    AssignedVolumeTooHighException
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.ddd import interface
@@ -59,8 +59,6 @@ class IsDistributedVolumeCorrect(interface.DomainService):
                 exceptions.add(AssignedVolumeInvalidValueException(distributed_volume, total_class_volume))
             if distributed_volume > attribution_volume:
                 exceptions.add(AssignedVolumeTooHighException(distributed_volume, attribution_volume))
-            if distributed_volume > total_class_volume or distributed_volume <= 0:
-                exceptions.add(InvalidVolumeException(total_class_volume))
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
