@@ -39,7 +39,12 @@ from osis_common.ddd.interface import ApplicationService
 class UclouvainCampusRepository(IUclouvainCampusRepository):
     @classmethod
     def get(cls, entity_id: UclouvainCampusIdentity) -> 'UclouvainCampus':
-        raise NotImplementedError
+        qs = _get_common_queryset()
+        qs = annotate_qs(qs)
+        qs = qs.filter(uuid=entity_id.uuid)
+        qs = _values_qs(qs)
+        obj_as_dict = qs.get()
+        return UclouvainCampusBuilder.build_from_repository_dto(UclouvainCampusDataDTO(**obj_as_dict))
 
     @classmethod
     def search(cls, entity_ids: Optional[List['UclouvainCampusIdentity']] = None, **kwargs) -> List['UclouvainCampus']:
