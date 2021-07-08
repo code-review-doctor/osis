@@ -51,7 +51,9 @@ class TutorRepartitionView(CommonClassView, FormView):
             {
                 'learning_unit': self.learning_unit,
                 'effective_class': self.effective_class,
-                'can_add_charge_repartition': True  # TODO je ne connais pas la condition
+                'can_add_charge_repartition': self.request.user.has_perm(
+                    "attribution.can_change_class_repartition", self.get_permission_object()
+                )
             }
         )
         return context
