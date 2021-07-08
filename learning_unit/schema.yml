@@ -252,7 +252,7 @@ paths:
       - in: query
         name: lang
         schema:
-          type: string 
+          type: string
       responses:
         '200':
           description: OK
