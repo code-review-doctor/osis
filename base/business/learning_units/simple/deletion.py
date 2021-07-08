@@ -125,7 +125,7 @@ def _check_learning_class_year_deletion(learning_class_year):
     for attribution_class in \
             AttributionClass.objects.filter(learning_class_year=learning_class_year):
         attribution = attribution_class.attribution_charge.attribution
-        msg[attribution] = _("Class %(acronym)s is assigned to %(tutor)s for the year %(year)s") % {
+        msg[attribution] = _("The class %(acronym)s is assigned to %(tutor)s for the year %(year)s") % {
             'acronym': learning_class_year.effective_class_complete_acronym,
             'tutor': attribution.tutor,
             'year': learning_class_year.learning_component_year.learning_unit_year.academic_year
