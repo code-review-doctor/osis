@@ -139,25 +139,7 @@ def prepare_xls_content(learning_unit_years: QuerySet,
     return result
 
 
-def _get_effective_classes(learning_unit_yr) -> List[LearningClassYear]:
-    class_attributions_queryset = AttributionClass.objects.all() \
-        .select_related(
-        'attribution_charge__learning_component_year',
-        'attribution_charge__attribution__tutor__person').order_by('attribution_charge__attribution__tutor__person')
-
-    effective_classes = LearningClassYear.objects.all().select_related(
-        'learning_component_year',
-        'learning_component_year__learning_unit_year',
-        'learning_component_year__learning_unit_year__academic_year'
-    ).filter(
-        learning_component_year__learning_unit_year__pk=learning_unit_yr.pk,
-    ).prefetch_related(
-        Prefetch('attributionclass_set',
-                 to_attr='class_attributions',
-                 queryset=class_attributions_queryset
-                 )
-    ).order_by('acronym')
-
+def _get_effective_classes(learning_unit_yr: LearningUnitYear) -> List[LearningClassYear]:
     return [
         effective_class
         for component in learning_unit_yr.learningcomponentyear_set.all().order_by('acronym')
