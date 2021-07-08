@@ -76,7 +76,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
         return _get_effective_class_type_with_dto(dto_object)(
             entity_id=class_identity,
             titles=ClassTitles(
-                frtutor_builder=dto_object.title_fr,
+                fr=dto_object.title_fr,
                 en=dto_object.title_en
             ),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(dto_object.teaching_place_uuid),
