@@ -48,8 +48,12 @@ class ClassTutorsView(CommonClassView, TemplateView):
                 'effective_class': self.effective_class,
                 'learning_unit': self.learning_unit,
                 'tutors': self.tutors,
-                'can_delete_attribution': True,  # todo je ne sais pas trop quel droit on doit vérifier ici
-                'can_change_attribution': True,
+                'can_delete_attribution': self.request.user.has_perm(
+                    "attribution.can_delete_class_repartition", self.get_permission_object()
+                ),
+                'can_change_attribution': self.request.user.has_perm(
+                    "attribution.can_change_class_repartition", self.get_permission_object()
+                ),
                 'warnings': self.get_warning_messages()
             }
         )

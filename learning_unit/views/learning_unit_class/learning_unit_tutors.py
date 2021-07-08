@@ -48,7 +48,9 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
                 'learning_unit_attributions': self.get_learning_unit_attributions(),
                 'learning_unit': self.learning_unit,
                 'personal_id_numbers_already_assigned': self.get_personal_id_numbers_assigned_to_class(),
-                'can_add_charge_repartition': True,  # TODO je ne connais pas la condition,
+                'can_add_charge_repartition': self.request.user.has_perm(
+                    "attribution.can_change_class_repartition", self.get_permission_object()
+                )
             }
         )
         context.update(self.common_url_tabs())
