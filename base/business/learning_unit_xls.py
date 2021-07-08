@@ -26,7 +26,7 @@
 from collections import defaultdict
 from typing import List, Dict, Optional
 
-from django.db.models import QuerySet, Prefetch
+from django.db.models import QuerySet
 from django.db.models import Subquery, OuterRef
 from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
@@ -37,7 +37,6 @@ from openpyxl.utils import get_column_letter
 from attribution.business import attribution_charge_new
 from attribution.business.attribution_class import create_attributions_dictionary
 from attribution.models.attribution import search as search_attributions
-from attribution.models.attribution_class import AttributionClass
 from attribution.models.enums.function import Functions
 from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -127,7 +126,6 @@ def prepare_xls_content(learning_unit_years: QuerySet,
         if is_external_ue_list:
             lu_data_part1.extend(_get_external_ue_data(learning_unit_yr))
         result.append(lu_data_part1)
-        # TODO :: Uncomment when refactoring score_responsible done.  Score_responsible assign to classes
         effective_classes = _get_effective_classes(learning_unit_yr)
 
         for effective_classe in effective_classes:
@@ -325,9 +323,8 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
     lu_data_part2 = []
     if with_attributions:
         if effective_class:
-            # TODO : OSIS-5783 A finaliser quand score_responsible sera assigné au class
             teachers = _get_effective_class_teachers(effective_class)
-            score_responsibles = []
+            score_responsibles = _get_class_score_responsibles(effective_class)
         else:
             teachers = _get_teachers(learning_unit_yr)
             score_responsibles = _get_score_responsibles(learning_unit_yr)
@@ -514,8 +511,16 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
         first = True
         cells_with_top_border.extend(["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
 
-        lu_data_part1 = get_data_part1(learning_unit_yr, None, is_external_ue_list=False)
-        lu_data_part2 = get_data_part2(learning_unit_yr, None, with_attributions=False)
+        lu_data_part1 = get_data_part1(
+            learning_unit_yr=learning_unit_yr,
+            effective_class=None,
+            is_external_ue_list=False
+        )
+        lu_data_part2 = get_data_part2(
+            learning_unit_yr=learning_unit_yr,
+            effective_class=None,
+            with_attributions=False
+        )
 
         lu_data_part1.extend(lu_data_part2)
 
@@ -671,8 +676,9 @@ def _get_score_responsibles(learning_unit_yr: LearningUnitYear) -> List[Person]:
 
 
 def _get_effective_class_teachers(effective_class: LearningClassYear) -> List[Person]:
-    attributions = create_attributions_dictionary(effective_class.class_attributions)
-
+    attributions = create_attributions_dictionary(
+        effective_class.attributionclass_set.all().order_by('attribution_charge__attribution__tutor__person')
+    )
     teachers = set()
     for k, attribution in attributions.items():
         if attribution.get('person'):
@@ -724,3 +730,10 @@ def _get_class_attribution_detail(an_attribution):
 
 def _get_attribution_volume(volume):
     return volume if volume and volume > 0 else 0
+
+
+def _get_class_score_responsibles(effective_class: LearningClassYear) -> List[Person]:
+    score_responsibles = set()
+    for a in effective_class.attributionclass_set.all():
+        score_responsibles = [a.attribution_charge.attribution.tutor.person for _ in a.scoreresponsible_set.all()]
+    return score_responsibles
