@@ -72,7 +72,6 @@ class ScoreResponsible(models.Model):
         super().save(*args, **kwargs)
 
     def __should_have_minimum_one_attribution(self):
-        #  TODO :: Question : est-ce correct?
-        #  Pourrait-il y avoir une fk attributionchargenew et une fk attributionclass???
-        if self.attribution_charge is None and self.attribution_class is None:
-            raise AttributeError(_('Score responsible should be link to an attribution'))
+        if (self.attribution_charge is None and self.attribution_class is None) or \
+                (self.attribution_charge and self.attribution_class):
+            raise AttributeError(_('Score responsible should be link to one attribution'))
