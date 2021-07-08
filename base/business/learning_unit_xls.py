@@ -190,7 +190,7 @@ def annotate_qs(learning_unit_years: QuerySet) -> QuerySet:
     )
 
 
-def create_xls_with_parameters(user, learning_units, filters, extra_configuration, is_external_ue_list):
+def create_xls_with_parameters(user, learning_units: QuerySet, filters, extra_configuration, is_external_ue_list: bool):
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
     titles_part1 = _prepare_titles(is_external_ue_list, with_attributions, with_grp)
