@@ -43,7 +43,18 @@ from base.views.common import display_error_messages, display_messages_by_level
 @login_required
 @require_POST
 def consolidate_proposal(request: http.HttpRequest, learning_unit_year_id: int):
-    proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year__id=learning_unit_year_id)
+    proposal = get_object_or_404(
+        ProposalLearningUnit.objects.select_related(
+            'learning_unit_year',
+            'learning_unit_year__learning_unit',
+            'learning_unit_year__learning_container_year',
+            'learning_unit_year__academic_year'
+        ).prefetch_related(
+            'learning_unit_year__learningcomponentyear_set'
+            'learning_unit_year__learningcomponentyear_set__learningclassyear_set'
+        ),
+        learning_unit_year__id=learning_unit_year_id
+    )
     user_person = get_object_or_404(Person, user=request.user)
 
     if not user_person.user.has_perm('base.can_consolidate_learningunit_proposal', proposal.learning_unit_year):

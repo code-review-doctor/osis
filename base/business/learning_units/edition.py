@@ -332,7 +332,15 @@ def update_learning_unit_year_with_report(
     override_postponement_consistency = kwargs.get('override_postponement_consistency', False)
     lu_to_consolidate = kwargs.get('lu_to_consolidate', None)
 
-    conflict_report = {}
+    if lu_to_consolidate:
+        for component in lu_to_consolidate.learningcomponentyear_set.all():
+            computed_total_volume = component.hourly_volume_partial_q1 + component.hourly_volume_partial_q2
+            total_volume = component.hourly_volume_total_annual
+            has_effective_classes = component.learningclassyear_set.all().exists()
+            if has_effective_classes:
+                # What to check on volumes?
+                pass
+
     if with_report:
         conflict_report = get_postponement_conflict_report(
             luy_to_update,

@@ -77,6 +77,12 @@ class VolumeEditionStrategy(metaclass=abc.ABCMeta):
                     if self.raw_volume_additional_requirement_entity_2 is not None:
                         self.obj.add_error(self.input_names['volume_additional_requirement_entity_2'], '')
 
+        print("Has classes : ", self.obj.has_effective_classes)
+        print("Is proposal : ", getattr(self.obj, 'proposal', False))
+        if not getattr(self.obj, 'proposal', False) and self.obj.has_effective_classes:
+            # TODO: Check volQ1+volQ2=0|None Or check vol_annual=0|None or both ?
+            print("In condition")
+
 
 class SimpleVolumeEditionFacultyStrategy(VolumeEditionStrategy):
     def __init__(self, obj, input_names):
