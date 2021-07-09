@@ -31,6 +31,8 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 from typing import List
 
+from assessments.tests.factories.score_responsible import ScoreResponsibleFactory, \
+    ClassAttributionScoreResponsibleFactory
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
@@ -41,7 +43,7 @@ from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOS
     _get_font_rows, _get_attribution_line, _add_training_data, \
     get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
-    prepare_xls_content_with_attributions, BOLD_FONT, _prepare_titles, HEADER_TEACHERS
+    prepare_xls_content_with_attributions, BOLD_FONT, _prepare_titles, HEADER_TEACHERS, _get_class_score_responsibles
 from base.business.learning_unit_xls import _get_col_letter
 from base.business.learning_unit_xls import get_significant_volume
 from base.models.entity_version import EntityVersion
@@ -749,6 +751,11 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
+        cls.score_responsible = ClassAttributionScoreResponsibleFactory(
+            learning_unit_year=cls.luy,
+            attribution_class=cls.attribution_1_on_class_a
+        )
+
     def test_get_data_part1_with_effective_class_for_lecturing(self):
         luy = self.luy
         effective_class = self.class_a
@@ -848,6 +855,10 @@ class TestLearningUnitXlsClassesDetail(TestCase):
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
         self.assertEqual(class_attribution_line_data[30], attribution_class.allocation_charge)
         self.assertEqual(class_attribution_line_data[31], 0)
+
+    def test_get_class_score_responsibles(self):
+        score_responsibles = _get_class_score_responsibles(self.class_a)
+        self.assertEqual(len(score_responsibles), 1)
 
 
 def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:

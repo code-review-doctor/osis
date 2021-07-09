@@ -49,7 +49,9 @@ class ScoreResponsibleFactory(factory.DjangoModelFactory):
 
 class LearningUnitAttributionScoreResponsibleFactory(ScoreResponsibleFactory):
     attribution_charge = factory.SubFactory(AttributionChargeNewFactory)
+    attribution_class = None
 
 
 class ClassAttributionScoreResponsibleFactory(ScoreResponsibleFactory):
+    attribution_charge = None
     attribution_class = factory.SubFactory(AttributionClassFactory)
