@@ -48,9 +48,14 @@ class DateRemiseNoteAtteinteException(BusinessException):
 
 
 class AucunEtudiantTrouveException(BusinessException):
-    def __init__(self, learning_unit_code: str, email: str, **kwargs):
-        message = _("No exam enrollment found for {learning_unit_code} (student = {email}").format(
+    def __init__(self, learning_unit_code: str, **kwargs):
+        message = _("The enrollment to the learning unit {earning_unit_code} doesn't exist").format(
             learning_unit_code=learning_unit_code,
-            email=email,
         )
+        super().__init__(message, **kwargs)
+
+
+class NomaNeCorrespondPasEmailException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Registration ID does not match email")
         super().__init__(message, **kwargs)
