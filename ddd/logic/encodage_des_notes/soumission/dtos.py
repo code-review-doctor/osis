@@ -154,3 +154,15 @@ class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     telephone = attr.ib(type=str)
     fax = attr.ib(type=str)
     email = attr.ib(type=str)
+
+# TODO :: @attr.s
+class AttributionEnseignantDTO(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    annee = attr.ib(type=int)
+
+
+class PeriodeSoumissionNotesDTO(interface.DTO):
+    annee_concernee = attr.ib(type=int)
+    session_concernee = attr.ib(type=str)
+    debut_periode_soumission = attr.ib(type=DateDTO)
+    fin_periode_soumission = attr.ib(type=DateDTO)

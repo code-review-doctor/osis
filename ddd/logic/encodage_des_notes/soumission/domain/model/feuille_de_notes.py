@@ -28,6 +28,8 @@ from typing import Set
 import attr
 
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
+    EncoderFeuilleDeNotesValidatorList
 from osis_common.ddd import interface
 
 
@@ -45,10 +47,16 @@ class FeuilleDeNotes(interface.RootEntity):
 
     def encoder_note(
             self,
-            noma_etudiant: str,
+            noma: str,
+            email: str,
             note: str,
     ) -> None:
-        # TODO :: builder pour créer objet Note
+        EncoderFeuilleDeNotesValidatorList(
+            noma=noma,
+            email=email,
+            note=note,
+            feuille_de_notes=self,
+        ).validate()
         raise NotImplementedError
 
     def soumettre(self) -> None:

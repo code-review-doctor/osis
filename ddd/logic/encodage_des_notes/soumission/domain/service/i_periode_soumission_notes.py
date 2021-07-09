@@ -23,20 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+import abc
+
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from osis_common.ddd import interface
 
 
-class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'EncoderFeuilleDeNotesCommand') -> 'IdentiteFeuilleDeNotes':
-        return IdentiteFeuilleDeNotes(
-            numero_session=cmd.numero_session,
-            code_unite_enseignement=cmd.code_unite_enseignement,
-            annee_academique=cmd.annee_unite_enseignement,
-        )
+class IPeriodeSoumissionNotesTranslator(interface.DomainService):
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteFeuilleDeNotes':
+    @abc.abstractmethod
+    def get(cls) -> 'PeriodeSoumissionNotesDTO':
         raise NotImplementedError

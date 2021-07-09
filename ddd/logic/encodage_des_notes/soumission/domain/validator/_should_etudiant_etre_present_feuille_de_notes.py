@@ -23,20 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
 
 
-class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'EncoderFeuilleDeNotesCommand') -> 'IdentiteFeuilleDeNotes':
-        return IdentiteFeuilleDeNotes(
-            numero_session=cmd.numero_session,
-            code_unite_enseignement=cmd.code_unite_enseignement,
-            annee_academique=cmd.annee_unite_enseignement,
-        )
+@attr.s(frozen=True, slots=True)
+class ShouldEtudiantEtrePresentFeuilleDeNotes(BusinessValidator):
+    noma_etudiant = attr.ib(type=str)
+    feuille_de_note = attr.ib(type=FeuilleDeNotes)
 
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteFeuilleDeNotes':
+    def validate(self, *args, **kwargs):
         raise NotImplementedError

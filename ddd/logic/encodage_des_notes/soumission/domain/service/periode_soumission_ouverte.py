@@ -23,15 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import IPeriodeSoumissionNotesTranslator
 from osis_common.ddd import interface
 
 
-class FeuilleDeNotesBuilder(interface.RootEntityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'FeuilleDeNotes':
-        pass
+class PeriodeSoumissionOuverte(interface.DomainService):
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'FeuilleDeNotes':
-        pass
+    def verifier(
+            cls,
+            cmd: 'EncoderFeuilleDeNotesCommand',
+            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
+    ) -> None:
+        # Vérifier l'année + session
+        raise NotImplementedError
