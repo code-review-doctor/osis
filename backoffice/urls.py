@@ -76,6 +76,8 @@ if 'admission' in settings.INSTALLED_APPS:
     )
 if 'osis_mail_template' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^osis_mail_template/', include('osis_mail_template.urls')),)
+if 'osis_signature' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^osis_signature/', include('osis_signature.urls')),)
 if 'osis_notification' in settings.INSTALLED_APPS:
     urlpatterns += (
         url(r'^notifications/v1/', include('osis_notification.api.urls_v1')),
