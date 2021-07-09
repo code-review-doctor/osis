@@ -387,7 +387,7 @@ class TestUeUtilization(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
-            _('yes')if luy.stage_dimona else _('no'),
+            _('yes') if luy.stage_dimona else _('no'),
             "{} ({})".format(self.a_group_year_parent.partial_acronym,
                              "{0:.2f}".format(self.group_element_child.relative_credits)),
             self.a_group_year_parent.acronym,
