@@ -29,8 +29,8 @@ import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.validator._should_date_soumission_pas_etre_atteinte import \
-    ShouldDateSoumissionPasEtreAtteinte
+from ddd.logic.encodage_des_notes.soumission.domain.validator._should_date_remise_note_pas_etre_atteinte import \
+    ShouldDateDeRemiseNotePasEtreAtteinte
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_email_correspondre_noma import \
     ShouldEmailCorrespondreNoma
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_etudiant_etre_present_feuille_de_notes import \
@@ -56,7 +56,7 @@ class EncoderFeuilleDeNotesValidatorList(TwoStepsMultipleBusinessExceptionListVa
         return [
             ShouldEtudiantEtrePresentFeuilleDeNotes(self.noma, self.feuille_de_notes),
             ShouldEmailCorrespondreNoma(self.noma, self.email, self.feuille_de_notes),
-            ShouldDateSoumissionPasEtreAtteinte(self.feuille_de_notes),
+            ShouldDateDeRemiseNotePasEtreAtteinte(self.feuille_de_notes),
             ShouldNotePasEtreSoumise(self.note),
             ShouldNoteEtreChoixValide(self.note),
         ]

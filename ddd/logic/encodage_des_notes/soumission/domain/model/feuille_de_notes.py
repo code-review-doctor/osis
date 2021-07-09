@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import date
 from typing import Set
 
 import attr
@@ -62,3 +63,10 @@ class FeuilleDeNotes(interface.RootEntity):
     def soumettre(self) -> None:
         # itérer sur notes et les passer en "soumises = True"
         raise NotImplementedError
+
+    def get_date_limite_de_remise(self, noma: str) -> date:
+        note = self.__get_note_etudiant(noma)
+        return note.date_limite_de_remise
+
+    def __get_note_etudiant(self, noma: str) -> 'NoteEtudiant':
+        return next(note for note in self.notes if note.noma == noma)

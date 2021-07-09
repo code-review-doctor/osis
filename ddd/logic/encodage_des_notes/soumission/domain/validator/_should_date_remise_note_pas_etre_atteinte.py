@@ -23,17 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import DateRemiseNoteAtteinteException
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldDateSoumissionPasEtreAtteinte(BusinessValidator):
+class ShouldDateDeRemiseNotePasEtreAtteinte(BusinessValidator):
+    noma = attr.ib(type=FeuilleDeNotes)
     feuille_de_note = attr.ib(type=FeuilleDeNotes)
 
     def validate(self, *args, **kwargs):
-        # TODO : UploadValueError("%s" % _("Deadline reached"), messages.ERROR)
-        raise NotImplementedError
+        date_limite_remise = self.feuille_de_note.get_date_limite_de_remise(self.noma)
+        aujourdhui = datetime.date.today()
+        if aujourdhui > date_limite_remise:
+            raise DateRemiseNoteAtteinteException()

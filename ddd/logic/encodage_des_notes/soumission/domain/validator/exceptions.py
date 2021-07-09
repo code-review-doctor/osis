@@ -39,3 +39,9 @@ class PeriodeSoumissionNotesFermeeException(BusinessException):
     def __init__(self, **kwargs):
         message = _("The period of scores' encoding is not opened")
         super().__init__(message, **kwargs)
+
+
+class DateRemiseNoteAtteinteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Deadline reached")
+        super().__init__(message, **kwargs)
