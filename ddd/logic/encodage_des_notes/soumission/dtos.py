@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import date
 from typing import List
 
 import attr
@@ -81,6 +82,9 @@ class DateDTO(interface.DTO):
     jour = attr.ib(type=str)
     mois = attr.ib(type=str)
     annee = attr.ib(type=str)
+
+    def to_date(self) -> date:
+        return date(day=self.jour, month=self.mois, year=self.annee)
 
 
 class EtudiantPepsDTO(interface.DTO):

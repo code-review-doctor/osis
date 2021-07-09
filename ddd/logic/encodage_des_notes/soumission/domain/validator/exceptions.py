@@ -33,3 +33,9 @@ class EnseignantNonAttribueUniteEnseignementException(BusinessException):
     def __init__(self, code_unite_enseignement: str, **kwargs):
         message = _("You're not attributed to the learning unit {}").format(code_unite_enseignement)
         super().__init__(message, **kwargs)
+
+
+class PeriodeSoumissionNotesFermeeException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The period of scores' encoding is not opened")
+        super().__init__(message, **kwargs)

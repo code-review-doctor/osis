@@ -23,9 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
+    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
 from osis_common.ddd import interface
 
 
@@ -37,5 +40,16 @@ class PeriodeSoumissionOuverte(interface.DomainService):
             cmd: 'EncoderFeuilleDeNotesCommand',
             periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
     ) -> None:
-        # Vérifier l'année + session
-        raise NotImplementedError
+        periode = periode_soumission_note_translator.get()
+
+        maintenant = datetime.datetime.now().date()
+        debut_periode = periode.debut_periode_soumission.to_date()
+        fin_periode = periode.fin_periode_soumission.to_date()
+        periode_est_ouverte = debut_periode < maintenant < fin_periode
+
+        annee_est_concernee = cmd.annee_unite_enseignement == periode.annee_concernee
+
+        session_est_concernee = cmd.numero_session == periode.session_concernee
+
+        if not periode_est_ouverte or not annee_est_concernee or not session_est_concernee:
+            raise PeriodeSoumissionNotesFermeeException()
