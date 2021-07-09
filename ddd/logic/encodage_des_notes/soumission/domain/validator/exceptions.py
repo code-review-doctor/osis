@@ -45,3 +45,12 @@ class DateRemiseNoteAtteinteException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Deadline reached")
         super().__init__(message, **kwargs)
+
+
+class AucunEtudiantTrouveException(BusinessException):
+    def __init__(self, learning_unit_code: str, email: str, **kwargs):
+        message = _("No exam enrollment found for {learning_unit_code} (student = {email}").format(
+            learning_unit_code=learning_unit_code,
+            email=email,
+        )
+        super().__init__(message, **kwargs)

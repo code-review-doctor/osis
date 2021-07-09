@@ -28,6 +28,7 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import AucunEtudiantTrouveException
 
 
 @attr.s(frozen=True, slots=True)
@@ -37,4 +38,9 @@ class ShouldEmailCorrespondreNoma(BusinessValidator):
     feuille_de_note = attr.ib(type=FeuilleDeNotes)
 
     def validate(self, *args, **kwargs):
-        raise NotImplementedError
+        correspondance_existe = any(
+            note for note in self.feuille_de_note.notes
+            if note.email == self.email_etudiant and note.entity_id.noma == self.noma_etudiant
+        )
+        if not correspondance_existe:
+            raise AucunEtudiantTrouveException(self.feuille_de_note.code_unite_enseignement, self.email_etudiant)

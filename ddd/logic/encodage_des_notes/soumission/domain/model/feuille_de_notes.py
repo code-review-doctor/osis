@@ -46,6 +46,10 @@ class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
     notes = attr.ib(type=Set[NoteEtudiant])
 
+    @property
+    def code_unite_enseignement(self) -> str:
+        return self.entity_id.code_unite_enseignement
+
     def encoder_note(
             self,
             noma: str,
