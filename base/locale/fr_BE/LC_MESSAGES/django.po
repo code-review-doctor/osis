@@ -2487,7 +2487,7 @@ msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
 
 msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
-msgstr "The class %(acronym)s est attribué(e) à %(tutor)s l’année %(year)s"
+msgstr "La classe %(acronym)s est attribué(e) à %(tutor)s l’année %(year)s"
 
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
