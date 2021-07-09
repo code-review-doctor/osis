@@ -23,3 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
+from django.utils.translation import gettext_lazy as _
+
+from osis_common.ddd.interface import BusinessException
+
+
+class EnseignantNonAttribueUniteEnseignementException(BusinessException):
+    def __init__(self, code_unite_enseignement: str, **kwargs):
+        message = _("You're not attributed to the learning unit {}").format(code_unite_enseignement)
+        super().__init__(message, **kwargs)
