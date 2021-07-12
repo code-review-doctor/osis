@@ -27,12 +27,15 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDejaSoumiseException
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldNotePasEtreSoumise(BusinessValidator):
-    note = attr.ib(type=str)
+    noma = attr.ib(type=str)
+    feuille_de_note = attr.ib(type=FeuilleDeNotes)
 
     def validate(self, *args, **kwargs):
-        # TODO :: UploadValueError("%s" % _("Score already submitted"), messages.WARNING)
-        raise NotImplementedError
+        if self.feuille_de_note.note_est_soumise(self.noma):
+            raise NoteDejaSoumiseException()

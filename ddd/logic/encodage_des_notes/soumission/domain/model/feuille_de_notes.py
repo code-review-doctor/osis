@@ -44,7 +44,7 @@ class IdentiteFeuilleDeNotes(interface.EntityIdentity):
 @attr.s(frozen=True, slots=True)
 class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
-    notes = attr.ib(type=Set[NoteEtudiant])
+    notes = attr.ib(type=Set[NoteEtudiant])  # type: Set[NoteEtudiant]
 
     @property
     def code_unite_enseignement(self) -> str:
@@ -74,3 +74,6 @@ class FeuilleDeNotes(interface.RootEntity):
 
     def __get_note_etudiant(self, noma: str) -> 'NoteEtudiant':
         return next(note for note in self.notes if note.noma == noma)
+
+    def note_est_soumise(self, noma: str) -> bool:
+        return self.__get_note_etudiant(noma).est_soumise

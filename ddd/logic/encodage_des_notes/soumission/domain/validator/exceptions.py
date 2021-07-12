@@ -67,3 +67,9 @@ class NoteIncorrecteException(BusinessException):
             "{note} isn't a valid score. Valid scores : 0 - 20 (0=Score of presence), A=Absent, T=Cheating"
         ).format(note=note_incorrecte)
         super().__init__(message, **kwargs)
+
+
+class NoteDejaSoumiseException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Score already submitted")
+        super().__init__(message, **kwargs)
