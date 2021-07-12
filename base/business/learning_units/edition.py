@@ -327,10 +327,14 @@ def update_learning_unit_year_with_report(
         luy_to_update: LearningUnitYear,
         fields_to_update: Dict[str, Any],
         entities_by_type_to_update: Dict,
-        **kwargs) -> None:
+        **kwargs
+) -> None:
     with_report = kwargs.get('with_report', True)
     override_postponement_consistency = kwargs.get('override_postponement_consistency', False)
     lu_to_consolidate = kwargs.get('lu_to_consolidate', None)
+
+    if lu_to_consolidate:
+        _check_if_learning_unit_is_consistent_with_classes(lu_to_consolidate)
 
     conflict_report = {}
     if with_report:
@@ -352,6 +356,16 @@ def update_learning_unit_year_with_report(
         _report_volume(lu_to_consolidate, luy_to_update_list)
         postpone_teaching_materials(luy_to_update)
         _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
+
+
+def _check_if_learning_unit_is_consistent_with_classes(lu_to_consolidate: 'LearningUnitYear'):
+    for component in lu_to_consolidate.learningcomponentyear_set.all():
+        has_effective_classes = component.learningclassyear_set.all()
+        if has_effective_classes and component.hourly_volume_total_annual in [None, 0]:
+            raise IntegrityError(
+                _("Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning unit whose volume has"
+                  " been deleted on a component having classes") % {'code_ue': lu_to_consolidate.acronym}
+            )
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
