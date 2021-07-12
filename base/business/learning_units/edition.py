@@ -360,7 +360,7 @@ def update_learning_unit_year_with_report(
 
 def _check_if_learning_unit_is_consistent_with_classes(lu_to_consolidate: 'LearningUnitYear'):
     for component in lu_to_consolidate.learningcomponentyear_set.all():
-        has_effective_classes = component.learningclassyear_set.all().exists()
+        has_effective_classes = component.learningclassyear_set.all()
         if has_effective_classes and component.hourly_volume_total_annual in [None, 0]:
             raise IntegrityError(
                 _("Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning unit whose volume has"
