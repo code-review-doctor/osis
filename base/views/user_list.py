@@ -48,9 +48,9 @@ from osis_role.contrib.helper import EntityRoleHelper, Row
 
 PersonId = int
 
-XLS_DESCRIPTION = _("User's list")
-XLS_FILENAME = _('users_list')
-WORKSHEET_TITLE = _("User's list")
+XLS_DESCRIPTION = _("List of users")
+XLS_FILENAME = _('List_of_users')
+WORKSHEET_TITLE = _("List of users")
 BOLD_FONT = Font(bold=True)
 
 
