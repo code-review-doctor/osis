@@ -28,6 +28,7 @@ from django.db.models import Q, OuterRef, Subquery, Exists
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
+from backoffice.settings.base import MINIMUM_LUE_YEAR
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
 from base.models.academic_year import AcademicYear
@@ -38,6 +39,8 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
+from infrastructure.messages_bus import message_bus_instance
 from learning_unit.calendar.learning_unit_limited_proposal_management import \
     LearningUnitLimitedProposalManagementCalendar
 
@@ -57,8 +60,7 @@ class ProposalLearningUnitOrderingFilter(OrderingFilter):
 
 
 class ProposalLearningUnitFilter(FilterSet):
-    academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+    academic_year__year = filters.ChoiceFilter(
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
@@ -139,7 +141,7 @@ class ProposalLearningUnitFilter(FilterSet):
     class Meta:
         model = LearningUnitYear
         fields = [
-            "academic_year",
+            "academic_year__year",
             "acronym",
             "subtype",
             "requirement_entity",
@@ -153,12 +155,11 @@ class ProposalLearningUnitFilter(FilterSet):
         self.__init_academic_year_field()
 
     def __init_academic_year_field(self):
-        target_years_opened = LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
-
-        self.form.fields['academic_year'].queryset = self.form.fields['academic_year'].queryset.filter(
-            year__in=target_years_opened
-        ).order_by('year')
-        self.form.fields["academic_year"].initial = self.form.fields['academic_year'].queryset.first()
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_LUE_YEAR))
+        choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
+        self.form.fields['academic_year__year'].choices = choices
+        self.form.fields['academic_year__year'].initial = \
+            LearningUnitLimitedProposalManagementCalendar().get_target_years_opened()
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
         most_recent_acronym = EntityVersion.objects.filter(

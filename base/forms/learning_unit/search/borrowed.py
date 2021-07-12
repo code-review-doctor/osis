@@ -41,11 +41,10 @@ from program_management.models.element import Element
 
 
 class BorrowedLearningUnitSearch(LearningUnitFilter):
-    academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+    academic_year__year = filters.ChoiceFilter(
         required=True,
         label=_('Ac yr.'),
-        empty_label=None
+        empty_label=None,
     )
     faculty_borrowing_acronym = filters.CharFilter(
         method=lambda queryset, *args, **kwargs: queryset,
@@ -62,14 +61,14 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.form.fields["academic_year"].required = True
+        self.form.fields["academic_year__year"].required = True
 
     def filter_queryset(self, queryset: 'LearningUnitYearQuerySet'):
         qs = super().filter_queryset(queryset).select_related("element").exclude(element__isnull=True)
 
         faculty_borrowing_id = None
         faculty_borrowing_acronym = self.form.cleaned_data.get('faculty_borrowing_acronym')
-        academic_year = self.form.cleaned_data["academic_year"]
+        academic_year = AcademicYear.objects.get(year=self.form.cleaned_data["academic_year__year"])
 
         if faculty_borrowing_acronym:
             try:
