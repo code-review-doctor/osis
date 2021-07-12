@@ -37,6 +37,7 @@ from base.models.enums import learning_container_year_types
 class LearningContainerYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.LearningContainerYear"
+        django_get_or_create = ('learning_container', 'academic_year')
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     academic_year = factory.SubFactory(AcademicYearFactory)
