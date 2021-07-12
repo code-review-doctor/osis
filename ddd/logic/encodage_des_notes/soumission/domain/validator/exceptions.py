@@ -59,3 +59,11 @@ class NomaNeCorrespondPasEmailException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Registration ID does not match email")
         super().__init__(message, **kwargs)
+
+
+class NoteIncorrecteException(BusinessException):
+    def __init__(self, note_incorrecte: str, **kwargs):
+        message = _(
+            "{note} isn't a valid score. Valid scores : 0 - 20 (0=Score of presence), A=Absent, T=Cheating"
+        ).format(note=note_incorrecte)
+        super().__init__(message, **kwargs)

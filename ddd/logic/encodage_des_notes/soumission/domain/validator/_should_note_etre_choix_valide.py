@@ -27,6 +27,11 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteIncorrecteException
+
+NOTE_MIN = 0
+NOTE_MAX = 20
+LETTRES_AUTORISEES = ['A', 'T']
 
 
 @attr.s(frozen=True, slots=True)
@@ -34,5 +39,5 @@ class ShouldNoteEtreChoixValide(BusinessValidator):
     note = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        # TODO :: valider note chiffree 0 - 20 + justification (enum)
-        raise NotImplementedError
+        if (self.note.isdigit() and not NOTE_MIN < int(self.note) < NOTE_MAX) or self.note not in LETTRES_AUTORISEES:
+            raise NoteIncorrecteException(self.note)
