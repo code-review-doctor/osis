@@ -168,11 +168,7 @@ class LearningUnitFilter(FilterSet):
         all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_LUE_YEAR))
         choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
         self.form.fields['academic_year__year'].choices = choices
-        self.form.fields['academic_year__year'].initial = \
-            [
-                academic_year.year for academic_year in all_academic_year
-                if academic_year.year == EducationGroupSwitchCalendar().get_target_years_opened()[0]
-            ][0]
+        self.form.fields['academic_year__year'].initial = EducationGroupSwitchCalendar().get_target_years_opened()
 
     def filter_tutor(self, queryset, name, value):
         value = value.replace(' ', '\\s')
