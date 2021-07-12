@@ -147,7 +147,7 @@ class TestFilter(TestCase):
         )
 
     def generate_get_data(self, borrowing_faculty: EntityVersion = None):
-        data = {"academic_year": self.academic_year.id}
+        data = {"academic_year__year": self.academic_year.year}
         if borrowing_faculty:
             data["faculty_borrowing_acronym"] = borrowing_faculty.acronym
         return data

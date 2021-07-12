@@ -147,4 +147,4 @@ class TestFilter(TestCase):
         )
 
     def generate_get_data(self):
-        return {"academic_year": self.academic_year.id}
+        return {"academic_year__year": self.academic_year.year}
