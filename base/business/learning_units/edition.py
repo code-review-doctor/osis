@@ -336,6 +336,7 @@ def update_learning_unit_year_with_report(
     if lu_to_consolidate:
         _check_if_learning_unit_is_consistent_with_classes(lu_to_consolidate)
 
+    conflict_report = {}
     if with_report:
         conflict_report = get_postponement_conflict_report(
             luy_to_update,
