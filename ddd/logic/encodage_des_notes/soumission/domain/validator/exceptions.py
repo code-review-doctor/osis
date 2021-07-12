@@ -73,3 +73,9 @@ class NoteDejaSoumiseException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Score already submitted")
         super().__init__(message, **kwargs)
+
+
+class NoteDecimaleNonAutoriseeException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Decimal scores not authorized")
+        super().__init__(message, **kwargs)

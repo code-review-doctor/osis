@@ -39,6 +39,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator._should_note_etre_
     ShouldNoteEtreChoixValide
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_note_pas_etre_soumise import \
     ShouldNotePasEtreSoumise
+from ddd.logic.encodage_des_notes.soumission.domain.validator._should_verifier_note_decimale_autorisee import \
+    ShouldVerifierNoteDecimaleAutorisee
 
 
 @attr.s(frozen=True, slots=True)
@@ -59,4 +61,5 @@ class EncoderFeuilleDeNotesValidatorList(TwoStepsMultipleBusinessExceptionListVa
             ShouldDateDeRemiseNotePasEtreAtteinte(self.noma, self.feuille_de_notes),
             ShouldNotePasEtreSoumise(self.noma, self.feuille_de_notes),
             ShouldNoteEtreChoixValide(self.note),
+            ShouldVerifierNoteDecimaleAutorisee(self.note, self.feuille_de_notes),
         ]
