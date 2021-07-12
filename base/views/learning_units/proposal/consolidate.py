@@ -50,7 +50,7 @@ def consolidate_proposal(request: http.HttpRequest, learning_unit_year_id: int):
             'learning_unit_year__learning_container_year',
             'learning_unit_year__academic_year'
         ).prefetch_related(
-            'learning_unit_year__learningcomponentyear_set'
+            'learning_unit_year__learningcomponentyear_set',
             'learning_unit_year__learningcomponentyear_set__learningclassyear_set'
         ),
         learning_unit_year__id=learning_unit_year_id
