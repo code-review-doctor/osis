@@ -40,7 +40,7 @@ class ShouldEmailCorrespondreNoma(BusinessValidator):
     def validate(self, *args, **kwargs):
         correspondance_existe = any(
             note for note in self.feuille_de_note.notes
-            if note.email == self.email_etudiant and note.entity_id.noma == self.noma_etudiant
+            if note.email == self.email_etudiant and note.noma == self.noma_etudiant
         )
         if not correspondance_existe:
             raise NomaNeCorrespondPasEmailException()

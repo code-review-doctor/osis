@@ -28,6 +28,7 @@ from typing import Set
 
 import attr
 
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
     EncoderFeuilleDeNotesValidatorList
@@ -55,15 +56,16 @@ class FeuilleDeNotes(interface.RootEntity):
             self,
             noma: str,
             email: str,
-            note: str,
+            note_encodee: str,
     ) -> None:
         EncoderFeuilleDeNotesValidatorList(
             noma=noma,
             email=email,
-            note=note,
+            note=note_encodee,
             feuille_de_notes=self,
         ).validate()
-        raise NotImplementedError
+        note_etudiant = self.__get_note_etudiant(noma)
+        note_etudiant.note = NoteBuilder.build(note_encodee)
 
     def soumettre(self) -> None:
         # itérer sur notes et les passer en "soumises = True"

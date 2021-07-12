@@ -27,12 +27,12 @@ from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_b
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
+    EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
     IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
-    EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
     PeriodeSoumissionOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
@@ -52,7 +52,7 @@ def encoder_feuille_de_notes(
 
     # When
     for note_etd in cmd.notes_etudiants:
-        feuille_de_notes.encoder_note(noma=note_etd.noma, email=note_etd.email, note=note_etd.note)
+        feuille_de_notes.encoder_note(noma=note_etd.noma, email=note_etd.email, note_encodee=note_etd.note)
 
     # Then
     feuille_de_note_repo.save(feuille_de_notes)

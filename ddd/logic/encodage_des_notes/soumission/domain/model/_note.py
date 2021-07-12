@@ -37,13 +37,31 @@ TRICHERIE = 'T'
 LETTRES_AUTORISEES = [ABSENCE_JUSTIFIEE, TRICHERIE]
 
 
+class NoteBuilder:
+    @staticmethod
+    def build(value: str) -> 'Note':
+        if value in LETTRES_AUTORISEES:
+            return Justification(value=value)
+        if NoteBuilder.__is_float(value):
+            return NoteChiffree(value=float(value))
+        return NoteManquante()
+
+    @staticmethod
+    def __is_float(value) -> bool:
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
+
 class Note(interface.ValueObject, abc.ABC):
     value = attr.ib(type=Any)
 
 
 @attr.s(frozen=True, slots=True)
 class NoteChiffree(Note):
-    value = attr.ib(type=int)
+    value = attr.ib(type=float)
 
 
 @attr.s(frozen=True, slots=True)

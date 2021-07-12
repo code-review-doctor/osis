@@ -38,10 +38,14 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
     noma = attr.ib(type=Noma)
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(slots=True)
 class NoteEtudiant(interface.Entity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)
     email = attr.ib(type=str)  # TODO :: to implement in repository
     date_limite_de_remise = attr.ib(type=date)
     est_soumise = attr.ib(type=bool)
+
+    @property
+    def noma(self) -> str:
+        return self.entity_id.noma

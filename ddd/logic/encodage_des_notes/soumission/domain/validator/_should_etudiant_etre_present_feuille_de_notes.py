@@ -39,7 +39,7 @@ class ShouldEtudiantEtrePresentFeuilleDeNotes(BusinessValidator):
     def validate(self, *args, **kwargs):
         correspondance_existe = any(
             note for note in self.feuille_de_note.notes
-            if note.entity_id.noma == self.noma_etudiant
+            if note.noma == self.noma_etudiant
         )
         if not correspondance_existe:
             raise AucunEtudiantTrouveException(self.feuille_de_note.code_unite_enseignement)
