@@ -153,7 +153,7 @@ def create_xls(request):
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters))
 
 
-def _prepare_xls_content(view, users_data_list):
+def _prepare_xls_content(view: UserListView, users_data_list) -> List[Dict[str, Dict[PersonId, List[Row]]]]:
     context = {
         'entity_managers': {},
         'faculty_managers_for_ue': {},
@@ -185,7 +185,7 @@ def _prepare_xls_content(view, users_data_list):
     return [_extract_xls_data(user_data, context) for user_data in users_data_list]
 
 
-def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[Row]]]):
+def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[Row]]]) -> List[str]:
     entities_managed = context.get('entity_managers').get(user_data.pk, [])
 
     central_managers_for_ue_entities_managed = context.get('central_managers_for_ue').get(user_data.pk, [])
