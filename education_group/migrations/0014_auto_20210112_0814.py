@@ -40,5 +40,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_education_group_switch_calendar, remove_education_group_switch_calendar),
+        migrations.RunPython(create_education_group_switch_calendar, remove_education_group_switch_calendar, elidable=True),
     ]

@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -81,6 +80,9 @@ msgid "Deputy"
 msgstr ""
 
 msgid "Deputy authority"
+msgstr ""
+
+msgid "Deputy disease or maternity"
 msgstr ""
 
 msgid "Deputy sabbatical"
@@ -171,6 +173,9 @@ msgstr ""
 msgid "Part-time teaching supply"
 msgstr ""
 
+msgid "Please precise at least a faculty or a code (or a part of a code)"
+msgstr ""
+
 msgid "Practical exercises"
 msgstr ""
 
@@ -178,12 +183,6 @@ msgid "Professor"
 msgstr ""
 
 msgid "Program modification"
-msgstr ""
-
-msgid "Publish application to portal"
-msgstr ""
-
-msgid "Publish attribution to portal"
 msgstr ""
 
 #, python-format
@@ -207,6 +206,12 @@ msgid "Substitute"
 msgstr ""
 
 msgid "Teaching supply"
+msgstr ""
+
+#, python-format
+msgid ""
+"The sum of volumes for the classes for professor %(tutor)s is superior to "
+"the volume of UE(%(ue_type)s) for this professor"
 msgstr ""
 
 #, python-format

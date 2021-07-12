@@ -43,5 +43,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(create_learning_unit_force_majeur_summary_edition_calendar, migrations.RunPython.noop),
+        migrations.RunPython(create_learning_unit_force_majeur_summary_edition_calendar, migrations.RunPython.noop, elidable=True),
     ]
