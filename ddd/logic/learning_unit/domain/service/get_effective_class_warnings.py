@@ -48,6 +48,15 @@ class EffectiveClassWarnings(interface.DomainService):
         return _warnings
 
 
+class EffectiveClassVolumesWarnings(interface.DomainService):
+
+    @staticmethod
+    def get(effective_class: 'EffectiveClass', learning_unit: 'LearningUnit') -> List[str]:
+        _warnings = []
+        _warnings.extend(_check_classes_volumes(effective_class, learning_unit))
+        return _warnings
+
+
 def _check_classes_quadrimester(effective_class: 'EffectiveClass', learning_unit: 'LearningUnit') -> List[str]:
     _warnings = []
     message = _('The %(code_class)s quadrimester is inconsistent with the LU quadrimester '

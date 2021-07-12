@@ -29,9 +29,9 @@
             {% trans 'Identification' %}
         </a>
     </li>
-    <!-- TODO: fill with components tab -->
-    <li role="presentation" {% if False %} class="active" {% endif %}>
-        <a href="" role="tab">
+
+    <li role="presentation" {% if request.path == url_class_components %} class="active" {% endif %}>
+        <a href="{{ url_class_components }}" role="tab">
             {% trans 'Components' %}
         </a>
     </li>

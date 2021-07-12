@@ -93,4 +93,5 @@ class CommonClassView(PermissionRequiredMixin):
             'url_class_tutors': reverse("class_tutors", kwargs=url_kwargs),
             'url_class_identification': reverse("class_identification", kwargs=url_kwargs),
             'url_lu_tutors': reverse("learning_unit_tutors", kwargs=url_kwargs),
+            'url_class_components': reverse("class_components", kwargs=url_kwargs),
         }
