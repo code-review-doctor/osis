@@ -27,11 +27,8 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NOTE_MIN, NOTE_MAX, LETTRES_AUTORISEES
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteIncorrecteException
-
-NOTE_MIN = 0
-NOTE_MAX = 20
-LETTRES_AUTORISEES = ['A', 'T']
 
 
 @attr.s(frozen=True, slots=True)

@@ -56,7 +56,7 @@ class EncoderFeuilleDeNotesValidatorList(TwoStepsMultipleBusinessExceptionListVa
         return [
             ShouldEtudiantEtrePresentFeuilleDeNotes(self.noma, self.feuille_de_notes),
             ShouldEmailCorrespondreNoma(self.noma, self.email, self.feuille_de_notes),
-            ShouldDateDeRemiseNotePasEtreAtteinte(self.feuille_de_notes),
-            ShouldNotePasEtreSoumise(self.note),
+            ShouldDateDeRemiseNotePasEtreAtteinte(self.noma, self.feuille_de_notes),
+            ShouldNotePasEtreSoumise(self.noma, self.feuille_de_notes),
             ShouldNoteEtreChoixValide(self.note),
         ]

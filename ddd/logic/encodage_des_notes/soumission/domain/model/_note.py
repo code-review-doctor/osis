@@ -30,6 +30,12 @@ import attr
 
 from osis_common.ddd import interface
 
+NOTE_MIN = 0
+NOTE_MAX = 20
+ABSENCE_JUSTIFIEE = 'A'
+TRICHERIE = 'T'
+LETTRES_AUTORISEES = [ABSENCE_JUSTIFIEE, TRICHERIE]
+
 
 class Note(interface.ValueObject, abc.ABC):
     value = attr.ib(type=Any)
