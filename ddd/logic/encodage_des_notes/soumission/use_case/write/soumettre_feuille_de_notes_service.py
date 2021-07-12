@@ -23,38 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
-from typing import Optional
-
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from osis_common.ddd import interface
-
-Noma = str
+from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+def soumettre_feuille_de_notes(
+        cmd: 'SoumettreFeuilleDeNotesCommand',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+) -> 'IdentiteFeuilleDeNotes':
+    # Given
 
+    # When
 
-@attr.s(slots=True)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=Optional[date])
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
-
+    # Then
+    # Historiser (DomainService)
+    return

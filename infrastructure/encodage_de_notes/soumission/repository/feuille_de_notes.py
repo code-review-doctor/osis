@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
-import itertools
-import operator
+
 from typing import Optional, List
 
-from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
+from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField
 from django.db.models.functions import Coalesce, Cast
 
 from base.models.exam_enrollment import ExamEnrollment

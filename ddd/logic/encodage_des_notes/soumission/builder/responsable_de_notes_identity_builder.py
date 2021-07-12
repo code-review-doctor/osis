@@ -23,38 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
-from typing import Optional
 
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from osis_common.ddd import interface
-
-Noma = str
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'IdentiteResponsableDeNotes':
+        raise NotImplementedError
 
-
-@attr.s(slots=True)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=Optional[date])
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
-
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteResponsableDeNotes':
+        raise NotImplementedError
