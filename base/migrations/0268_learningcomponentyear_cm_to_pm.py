@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunSQL(
-            [("UPDATE base_learningcomponentyear SET acronym = replace(acronym, 'CM', 'PM')"), ]
+            [("UPDATE base_learningcomponentyear SET acronym = replace(acronym, 'CM', 'PM')"), ],
+            elidable=True
         )
     ]

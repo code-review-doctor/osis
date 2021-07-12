@@ -40,5 +40,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_default_titles_to_common_core_and_complementary_module),
+        migrations.RunPython(add_default_titles_to_common_core_and_complementary_module, elidable=True),
     ]

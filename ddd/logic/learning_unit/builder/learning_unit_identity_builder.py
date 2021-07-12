@@ -25,16 +25,16 @@
 ##############################################################################
 from typing import Union
 
-from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO, EntityIdentity
-from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
 from ddd.logic.learning_unit.business_types import *
+from ddd.logic.learning_unit.commands import CopyLearningUnitToNextYearCommand
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
 class LearningUnitIdentityBuilder(EntityIdentityBuilder):
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'EntityIdentity':
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'LearningUnitIdentity':
         raise NotImplementedError
 
     @classmethod

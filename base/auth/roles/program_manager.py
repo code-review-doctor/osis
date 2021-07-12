@@ -116,6 +116,7 @@ class ProgramManager(EducationGroupRoleModel):
                 message=_("Program manager is not allowed to modify a specific version")
             ),
             'base.view_publish_btn': rules.always_deny,
+            'learning_unit.view_learningclassyear': rules.always_allow,
         })
 
 

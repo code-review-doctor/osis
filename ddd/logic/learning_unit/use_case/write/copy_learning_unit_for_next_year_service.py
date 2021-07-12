@@ -38,7 +38,7 @@ def copy_learning_unit_to_next_year(cmd: CopyLearningUnitToNextYearCommand) -> '
     # GIVEN
     repository = LearningUnitRepository()
     learning_unit = repository.get(entity_id=LearningUnitIdentityBuilder.build_from_command(cmd))
-    all_existing_learning_unit_identities = repository.get_identities()
+    all_existing_learning_unit_identities = repository.get_all_identities()
 
     # WHEN
     learning_unit_net_year = LearningUnitBuilder.copy_to_next_year(learning_unit, all_existing_learning_unit_identities)

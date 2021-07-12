@@ -5,8 +5,11 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('assessments', '0001_initial'), ('assessments', '0002_auto_20170428_1702'), ('assessments', '0003_scoresheetaddress'), ('assessments', '0004_auto_20180807_1229'), ('assessments', '0005_auto_20190128_1631'), ('assessments', '0006_auto_20190802_1104')]
+    replaces = [('assessments', '0001_initial'), ('assessments', '0002_auto_20170428_1702'),
+                ('assessments', '0003_scoresheetaddress'), ('assessments', '0004_auto_20180807_1229'),
+                ('assessments', '0005_auto_20190128_1631'), ('assessments', '0006_auto_20190802_1104'),
+                ('assessments', '0002_scoresheetaddress_education_group'),
+                ('assessments', '0003_remove_scoresheetaddress_offer_year')]
 
     initial = True
 
@@ -50,7 +53,7 @@ class Migration(migrations.Migration):
                 ('fax', models.CharField(blank=True, max_length=30, null=True, verbose_name='Fax')),
                 ('email', models.EmailField(blank=True, max_length=254, null=True, verbose_name='Email')),
                 ('country', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='reference.Country')),
-                ('offer_year', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='base.OfferYear')),
+                ('education_group', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='base.EducationGroup')),
             ],
         ),
         migrations.AlterModelOptions(
