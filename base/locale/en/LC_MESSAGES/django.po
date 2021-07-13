@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:03+0200\n"
+"POT-Creation-Date: 2021-07-13 10:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1228,9 +1228,15 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr ""
 
+msgid "January"
+msgstr ""
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
+msgstr ""
+
+msgid "June"
 msgstr ""
 
 msgid "Junior year"
@@ -2228,6 +2234,9 @@ msgid "Send calendar reminder notice"
 msgstr ""
 
 msgid "Separate"
+msgstr ""
+
+msgid "September"
 msgstr ""
 
 msgid "Service courses"
