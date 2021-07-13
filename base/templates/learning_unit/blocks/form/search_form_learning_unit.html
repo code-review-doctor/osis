@@ -27,17 +27,21 @@
 
 {% block search_form_row_1 %}
     {% bootstrap_field form.search_type %}
-    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
-    <div class="col-md-2">
+    {% bootstrap_field form.academic_year form_group_class="col-md-1" %}
+    <div class="col-md-1">
         {% bootstrap_label form.acronym.label %}
         {% bootstrap_field form.acronym show_label=False %}
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         {% bootstrap_label form.title.label %}
         {% bootstrap_field form.title show_label=False %}
     </div>
     {% bootstrap_field form.container_type form_group_class="col-md-2" %}
     {% bootstrap_field form.subtype form_group_class="col-md-2" %}
+    <div class="col-md-3">
+        {% bootstrap_field form.only_ue_having_classes %}
+        {% bootstrap_field form.with_only_proposals %}
+    </div>
     {{ form.media }}
     {% bootstrap_field form.ordering %}
 {% endblock %}
@@ -50,14 +54,14 @@
         {% bootstrap_label form.tutor.label %}
         {% bootstrap_field form.tutor show_label=False %}
         </div>
-        {% bootstrap_field form.requirement_entity form_group_class="col-md-2" %}
+        {% bootstrap_field form.requirement_entity form_group_class="col-md-1" %}
         {% if search_type == service_search_type or search_type == activity_search_type or search_type == borrowed_search_type%}
-            {% bootstrap_field form.allocation_entity form_group_class="col-md-2" %}
+            {% bootstrap_field form.allocation_entity form_group_class="col-md-1" %}
             <div class="col-md-2">
                 {% bootstrap_field form.with_entity_subordinated %}
-                {% bootstrap_field form.with_only_proposals %}
             </div>
         {% endif %}
+        {% bootstrap_field form.campus form_group_class="col-md-2" %}
     {% endwith %}
 {% endblock %}
 
