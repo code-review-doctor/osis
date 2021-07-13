@@ -44,7 +44,7 @@ class NoteChiffree(Note):
 
 @attr.s(slots=True, frozen=True)
 class NoteManquante(Note):
-    value = attr.ib(type=str, default='')
+    value = attr.ib(init=False, default='', type=str)
 
 
 @attr.s(slots=True, frozen=True)

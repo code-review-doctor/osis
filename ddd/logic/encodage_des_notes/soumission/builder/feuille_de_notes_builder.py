@@ -42,11 +42,11 @@ class FeuilleDeNotesBuilder(interface.RootEntityBuilder):
     def build_from_repository_dto(cls, dto_object: 'FeuilleDeNotesFromRepositoryDTO') -> 'FeuilleDeNotes':
         return FeuilleDeNotes(
             entity_id=FeuilleDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
-            notes=[cls._build_note_etudiant_from_repository_dto(note_dto) for note_dto in dto_object.notes]
+            notes={cls.__build_note_etudiant_from_repository_dto(note_dto) for note_dto in dto_object.notes}
         )
 
     @classmethod
-    def _build_note_etudiant_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
+    def __build_note_etudiant_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
         return NoteEtudiant(
             entity_id=IdentiteNoteEtudiant(noma=dto_object.noma),
             note=_build_note_from_value(dto_object.note),

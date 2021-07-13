@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,21 +22,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+import attr
 
 
-def encoder_feuille_de_notes(
-        cmd: 'EncoderFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
-) -> 'IdentiteFeuilleDeNotes':
-    # Given
-    # Anticorruption layer : réutiliser un DomainService/repository interface
-    # pour récupérer le current numéro de session + le current year (data_target_year)
+def assert_attrs_instances_are_equal(inst1, inst2):
+    """
+    Assert that two instances of a same class have same values for their attributes
 
-    # When
-
-    # Then
-    # Historiser (DomainService)
-    return
+    :param inst1:  Instance of an attrs-decoracted class
+    :param inst2: Instance of an attrs-decoracted class
+    """
+    assert attr.astuple(inst1, retain_collection_types=True) == attr.astuple(inst2, retain_collection_types=True)

@@ -68,7 +68,7 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
             numero_session=entity_id.numero_session,
             code_unite_enseignement=entity_id.code_unite_enseignement,
             annee_academique=entity_id.annee_academique,
-            notes=[
+            notes=set(
                 NoteEtudiantFromRepositoryDTO(
                     noma=row.noma,
                     note=row.note,
@@ -76,7 +76,7 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
                     est_soumise=row.est_soumise
                 )
                 for row in rows
-            ]
+            )
         )
 
         return FeuilleDeNotesBuilder().build_from_repository_dto(dto_object)

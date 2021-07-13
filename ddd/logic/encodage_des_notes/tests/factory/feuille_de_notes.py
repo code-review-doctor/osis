@@ -45,30 +45,30 @@ class EmptyFeuilleDeNotesFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
-    notes = []
+    notes = set()
 
 
-class FeuilleDeNotesWithNoNotesEncoded(EmptyFeuilleDeNotesFactory):
-    notes = [
+class FeuilleDeNotesSansNotesEncodees(EmptyFeuilleDeNotesFactory):
+    notes = {
         NoteManquanteEtudiantFactory(),
         NoteManquanteEtudiantFactory(),
         NoteManquanteEtudiantFactory()
-    ]
+    }
 
 
-class FeuilleDeNotesWithNotesEncoded(EmptyFeuilleDeNotesFactory):
-    notes = [
+class FeuilleDeNotesAvecNotesEncodees(EmptyFeuilleDeNotesFactory):
+    notes = {
         NoteChiffreEtudiantFactory(),
         NoteChiffreEtudiantFactory(),
         NoteJustificationEtudiantFactory(),
         NoteManquanteEtudiantFactory()
-    ]
+    }
 
 
-class FeuilleDeNotesWithNotesSubmitted(EmptyFeuilleDeNotesFactory):
-    notes = [
+class FeuilleDeNotesAvecNotesSoumises(EmptyFeuilleDeNotesFactory):
+    notes = {
         NoteChiffreEtudiantFactory(est_soumise=True),
         NoteChiffreEtudiantFactory(),
         NoteJustificationEtudiantFactory(est_soumise=True),
         NoteManquanteEtudiantFactory()
-    ]
+    }

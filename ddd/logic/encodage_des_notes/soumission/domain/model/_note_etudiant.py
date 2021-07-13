@@ -39,7 +39,7 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
     noma = attr.ib(type=Noma)
 
 
-@attr.s(slots=True)
+@attr.s(slots=True, eq=False)
 class NoteEtudiant(interface.Entity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)

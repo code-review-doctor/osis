@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from datetime import date
-from typing import List
+from typing import List, Set
 
 import attr
 
@@ -170,4 +170,4 @@ class FeuilleDeNotesFromRepositoryDTO(interface.DTO):
     numero_session = attr.ib(type=int)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
-    notes = attr.ib(type=List[NoteEtudiantFromRepositoryDTO])
+    notes = attr.ib(type=Set[NoteEtudiantFromRepositoryDTO])
