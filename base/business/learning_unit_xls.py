@@ -551,17 +551,20 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
             ).values()
 
             first_attribution = True
+            cells_with_top_border.extend(
+                ["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
             if attributions:
-                cells_with_top_border.extend(
-                    ["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
-            for attribution in attributions:
-                data.append(lu_data_part1 + _get_attribution_detail(attribution, True))
-                line += 1
-                if not first_attribution:
-                    cells_with_white_font.extend(
-                        ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24, 1)]
-                    )
+                for attribution in attributions:
+                    data.append(lu_data_part1 + _get_attribution_detail(attribution, True))
+                    line += 1
+                    if not first_attribution:
+                        cells_with_white_font.extend(
+                            ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24, 1)]
+                        )
+            else:
                 first_attribution = False
+                data.append(lu_data_part1)
+                line += 1
 
     return {
         'data': data,
