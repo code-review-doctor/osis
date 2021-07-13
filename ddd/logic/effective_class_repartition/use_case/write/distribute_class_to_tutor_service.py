@@ -30,7 +30,7 @@ from ddd.logic.effective_class_repartition.domain.model.tutor import TutorIdenti
 from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
     ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.domain.service.is_distributed_volume_correct import \
-    IsDistributedVolumeCorrect
+    DistributedVolumeWithClassVolume
 from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
@@ -40,7 +40,6 @@ def distribute_class_to_tutor(
         cmd: DistributeClassToTutorCommand,
         repository: 'ITutorRepository',
         effective_class_repository: 'IEffectiveClassRepository',
-        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
 ) -> 'TutorIdentity':
     # GIVEN
     tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(cmd.tutor_personal_id_number)
@@ -48,11 +47,9 @@ def distribute_class_to_tutor(
     effective_class = effective_class_repository.get(EffectiveClassIdentityBuilder.build_from_command(cmd))
 
     # WHEN
-    IsDistributedVolumeCorrect().verify(
+    DistributedVolumeWithClassVolume().verify(
         distributed_volume=cmd.distributed_volume,
-        attribution_uuid=cmd.learning_unit_attribution_uuid,
         effective_class=effective_class,
-        tutor_attribution_translator=tutor_attribution_translator
     )
     tutor.assign_class(
         effective_class_id=effective_class.entity_id,

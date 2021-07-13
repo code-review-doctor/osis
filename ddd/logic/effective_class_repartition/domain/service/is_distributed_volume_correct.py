@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
-    ITutorAttributionToLearningUnitTranslator
-from ddd.logic.effective_class_repartition.domain.validator.exceptions import AssignedVolumeInvalidValueException, \
-    AssignedVolumeTooHighException, InvalidVolumeException
+from functools import partial
+
+from base.ddd.utils.business_validator import execute_functions_and_aggregate_exceptions
+from ddd.logic.effective_class_repartition.domain.validator.exceptions import AssignedVolumeInvalidValueException
 from ddd.logic.learning_unit.domain.model._financial_volumes_repartition import DurationUnit
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.ddd import interface
@@ -35,32 +34,21 @@ from osis_common.ddd import interface
 MINIMUM_VALUE = 0
 
 
-class IsDistributedVolumeCorrect(interface.DomainService):
+class DistributedVolumeWithClassVolume(interface.DomainService):
 
     @classmethod
     def verify(
             cls,
             distributed_volume: 'DurationUnit',
-            attribution_uuid: str,
             effective_class: 'EffectiveClass',
-            tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
     ):
         total_class_volume = effective_class.volumes.total_volume
-        attribution = tutor_attribution_translator.get_learning_unit_attribution(attribution_uuid)
-        if effective_class.is_lecturing:
-            attribution_volume = attribution.lecturing_volume_attributed
-        else:
-            attribution_volume = attribution.practical_volume_attributed
-
-        exceptions = set()
-
         if distributed_volume:
-            if distributed_volume < MINIMUM_VALUE or distributed_volume > total_class_volume:
-                exceptions.add(AssignedVolumeInvalidValueException(distributed_volume, total_class_volume))
-            if distributed_volume > attribution_volume:
-                exceptions.add(AssignedVolumeTooHighException(distributed_volume, attribution_volume))
-            if distributed_volume > total_class_volume or distributed_volume <= 0:
-                exceptions.add(InvalidVolumeException(total_class_volume))
+            execute_functions_and_aggregate_exceptions(
+                partial(_should_be_lower_than_effective_class_volume, distributed_volume, total_class_volume),
+            )
 
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
+
+def _should_be_lower_than_effective_class_volume(distributed_volume, total_class_volume):
+    if distributed_volume and distributed_volume < MINIMUM_VALUE or distributed_volume > total_class_volume:
+        raise AssignedVolumeInvalidValueException(distributed_volume, total_class_volume)

@@ -54,7 +54,6 @@ class ClassTutorsView(CommonClassView, TemplateView):
                 'can_change_attribution': self.request.user.has_perm(
                     "attribution.can_change_class_repartition", self.get_permission_object()
                 ),
-                'warnings': self.get_warning_messages()
             }
         )
         context.update(self.common_url_tabs())
@@ -68,6 +67,3 @@ class ClassTutorsView(CommonClassView, TemplateView):
             class_code=self.class_code,
         )
         return message_bus_instance.invoke(command)
-
-    def get_warning_messages(self):
-        return _get_classes_charge_repartition_warning_messages(self.learning_unit_year)
