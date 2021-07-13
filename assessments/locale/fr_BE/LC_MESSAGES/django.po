@@ -215,8 +215,6 @@ msgstr "Entité"
 msgid "Evaluations"
 msgstr "Evaluations"
 
-#, fuzzy, python-format
-#| msgid "Extra time (33% generally)"
 msgid "Extra time (33% generally)"
 msgstr "Tiers-Temps"
 
@@ -263,10 +261,10 @@ msgid "Invalid justification value"
 msgstr "Valeur de justification invalide"
 
 msgid "January"
-msgstr ""
+msgstr "Janvier"
 
 msgid "June"
-msgstr ""
+msgstr "Juin"
 
 msgid "Justification"
 msgstr "Justification"
