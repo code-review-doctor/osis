@@ -318,6 +318,7 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, with_attributions: bool) 
         learning_unit_yr.get_quadrimester_display() or '',
         learning_unit_yr.get_session_display() or '',
         learning_unit_yr.language or "",
+        yesno(learning_unit_yr.stage_dimona).strip(),
     ])
     return lu_data_part2
 
@@ -366,6 +367,7 @@ def learning_unit_titles_part2() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
+        str(_('Stage-Dimona')),
     ]
 
 
