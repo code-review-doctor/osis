@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0588_remove_learningcomponentyear_uuid'),
+        ('base', '0590_set_stage_dimona_for_stage_type'),
     ]
 
     operations = [
