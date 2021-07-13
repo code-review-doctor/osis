@@ -476,7 +476,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
-                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(24)]
+                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(25)]
                     )
                 first = False
         else:
