@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 09:07+0200\n"
+"POT-Creation-Date: 2021-07-13 11:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -307,6 +307,9 @@ msgid "Agreements"
 msgstr ""
 
 msgid "Alert"
+msgstr ""
+
+msgid "All"
 msgstr ""
 
 msgctxt "female plural"
@@ -1702,7 +1705,10 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-msgid "Only proposals"
+msgid "Only UE in proposal"
+msgstr ""
+
+msgid "Only UE with classes"
 msgstr ""
 
 msgid "Only the volume Q1 must have a value"

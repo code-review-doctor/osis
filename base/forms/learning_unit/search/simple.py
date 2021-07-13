@@ -31,12 +31,15 @@ from django_filters import FilterSet, filters, OrderingFilter
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex, espace_special_characters
 from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.campus import Campus, find_main_campuses
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
 from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
+from learning_unit.models.learning_class_year import LearningClassYear
 
 COMMON_ORDERING_FIELDS = (
     ('academic_year__year', 'academic_year'), ('acronym', 'acronym'), ('full_title', 'title'),
@@ -130,17 +133,29 @@ class LearningUnitFilter(FilterSet):
 
     with_only_proposals = filters.BooleanFilter(
         method="filter_only_proposals",
-        label=_('Only proposals'),
+        label=_('Only UE in proposal'),
         widget=forms.CheckboxInput,
         initial=False
     )
-
+    campus = filters.ModelChoiceFilter(
+        queryset=find_main_campuses(),
+        required=False,
+        label=_('Learning location'),
+        empty_label=_("All"),
+    )
     order_by_field = 'ordering'
     ordering = OrderingFilter(
         fields=(
             COMMON_ORDERING_FIELDS
         ),
         widget=forms.HiddenInput
+    )
+
+    only_ue_having_classes = filters.BooleanFilter(
+        method="filter_only_ue_with_classes",
+        label=_('Only UE with classes'),
+        widget=forms.CheckboxInput,
+        initial=False
     )
 
     class Meta:
@@ -199,7 +214,9 @@ class LearningUnitFilter(FilterSet):
         has_proposal = ProposalLearningUnit.objects.filter(
             learning_unit_year=OuterRef('pk'),
         )
-
+        has_classes = LearningClassYear.objects.filter(
+            learning_component_year__learning_unit_year=OuterRef('pk'),
+        )
         queryset = LearningUnitYear.objects_with_container.select_related(
             'academic_year',
             'learning_container_year__academic_year',
@@ -208,6 +225,7 @@ class LearningUnitFilter(FilterSet):
             'externallearningunityear'
         ).order_by('academic_year__year', 'acronym').annotate(
             has_proposal=Exists(has_proposal),
+            has_classes=Exists(has_classes)
         )
         queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
@@ -229,6 +247,11 @@ class LearningUnitFilter(FilterSet):
     def filter_only_proposals(self, queryset, name, value):
         if value:
             return queryset.filter(has_proposal=True)
+        return queryset
+
+    def filter_only_ue_with_classes(self, queryset, name, value):
+        if value:
+            return queryset.filter(has_classes=True)
         return queryset
 
 
