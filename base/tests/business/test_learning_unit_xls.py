@@ -842,15 +842,15 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         # UE attr 4- line 5
         # Class A attr 1- line 6
         # Class A attr 2 - line 7
-        # Class C 0 attr 0 - line 9
+        # Class B attr 1  - line 8
+        # Class C no attr - line 9
         expected = _build_cells_ref(ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST, [2, 6, 8, 9])
         self.assertSetEqual(cells_with_top_border, expected)
 
         expected = _build_cells_ref(
             ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
              'V', 'W', 'X'], [3, 4, 5, 7])
-        print(expected)
-        print(cells_with_white_font)
+
         self.assertSetEqual(
             cells_with_white_font,
             expected

@@ -561,8 +561,8 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                         cells_with_white_font.extend(
                             ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24, 1)]
                         )
+                    first_attribution = False
             else:
-                first_attribution = False
                 data.append(lu_data_part1)
                 line += 1
 
