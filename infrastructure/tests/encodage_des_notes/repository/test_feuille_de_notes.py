@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 from django.test import TestCase
 
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
@@ -114,7 +113,3 @@ class FeuilleDeNotesRepositoryTest(TestCase):
                 deadline=note.date_limite_de_remise,
                 deadline_tutor=0
             )
-
-
-def are_attrs_instances_equal(inst1, inst2) -> bool:
-    return attr.astuple(inst1, retain_collection_types=True) == attr.astuple(inst2, retain_collection_types=True)
