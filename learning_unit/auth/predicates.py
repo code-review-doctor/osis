@@ -4,6 +4,7 @@ from rules import predicate
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.tutor_application import TutorApplication
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.proposal_state import ProposalState
@@ -22,7 +23,6 @@ from learning_unit.calendar.learning_unit_limited_proposal_management import \
 from learning_unit.calendar.learning_unit_summary_edition_calendar import LearningUnitSummaryEditionCalendar
 from osis_role.cache import predicate_cache
 from osis_role.errors import predicate_failed_msg
-
 
 FACULTY_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.COURSE,
@@ -72,6 +72,20 @@ def is_user_attached_to_current_requirement_entity(self, user, learning_unit_yea
             current_container_year.requirement_entity_id, self
         )
     return learning_unit_year
+
+
+@predicate(bind=True)
+@predicate_failed_msg(
+    message=_("You can only modify an effective class when your are linked to its requirement entity")
+)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_user_attached_to_learning_unit_current_requirement_entity(self, user, learning_class_year=None):
+    if learning_class_year:
+        current_container_year = learning_class_year.learning_component_year.learning_unit_year.learning_container_year
+        return current_container_year is not None and _is_attached_to_entity(
+            current_container_year.requirement_entity_id, self
+        )
+    return learning_class_year
 
 
 def _is_attached_to_entity(requirement_entity, self):
@@ -177,9 +191,23 @@ def is_learning_unit_edition_for_central_manager_period_open(self, user, learnin
 @predicate_failed_msg(message=_("This learning unit is not editable this period."))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_edition_for_faculty_manager_period_open(self, user, learning_unit_year):
+    academic_year = learning_unit_year.academic_year if learning_unit_year else None
+    return _check_if_education_group_limited_daily_management_is_open(academic_year)
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This effective class is not editable this period."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_effective_class_edition_for_faculty_manager_period_open(self, user, learning_class_year):
+    academic_year = learning_class_year.learning_component_year.learning_unit_year.academic_year \
+        if learning_class_year else None
+    return _check_if_education_group_limited_daily_management_is_open(academic_year)
+
+
+def _check_if_education_group_limited_daily_management_is_open(academic_year: 'AcademicYear'):
     calendar = EducationGroupLimitedDailyManagementCalendar()
-    if learning_unit_year:
-        return calendar.is_target_year_authorized(target_year=learning_unit_year.academic_year.year)
+    if academic_year:
+        return calendar.is_target_year_authorized(target_year=academic_year.year)
     return bool(calendar.get_target_years_opened())
 
 

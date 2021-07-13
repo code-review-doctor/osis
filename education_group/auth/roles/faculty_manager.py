@@ -203,9 +203,9 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.view_publish_btn': rules.always_allow,
             'attribution.can_change_class_repartition':
-                lu_predicates.is_learning_unit_edition_for_faculty_manager_period_open &
+                lu_predicates.is_effective_class_edition_for_faculty_manager_period_open &
                 lu_predicates.is_user_attached_to_current_requirement_entity,
             'attribution.can_delete_class_repartition':
-                lu_predicates.is_learning_unit_edition_for_faculty_manager_period_open &
+                lu_predicates.is_effective_class_edition_for_faculty_manager_period_open &
                 lu_predicates.is_user_attached_to_current_requirement_entity,
         })
