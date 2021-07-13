@@ -42,7 +42,7 @@ class IdentiteFeuilleDeNotes(interface.EntityIdentity):
     annee_academique = attr.ib(type=int)
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(slots=True, eq=False)
 class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
     note_decimale_autorisee = attr.ib(type=bool)    # TODO :: to implement in repository

@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,42 +22,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
-from typing import Optional
-
 import attr
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from osis_common.ddd import interface
 
-Noma = str
+def assert_attrs_instances_are_equal(inst1, inst2):
+    """
+    Assert that two instances of a same class have same values for their attributes
 
-
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
-
-
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    email = attr.ib(type=str)  # TODO :: to implement in repository
-    date_limite_de_remise = attr.ib(type=Optional[date])
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    :param inst1:  Instance of an attrs-decoracted class
+    :param inst2: Instance of an attrs-decoracted class
+    """
+    assert attr.astuple(inst1, retain_collection_types=True) == attr.astuple(inst2, retain_collection_types=True)

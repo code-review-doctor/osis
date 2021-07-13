@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -25,7 +25,8 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO
+from osis_common.ddd.interface import EntityIdentityBuilder
 
 
 class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
@@ -38,5 +39,21 @@ class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
         )
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteFeuilleDeNotes':
-        raise NotImplementedError
+    def build_from_repository_dto(cls, dto_object: 'FeuilleDeNotesFromRepositoryDTO') -> 'IdentiteFeuilleDeNotes':
+        return IdentiteFeuilleDeNotes(
+            numero_session=dto_object.numero_session,
+            code_unite_enseignement=dto_object.code_unite_enseignement,
+            annee_academique=dto_object.annee_academique
+        )
+
+    def build_from_session_and_unit_enseignement_datas(
+            self,
+            numero_session: int,
+            code_unite_enseignement: str,
+            annee_academique: int
+    ) -> IdentiteFeuilleDeNotes:
+        return IdentiteFeuilleDeNotes(
+            numero_session=numero_session,
+            code_unite_enseignement=code_unite_enseignement,
+            annee_academique=annee_academique
+        )

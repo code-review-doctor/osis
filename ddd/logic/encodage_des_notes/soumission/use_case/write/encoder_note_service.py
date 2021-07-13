@@ -23,54 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Any
-
-import attr
-
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
-from osis_common.ddd import interface
-
-NOTE_MIN = 0
-NOTE_MAX = 20
-ABSENCE_JUSTIFIEE = 'A'
-TRICHERIE = 'T'
-LETTRES_AUTORISEES = [ABSENCE_JUSTIFIEE, TRICHERIE]
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
-class NoteBuilder:
-    @staticmethod
-    def build(value: str) -> 'Note':
-        if value in LETTRES_AUTORISEES:
-            return Justification(value=value)
-        if NoteBuilder.__is_float(value):
-            return NoteChiffree(value=float(value))
-        return NoteManquante()
+def encoder_feuille_de_notes(
+        cmd: 'EncoderFeuilleDeNotesCommand',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+) -> 'IdentiteFeuilleDeNotes':
+    # Given
+    # Anticorruption layer : réutiliser un DomainService/repository interface
+    # pour récupérer le current numéro de session + le current year (data_target_year)
 
-    @staticmethod
-    def __is_float(value) -> bool:
-        try:
-            float(value)
-            return True
-        except ValueError:
-            return False
+    # When
 
-
-@attr.s(slots=True, frozen=True)
-class Note(interface.ValueObject, abc.ABC):
-    value = attr.ib(type=Any)
-
-
-@attr.s(slots=True, frozen=True)
-class NoteChiffree(Note):
-    value = attr.ib(type=float)
-
-
-@attr.s(slots=True, frozen=True)
-class NoteManquante(Note):
-    value = attr.ib(init=False, default='', type=str)
-
-
-@attr.s(slots=True, frozen=True)
-class Justification(Note):
-    value = attr.ib(type=TutorJustificationTypes)
+    # Then
+    # Historiser (DomainService)
+    return

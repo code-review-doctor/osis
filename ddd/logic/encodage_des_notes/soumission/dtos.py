@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from datetime import date
-from typing import List
+from typing import List, Set
 
 import attr
 
@@ -170,3 +170,19 @@ class PeriodeSoumissionNotesDTO(interface.DTO):
     session_concernee = attr.ib(type=str)
     debut_periode_soumission = attr.ib(type=DateDTO)
     fin_periode_soumission = attr.ib(type=DateDTO)
+
+
+@attr.s(frozen=True, slots=True)
+class NoteEtudiantFromRepositoryDTO(interface.DTO):
+    noma = attr.ib(type=str)
+    note = attr.ib(type=str)
+    date_limite_de_remise = attr.ib(type=date)
+    est_soumise = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class FeuilleDeNotesFromRepositoryDTO(interface.DTO):
+    numero_session = attr.ib(type=int)
+    code_unite_enseignement = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
+    notes = attr.ib(type=Set[NoteEtudiantFromRepositoryDTO])
