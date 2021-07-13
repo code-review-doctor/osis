@@ -39,16 +39,16 @@ class _IdentiteFeuilleDeNotesFactory(factory.Factory):
     annee_academique = 2020
 
 
-class EmptyFeuilleDeNotesFactory(factory.Factory):
+class _FeuilleDeNotesFactory(factory.Factory):
     class Meta:
         model = FeuilleDeNotes
-        abstract = False
+        abstract = True
 
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
     notes = set()
 
 
-class FeuilleDeNotesSansNotesEncodees(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesSansNotesEncodees(_FeuilleDeNotesFactory):
     notes = {
         NoteManquanteEtudiantFactory(),
         NoteManquanteEtudiantFactory(),
@@ -56,7 +56,7 @@ class FeuilleDeNotesSansNotesEncodees(EmptyFeuilleDeNotesFactory):
     }
 
 
-class FeuilleDeNotesAvecNotesEncodees(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesAvecNotesEncodees(_FeuilleDeNotesFactory):
     notes = {
         NoteChiffreEtudiantFactory(),
         NoteChiffreEtudiantFactory(),
@@ -65,7 +65,7 @@ class FeuilleDeNotesAvecNotesEncodees(EmptyFeuilleDeNotesFactory):
     }
 
 
-class FeuilleDeNotesAvecNotesSoumises(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesAvecNotesSoumises(_FeuilleDeNotesFactory):
     notes = {
         NoteChiffreEtudiantFactory(est_soumise=True),
         NoteChiffreEtudiantFactory(),

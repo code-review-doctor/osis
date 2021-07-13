@@ -28,8 +28,8 @@ from django.test import TestCase
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import EmptyFeuilleDeNotesFactory, \
-    FeuilleDeNotesSansNotesEncodees, FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesAvecNotesSoumises
+from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesSansNotesEncodees, \
+    FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesAvecNotesSoumises
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
 from testing.assertions import assert_attrs_instances_are_equal
 
@@ -37,15 +37,6 @@ from testing.assertions import assert_attrs_instances_are_equal
 class FeuilleDeNotesRepositoryTest(TestCase):
     def setUp(self) -> None:
         self.feuille_de_notes_repository = FeuilleDeNotesRepository()
-
-    def test_should_save_feuille_de_notes_vide(self):
-        feuille_de_notes = EmptyFeuilleDeNotesFactory()
-        self._create_save_necessary_data(feuille_de_notes)
-
-        self.feuille_de_notes_repository.save(feuille_de_notes)
-        feuille_de_notes_retrieved_from_repo = self.feuille_de_notes_repository.get(feuille_de_notes.entity_id)
-
-        assert_attrs_instances_are_equal(feuille_de_notes, feuille_de_notes_retrieved_from_repo)
 
     def test_should_save_feuille_de_notes_sans_notes_encodees(self):
         feuille_de_notes = FeuilleDeNotesSansNotesEncodees()
@@ -74,13 +65,11 @@ class FeuilleDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(feuille_de_notes, feuille_de_notes_retrieved_from_repo)
 
-    def test_should_return_empty_feuille_de_notes_if_no_matching_feuille_de_notes(self):
+    def test_should_raise_exception_if_no_feuille_de_notes(self):
         feuille_de_notes_not_persisted = FeuilleDeNotesAvecNotesSoumises()
 
-        retrieved_feuille_de_notes = self.feuille_de_notes_repository.get(feuille_de_notes_not_persisted.entity_id)
-
-        self.assertEqual(retrieved_feuille_de_notes.entity_id, feuille_de_notes_not_persisted.entity_id)
-        self.assertSetEqual(retrieved_feuille_de_notes.notes, set())
+        with self.assertRaises(IndexError):
+            self.feuille_de_notes_repository.get(feuille_de_notes_not_persisted.entity_id)
 
     def test_should_search_feuilles_de_notes_by_entity_ids(self):
         feuilles_de_notes = [FeuilleDeNotesAvecNotesEncodees(), FeuilleDeNotesAvecNotesSoumises()]
