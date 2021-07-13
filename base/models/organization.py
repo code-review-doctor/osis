@@ -62,7 +62,6 @@ class Organization(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=255)
-    code = models.CharField(max_length=50, blank=True)
     acronym = models.CharField(max_length=20, blank=True)
     type = models.CharField(max_length=30, blank=True, choices=organization_type.ORGANIZATION_TYPE, default='')
     prefix = models.CharField(max_length=30, blank=True)
