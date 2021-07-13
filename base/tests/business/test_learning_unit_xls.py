@@ -845,13 +845,15 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         # Class C 0 attr 0 - line 9
         expected = _build_cells_ref(ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST, [2, 6, 8, 9])
         self.assertSetEqual(cells_with_top_border, expected)
+
+        expected = _build_cells_ref(
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+             'V', 'W', 'X'], [3, 4, 5, 7])
+        print(expected)
+        print(cells_with_white_font)
         self.assertSetEqual(
             cells_with_white_font,
-            _build_cells_ref(
-                ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                 'U', 'V', 'W', 'X'],
-                [3, 4, 5, 7]
-            )
+            expected
         )
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
