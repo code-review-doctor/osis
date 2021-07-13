@@ -815,7 +815,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         # 4 UE attributions = 3 attributions on lecturing + 1 on practical
         # 3 Effective Class attributions = 2 on class a and 1 on class b
-        self.assertEqual(len(result.get('data')), 7)
+        # 1 Line for class c without attribution
+        self.assertEqual(len(result.get('data')), 8)
 
         # Check classes content
         xls_class_a_attribution_1 = data[4]
@@ -841,15 +842,18 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         # UE attr 4- line 5
         # Class A attr 1- line 6
         # Class A attr 2 - line 7
-        expected = _build_cells_ref(ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST, [2, 6, 8])
+        # Class B attr 1  - line 8
+        # Class C no attr - line 9
+        expected = _build_cells_ref(ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST, [2, 6, 8, 9])
         self.assertSetEqual(cells_with_top_border, expected)
+
+        expected = _build_cells_ref(
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+             'V', 'W', 'X'], [3, 4, 5, 7])
+
         self.assertSetEqual(
             cells_with_white_font,
-            _build_cells_ref(
-                ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
-                 'U', 'V', 'W', 'X'],
-                [3, 4, 5, 7]
-            )
+            expected
         )
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
