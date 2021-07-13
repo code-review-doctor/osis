@@ -815,7 +815,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         # 4 UE attributions = 3 attributions on lecturing + 1 on practical
         # 3 Effective Class attributions = 2 on class a and 1 on class b
-        self.assertEqual(len(result.get('data')), 7)
+        # 1 Line for class c without attribution
+        self.assertEqual(len(result.get('data')), 8)
 
         # Check classes content
         xls_class_a_attribution_1 = data[4]
