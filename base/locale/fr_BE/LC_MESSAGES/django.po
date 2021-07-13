@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 09:07+0200\n"
+"POT-Creation-Date: 2021-07-13 13:48+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1905,6 +1905,9 @@ msgstr ""
 "Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
 "dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
+msgid "Please report this incident to the Service Desk"
+msgstr "Merci de signaler cet incident au Service Desk"
+
 msgid "Please select a country and a city first"
 msgstr "Veuillez d'abord sélectionner un pays et une ville"
 
@@ -3001,9 +3004,6 @@ msgstr "Les volumes de {} sont incohérents"
 
 msgid "We detected inconsistencies in the following data :"
 msgstr "Nous avons détecté des incohérences dans les données suivantes :"
-
-msgid "We will fix this as soon as possible"
-msgstr "Nous mettons tout en oeuvre pour résoudre ce problème"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
