@@ -50,4 +50,3 @@ class NoteManquante(Note):
 @attr.s(slots=True, frozen=True)
 class Justification(Note):
     value = attr.ib(type=TutorJustificationTypes)
-

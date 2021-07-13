@@ -57,4 +57,3 @@ class NoteEtudiant(interface.Entity):
     @property
     def is_justification(self) -> bool:
         return not self.is_manquant and not self.is_chiffree
-
