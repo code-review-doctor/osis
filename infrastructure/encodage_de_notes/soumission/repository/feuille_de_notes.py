@@ -117,7 +117,7 @@ def _fetch_session_exams():
         date_limite_de_remise=Case(
             When(
                 learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline_tutor__isnull=True,
-                then=Value(None)
+                then=F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline')
             ),
             default=ExpressionWrapper(
                 F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline') -

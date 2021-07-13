@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from datetime import date
-from typing import Optional
 
 import attr
 
@@ -43,7 +42,7 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
 class NoteEtudiant(interface.Entity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=Optional[date])
+    date_limite_de_remise = attr.ib(type=date)
     est_soumise = attr.ib(type=bool)
 
     @property
