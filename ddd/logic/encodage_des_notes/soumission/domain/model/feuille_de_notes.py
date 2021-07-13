@@ -52,6 +52,14 @@ class FeuilleDeNotes(interface.RootEntity):
     def code_unite_enseignement(self) -> str:
         return self.entity_id.code_unite_enseignement
 
+    @property
+    def annee(self) -> int:
+        return self.entity_id.annee_academique
+
+    @property
+    def numero_session(self) -> int:
+        return self.entity_id.numero_session
+
     def encoder_note(
             self,
             noma: str,

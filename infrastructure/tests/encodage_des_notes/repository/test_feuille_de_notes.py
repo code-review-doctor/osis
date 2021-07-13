@@ -29,7 +29,7 @@ from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import EmptyFeuilleDeNotesFactory, \
-    FeuilleDeNotesSansNotesEncodees, FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesAvecNotesSoumises
+    FeuilleDeNotesAvecNotesManquantes, FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesAvecNotesSoumises
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
 from testing.assertions import assert_attrs_instances_are_equal
 
@@ -48,7 +48,7 @@ class FeuilleDeNotesRepositoryTest(TestCase):
         assert_attrs_instances_are_equal(feuille_de_notes, feuille_de_notes_retrieved_from_repo)
 
     def test_should_save_feuille_de_notes_sans_notes_encodees(self):
-        feuille_de_notes = FeuilleDeNotesSansNotesEncodees()
+        feuille_de_notes = FeuilleDeNotesAvecNotesManquantes()
         self._create_save_necessary_data(feuille_de_notes)
 
         self.feuille_de_notes_repository.save(feuille_de_notes)

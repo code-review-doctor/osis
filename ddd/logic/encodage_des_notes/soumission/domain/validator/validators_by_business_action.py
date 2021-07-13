@@ -28,7 +28,7 @@ from typing import List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.business_types import *
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_date_remise_note_pas_etre_atteinte import \
     ShouldDateDeRemiseNotePasEtreAtteinte
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_email_correspondre_noma import \
@@ -49,14 +49,15 @@ class EncoderFeuilleDeNotesValidatorList(TwoStepsMultipleBusinessExceptionListVa
     noma = attr.ib(type=str)
     email = attr.ib(type=str)
     note = attr.ib(type=str)
-    feuille_de_notes = attr.ib(type=FeuilleDeNotes)
+    feuille_de_notes = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
-        return []
+        return [
+            ShouldEtudiantEtrePresentFeuilleDeNotes(self.noma, self.feuille_de_notes),
+        ]
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldEtudiantEtrePresentFeuilleDeNotes(self.noma, self.feuille_de_notes),
             ShouldEmailCorrespondreNoma(self.noma, self.email, self.feuille_de_notes),
             ShouldDateDeRemiseNotePasEtreAtteinte(self.noma, self.feuille_de_notes),
             ShouldNotePasEtreSoumise(self.noma, self.feuille_de_notes),

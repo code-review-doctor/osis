@@ -41,6 +41,8 @@ class PeriodeSoumissionOuverte(interface.DomainService):
             periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
     ) -> None:
         periode = periode_soumission_note_translator.get()
+        if not periode:
+            raise PeriodeSoumissionNotesFermeeException()
 
         aujourdhui = datetime.date.today()
         debut_periode = periode.debut_periode_soumission.to_date()

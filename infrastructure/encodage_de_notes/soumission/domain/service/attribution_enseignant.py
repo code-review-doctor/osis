@@ -23,19 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
 
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDejaSoumiseException
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldNotePasEtreSoumise(BusinessValidator):
-    noma = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
 
-    def validate(self, *args, **kwargs):
-        if self.feuille_de_note.note_est_soumise(self.noma):
-            raise NoteDejaSoumiseException()
+    @classmethod
+    def search_attributions_enseignant(
+            cls,
+            matricule_fgs_enseignant: str,
+            annee: int,
+    ) -> Set['AttributionEnseignantDTO']:
+        raise NotImplementedError

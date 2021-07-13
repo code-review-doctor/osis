@@ -49,7 +49,7 @@ class DateRemiseNoteAtteinteException(BusinessException):
 
 class AucunEtudiantTrouveException(BusinessException):
     def __init__(self, learning_unit_code: str, **kwargs):
-        message = _("The enrollment to the learning unit {earning_unit_code} doesn't exist").format(
+        message = _("The enrollment to the learning unit {learning_unit_code} doesn't exist").format(
             learning_unit_code=learning_unit_code,
         )
         super().__init__(message, **kwargs)

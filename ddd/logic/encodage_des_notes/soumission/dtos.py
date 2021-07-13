@@ -31,6 +31,7 @@ import attr
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class DateEcheanceDTO(interface.DTO):
     jour = attr.ib(type=str)
     mois = attr.ib(type=str)
@@ -47,11 +48,13 @@ class DateEcheanceDTO(interface.DTO):
         return self.quantite_notes_manquantes == 0
 
 
+@attr.s(frozen=True, slots=True)
 class EnseignantDTO(interface.DTO):
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
 class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)
@@ -74,10 +77,12 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
         return self.quantite_notes_soumises / self.quantite_totale_notes == 0
 
 
+@attr.s(frozen=True, slots=True)
 class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
     progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
 
 
+@attr.s(frozen=True, slots=True)
 class DateDTO(interface.DTO):
     jour = attr.ib(type=str)
     mois = attr.ib(type=str)
@@ -87,6 +92,7 @@ class DateDTO(interface.DTO):
         return date(day=self.jour, month=self.mois, year=self.annee)
 
 
+@attr.s(frozen=True, slots=True)
 class EtudiantPepsDTO(interface.DTO):
     type_peps = attr.ib(type=str)
     tiers_temps = attr.ib(type=bool)
@@ -97,6 +103,7 @@ class EtudiantPepsDTO(interface.DTO):
     accompagnateur = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
 class NoteEtudiantDTO(interface.DTO):
     est_soumise = attr.ib(type=bool)
     date_remise_de_notes = attr.ib(type=DateDTO)
@@ -115,6 +122,7 @@ class NoteEtudiantDTO(interface.DTO):
         raise NotImplementedError
 
 
+@attr.s(frozen=True, slots=True)
 class FeuilleDeNotesDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)
@@ -138,12 +146,14 @@ class FeuilleDeNotesDTO(interface.DTO):
         return len(self.notes_etudiants)
 
 
+@attr.s(frozen=True, slots=True)
 class AdresseDTO(interface.DTO):
     code_postal = attr.ib(type=str)
     ville = attr.ib(type=str)
     rue_numero_boite = attr.ib(type=str)
 
 
+@attr.s(frozen=True, slots=True)
 class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     sigle_formation = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
@@ -159,12 +169,14 @@ class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     fax = attr.ib(type=str)
     email = attr.ib(type=str)
 
-# TODO :: @attr.s
+
+@attr.s(frozen=True, slots=True)
 class AttributionEnseignantDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     annee = attr.ib(type=int)
 
 
+@attr.s(frozen=True, slots=True)
 class PeriodeSoumissionNotesDTO(interface.DTO):
     annee_concernee = attr.ib(type=int)
     session_concernee = attr.ib(type=str)

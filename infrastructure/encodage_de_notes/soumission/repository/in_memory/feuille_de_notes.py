@@ -23,19 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDejaSoumiseException
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldNotePasEtreSoumise(BusinessValidator):
-    noma = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class FeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IFeuilleDeNotesRepository):
+    entities = list()  # type: List[FeuilleDeNotes]
 
-    def validate(self, *args, **kwargs):
-        if self.feuille_de_note.note_est_soumise(self.noma):
-            raise NoteDejaSoumiseException()

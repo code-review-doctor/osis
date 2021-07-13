@@ -36,5 +36,10 @@ class ShouldNoteEtreChoixValide(BusinessValidator):
     note = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        if (self.note.isdigit() and not NOTE_MIN < int(self.note) < NOTE_MAX) or self.note not in LETTRES_AUTORISEES:
-            raise NoteIncorrecteException(self.note)
+        try:
+            note_digit = float(self.note)
+            if not NOTE_MIN < note_digit < NOTE_MAX:
+                raise NoteIncorrecteException(self.note)
+        except ValueError:
+            if self.note not in LETTRES_AUTORISEES:
+                raise NoteIncorrecteException(self.note)

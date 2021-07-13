@@ -28,14 +28,14 @@ import datetime
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.business_types import *
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import DateRemiseNoteAtteinteException
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldDateDeRemiseNotePasEtreAtteinte(BusinessValidator):
-    noma = attr.ib(type=FeuilleDeNotes)
-    feuille_de_note = attr.ib(type=FeuilleDeNotes)
+    noma = attr.ib(type=str)
+    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
 
     def validate(self, *args, **kwargs):
         date_limite_remise = self.feuille_de_note.get_date_limite_de_remise(self.noma)

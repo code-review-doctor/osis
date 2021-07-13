@@ -27,7 +27,7 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.business_types import *
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NomaNeCorrespondPasEmailException
 
 
@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 class ShouldEmailCorrespondreNoma(BusinessValidator):
     noma_etudiant = attr.ib(type=str)
     email_etudiant = attr.ib(type=str)
-    feuille_de_note = attr.ib(type=FeuilleDeNotes)
+    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
 
     def validate(self, *args, **kwargs):
         correspondance_existe = any(

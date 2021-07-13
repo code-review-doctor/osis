@@ -24,18 +24,13 @@
 #
 ##############################################################################
 
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDejaSoumiseException
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
+    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldNotePasEtreSoumise(BusinessValidator):
-    noma = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class PeriodeSoumissionNotesTranslator(IPeriodeSoumissionNotesTranslator):
 
-    def validate(self, *args, **kwargs):
-        if self.feuille_de_note.note_est_soumise(self.noma):
-            raise NoteDejaSoumiseException()
+    @classmethod
+    def get(cls) -> 'PeriodeSoumissionNotesDTO':
+        raise NotImplementedError

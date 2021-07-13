@@ -30,14 +30,14 @@ from typing import Optional
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.business_types import *
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDecimaleNonAutoriseeException
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
     note = attr.ib(type=str)
-    feuille_de_note = attr.ib(type=FeuilleDeNotes)
+    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
 
     def validate(self, *args, **kwargs):
         note_chiffree = self.__get_note_chiffree()

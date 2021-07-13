@@ -45,10 +45,11 @@ class EmptyFeuilleDeNotesFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
+    note_decimale_autorisee = False
     notes = set()
 
 
-class FeuilleDeNotesSansNotesEncodees(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesAvecNotesManquantes(EmptyFeuilleDeNotesFactory):
     notes = {
         NoteManquanteEtudiantFactory(),
         NoteManquanteEtudiantFactory(),
@@ -71,4 +72,11 @@ class FeuilleDeNotesAvecNotesSoumises(EmptyFeuilleDeNotesFactory):
         NoteChiffreEtudiantFactory(),
         NoteJustificationEtudiantFactory(est_soumise=True),
         NoteManquanteEtudiantFactory()
+    }
+
+
+class FeuilleDeNotesDecimalesAutorisees(EmptyFeuilleDeNotesFactory):
+    note_decimale_autorisee = True
+    notes = {
+        NoteManquanteEtudiantFactory(),
     }
