@@ -81,7 +81,7 @@ class CommonClassView(PermissionRequiredMixin):
         ).select_related(
             'learning_component_year__learning_unit_year',
             'learning_component_year__learning_unit_year__academic_year'
-        )
+        ).get()
 
     def common_url_tabs(self) -> Dict[str, str]:
         url_kwargs = {
