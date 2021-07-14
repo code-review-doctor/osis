@@ -431,4 +431,46 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
     def test_should_aggreger_erreurs_plusieurs_notes(self):
-        raise NotImplementedError
+        note_deja_soumise_1 = NoteManquanteEtudiantFactory(est_soumise=True)
+        note_deja_soumise_2 = NoteManquanteEtudiantFactory(est_soumise=True)
+        note_deja_soumise_3 = NoteManquanteEtudiantFactory(est_soumise=True)
+
+        feuille_de_notes = EmptyFeuilleDeNotesFactory(
+            notes={note_deja_soumise_1, note_deja_soumise_2, note_deja_soumise_3}
+        )
+        self.repository.save(feuille_de_notes)
+        cmd = EncoderFeuilleDeNotesCommand(
+            code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
+            annee_unite_enseignement=feuille_de_notes.annee,
+            numero_session=feuille_de_notes.numero_session,
+            matricule_fgs_enseignant=self.matricule_enseignant,
+            notes_etudiants=[
+                NoteEtudiantCommand(
+                    noma=note_deja_soumise_1.noma,
+                    email=note_deja_soumise_1.email,
+                    note='12'
+                ),
+                NoteEtudiantCommand(
+                    noma=note_deja_soumise_2.noma,
+                    email=note_deja_soumise_2.email,
+                    note='12'
+                ),
+                NoteEtudiantCommand(
+                    noma=note_deja_soumise_3.noma,
+                    email=note_deja_soumise_3.email,
+                    note='12'
+                ),
+            ],
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            encoder_feuille_de_notes(
+                cmd=cmd,
+                feuille_de_note_repo=self.repository,
+                periode_soumission_note_translator=self.periode_soumission_translator,
+                attribution_translator=self.attribution_translator,
+            )
+
+        exceptions = class_exceptions.exception.exceptions
+        self.assertEqual(len(exceptions), 3)
+        for exception in exceptions:
+            self.assertIsInstance(exception, NoteDejaSoumiseException)
