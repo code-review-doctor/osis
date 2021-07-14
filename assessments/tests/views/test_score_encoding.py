@@ -423,13 +423,13 @@ class OutsideEncodingPeriodTest(SessionExamCalendarMockMixin, TestCase):
         self.assertEqual(messages[0].tags, 'warning')
         end_date_str = self.academic_calendar.end_date.strftime(date_format)
         self.assertEqual(messages[0].message,
-                         _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
-                         % {'session_number': 1, 'str_date': end_date_str})
+                         _("The period of scores' encoding for %(month_session)s session is closed since %(str_date)s")
+                         % {'month_session': _('January'), 'str_date': end_date_str})
         self.assertEqual(messages[1].tags, 'warning')
         start_date_str = ac.start_date.strftime(date_format)
         self.assertEqual(messages[1].message,
-                         _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
-                         % {'session_number': 2, 'str_date': start_date_str})
+                         _("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
+                         % {'month_session': _('June'), 'str_date': start_date_str})
 
 
 class GetScoreEncodingViewProgramManagerTest(SessionExamCalendarMockMixin, TestCase):
