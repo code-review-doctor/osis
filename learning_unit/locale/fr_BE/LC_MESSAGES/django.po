@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-02 14:39+0200\n"
+"POT-Creation-Date: 2021-07-14 10:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,15 +40,15 @@ msgstr "Entité d'attribution"
 msgid "Annual volume"
 msgstr "Volume annuel"
 
-msgid "Are you sure?"
-msgstr "Êtes-vous sûr·e?"
-
 #, python-format
 msgid ""
 "Are you certain that you want to definitively delete the class in %(year)s ?"
 msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette classe en "
 "%(year)s ?"
+
+msgid "Are you sure?"
+msgstr "Êtes-vous sûr·e?"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
@@ -104,11 +104,11 @@ msgstr "Confirmer"
 msgid "Credits"
 msgstr "Crédits"
 
-msgid "Delete class definitively"
-msgstr "Supprimer la classe définitivement"
-
 msgid "Delete"
 msgstr "Supprimer"
+
+msgid "Delete class definitively"
+msgstr "Supprimer la classe définitivement"
 
 msgid "Derogation's session"
 msgstr "Session de dérogation"
@@ -303,6 +303,9 @@ msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
+msgid "This effective class is not editable this period."
+msgstr "La classe n'est pas modifiable durant cette période."
+
 msgid "This learning unit has an application in the future"
 msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
 
@@ -436,6 +439,13 @@ msgid ""
 msgstr ""
 "Vous pouvez seulement modifier une unité d'enseignement pour laquelle vous "
 "êtes lié à l'entité responsable"
+
+msgid ""
+"You can only modify an effective class when your are linked to learning unit "
+"requirement entity"
+msgstr ""
+"Vous pouvez seulement modifier une classe pour laquelle vous "
+"êtes lié à l'entité responsable de l'unité d'enseignement"
 
 #, python-format
 msgid ""
