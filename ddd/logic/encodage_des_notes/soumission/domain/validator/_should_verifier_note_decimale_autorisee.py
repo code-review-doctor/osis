@@ -43,7 +43,7 @@ class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
         note_chiffree = self.__get_note_chiffree()
         if note_chiffree:
             is_integer = note_chiffree % 1 == 0
-            if not self.feuille_de_note.note_decimale_autorisee and not is_integer:
+            if not self.feuille_de_note.note_decimale_est_autorisee() and not is_integer:
                 raise NoteDecimaleNonAutoriseeException()
 
     def __get_note_chiffree(self) -> Optional[Decimal]:

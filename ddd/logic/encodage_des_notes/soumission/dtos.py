@@ -187,6 +187,7 @@ class PeriodeSoumissionNotesDTO(interface.DTO):
 @attr.s(frozen=True, slots=True)
 class NoteEtudiantFromRepositoryDTO(interface.DTO):
     noma = attr.ib(type=str)
+    email = attr.ib(type=str)
     note = attr.ib(type=str)
     date_limite_de_remise = attr.ib(type=date)
     est_soumise = attr.ib(type=bool)
@@ -197,4 +198,5 @@ class FeuilleDeNotesFromRepositoryDTO(interface.DTO):
     numero_session = attr.ib(type=int)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
+    credits_unite_enseignement = attr.ib(type=float)
     notes = attr.ib(type=Set[NoteEtudiantFromRepositoryDTO])

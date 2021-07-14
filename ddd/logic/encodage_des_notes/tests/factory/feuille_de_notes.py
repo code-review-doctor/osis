@@ -24,7 +24,8 @@
 ##############################################################################
 import factory
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, \
+    IdentiteFeuilleDeNotes, NOTE_DECIMALE_AUTORISEE
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, \
     NoteChiffreEtudiantFactory, NoteJustificationEtudiantFactory
 
@@ -45,7 +46,7 @@ class EmptyFeuilleDeNotesFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
-    note_decimale_autorisee = False
+    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE - 5.0  # Non autorisé par défaut
     notes = set()
 
 
@@ -76,7 +77,7 @@ class FeuilleDeNotesAvecNotesSoumises(EmptyFeuilleDeNotesFactory):
 
 
 class FeuilleDeNotesDecimalesAutorisees(EmptyFeuilleDeNotesFactory):
-    note_decimale_autorisee = True
+    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE
     notes = {
         NoteManquanteEtudiantFactory(),
     }

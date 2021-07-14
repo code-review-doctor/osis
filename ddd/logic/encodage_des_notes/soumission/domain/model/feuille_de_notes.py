@@ -34,6 +34,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_busi
     EncoderFeuilleDeNotesValidatorList
 from osis_common.ddd import interface
 
+NOTE_DECIMALE_AUTORISEE = 15.0
+
 
 @attr.s(frozen=True, slots=True)
 class IdentiteFeuilleDeNotes(interface.EntityIdentity):
@@ -45,7 +47,7 @@ class IdentiteFeuilleDeNotes(interface.EntityIdentity):
 @attr.s(slots=True, eq=False)
 class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
-    note_decimale_autorisee = attr.ib(type=bool)    # TODO :: to implement in repository
+    credits_unite_enseignement = attr.ib(type=float)
     notes = attr.ib(type=Set[NoteEtudiant])  # type: Set[NoteEtudiant]
 
     @property
@@ -59,6 +61,9 @@ class FeuilleDeNotes(interface.RootEntity):
     @property
     def numero_session(self) -> int:
         return self.entity_id.numero_session
+
+    def note_decimale_est_autorisee(self) -> bool:
+        return self.credits_unite_enseignement >= NOTE_DECIMALE_AUTORISEE
 
     def encoder_note(
             self,

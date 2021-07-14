@@ -30,6 +30,7 @@ from django.db.models import F, Case, CharField, Value, When, BooleanField, Expr
 from django.db.models.functions import Coalesce, Cast
 
 from base.models.exam_enrollment import ExamEnrollment
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_builder import FeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes, FeuilleDeNotes
@@ -64,13 +65,21 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
             session_exam__number_session=entity_id.numero_session
         )
 
+        credits_unite_enseignement = LearningUnitYear.objects.filter(
+            acronym=entity_id.code_unite_enseignement,
+            academic_year__year=entity_id.annee_academique,
+        ).values_list('credits', flat=True)
+        credits_unite_enseignement = credits_unite_enseignement[0] if credits_unite_enseignement else None
+
         dto_object = FeuilleDeNotesFromRepositoryDTO(
             numero_session=entity_id.numero_session,
             code_unite_enseignement=entity_id.code_unite_enseignement,
             annee_academique=entity_id.annee_academique,
+            credits_unite_enseignement=credits_unite_enseignement,
             notes=set(
                 NoteEtudiantFromRepositoryDTO(
                     noma=row.noma,
+                    email=row.email,
                     note=row.note,
                     date_limite_de_remise=row.date_limite_de_remise,
                     est_soumise=row.est_soumise
@@ -102,6 +111,7 @@ def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteE
 def _fetch_session_exams():
     return ExamEnrollment.objects.annotate(
         noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
+        email=F('learning_unit_enrollment__offer_enrollment__student__person__email'),
         score_final_char=Cast('score_final', output_field=CharField()),
         score_reencoded_char=Cast('score_reencoded', output_field=CharField()),
         score_draft_char=Cast('score_draft', output_field=CharField()),
@@ -133,6 +143,7 @@ def _fetch_session_exams():
         )
     ).values_list(
         'noma',
+        'email',
         'note',
         'date_limite_de_remise',
         'est_soumise',
