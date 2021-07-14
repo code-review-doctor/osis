@@ -76,7 +76,7 @@ def is_user_attached_to_current_requirement_entity(self, user, learning_unit_yea
 
 @predicate(bind=True)
 @predicate_failed_msg(
-    message=_("You can only modify an effective class when your are linked to its requirement entity")
+    message=_("You can only modify an effective class when your are linked to learning unit requirement entity")
 )
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_user_attached_to_learning_unit_current_requirement_entity(self, user, learning_class_year=None):
