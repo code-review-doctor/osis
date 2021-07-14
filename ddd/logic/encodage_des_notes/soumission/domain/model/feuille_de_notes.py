@@ -62,6 +62,10 @@ class FeuilleDeNotes(interface.RootEntity):
     def numero_session(self) -> int:
         return self.entity_id.numero_session
 
+    @property
+    def total_notes_soumises(self) -> int:
+        return sum(1 for note in self.notes if note.est_soumise)
+
     def note_decimale_est_autorisee(self) -> bool:
         return self.credits_unite_enseignement >= NOTE_DECIMALE_AUTORISEE
 
@@ -81,8 +85,9 @@ class FeuilleDeNotes(interface.RootEntity):
         note_etudiant.note = NoteBuilder.build(note_encodee)
 
     def soumettre(self) -> None:
-        # itérer sur notes et les passer en "soumises = True"
-        raise NotImplementedError
+        for note in self.notes:
+            if not note.est_soumise and not note.is_manquant:
+                note.est_soumise = True
 
     def get_date_limite_de_remise(self, noma: str) -> date:
         note = self.__get_note_etudiant(noma)

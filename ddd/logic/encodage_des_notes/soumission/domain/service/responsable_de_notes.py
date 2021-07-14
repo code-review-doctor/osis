@@ -23,36 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
+from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
+    ResponsableDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
 
-class PeriodeSoumissionOuverte(interface.DomainService):
+class ResponsableDeNotes(interface.DomainService):
 
     @classmethod
     def verifier(
             cls,
-            annee_unite_enseignement: int,
-            numero_session: int,
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
+            matricule_fgs_enseignant: str,
+            feuille_de_notes_id: 'IdentiteFeuilleDeNotes',
+            responsable_notes_repo: 'IResponsableDeNotesRepository',
     ) -> None:
-        periode = periode_soumission_note_translator.get()
-        if not periode:
-            raise PeriodeSoumissionNotesFermeeException()
-
-        aujourdhui = datetime.date.today()
-        debut_periode = periode.debut_periode_soumission.to_date()
-        fin_periode = periode.fin_periode_soumission.to_date()
-        periode_est_ouverte = debut_periode < aujourdhui < fin_periode
-
-        annee_est_concernee = annee_unite_enseignement == periode.annee_concernee
-
-        session_est_concernee = numero_session == periode.session_concernee
-
-        if not periode_est_ouverte or not annee_est_concernee or not session_est_concernee:
-            raise PeriodeSoumissionNotesFermeeException()
+        resp_notes_identity = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
+        resp_notes = responsable_notes_repo.get(resp_notes_identity)
+        if not resp_notes:
+            raise PasResponsableDeNotesException(feuille_de_notes_id.code_unite_enseignement)
+        est_responsable = resp_notes.is_responsable_unite_enseignement(
+            feuille_de_notes_id.code_unite_enseignement,
+            feuille_de_notes_id.annee_academique,
+        )
+        if not est_responsable:
+            raise PasResponsableDeNotesException(feuille_de_notes_id.code_unite_enseignement)

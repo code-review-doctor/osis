@@ -23,20 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'IdentiteResponsableDeNotes':
-        raise NotImplementedError
-
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteResponsableDeNotes':
-        raise NotImplementedError
-
-    @classmethod
-    def build_from_matricule_fgs(cls, fgs_enseignant: str) -> 'IdentiteResponsableDeNotes':
-        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=fgs_enseignant)
+class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
+    entities = list()  # type: List[ResponsableDeNotes]

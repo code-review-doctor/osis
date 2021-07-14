@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,20 +22,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import factory
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
+    IdentiteResponsableDeNotes, UniteEnseignementIdentite
 
 
-class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
-    @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'IdentiteResponsableDeNotes':
-        raise NotImplementedError
+class _IdentiteResponsableDeNotesFactory(factory.Factory):
+    class Meta:
+        model = IdentiteResponsableDeNotes
+        abstract = False
 
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteResponsableDeNotes':
-        raise NotImplementedError
+    matricule_fgs_enseignant = '00123456'
 
-    @classmethod
-    def build_from_matricule_fgs(cls, fgs_enseignant: str) -> 'IdentiteResponsableDeNotes':
-        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=fgs_enseignant)
+
+class ResponsableDeNotesLDROI1001Annee2020Factory(factory.Factory):
+    class Meta:
+        model = ResponsableDeNotes
+        abstract = False
+
+    entity_id = factory.SubFactory(_IdentiteResponsableDeNotesFactory)
+    unites_enseignements = {
+        UniteEnseignementIdentite('LDROI1001', 2020),
+    }
