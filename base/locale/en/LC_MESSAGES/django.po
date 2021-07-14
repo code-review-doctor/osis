@@ -2279,6 +2279,9 @@ msgstr ""
 msgid "Sport"
 msgstr ""
 
+msgid "Stage-Dimona"
+msgstr ""
+
 msgid "Start"
 msgstr ""
 
@@ -2522,6 +2525,11 @@ msgstr ""
 msgid ""
 "The learning unit is in proposal, the report from %(proposal_year)s will be "
 "done at consolidation"
+msgstr ""
+
+msgid ""
+"The learning unit is not a Stage-Dimona activity although it is an "
+"internship type."
 msgstr ""
 
 msgid "The learning units"

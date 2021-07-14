@@ -2340,6 +2340,9 @@ msgstr "Cahier des charges"
 msgid "Sport"
 msgstr "Sport"
 
+msgid "Stage-Dimona"
+msgstr "Stage-Dimona"
+
 msgid "Start"
 msgstr "Début"
 
@@ -2618,6 +2621,13 @@ msgid ""
 msgstr ""
 "L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
 "effectué lors de la consolidation"
+
+msgid ""
+"The learning unit is not a Stage-Dimona activity although it is an "
+"internship type."
+msgstr ""
+"L'unité d'enseignement n'est pas une activité Stage-Dimona alors qu'elle est "
+"de type stage."
 
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
