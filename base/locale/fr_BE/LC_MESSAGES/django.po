@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:03+0200\n"
+"POT-Creation-Date: 2021-07-13 10:44+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1258,12 +1258,18 @@ msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
 
+msgid "January"
+msgstr "Janvier"
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
 msgstr ""
 "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas "
 "sans JavaScript."
+
+msgid "June"
+msgstr "Juin"
 
 msgid "Junior year"
 msgstr "Junior year"
@@ -2290,6 +2296,9 @@ msgstr "Envoyer un rappel sur les événements académiques"
 
 msgid "Separate"
 msgstr "Séparer"
+
+msgid "September"
+msgstr "Septembre"
 
 msgid "Service courses"
 msgstr "Cours de service"
