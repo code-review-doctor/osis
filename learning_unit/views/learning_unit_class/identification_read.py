@@ -66,7 +66,8 @@ class ClassIdentificationView(CommonClassView, TemplateView):
                     ),  # type: Language
                 'teaching_place': get_teaching_place(self.effective_class.teaching_place),
                 'form_delete': DeleteClassForm(effective_class=self.effective_class),
-                'warnings': self.warnings
+                'warnings': self.warnings,
+                'learning_class_year': self.get_permission_object()
             }
         )
         context.update(self.common_url_tabs())

@@ -108,6 +108,21 @@ def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, l
 
 @predicate(bind=True)
 @predicate_failed_msg(
+    message=_(
+        "You can't modify effective class under year : %(year)d. "
+        "Modifications should be made in EPC under year %(year)d"
+    ) % {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
+)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_class_year_older_or_equals_than_limit_settings_year(self, user, learning_class_year=None):
+    if learning_class_year:
+        luy = learning_class_year.learning_component_year.learning_unit_year
+        return luy.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(
     message=_("The learning unit start year is set before %(year)d.") % {
         "year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1
     },
