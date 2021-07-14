@@ -386,16 +386,18 @@ class TestProposalLearningUnitFilter(TestCase):
         self.client.force_login(self.central_manager.user)
         proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
         self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
+        # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
         self.assertEqual(
-            proposal_filter.form.fields['academic_year'].initial,
-            self.academic_years[3]  # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
+            proposal_filter.form.fields['academic_year__year'].initial,
+            [self.academic_years[3].year, self.academic_years[2].year]
         )
 
     def test_initial_value_with_entity_subordinated_faculty_manager(self):
         self.client.force_login(self.faculty_manager.user)
         proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
         self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)
+        # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
         self.assertEqual(
-            proposal_filter.form.fields['academic_year'].initial,
-            self.academic_years[3]  # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
+            proposal_filter.form.fields['academic_year__year'].initial,
+            [self.academic_years[3].year, self.academic_years[2].year]
         )

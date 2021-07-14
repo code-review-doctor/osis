@@ -39,7 +39,7 @@ class TestGroupFilter(TestCase):
 
     def test_ensure_academic_year_initial_value_case_no_education_group_switch_calendar_opened(self):
         filter = GroupFilter()
-        self.assertIsNone(filter.form['academic_year__year'].initial)
+        self.assertEqual(filter.form['academic_year__year'].initial, [])
 
     def test_ensure_academic_year_initial_value_case_one_education_group_switch_calendar_opened(self):
         OpenAcademicCalendarFactory(
@@ -48,7 +48,7 @@ class TestGroupFilter(TestCase):
         )
 
         filter = GroupFilter()
-        self.assertEqual(filter.form['academic_year__year'].initial, self.academic_years[2])
+        self.assertEqual(filter.form['academic_year__year'].initial, [self.academic_years[2].year])
 
     def test_ensure_academic_year_initial_value_case_multiple_education_group_switch_calendar_opened(self):
         for academic_year in self.academic_years[:2]:
@@ -58,7 +58,10 @@ class TestGroupFilter(TestCase):
             )
 
         filter = GroupFilter()
-        self.assertEqual(filter.form['academic_year__year'].initial, self.academic_years[0])
+        self.assertEqual(
+            filter.form['academic_year__year'].initial,
+            [self.academic_years[0].year, self.academic_years[1].year]
+        )
 
     def test_ensure_category_initial_value(self):
         filter = GroupFilter()

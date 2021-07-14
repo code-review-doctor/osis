@@ -51,7 +51,7 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
         )
         cls.url = reverse("learning_units_borrowed_course")
         cls.get_data = {
-            "academic_year": str(cls.luys[0].academic_year.id),
+            "academic_year__year": str(cls.luys[0].academic_year.year),
         }
         cls.tuples_xls_status_value_with_xls_method_function = (
             ("xls", "base.views.learning_units.search.common.create_xls"),
