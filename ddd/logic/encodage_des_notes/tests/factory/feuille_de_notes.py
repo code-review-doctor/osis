@@ -47,6 +47,12 @@ class _FeuilleDeNotesFactory(factory.Factory):
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
     notes = set()
 
+    class Params:
+        for_class = factory.SubFactory(
+            _IdentiteFeuilleDeNotesFactory,
+            code_unite_enseignement='LOSIS1452A'
+        )
+
 
 class FeuilleDeNotesSansNotesEncodees(_FeuilleDeNotesFactory):
     notes = {
