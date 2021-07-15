@@ -585,9 +585,9 @@ def _get_attribution_detail(an_attribution: dict, is_attribution_class=False) ->
         an_attribution.get('person').full_name,
         an_attribution.get('person').email,
         Functions[an_attribution['function']].value if 'function' in an_attribution else '',
-        an_attribution.get('substitute') if an_attribution.get('substitute') else '',
-        an_attribution.get('start_year'),
-        an_attribution.get('duration') if an_attribution.get('duration') else '',
+        an_attribution.get('substitute', ''),
+        an_attribution.get('start_year') if not is_attribution_class else '',
+        an_attribution.get('duration', '') if not is_attribution_class else '',
         _get_attribution_volume(volume_lecturing),
         _get_attribution_volume(volume_practical)
     ]
