@@ -606,7 +606,7 @@ msgid ""
 "%(str_date)s"
 msgstr ""
 "La période d'encodage de notes de la session de %(month_session)s est fermée "
-"depuis %(str_date)s"
+"depuis le %(str_date)s"
 
 #, python-format
 msgid ""
