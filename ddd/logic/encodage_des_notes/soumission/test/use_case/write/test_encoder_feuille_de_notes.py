@@ -87,7 +87,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.attribution_translator.search_attributions_enseignant = lambda **kwargs: {self.attribution_dto}
 
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
-        date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
+        hier = datetime.date.today() - datetime.timedelta(days=1)
+        date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
         periode_fermee = attr.evolve(
             self.periode_soumission_ouverte,
             debut_periode_soumission=date_dans_le_passe,
