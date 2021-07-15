@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import Set
+from typing import Set
 
 import attr
 
