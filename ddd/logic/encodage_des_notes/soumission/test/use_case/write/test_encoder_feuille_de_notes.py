@@ -34,14 +34,16 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, NoteEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification, NoteChiffree
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    EnseignantNonAttribueUniteEnseignementException, DateRemiseNoteAtteinteException, NomaNeCorrespondPasEmailException, \
-    AucunEtudiantTrouveException, NoteIncorrecteException, NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
+    EnseignantNonAttribueUniteEnseignementException, DateRemiseNoteAtteinteException, \
+    NomaNeCorrespondPasEmailException, AucunEtudiantTrouveException, NoteIncorrecteException, \
+    NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
     encoder_feuille_de_notes
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import EmptyFeuilleDeNotesFactory, \
-    FeuilleDeNotesAvecNotesManquantes, FeuilleDeNotesDecimalesAutorisees
+from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import _FeuilleDeNotesFactory, \
+    FeuilleDeNotesAvecNotesManquantes, FeuilleDeNotesDecimalesAutorisees, FeuilleDeNotesAvecToutesNotesSoumises, \
+    FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier
 from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
@@ -150,11 +152,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             )
 
     def test_should_empecher_si_date_de_remise_est_hier(self):
-        hier = datetime.date.today() - datetime.timedelta(days=1)
-        note_date_limite_depassee = NoteManquanteEtudiantFactory(date_limite_de_remise=hier)
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_date_limite_depassee}
-        )
+        feuille_de_notes = FeuilleDeNotesDateLimiteRemiseHier()
         self.repository.save(feuille_de_notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
@@ -163,8 +161,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_date_limite_depassee.noma,
-                    email=note_date_limite_depassee.email,
+                    noma=list(feuille_de_notes.notes)[0].noma,
+                    email=list(feuille_de_notes.notes)[0].email,
                     note='12'
                 )
             ],
@@ -182,11 +180,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
 
     def test_should_empecher_si_date_de_remise_est_aujourdhui(self):
-        aujourdhui = datetime.date.today()
-        note_date_limite_depassee = NoteManquanteEtudiantFactory(date_limite_de_remise=aujourdhui)
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_date_limite_depassee}
-        )
+        feuille_de_notes = FeuilleDeNotesDateLimiteRemiseAujourdhui()
         self.repository.save(feuille_de_notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
@@ -195,8 +189,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_date_limite_depassee.noma,
-                    email=note_date_limite_depassee.email,
+                    noma=list(feuille_de_notes.notes)[0].noma,
+                    email=list(feuille_de_notes.notes)[0].email,
                     note='12'
                 )
             ],
@@ -348,10 +342,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.assertEqual(list(self.repository.get(entity_id).notes)[0].note.value, Decimal(12.5))
 
     def test_should_empecher_si_note_deja_soumise(self):
-        note_est_soumise = NoteManquanteEtudiantFactory(est_soumise=True)
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_est_soumise}
-        )
+        feuille_de_notes = FeuilleDeNotesAvecToutesNotesSoumises()
         self.repository.save(feuille_de_notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
@@ -360,8 +351,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_est_soumise.noma,
-                    email=note_est_soumise.email,
+                    noma=list(feuille_de_notes.notes)[0].noma,
+                    email=list(feuille_de_notes.notes)[0].email,
                     note='12'
                 )
             ],
@@ -431,14 +422,9 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
     def test_should_aggreger_erreurs_plusieurs_notes(self):
-        note_deja_soumise_1 = NoteManquanteEtudiantFactory(est_soumise=True)
-        note_deja_soumise_2 = NoteManquanteEtudiantFactory(est_soumise=True)
-        note_deja_soumise_3 = NoteManquanteEtudiantFactory(est_soumise=True)
-
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_deja_soumise_1, note_deja_soumise_2, note_deja_soumise_3}
-        )
+        feuille_de_notes = FeuilleDeNotesAvecToutesNotesSoumises()
         self.repository.save(feuille_de_notes)
+        notes = list(feuille_de_notes.notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
             annee_unite_enseignement=feuille_de_notes.annee,
@@ -446,18 +432,18 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_deja_soumise_1.noma,
-                    email=note_deja_soumise_1.email,
+                    noma=notes[0].noma,
+                    email=notes[0].email,
                     note='12'
                 ),
                 NoteEtudiantCommand(
-                    noma=note_deja_soumise_2.noma,
-                    email=note_deja_soumise_2.email,
+                    noma=notes[1].noma,
+                    email=notes[1].email,
                     note='12'
                 ),
                 NoteEtudiantCommand(
-                    noma=note_deja_soumise_3.noma,
-                    email=note_deja_soumise_3.email,
+                    noma=notes[2].noma,
+                    email=notes[2].email,
                     note='12'
                 ),
             ],
