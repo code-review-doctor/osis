@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesSansNotesEncodees, \
+from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
     FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesAvecNotesSoumises
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
 from testing.assertions import assert_attrs_instances_are_equal
@@ -38,8 +38,8 @@ class FeuilleDeNotesRepositoryTest(TestCase):
     def setUp(self) -> None:
         self.feuille_de_notes_repository = FeuilleDeNotesRepository()
 
-    def test_should_save_feuille_de_notes_sans_notes_encodees(self):
-        feuille_de_notes = FeuilleDeNotesSansNotesEncodees()
+    def test_should_save_feuille_de_notes_avec_notes_manquantes(self):
+        feuille_de_notes = FeuilleDeNotesAvecNotesManquantes()
         self._create_save_necessary_data(feuille_de_notes)
 
         self.feuille_de_notes_repository.save(feuille_de_notes)
@@ -87,7 +87,8 @@ class FeuilleDeNotesRepositoryTest(TestCase):
     def _create_save_necessary_data(self, feuille_de_notes_to_save):
         luy = LearningUnitYearFactory(
             acronym=feuille_de_notes_to_save.entity_id.code_unite_enseignement,
-            academic_year__year=feuille_de_notes_to_save.entity_id.annee_academique
+            academic_year__year=feuille_de_notes_to_save.entity_id.annee_academique,
+            credits=feuille_de_notes_to_save.credits_unite_enseignement,
         )
 
         for note in feuille_de_notes_to_save.notes:
@@ -95,7 +96,8 @@ class FeuilleDeNotesRepositoryTest(TestCase):
                 session_exam__number_session=feuille_de_notes_to_save.entity_id.numero_session,
                 session_exam__learning_unit_year=luy,
                 learning_unit_enrollment__learning_unit_year=luy,
-                learning_unit_enrollment__offer_enrollment__student__registration_id=note.entity_id.noma
+                learning_unit_enrollment__offer_enrollment__student__registration_id=note.entity_id.noma,
+                learning_unit_enrollment__offer_enrollment__student__person__email=note.email,
             )
             SessionExamDeadlineFactory(
                 offer_enrollment=enrollment.learning_unit_enrollment.offer_enrollment,

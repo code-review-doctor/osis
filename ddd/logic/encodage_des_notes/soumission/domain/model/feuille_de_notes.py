@@ -23,12 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from datetime import date
 from typing import Set
 
 import attr
 
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
+    EncoderFeuilleDeNotesValidatorList
 from osis_common.ddd import interface
+
+CREDITS_MIN_POUR_NOTE_DECIMALE = 15.0
 
 
 @attr.s(frozen=True, slots=True)
@@ -41,16 +47,49 @@ class IdentiteFeuilleDeNotes(interface.EntityIdentity):
 @attr.s(slots=True, eq=False)
 class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
-    notes = attr.ib(type=Set[NoteEtudiant])
+    credits_unite_enseignement = attr.ib(type=float)
+    notes = attr.ib(type=Set[NoteEtudiant])  # type: Set[NoteEtudiant]
+
+    @property
+    def code_unite_enseignement(self) -> str:
+        return self.entity_id.code_unite_enseignement
+
+    @property
+    def annee(self) -> int:
+        return self.entity_id.annee_academique
+
+    @property
+    def numero_session(self) -> int:
+        return self.entity_id.numero_session
+
+    def note_decimale_est_autorisee(self) -> bool:
+        return self.credits_unite_enseignement >= CREDITS_MIN_POUR_NOTE_DECIMALE
 
     def encoder_note(
             self,
-            noma_etudiant: str,
-            note: str,
+            noma: str,
+            email: str,
+            note_encodee: str,
     ) -> None:
-        # TODO :: builder pour créer objet Note
-        raise NotImplementedError
+        EncoderFeuilleDeNotesValidatorList(
+            noma=noma,
+            email=email,
+            note=note_encodee,
+            feuille_de_notes=self,
+        ).validate()
+        note_etudiant = self.__get_note_etudiant(noma)
+        note_etudiant.note = NoteBuilder.build(note_encodee)
 
     def soumettre(self) -> None:
         # itérer sur notes et les passer en "soumises = True"
         raise NotImplementedError
+
+    def get_date_limite_de_remise(self, noma: str) -> date:
+        note = self.__get_note_etudiant(noma)
+        return note.date_limite_de_remise
+
+    def __get_note_etudiant(self, noma: str) -> 'NoteEtudiant':
+        return next(note for note in self.notes if note.noma == noma)
+
+    def note_est_soumise(self, noma: str) -> bool:
+        return self.__get_note_etudiant(noma).est_soumise

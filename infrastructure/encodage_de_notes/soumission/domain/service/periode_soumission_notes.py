@@ -23,41 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
+import datetime
 
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from osis_common.ddd import interface
-
-Noma = str
+from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
+    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
 
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+class PeriodeSoumissionNotesTranslator(IPeriodeSoumissionNotesTranslator):
 
-
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=date)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    @classmethod
+    def get(cls) -> 'PeriodeSoumissionNotesDTO':
+        calendar = ScoresExamSubmissionCalendar()
+        events = calendar.get_opened_academic_events(date=datetime.date.today())
+        if events:
+            event = events[0]
+            date_debut = event.start_date
+            date_fin = event.end_date
+            return PeriodeSoumissionNotesDTO(
+                annee_concernee=event.authorized_target_year,
+                session_concernee=event.session,
+                debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
+                fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
+            )

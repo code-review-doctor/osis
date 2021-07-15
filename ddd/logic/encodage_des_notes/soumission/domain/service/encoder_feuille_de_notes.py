@@ -23,41 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
-
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
 from osis_common.ddd import interface
 
-Noma = str
 
+class EncoderFeuilleDeNotes(interface.DomainService):
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+    @classmethod
+    def encoder(
+            cls,
+            cmd: 'EncoderFeuilleDeNotesCommand',
+            feuille_de_notes: 'FeuilleDeNotes',
+    ) -> None:
+        exceptions = set()
+        for note_etd in cmd.notes_etudiants:
+            try:
+                feuille_de_notes.encoder_note(noma=note_etd.noma, email=note_etd.email, note_encodee=note_etd.note)
+            except MultipleBusinessExceptions as e:
+                exceptions |= e.exceptions
 
-
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=date)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+        if exceptions:
+            raise MultipleBusinessExceptions(exceptions=exceptions)

@@ -62,13 +62,16 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
 
         result = []
         for identity, group_rows in rows_group_by_identity:
+            group_rows = list(group_rows)
             dto_object = FeuilleDeNotesFromRepositoryDTO(
                 numero_session=identity[2],
                 code_unite_enseignement=identity[0],
                 annee_academique=identity[1],
+                credits_unite_enseignement=group_rows[0].credits_unite_enseignement,
                 notes=set(
                     NoteEtudiantFromRepositoryDTO(
                         noma=row.noma,
+                        email=row.email,
                         note=row.note,
                         date_limite_de_remise=row.date_limite_de_remise,
                         est_soumise=row.est_soumise
@@ -119,7 +122,9 @@ def _fetch_session_exams():
         acronym=F('learning_unit_enrollment__learning_unit_year__acronym'),
         year=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
         number_session=F('session_exam__number_session'),
+        credits_unite_enseignement=F('learning_unit_enrollment__learning_unit_year__credits'),
         noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
+        email=F('learning_unit_enrollment__offer_enrollment__student__person__email'),
         score_final_char=Cast('score_final', output_field=CharField()),
         score_reencoded_char=Cast('score_reencoded', output_field=CharField()),
         score_draft_char=Cast('score_draft', output_field=CharField()),
@@ -153,7 +158,9 @@ def _fetch_session_exams():
         'acronym',
         'year',
         'number_session',
+        'credits_unite_enseignement',
         'noma',
+        'email',
         'note',
         'date_limite_de_remise',
         'est_soumise',

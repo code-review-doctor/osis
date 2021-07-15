@@ -31,6 +31,34 @@ import attr
 from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from osis_common.ddd import interface
 
+NOTE_MIN = 0
+NOTE_MAX = 20
+ABSENCE_INJUSTIFIEE = 'A'
+TRICHERIE = 'T'
+LETTRES_AUTORISEES = [ABSENCE_INJUSTIFIEE, TRICHERIE]
+
+
+class NoteBuilder:
+    @staticmethod
+    def build(value: str) -> 'Note':
+        if value in LETTRES_AUTORISEES:
+            map_to_enum = {
+                ABSENCE_INJUSTIFIEE: TutorJustificationTypes.ABSENCE_UNJUSTIFIED,
+                TRICHERIE: TutorJustificationTypes.CHEATING,
+            }
+            return Justification(value=map_to_enum[value])
+        if NoteBuilder.__is_float(value):
+            return NoteChiffree(value=float(value))
+        return NoteManquante()
+
+    @staticmethod
+    def __is_float(value) -> bool:
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
 
 @attr.s(slots=True, frozen=True)
 class Note(interface.ValueObject, abc.ABC):
