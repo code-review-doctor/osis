@@ -128,7 +128,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                 periode_soumission_note_translator=periode_soumission_translator,
                 attribution_translator=self.attribution_translator,
             ),
-            "La periode d'encodage est encore ouverte jusqu'à date encodée (aujourdhui) 23h59"
+            "Si la date de fermeture est aujourdhui, alors l'encodage est autorisé jusqu'à aujourdhui 23h59"
         )
 
     def test_should_autoriser_si_periode_ouvre_aujourdhui(self):
@@ -152,7 +152,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                 periode_soumission_note_translator=periode_soumission_translator,
                 attribution_translator=self.attribution_translator,
             ),
-            "La periode d'encodage est encore ouverte à partir du de la date encodée (inclus) à 00h01"
+            "Si la période d'encodage ouvre aujourdhui, alors l'encodage est autorisé à partir de aujourd'hui 00h01"
         )
 
     def test_should_empecher_si_aucune_periode_trouvee(self):
