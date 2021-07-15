@@ -38,9 +38,21 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
     noma = attr.ib(type=Noma)
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(slots=True, eq=False)
 class NoteEtudiant(interface.Entity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)
     date_limite_de_remise = attr.ib(type=date)
     est_soumise = attr.ib(type=bool)
+
+    @property
+    def is_chiffree(self) -> bool:
+        return type(self.note.value) in (float, int)
+
+    @property
+    def is_manquant(self) -> bool:
+        return not bool(self.note.value)
+
+    @property
+    def is_justification(self) -> bool:
+        return not self.is_manquant and not self.is_chiffree

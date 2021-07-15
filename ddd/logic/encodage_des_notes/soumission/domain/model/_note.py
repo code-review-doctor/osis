@@ -28,23 +28,25 @@ from typing import Any
 
 import attr
 
+from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from osis_common.ddd import interface
 
 
+@attr.s(slots=True, frozen=True)
 class Note(interface.ValueObject, abc.ABC):
     value = attr.ib(type=Any)
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(slots=True, frozen=True)
 class NoteChiffree(Note):
-    value = attr.ib(type=int)
+    value = attr.ib(type=float)
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(slots=True, frozen=True)
 class NoteManquante(Note):
-    value = ""
+    value = attr.ib(init=False, default='', type=str)
 
 
-@attr.s(frozen=True, slots=True)
+@attr.s(slots=True, frozen=True)
 class Justification(Note):
-    value = attr.ib(type=str)  # TODO : remplacer avec Enum (sans "absence justifiée")
+    value = attr.ib(type=TutorJustificationTypes)

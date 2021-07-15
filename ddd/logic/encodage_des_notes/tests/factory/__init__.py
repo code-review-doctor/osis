@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,34 +22,3 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
-
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class IdentiteFeuilleDeNotes(interface.EntityIdentity):
-    numero_session = attr.ib(type=int)
-    code_unite_enseignement = attr.ib(type=str)
-    annee_academique = attr.ib(type=int)
-
-
-@attr.s(slots=True, eq=False)
-class FeuilleDeNotes(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
-    notes = attr.ib(type=Set[NoteEtudiant])
-
-    def encoder_note(
-            self,
-            noma_etudiant: str,
-            note: str,
-    ) -> None:
-        # TODO :: builder pour créer objet Note
-        raise NotImplementedError
-
-    def soumettre(self) -> None:
-        # itérer sur notes et les passer en "soumises = True"
-        raise NotImplementedError

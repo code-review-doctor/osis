@@ -49,3 +49,8 @@ class JustificationTypes(ChoiceEnum):
     ABSENCE_UNJUSTIFIED = _("Absence unjustified")
     ABSENCE_JUSTIFIED = _("Absence justified")
     CHEATING = _("Cheating")
+
+
+class TutorJustificationTypes(ChoiceEnum):
+    ABSENCE_UNJUSTIFIED = _("Absence unjustified")
+    CHEATING = _("Cheating")

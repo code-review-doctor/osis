@@ -23,34 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
-
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
-@attr.s(frozen=True, slots=True)
-class IdentiteFeuilleDeNotes(interface.EntityIdentity):
-    numero_session = attr.ib(type=int)
-    code_unite_enseignement = attr.ib(type=str)
-    annee_academique = attr.ib(type=int)
+def soumettre_feuille_de_notes(
+        cmd: 'SoumettreFeuilleDeNotesCommand',
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+) -> 'IdentiteFeuilleDeNotes':
+    # Given
 
+    # When
 
-@attr.s(slots=True, eq=False)
-class FeuilleDeNotes(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
-    notes = attr.ib(type=Set[NoteEtudiant])
-
-    def encoder_note(
-            self,
-            noma_etudiant: str,
-            note: str,
-    ) -> None:
-        # TODO :: builder pour créer objet Note
-        raise NotImplementedError
-
-    def soumettre(self) -> None:
-        # itérer sur notes et les passer en "soumises = True"
-        raise NotImplementedError
+    # Then
+    # Historiser (DomainService)
+    return
