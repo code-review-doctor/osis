@@ -33,16 +33,20 @@ from osis_common.ddd import interface
 
 NOTE_MIN = 0
 NOTE_MAX = 20
-ABSENCE_JUSTIFIEE = 'A'
+ABSENCE_INJUSTIFIEE = 'A'
 TRICHERIE = 'T'
-LETTRES_AUTORISEES = [ABSENCE_JUSTIFIEE, TRICHERIE]
+LETTRES_AUTORISEES = [ABSENCE_INJUSTIFIEE, TRICHERIE]
 
 
 class NoteBuilder:
     @staticmethod
     def build(value: str) -> 'Note':
         if value in LETTRES_AUTORISEES:
-            return Justification(value=value)
+            map_to_enum = {
+                ABSENCE_INJUSTIFIEE: TutorJustificationTypes.ABSENCE_UNJUSTIFIED,
+                TRICHERIE: TutorJustificationTypes.CHEATING,
+            }
+            return Justification(value=map_to_enum[value])
         if NoteBuilder.__is_float(value):
             return NoteChiffree(value=float(value))
         return NoteManquante()

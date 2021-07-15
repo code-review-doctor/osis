@@ -53,7 +53,9 @@ def _search_attributions_unite_enseignement(matricule_fgs: str, annee: int) -> S
         learning_container_year__academic_year__year=annee,
     ).annotate(
         code_unite_enseignement=F('learning_container_year__acronym'),
-    ).values().distinct()
+    ).values(
+        'code_unite_enseignement',
+    ).distinct()
     return {
         AttributionEnseignantDTO(
             code_unite_enseignement=attribution_as_dict['code_unite_enseignement'],
@@ -71,7 +73,10 @@ def _search_repartition_classes(matricule_fgs: str, annee: int) -> Set['Attribut
     ).annotate(
         learning_unit_code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
         class_code=F('learning_class_year__acronym'),
-    ).values().distinct()
+    ).values(
+        'learning_unit_code',
+        'class_code',
+    ).distinct()
     dtos = set()
     for class_repartition_as_dict in classes_repartition:
         code_classe = class_repartition_as_dict['class_code']

@@ -38,7 +38,7 @@ class FeuilleDeNotesRepositoryTest(TestCase):
     def setUp(self) -> None:
         self.feuille_de_notes_repository = FeuilleDeNotesRepository()
 
-    def test_should_save_feuille_de_notes_sans_notes_encodees(self):
+    def test_should_save_feuille_de_notes_avec_notes_manquantes(self):
         feuille_de_notes = FeuilleDeNotesAvecNotesManquantes()
         self._create_save_necessary_data(feuille_de_notes)
 

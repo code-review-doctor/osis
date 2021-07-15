@@ -27,7 +27,7 @@ import datetime
 import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, \
-    IdentiteFeuilleDeNotes, NOTE_DECIMALE_AUTORISEE
+    IdentiteFeuilleDeNotes, CREDITS_MIN_POUR_NOTE_DECIMALE
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, \
     NoteChiffreEtudiantFactory, NoteJustificationEtudiantFactory
 
@@ -48,7 +48,7 @@ class _FeuilleDeNotesFactory(factory.Factory):
         abstract = True
 
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
-    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE - 5.0  # Non autorisé par défaut
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE - 5.0  # Non autorisé par défaut
     notes = set()
 
 
@@ -87,21 +87,21 @@ class FeuilleDeNotesAvecToutesNotesSoumises(_FeuilleDeNotesFactory):
 
 
 class FeuilleDeNotesDecimalesAutorisees(_FeuilleDeNotesFactory):
-    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
         NoteManquanteEtudiantFactory(),
     }
 
 
 class FeuilleDeNotesDateLimiteRemiseAujourdhui(_FeuilleDeNotesFactory):
-    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
         NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today()),
     }
 
 
 class FeuilleDeNotesDateLimiteRemiseHier(_FeuilleDeNotesFactory):
-    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
         NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today() - datetime.timedelta(days=1)),
     }
