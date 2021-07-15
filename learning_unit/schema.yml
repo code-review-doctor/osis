@@ -54,6 +54,10 @@ paths:
         schema:
           description: ''
           type: string
+      - in: query
+        name: stage_dimona
+        schema:
+          type: boolean
       responses:
         '200':
           description: OK
