@@ -271,7 +271,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_etudiant_pas_sur_feuille_de_notes(self):
         noma_pas_sur_feuille_de_notes = "9999999999"
-        note_etudiant = NoteEtudiantCommand(noma=noma_pas_sur_feuille_de_notes, email=self.note_manquante.email, note='12')
+        note_etudiant = NoteEtudiantCommand(
+            noma=noma_pas_sur_feuille_de_notes,
+            email=self.note_manquante.email,
+            note='12',
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -287,7 +291,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_inferieure_0(self):
         note_inferieure_0 = "-1"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=note_inferieure_0)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=note_inferieure_0,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -303,7 +311,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_superieure_20(self):
         note_superieure_20 = "21"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=note_superieure_20)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=note_superieure_20,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -319,7 +331,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
         lettre_inexistante = "S"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=lettre_inexistante)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=lettre_inexistante,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -335,7 +351,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_mal_formatee(self):
         lettre_inexistante = "T 12"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=lettre_inexistante)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=lettre_inexistante,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -351,7 +371,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_decimale_non_autorisee(self):
         note_decimale = "12.5"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=note_decimale)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=note_decimale,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(

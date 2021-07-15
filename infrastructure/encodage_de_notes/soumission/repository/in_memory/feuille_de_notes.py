@@ -32,4 +32,3 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes impor
 
 class FeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IFeuilleDeNotesRepository):
     entities = list()  # type: List[FeuilleDeNotes]
-
