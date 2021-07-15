@@ -1228,9 +1228,15 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr ""
 
+msgid "January"
+msgstr ""
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
+msgstr ""
+
+msgid "June"
 msgstr ""
 
 msgid "Junior year"
@@ -2231,6 +2237,9 @@ msgid "Send calendar reminder notice"
 msgstr ""
 
 msgid "Separate"
+msgstr ""
+
+msgid "September"
 msgstr ""
 
 msgid "Service courses"

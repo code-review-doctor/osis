@@ -1258,12 +1258,18 @@ msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
 
+msgid "January"
+msgstr "Janvier"
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
 msgstr ""
 "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas "
 "sans JavaScript."
+
+msgid "June"
+msgstr "Juin"
 
 msgid "Junior year"
 msgstr "Junior year"
@@ -2293,6 +2299,9 @@ msgstr "Envoyer un rappel sur les événements académiques"
 
 msgid "Separate"
 msgstr "Séparer"
+
+msgid "September"
+msgstr "Septembre"
 
 msgid "Service courses"
 msgstr "Cours de service"
