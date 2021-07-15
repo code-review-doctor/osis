@@ -23,30 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+import abc
+from typing import Set, List
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
+from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO, SignaletiqueEtudiantDTO
 from osis_common.ddd import interface
 
 
-class PeriodeSoumissionOuverte(interface.DomainService):
+class ISignaletiqueEtudiantTranslator(interface.DomainService):
 
     @classmethod
-    def verifier(
+    @abc.abstractmethod
+    def search(
             cls,
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
-    ) -> None:
-        periode = periode_soumission_note_translator.get()
-        if not periode:
-            raise PeriodeSoumissionNotesFermeeException()
-
-        aujourdhui = datetime.date.today()
-        debut_periode = periode.debut_periode_soumission.to_date()
-        fin_periode = periode.fin_periode_soumission.to_date()
-        periode_est_ouverte = debut_periode < aujourdhui < fin_periode
-
-        if not periode_est_ouverte:
-            raise PeriodeSoumissionNotesFermeeException()
+            nomas: List[str],
+    ) -> Set['SignaletiqueEtudiantDTO']:
+        raise NotImplementedError

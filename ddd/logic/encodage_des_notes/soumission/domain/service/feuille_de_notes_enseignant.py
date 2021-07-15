@@ -23,39 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
-    FeuilleDeNotesIdentityBuilder
+
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_feuille_de_notes import EncoderFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
-    EnseignantAttribueUniteEnseignement
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
     IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
-    PeriodeSoumissionOuverte
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    EnseignantNonAttribueUniteEnseignementException
+from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO
+from osis_common.ddd import interface
 
 
-def encoder_feuille_de_notes(
-        cmd: 'EncoderFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
-        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
-        attribution_translator: 'IAttributionEnseignantTranslator'
-) -> 'IdentiteFeuilleDeNotes':
-    # Given
-    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
-    EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
-    feuille_de_note_identity = FeuilleDeNotesIdentityBuilder.build_from_command(cmd)
-    feuille_de_notes = feuille_de_note_repo.get(feuille_de_note_identity)
+class FeuilleDeNotesEnseignant(interface.DomainService):
 
-    # When
-    EncoderFeuilleDeNotes().encoder(cmd, feuille_de_notes)
-
-    # Then
-    feuille_de_note_repo.save(feuille_de_notes)
-    # TODO :: Historiser (DomainService) ?
-
-    return feuille_de_notes.entity_id
+    @classmethod
+    def get(
+            cls,
+            feuille_de_notes: 'FeuilleDeNotes',
+            responsable_de_notes: 'ResponsableDeNotes',
+            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
+            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+            attribution_translator: 'IAttributionEnseignantTranslator',
+            unite_enseignement_translator: 'IUniteEnseignementTranslator',
+    ) -> 'FeuilleDeNotesEnseignantDTO':
+        pass
