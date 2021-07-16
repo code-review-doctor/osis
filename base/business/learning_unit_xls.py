@@ -732,7 +732,7 @@ def _get_class_attribution_detail(an_attribution):
 
 
 def _get_attribution_volume(volume):
-    return volume if volume and volume > 0 else 0
+    return volume if volume and volume >= 0 else ''
 
 
 def _get_class_score_responsibles(effective_class: LearningClassYear) -> List[Person]:
