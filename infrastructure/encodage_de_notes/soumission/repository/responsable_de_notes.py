@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 import itertools
+import operator
 from typing import Optional, List
 
-from django.db.models import F
+from django.db.models import F, Q
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -77,15 +79,32 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
     @classmethod
     def save(cls, entity: 'ResponsableDeNotes') -> None:
-        for identite_ue in entity.unites_enseignements:
-            attribution = AttributionNew.objects.get(
-                attributionchargenew__learning_component_year__learning_unit_year__acronym=identite_ue.
-                code_unite_enseignement,
-                attributionchargenew__learning_component_year__learning_unit_year__academic_year__year=identite_ue.
-                annee_academique,
-                tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant
-            )
+        q_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(attributionchargenew__learning_component_year__learning_unit_year__acronym=identite_ue.
+                    code_unite_enseignement,
+                    attributionchargenew__learning_component_year__learning_unit_year__academic_year__year=identite_ue.
+                    annee_academique)
+                for identite_ue in entity.unites_enseignements]
+        ) if entity.unites_enseignements else []
+
+        qs_attribution_for_which_score_responsible = AttributionNew.objects.filter(
+            q_filters,
+            tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant,
+        ) if q_filters else AttributionNew.objects.none()
+
+        for attribution in qs_attribution_for_which_score_responsible:
             attribution.score_responsible = True
+            attribution.save()
+
+        qs_attribution_for_which_not_score_responsible_anymore = AttributionNew.objects.filter(
+            tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant,
+            score_responsible=True,
+        ).exclude(q_filters)
+
+        for attribution in qs_attribution_for_which_not_score_responsible_anymore:
+            attribution.score_responsible = False
             attribution.save()
 
     @classmethod
