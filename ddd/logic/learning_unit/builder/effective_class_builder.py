@@ -57,7 +57,7 @@ class EffectiveClassBuilder(interface.RootEntityBuilder):
             titles=ClassTitles(fr=cmd.title_fr, en=cmd.title_en),
             teaching_place=UclouvainCampusIdentityBuilder.build_from_uuid(cmd.teaching_place_uuid),
             derogation_quadrimester=DerogationQuadrimester[quadri] if quadri else None,
-            session_derogation=DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None,
+            session_derogation=DerogationSession(cmd.session_derogation) if cmd.session_derogation else None,
             volumes=ClassVolumes(
                 volume_first_quadrimester=cmd.volume_first_quadrimester,
                 volume_second_quadrimester=cmd.volume_second_quadrimester,
