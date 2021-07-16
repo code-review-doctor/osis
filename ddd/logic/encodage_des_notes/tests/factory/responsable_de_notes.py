@@ -22,10 +22,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
     IdentiteResponsableDeNotes, UniteEnseignementIdentite
+
+
+def generate_matricule_fgs() -> int:
+    first_digit = str(random.randint(1, 9))
+    other_digits = [str(random.randint(0, 9)) for _ in range(8)]
+    return int("".join([first_digit] + other_digits))
 
 
 class _IdentiteResponsableDeNotesFactory(factory.Factory):
@@ -33,7 +41,7 @@ class _IdentiteResponsableDeNotesFactory(factory.Factory):
         model = IdentiteResponsableDeNotes
         abstract = False
 
-    matricule_fgs_enseignant = 64641250
+    matricule_fgs_enseignant = factory.LazyFunction(generate_matricule_fgs)
 
 
 class _UniteEnseignementIdentiteFactory(factory.Factory):
@@ -66,6 +74,6 @@ class ResponsableDeNotesPourUnCours(_ResponsableDeNotesFactory):
 
 class ResponsableDeNotesPourMultipleCours(_ResponsableDeNotesFactory):
     unites_enseignements = {
-        _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254"),
+        _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354"),
         _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1589")
     }
