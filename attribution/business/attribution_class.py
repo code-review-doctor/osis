@@ -30,7 +30,7 @@ from attribution.models.attribution_class import AttributionClass
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 
 
-def create_attributions_dictionary(class_attribution_charges: List[AttributionClass]) -> OrderedDict():
+def create_attributions_dictionary(class_attribution_charges: List[AttributionClass]) -> OrderedDict:
     attributions = OrderedDict()
 
     for class_attribution in class_attribution_charges:
