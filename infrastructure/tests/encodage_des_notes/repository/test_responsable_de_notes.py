@@ -27,7 +27,8 @@ from django.test import TestCase
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
-from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesPourUnCours
+from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesPourUnCours, \
+    ResponsableDeNotesPourMultipleCours
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from testing.assertions import assert_attrs_instances_are_equal
 
@@ -38,6 +39,16 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
     def test_should_save_responsable_de_notes_pour_un_cours(self):
         responsable = ResponsableDeNotesPourUnCours()
+        self._create_necessary_data(responsable)
+
+        self.responsable_de_notes_repository.save(responsable)
+
+        responsable_retrieved = self.responsable_de_notes_repository.get(responsable.entity_id)
+
+        assert_attrs_instances_are_equal(responsable, responsable_retrieved)
+
+    def test_should_save_responsable_de_notes_pour_plusieurs_cours(self):
+        responsable = ResponsableDeNotesPourMultipleCours()
         self._create_necessary_data(responsable)
 
         self.responsable_de_notes_repository.save(responsable)

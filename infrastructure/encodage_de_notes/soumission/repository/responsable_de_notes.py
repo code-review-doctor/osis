@@ -23,16 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import functools
 import itertools
-import operator
 from typing import Optional, List
 
-from django.db.models import F, Q
+from django.db.models import F
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
-from base.auth.roles.tutor import Tutor
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
