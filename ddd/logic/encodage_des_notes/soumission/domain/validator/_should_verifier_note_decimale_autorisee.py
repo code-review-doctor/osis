@@ -23,41 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
+import decimal
+from decimal import Decimal
+from typing import Optional
 
 import attr
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from osis_common.ddd import interface
-
-Noma = str
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.business_types import *
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDecimaleNonAutoriseeException
 
 
 @attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
+    note = attr.ib(type=str)
+    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
 
+    def validate(self, *args, **kwargs):
+        note_chiffree = self.__get_note_chiffree()
+        if note_chiffree:
+            is_integer = note_chiffree % 1 == 0
+            if not self.feuille_de_note.note_decimale_est_autorisee() and not is_integer:
+                raise NoteDecimaleNonAutoriseeException()
 
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=date)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    def __get_note_chiffree(self) -> Optional[Decimal]:
+        try:
+            return decimal.Decimal(self.note)
+        except decimal.InvalidOperation:
+            return

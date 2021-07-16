@@ -65,8 +65,13 @@ class NoteManquanteEtudiantFactory(factory.Factory):
 
     entity_id = factory.SubFactory(_IdentiteNoteEtudiantFactory)
     note = NoteManquante()
+    email = factory.Faker('email')
     date_limite_de_remise = factory.LazyFunction(datetime.date.today)
     est_soumise = False
+
+
+class NoteManquanteEtudiantDateLimiteDepasseeFactory(NoteManquanteEtudiantFactory):
+    date_limite_de_remise = datetime.date.today() - datetime.timedelta(days=1)
 
 
 class NoteChiffreEtudiantFactory(NoteManquanteEtudiantFactory):

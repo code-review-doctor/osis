@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
@@ -30,8 +31,12 @@ from osis_common.ddd.interface import EntityIdentityBuilder
 
 class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'EntityIdentity':
-        raise NotImplementedError
+    def build_from_command(cls, cmd: 'EncoderFeuilleDeNotesCommand') -> 'IdentiteFeuilleDeNotes':
+        return IdentiteFeuilleDeNotes(
+            numero_session=cmd.numero_session,
+            code_unite_enseignement=cmd.code_unite_enseignement,
+            annee_academique=cmd.annee_unite_enseignement,
+        )
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'FeuilleDeNotesFromRepositoryDTO') -> 'IdentiteFeuilleDeNotes':

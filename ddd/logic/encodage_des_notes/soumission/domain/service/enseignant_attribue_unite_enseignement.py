@@ -23,41 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    EnseignantNonAttribueUniteEnseignementException
 from osis_common.ddd import interface
 
-Noma = str
 
+class EnseignantAttribueUniteEnseignement(interface.DomainService):
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
-
-
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=date)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    @classmethod
+    def verifier(
+            cls,
+            cmd: 'EncoderFeuilleDeNotesCommand',
+            attribution_translator: 'IAttributionEnseignantTranslator'
+    ) -> None:
+        attributions = attribution_translator.search_attributions_enseignant(
+            matricule_fgs_enseignant=cmd.matricule_fgs_enseignant,
+            annee=cmd.annee_unite_enseignement,
+        )
+        est_attribue_unite_enseignement = any(
+            attribution for attribution in attributions
+            if attribution.code_unite_enseignement == cmd.code_unite_enseignement
+            and attribution.annee == cmd.annee_unite_enseignement
+        )
+        if not est_attribue_unite_enseignement:
+            raise EnseignantNonAttribueUniteEnseignementException(cmd.code_unite_enseignement)
