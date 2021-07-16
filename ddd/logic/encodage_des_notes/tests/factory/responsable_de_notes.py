@@ -28,6 +28,7 @@ import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
     IdentiteResponsableDeNotes, UniteEnseignementIdentite
+from testing.factory import SetFactory
 
 
 def generate_matricule_fgs() -> int:
@@ -67,13 +68,17 @@ class ResponsableDeNotesPourAucunCours(_ResponsableDeNotesFactory):
 
 
 class ResponsableDeNotesPourUnCours(_ResponsableDeNotesFactory):
-    unites_enseignements = {
-        _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254")
-    }
+    unites_enseignements = factory.List(
+        [_UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254")],
+        list_factory=SetFactory
+    )
 
 
 class ResponsableDeNotesPourMultipleCours(_ResponsableDeNotesFactory):
-    unites_enseignements = {
-        _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354"),
-        _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1589")
-    }
+    unites_enseignements = factory.List(
+        [
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354"),
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1589"),
+        ],
+        list_factory=SetFactory
+    )
