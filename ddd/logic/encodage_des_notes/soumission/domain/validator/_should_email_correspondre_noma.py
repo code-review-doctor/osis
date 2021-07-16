@@ -23,41 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 
 import attr
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from osis_common.ddd import interface
-
-Noma = str
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.encodage_des_notes.business_types import *
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NomaNeCorrespondPasEmailException
 
 
 @attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+class ShouldEmailCorrespondreNoma(BusinessValidator):
+    noma_etudiant = attr.ib(type=str)
+    email_etudiant = attr.ib(type=str)
+    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
 
-
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=date)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    def validate(self, *args, **kwargs):
+        correspondance_existe = any(
+            note for note in self.feuille_de_note.notes
+            if note.email == self.email_etudiant and note.noma == self.noma_etudiant
+        )
+        if not correspondance_existe:
+            raise NomaNeCorrespondPasEmailException()

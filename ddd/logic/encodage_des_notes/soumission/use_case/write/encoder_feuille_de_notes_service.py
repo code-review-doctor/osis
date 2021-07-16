@@ -23,20 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
+    FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_feuille_de_notes import EncoderFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
+    EnseignantAttribueUniteEnseignement
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
+    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
+    PeriodeSoumissionOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def encoder_feuille_de_notes(
         cmd: 'EncoderFeuilleDeNotesCommand',
         feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+        attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
-    # Anticorruption layer : réutiliser un DomainService/repository interface pour récupérer le current numéro de session + le current year (data_target_year)
+    PeriodeSoumissionOuverte().verifier(cmd, periode_soumission_note_translator)
+    EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
+    feuille_de_note_identity = FeuilleDeNotesIdentityBuilder.build_from_command(cmd)
+    feuille_de_notes = feuille_de_note_repo.get(feuille_de_note_identity)
 
     # When
+    EncoderFeuilleDeNotes().encoder(cmd, feuille_de_notes)
 
     # Then
-    # Historiser (DomainService)
-    return
+    feuille_de_note_repo.save(feuille_de_notes)
+    # TODO :: Historiser (DomainService) ?
+
+    return feuille_de_notes.entity_id

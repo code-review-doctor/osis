@@ -23,41 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
+import datetime
 
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
+    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
 from osis_common.ddd import interface
 
-Noma = str
 
+class PeriodeSoumissionOuverte(interface.DomainService):
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+    @classmethod
+    def verifier(
+            cls,
+            cmd: 'EncoderFeuilleDeNotesCommand',
+            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
+    ) -> None:
+        periode = periode_soumission_note_translator.get()
+        if not periode:
+            raise PeriodeSoumissionNotesFermeeException()
 
+        aujourdhui = datetime.date.today()
+        debut_periode = periode.debut_periode_soumission.to_date()
+        fin_periode = periode.fin_periode_soumission.to_date()
+        periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
 
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=date)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
+        annee_est_concernee = cmd.annee_unite_enseignement == periode.annee_concernee
 
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
+        session_est_concernee = cmd.numero_session == periode.session_concernee
 
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+        if not periode_est_ouverte or not annee_est_concernee or not session_est_concernee:
+            raise PeriodeSoumissionNotesFermeeException()
