@@ -146,8 +146,8 @@ class FacultyManager(osis_role_models.EntityRoleModel):
                   predicates.has_learning_unit_no_application_this_year)
                  ),
             'base.can_create_class':
-                predicates.is_user_attached_to_learning_unit_current_requirement_entity &
-                predicates.is_learning_class_year_older_or_equals_than_limit_settings_year,
+                predicates.is_user_attached_to_current_requirement_entity &
+                predicates.is_learning_unit_year_older_or_equals_than_limit_settings_year,
             'learning_unit.view_learningclassyear': rules.always_allow,
             'learning_unit.change_learningclassyear':
                 predicates.is_user_attached_to_learning_unit_current_requirement_entity &
