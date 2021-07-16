@@ -588,8 +588,8 @@ def _get_attribution_detail(an_attribution: dict, is_attribution_class=False) ->
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         an_attribution.get('start_year') if not is_attribution_class else '',
         an_attribution.get('duration') if an_attribution.get('duration') and not is_attribution_class else '',
-        _get_attribution_volume(volume_lecturing),
-        _get_attribution_volume(volume_practical)
+        _get_attribution_volume(volume_lecturing, is_attribution_class),
+        _get_attribution_volume(volume_practical, is_attribution_class)
     ]
 
 
@@ -731,8 +731,9 @@ def _get_class_attribution_detail(an_attribution):
     ]
 
 
-def _get_attribution_volume(volume):
-    return volume if volume and volume > 0 else 0
+def _get_attribution_volume(volume, is_attribution_class):
+    default_value = '' if is_attribution_class else 0
+    return volume if volume and volume > 0 else default_value
 
 
 def _get_class_score_responsibles(effective_class: LearningClassYear) -> List[Person]:

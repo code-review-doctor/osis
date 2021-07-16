@@ -24,15 +24,14 @@
 #
 ##############################################################################
 import datetime
+from typing import List
 
 from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-from typing import List
 
-from assessments.tests.factories.score_responsible import ScoreResponsibleFactory, \
-    ClassAttributionScoreResponsibleFactory
+from assessments.tests.factories.score_responsible import ClassAttributionScoreResponsibleFactory
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
@@ -858,7 +857,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
         self.assertEqual(class_attribution_line_data[30], attribution_class.allocation_charge)
-        self.assertEqual(class_attribution_line_data[31], 0)
+        self.assertEqual(class_attribution_line_data[31], '')
 
     def test_get_class_score_responsibles(self):
         score_responsibles = _get_class_score_responsibles(self.class_a)
