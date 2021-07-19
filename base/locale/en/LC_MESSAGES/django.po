@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-25 11:03+0200\n"
+"POT-Creation-Date: 2021-07-13 13:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1228,9 +1228,15 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr ""
 
+msgid "January"
+msgstr ""
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
+msgstr ""
+
+msgid "June"
 msgstr ""
 
 msgid "Junior year"
@@ -1858,6 +1864,9 @@ msgid ""
 "12, 23, 46"
 msgstr ""
 
+msgid "Please report this incident to the Service Desk"
+msgstr ""
+
 msgid "Please select a country and a city first"
 msgstr ""
 
@@ -2230,6 +2239,9 @@ msgstr ""
 msgid "Separate"
 msgstr ""
 
+msgid "September"
+msgstr ""
+
 msgid "Service courses"
 msgstr ""
 
@@ -2268,6 +2280,9 @@ msgid "Specifications"
 msgstr ""
 
 msgid "Sport"
+msgstr ""
+
+msgid "Stage-Dimona"
 msgstr ""
 
 msgid "Start"
@@ -2513,6 +2528,11 @@ msgstr ""
 msgid ""
 "The learning unit is in proposal, the report from %(proposal_year)s will be "
 "done at consolidation"
+msgstr ""
+
+msgid ""
+"The learning unit is not a Stage-Dimona activity although it is an "
+"internship type."
 msgstr ""
 
 msgid "The learning units"
@@ -2861,9 +2881,6 @@ msgid "Volumes of {} are inconsistent"
 msgstr ""
 
 msgid "We detected inconsistencies in the following data :"
-msgstr ""
-
-msgid "We will fix this as soon as possible"
 msgstr ""
 
 msgid "Web re-registration"

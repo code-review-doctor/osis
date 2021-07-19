@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,12 +22,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 
-from assessments.models import *
+from backoffice.celery import app as celery_app
+from learning_unit.postponement import postpone_learning_units
 
-admin.site.register(score_sheet_address.ScoreSheetAddress,
-                    score_sheet_address.ScoreSheetAddressAdmin)
 
-admin.site.register(score_responsible.ScoreResponsible,
-                    score_responsible.ScoreResponsibleAdmin)
+@celery_app.task
+def run() -> dict:
+    postpone_learning_units.PostponeLearningUnits().postpone()
+    postpone_learning_units.PostponeLearningUnits().postpone_partims()
+    return {}
