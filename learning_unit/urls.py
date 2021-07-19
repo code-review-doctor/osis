@@ -26,9 +26,9 @@
 from django.urls import include, path
 
 from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
+from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
 from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
 from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
-from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
 
 urlpatterns = [
     path('<int:learning_unit_year>/<str:learning_unit_code>/', include([

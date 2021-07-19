@@ -134,6 +134,11 @@
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'professional_integration' value=learning_unit_year.professional_integration|yesno:_("yes,no")|title %}
                                 </div>
+                                {% if not learning_unit_year.is_external_mobility %}
+                                <div class="col-md-3">
+                                    {% dl_tooltip learning_unit_year 'stage_dimona' value=learning_unit_year.stage_dimona|yesno:_("yes,no")|title %}
+                                </div>
+                                {% endif %}
                             {% endblock content_row3 %}
                         </div>
                         {% block titles %}

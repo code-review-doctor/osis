@@ -469,38 +469,40 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             self.assertEqual(note.note, expected_result)
 
     def test_should_encoder_absence_injustifiee(self):
-        absence_injustifiee = "A"
-        note_etudiant = NoteEtudiantCommand(
-            noma=self.note_manquante.noma,
-            email=self.note_manquante.email,
-            note=absence_injustifiee,
-        )
-        cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
-        entity_id = encoder_feuille_de_notes(
-            cmd=cmd,
-            feuille_de_note_repo=self.repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            attribution_translator=self.attribution_translator,
-        )
-        expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
-        self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
+        for absence_injustifiee in ['A', TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name]:
+            with self.subTest(absence=absence_injustifiee):
+                note_etudiant = NoteEtudiantCommand(
+                    noma=self.note_manquante.noma,
+                    email=self.note_manquante.email,
+                    note=absence_injustifiee,
+                )
+                cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
+                entity_id = encoder_feuille_de_notes(
+                    cmd=cmd,
+                    feuille_de_note_repo=self.repository,
+                    periode_soumission_note_translator=self.periode_soumission_translator,
+                    attribution_translator=self.attribution_translator,
+                )
+                expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
+                self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
     def test_should_encoder_tricherie(self):
-        absence_injustifiee = "T"
-        note_etudiant = NoteEtudiantCommand(
-            noma=self.note_manquante.noma,
-            email=self.note_manquante.email,
-            note=absence_injustifiee,
-        )
-        cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
-        entity_id = encoder_feuille_de_notes(
-            cmd=cmd,
-            feuille_de_note_repo=self.repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            attribution_translator=self.attribution_translator,
-        )
-        expected_result = Justification(value=TutorJustificationTypes.CHEATING)
-        self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
+        for tricherie in ['T', TutorJustificationTypes.CHEATING.name]:
+            with self.subTest(tricherie=tricherie):
+                note_etudiant = NoteEtudiantCommand(
+                    noma=self.note_manquante.noma,
+                    email=self.note_manquante.email,
+                    note=tricherie,
+                )
+                cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
+                entity_id = encoder_feuille_de_notes(
+                    cmd=cmd,
+                    feuille_de_note_repo=self.repository,
+                    periode_soumission_note_translator=self.periode_soumission_translator,
+                    attribution_translator=self.attribution_translator,
+                )
+                expected_result = Justification(value=TutorJustificationTypes.CHEATING)
+                self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
     def test_should_aggreger_erreurs_plusieurs_notes(self):
         feuille_de_notes = FeuilleDeNotesAvecToutesNotesSoumises()
