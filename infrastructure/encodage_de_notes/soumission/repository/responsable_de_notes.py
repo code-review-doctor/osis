@@ -26,12 +26,16 @@
 import functools
 import itertools
 import operator
+import string
 from typing import Optional, List
 
-from django.db.models import F, Q
+from django.db.models import F, Q, Value, CharField
+from django.db.models.functions import Coalesce, Concat
 
+from assessments.models.score_responsible import ScoreResponsible
 from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.models.attribution_new import AttributionNew
+from attribution.models.attribution_class import AttributionClass
+from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
@@ -75,13 +79,15 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteResponsableDeNotes', **kwargs: ApplicationService) -> None:
-        qs_attribution_for_which_score_responsible = AttributionNew.objects.filter(
-            tutor__person__global_id=entity_id.matricule_fgs_enseignant,
-            score_responsible=True,
+        qs_score_responsible = ScoreResponsible.objects.filter(
+            Q(attribution_charge__attribution__tutor__person__global_id=entity_id.matricule_fgs_enseignant) |
+            Q(
+                attribution_class__attribution_charge__attribution__tutor__person__global_id=entity_id.
+                matricule_fgs_enseignant
+            )
         )
-        for attribution in qs_attribution_for_which_score_responsible:
-            attribution.score_responsible = False
-            attribution.save()
+        for score_responsible in qs_score_responsible:
+            score_responsible.delete()
 
     @classmethod
     def save(cls, entity: 'ResponsableDeNotes') -> None:
@@ -89,34 +95,56 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             cls.delete(entity.entity_id)
             return
 
+        for unite_enseignement in entity.unites_enseignements:
+            is_class = unite_enseignement.code_unite_enseignement[-1] in string.ascii_letters
+            if is_class:
+                luy = LearningUnitYear.objects.get(
+                    acronym=unite_enseignement.code_unite_enseignement[:-1],
+                    academic_year__year=unite_enseignement.annee_academique
+                )
+                attribution_class = AttributionClass.objects.get(
+                    learning_class_year__acronym=unite_enseignement.code_unite_enseignement[-1],
+                    learning_class_year__learning_component_year__learning_unit_year=luy
+                )
+                ScoreResponsible.objects.update_or_create(
+                    learning_unit_year=luy,
+                    attribution_class=attribution_class
+                )
+            else:
+                luy = LearningUnitYear.objects.get(
+                    acronym=unite_enseignement.code_unite_enseignement,
+                    academic_year__year=unite_enseignement.annee_academique
+                )
+                attribution_charge = AttributionChargeNew.objects.get(learning_component_year__learning_unit_year=luy)
+                ScoreResponsible.objects.update_or_create(
+                    learning_unit_year=luy,
+                    attribution_charge=attribution_charge
+                )
+
         unite_enseignement_filters = functools.reduce(
             operator.or_,
             [
-                Q(
-                    attributionchargenew__learning_component_year__learning_unit_year__acronym=identite_ue.
-                    code_unite_enseignement,
-                    attributionchargenew__learning_component_year__learning_unit_year__academic_year__year=identite_ue.
-                    annee_academique
-                ) for identite_ue in entity.unites_enseignements]
+                Q(acronym=identite_ue.code_unite_enseignement, year=identite_ue.annee_academique)
+                for identite_ue in entity.unites_enseignements
+            ]
         )
-
-        qs_attribution_for_which_score_responsible = AttributionNew.objects.filter(
-            unite_enseignement_filters,
-            tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant,
-        )
-
-        for attribution in qs_attribution_for_which_score_responsible:
-            attribution.score_responsible = True
-            attribution.save()
-
-        qs_attribution_for_which_not_score_responsible_anymore = AttributionNew.objects.filter(
-            tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant,
-            score_responsible=True,
+        qs_base_score_responsible = ScoreResponsible.objects.annotate(
+            acronym=Concat(
+                'learning_unit_year__acronym',
+                'attribution_class__learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            year=F('learning_unit_year__academic_year__year')
+        ).filter(
+            Q(attribution_charge__attribution__tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant) |
+            Q(
+                attribution_class__attribution_charge__attribution__tutor__person__global_id=entity.entity_id.
+                matricule_fgs_enseignant
+            )
         ).exclude(unite_enseignement_filters)
 
-        for attribution in qs_attribution_for_which_not_score_responsible_anymore:
-            attribution.score_responsible = False
-            attribution.save()
+        for score_responsible in qs_base_score_responsible:
+            score_responsible.delete()
 
     @classmethod
     def get_all_identities(cls) -> List['IdentiteResponsableDeNotes']:
@@ -128,12 +156,18 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
 
 def _fetch_responsable_de_notes():
-    return AttributionChargeNew.objects.filter(
-        attribution__score_responsible=True
-    ).annotate(
-        global_id=F('attribution__tutor__person__global_id'),
-        acronym=F('learning_component_year__learning_unit_year__acronym'),
-        year=F('learning_component_year__learning_unit_year__academic_year__year'),
+    return ScoreResponsible.objects.annotate(
+        global_id=Coalesce(
+            'attribution_charge__attribution__tutor__person__global_id',
+            'attribution_class__attribution_charge__attribution__tutor__person__global_id',
+            Value('')
+        ),
+        acronym=Concat(
+            'learning_unit_year__acronym',
+            'attribution_class__learning_class_year__acronym',
+            output_field=CharField()
+        ),
+        year=F('learning_unit_year__academic_year__year'),
     ).values_list(
         'global_id',
         'acronym',

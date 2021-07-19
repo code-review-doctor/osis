@@ -79,3 +79,13 @@ class ResponsableDeNotesPourMultipleCours(_ResponsableDeNotesFactory):
         ],
         list_factory=SetFactory
     )
+
+
+class ResponsableDeNotesPourClasse(_ResponsableDeNotesFactory):
+    unites_enseignements = factory.List(
+        [
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354A"),  # classe
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS2569"),
+        ],
+        list_factory=SetFactory
+    )
