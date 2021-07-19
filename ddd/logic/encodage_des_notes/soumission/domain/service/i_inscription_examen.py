@@ -37,5 +37,7 @@ class IInscriptionExamenTranslator(interface.DomainService):
     def search(
             cls,
             nomas: List[str],
+            numero_session: int,
+            annee: int,
     ) -> Set['InscriptionExamenDTO']:
         raise NotImplementedError

@@ -68,9 +68,14 @@ def get_feuille_de_notes(
     )
 
     # WHEN
-    FeuilleDeNotesEnseignant().get(
+    feuille_de_notes_dto = FeuilleDeNotesEnseignant().get(
         feuille_de_note_repo.get(feuille_notes_entity_id),
-        responsable_notes_repo.get(responsable_notes_entity_id)
+        responsable_notes_repo.get(responsable_notes_entity_id),
+        periode_soumission_note_translator,
+        inscription_examen_translator,
+        signaletique_etudiant_translator,
+        attribution_translator,
+        unite_enseignement_translator,
     )
 
-    return feuille_de_note_repo.get_dto(entity_id)
+    return feuille_de_notes_dto
