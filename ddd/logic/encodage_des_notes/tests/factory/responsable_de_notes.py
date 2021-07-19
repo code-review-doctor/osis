@@ -64,10 +64,6 @@ class _ResponsableDeNotesFactory(factory.Factory):
     unites_enseignements = set()
 
 
-class ResponsableDeNotesPourAucunCours(_ResponsableDeNotesFactory):
-    pass
-
-
 class ResponsableDeNotesPourUnCours(_ResponsableDeNotesFactory):
     unites_enseignements = factory.List(
         [_UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254")],
