@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import Union
 
-from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
+from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand, \
+    EditClassVolumeRepartitionToTutorCommand
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand, \
     DeleteEffectiveClassCommand
@@ -41,7 +42,8 @@ class EffectiveClassIdentityBuilder(EntityIdentityBuilder):
                 'CreateEffectiveClassCommand',
                 'UpdateEffectiveClassCommand',
                 'DeleteEffectiveClassCommand',
-                'DistributeClassToTutorCommand'
+                'DistributeClassToTutorCommand',
+                'EditClassVolumeRepartitionToTutorCommand'
             ]
     ) -> 'EffectiveClassIdentity':
         return EffectiveClassIdentity(

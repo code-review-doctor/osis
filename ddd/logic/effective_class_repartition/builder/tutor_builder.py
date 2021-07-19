@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
 from ddd.logic.effective_class_repartition.builder.tutor_identity_builder import TutorIdentityBuilder
-from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand
+from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand, \
+    EditClassVolumeRepartitionToTutorCommand
 from ddd.logic.effective_class_repartition.domain.model._class_volume_repartition import ClassVolumeRepartition
 from ddd.logic.effective_class_repartition.domain.model._learning_unit_attribution import \
     LearningUnitAttributionIdentity
@@ -51,7 +53,10 @@ class TutorBuilder(interface.RootEntityBuilder):
         )
 
     @classmethod
-    def build_from_command(cls, cmd: 'DistributeClassToTutorCommand') -> 'Tutor':
+    def build_from_command(
+            cls,
+            cmd: Union['DistributeClassToTutorCommand', 'EditClassVolumeRepartitionToTutorCommand']
+    ) -> 'Tutor':
         tutor_identity = TutorIdentityBuilder.build_from_personal_id_number(
             personal_id_number=cmd.tutor_personal_id_number
         )

@@ -31,7 +31,8 @@ from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import VolumeField
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
-from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand
+from ddd.logic.effective_class_repartition.commands import DistributeClassToTutorCommand, UnassignTutorClassCommand, \
+    EditClassVolumeRepartitionToTutorCommand
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from osis_common.forms.widgets import DecimalFormatInput
@@ -118,3 +119,13 @@ class ClassEditTutorRepartitionForm(ClassTutorRepartitionForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['volume'].initial = self.tutor.distributed_volume_to_class
+
+    def get_command(self) -> 'EditClassVolumeRepartitionToTutorCommand':
+        return EditClassVolumeRepartitionToTutorCommand(
+            tutor_personal_id_number=self.tutor.personal_id_number,
+            learning_unit_attribution_uuid=self.tutor.attribution_uuid,
+            class_code=self.effective_class.entity_id.class_code,
+            distributed_volume=self.cleaned_data['volume'] or 0,
+            learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+            year=self.effective_class.entity_id.learning_unit_identity.year
+        )
