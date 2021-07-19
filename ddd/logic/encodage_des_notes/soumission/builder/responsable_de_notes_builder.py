@@ -25,10 +25,10 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
     ResponsableDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
-    UniteEnseignementIdentite
-from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
-    UniteEnseignementIdentiteFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentiteBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO
 from osis_common.ddd import interface
 
 
@@ -42,18 +42,7 @@ class ResponsableDeNotesBuilder(interface.RootEntityBuilder):
         return ResponsableDeNotes(
             entity_id=ResponsableDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
             unites_enseignements={
-                cls.__build_unite_enseignement_identite_from_repository(dto_unite_enseignement_identite)
+                UniteEnseignementIdentiteBuilder.build_from_repository_dto(dto_unite_enseignement_identite)
                 for dto_unite_enseignement_identite in dto_object.unites_enseignements
             }
-        )
-        pass
-
-    @classmethod
-    def __build_unite_enseignement_identite_from_repository(
-            cls,
-            dto_object: 'UniteEnseignementIdentiteFromRepositoryDTO'
-    ) -> 'UniteEnseignementIdentite':
-        return UniteEnseignementIdentite(
-            code_unite_enseignement=dto_object.code_unite_enseignement,
-            annee_academique=dto_object.annee_academique
         )

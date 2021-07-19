@@ -27,7 +27,8 @@ import random
 import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
-    IdentiteResponsableDeNotes, UniteEnseignementIdentite
+    IdentiteResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from testing.factory import SetFactory
 
 
