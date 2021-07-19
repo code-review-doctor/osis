@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +5,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +22,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
 
-import factory.fuzzy
-
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
+from backoffice.celery import app as celery_app
+from learning_unit.postponement import postpone_learning_units
 
 
-class LearningUnitEnrollmentFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.LearningUnitEnrollment"
-
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    date_enrollment = datetime.datetime.now()
-    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
-    learning_class_year = None
-    offer_enrollment = factory.SubFactory(OfferEnrollmentFactory)
+@celery_app.task
+def run() -> dict:
+    postpone_learning_units.PostponeLearningUnits().postpone()
+    postpone_learning_units.PostponeLearningUnits().postpone_partims()
+    return {}

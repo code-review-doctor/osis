@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 11:29+0200\n"
+"POT-Creation-Date: 2021-07-19 11:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,6 +63,12 @@ msgstr ""
 msgid "Credits should be greather than 0"
 msgstr ""
 
+msgid "Deadline reached"
+msgstr ""
+
+msgid "Decimal scores not authorized"
+msgstr ""
+
 msgid "Following fields are required : {}"
 msgstr ""
 
@@ -81,12 +87,19 @@ msgstr ""
 msgid "No vacant corresponding activity"
 msgstr ""
 
+msgid "Registration ID does not match email"
+msgstr ""
+
+msgid "Score already submitted"
+msgstr ""
+
 msgid "Selected entity {} is not an authorized responsible entity"
 msgstr ""
 
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr ""
 
+#, python-format
 msgid ""
 "The %(code_class)s derogation session is inconsistent with the LU derogation "
 "session (should be %(should_be_values)s)"
@@ -138,6 +151,13 @@ msgstr ""
 msgid "The code {} is not a valid code"
 msgstr ""
 
+#, python-brace-format
+msgid "The enrollment to the learning unit {learning_unit_code} doesn't exist"
+msgstr ""
+
+msgid "The period of scores' encoding is not opened"
+msgstr ""
+
 #, python-format
 msgid "The subdivision %(subd)s already exists for %(ue)s"
 msgstr ""
@@ -149,7 +169,6 @@ msgid ""
 "The sum of first/second quadrimesters volumes should be equal to annual "
 "volume of the learning unit ({})"
 msgstr ""
-
 
 msgid "The teaching place is required."
 msgstr ""
@@ -179,8 +198,17 @@ msgstr ""
 msgid "You have already applied on vacant course"
 msgstr ""
 
+msgid "You're not attributed to the learning unit {}"
+msgstr ""
+
 msgid "at least one class volume is greater than the volume of the LU"
 msgstr ""
 
 msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"{note} isn't a valid score. Valid scores : 0 - 20 (0=Score of presence), "
+"A=Absent, T=Cheating"
 msgstr ""
