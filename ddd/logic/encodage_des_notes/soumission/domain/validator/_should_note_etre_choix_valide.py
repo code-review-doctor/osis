@@ -27,7 +27,7 @@
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import NOTE_MIN, NOTE_MAX, LETTRES_AUTORISEES
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NOTE_MIN, NOTE_MAX, JUSTIFICATIONS_AUTORISEES
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteIncorrecteException
 
 
@@ -41,5 +41,5 @@ class ShouldNoteEtreChoixValide(BusinessValidator):
             if not NOTE_MIN < note_digit < NOTE_MAX:
                 raise NoteIncorrecteException(self.note)
         except ValueError:
-            if self.note not in LETTRES_AUTORISEES:
+            if self.note not in JUSTIFICATIONS_AUTORISEES:
                 raise NoteIncorrecteException(self.note)

@@ -29,7 +29,7 @@ import operator
 from typing import Optional, List
 
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
-from django.db.models.functions import Coalesce, Cast
+from django.db.models.functions import Coalesce, Cast, Concat
 
 from base.models.exam_enrollment import ExamEnrollment
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_builder import FeuilleDeNotesBuilder
@@ -50,9 +50,9 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
             operator.or_,
             [
                 Q(
-                    learning_unit_enrollment__learning_unit_year__acronym=entity_id.code_unite_enseignement,
-                    learning_unit_enrollment__learning_unit_year__academic_year__year=entity_id.annee_academique,
-                    session_exam__number_session=entity_id.numero_session
+                    acronym=entity_id.code_unite_enseignement,
+                    year=entity_id.annee_academique,
+                    number_session=entity_id.numero_session
                 )
                 for entity_id in entity_ids
             ]
@@ -67,7 +67,7 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
                 numero_session=identity[2],
                 code_unite_enseignement=identity[0],
                 annee_academique=identity[1],
-                credits_unite_enseignement=group_rows[0].credits_unite_enseignement,
+                credits_unite_enseignement=float(group_rows[0].credits_unite_enseignement),
                 notes=set(
                     NoteEtudiantFromRepositoryDTO(
                         noma=row.noma,
@@ -101,8 +101,14 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
 
 
 def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteEtudiant'):
-    db_obj = ExamEnrollment.objects.get(
-        learning_unit_enrollment__learning_unit_year__acronym=feuille_de_note_entity_id.code_unite_enseignement,
+    db_obj = ExamEnrollment.objects.annotate(
+        code_unite_enseignement=Concat(
+            'learning_unit_enrollment__learning_unit_year__acronym',
+            'learning_unit_enrollment__learning_class_year__acronym',
+            output_field=CharField()
+        )
+    ).get(
+        code_unite_enseignement=feuille_de_note_entity_id.code_unite_enseignement,
         learning_unit_enrollment__learning_unit_year__academic_year__year=feuille_de_note_entity_id.annee_academique,
         session_exam__number_session=feuille_de_note_entity_id.numero_session,
         learning_unit_enrollment__offer_enrollment__student__registration_id=note.entity_id.noma
@@ -119,7 +125,11 @@ def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteE
 
 def _fetch_session_exams():
     return ExamEnrollment.objects.annotate(
-        acronym=F('learning_unit_enrollment__learning_unit_year__acronym'),
+        acronym=Concat(
+            'learning_unit_enrollment__learning_unit_year__acronym',
+            'learning_unit_enrollment__learning_class_year__acronym',
+            output_field=CharField()
+        ),
         year=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
         number_session=F('session_exam__number_session'),
         credits_unite_enseignement=F('learning_unit_enrollment__learning_unit_year__credits'),

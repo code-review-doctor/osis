@@ -31,6 +31,7 @@ from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactor
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
     FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesAvecNotesSoumises
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from testing.assertions import assert_attrs_instances_are_equal
 
 
@@ -65,6 +66,15 @@ class FeuilleDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(feuille_de_notes, feuille_de_notes_retrieved_from_repo)
 
+    def test_should_save_feuille_de_notes_for_class(self):
+        feuille_de_notes = FeuilleDeNotesAvecNotesSoumises(for_class=True)
+        self._create_save_necessary_data(feuille_de_notes, for_class=True)
+
+        self.feuille_de_notes_repository.save(feuille_de_notes)
+        feuille_de_notes_retrieved_from_repo = self.feuille_de_notes_repository.get(feuille_de_notes.entity_id)
+
+        assert_attrs_instances_are_equal(feuille_de_notes, feuille_de_notes_retrieved_from_repo)
+
     def test_should_raise_exception_if_no_feuille_de_notes(self):
         feuille_de_notes_not_persisted = FeuilleDeNotesAvecNotesSoumises()
 
@@ -84,12 +94,23 @@ class FeuilleDeNotesRepositoryTest(TestCase):
         for feuille in feuilles_de_notes:
             self.assertIn(feuille, feuilles_de_notes_retrieved)
 
-    def _create_save_necessary_data(self, feuille_de_notes_to_save):
+    def _create_save_necessary_data(self, feuille_de_notes_to_save, for_class: bool = False):
+        luy_acronym = feuille_de_notes_to_save.entity_id.code_unite_enseignement
+        if for_class:
+            luy_acronym = luy_acronym[:-1]
+
         luy = LearningUnitYearFactory(
-            acronym=feuille_de_notes_to_save.entity_id.code_unite_enseignement,
+            acronym=luy_acronym,
             academic_year__year=feuille_de_notes_to_save.entity_id.annee_academique,
             credits=feuille_de_notes_to_save.credits_unite_enseignement,
         )
+
+        class_attributes = {
+            "learning_unit_enrollment__learning_class_year": LearningClassYearFactory(
+                learning_component_year__learning_unit_year=luy,
+                acronym=feuille_de_notes_to_save.entity_id.code_unite_enseignement[-1]
+            )
+        } if for_class else {}
 
         for note in feuille_de_notes_to_save.notes:
             enrollment = ExamEnrollmentFactory(
@@ -98,6 +119,7 @@ class FeuilleDeNotesRepositoryTest(TestCase):
                 learning_unit_enrollment__learning_unit_year=luy,
                 learning_unit_enrollment__offer_enrollment__student__registration_id=note.entity_id.noma,
                 learning_unit_enrollment__offer_enrollment__student__person__email=note.email,
+                **class_attributes
             )
             SessionExamDeadlineFactory(
                 offer_enrollment=enrollment.learning_unit_enrollment.offer_enrollment,

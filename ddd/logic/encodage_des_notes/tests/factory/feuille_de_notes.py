@@ -51,6 +51,12 @@ class _FeuilleDeNotesFactory(factory.Factory):
     credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE - 5.0  # Non autorisé par défaut
     notes = set()
 
+    class Params:
+        for_class = factory.SubFactory(
+            _IdentiteFeuilleDeNotesFactory,
+            code_unite_enseignement='LOSIS1452A'
+        )
+
 
 class FeuilleDeNotesAvecNotesManquantes(_FeuilleDeNotesFactory):
     notes = {
