@@ -83,18 +83,24 @@ def outside_period(request):
     closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
 
     if latest_session_exam:
-        session_number = latest_session_exam.session
+        month_session = latest_session_exam.month_session_name()
         str_date = latest_session_exam.end_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING,
-                             _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
-                             % {'session_number': session_number, 'str_date': str_date})
+        messages.add_message(
+            request,
+            messages.WARNING,
+            _("The period of scores' encoding for %(month_session)s session is closed since %(str_date)s")
+            % {'month_session': month_session, 'str_date': str_date}
+        )
 
     if closest_new_session_exam:
-        session_number = closest_new_session_exam.session
+        month_session = closest_new_session_exam.month_session_name()
         str_date = closest_new_session_exam.start_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING,
-                             _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
-                             % {'session_number': session_number, 'str_date': str_date})
+        messages.add_message(
+            request,
+            messages.WARNING,
+            _("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
+            % {'month_session': month_session, 'str_date': str_date}
+        )
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
