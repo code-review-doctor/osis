@@ -63,6 +63,7 @@ class Organization(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=255)
     acronym = models.CharField(max_length=20, blank=True)
+    code = models.CharField(max_length=50, blank=True)
     type = models.CharField(max_length=30, blank=True, choices=organization_type.ORGANIZATION_TYPE, default='')
     prefix = models.CharField(max_length=30, blank=True)
     logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
