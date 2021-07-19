@@ -210,5 +210,5 @@ class UniteEnseignementIdentiteFromRepositoryDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class ResponsableDeNotesFromRepositoryDTO(interface.DTO):
-    matricule_fgs_enseignant = attr.ib(type=int)
+    matricule_fgs_enseignant = attr.ib(type=str)
     unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentiteFromRepositoryDTO])

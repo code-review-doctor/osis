@@ -32,10 +32,10 @@ from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_id
 from testing.factory import SetFactory
 
 
-def generate_matricule_fgs() -> int:
+def generate_matricule_fgs() -> str:
     first_digit = str(random.randint(1, 9))
     other_digits = [str(random.randint(0, 9)) for _ in range(8)]
-    return int("".join([first_digit] + other_digits))
+    return "".join([first_digit] + other_digits)
 
 
 class _IdentiteResponsableDeNotesFactory(factory.Factory):

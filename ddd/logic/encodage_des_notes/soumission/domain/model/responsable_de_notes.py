@@ -33,7 +33,7 @@ from osis_common.ddd import interface
 
 @attr.s(frozen=True, slots=True)
 class IdentiteResponsableDeNotes(interface.EntityIdentity):
-    matricule_fgs_enseignant = attr.ib(type=int)
+    matricule_fgs_enseignant = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

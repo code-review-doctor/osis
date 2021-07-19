@@ -59,7 +59,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         result = []
         for global_id, rows_grouped in rows_grouped_by_global_id:
             dto = ResponsableDeNotesFromRepositoryDTO(
-                matricule_fgs_enseignant=int(global_id),
+                matricule_fgs_enseignant=global_id,
                 unites_enseignements=[
                     UniteEnseignementIdentiteFromRepositoryDTO(
                         code_unite_enseignement=row.acronym,
