@@ -181,6 +181,8 @@ class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
 class AttributionEnseignantDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     annee = attr.ib(type=int)
+    nom = attr.ib(type=str)
+    prenom = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -224,6 +226,14 @@ class InscriptionExamenDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     sigle_formation = attr.ib(type=str)
     date_inscription = attr.ib(type=DateDTO)
+
+
+@attr.s(frozen=True, slots=True)
+class DesinscriptionExamenDTO(interface.DTO):
+    annee = attr.ib(type=int)
+    noma = attr.ib(type=str)
+    code_unite_enseignement = attr.ib(type=str)
+    sigle_formation = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

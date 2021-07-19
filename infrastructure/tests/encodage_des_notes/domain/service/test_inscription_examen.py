@@ -25,8 +25,10 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums import exam_enrollment_state
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
 from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
@@ -37,40 +39,44 @@ class InscriptionExamenTest(TestCase):
     def setUpTestData(cls):
         cls.annee = 2020
         cls.numero_session = 2
+        cls.code_unite_enseignement = 'LDROI1001'
         cls.translator = InscriptionExamenTranslator()
 
     def test_should_trouver_aucun_resultats(self):
-        result = self.translator.search(["12316451", "12345678", "11111111"], self.numero_session, self.annee)
+        result = self.translator.search_inscrits(self.code_unite_enseignement, self.numero_session, self.annee)
         expected_result = set()
         self.assertSetEqual(expected_result, result)
 
     def test_should_trouver_2_inscriptions_unite_enseignement(self):
-        nomas = ['11111111', '22222222']
+        unite_enseignement = LearningUnitYearFactory(
+            academic_year__year=self.annee,
+            acronym=self.code_unite_enseignement,
+        )
         exam_1 = ExamEnrollmentFactory(
-            learning_unit_enrollment__learning_unit_year__academic_year__year=self.annee,
+            learning_unit_enrollment__learning_unit_year=unite_enseignement,
             session_exam__number_session=self.numero_session,
-            learning_unit_enrollment__offer_enrollment__student__registration_id='11111111',
+            enrollment_state=exam_enrollment_state.ENROLLED,
         )
         exam_2 = ExamEnrollmentFactory(
-            learning_unit_enrollment__learning_unit_year__academic_year__year=self.annee,
+            learning_unit_enrollment__learning_unit_year=unite_enseignement,
             session_exam__number_session=self.numero_session,
-            learning_unit_enrollment__offer_enrollment__student__registration_id='22222222',
+            enrollment_state=exam_enrollment_state.ENROLLED,
         )
 
-        result = self.translator.search(nomas, self.numero_session, self.annee)
+        result = self.translator.search_inscrits(self.code_unite_enseignement, self.numero_session, self.annee)
         self.assertEqual(len(result), 2)
         expected_result = {
             InscriptionExamenDTO(
                 annee=self.annee,
-                noma='11111111',
-                code_unite_enseignement=exam_1.learning_unit_enrollment.learning_unit_year.acronym,
+                noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                code_unite_enseignement=self.code_unite_enseignement,
                 sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_1.date_enrollment,
             ),
             InscriptionExamenDTO(
                 annee=self.annee,
-                noma='22222222',
-                code_unite_enseignement=exam_2.learning_unit_enrollment.learning_unit_year.acronym,
+                noma=exam_2.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                code_unite_enseignement=self.code_unite_enseignement,
                 sigle_formation=exam_2.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_2.date_enrollment,
             ),
@@ -80,26 +86,72 @@ class InscriptionExamenTest(TestCase):
     def test_should_trouver_1_inscription_classe(self):
         class_year = LearningClassYearFactory(
             learning_component_year__learning_unit_year__academic_year__year=self.annee,
-            learning_component_year__learning_unit_year__acronym="LDROI1001",
+            learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
             acronym='A'
         )
-        nomas = ['11111111']
         exam_1 = ExamEnrollmentFactory(
             learning_unit_enrollment__learning_unit_year=class_year.learning_component_year.learning_unit_year,
             session_exam__number_session=self.numero_session,
-            learning_unit_enrollment__offer_enrollment__student__registration_id='11111111',
             learning_unit_enrollment__learning_class_year=class_year,
+            enrollment_state=exam_enrollment_state.ENROLLED,
         )
 
-        result = self.translator.search(nomas, self.numero_session, self.annee)
+        result = self.translator.search_inscrits("LDROI1001A", self.numero_session, self.annee)
         self.assertEqual(len(result), 1)
         expected_result = {
             InscriptionExamenDTO(
                 annee=self.annee,
-                noma='11111111',
+                noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement='LDROI1001A',
                 sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_1.date_enrollment,
             )
+        }
+        self.assertSetEqual(expected_result, result)
+
+    def test_should_trouver_1_desinscription_classe(self):
+        class_year = LearningClassYearFactory(
+            learning_component_year__learning_unit_year__academic_year__year=self.annee,
+            learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
+            acronym='A'
+        )
+        exam_1 = ExamEnrollmentFactory(
+            learning_unit_enrollment__learning_unit_year=class_year.learning_component_year.learning_unit_year,
+            session_exam__number_session=self.numero_session,
+            learning_unit_enrollment__learning_class_year=class_year,
+            enrollment_state=exam_enrollment_state.NOT_ENROLLED,
+        )
+
+        result = self.translator.search_desinscrits("LDROI1001A", self.numero_session, self.annee)
+        self.assertEqual(len(result), 1)
+        expected_result = {
+            DesinscriptionExamenDTO(
+                annee=self.annee,
+                noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                code_unite_enseignement='LDROI1001A',
+                sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+            )
+        }
+        self.assertSetEqual(expected_result, result)
+
+    def test_should_trouver_1_desinscriptions_unite_enseignement(self):
+        unite_enseignement = LearningUnitYearFactory(
+            academic_year__year=self.annee,
+            acronym=self.code_unite_enseignement,
+        )
+        exam_1 = ExamEnrollmentFactory(
+            learning_unit_enrollment__learning_unit_year=unite_enseignement,
+            session_exam__number_session=self.numero_session,
+            enrollment_state=exam_enrollment_state.NOT_ENROLLED,
+        )
+        result = self.translator.search_desinscrits(self.code_unite_enseignement, self.numero_session, self.annee)
+        self.assertEqual(len(result), 1)
+        expected_result = {
+            DesinscriptionExamenDTO(
+                annee=self.annee,
+                noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                code_unite_enseignement=self.code_unite_enseignement,
+                sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+            ),
         }
         self.assertSetEqual(expected_result, result)

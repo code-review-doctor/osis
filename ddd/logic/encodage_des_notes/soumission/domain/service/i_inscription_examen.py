@@ -24,9 +24,9 @@
 #
 ##############################################################################
 import abc
-from typing import Set, List
+from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
 from osis_common.ddd import interface
 
 
@@ -34,10 +34,20 @@ class IInscriptionExamenTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search(
+    def search_inscrits(
             cls,
-            nomas: List[str],
+            code_unite_enseignement: str,  # TODO :: to implement
             numero_session: int,
             annee: int,
     ) -> Set['InscriptionExamenDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_desinscrits(
+            cls,
+            code_unite_enseignement: str,
+            numero_session: int,
+            annee: int,
+    ) -> Set['DesinscriptionExamenDTO']:
         raise NotImplementedError

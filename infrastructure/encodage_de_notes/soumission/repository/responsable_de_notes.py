@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd.interface import ApplicationService
 
@@ -55,3 +56,7 @@ class ResponsableDeNotesRepositoryRepository(IResponsableDeNotesRepository):
     @classmethod
     def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
         raise NotImplementedError
+
+    @classmethod
+    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
+        raise NotImplementedError   # TODO :: to implement

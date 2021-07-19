@@ -36,3 +36,9 @@ class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteResponsableDeNotes':
         raise NotImplementedError
+
+    @classmethod
+    def build_from_matricule_fgs_enseignant(cls, matricule_fgs_enseignant: str) -> IdentiteResponsableDeNotes:
+        return IdentiteResponsableDeNotes(
+            matricule_fgs_enseignant=matricule_fgs_enseignant,
+        )

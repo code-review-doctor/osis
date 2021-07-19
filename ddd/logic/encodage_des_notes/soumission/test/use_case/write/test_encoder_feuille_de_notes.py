@@ -82,6 +82,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.attribution_dto = AttributionEnseignantDTO(
             code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
             annee=self.feuille_de_notes.annee,
+            nom="Smith",
+            prenom="Charles",
         )
         self.attribution_translator = AttributionEnseignantTranslator()
         self.attribution_translator.search_attributions_enseignant = lambda **kwargs: {self.attribution_dto}

@@ -25,8 +25,6 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
-    ResponsableDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.feuille_de_notes_enseignant import FeuilleDeNotesEnseignant
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
@@ -51,7 +49,7 @@ def get_feuille_de_notes(
         inscription_examen_translator: 'IInscriptionExamenTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
-        unite_enseignement_translator: 'IUniteEnseignementTranslator',  # FIXME :: LearningUnitYear.credits est déjà utilisé coté repo car nécessaire pour la validation feuille denotes ;
+        unite_enseignement_translator: 'IUniteEnseignementTranslator',
 ) -> 'FeuilleDeNotesEnseignantDTO':
     # GIVEN
     PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
@@ -61,16 +59,12 @@ def get_feuille_de_notes(
         code_unite_enseignement=cmd.code_unite_enseignement,
         annee_academique=periode_soumission.annee_concernee,
     )
-    responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
-        numero_session=periode_soumission.session_concernee,
-        code_unite_enseignement=cmd.code_unite_enseignement,
-        annee_academique=periode_soumission.annee_concernee,
-    )
 
     # WHEN
     feuille_de_notes_dto = FeuilleDeNotesEnseignant().get(
         feuille_de_note_repo.get(feuille_notes_entity_id),
-        responsable_notes_repo.get(responsable_notes_entity_id),
+        cmd.matricule_fgs_enseignant,
+        responsable_notes_repo,
         periode_soumission_note_translator,
         inscription_examen_translator,
         signaletique_etudiant_translator,
