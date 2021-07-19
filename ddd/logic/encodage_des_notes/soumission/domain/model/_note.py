@@ -36,6 +36,7 @@ NOTE_MAX = 20
 ABSENCE_INJUSTIFIEE = 'A'
 TRICHERIE = 'T'
 LETTRES_AUTORISEES = [ABSENCE_INJUSTIFIEE, TRICHERIE]
+JUSTIFICATIONS_AUTORISEES = LETTRES_AUTORISEES + TutorJustificationTypes.get_names()
 
 
 class NoteBuilder:
@@ -47,6 +48,8 @@ class NoteBuilder:
                 TRICHERIE: TutorJustificationTypes.CHEATING,
             }
             return Justification(value=map_to_enum[value])
+        if value in TutorJustificationTypes.get_names():
+            return Justification(value=TutorJustificationTypes[value])
         if NoteBuilder.__is_float(value):
             return NoteChiffree(value=float(value))
         return NoteManquante()
