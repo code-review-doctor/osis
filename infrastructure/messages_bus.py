@@ -42,7 +42,7 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
@@ -50,6 +50,8 @@ from ddd.logic.effective_class_repartition.use_case.read.search_effective_classe
     search_tutors_distributed_to_class
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
     distribute_class_to_tutor
+from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
+    edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
@@ -186,6 +188,11 @@ class MessageBus:
             EffectiveClassRepository(),
         ),
         UnassignTutorClassCommand: lambda cmd: unassign_tutor_class(cmd, TutorRepository()),
+        EditClassVolumeRepartitionToTutorCommand: lambda cmd: edit_class_volume_repartition_to_tutor(
+            cmd,
+            TutorRepository(),
+            EffectiveClassRepository()
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

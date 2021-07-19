@@ -24,8 +24,7 @@
 #
 ##############################################################################
 
-from django.shortcuts import render, redirect
-from django.urls import reverse
+from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
@@ -99,18 +98,6 @@ class TutorRepartitionView(CommonClassView, FormView):
             'tutor': self.tutor.full_name,
             'function': self.tutor.function_text
         }
-
-    def redirect_to_learning_unit_tutors(self):
-        return redirect(
-            reverse(
-                'learning_unit_tutors',
-                kwargs={
-                    'learning_unit_code': self.learning_unit.code,
-                    'learning_unit_year': self.learning_unit.year,
-                    'class_code': self.effective_class.entity_id.class_code
-                }
-            )
-        )
 
 
 class TutorRepartitionRemoveView(TutorRepartitionView):

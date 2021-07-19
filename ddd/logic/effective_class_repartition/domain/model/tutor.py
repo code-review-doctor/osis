@@ -63,6 +63,18 @@ class Tutor(interface.RootEntity):
         )
         self.distributed_effective_classes.append(class_volume)
 
+    def edit_distributed_volume(
+            self,
+            class_code: str,
+            learning_unit_attribution_uuid: str,
+            distributed_volume: Decimal,
+    ) -> None:
+        for class_volume in self.distributed_effective_classes:
+            attribution_uuid = class_volume.attribution.uuid
+            effective_class_code = class_volume.effective_class.class_code
+            if attribution_uuid == learning_unit_attribution_uuid and class_code == effective_class_code:
+                class_volume.distributed_volume = distributed_volume
+
     def unassign_class(self, class_code: str, learning_unit_attribution_uuid: str) -> None:
         for class_volume in self.distributed_effective_classes:
             attribution_uuid = class_volume.attribution.uuid
