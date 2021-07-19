@@ -23,10 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteManquante, Note, Justification, NoteChiffree
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, NoteEtudiantFromRepositoryDTO
@@ -51,23 +50,7 @@ class FeuilleDeNotesBuilder(interface.RootEntityBuilder):
         return NoteEtudiant(
             entity_id=IdentiteNoteEtudiant(noma=dto_object.noma),
             email=dto_object.email,
-            note=_build_note_from_value(dto_object.note),
+            note=NoteBuilder.build(dto_object.note),
             date_limite_de_remise=dto_object.date_limite_de_remise,
             est_soumise=dto_object.est_soumise
         )
-
-
-def _build_note_from_value(note_value: str) -> 'Note':
-    if _is_float(note_value):
-        return NoteChiffree(float(note_value))
-    if note_value:
-        return Justification(TutorJustificationTypes[note_value])
-    return NoteManquante()
-
-
-def _is_float(value) -> bool:
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False

@@ -22,10 +22,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+
 import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, \
-    IdentiteFeuilleDeNotes, NOTE_DECIMALE_AUTORISEE
+    IdentiteFeuilleDeNotes, CREDITS_MIN_POUR_NOTE_DECIMALE
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, \
     NoteChiffreEtudiantFactory, NoteJustificationEtudiantFactory
 
@@ -40,17 +42,17 @@ class _IdentiteFeuilleDeNotesFactory(factory.Factory):
     annee_academique = 2020
 
 
-class EmptyFeuilleDeNotesFactory(factory.Factory):
+class _FeuilleDeNotesFactory(factory.Factory):
     class Meta:
         model = FeuilleDeNotes
-        abstract = False
+        abstract = True
 
     entity_id = factory.SubFactory(_IdentiteFeuilleDeNotesFactory)
-    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE - 5.0  # Non autorisé par défaut
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE - 5.0  # Non autorisé par défaut
     notes = set()
 
 
-class FeuilleDeNotesAvecNotesManquantes(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesAvecNotesManquantes(_FeuilleDeNotesFactory):
     notes = {
         NoteManquanteEtudiantFactory(),
         NoteManquanteEtudiantFactory(),
@@ -58,7 +60,7 @@ class FeuilleDeNotesAvecNotesManquantes(EmptyFeuilleDeNotesFactory):
     }
 
 
-class FeuilleDeNotesAvecNotesEncodees(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesAvecNotesEncodees(_FeuilleDeNotesFactory):
     notes = {
         NoteChiffreEtudiantFactory(),
         NoteChiffreEtudiantFactory(),
@@ -67,7 +69,7 @@ class FeuilleDeNotesAvecNotesEncodees(EmptyFeuilleDeNotesFactory):
     }
 
 
-class FeuilleDeNotesAvecNotesSoumises(EmptyFeuilleDeNotesFactory):
+class FeuilleDeNotesAvecNotesSoumises(_FeuilleDeNotesFactory):
     notes = {
         NoteChiffreEtudiantFactory(est_soumise=True),
         NoteChiffreEtudiantFactory(),
@@ -76,8 +78,30 @@ class FeuilleDeNotesAvecNotesSoumises(EmptyFeuilleDeNotesFactory):
     }
 
 
-class FeuilleDeNotesDecimalesAutorisees(EmptyFeuilleDeNotesFactory):
-    credits_unite_enseignement = NOTE_DECIMALE_AUTORISEE
+class FeuilleDeNotesAvecToutesNotesSoumises(_FeuilleDeNotesFactory):
+    notes = {
+        NoteManquanteEtudiantFactory(est_soumise=True),
+        NoteManquanteEtudiantFactory(est_soumise=True),
+        NoteManquanteEtudiantFactory(est_soumise=True),
+    }
+
+
+class FeuilleDeNotesDecimalesAutorisees(_FeuilleDeNotesFactory):
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
         NoteManquanteEtudiantFactory(),
+    }
+
+
+class FeuilleDeNotesDateLimiteRemiseAujourdhui(_FeuilleDeNotesFactory):
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
+    notes = {
+        NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today()),
+    }
+
+
+class FeuilleDeNotesDateLimiteRemiseHier(_FeuilleDeNotesFactory):
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
+    notes = {
+        NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today() - datetime.timedelta(days=1)),
     }
