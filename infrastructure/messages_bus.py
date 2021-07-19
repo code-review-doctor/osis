@@ -47,12 +47,14 @@ from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_clas
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
+    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand, \
+    LearningUnitSearchCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
+from ddd.logic.learning_unit.use_case.read.search_learning_units_service import search_learning_units
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
@@ -97,6 +99,7 @@ class MessageBus:
             cmd, program_tree_repo.ProgramTreeRepository(), ReportRepository()
         ),
         GetLearningUnitCommand: lambda cmd: get_learning_unit(cmd, LearningUnitRepository()),
+        LearningUnitSearchCommand: lambda cmd: search_learning_units(cmd, LearningUnitRepository()),
         CreateEffectiveClassCommand: lambda cmd: create_effective_class(
             cmd, LearningUnitRepository(), EffectiveClassRepository()
         ),

@@ -23,21 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
 
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
-def search_learning_units(
-        cmd: LearningUnitSearchCommand,
-        repository: 'ILearningUnitRepository'
-) -> List['LearningUnitSearchDTO']:
-    return repository.search_learning_units_dto(
-        code=cmd.code,
-        year=cmd.year,
-        full_title=cmd.full_title,
-        type=cmd.type,
-        responsible_entity_code=cmd.responsible_entity_code,
-    )
+class UniteEnseignementTranslator(IUniteEnseignementTranslator):
+
+    @classmethod
+    def get(
+            cls,
+            code: str,
+            annee: int,
+    ) -> 'UniteEnseignementDTO':
+        results = message_bus_instance.invoke(LearningUnitSearchCommand(code=code, year=annee))
+        if results:
+            dto = results[0]
+            return UniteEnseignementDTO(
+                annee=code,
+                code=code,
+                intitule_complet=dto.full_title,
+            )

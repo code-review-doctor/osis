@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import abc
-from typing import Set
 
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from osis_common.ddd import interface
@@ -37,5 +36,6 @@ class IUniteEnseignementTranslator(interface.DomainService):
     def get(
             cls,
             code: str,
-    ) -> Set['UniteEnseignementDTO']:
+            annee: int,
+    ) -> 'UniteEnseignementDTO':
         raise NotImplementedError
