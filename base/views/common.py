@@ -97,10 +97,13 @@ def common_context_processor(request):
         sentry_dns = ''
     release_tag = settings.RELEASE_TAG if hasattr(settings, 'RELEASE_TAG') else None
 
-    context = {'installed_apps': settings.INSTALLED_APPS,
-               'environment': env,
-               'sentry_dns': sentry_dns,
-               'release_tag': release_tag}
+    context = {
+        'installed_apps': settings.INSTALLED_APPS,
+        'environment': env,
+        'sentry_dns': sentry_dns,
+        'release_tag': release_tag,
+        'email_service_desk': settings.EMAIL_SERVICE_DESK,
+    }
     _check_notice(request, context)
     return context
 

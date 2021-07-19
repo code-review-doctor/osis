@@ -27,7 +27,7 @@ from django.utils.translation import gettext_lazy as _
 
 FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = [
     'acronym', 'internship_subtype', 'credits', 'periodicity',
-    'status', 'language', 'professional_integration', 'specific_title',
+    'status', 'language', 'professional_integration', 'stage_dimona', 'specific_title',
     'specific_title_english', 'quadrimester', 'session', 'faculty_remark',
     'other_remark', 'other_remark_english'
 ]
