@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 14:15+0200\n"
+"POT-Creation-Date: 2021-07-19 11:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,11 +68,17 @@ msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
 msgid "Class of learning unit having enrollment can't be delete"
 msgstr ""
-"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne pouvez "
-"pas supprimer cette classe."
+"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne "
+"pouvez pas supprimer cette classe."
 
 msgid "Credits should be greather than 0"
 msgstr "Les crédits doivent être > 0"
+
+msgid "Deadline reached"
+msgstr "Date d'échéance atteinte"
+
+msgid "Decimal scores not authorized"
+msgstr "Notes décimales non authorisées"
 
 msgid "Following fields are required : {}"
 msgstr "Les champs suivants sont requis : {}"
@@ -91,6 +97,12 @@ msgstr "Le vol.1 postulé ou le vol.2 postulé doit être rempli"
 
 msgid "No vacant corresponding activity"
 msgstr "Pas d'activité vacante correspondante"
+
+msgid "Registration ID does not match email"
+msgstr "Le noma ne corresond pas à l'adresse de messagerie"
+
+msgid "Score already submitted"
+msgstr "Note déjà soumise"
 
 msgid "Selected entity {} is not an authorized responsible entity"
 msgstr "L'entité sélectionnée {} n'est pas une entité responsable autorisée"
@@ -120,29 +132,32 @@ msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
 "and Q2 volumes have to be completed)"
 msgstr ""
-"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les volumes Q1 et Q2 doivent avoir une valeur)"
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les "
+"volumes Q1 et Q2 doivent avoir une valeur)"
 
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
 "Q2 volume has to be completed but not both)"
-msgstr "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
 
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
 "%(quadrimester)s volume has to be completed)"
 msgstr ""
-"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul le volume %(quadrimester)s doit avoir une "
-"valeur)"
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul "
+"le volume %(quadrimester)s doit avoir une valeur)"
 
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(the "
 "%(quadrimester)s volume has to be completed)"
 msgstr ""
-"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume %(quadrimester)s doit avoir une "
-"valeur)"
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume %(quadrimester)s doit avoir une valeur)"
 
 #, python-format
 msgid ""
@@ -152,6 +167,7 @@ msgstr ""
 "La classe %(class_complete_code)s est attribuée à %(tutor_full_name)s en "
 "%(year)s"
 
+#, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr "Le code %(ue_code)s - %(code)s existe déjà pour l'UE %(ue)s"
 
@@ -160,6 +176,13 @@ msgstr "Le code {} existe déjà"
 
 msgid "The code {} is not a valid code"
 msgstr "Le code {} est invalide"
+
+#, python-brace-format
+msgid "The enrollment to the learning unit {learning_unit_code} doesn't exist"
+msgstr "L'inscription pour l'unité d'enseignement {learning_unit_code} n'existe pas"
+
+msgid "The period of scores' encoding is not opened"
+msgstr "La période d'encodage de notes n'est pas ouverte"
 
 #, python-format
 msgid "The subdivision %(subd)s already exists for %(ue)s"
@@ -210,8 +233,20 @@ msgstr ""
 msgid "You have already applied on vacant course"
 msgstr "Vous avez déjà candidaté pour cette activité"
 
+msgid "You're not attributed to the learning unit {}"
+msgstr "Vous n'êtes pas attribué(e) à l'unité d'enseignement {}"
+
 msgid "at least one class volume is greater than the volume of the LU"
-msgstr "au moins un des volumes de la classe est plus élevé que celui de l'unité d'enseignement"
+msgstr ""
+"au moins un des volumes de la classe est plus élevé que celui de l'unité "
+"d'enseignement"
 
 msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
+
+#, python-brace-format
+msgid ""
+"{note} isn't a valid score. Valid scores : 0 - 20 (0=Score of presence), "
+"A=Absent, T=Cheating"
+msgstr "{note} n'est pas une note valide. Notes valides: 0 - 20 (0=Note de présence), "
+"A=Abscence, T=Tricherie"
