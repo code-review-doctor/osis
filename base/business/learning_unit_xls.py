@@ -355,6 +355,7 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
         ])
 
     lu_data_part2.append(learning_unit_yr.language or "", )
+    lu_data_part2.append(yesno(learning_unit_yr.stage_dimona).strip())
     return lu_data_part2
 
 
@@ -415,6 +416,7 @@ def learning_unit_titles_part2() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
+        str(_('Stage-Dimona')),
     ]
 
 
@@ -532,7 +534,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
-                        ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24)]
+                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(25)]
                     )
                 first = False
         else:

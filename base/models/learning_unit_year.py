@@ -339,6 +339,8 @@ class LearningUnitYear(SerializableModel):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('Professional integration'))
 
+    stage_dimona = models.BooleanField(default=False, verbose_name=_('Stage-Dimona'))
+
     campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
     language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.PROTECT)
@@ -566,6 +568,7 @@ class LearningUnitYear(SerializableModel):
             self._warnings.extend(self._check_credits_is_integer())
             self._warnings.extend(self._check_partim_parent_credits())
             self._warnings.extend(self._check_internship_subtype())
+            self._warnings.extend(self._check_stage_dimona())
             self._warnings.extend(self._check_partim_parent_status())
             self._warnings.extend(self._check_partim_parent_periodicity())
             self._warnings.extend(self._check_learning_component_year_warnings())
@@ -639,11 +642,21 @@ class LearningUnitYear(SerializableModel):
         else:
             return get_learning_container_year_warnings(self.learning_container_year, self.id)
 
+    def _check_stage_dimona(self):
+        warnings = []
+        if (self.learning_container_year.container_type == learning_container_year_types.INTERNSHIP and
+                not self.stage_dimona):
+            warnings.append(_('The learning unit is not a Stage-Dimona activity although it is an internship type.'))
+        return warnings
+
     def is_external(self):
         return hasattr(self, "externallearningunityear")
 
     def is_external_with_co_graduation(self):
         return self.is_external() and self.externallearningunityear.co_graduation
+
+    def is_external_mobility(self):
+        return self.is_external() and self.externallearningunityear.mobility
 
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(

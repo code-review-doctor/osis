@@ -449,6 +449,7 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             "",
+            str(_('yes')) if luy.stage_dimona else str(_('no')),
         ]
         self.assertEqual(
             get_data_part2(learning_unit_yr=luy, effective_class=None, with_attributions=False),
@@ -600,6 +601,7 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
+            str(_('yes')) if luy.stage_dimona else str(_('no')),
             "{} ({}) - {} - {}".format(
                 self.a_group_year_parent.partial_acronym,
                 "{0:.2f}".format(self.group_element_child.relative_credits),
@@ -656,20 +658,22 @@ class TestLearningUnitXls(TestCase):
                                                                     'Q2', 'R2', 'S2', 'T2', 'U2', 'V2', 'W2', 'X2',
                                                                     'Y2', 'Z2', 'AA2', 'AB2', 'AC2', 'AD2', 'AE2']
                               )
-        self.assertCountEqual(result.get('cells_with_white_font'), ['A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3',
-                                                                    'I3', 'J3', 'K3', 'L3', 'M3', 'N3', 'O3', 'P3',
-                                                                    'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3']
+        self.assertCountEqual(result.get('cells_with_white_font'),
+                              [
+                                  'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3', 'K3', 'L3', 'M3', 'N3',
+                                  'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3'
+                              ]
                               )
         first_attribution = result.get('data')[0]
-
-        self.assertEqual(first_attribution[24], 'Dupuis Tom')
-        self.assertEqual(first_attribution[25], 'dupuis@gmail.com')
-        self.assertEqual(first_attribution[26], _("Coordinator"))
-        self.assertEqual(first_attribution[27], "")
-        self.assertEqual(first_attribution[28], 2017)
-        self.assertEqual(first_attribution[29], '')
-        self.assertEqual(first_attribution[30], 15)
-        self.assertEqual(first_attribution[31], 5)
+        self.assertEqual(first_attribution[24], _('no'))
+        self.assertEqual(first_attribution[25], 'Dupuis Tom')
+        self.assertEqual(first_attribution[26], 'dupuis@gmail.com')
+        self.assertEqual(first_attribution[27], _("Coordinator"))
+        self.assertEqual(first_attribution[28], "")
+        self.assertEqual(first_attribution[29], 2017)
+        self.assertEqual(first_attribution[30], '')
+        self.assertEqual(first_attribution[31], 15)
+        self.assertEqual(first_attribution[32], 5)
 
     def test_add_training_data_for_version(self):
         luy = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_version.pk).annotate(
@@ -918,6 +922,7 @@ def _expected_titles_common_part2_b() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
+        str(_('Stage-Dimona')),
     ]
 
 
