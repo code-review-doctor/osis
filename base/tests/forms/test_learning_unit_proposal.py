@@ -390,7 +390,7 @@ class TestProposalLearningUnitFilter(TestCase):
         # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
         self.assertEqual(
             proposal_filter.form.fields['academic_year__year'].initial,
-            [self.academic_years[3].year, self.academic_years[2].year]
+            [self.academic_years[3].year, self.academic_years[4].year]
         )
 
     def test_initial_value_with_entity_subordinated_faculty_manager(self):
@@ -400,5 +400,5 @@ class TestProposalLearningUnitFilter(TestCase):
         # Index 3 is n+1 because we produced academic years from n-2 in setUpTestData
         self.assertEqual(
             proposal_filter.form.fields['academic_year__year'].initial,
-            [self.academic_years[3].year, self.academic_years[2].year]
+            [self.academic_years[3].year, self.academic_years[4].year]
         )
