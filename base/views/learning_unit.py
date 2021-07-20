@@ -43,7 +43,7 @@ from base.business.learning_unit import get_cms_label_data, \
     get_components_identification
 from base.business.learning_unit_proposal import _get_value_from_enum, clean_attribute_initial_value
 from base.business.learning_units.comparison import FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, \
-    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, FIELDS_FOR_COMMON_TITLE_COMPARISON
+    FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON, FIELDS_FOR_COMMON_TITLE_COMPARISON, _get_boolean_translation
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -68,7 +68,6 @@ from program_management.ddd.repositories.node import NodeRepository
 from program_management.ddd.service.read.search_program_trees_using_node_service import search_program_trees_using_node
 from program_management.serializers.program_trees_utilizations import utilizations_serializer
 from reference.models.language import find_language_in_settings
-from django.contrib.messages import get_messages
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
                      'ADDITIONAL_REQUIREMENT_ENTITY_1', 'ADDITIONAL_REQUIREMENT_ENTITY_2',
@@ -477,6 +476,8 @@ def get_learning_unit_context(learning_unit_year):
             value = _get_value_from_enum(PERIODICITY_TYPES, getattr(learning_unit_year, field))
         elif field == 'attribution_procedure':
             value = _get_value_from_enum(ATTRIBUTION_PROCEDURES, getattr(learning_unit_year, field))
+        elif field == 'stage_dimona':
+            value = _get_boolean_translation(getattr(learning_unit_year, field)).capitalize()
         else:
             value = getattr(learning_unit_year, field)
         learning_unit_year_fields[field_name] = value

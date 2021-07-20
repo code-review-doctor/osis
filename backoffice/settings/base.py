@@ -48,6 +48,7 @@ CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 't
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'backoffice.urls')
 WSGI_APPLICATION = os.environ.get('WSGI_APPLICATION', 'backoffice.wsgi.application')
 MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.storage.fallback.FallbackStorage')
+EMAIL_SERVICE_DESK = os.environ.get('EMAIL_SERVICE_DESK', '')
 
 
 # Application definition
