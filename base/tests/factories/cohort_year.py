@@ -23,26 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import string
+import operator
 
 import factory.fuzzy
 
-from base.models.enums import offer_enrollment_state
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.student import StudentFactory
+from base.tests.factories.entity import EntityFactory
+from education_group.models.cohort_year import CohortYear
+from education_group.models.enums.cohort_name import CohortName
 
 
-class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
+class CohortYearFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = "base.OfferEnrollment"
+        model = CohortYear
+        django_get_or_create = ('education_group_year', 'name',)
 
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                               datetime.datetime(2017, 3, 1))
-    date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                                       datetime.datetime(2017, 3, 1))
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    student = factory.SubFactory(StudentFactory)
-    education_group_year = factory.SubFactory(EducationGroupYearFactory)
-    cohort_year = None
-    enrollment_state = offer_enrollment_state.SUBSCRIBED
+    education_group_year = factory.SubFactory("base.tests.factories.education_group_year.EducationGroupYearFactory")
+    administration_entity = factory.SubFactory(EntityFactory)
+    name = factory.Iterator(CohortName.choices(), getter=operator.itemgetter(0))

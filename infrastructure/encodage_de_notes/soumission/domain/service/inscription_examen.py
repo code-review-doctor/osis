@@ -25,8 +25,8 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F, Case, When, QuerySet
-from django.db.models.functions import Concat
+from django.db.models import F, Case, When, QuerySet, Value, CharField
+from django.db.models.functions import Concat, Replace
 
 from base.models.enums import exam_enrollment_state
 from base.models.exam_enrollment import ExamEnrollment
@@ -52,7 +52,14 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
         ).annotate(
             annee=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
             noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
-            sigle_formation=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+            sigle_formation=Case(
+                When(
+                    learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
+                    then=Replace('learning_unit_enrollment__offer_enrollment__education_group_year__acronym', Value('1BA'), Value('11BA')),
+                ),
+                default='learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                output_field=CharField(),
+            ),
         ).values(
             'annee',
             'noma',
@@ -77,7 +84,14 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
         ).annotate(
             annee=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
             noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
-            sigle_formation=F('learning_unit_enrollment__offer_enrollment__education_group_year__acronym'),
+            sigle_formation=Case(
+                When(
+                    learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
+                    then=Replace('learning_unit_enrollment__offer_enrollment__education_group_year__acronym', Value('1BA'), Value('11BA')),
+                ),
+                default='learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                output_field=CharField(),
+            ),
             date_inscription=F('date_enrollment'),
         ).values(
             'annee',
