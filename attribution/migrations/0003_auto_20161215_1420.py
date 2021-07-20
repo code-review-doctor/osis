@@ -9,7 +9,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('base', '0083_auto_20161215_1414'),
         ('attribution', '0002_move_data_from_base_attribution_to_attribution_attribution'),
@@ -30,7 +29,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='attribution',
             name='function',
-            field=models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('PROFESSOR', 'PROFESSOR')], db_index=True, max_length=15, null=True),
+            field=models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'),
+                                                        ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'),
+                                                        ('PROFESSOR', 'PROFESSOR')], db_index=True, max_length=15,
+                                   null=True),
         ),
         migrations.AddField(
             model_name='attributioncharge',

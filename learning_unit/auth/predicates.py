@@ -426,7 +426,7 @@ def has_learning_unit_partim_no_application_all_years(self, user, learning_unit_
 @predicate_failed_msg(message=_("This learning unit has an application in the future"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
-    if learning_unit_year:
+    if learning_unit_year and not learning_unit_year.is_partim():
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not TutorApplication.objects.filter(
             learning_container_year__learning_container=learning_container,
