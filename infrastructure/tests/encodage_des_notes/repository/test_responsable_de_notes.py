@@ -3,7 +3,7 @@
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
-#    courses, programs and so on.
+#    unite_enseignementses, programs and so on.
 #
 #    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
@@ -29,8 +29,9 @@ from django.test import TestCase
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory, ScoreResponsibleOfClassFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
-from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesPourUnCours, \
-    ResponsableDeNotesPourMultipleCours, ResponsableDeNotesPourClasse
+from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
+    ResponsableDeNotesPourUneUniteEnseignement, \
+    ResponsableDeNotesPourMultipleUniteEnseignements, ResponsableDeNotesPourClasse
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from testing.assertions import assert_attrs_instances_are_equal
 
@@ -39,8 +40,8 @@ class ResponsableDeNotesRepositoryTest(TestCase):
     def setUp(self) -> None:
         self.responsable_de_notes_repository = ResponsableDeNotesRepository()
 
-    def test_should_save_responsable_de_notes_pour_un_cours(self):
-        responsable = ResponsableDeNotesPourUnCours()
+    def test_should_save_responsable_de_notes_pour_une_unite_enseignement(self):
+        responsable = ResponsableDeNotesPourUneUniteEnseignement()
         self._create_necessary_data(responsable)
 
         self.responsable_de_notes_repository.save(responsable)
@@ -49,8 +50,8 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 
-    def test_should_save_responsable_de_notes_pour_plusieurs_cours(self):
-        responsable = ResponsableDeNotesPourMultipleCours()
+    def test_should_save_responsable_de_notes_pour_plusieurs_unite_enseignements(self):
+        responsable = ResponsableDeNotesPourMultipleUniteEnseignements()
         self._create_necessary_data(responsable)
 
         self.responsable_de_notes_repository.save(responsable)
@@ -59,7 +60,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 
-    def test_should_save_responsable_de_notes_pour_cours_de_type_classe(self):
+    def test_should_save_responsable_de_notes_pour_unite_enseignements_de_type_classe(self):
         responsable = ResponsableDeNotesPourClasse()
         self._create_necessary_data(responsable)
 
@@ -70,7 +71,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 
     def test_should_save_desassignation_pour_responsable_de_notes(self):
-        responsable = ResponsableDeNotesPourMultipleCours()
+        responsable = ResponsableDeNotesPourMultipleUniteEnseignements()
         self._create_necessary_data(responsable)
 
         self.responsable_de_notes_repository.save(responsable)
@@ -83,12 +84,13 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 
-    def test_should_save_desassignation_pour_tout_les_cours(self):
-        responsable = ResponsableDeNotesPourUnCours()
+    def test_should_save_desassignation_pour_tout_les_unite_enseignements(self):
+        responsable = ResponsableDeNotesPourClasse()
         self._create_necessary_data(responsable)
 
         self.responsable_de_notes_repository.save(responsable)
 
+        responsable.unites_enseignements.pop()
         responsable.unites_enseignements.pop()
 
         self.responsable_de_notes_repository.save(responsable)
@@ -98,8 +100,8 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
     def test_should_search_responsable_de_notes_by_entity_ids(self):
         responsables = [
-            ResponsableDeNotesPourUnCours(),
-            ResponsableDeNotesPourMultipleCours()
+            ResponsableDeNotesPourUneUniteEnseignement(),
+            ResponsableDeNotesPourMultipleUniteEnseignements()
         ]
         for responsable in responsables:
             self._create_necessary_data(responsable)
@@ -109,6 +111,13 @@ class ResponsableDeNotesRepositoryTest(TestCase):
             [responsable.entity_id for responsable in responsables]
         )
         self.assertCountEqual(responsables_retrieved, responsables)
+
+    def test_search_responsable_de_notes_by_entity_ids_should_return_empty_list_when_no_matching_entity_id(self):
+        responsable_not_persisted = ResponsableDeNotesPourUneUniteEnseignement()
+
+        responsables_retrieved = self.responsable_de_notes_repository.search([responsable_not_persisted.entity_id])
+
+        self.assertListEqual(responsables_retrieved, [])
 
     def _create_necessary_data(self, responsable: 'ResponsableDeNotes'):
         tutor = TutorFactory(person__global_id=responsable.entity_id.matricule_fgs_enseignant)

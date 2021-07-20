@@ -64,14 +64,14 @@ class _ResponsableDeNotesFactory(factory.Factory):
     unites_enseignements = set()
 
 
-class ResponsableDeNotesPourUnCours(_ResponsableDeNotesFactory):
+class ResponsableDeNotesPourUneUniteEnseignement(_ResponsableDeNotesFactory):
     unites_enseignements = factory.List(
         [_UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254")],
         list_factory=SetFactory
     )
 
 
-class ResponsableDeNotesPourMultipleCours(_ResponsableDeNotesFactory):
+class ResponsableDeNotesPourMultipleUniteEnseignements(_ResponsableDeNotesFactory):
     unites_enseignements = factory.List(
         [
             _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354"),
