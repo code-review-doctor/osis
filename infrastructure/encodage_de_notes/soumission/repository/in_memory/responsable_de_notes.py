@@ -23,33 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import Set
-from typing import List
+from typing import List, Optional
 
-import attr
-
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class IdentiteResponsableDeNotes(interface.EntityIdentity):
-    matricule_fgs_enseignant = attr.ib(type=int)
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
+    IdentiteResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-@attr.s(frozen=True, slots=True)
-class UniteEnseignementIdentite(interface.EntityIdentity):
-    """Identifie un cours, stage, mémoire partim, classe..."""
-    code_unite_enseignement = attr.ib(type=str)
-    annee_academique = attr.ib(type=int)
-
-
-@attr.s(frozen=True, slots=True)
-class ResponsableDeNotes(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteResponsableDeNotes)
-    unites_enseignements = attr.ib(type=List[UniteEnseignementIdentite])
-
-    def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
+class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
+    @classmethod
+    def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
         raise NotImplementedError
 
-    def desassigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
+    @classmethod
+    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
+        return EnseignantDTO(nom='Chileng', prenom='Jean-Michel')
+
+    entities = list()  # type: List[ResponsableDeNotes]

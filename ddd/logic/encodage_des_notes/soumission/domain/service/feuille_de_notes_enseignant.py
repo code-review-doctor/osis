@@ -93,13 +93,13 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
 
         periode_soumission = periode_soumission_note_translator.get()
 
-        result = []
+        notes_etudiants = []
         for note in feuille_de_notes.notes:
             inscr_exmen = inscr_examen_par_noma.get(note.noma)
-            inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription > periode_soumission.debut_periode_soumission
+            inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > periode_soumission.debut_periode_soumission.to_date()
             desinscription = desinscr_examen_par_noma.get(note.noma)
             signaletique = signaletique_par_noma[note.noma]
-            result.append(
+            notes_etudiants.append(
                 NoteEtudiantDTO(
                     est_soumise=note.est_soumise,
                     date_remise_de_notes=note.date_limite_de_remise,
@@ -117,7 +117,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
 
         return FeuilleDeNotesEnseignantDTO(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
-            intitule_complet_unite_enseignement=unite_enseignement,
+            intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
             responsable_note=EnseignantDTO(
                 nom=responsable_notes.nom,
                 prenom=responsable_notes.prenom,
@@ -125,5 +125,5 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
             autres_enseignants=autres_enseignants,
             annee_academique=feuille_de_notes.annee,
             numero_session=feuille_de_notes.numero_session,
-            notes_etudiants=None,
+            notes_etudiants=notes_etudiants,
         )

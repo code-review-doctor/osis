@@ -224,7 +224,7 @@ class InscriptionExamenDTO(interface.DTO):
     annee = attr.ib(type=int)
     noma = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    sigle_formation = attr.ib(type=str)
+    sigle_formation = attr.ib(type=str)  # TODO :: renomer en "nom_cohorte"
     date_inscription = attr.ib(type=DateDTO)
 
 
@@ -233,7 +233,7 @@ class DesinscriptionExamenDTO(interface.DTO):
     annee = attr.ib(type=int)
     noma = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    sigle_formation = attr.ib(type=str)
+    sigle_formation = attr.ib(type=str)  # TODO :: renomer en "nom_cohorte"
 
 
 @attr.s(frozen=True, slots=True)
