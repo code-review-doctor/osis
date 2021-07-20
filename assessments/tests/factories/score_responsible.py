@@ -24,30 +24,24 @@
 ##############################################################################
 import factory
 
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.tests.factories.attribution_class import AttributionClassFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.tutor import TutorFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class ScoreResponsibleFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'assessments.ScoreResponsible'
 
+    tutor = factory.SubFactory(TutorFactory)
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
-    attribution_charge = factory.SubFactory(
-        AttributionChargeNewFactory,
+    learning_class_year = None
+
+
+class ScoreResponsibleOfClassFactory(ScoreResponsibleFactory):
+    learning_class_year = factory.SubFactory(
+        LearningClassYearFactory,
         learning_component_year__learning_unit_year=factory.LazyAttribute(
             lambda component: component.factory_parent.factory_parent.learning_unit_year
         )
     )
-    attribution_class = None
-
-
-class ScoreResponsibleOfClassFactory(ScoreResponsibleFactory):
-    attribution_class = factory.SubFactory(
-        AttributionClassFactory,
-        learning_class_year__learning_component_year__learning_unit_year=factory.LazyAttribute(
-            lambda class_year: class_year.factory_parent.factory_parent.factory_parent.learning_unit_year
-        )
-    )
-    attribution_charge = None

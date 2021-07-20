@@ -35,6 +35,7 @@ from django.db.models.functions import Coalesce, Concat
 from assessments.models.score_responsible import ScoreResponsible
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_class import AttributionClass
+from base.auth.roles.tutor import Tutor
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
@@ -43,6 +44,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes i
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
     UniteEnseignementIdentiteFromRepositoryDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.ddd.interface import ApplicationService
 
 
@@ -99,16 +101,12 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         qs_base_score_responsible = ScoreResponsible.objects.annotate(
             acronym=Concat(
                 'learning_unit_year__acronym',
-                'attribution_class__learning_class_year__acronym',
+                'learning_class_year__acronym',
                 output_field=CharField()
             ),
             year=F('learning_unit_year__academic_year__year')
         ).filter(
-            Q(attribution_charge__attribution__tutor__person__global_id=entity_id.matricule_fgs_enseignant) |
-            Q(
-                attribution_class__attribution_charge__attribution__tutor__person__global_id=entity_id.
-                matricule_fgs_enseignant
-            )
+            tutor__person__global_id=entity_id.matricule_fgs_enseignant
         )
         if unite_enseignement_filters:
             qs_base_score_responsible = qs_base_score_responsible.exclude(unite_enseignement_filters)
@@ -123,34 +121,37 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             return
 
         for unite_enseignement in entity.unites_enseignements:
-            cls._save_for_unite_enseignement(unite_enseignement)
+            cls._save_for_unite_enseignement(entity.entity_id, unite_enseignement)
 
         cls._delete(entity.entity_id, unite_enseignement_to_exclude=entity.unites_enseignements)
 
     @classmethod
-    def _save_for_unite_enseignement(cls, unite_enseignement: 'UniteEnseignementIdentite'):
+    def _save_for_unite_enseignement(
+            cls,
+            entity_id: 'IdentiteResponsableDeNotes',
+            unite_enseignement: 'UniteEnseignementIdentite'
+    ):
         is_class = unite_enseignement.code_unite_enseignement[-1] in string.ascii_letters
+        tutor = Tutor.objects.get(person__global_id=entity_id.matricule_fgs_enseignant)
         if is_class:
             luy = LearningUnitYear.objects.get(
                 acronym=unite_enseignement.code_unite_enseignement[:-1],
                 academic_year__year=unite_enseignement.annee_academique
             )
-            attribution_class = AttributionClass.objects.get(
-                learning_class_year__acronym=unite_enseignement.code_unite_enseignement[-1],
-                learning_class_year__learning_component_year__learning_unit_year=luy
+            class_year = LearningClassYear.objects.get(
+                acronym=unite_enseignement.code_unite_enseignement[-1],
+                learning_component_year__learning_unit_year=luy
             )
-            attribution_charge = None
         else:
             luy = LearningUnitYear.objects.get(
                 acronym=unite_enseignement.code_unite_enseignement,
                 academic_year__year=unite_enseignement.annee_academique
             )
-            attribution_charge = AttributionChargeNew.objects.get(learning_component_year__learning_unit_year=luy)
-            attribution_class = None
+            class_year = None
         ScoreResponsible.objects.update_or_create(
+            tutor=tutor,
             learning_unit_year=luy,
-            attribution_charge=attribution_charge,
-            attribution_class=attribution_class
+            learning_class_year=class_year,
         )
 
     @classmethod
@@ -164,16 +165,8 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
 def _fetch_responsable_de_notes():
     return ScoreResponsible.objects.annotate(
-        global_id=Coalesce(
-            'attribution_charge__attribution__tutor__person__global_id',
-            'attribution_class__attribution_charge__attribution__tutor__person__global_id',
-            Value('')
-        ),
-        acronym=Concat(
-            'learning_unit_year__acronym',
-            'attribution_class__learning_class_year__acronym',
-            output_field=CharField()
-        ),
+        global_id=F('tutor__person__global_id'),
+        acronym=Concat('learning_unit_year__acronym', 'learning_class_year__acronym', output_field=CharField()),
         year=F('learning_unit_year__academic_year__year'),
     ).values_list(
         'global_id',
