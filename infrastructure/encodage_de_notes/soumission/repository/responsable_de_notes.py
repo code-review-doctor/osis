@@ -37,6 +37,7 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_class import AttributionClass
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
@@ -60,33 +61,59 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         rows = _fetch_responsable_de_notes().filter(**filter)
         rows_grouped_by_global_id = itertools.groupby(rows, key=lambda row: row.global_id)
 
-        result = []
-        for global_id, rows_grouped in rows_grouped_by_global_id:
-            dto = ResponsableDeNotesFromRepositoryDTO(
-                matricule_fgs_enseignant=global_id,
-                unites_enseignements=[
-                    UniteEnseignementIdentiteFromRepositoryDTO(
-                        code_unite_enseignement=row.acronym,
-                        annee_academique=row.year
-                    )
-                    for row in rows_grouped
-                ]
-            )
-            result.append(
-                ResponsableDeNotesBuilder().build_from_repository_dto(dto)
-            )
-        return result
+        return [
+            ResponsableDeNotesBuilder.build_from_repository_dto(cls._rows_to_dto(global_id, rows_grouped))
+            for global_id, rows_grouped in rows_grouped_by_global_id
+        ]
+
+    @classmethod
+    def _rows_to_dto(cls, global_id: str, rows_grouped_by_global_id):
+        return ResponsableDeNotesFromRepositoryDTO(
+            matricule_fgs_enseignant=global_id,
+            unites_enseignements=[
+                UniteEnseignementIdentiteFromRepositoryDTO(
+                    code_unite_enseignement=row.acronym,
+                    annee_academique=row.year
+                )
+                for row in rows_grouped_by_global_id
+            ]
+        )
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteResponsableDeNotes', **kwargs: ApplicationService) -> None:
-        qs_score_responsible = ScoreResponsible.objects.filter(
+        cls._delete(entity_id)
+
+    @classmethod
+    def _delete(
+            cls,
+            entity_id: 'IdentiteResponsableDeNotes',
+            unite_enseignement_to_exclude: List['UniteEnseignementIdentite'] = None
+    ):
+        unite_enseignement_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(acronym=identite_ue.code_unite_enseignement, year=identite_ue.annee_academique)
+                for identite_ue in unite_enseignement_to_exclude
+            ]
+        ) if unite_enseignement_to_exclude else None
+        qs_base_score_responsible = ScoreResponsible.objects.annotate(
+            acronym=Concat(
+                'learning_unit_year__acronym',
+                'attribution_class__learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            year=F('learning_unit_year__academic_year__year')
+        ).filter(
             Q(attribution_charge__attribution__tutor__person__global_id=entity_id.matricule_fgs_enseignant) |
             Q(
                 attribution_class__attribution_charge__attribution__tutor__person__global_id=entity_id.
                 matricule_fgs_enseignant
             )
         )
-        for score_responsible in qs_score_responsible:
+        if unite_enseignement_filters:
+            qs_base_score_responsible = qs_base_score_responsible.exclude(unite_enseignement_filters)
+
+        for score_responsible in qs_base_score_responsible:
             score_responsible.delete()
 
     @classmethod
@@ -96,55 +123,35 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             return
 
         for unite_enseignement in entity.unites_enseignements:
-            is_class = unite_enseignement.code_unite_enseignement[-1] in string.ascii_letters
-            if is_class:
-                luy = LearningUnitYear.objects.get(
-                    acronym=unite_enseignement.code_unite_enseignement[:-1],
-                    academic_year__year=unite_enseignement.annee_academique
-                )
-                attribution_class = AttributionClass.objects.get(
-                    learning_class_year__acronym=unite_enseignement.code_unite_enseignement[-1],
-                    learning_class_year__learning_component_year__learning_unit_year=luy
-                )
-                ScoreResponsible.objects.update_or_create(
-                    learning_unit_year=luy,
-                    attribution_class=attribution_class
-                )
-            else:
-                luy = LearningUnitYear.objects.get(
-                    acronym=unite_enseignement.code_unite_enseignement,
-                    academic_year__year=unite_enseignement.annee_academique
-                )
-                attribution_charge = AttributionChargeNew.objects.get(learning_component_year__learning_unit_year=luy)
-                ScoreResponsible.objects.update_or_create(
-                    learning_unit_year=luy,
-                    attribution_charge=attribution_charge
-                )
+            cls._save_for_unite_enseignement(unite_enseignement)
 
-        unite_enseignement_filters = functools.reduce(
-            operator.or_,
-            [
-                Q(acronym=identite_ue.code_unite_enseignement, year=identite_ue.annee_academique)
-                for identite_ue in entity.unites_enseignements
-            ]
-        )
-        qs_base_score_responsible = ScoreResponsible.objects.annotate(
-            acronym=Concat(
-                'learning_unit_year__acronym',
-                'attribution_class__learning_class_year__acronym',
-                output_field=CharField()
-            ),
-            year=F('learning_unit_year__academic_year__year')
-        ).filter(
-            Q(attribution_charge__attribution__tutor__person__global_id=entity.entity_id.matricule_fgs_enseignant) |
-            Q(
-                attribution_class__attribution_charge__attribution__tutor__person__global_id=entity.entity_id.
-                matricule_fgs_enseignant
+        cls._delete(entity.entity_id, unite_enseignement_to_exclude=entity.unites_enseignements)
+
+    @classmethod
+    def _save_for_unite_enseignement(cls, unite_enseignement: 'UniteEnseignementIdentite'):
+        is_class = unite_enseignement.code_unite_enseignement[-1] in string.ascii_letters
+        if is_class:
+            luy = LearningUnitYear.objects.get(
+                acronym=unite_enseignement.code_unite_enseignement[:-1],
+                academic_year__year=unite_enseignement.annee_academique
             )
-        ).exclude(unite_enseignement_filters)
-
-        for score_responsible in qs_base_score_responsible:
-            score_responsible.delete()
+            attribution_class = AttributionClass.objects.get(
+                learning_class_year__acronym=unite_enseignement.code_unite_enseignement[-1],
+                learning_class_year__learning_component_year__learning_unit_year=luy
+            )
+            attribution_charge = None
+        else:
+            luy = LearningUnitYear.objects.get(
+                acronym=unite_enseignement.code_unite_enseignement,
+                academic_year__year=unite_enseignement.annee_academique
+            )
+            attribution_charge = AttributionChargeNew.objects.get(learning_component_year__learning_unit_year=luy)
+            attribution_class = None
+        ScoreResponsible.objects.update_or_create(
+            learning_unit_year=luy,
+            attribution_charge=attribution_charge,
+            attribution_class=attribution_class
+        )
 
     @classmethod
     def get_all_identities(cls) -> List['IdentiteResponsableDeNotes']:
