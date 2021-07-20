@@ -7,8 +7,6 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('learning_unit', '0014_auto_20210604_1537'),
-        ('base', '0592_auto_20210719_1125'),
         ('assessments', '0002_scoreresponsible'),
     ]
 
