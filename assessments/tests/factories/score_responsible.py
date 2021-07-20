@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,26 +22,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+import factory
 
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class IdentiteResponsableDeNotes(interface.EntityIdentity):
-    matricule_fgs_enseignant = attr.ib(type=str)
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.tutor import TutorFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
-@attr.s(frozen=True, slots=True)
-class ResponsableDeNotes(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteResponsableDeNotes)
-    unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
+class ScoreResponsibleFactory(factory.DjangoModelFactory):
+    class Meta:
+        model = 'assessments.ScoreResponsible'
 
-    def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
+    tutor = factory.SubFactory(TutorFactory)
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
+    learning_class_year = None
 
-    def desassigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
+
+class ScoreResponsibleOfClassFactory(ScoreResponsibleFactory):
+    learning_class_year = factory.SubFactory(
+        LearningClassYearFactory,
+        learning_component_year__learning_unit_year=factory.LazyAttribute(
+            lambda component: component.factory_parent.factory_parent.learning_unit_year
+        )
+    )

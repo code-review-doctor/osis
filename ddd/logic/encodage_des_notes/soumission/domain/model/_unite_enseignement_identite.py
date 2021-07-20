@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,26 +22,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
-
 import attr
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementIdentiteFromRepositoryDTO
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
-class IdentiteResponsableDeNotes(interface.EntityIdentity):
-    matricule_fgs_enseignant = attr.ib(type=str)
+class UniteEnseignementIdentiteBuilder(interface.EntityIdentity):
+    @staticmethod
+    def build_from_repository_dto(
+            dto_object: 'UniteEnseignementIdentiteFromRepositoryDTO'
+    ) -> 'UniteEnseignementIdentite':
+        return UniteEnseignementIdentite(
+            code_unite_enseignement=dto_object.code_unite_enseignement,
+            annee_academique=dto_object.annee_academique
+        )
 
 
 @attr.s(frozen=True, slots=True)
-class ResponsableDeNotes(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteResponsableDeNotes)
-    unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
-
-    def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
-
-    def desassigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
+class UniteEnseignementIdentite(interface.EntityIdentity):
+    """Identifie un cours, stage, mémoire partim, classe..."""
+    code_unite_enseignement = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
