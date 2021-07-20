@@ -1,4 +1,3 @@
-##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +14,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,20 +22,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO
-from osis_common.ddd.interface import EntityIdentityBuilder
+from typing import List
+
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentiteBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
+class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
+    entities = list()  # type: List[ResponsableDeNotes]
+
     @classmethod
-    def build_from_command(cls, cmd: 'AssignerResponsableDeNotesCommand') -> 'IdentiteResponsableDeNotes':
-        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=cmd.matricule_fgs_enseignant)
-
-    @classmethod
-    def build_from_repository_dto(
-            cls,
-            dto_object: 'ResponsableDeNotesFromRepositoryDTO'
-    ) -> 'IdentiteResponsableDeNotes':
-        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=dto_object.matricule_fgs_enseignant)
+    def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+        ue_identite = UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+            code_unite_enseignement,
+            annee_academique
+        )
+        return next(entity for entity in cls.entities if ue_identite in entity.unites_enseignements)

@@ -58,3 +58,8 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
         pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+        pass

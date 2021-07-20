@@ -23,18 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
+from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
+    ResponsableDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
+    EnseignantAttribueUniteEnseignement
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
 def assigner_responsable_de_notes(
         cmd: 'AssignerResponsableDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
-) -> 'IdentiteFeuilleDeNotes':
+        responsable_de_notes_repo: 'IResponsableDeNotesRepository',
+        attribution_translator: 'IAttributionEnseignantTranslator'
+) -> 'IdentiteResponsableDeNotes':
     # Given
+    EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
 
     # When
+    actuelle_responsable = responsable_de_notes_repo.get_for_cours(
+        cmd.code_unite_enseignement,
+        cmd.annee_unite_enseignement
+    )
+    actuelle_responsable.desassigner(cmd.code_unite_enseignement, cmd.annee_unite_enseignement)
+
+    nouveau_responsable = responsable_de_notes_repo.get(ResponsableDeNotesIdentityBuilder.build_from_command(cmd)) or \
+        ResponsableDeNotesBuilder().build_from_command(cmd)
+    nouveau_responsable.assigner(cmd.code_unite_enseignement, cmd.annee_unite_enseignement)
 
     # Then
-    return
+    responsable_de_notes_repo.save(actuelle_responsable)
+    responsable_de_notes_repo.save(nouveau_responsable)
+
+    return nouveau_responsable.entity_id

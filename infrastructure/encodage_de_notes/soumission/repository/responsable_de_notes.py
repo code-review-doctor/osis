@@ -53,12 +53,22 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
     def search(
             cls,
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
+            code_unite_enseignement: Optional[str] = None,
+            annee_academique: Optional[int] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
-        if not entity_ids:
-            return []
+        filter = {}
+        if entity_ids:
+            filter["global_id__in"] = [str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids]
 
-        filter = {"global_id__in": [str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids]}
+        if code_unite_enseignement:
+            filter["acronym"] = code_unite_enseignement
+
+        if annee_academique:
+            filter["year"] = annee_academique
+
+        if not filter:
+            return []
 
         rows = _fetch_responsable_de_notes().filter(**filter)
         rows_grouped_by_global_id = itertools.groupby(rows, key=lambda row: row.global_id)
@@ -161,6 +171,10 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
     @classmethod
     def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
         return cls.search([entity_id])[0]
+
+    @classmethod
+    def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+        return cls.search(code_unite_enseignement=code_unite_enseignement, annee_academique=annee_academique)[0]
 
 
 def _fetch_responsable_de_notes():

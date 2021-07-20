@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, \
+    AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
@@ -37,7 +39,7 @@ class EnseignantAttribueUniteEnseignement(interface.DomainService):
     @classmethod
     def verifier(
             cls,
-            cmd: 'EncoderFeuilleDeNotesCommand',
+            cmd: Union['EncoderFeuilleDeNotesCommand', 'AssignerResponsableDeNotesCommand'],
             attribution_translator: 'IAttributionEnseignantTranslator'
     ) -> None:
         attributions = attribution_translator.search_attributions_enseignant(
