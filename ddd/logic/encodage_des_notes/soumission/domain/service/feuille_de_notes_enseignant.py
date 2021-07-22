@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Dict
+
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
     ResponsableDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
@@ -34,7 +36,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO, NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO, NoteEtudiantDTO, \
+    SignaletiqueEtudiantDTO, InscriptionExamenDTO, DesinscriptionExamenDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -105,48 +108,62 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         )
 
 
-def _get_signaletique_etudiant_par_noma(nomas_concernes, signaletique_etudiant_translator):
+NomaEtudiant = str
+
+
+def _get_signaletique_etudiant_par_noma(
+        nomas_concernes: List[NomaEtudiant],
+        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
+) -> Dict[NomaEtudiant, 'SignaletiqueEtudiantDTO']:
     signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
-    signaletique_par_noma = {signal.noma: signal for signal in signaletiques_etds}
-    return signaletique_par_noma
+    return {signal.noma: signal for signal in signaletiques_etds}
 
 
-def _get_desinscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator):
+def _get_desinscriptions_examens_par_noma(
+        feuille_de_notes: 'FeuilleDeNotes',
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
+) -> Dict[NomaEtudiant, 'DesinscriptionExamenDTO']:
     desinscriptions_examens = inscription_examen_translator.search_desinscrits(
         code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
         annee=feuille_de_notes.annee,
         numero_session=feuille_de_notes.numero_session,
     )
-    desinscr_examen_par_noma = {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
-    return desinscr_examen_par_noma
+    return {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
 
 
-def _get_inscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator):
+def _get_inscriptions_examens_par_noma(
+        feuille_de_notes: 'FeuilleDeNotes',
+        inscription_examen_translator: 'IInscriptionExamenTranslator'
+) -> Dict[NomaEtudiant, 'InscriptionExamenDTO']:
     inscr_examens = inscription_examen_translator.search_inscrits(
         code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
         annee=feuille_de_notes.annee,
         numero_session=feuille_de_notes.numero_session,
     )
-    inscr_examen_par_noma = {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
-    return inscr_examen_par_noma
+    return {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
 
 
-def _get_autres_enseignants(attribution_translator, feuille_de_notes, responsable_notes):
+def _get_autres_enseignants(
+        attribution_translator: 'IAttributionEnseignantTranslator',
+        feuille_de_notes: 'FeuilleDeNotes',
+        responsable_notes: 'EnseignantDTO'
+) -> List[EnseignantDTO]:
     enseignants = attribution_translator.search_attributions_enseignant(
         feuille_de_notes.code_unite_enseignement,
         feuille_de_notes.annee,
     )
-    autres_enseignants = [
+    return [
         EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
         for enseignant in sorted(enseignants, key=lambda ens: (ens.nom, ens.prenom))
         if enseignant.nom != responsable_notes.nom and enseignant.prenom != responsable_notes.prenom
     ]
-    return autres_enseignants
 
 
-def _get_responsable_de_notes(matricule_fgs_enseignant, responsable_notes_repo):
+def _get_responsable_de_notes(
+        matricule_fgs_enseignant: str,
+        responsable_notes_repo: 'IResponsableDeNotesRepository'
+) -> EnseignantDTO:
     responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs_enseignant(
         matricule_fgs_enseignant=matricule_fgs_enseignant,
     )
-    responsable_notes = responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
-    return responsable_notes
+    return responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
