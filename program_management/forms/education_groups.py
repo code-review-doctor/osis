@@ -31,11 +31,11 @@ from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
+from backoffice.settings.base import MINIMUM_EDG_YEAR
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex
 from base.models import campus
 from base.models import entity_version
-from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
@@ -56,7 +56,7 @@ VERSION_CHOICES = (
 
 
 class GroupFilter(FilterSet):
-    academic_year = filters.ChoiceFilter(
+    academic_year__year = filters.ChoiceFilter(
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
@@ -167,12 +167,10 @@ class GroupFilter(FilterSet):
         self.form.fields["version"].initial = kwargs.pop('version', None)
 
     def __init_academic_year_field(self):
-        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand())
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_EDG_YEAR))
         choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
-        self.form.fields['academic_year'].choices = choices
-        self.form.fields['academic_year'].initial = AcademicYear.objects.filter(
-            year__in=EducationGroupSwitchCalendar().get_target_years_opened()
-        ).first()
+        self.form.fields['academic_year__year'].choices = choices
+        self.form.fields['academic_year__year'].initial = EducationGroupSwitchCalendar().get_target_years_opened()
 
     def filter_with_entity_subordinated(self, queryset, name, value):
         with_subordinated = self.form.cleaned_data['with_entity_subordinated']
