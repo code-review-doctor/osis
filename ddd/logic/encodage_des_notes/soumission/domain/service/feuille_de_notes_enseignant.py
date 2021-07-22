@@ -79,7 +79,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
                 NoteEtudiantDTO(
                     est_soumise=note.est_soumise,
                     date_remise_de_notes=note.date_limite_de_remise,
-                    sigle_formation=inscr_exmen.sigle_formation if inscr_exmen else desinscription.sigle_formation,
+                    nom_cohorte=inscr_exmen.nom_cohorte if inscr_exmen else desinscription.nom_cohorte,
                     noma=note.noma,
                     nom=signaletique.nom,
                     prenom=signaletique.prenom,

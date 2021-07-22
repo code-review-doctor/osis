@@ -108,7 +108,7 @@ class EtudiantPepsDTO(interface.DTO):
 class NoteEtudiantDTO(interface.DTO):
     est_soumise = attr.ib(type=bool)
     date_remise_de_notes = attr.ib(type=DateDTO)
-    sigle_formation = attr.ib(type=str)  # inscription examen
+    nom_cohorte = attr.ib(type=str)  # inscription examen
     noma = attr.ib(type=str)  # matricule
     nom = attr.ib(type=str)  # signaletique
     prenom = attr.ib(type=str)  # signaletique
@@ -224,7 +224,7 @@ class InscriptionExamenDTO(interface.DTO):
     annee = attr.ib(type=int)
     noma = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    sigle_formation = attr.ib(type=str)  # TODO :: renomer en "nom_cohorte"
+    nom_cohorte = attr.ib(type=str)
     date_inscription = attr.ib(type=DateDTO)
 
 
@@ -233,7 +233,7 @@ class DesinscriptionExamenDTO(interface.DTO):
     annee = attr.ib(type=int)
     noma = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    sigle_formation = attr.ib(type=str)  # TODO :: renomer en "nom_cohorte"
+    nom_cohorte = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)

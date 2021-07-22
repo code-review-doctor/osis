@@ -52,7 +52,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
         ).annotate(
             annee=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
             noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
-            sigle_formation=Case(
+            nom_cohorte=Case(
                 When(
                     learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
                     then=Replace('learning_unit_enrollment__offer_enrollment__education_group_year__acronym', Value('1BA'), Value('11BA')),
@@ -64,7 +64,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             'annee',
             'noma',
             'code_unite_enseignement',
-            'sigle_formation',
+            'nom_cohorte',
         )
         return {DesinscriptionExamenDTO(**values) for values in qs_as_values}
 
@@ -84,7 +84,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
         ).annotate(
             annee=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
             noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
-            sigle_formation=Case(
+            nom_cohorte=Case(
                 When(
                     learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
                     then=Replace('learning_unit_enrollment__offer_enrollment__education_group_year__acronym', Value('1BA'), Value('11BA')),
@@ -97,7 +97,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             'annee',
             'noma',
             'code_unite_enseignement',
-            'sigle_formation',
+            'nom_cohorte',
             'date_inscription',
         )
         return {InscriptionExamenDTO(**values) for values in qs_as_values}

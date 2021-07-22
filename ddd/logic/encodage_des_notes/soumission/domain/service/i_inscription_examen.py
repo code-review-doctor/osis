@@ -36,7 +36,7 @@ class IInscriptionExamenTranslator(interface.DomainService):
     @abc.abstractmethod
     def search_inscrits(
             cls,
-            code_unite_enseignement: str,  # TODO :: to implement
+            code_unite_enseignement: str,
             numero_session: int,
             annee: int,
     ) -> Set['InscriptionExamenDTO']:

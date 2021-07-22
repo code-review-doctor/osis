@@ -36,7 +36,7 @@ class InscriptionExamenTranslatorInMemory(IInscriptionExamenTranslator):
             annee=2020,
             noma='11111111',
             code_unite_enseignement='LDROI1001',
-            sigle_formation='DROI1BA',
+            nom_cohorte='DROI1BA',
             date_inscription=DateDTO(
                 jour=1,
                 mois=1,
@@ -50,7 +50,7 @@ class InscriptionExamenTranslatorInMemory(IInscriptionExamenTranslator):
             annee=2020,
             noma='22222222',
             code_unite_enseignement='LDROI1001',
-            sigle_formation='DROI1BA',
+            nom_cohorte='DROI1BA',
         ),
     }
 

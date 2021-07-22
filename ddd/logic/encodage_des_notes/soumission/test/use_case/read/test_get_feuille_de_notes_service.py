@@ -58,7 +58,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.matricule_enseignant = '00321234'
         self.code_unite_enseignement = 'LDROI1001'
         self.noma = '11111111'
-        self.sigle_formation = 'DROI1BA'
+        self.nom_cohorte = 'DROI1BA'
 
         self.feuille_de_notes = FeuilleDeNotesAvecUneSeuleNoteManquante(
             notes={
@@ -192,7 +192,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             annee=self.annee,
             noma=self.noma,
             code_unite_enseignement=self.code_unite_enseignement,
-            sigle_formation=self.sigle_formation,
+            nom_cohorte=self.nom_cohorte,
             date_inscription=DateDTO(
                 jour=date_apres_ouverture.day,
                 mois=date_apres_ouverture.month,
@@ -221,7 +221,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             annee=self.annee,
             noma=self.noma,
             code_unite_enseignement=self.code_unite_enseignement,
-            sigle_formation=self.sigle_formation,
+            nom_cohorte=self.nom_cohorte,
             date_inscription=DateDTO(
                 jour=date_apres_ouverture.day,
                 mois=date_apres_ouverture.month,

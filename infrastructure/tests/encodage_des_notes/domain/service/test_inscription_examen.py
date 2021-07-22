@@ -71,14 +71,14 @@ class InscriptionExamenTest(TestCase):
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement=self.code_unite_enseignement,
-                sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                nom_cohorte=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_1.date_enrollment,
             ),
             InscriptionExamenDTO(
                 annee=self.annee,
                 noma=exam_2.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement=self.code_unite_enseignement,
-                sigle_formation=exam_2.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                nom_cohorte=exam_2.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_2.date_enrollment,
             ),
         }
@@ -104,7 +104,7 @@ class InscriptionExamenTest(TestCase):
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement='LDROI1001A',
-                sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                nom_cohorte=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
                 date_inscription=exam_1.date_enrollment,
             )
         }
@@ -130,7 +130,7 @@ class InscriptionExamenTest(TestCase):
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement='LDROI1001A',
-                sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                nom_cohorte=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             )
         }
         self.assertSetEqual(expected_result, result)
@@ -152,7 +152,7 @@ class InscriptionExamenTest(TestCase):
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement=self.code_unite_enseignement,
-                sigle_formation=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
+                nom_cohorte=exam_1.learning_unit_enrollment.offer_enrollment.education_group_year.acronym,
             ),
         }
         self.assertSetEqual(expected_result, result)
@@ -180,7 +180,7 @@ class InscriptionExamenTest(TestCase):
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement='LDROI1001',
-                sigle_formation='DROI11BA',
+                nom_cohorte='DROI11BA',
                 date_inscription=exam_1.date_enrollment,
             ),
         }
@@ -209,7 +209,7 @@ class InscriptionExamenTest(TestCase):
                 annee=self.annee,
                 noma=exam_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
                 code_unite_enseignement='LDROI1001',
-                sigle_formation='DROI11BA',
+                nom_cohorte='DROI11BA',
             ),
         }
         self.assertSetEqual(expected_result, result)
