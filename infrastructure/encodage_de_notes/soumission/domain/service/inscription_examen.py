@@ -55,7 +55,11 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             nom_cohorte=Case(
                 When(
                     learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
-                    then=Replace('learning_unit_enrollment__offer_enrollment__education_group_year__acronym', Value('1BA'), Value('11BA')),
+                    then=Replace(
+                        'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                        Value('1BA'),
+                        Value('11BA')
+                    ),
                 ),
                 default='learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
                 output_field=CharField(),
@@ -87,7 +91,11 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             nom_cohorte=Case(
                 When(
                     learning_unit_enrollment__offer_enrollment__cohort_year__isnull=False,
-                    then=Replace('learning_unit_enrollment__offer_enrollment__education_group_year__acronym', Value('1BA'), Value('11BA')),
+                    then=Replace(
+                        'learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
+                        Value('1BA'),
+                        Value('11BA')
+                    ),
                 ),
                 default='learning_unit_enrollment__offer_enrollment__education_group_year__acronym',
                 output_field=CharField(),
