@@ -163,7 +163,16 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 
     @classmethod
     def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
-        raise NotImplementedError   # TODO :: to implement
+        detail_enseignant_as_values = ScoreResponsible.objects.filter(
+            tutor__person__global_id=entity_id.matricule_fgs_enseignant,
+        ).annotate(
+            nom=F('tutor__person__last_name'),
+            prenom=F('tutor__person__first_name'),
+        ).values(
+            'nom',
+            'prenom',
+        ).get()
+        return EnseignantDTO(**detail_enseignant_as_values)
 
 
 def _fetch_responsable_de_notes():
