@@ -242,3 +242,15 @@ class UniteEnseignementDTO(interface.DTO):
     annee = attr.ib(type=int)
     code = attr.ib(type=str)
     intitule_complet = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class UniteEnseignementIdentiteFromRepositoryDTO(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class ResponsableDeNotesFromRepositoryDTO(interface.DTO):
+    matricule_fgs_enseignant = attr.ib(type=str)
+    unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentiteFromRepositoryDTO])

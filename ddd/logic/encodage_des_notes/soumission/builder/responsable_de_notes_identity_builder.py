@@ -25,6 +25,7 @@
 ##############################################################################
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
@@ -34,8 +35,11 @@ class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
         raise NotImplementedError
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'IdentiteResponsableDeNotes':
-        raise NotImplementedError
+    def build_from_repository_dto(
+            cls,
+            dto_object: 'ResponsableDeNotesFromRepositoryDTO'
+    ) -> 'IdentiteResponsableDeNotes':
+        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=dto_object.matricule_fgs_enseignant)
 
     @classmethod
     def build_from_matricule_fgs_enseignant(cls, matricule_fgs_enseignant: str) -> IdentiteResponsableDeNotes:

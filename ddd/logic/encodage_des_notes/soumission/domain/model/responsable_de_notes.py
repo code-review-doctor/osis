@@ -23,30 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import Set
-from typing import List
+from typing import Set
 
 import attr
 
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
 class IdentiteResponsableDeNotes(interface.EntityIdentity):
-    matricule_fgs_enseignant = attr.ib(type=int)
-
-
-@attr.s(frozen=True, slots=True)
-class UniteEnseignementIdentite(interface.EntityIdentity):
-    """Identifie un cours, stage, mémoire partim, classe..."""
-    code_unite_enseignement = attr.ib(type=str)
-    annee_academique = attr.ib(type=int)
+    matricule_fgs_enseignant = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
 class ResponsableDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteResponsableDeNotes)
-    unites_enseignements = attr.ib(type=List[UniteEnseignementIdentite])
+    unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
 
     def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
         raise NotImplementedError

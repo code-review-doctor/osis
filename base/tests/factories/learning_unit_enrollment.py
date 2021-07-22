@@ -43,4 +43,3 @@ class LearningUnitEnrollmentFactory(factory.django.DjangoModelFactory):
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     learning_class_year = None
     offer_enrollment = factory.SubFactory(OfferEnrollmentFactory)
-

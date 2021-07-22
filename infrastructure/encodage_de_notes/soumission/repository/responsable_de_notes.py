@@ -23,31 +23,135 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import itertools
+import operator
+import string
 from typing import Optional, List
 
+from django.db.models import F, Q, CharField
+from django.db.models.functions import Concat
+
+from assessments.models.score_responsible import ScoreResponsible
+from base.auth.roles.tutor import Tutor
+from base.models.learning_unit_year import LearningUnitYear
+from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
+    UniteEnseignementIdentiteFromRepositoryDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.ddd.interface import ApplicationService
 
 
-class ResponsableDeNotesRepositoryRepository(IResponsableDeNotesRepository):
+class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
     @classmethod
     def search(
             cls,
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
-        raise NotImplementedError
+        if not entity_ids:
+            return []
+
+        filter = {"global_id__in": [str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids]}
+
+        rows = _fetch_responsable_de_notes().filter(**filter)
+        rows_grouped_by_global_id = itertools.groupby(rows, key=lambda row: row.global_id)
+
+        return [
+            ResponsableDeNotesBuilder.build_from_repository_dto(cls._rows_to_dto(global_id, rows_grouped))
+            for global_id, rows_grouped in rows_grouped_by_global_id
+        ]
+
+    @classmethod
+    def _rows_to_dto(cls, global_id: str, rows_grouped_by_global_id):
+        return ResponsableDeNotesFromRepositoryDTO(
+            matricule_fgs_enseignant=global_id,
+            unites_enseignements=[
+                UniteEnseignementIdentiteFromRepositoryDTO(
+                    code_unite_enseignement=row.acronym,
+                    annee_academique=row.year
+                )
+                for row in rows_grouped_by_global_id
+            ]
+        )
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteResponsableDeNotes', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+        cls._delete(entity_id)
+
+    @classmethod
+    def _delete(
+            cls,
+            entity_id: 'IdentiteResponsableDeNotes',
+            unite_enseignement_to_exclude: List['UniteEnseignementIdentite'] = None
+    ):
+        unite_enseignement_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(acronym=identite_ue.code_unite_enseignement, year=identite_ue.annee_academique)
+                for identite_ue in unite_enseignement_to_exclude
+            ]
+        ) if unite_enseignement_to_exclude else None
+        qs_base_score_responsible = ScoreResponsible.objects.annotate(
+            acronym=Concat(
+                'learning_unit_year__acronym',
+                'learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            year=F('learning_unit_year__academic_year__year')
+        ).filter(
+            tutor__person__global_id=entity_id.matricule_fgs_enseignant
+        )
+        if unite_enseignement_filters:
+            qs_base_score_responsible = qs_base_score_responsible.exclude(unite_enseignement_filters)
+
+        for score_responsible in qs_base_score_responsible:
+            score_responsible.delete()
 
     @classmethod
     def save(cls, entity: 'ResponsableDeNotes') -> None:
-        raise NotImplementedError
+        if not entity.unites_enseignements:
+            cls.delete(entity.entity_id)
+            return
+
+        for unite_enseignement in entity.unites_enseignements:
+            cls._save_for_unite_enseignement(entity.entity_id, unite_enseignement)
+
+        cls._delete(entity.entity_id, unite_enseignement_to_exclude=entity.unites_enseignements)
+
+    @classmethod
+    def _save_for_unite_enseignement(
+            cls,
+            entity_id: 'IdentiteResponsableDeNotes',
+            unite_enseignement: 'UniteEnseignementIdentite'
+    ):
+        is_class = unite_enseignement.code_unite_enseignement[-1] in string.ascii_letters
+        tutor = Tutor.objects.get(person__global_id=entity_id.matricule_fgs_enseignant)
+        if is_class:
+            luy = LearningUnitYear.objects.get(
+                acronym=unite_enseignement.code_unite_enseignement[:-1],
+                academic_year__year=unite_enseignement.annee_academique
+            )
+            class_year = LearningClassYear.objects.get(
+                acronym=unite_enseignement.code_unite_enseignement[-1],
+                learning_component_year__learning_unit_year=luy
+            )
+        else:
+            luy = LearningUnitYear.objects.get(
+                acronym=unite_enseignement.code_unite_enseignement,
+                academic_year__year=unite_enseignement.annee_academique
+            )
+            class_year = None
+        ScoreResponsible.objects.update_or_create(
+            tutor=tutor,
+            learning_unit_year=luy,
+            learning_class_year=class_year,
+        )
 
     @classmethod
     def get_all_identities(cls) -> List['IdentiteResponsableDeNotes']:
@@ -55,8 +159,23 @@ class ResponsableDeNotesRepositoryRepository(IResponsableDeNotesRepository):
 
     @classmethod
     def get(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'ResponsableDeNotes':
-        raise NotImplementedError
+        return cls.search([entity_id])[0]
 
     @classmethod
     def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
         raise NotImplementedError   # TODO :: to implement
+
+
+def _fetch_responsable_de_notes():
+    return ScoreResponsible.objects.annotate(
+        global_id=F('tutor__person__global_id'),
+        acronym=Concat('learning_unit_year__acronym', 'learning_class_year__acronym', output_field=CharField()),
+        year=F('learning_unit_year__academic_year__year'),
+    ).values_list(
+        'global_id',
+        'acronym',
+        'year',
+        named=True
+    ).order_by(
+        'global_id'
+    )
