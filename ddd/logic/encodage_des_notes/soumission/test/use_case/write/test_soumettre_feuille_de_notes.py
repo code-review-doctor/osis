@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesD
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_feuille_de_notes_service import \
     soumettre_feuille_de_notes
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesEncodees, \
-    FeuilleDeNotesAvecNotesManquantes, FeuilleDeNotesAvecNotesEncodeesEtNotesManquantes
+    FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
@@ -53,10 +53,6 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
         self.responsables_notes_repo = ResponsableDeNotesInMemoryRepository()
         self.responsables_notes_repo.save(self.responsable_notes)
         self.matricule_enseignant = self.responsable_notes.matricule_fgs_enseignant
-
-        # self.unite_enseignement = 'LDROI1001'
-        # self.annee = 2020
-        # self.numero_session = 2
 
         self.feuille_de_notes = FeuilleDeNotesAvecNotesEncodees(
             entity_id__code_unite_enseignement='LDROI1001',
