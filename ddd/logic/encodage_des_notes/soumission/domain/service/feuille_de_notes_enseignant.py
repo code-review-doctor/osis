@@ -53,51 +53,27 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
             attribution_translator: 'IAttributionEnseignantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'FeuilleDeNotesEnseignantDTO':
-        # TODO :: decoupe en fonction
 
+        periode_soumission_ouverte = periode_soumission_note_translator.get()
         unite_enseignement = unite_enseignement_translator.get(
             feuille_de_notes.code_unite_enseignement,
             feuille_de_notes.annee,
         )
-        responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs_enseignant(
-            matricule_fgs_enseignant=matricule_fgs_enseignant,
-        )
-        responsable_notes = responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
-        enseignants = attribution_translator.search_attributions_enseignant(
-            feuille_de_notes.code_unite_enseignement,
-            feuille_de_notes.annee,
-        )
-        autres_enseignants = [
-            EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
-            for enseignant in sorted(enseignants, key=lambda ens: (ens.nom, ens.prenom))
-            if enseignant.nom != responsable_notes.nom and enseignant.prenom != responsable_notes.prenom
-        ]
+        responsable_notes = _get_responsable_de_notes(matricule_fgs_enseignant, responsable_notes_repo)
+        autres_enseignants = _get_autres_enseignants(attribution_translator, feuille_de_notes, responsable_notes)
 
         nomas_concernes = [note.noma for note in feuille_de_notes.notes]
-        inscr_examens = inscription_examen_translator.search_inscrits(
-            code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
-            annee=feuille_de_notes.annee,
-            numero_session=feuille_de_notes.numero_session,
-        )
-        inscr_examen_par_noma = {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
-        desinscriptions_examens = inscription_examen_translator.search_desinscrits(
-            code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
-            annee=feuille_de_notes.annee,
-            numero_session=feuille_de_notes.numero_session,
-        )
-        desinscr_examen_par_noma = {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
 
-        signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
-        signaletique_par_noma = {signal.noma: signal for signal in signaletiques_etds}
-
-        periode_soumission = periode_soumission_note_translator.get()
+        inscr_examen_par_noma = _get_inscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator)
+        desinscr_exam_par_noma = _get_desinscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator)
+        signaletique_par_noma = _get_signaletique_etudiant_par_noma(nomas_concernes, signaletique_etudiant_translator)
 
         notes_etudiants = []
         for note in feuille_de_notes.notes:
             inscr_exmen = inscr_examen_par_noma.get(note.noma)
-            ouverture_periode_soumission = periode_soumission.debut_periode_soumission.to_date()
+            ouverture_periode_soumission = periode_soumission_ouverte.debut_periode_soumission.to_date()
             inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > ouverture_periode_soumission
-            desinscription = desinscr_examen_par_noma.get(note.noma)
+            desinscription = desinscr_exam_par_noma.get(note.noma)
             signaletique = signaletique_par_noma[note.noma]
             notes_etudiants.append(
                 NoteEtudiantDTO(
@@ -127,3 +103,50 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
             numero_session=feuille_de_notes.numero_session,
             notes_etudiants=notes_etudiants,
         )
+
+
+def _get_signaletique_etudiant_par_noma(nomas_concernes, signaletique_etudiant_translator):
+    signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
+    signaletique_par_noma = {signal.noma: signal for signal in signaletiques_etds}
+    return signaletique_par_noma
+
+
+def _get_desinscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator):
+    desinscriptions_examens = inscription_examen_translator.search_desinscrits(
+        code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
+        annee=feuille_de_notes.annee,
+        numero_session=feuille_de_notes.numero_session,
+    )
+    desinscr_examen_par_noma = {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
+    return desinscr_examen_par_noma
+
+
+def _get_inscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator):
+    inscr_examens = inscription_examen_translator.search_inscrits(
+        code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
+        annee=feuille_de_notes.annee,
+        numero_session=feuille_de_notes.numero_session,
+    )
+    inscr_examen_par_noma = {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
+    return inscr_examen_par_noma
+
+
+def _get_autres_enseignants(attribution_translator, feuille_de_notes, responsable_notes):
+    enseignants = attribution_translator.search_attributions_enseignant(
+        feuille_de_notes.code_unite_enseignement,
+        feuille_de_notes.annee,
+    )
+    autres_enseignants = [
+        EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
+        for enseignant in sorted(enseignants, key=lambda ens: (ens.nom, ens.prenom))
+        if enseignant.nom != responsable_notes.nom and enseignant.prenom != responsable_notes.prenom
+    ]
+    return autres_enseignants
+
+
+def _get_responsable_de_notes(matricule_fgs_enseignant, responsable_notes_repo):
+    responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs_enseignant(
+        matricule_fgs_enseignant=matricule_fgs_enseignant,
+    )
+    responsable_notes = responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
+    return responsable_notes
