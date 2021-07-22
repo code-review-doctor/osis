@@ -38,7 +38,7 @@ class _IdentiteFeuilleDeNotesFactory(factory.Factory):
         abstract = False
 
     numero_session = 2
-    code_unite_enseignement = 'LOSIS1452'
+    code_unite_enseignement = 'LDROI1001'
     annee_academique = 2020
 
 
@@ -54,7 +54,7 @@ class _FeuilleDeNotesFactory(factory.Factory):
     class Params:
         for_class = factory.SubFactory(
             _IdentiteFeuilleDeNotesFactory,
-            code_unite_enseignement='LOSIS1452A'
+            code_unite_enseignement='LDROI1001A'
         )
 
 
@@ -110,4 +110,10 @@ class FeuilleDeNotesDateLimiteRemiseHier(_FeuilleDeNotesFactory):
     credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
         NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today() - datetime.timedelta(days=1)),
+    }
+
+
+class FeuilleDeNotesAvecUneSeuleNoteManquante(_FeuilleDeNotesFactory):
+    notes = {
+        NoteManquanteEtudiantFactory()
     }

@@ -54,8 +54,6 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'FeuilleDeNotesEnseignantDTO':
         # TODO :: decoupe en fonction
-        # TODO :: reutiliser attribution_translator pour le nom/prenom du resp notes
-        # TODO :: unit tests
 
         unite_enseignement = unite_enseignement_translator.get(
             feuille_de_notes.code_unite_enseignement,
@@ -66,7 +64,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         )
         responsable_notes = responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
         enseignants = attribution_translator.search_attributions_enseignant(
-            matricule_fgs_enseignant,
+            feuille_de_notes.code_unite_enseignement,
             feuille_de_notes.annee,
         )
         autres_enseignants = [
@@ -96,7 +94,8 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         notes_etudiants = []
         for note in feuille_de_notes.notes:
             inscr_exmen = inscr_examen_par_noma.get(note.noma)
-            inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > periode_soumission.debut_periode_soumission.to_date()
+            ouverture_periode_soumission = periode_soumission.debut_periode_soumission.to_date()
+            inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > ouverture_periode_soumission
             desinscription = desinscr_examen_par_noma.get(note.noma)
             signaletique = signaletique_par_noma[note.noma]
             notes_etudiants.append(
