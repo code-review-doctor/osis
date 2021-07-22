@@ -70,6 +70,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         autres_enseignants = [
             EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
             for enseignant in sorted(enseignants, key=lambda ens: (ens.nom, ens.prenom))
+            if enseignant.nom != responsable_notes.nom and enseignant.prenom != responsable_notes.prenom
         ]
 
         nomas_concernes = [note.noma for note in feuille_de_notes.notes]

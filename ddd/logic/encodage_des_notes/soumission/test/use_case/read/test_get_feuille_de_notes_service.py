@@ -29,7 +29,8 @@ from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
+    AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante
@@ -93,6 +94,27 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         )
         self.assertEqual(result.responsable_note.nom, 'Chileng')
         self.assertEqual(result.responsable_note.prenom, 'Jean-Michel')
+
+    def test_should_ignorer_responsable_notes_dans_autre_enseigants(self):
+        attribution_translator = AttributionEnseignantTranslatorInMemory()
+        responsable_notes = AttributionEnseignantDTO(
+            code_unite_enseignement=self.code_unite_enseignement,
+            annee=self.annee,
+            nom="Chileng",  # Responsable de notes
+            prenom="Jean-Michel"  # Responsable de notes
+        )
+        attribution_translator.search_attributions_enseignant = lambda *args, **kwargs: {responsable_notes}
+        result = get_feuille_de_notes(
+            self.cmd,
+            feuille_de_note_repo=self.repository,
+            responsable_notes_repo=self.resp_notes_repository,
+            periode_soumission_note_translator=self.periode_soumission_translator,
+            inscription_examen_translator=self.inscr_examen_translator,
+            signaletique_etudiant_translator=self.signaletique_translator,
+            attribution_translator=attribution_translator,
+            unite_enseignement_translator=self.unite_enseignement_trans,
+        )
+        self.assertEqual(result.autres_enseignants, list())
 
     def test_should_renvoyer_unite_enseignement(self):
         result = get_feuille_de_notes(
