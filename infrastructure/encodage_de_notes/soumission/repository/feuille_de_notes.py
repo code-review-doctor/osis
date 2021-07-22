@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import functools
+import itertools
+import operator
 from typing import Optional, List
 
-from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField
-from django.db.models.functions import Coalesce, Cast
+from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
+from django.db.models.functions import Coalesce, Cast, Concat
 
 from base.models.exam_enrollment import ExamEnrollment
-from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_builder import FeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes, FeuilleDeNotes
@@ -42,7 +43,44 @@ from osis_common.ddd.interface import ApplicationService
 class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
-        return [cls.get(entity_id) for entity_id in entity_ids]
+        if not entity_ids:
+            return []
+
+        q_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(
+                    acronym=entity_id.code_unite_enseignement,
+                    year=entity_id.annee_academique,
+                    number_session=entity_id.numero_session
+                )
+                for entity_id in entity_ids
+            ]
+        )
+        rows = _fetch_session_exams().filter(q_filters)
+        rows_group_by_identity = itertools.groupby(rows, key=lambda row: (row.acronym, row.year, row.number_session))
+
+        result = []
+        for identity, group_rows in rows_group_by_identity:
+            group_rows = list(group_rows)
+            dto_object = FeuilleDeNotesFromRepositoryDTO(
+                numero_session=identity[2],
+                code_unite_enseignement=identity[0],
+                annee_academique=identity[1],
+                credits_unite_enseignement=float(group_rows[0].credits_unite_enseignement),
+                notes=set(
+                    NoteEtudiantFromRepositoryDTO(
+                        noma=row.noma,
+                        email=row.email,
+                        note=row.note,
+                        date_limite_de_remise=row.date_limite_de_remise,
+                        est_soumise=row.est_soumise
+                    )
+                    for row in group_rows
+                )
+            )
+            result.append(FeuilleDeNotesBuilder().build_from_repository_dto(dto_object))
+        return result
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteFeuilleDeNotes', **kwargs: ApplicationService) -> None:
@@ -59,41 +97,18 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
 
     @classmethod
     def get(cls, entity_id: 'IdentiteFeuilleDeNotes') -> 'FeuilleDeNotes':
-        rows = _fetch_session_exams().filter(
-            learning_unit_enrollment__learning_unit_year__acronym=entity_id.code_unite_enseignement,
-            learning_unit_enrollment__learning_unit_year__academic_year__year=entity_id.annee_academique,
-            session_exam__number_session=entity_id.numero_session
-        )
-
-        credits_unite_enseignement = LearningUnitYear.objects.filter(
-            acronym=entity_id.code_unite_enseignement,
-            academic_year__year=entity_id.annee_academique,
-        ).values_list('credits', flat=True)
-        credits_unite_enseignement = credits_unite_enseignement[0] if credits_unite_enseignement else None
-
-        dto_object = FeuilleDeNotesFromRepositoryDTO(
-            numero_session=entity_id.numero_session,
-            code_unite_enseignement=entity_id.code_unite_enseignement,
-            annee_academique=entity_id.annee_academique,
-            credits_unite_enseignement=credits_unite_enseignement,
-            notes=set(
-                NoteEtudiantFromRepositoryDTO(
-                    noma=row.noma,
-                    email=row.email,
-                    note=row.note,
-                    date_limite_de_remise=row.date_limite_de_remise,
-                    est_soumise=row.est_soumise
-                )
-                for row in rows
-            )
-        )
-
-        return FeuilleDeNotesBuilder().build_from_repository_dto(dto_object)
+        return cls.search([entity_id])[0]
 
 
 def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteEtudiant'):
-    db_obj = ExamEnrollment.objects.get(
-        learning_unit_enrollment__learning_unit_year__acronym=feuille_de_note_entity_id.code_unite_enseignement,
+    db_obj = ExamEnrollment.objects.annotate(
+        code_unite_enseignement=Concat(
+            'learning_unit_enrollment__learning_unit_year__acronym',
+            'learning_unit_enrollment__learning_class_year__acronym',
+            output_field=CharField()
+        )
+    ).get(
+        code_unite_enseignement=feuille_de_note_entity_id.code_unite_enseignement,
         learning_unit_enrollment__learning_unit_year__academic_year__year=feuille_de_note_entity_id.annee_academique,
         session_exam__number_session=feuille_de_note_entity_id.numero_session,
         learning_unit_enrollment__offer_enrollment__student__registration_id=note.entity_id.noma
@@ -110,6 +125,14 @@ def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteE
 
 def _fetch_session_exams():
     return ExamEnrollment.objects.annotate(
+        acronym=Concat(
+            'learning_unit_enrollment__learning_unit_year__acronym',
+            'learning_unit_enrollment__learning_class_year__acronym',
+            output_field=CharField()
+        ),
+        year=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
+        number_session=F('session_exam__number_session'),
+        credits_unite_enseignement=F('learning_unit_enrollment__learning_unit_year__credits'),
         noma=F('learning_unit_enrollment__offer_enrollment__student__registration_id'),
         email=F('learning_unit_enrollment__offer_enrollment__student__person__email'),
         score_final_char=Cast('score_final', output_field=CharField()),
@@ -127,7 +150,7 @@ def _fetch_session_exams():
         date_limite_de_remise=Case(
             When(
                 learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline_tutor__isnull=True,
-                then=Value(None)
+                then=F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline')
             ),
             default=ExpressionWrapper(
                 F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline') -
@@ -142,10 +165,18 @@ def _fetch_session_exams():
             output_field=BooleanField()
         )
     ).values_list(
+        'acronym',
+        'year',
+        'number_session',
+        'credits_unite_enseignement',
         'noma',
         'email',
         'note',
         'date_limite_de_remise',
         'est_soumise',
         named=True
+    ).order_by(
+        'acronym',
+        'year',
+        'number_session',
     )

@@ -48,7 +48,7 @@ class PeriodeSoumissionOuverte(interface.DomainService):
         aujourdhui = datetime.date.today()
         debut_periode = periode.debut_periode_soumission.to_date()
         fin_periode = periode.fin_periode_soumission.to_date()
-        periode_est_ouverte = debut_periode < aujourdhui < fin_periode
+        periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
 
         annee_est_concernee = annee_unite_enseignement == periode.annee_concernee
 

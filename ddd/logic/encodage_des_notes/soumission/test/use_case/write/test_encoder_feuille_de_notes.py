@@ -31,17 +31,19 @@ import attr
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
+from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, NoteEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification, NoteChiffree
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    EnseignantNonAttribueUniteEnseignementException, DateRemiseNoteAtteinteException, NomaNeCorrespondPasEmailException, \
-    AucunEtudiantTrouveException, NoteIncorrecteException, NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
+    EnseignantNonAttribueUniteEnseignementException, DateRemiseNoteAtteinteException, \
+    NomaNeCorrespondPasEmailException, AucunEtudiantTrouveException, NoteIncorrecteException, \
+    NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
     encoder_feuille_de_notes
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import EmptyFeuilleDeNotesFactory, \
-    FeuilleDeNotesAvecNotesManquantes, FeuilleDeNotesDecimalesAutorisees
+from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
+    FeuilleDeNotesDecimalesAutorisees, FeuilleDeNotesAvecToutesNotesSoumises, \
+    FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier
 from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
@@ -84,8 +86,9 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.attribution_translator = AttributionEnseignantTranslator()
         self.attribution_translator.search_attributions_enseignant = lambda **kwargs: {self.attribution_dto}
 
-    def test_should_empecher_si_periode_fermee(self):
-        date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
+    def test_should_empecher_si_periode_fermee_depuis_hier(self):
+        hier = datetime.date.today() - datetime.timedelta(days=1)
+        date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
         periode_fermee = attr.evolve(
             self.periode_soumission_ouverte,
             debut_periode_soumission=date_dans_le_passe,
@@ -103,6 +106,54 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                 periode_soumission_note_translator=periode_soumission_translator,
                 attribution_translator=self.attribution_translator,
             )
+
+    def test_should_autoriser_si_periode_ferme_aujourdhui(self):
+        aujourdhui = datetime.date.today()
+        date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
+        date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
+        periode_ouverte = attr.evolve(
+            self.periode_soumission_ouverte,
+            debut_periode_soumission=date_dans_le_passe,
+            fin_periode_soumission=date_aujourdhui,
+        )
+        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator.get = lambda *args: periode_ouverte
+
+        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
+        cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
+        self.assertTrue(
+            encoder_feuille_de_notes(
+                cmd=cmd,
+                feuille_de_note_repo=self.repository,
+                periode_soumission_note_translator=periode_soumission_translator,
+                attribution_translator=self.attribution_translator,
+            ),
+            "Si la date de fermeture est aujourdhui, alors l'encodage est autorisé jusqu'à aujourdhui 23h59"
+        )
+
+    def test_should_autoriser_si_periode_ouvre_aujourdhui(self):
+        aujourdhui = datetime.date.today()
+        date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
+        date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
+        periode_ouverte = attr.evolve(
+            self.periode_soumission_ouverte,
+            debut_periode_soumission=date_aujourdhui,
+            fin_periode_soumission=date_dans_le_futur,
+        )
+        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator.get = lambda *args: periode_ouverte
+
+        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
+        cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
+        self.assertTrue(
+            encoder_feuille_de_notes(
+                cmd=cmd,
+                feuille_de_note_repo=self.repository,
+                periode_soumission_note_translator=periode_soumission_translator,
+                attribution_translator=self.attribution_translator,
+            ),
+            "Si la période d'encodage ouvre aujourdhui, alors l'encodage est autorisé à partir de aujourd'hui 00h01"
+        )
 
     def test_should_empecher_si_aucune_periode_trouvee(self):
         aucune_periode_trouvee = None
@@ -150,11 +201,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             )
 
     def test_should_empecher_si_date_de_remise_est_hier(self):
-        hier = datetime.date.today() - datetime.timedelta(days=1)
-        note_date_limite_depassee = NoteManquanteEtudiantFactory(date_limite_de_remise=hier)
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_date_limite_depassee}
-        )
+        feuille_de_notes = FeuilleDeNotesDateLimiteRemiseHier()
         self.repository.save(feuille_de_notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
@@ -163,8 +210,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_date_limite_depassee.noma,
-                    email=note_date_limite_depassee.email,
+                    noma=list(feuille_de_notes.notes)[0].noma,
+                    email=list(feuille_de_notes.notes)[0].email,
                     note='12'
                 )
             ],
@@ -181,12 +228,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             DateRemiseNoteAtteinteException
         )
 
-    def test_should_empecher_si_date_de_remise_est_aujourdhui(self):
-        aujourdhui = datetime.date.today()
-        note_date_limite_depassee = NoteManquanteEtudiantFactory(date_limite_de_remise=aujourdhui)
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_date_limite_depassee}
-        )
+    def test_should_autoriser_si_date_de_remise_est_aujourdhui(self):
+        feuille_de_notes = FeuilleDeNotesDateLimiteRemiseAujourdhui()
         self.repository.save(feuille_de_notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
@@ -195,8 +238,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_date_limite_depassee.noma,
-                    email=note_date_limite_depassee.email,
+                    noma=list(feuille_de_notes.notes)[0].noma,
+                    email=list(feuille_de_notes.notes)[0].email,
                     note='12'
                 )
             ],
@@ -228,7 +271,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_etudiant_pas_sur_feuille_de_notes(self):
         noma_pas_sur_feuille_de_notes = "9999999999"
-        note_etudiant = NoteEtudiantCommand(noma=noma_pas_sur_feuille_de_notes, email=self.note_manquante.email, note='12')
+        note_etudiant = NoteEtudiantCommand(
+            noma=noma_pas_sur_feuille_de_notes,
+            email=self.note_manquante.email,
+            note='12',
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -244,7 +291,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_inferieure_0(self):
         note_inferieure_0 = "-1"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=note_inferieure_0)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=note_inferieure_0,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -260,7 +311,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_superieure_20(self):
         note_superieure_20 = "21"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=note_superieure_20)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=note_superieure_20,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -276,7 +331,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
         lettre_inexistante = "S"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=lettre_inexistante)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=lettre_inexistante,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -292,7 +351,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_mal_formatee(self):
         lettre_inexistante = "T 12"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=lettre_inexistante)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=lettre_inexistante,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -308,7 +371,11 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_note_decimale_non_autorisee(self):
         note_decimale = "12.5"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=note_decimale)
+        note_etudiant = NoteEtudiantCommand(
+            noma=self.note_manquante.noma,
+            email=self.note_manquante.email,
+            note=note_decimale,
+        )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             encoder_feuille_de_notes(
@@ -348,10 +415,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         self.assertEqual(list(self.repository.get(entity_id).notes)[0].note.value, Decimal(12.5))
 
     def test_should_empecher_si_note_deja_soumise(self):
-        note_est_soumise = NoteManquanteEtudiantFactory(est_soumise=True)
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_est_soumise}
-        )
+        feuille_de_notes = FeuilleDeNotesAvecToutesNotesSoumises()
         self.repository.save(feuille_de_notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
@@ -360,8 +424,8 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_est_soumise.noma,
-                    email=note_est_soumise.email,
+                    noma=list(feuille_de_notes.notes)[0].noma,
+                    email=list(feuille_de_notes.notes)[0].email,
                     note='12'
                 )
             ],
@@ -405,40 +469,45 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             self.assertEqual(note.note, expected_result)
 
     def test_should_encoder_absence_injustifiee(self):
-        absence_injustifiee = "A"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=absence_injustifiee)
-        cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
-        entity_id = encoder_feuille_de_notes(
-            cmd=cmd,
-            feuille_de_note_repo=self.repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            attribution_translator=self.attribution_translator,
-        )
-        expected_result = Justification(value='A')
-        self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
+        for absence_injustifiee in ['A', TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name]:
+            with self.subTest(absence=absence_injustifiee):
+                note_etudiant = NoteEtudiantCommand(
+                    noma=self.note_manquante.noma,
+                    email=self.note_manquante.email,
+                    note=absence_injustifiee,
+                )
+                cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
+                entity_id = encoder_feuille_de_notes(
+                    cmd=cmd,
+                    feuille_de_note_repo=self.repository,
+                    periode_soumission_note_translator=self.periode_soumission_translator,
+                    attribution_translator=self.attribution_translator,
+                )
+                expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
+                self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
     def test_should_encoder_tricherie(self):
-        absence_injustifiee = "T"
-        note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note=absence_injustifiee)
-        cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
-        entity_id = encoder_feuille_de_notes(
-            cmd=cmd,
-            feuille_de_note_repo=self.repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            attribution_translator=self.attribution_translator,
-        )
-        expected_result = Justification(value='T')
-        self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
+        for tricherie in ['T', TutorJustificationTypes.CHEATING.name]:
+            with self.subTest(tricherie=tricherie):
+                note_etudiant = NoteEtudiantCommand(
+                    noma=self.note_manquante.noma,
+                    email=self.note_manquante.email,
+                    note=tricherie,
+                )
+                cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
+                entity_id = encoder_feuille_de_notes(
+                    cmd=cmd,
+                    feuille_de_note_repo=self.repository,
+                    periode_soumission_note_translator=self.periode_soumission_translator,
+                    attribution_translator=self.attribution_translator,
+                )
+                expected_result = Justification(value=TutorJustificationTypes.CHEATING)
+                self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
     def test_should_aggreger_erreurs_plusieurs_notes(self):
-        note_deja_soumise_1 = NoteManquanteEtudiantFactory(est_soumise=True)
-        note_deja_soumise_2 = NoteManquanteEtudiantFactory(est_soumise=True)
-        note_deja_soumise_3 = NoteManquanteEtudiantFactory(est_soumise=True)
-
-        feuille_de_notes = EmptyFeuilleDeNotesFactory(
-            notes={note_deja_soumise_1, note_deja_soumise_2, note_deja_soumise_3}
-        )
+        feuille_de_notes = FeuilleDeNotesAvecToutesNotesSoumises()
         self.repository.save(feuille_de_notes)
+        notes = list(feuille_de_notes.notes)
         cmd = EncoderFeuilleDeNotesCommand(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
             annee_unite_enseignement=feuille_de_notes.annee,
@@ -446,18 +515,18 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             notes_etudiants=[
                 NoteEtudiantCommand(
-                    noma=note_deja_soumise_1.noma,
-                    email=note_deja_soumise_1.email,
+                    noma=notes[0].noma,
+                    email=notes[0].email,
                     note='12'
                 ),
                 NoteEtudiantCommand(
-                    noma=note_deja_soumise_2.noma,
-                    email=note_deja_soumise_2.email,
+                    noma=notes[1].noma,
+                    email=notes[1].email,
                     note='12'
                 ),
                 NoteEtudiantCommand(
-                    noma=note_deja_soumise_3.noma,
-                    email=note_deja_soumise_3.email,
+                    noma=notes[2].noma,
+                    email=notes[2].email,
                     note='12'
                 ),
             ],

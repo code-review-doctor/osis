@@ -22,10 +22,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 import factory
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes, \
-    IdentiteResponsableDeNotes, UniteEnseignementIdentite
+    IdentiteResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
+from testing.factory import SetFactory
+
+
+def generate_matricule_fgs() -> str:
+    first_digit = str(random.randint(1, 9))
+    other_digits = [str(random.randint(0, 9)) for _ in range(8)]
+    return "".join([first_digit] + other_digits)
 
 
 class _IdentiteResponsableDeNotesFactory(factory.Factory):
@@ -33,7 +43,52 @@ class _IdentiteResponsableDeNotesFactory(factory.Factory):
         model = IdentiteResponsableDeNotes
         abstract = False
 
-    matricule_fgs_enseignant = '00123456'
+    matricule_fgs_enseignant = factory.LazyFunction(generate_matricule_fgs)
+
+
+class _UniteEnseignementIdentiteFactory(factory.Factory):
+    class Meta:
+        model = UniteEnseignementIdentite
+        abstract = False
+
+    code_unite_enseignement = "LOSIS1254"
+    annee_academique = 2020
+
+
+class _ResponsableDeNotesFactory(factory.Factory):
+    class Meta:
+        model = ResponsableDeNotes
+        abstract = True
+
+    entity_id = factory.SubFactory(_IdentiteResponsableDeNotesFactory)
+    unites_enseignements = set()
+
+
+class ResponsableDeNotesPourUneUniteEnseignement(_ResponsableDeNotesFactory):
+    unites_enseignements = factory.List(
+        [_UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254")],
+        list_factory=SetFactory
+    )
+
+
+class ResponsableDeNotesPourMultipleUniteEnseignements(_ResponsableDeNotesFactory):
+    unites_enseignements = factory.List(
+        [
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354"),
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1589"),
+        ],
+        list_factory=SetFactory
+    )
+
+
+class ResponsableDeNotesPourClasse(_ResponsableDeNotesFactory):
+    unites_enseignements = factory.List(
+        [
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354A"),  # classe
+            _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS2569"),
+        ],
+        list_factory=SetFactory
+    )
 
 
 class ResponsableDeNotesLDROI1001Annee2020Factory(factory.Factory):

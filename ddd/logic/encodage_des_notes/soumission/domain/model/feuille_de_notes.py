@@ -34,7 +34,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_busi
     EncoderFeuilleDeNotesValidatorList
 from osis_common.ddd import interface
 
-NOTE_DECIMALE_AUTORISEE = 15.0
+CREDITS_MIN_POUR_NOTE_DECIMALE = 15.0
 
 
 @attr.s(frozen=True, slots=True)
@@ -67,7 +67,7 @@ class FeuilleDeNotes(interface.RootEntity):
         return sum(1 for note in self.notes if note.est_soumise)
 
     def note_decimale_est_autorisee(self) -> bool:
-        return self.credits_unite_enseignement >= NOTE_DECIMALE_AUTORISEE
+        return self.credits_unite_enseignement >= CREDITS_MIN_POUR_NOTE_DECIMALE
 
     def encoder_note(
             self,

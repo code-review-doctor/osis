@@ -30,6 +30,7 @@ import factory.fuzzy
 
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class LearningUnitEnrollmentFactory(factory.django.DjangoModelFactory):
@@ -40,4 +41,5 @@ class LearningUnitEnrollmentFactory(factory.django.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     date_enrollment = datetime.datetime.now()
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
+    learning_class_year = None
     offer_enrollment = factory.SubFactory(OfferEnrollmentFactory)
