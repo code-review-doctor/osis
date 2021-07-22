@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-from datetime import date
 from decimal import Decimal
 
 import attr
@@ -44,10 +43,10 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_n
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
     FeuilleDeNotesDecimalesAutorisees, FeuilleDeNotesAvecToutesNotesSoumises, \
     FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier
-from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
-    AttributionEnseignantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+    AttributionEnseignantTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
+    PeriodeSoumissionNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
     FeuilleDeNotesInMemoryRepository
 
@@ -70,33 +69,19 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             notes_etudiants=[],
         )
 
-        self.periode_soumission_ouverte = PeriodeSoumissionNotesDTO(
-            annee_concernee=self.feuille_de_notes.annee,
-            session_concernee=self.feuille_de_notes.numero_session,
-            debut_periode_soumission=DateDTO(jour=1, mois=1, annee=date.today().year),
-            fin_periode_soumission=DateDTO(jour=31, mois=12, annee=date.today().year),
-        )
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslator()
-        self.periode_soumission_translator.get = lambda *args: self.periode_soumission_ouverte
-
-        self.attribution_dto = AttributionEnseignantDTO(
-            code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
-            annee=self.feuille_de_notes.annee,
-            nom="Smith",
-            prenom="Charles",
-        )
-        self.attribution_translator = AttributionEnseignantTranslator()
-        self.attribution_translator.search_attributions_enseignant = lambda **kwargs: {self.attribution_dto}
+        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.attribution_translator = AttributionEnseignantTranslatorInMemory()
 
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = attr.evolve(
-            self.periode_soumission_ouverte,
+        periode_fermee = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_fermee
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
@@ -113,12 +98,13 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
-        periode_ouverte = attr.evolve(
-            self.periode_soumission_ouverte,
+        periode_ouverte = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_aujourdhui,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_ouverte
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
@@ -137,12 +123,13 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
-        periode_ouverte = attr.evolve(
-            self.periode_soumission_ouverte,
+        periode_ouverte = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_aujourdhui,
             fin_periode_soumission=date_dans_le_futur,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_ouverte
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
@@ -159,7 +146,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_aucune_periode_trouvee(self):
         aucune_periode_trouvee = None
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: aucune_periode_trouvee
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
@@ -173,8 +160,14 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             )
 
     def test_should_empecher_si_utilisateur_non_attribue_unite_enseignement(self):
-        attribution_autre_unite_enseignement = attr.evolve(self.attribution_dto, code_unite_enseignement='LAUTRE1234')
-        attribution_translator = AttributionEnseignantTranslator()
+        attribution_autre_unite_enseignement = AttributionEnseignantDTO(
+            matricule_fgs_enseignant=self.matricule_enseignant,
+            code_unite_enseignement="LAUTRE1234",
+            annee=self.feuille_de_notes.annee,
+            nom="Smith",
+            prenom="Charles",
+        )
+        attribution_translator = AttributionEnseignantTranslatorInMemory()
         attribution_translator.search_attributions_enseignant = lambda **kwargs: {attribution_autre_unite_enseignement}
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
@@ -189,7 +182,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
 
     def test_should_empecher_si_utilisateur_aucune_attribution(self):
         aucune_attribution = set()
-        attribution_translator = AttributionEnseignantTranslator()
+        attribution_translator = AttributionEnseignantTranslatorInMemory()
         attribution_translator.search_attributions_enseignant = lambda **kwargs: aucune_attribution
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')

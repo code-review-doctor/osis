@@ -95,9 +95,10 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.assertEqual(result.responsable_note.nom, 'Chileng')
         self.assertEqual(result.responsable_note.prenom, 'Jean-Michel')
 
-    def test_should_ignorer_responsable_notes_dans_autre_enseigants(self):
+    def test_should_ignorer_responsable_notes_dans_autres_enseignants(self):
         attribution_translator = AttributionEnseignantTranslatorInMemory()
         responsable_notes = AttributionEnseignantDTO(
+            matricule_fgs_enseignant=self.matricule_enseignant,
             code_unite_enseignement=self.code_unite_enseignement,
             annee=self.annee,
             nom="Chileng",  # Responsable de notes

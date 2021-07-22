@@ -179,6 +179,7 @@ class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class AttributionEnseignantDTO(interface.DTO):
+    matricule_fgs_enseignant = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     annee = attr.ib(type=int)
     nom = attr.ib(type=str)

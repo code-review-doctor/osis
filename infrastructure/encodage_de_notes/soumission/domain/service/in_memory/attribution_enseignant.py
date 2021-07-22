@@ -38,12 +38,14 @@ class AttributionEnseignantTranslatorInMemory(IAttributionEnseignantTranslator):
 
     attributions_dtos = {
         AttributionEnseignantDTO(
+            matricule_fgs_enseignant="00321234",
             code_unite_enseignement="LDROI1001",
             annee=2020,
             nom="Smith",
             prenom="Charles",
         ),
         AttributionEnseignantDTO(
+            matricule_fgs_enseignant="12345678",
             code_unite_enseignement="LDROI1001",
             annee=2020,
             nom="Jolypas",

@@ -47,21 +47,27 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
         return dtos
 
 
-def _search_attributions_unite_enseignement(code_unite_enseignement: str, annee: int) -> Set['AttributionEnseignantDTO']:
+def _search_attributions_unite_enseignement(
+        code_unite_enseignement: str,
+        annee: int
+) -> Set['AttributionEnseignantDTO']:
     attributions_unite_enseignement = AttributionNew.objects.filter(
         learning_container_year__academic_year__year=annee,
         learning_container_year__acronym=code_unite_enseignement,
     ).annotate(
+        matricule_fgs_enseignant=F('tutor__person__global_id'),
         code_unite_enseignement=F('learning_container_year__acronym'),
         nom=F('tutor__person__last_name'),
         prenom=F('tutor__person__first_name'),
     ).values(
+        'matricule_fgs_enseignant',
         'code_unite_enseignement',
         'nom',
         'prenom',
     ).distinct()
     return {
         AttributionEnseignantDTO(
+            matricule_fgs_enseignant=attribution_as_dict['matricule_fgs_enseignant'],
             code_unite_enseignement=attribution_as_dict['code_unite_enseignement'],
             annee=annee,
             prenom=attribution_as_dict['prenom'],

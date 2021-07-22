@@ -49,6 +49,7 @@ class AttributionEnseignantTest(TestCase):
         self.assertEqual(len(result), 1)
         expected_result = {
             AttributionEnseignantDTO(
+                matricule_fgs_enseignant=attribution_db.tutor.person.global_id,
                 code_unite_enseignement=attribution_db.learning_container_year.acronym,
                 annee=self.annee,
                 nom=attribution_db.tutor.person.last_name,
