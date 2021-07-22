@@ -61,9 +61,6 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
     dates_echeance = attr.ib(type=List[DateEcheanceDTO])
     a_etudiants_peps = attr.ib(type=bool)  # signaletique
-    enseignant = attr.ib(type=EnseignantDTO)  # FIXME :: enseignant = responsable de notes ? Ou utilisateur connecté ?
-    annee_academique = attr.ib(type=int)
-    numero_session = attr.ib(type=int)
 
     @property
     def quantite_notes_soumises(self) -> int:
@@ -80,6 +77,9 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
+    # enseignant = attr.ib(type=EnseignantDTO)  # FIXME :: enseignant = responsable de notes ? Ou utilisateur connecté ?
+    annee_academique = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
     progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
 
 

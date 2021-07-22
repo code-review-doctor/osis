@@ -94,6 +94,11 @@ class FeuilleDeNotesRepositoryTest(TestCase):
         for feuille in feuilles_de_notes:
             self.assertIn(feuille, feuilles_de_notes_retrieved)
 
+    def test_should_(self):
+        feuille_de_notes = FeuilleDeNotesAvecNotesEncodees()
+        self._create_save_necessary_data(feuille_de_notes)
+        FeuilleDeNotesRepository().get_progression_generale(feuille_de_notes.entity_id)
+
     def _create_save_necessary_data(self, feuille_de_notes_to_save, for_class: bool = False):
         luy_acronym = feuille_de_notes_to_save.entity_id.code_unite_enseignement
         if for_class:

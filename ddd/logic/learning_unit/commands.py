@@ -105,7 +105,7 @@ class CreateCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitSearchCommand(interface.CommandRequest):
-    code = attr.ib(type=str, default=None)
+    codes = attr.ib(type=str, default=None)
     year = attr.ib(type=int, default=None)
     type = attr.ib(type=str, default=None)
     full_title = attr.ib(type=str, default=None)

@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+import functools
+import operator
+from typing import Optional, List, Set
 
 from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet
 from django.db.models.functions import Concat, Substr, Length
@@ -67,7 +69,7 @@ class LearningUnitRepository(ILearningUnitRepository):
     @classmethod
     def search_learning_units_dto(
             cls,
-            code: str = None,
+            codes: Set[str] = None,
             year: int = None,
             full_title: str = None,
             type: str = None,
@@ -75,10 +77,17 @@ class LearningUnitRepository(ILearningUnitRepository):
     ) -> List['LearningUnitSearchDTO']:
         qs = _get_common_queryset()
         # FIXME :: reuse Django filter
-        if code is not None:
-            qs = qs.filter(
-                acronym__icontains=code,
+        if codes is not None:
+            q_filters = functools.reduce(
+                operator.or_,
+                [
+                    Q(
+                        acronym__icontains=code,
+                    )
+                    for code in codes
+                ]
             )
+            qs = qs.filter(q_filters)
         if year is not None:
             qs = qs.filter(
                 academic_year__year=year,

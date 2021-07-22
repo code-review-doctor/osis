@@ -28,10 +28,12 @@ import itertools
 import operator
 from typing import Optional, List
 
-from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
+from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, Subquery, \
+    OuterRef
 from django.db.models.functions import Coalesce, Cast, Concat
 
 from base.models.exam_enrollment import ExamEnrollment
+from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_builder import FeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes, FeuilleDeNotes
@@ -98,6 +100,113 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
     @classmethod
     def get(cls, entity_id: 'IdentiteFeuilleDeNotes') -> 'FeuilleDeNotes':
         return cls.search([entity_id])[0]
+
+    @classmethod
+    def get_progression_generale(cls, entity_ids: List['IdentiteFeuilleDeNotes']) -> 'ProgressionGeneraleEncodageNotesDTO':
+        session_concernee = entity_ids[0].numero_session
+        q_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(
+                    learning_unit_enrollment__learning_unit_year__acronym=entity_id.code_unite_enseignement,
+                    learning_unit_enrollment__learning_unit_year__academic_year__year=entity_id.annee_academique,
+                )
+                for entity_id in entity_ids
+            ]
+        )
+        ExamEnrollment.objects.filter(
+            # Une seule période d'encodage de notes ouverte à un même moment
+            session_exam__number_session=session_concernee,
+        ).filter(
+            q_filters
+        ).annotate(
+            code_unite_enseignement=F('learning_unit_enrollment__learning_unit_year__acronym'),
+            # intitule_complet_unite_enseignement=Subquery(
+            #     LearningUnitYear.objects.filter(
+            #         pk=OuterRef('learning_unit_enrollment__learning_unit_year__pk'),
+            #     ).annotate_full_title().values('full_title')[:1],
+            #     output_field=CharField()
+            # ),
+            date_echeance=Subquery(
+                SessionExamDeadline.objects.filter(
+                    offer_enrollment=OuterRef('offer_enrollment'),
+                    session=OuterRef('session_exam__number_session'),
+                ).values('deadline_tutor')[:1],
+                output_field=DateField()
+            ),
+
+        )
+        # subquery_notes_soumises = Subquery(
+        #     ExamEnrollment.objects.filter(
+        #         learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline=OuterRef('deadline'),
+        #         learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline_tutor=OuterRef('deadline_tutor'),
+        #         learning_unit_enrollment__learning_unit_year__acronym=OuterRef('code_unite_enseignement'),
+        #         learning_unit_enrollment__learning_unit_year__academic_year__year=OuterRef('annee_unite_enseignement'),
+        #     ).filter(
+        #         Q(score_final__isnull=False) | Q(justification_final__isnull=False)
+        #     ).values(
+        #
+        #     ).annotate(
+        #         count=Count('pk'),
+        #     ).values(
+        #         'count'
+        #     ),
+        #     output_field=IntegerField(),
+        # )
+        # subquery_notes_total = Subquery(
+        #     ExamEnrollment.objects.filter(
+        #         learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline=OuterRef('deadline'),
+        #         learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline_tutor=OuterRef('deadline_tutor'),
+        #         learning_unit_enrollment__learning_unit_year__acronym=OuterRef('code_unite_enseignement'),
+        #         learning_unit_enrollment__learning_unit_year__academic_year__year=OuterRef('annee_unite_enseignement'),
+        #     ).annotate(
+        #         count=Count('pk'),
+        #     ).values(
+        #         'count'
+        #     ),
+        #     output_field=IntegerField(),
+        # )
+
+        # qs = SessionExamDeadline.objects.filter(
+        #     # Une seule période d'encodage de notes ouverte à un même moment
+        #     number_session=entity_ids[0].numero_session,
+        # ).filter(
+        #     q_filters
+        # ).annotate(
+        #     code_unite_enseignement=F('offer_enrollment__learningunitenrollment__learning_unit_year__acronym'),
+        #     annee_unite_enseignement=F('offer_enrollment__learningunitenrollment__learning_unit_year__academic_year__year'),
+        # ).values(
+        #     # 'pk',
+        #     # 'date_limite_de_remise',
+        #     'deadline_tutor',
+        #     'deadline',
+        #     'code_unite_enseignement',
+        #     'annee_unite_enseignement',
+        # ).distinct(
+        #
+        # ).annotate(
+        #     quantite_notes_soumises=Coalesce(subquery_notes_soumises, 0),
+        #     quantite_total_notes=Coalesce(subquery_notes_total, 0),
+        #     date_limite_de_remise=Case(
+        #         When(
+        #             deadline_tutor__isnull=True,
+        #             then='deadline'
+        #         ),
+        #         default=ExpressionWrapper(
+        #             F('deadline') -
+        #             F('deadline_tutor'),
+        #             output_field=DateField()
+        #         )
+        #     ),
+        # ).values(
+        #     'quantite_notes_soumises',
+        #     'quantite_total_notes',
+        #     'date_limite_de_remise',
+        # )
+        print(str(qs))
+        print()
+        print()
+
 
 
 def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteEtudiant'):

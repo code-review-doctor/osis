@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
@@ -16,7 +16,7 @@ class LearningUnitRepository(InMemoryGenericRepository, ILearningUnitRepository)
     @classmethod
     def search_learning_units_dto(
             cls,
-            code: str = None,
+            codes: Set[str] = None,
             year: int = None,
             full_title: str = None,
             type: str = None,

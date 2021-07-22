@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import abc
-from typing import List
+from typing import List, Set
 
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity, LearningUnit
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
@@ -41,7 +41,7 @@ class ILearningUnitRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def search_learning_units_dto(
             cls,
-            code: str = None,
+            codes: Set[str] = None,
             year: int = None,
             full_title: str = None,
             type: str = None,

@@ -35,7 +35,7 @@ def search_learning_units(
         repository: 'ILearningUnitRepository'
 ) -> List['LearningUnitSearchDTO']:
     return repository.search_learning_units_dto(
-        code=cmd.code,
+        codes=cmd.codes,
         year=cmd.year,
         full_title=cmd.full_title,
         type=cmd.type,

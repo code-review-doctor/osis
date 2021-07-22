@@ -24,6 +24,16 @@
 #
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
+    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeSoumissionOuverte
+from ddd.logic.encodage_des_notes.soumission.domain.service.progression_generale_encodage import \
+    ProgressionGeneraleEncodage
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
@@ -31,10 +41,23 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes impor
 def get_progression_generale(
         cmd: 'GetProgressionGeneraleCommand',
         feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+        attribution_translator: 'IAttributionEnseignantTranslator',
+        unite_enseignement_translator: 'IUniteEnseignementTranslator',
 ) -> 'ProgressionGeneraleEncodageNotesDTO':
     # Given
+    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
 
     # When
+    progression_dto = ProgressionGeneraleEncodage().get(
+        matricule_fgs_enseignant=cmd.matricule_fgs_enseignant,
+        feuille_de_note_repo=feuille_de_note_repo,
+        attribution_translator=attribution_translator,
+        periode_soumission_note_translator=periode_soumission_note_translator,
+        signaletique_etudiant_translator=signaletique_etudiant_translator,
+        unite_enseignement_translator=unite_enseignement_translator,
+    )
 
     # Then
-    return
+    return progression_dto
