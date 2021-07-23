@@ -89,3 +89,14 @@ class ResponsableDeNotesPourClasse(_ResponsableDeNotesFactory):
         ],
         list_factory=SetFactory
     )
+
+
+class ResponsableDeNotesLDROI1001Annee2020Factory(factory.Factory):
+    class Meta:
+        model = ResponsableDeNotes
+        abstract = False
+
+    entity_id = factory.SubFactory(_IdentiteResponsableDeNotesFactory)
+    unites_enseignements = {
+        UniteEnseignementIdentite('LDROI1001', 2020),
+    }

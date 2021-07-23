@@ -23,37 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import List
 
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class IdentiteResponsableDeNotes(interface.EntityIdentity):
-    matricule_fgs_enseignant = attr.ib(type=str)
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-@attr.s(frozen=True, slots=True)
-class ResponsableDeNotes(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteResponsableDeNotes)
-    unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
-
-    @property
-    def matricule_fgs_enseignant(self) -> str:
-        return self.entity_id.matricule_fgs_enseignant
-
-    def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
-
-    def desassigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
-
-    def is_responsable_unite_enseignement(self, code_unite_enseignement: str, annee: int) -> bool:
-        return any(
-            ue for ue in self.unites_enseignements
-            if ue.code_unite_enseignement == code_unite_enseignement
-            and ue.annee_academique == annee
-        )
+class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
+    entities = list()  # type: List[ResponsableDeNotes]
