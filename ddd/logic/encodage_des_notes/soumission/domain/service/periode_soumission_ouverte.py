@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
     IPeriodeSoumissionNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException

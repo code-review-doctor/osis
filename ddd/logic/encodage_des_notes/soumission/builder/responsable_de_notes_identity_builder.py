@@ -42,7 +42,5 @@ class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
         return IdentiteResponsableDeNotes(matricule_fgs_enseignant=dto_object.matricule_fgs_enseignant)
 
     @classmethod
-    def build_from_matricule_fgs_enseignant(cls, matricule_fgs_enseignant: str) -> IdentiteResponsableDeNotes:
-        return IdentiteResponsableDeNotes(
-            matricule_fgs_enseignant=matricule_fgs_enseignant,
-        )
+    def build_from_matricule_fgs(cls, fgs_enseignant: str) -> 'IdentiteResponsableDeNotes':
+        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=fgs_enseignant)

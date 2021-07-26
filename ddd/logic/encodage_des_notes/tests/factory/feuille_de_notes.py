@@ -71,6 +71,14 @@ class FeuilleDeNotesAvecNotesEncodees(_FeuilleDeNotesFactory):
         NoteChiffreEtudiantFactory(),
         NoteChiffreEtudiantFactory(),
         NoteJustificationEtudiantFactory(),
+    }
+
+
+class FeuilleDeNotesAvecNotesEncodeesEtNotesManquantes(_FeuilleDeNotesFactory):
+    notes = {
+        NoteChiffreEtudiantFactory(),
+        NoteChiffreEtudiantFactory(),
+        NoteJustificationEtudiantFactory(),
         NoteManquanteEtudiantFactory()
     }
 

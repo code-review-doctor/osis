@@ -41,8 +41,19 @@ class ResponsableDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteResponsableDeNotes)
     unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
 
+    @property
+    def matricule_fgs_enseignant(self) -> str:
+        return self.entity_id.matricule_fgs_enseignant
+
     def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
         raise NotImplementedError
 
     def desassigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
         raise NotImplementedError
+
+    def is_responsable_unite_enseignement(self, code_unite_enseignement: str, annee: int) -> bool:
+        return any(
+            ue for ue in self.unites_enseignements
+            if ue.code_unite_enseignement == code_unite_enseignement
+            and ue.annee_academique == annee
+        )
