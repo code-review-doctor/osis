@@ -26,6 +26,7 @@ import string
 
 from django.test import TestCase
 
+from assessments.models.score_responsible import ScoreResponsible
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory, ScoreResponsibleOfClassFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
@@ -113,6 +114,18 @@ class ResponsableDeNotesRepositoryTest(TestCase):
         self.assertCountEqual(responsables_retrieved, responsables)
 
     def test_search_responsable_de_notes_by_entity_ids_should_return_empty_list_when_no_matching_entity_id(self):
+        responsable = ResponsableDeNotesPourUneUniteEnseignement()
+        self._create_necessary_data(responsable)
+        self.responsable_de_notes_repository.save(responsable)
+
+        enseignant_dto = self.responsable_de_notes_repository.get_detail_enseignant(responsable.entity_id)
+        responsable_db = ScoreResponsible.objects.get(
+            tutor__person__global_id=responsable.entity_id.matricule_fgs_enseignant
+        )
+        self.assertEqual(enseignant_dto.prenom, responsable_db.tutor.person.first_name)
+        self.assertEqual(enseignant_dto.nom, responsable_db.tutor.person.last_name)
+
+    def test_should_renvoyer_details_enseignants(self):
         responsable_not_persisted = ResponsableDeNotesPourUneUniteEnseignement()
 
         responsables_retrieved = self.responsable_de_notes_repository.search([responsable_not_persisted.entity_id])

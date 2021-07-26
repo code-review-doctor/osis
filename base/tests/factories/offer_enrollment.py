@@ -44,4 +44,5 @@ class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     student = factory.SubFactory(StudentFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    cohort_year = None
     enrollment_state = offer_enrollment_state.SUBSCRIBED

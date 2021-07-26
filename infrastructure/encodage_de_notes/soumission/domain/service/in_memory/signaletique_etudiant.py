@@ -23,21 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Set, List
 
-from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from base.models.enums.peps_type import PepsTypes
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, EtudiantPepsDTO
 
 
-def search_learning_units(
-        cmd: LearningUnitSearchCommand,
-        repository: 'ILearningUnitRepository'
-) -> List['LearningUnitSearchDTO']:
-    return repository.search_learning_units_dto(
-        code=cmd.code,
-        year=cmd.year,
-        full_title=cmd.full_title,
-        type=cmd.type,
-        responsible_entity_code=cmd.responsible_entity_code,
-    )
+class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
+
+    signaletique_dtos = {
+        SignaletiqueEtudiantDTO(
+            noma='11111111',
+            nom="Dupont",
+            prenom="Marie",
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                tiers_temps=True,
+                copie_adaptee=True,
+                local_specifique=True,
+                autre_amenagement=True,
+                details_autre_amenagement="Details autre aménagement",
+                accompagnateur="Accompagnateur",
+            ),
+        )
+    }
+
+    @classmethod
+    def search(
+            cls,
+            nomas: List[str],
+    ) -> Set['SignaletiqueEtudiantDTO']:
+        nomas_as_set = set(nomas)
+        return set(
+            filter(
+                lambda dto: dto.noma in nomas_as_set,
+                cls.signaletique_dtos,
+            )
+        )

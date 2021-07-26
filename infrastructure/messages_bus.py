@@ -44,15 +44,21 @@ from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_s
     has_class_repartition_service
 from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
     has_enrollments_to_class_service
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
+    encoder_feuille_de_notes
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand
+    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand, \
+    LearningUnitSearchCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_warnings_service import get_effective_class_warnings
 from ddd.logic.learning_unit.use_case.read.get_learning_unit_service import get_learning_unit
+from ddd.logic.learning_unit.use_case.read.search_learning_units_service import search_learning_units
 from ddd.logic.learning_unit.use_case.write.create_effective_class_service import create_effective_class
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
@@ -71,6 +77,16 @@ from infrastructure.application.repository.application_calendar import Applicati
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
+    AttributionEnseignantTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
+    PeriodeSoumissionNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
+    SignaletiqueEtudiantTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
+from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -97,6 +113,7 @@ class MessageBus:
             cmd, program_tree_repo.ProgramTreeRepository(), ReportRepository()
         ),
         GetLearningUnitCommand: lambda cmd: get_learning_unit(cmd, LearningUnitRepository()),
+        LearningUnitSearchCommand: lambda cmd: search_learning_units(cmd, LearningUnitRepository()),
         CreateEffectiveClassCommand: lambda cmd: create_effective_class(
             cmd, LearningUnitRepository(), EffectiveClassRepository()
         ),
@@ -153,6 +170,22 @@ class MessageBus:
         SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
             ApplicationsMailSummary()
+        ),
+        GetFeuilleDeNotesCommand: lambda cmd: get_feuille_de_notes(
+            cmd,
+            FeuilleDeNotesRepository(),
+            ResponsableDeNotesRepository(),
+            PeriodeSoumissionNotesTranslator(),
+            InscriptionExamenTranslator(),
+            SignaletiqueEtudiantTranslator(),
+            AttributionEnseignantTranslator(),
+            UniteEnseignementTranslator(),
+        ),
+        EncoderFeuilleDeNotesCommand: lambda cmd: encoder_feuille_de_notes(
+            cmd,
+            FeuilleDeNotesRepository(),
+            PeriodeSoumissionNotesTranslator(),
+            AttributionEnseignantTranslator(),
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

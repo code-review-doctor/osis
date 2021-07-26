@@ -24,11 +24,22 @@
 #
 ##############################################################################
 from typing import List
+from typing import Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
 class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
+    @classmethod
+    def search(cls, entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None, **kwargs) -> List['RootEntity']:
+        raise NotImplementedError
+
+    @classmethod
+    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
+        return EnseignantDTO(nom='Chileng', prenom='Jean-Michel')
+
     entities = list()  # type: List[ResponsableDeNotes]

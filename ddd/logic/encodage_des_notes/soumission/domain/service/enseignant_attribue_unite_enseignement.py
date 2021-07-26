@@ -41,12 +41,13 @@ class EnseignantAttribueUniteEnseignement(interface.DomainService):
             attribution_translator: 'IAttributionEnseignantTranslator'
     ) -> None:
         attributions = attribution_translator.search_attributions_enseignant(
-            matricule_fgs_enseignant=cmd.matricule_fgs_enseignant,
+            code_unite_enseignement=cmd.code_unite_enseignement,
             annee=cmd.annee_unite_enseignement,
         )
         est_attribue_unite_enseignement = any(
             attribution for attribution in attributions
-            if attribution.code_unite_enseignement == cmd.code_unite_enseignement
+            if attribution.matricule_fgs_enseignant == cmd.matricule_fgs_enseignant
+            and attribution.code_unite_enseignement == cmd.code_unite_enseignement
             and attribution.annee == cmd.annee_unite_enseignement
         )
         if not est_attribue_unite_enseignement:
