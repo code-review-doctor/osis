@@ -32,7 +32,6 @@ from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
     AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
@@ -198,16 +197,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.assertTrue(note_etudiant.desinscrit_tardivement)
 
     def test_should_renvoyer_note_est_soumise(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = message_bus_instance.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertFalse(note_etudiant.est_soumise)
 
