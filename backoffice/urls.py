@@ -51,7 +51,11 @@ if 'assistant' in settings.INSTALLED_APPS:
 if 'internship' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^internships/', include('internship.urls')),)
 if 'dissertation' in settings.INSTALLED_APPS:
-    urlpatterns += (url(r'^dissertation/', include('dissertation.urls')),)
+    urlpatterns += (
+        url(r'^dissertation/', include('dissertation.urls')),
+        # API
+        url(r'^api/v1/dissertation/', include('dissertation.api.url_v1', namespace='dissertation_api_v1'))
+    )
 if 'assessments' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^assessments/', include('assessments.urls')),)
 if 'attribution' in settings.INSTALLED_APPS:
