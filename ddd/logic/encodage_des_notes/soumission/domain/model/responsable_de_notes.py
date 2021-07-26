@@ -42,6 +42,10 @@ class ResponsableDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteResponsableDeNotes)
     unites_enseignements = attr.ib(type=Set[UniteEnseignementIdentite])
 
+    @property
+    def matricule_fgs_enseignant(self) -> str:
+        return self.entity_id.matricule_fgs_enseignant
+
     def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
         self.unites_enseignements.add(
             UniteEnseignementIdentiteBuilder.build_from_code_and_annee(code_unite_enseignement, annee_academique)
@@ -52,13 +56,9 @@ class ResponsableDeNotes(interface.RootEntity):
             UniteEnseignementIdentiteBuilder.build_from_code_and_annee(code_unite_enseignement, annee_academique)
         )
 
-    def est_responsable_de(self, code_unite_enseignement: str, annee_academique: int) -> bool:
-        unite_enseignement_identite = UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
-            code_unite_enseignement,
-            annee_academique
+    def is_responsable_unite_enseignement(self, code_unite_enseignement: str, annee: int) -> bool:
+        return any(
+            ue for ue in self.unites_enseignements
+            if ue.code_unite_enseignement == code_unite_enseignement
+            and ue.annee_academique == annee
         )
-        return unite_enseignement_identite in self.unites_enseignements
-
-    @property
-    def matricule_fgs_enseignant(self) -> str:
-        return self.entity_id.matricule_fgs_enseignant

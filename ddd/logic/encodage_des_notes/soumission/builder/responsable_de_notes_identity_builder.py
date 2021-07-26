@@ -40,3 +40,7 @@ class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
             dto_object: 'ResponsableDeNotesFromRepositoryDTO'
     ) -> 'IdentiteResponsableDeNotes':
         return IdentiteResponsableDeNotes(matricule_fgs_enseignant=dto_object.matricule_fgs_enseignant)
+
+    @classmethod
+    def build_from_matricule_fgs(cls, fgs_enseignant: str) -> 'IdentiteResponsableDeNotes':
+        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=fgs_enseignant)

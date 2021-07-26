@@ -79,3 +79,11 @@ class NoteDecimaleNonAutoriseeException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Decimal scores not authorized")
         super().__init__(message, **kwargs)
+
+
+class PasResponsableDeNotesException(BusinessException):
+    def __init__(self, code_unite_enseignement: str, **kwargs):
+        message = _("You must be score responsible of {code_unite_enseignement} to submit the scores").format(
+            code_unite_enseignement=code_unite_enseignement
+        )
+        super().__init__(message, **kwargs)

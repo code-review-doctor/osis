@@ -79,7 +79,7 @@ class TestAssignerResponsableDeNotes(SimpleTestCase):
 
         responsable_retrieved = self.repo.get(entity_id)
         self.assertTrue(
-            responsable_retrieved.est_responsable_de(
+            responsable_retrieved.is_responsable_unite_enseignement(
                 self.cmd.code_unite_enseignement,
                 self.cmd.annee_unite_enseignement
             )
@@ -95,7 +95,7 @@ class TestAssignerResponsableDeNotes(SimpleTestCase):
         responsable_retrieved = self.repo.get(entity_id)
         self.assertTrue(responsable, responsable_retrieved)
         self.assertTrue(
-            responsable_retrieved.est_responsable_de(
+            responsable_retrieved.is_responsable_unite_enseignement(
                 self.cmd.code_unite_enseignement,
                 self.cmd.annee_unite_enseignement
             )
