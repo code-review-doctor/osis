@@ -44,6 +44,8 @@ from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_s
     has_class_repartition_service
 from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
     has_enrollments_to_class_service
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -73,6 +75,16 @@ from infrastructure.application.repository.application_calendar import Applicati
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
+    AttributionEnseignantTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
+    PeriodeSoumissionNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
+    SignaletiqueEtudiantTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
+from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -156,7 +168,17 @@ class MessageBus:
         SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
             ApplicationsMailSummary()
-        )
+        ),
+        GetFeuilleDeNotesCommand: lambda cmd: get_feuille_de_notes(
+            cmd,
+            FeuilleDeNotesRepository(),
+            ResponsableDeNotesRepository(),
+            PeriodeSoumissionNotesTranslator(),
+            InscriptionExamenTranslator(),
+            SignaletiqueEtudiantTranslator(),
+            AttributionEnseignantTranslator(),
+            UniteEnseignementTranslator(),
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

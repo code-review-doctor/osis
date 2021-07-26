@@ -27,7 +27,6 @@
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from infrastructure.messages_bus import message_bus_instance
 
 
 class UniteEnseignementTranslator(IUniteEnseignementTranslator):
@@ -38,6 +37,7 @@ class UniteEnseignementTranslator(IUniteEnseignementTranslator):
             code: str,
             annee: int,
     ) -> 'UniteEnseignementDTO':
+        from infrastructure.messages_bus import message_bus_instance
         results = message_bus_instance.invoke(LearningUnitSearchCommand(code=code, year=annee))
         if results:
             dto = results[0]

@@ -27,6 +27,7 @@ from typing import List, Dict
 
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
     ResponsableDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import Noma
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
@@ -108,13 +109,10 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         )
 
 
-NomaEtudiant = str
-
-
 def _get_signaletique_etudiant_par_noma(
-        nomas_concernes: List[NomaEtudiant],
+        nomas_concernes: List['Noma'],
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
-) -> Dict[NomaEtudiant, 'SignaletiqueEtudiantDTO']:
+) -> Dict['Noma', 'SignaletiqueEtudiantDTO']:
     signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
     return {signal.noma: signal for signal in signaletiques_etds}
 
@@ -122,7 +120,7 @@ def _get_signaletique_etudiant_par_noma(
 def _get_desinscriptions_examens_par_noma(
         feuille_de_notes: 'FeuilleDeNotes',
         inscription_examen_translator: 'IInscriptionExamenTranslator'
-) -> Dict[NomaEtudiant, 'DesinscriptionExamenDTO']:
+) -> Dict['Noma', 'DesinscriptionExamenDTO']:
     desinscriptions_examens = inscription_examen_translator.search_desinscrits(
         code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
         annee=feuille_de_notes.annee,
@@ -134,7 +132,7 @@ def _get_desinscriptions_examens_par_noma(
 def _get_inscriptions_examens_par_noma(
         feuille_de_notes: 'FeuilleDeNotes',
         inscription_examen_translator: 'IInscriptionExamenTranslator'
-) -> Dict[NomaEtudiant, 'InscriptionExamenDTO']:
+) -> Dict['Noma', 'InscriptionExamenDTO']:
     inscr_examens = inscription_examen_translator.search_inscrits(
         code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
         annee=feuille_de_notes.annee,
@@ -163,7 +161,5 @@ def _get_responsable_de_notes(
         matricule_fgs_enseignant: str,
         responsable_notes_repo: 'IResponsableDeNotesRepository'
 ) -> EnseignantDTO:
-    responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs_enseignant(
-        matricule_fgs_enseignant=matricule_fgs_enseignant,
-    )
+    responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
     return responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
