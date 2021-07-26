@@ -79,15 +79,7 @@ class InscriptionExamenTest(TestCase):
                 noma=student.registration_id,
                 nom=student.person.last_name,
                 prenom=student.person.first_name,
-                peps=EtudiantPepsDTO(
-                    type_peps=None,
-                    tiers_temps=None,
-                    copie_adaptee=None,
-                    local_specifique=None,
-                    autre_amenagement=None,
-                    details_autre_amenagement=None,
-                    accompagnateur=None,
-                ),
+                peps=None,
             )
         }
         self.assertSetEqual(expected_result, result)

@@ -67,12 +67,18 @@ class SignaletiqueEtudiantTranslator(ISignaletiqueEtudiantTranslator):
         ).distinct()
         result = set()
         for values in qs_as_values:
+            noma = values.pop('noma')
+            nom = values.pop('nom')
+            prenom = values.pop('prenom')
+            peps = None
+            if any(values.values()):
+                peps = EtudiantPepsDTO(**values)
             result.add(
                 SignaletiqueEtudiantDTO(
-                    noma=values.pop('noma'),
-                    nom=values.pop('nom'),
-                    prenom=values.pop('prenom'),
-                    peps=EtudiantPepsDTO(**values),
+                    noma=noma,
+                    nom=nom,
+                    prenom=prenom,
+                    peps=peps,
                 )
             )
         return result

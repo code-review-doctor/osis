@@ -49,4 +49,14 @@ class UniteEnseignementTranslatorInMemory(IUniteEnseignementTranslator):
                 code='LDROI1001',
                 intitule_complet="Intitule complet unite enseignement",
             ),
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1002',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1003',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
         }

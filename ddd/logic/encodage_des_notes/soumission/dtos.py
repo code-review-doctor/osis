@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from datetime import date
-from typing import List, Set
+from typing import List, Set, Optional
 
 import attr
 
@@ -77,7 +77,6 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
-    # enseignant = attr.ib(type=EnseignantDTO)  # FIXME :: enseignant = responsable de notes ? Ou utilisateur connecté ?
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
     progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
@@ -112,7 +111,7 @@ class NoteEtudiantDTO(interface.DTO):
     noma = attr.ib(type=str)  # matricule
     nom = attr.ib(type=str)  # signaletique
     prenom = attr.ib(type=str)  # signaletique
-    peps = attr.ib(type=EtudiantPepsDTO)  # signaletique
+    peps = attr.ib(type=Optional[EtudiantPepsDTO])  # signaletique
     email = attr.ib(type=str)
     note = attr.ib(type=str)
     inscrit_tardivement = attr.ib(type=bool)  # inscription examen
@@ -217,7 +216,7 @@ class SignaletiqueEtudiantDTO(interface.DTO):
     noma = attr.ib(type=str)
     nom = attr.ib(type=str)
     prenom = attr.ib(type=int)
-    peps = attr.ib(type=EtudiantPepsDTO)
+    peps = attr.ib(type=Optional[EtudiantPepsDTO])
 
 
 @attr.s(frozen=True, slots=True)

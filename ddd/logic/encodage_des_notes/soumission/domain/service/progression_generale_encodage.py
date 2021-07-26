@@ -71,7 +71,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
         numero_session = feuilles_de_notes[0].numero_session
 
         nomas_concernes = [note.noma for feuille_de_notes in feuilles_de_notes for note in feuille_de_notes.notes]
-        signaletique_par_noma = _get_signaletique_etudiant_par_noma(nomas_concernes, signaletique_etudiant_translator)
+        nomas_avec_peps = _get_nomas_avec_peps(nomas_concernes, signaletique_etudiant_translator)
 
         codes_concernes = {f.code_unite_enseignement for f in feuilles_de_notes}
         unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
@@ -82,7 +82,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
 
         progressions = []
 
-        for feuille_de_notes in feuilles_de_notes:
+        for feuille_de_notes in sorted(feuilles_de_notes, key=lambda f: f.code_unite_enseignement):
             notes_soumises = [
                 note.date_limite_de_remise for note in feuille_de_notes.notes
                 if note.est_soumise
@@ -95,6 +95,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             total_notes_par_echeance = OrderedDict(sorted(Counter(total_notes).items()))
 
             detail_unite_enseignement = unite_enseignement_par_code[feuille_de_notes.code_unite_enseignement]
+
             progression = ProgressionEncodageNotesUniteEnseignementDTO(
                 code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
                 intitule_complet_unite_enseignement=detail_unite_enseignement.intitule_complet,
@@ -103,11 +104,11 @@ class ProgressionGeneraleEncodage(interface.DomainService):
                         jour=echeance.day,
                         mois=echeance.month,
                         annee=echeance.year,
-                        quantite_notes_soumises=notes_soumises_par_echeance[echeance],
+                        quantite_notes_soumises=notes_soumises_par_echeance.get(echeance) or 0,
                         quantite_total_notes=total_notes,
                     ) for echeance, total_notes in total_notes_par_echeance.items()
                 ],
-                a_etudiants_peps=any(signaletique_par_noma.get(note.noma) for note in feuille_de_notes.notes),
+                a_etudiants_peps=any(note.noma in nomas_avec_peps for note in feuille_de_notes.notes),
             )
             progressions.append(progression)
 
@@ -118,12 +119,12 @@ class ProgressionGeneraleEncodage(interface.DomainService):
         )
 
 
-def _get_signaletique_etudiant_par_noma(
+def _get_nomas_avec_peps(
         nomas_concernes: List[str],
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
-) -> Dict[str, 'SignaletiqueEtudiantDTO']:
+) -> Set[str]:
     signaletiques_etds = signaletique_etudiant_translator.search(nomas=nomas_concernes)
-    return {signal.noma: signal for signal in signaletiques_etds}
+    return {signal.noma for signal in signaletiques_etds if bool(signal.peps)}
 
 
 def _get_detail_unite_enseignement_par_code(
