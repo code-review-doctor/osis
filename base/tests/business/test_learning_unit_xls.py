@@ -801,6 +801,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
             effective_class.get_quadrimester_display() or '',
             effective_class.get_session_display() or '',
             luy.language,
+            yesno(luy.stage_dimona).strip(),
         ]
 
         self.assertEqual(
@@ -852,7 +853,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         expected = _build_cells_ref(
             ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-             'V', 'W', 'X'], [3, 4, 5, 7])
+             'V', 'W', 'X', 'Y'], [3, 4, 5, 7])
+        expected.remove('Y7')
 
         self.assertSetEqual(
             cells_with_white_font,
@@ -860,8 +862,8 @@ class TestLearningUnitXlsClassesDetail(TestCase):
         )
 
     def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
-        self.assertEqual(class_attribution_line_data[30], attribution_class.allocation_charge)
-        self.assertEqual(class_attribution_line_data[31], '')
+        self.assertEqual(class_attribution_line_data[30], '')
+        self.assertEqual(class_attribution_line_data[31], attribution_class.allocation_charge)
 
     def test_get_class_score_responsibles(self):
         score_responsibles = _get_class_score_responsibles(self.class_a)
