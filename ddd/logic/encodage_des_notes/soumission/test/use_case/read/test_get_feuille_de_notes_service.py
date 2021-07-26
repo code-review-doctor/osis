@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
 from django.test import SimpleTestCase
 
@@ -31,7 +32,6 @@ from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
     AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
@@ -48,6 +48,7 @@ from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de
     FeuilleDeNotesInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
 class GetFeuilleDeNotesTest(SimpleTestCase):
@@ -80,22 +81,31 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
         self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
         self.unite_enseignement_trans = UniteEnseignementTranslatorInMemory()
+        self.__mock_service_bus()
+
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch.multiple(
+            'infrastructure.messages_bus',
+            FeuilleDeNotesRepository=lambda: self.repository,
+            ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
+            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
+            SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
+            AttributionEnseignantTranslator=lambda: self.attribution_translator,
+            UniteEnseignementTranslator=lambda: self.unite_enseignement_trans,
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
+
+        self.message_bus = message_bus_instance
 
     def test_should_renvoyer_responsable_de_notes(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.responsable_note.nom, 'Chileng')
         self.assertEqual(result.responsable_note.prenom, 'Jean-Michel')
 
-    def test_should_ignorer_responsable_notes_dans_autres_enseignants(self):
+    @mock.patch("infrastructure.messages_bus.AttributionEnseignantTranslator")
+    def test_should_ignorer_responsable_notes_dans_autres_enseignants(self, mock_attrib_translator):
         attribution_translator = AttributionEnseignantTranslatorInMemory()
         responsable_notes = AttributionEnseignantDTO(
             matricule_fgs_enseignant=self.matricule_enseignant,
@@ -105,43 +115,17 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             prenom="Jean-Michel"  # Responsable de notes
         )
         attribution_translator.search_attributions_enseignant = lambda *args, **kwargs: {responsable_notes}
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        mock_attrib_translator.return_value = attribution_translator
+        result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.autres_enseignants, list())
 
     def test_should_renvoyer_unite_enseignement(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.code_unite_enseignement, self.code_unite_enseignement)
         self.assertEqual(result.intitule_complet_unite_enseignement, "Intitule complet unite enseignement")
 
     def test_should_renvoyer_autres_enseignants_ordonnes(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = self.message_bus.invoke(self.cmd)
         resultat_ordonne = [
             EnseignantDTO(nom="Jolypas", prenom="Michelle"),
             EnseignantDTO(nom="Smith", prenom="Charles"),
@@ -149,16 +133,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.assertListEqual(resultat_ordonne, result.autres_enseignants)
 
     def test_should_renvoyer_signaletique_etudiant(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertEqual(note_etudiant.noma, self.noma)
         self.assertEqual(note_etudiant.nom, "Dupont")
@@ -172,20 +147,12 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.assertEqual(note_etudiant.peps.accompagnateur, "Accompagnateur")
 
     def test_should_renvoyer_numero_de_session_et_annee(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.annee_academique, self.annee)
         self.assertEqual(result.numero_session, self.numero_session)
 
-    def test_should_renvoyer_inscrit_tardivement(self):
+    @mock.patch("infrastructure.messages_bus.InscriptionExamenTranslator")
+    def test_should_renvoyer_inscrit_tardivement(self, mock_inscr_exam):
         periode_ouverte = self.periode_soumission_translator.get()
         date_apres_ouverture = periode_ouverte.debut_periode_soumission.to_date() + datetime.timedelta(days=1)
         inscr_exam_translator = InscriptionExamenTranslatorInMemory()
@@ -201,20 +168,13 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             ),
         )
         inscr_exam_translator.search_inscrits = lambda *args, **kwargs: {inscrit_tardivement}
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=inscr_exam_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        mock_inscr_exam.return_value = inscr_exam_translator
+        result = message_bus_instance.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertTrue(note_etudiant.inscrit_tardivement)
 
-    def test_should_renvoyer_desinscrit_tardivement(self):
+    @mock.patch("infrastructure.messages_bus.InscriptionExamenTranslator")
+    def test_should_renvoyer_desinscrit_tardivement(self, mock_inscr_exam):
         periode_ouverte = self.periode_soumission_translator.get()
         date_apres_ouverture = periode_ouverte.debut_periode_soumission.to_date() + datetime.timedelta(days=1)
         inscr_exam_translator = InscriptionExamenTranslatorInMemory()
@@ -231,44 +191,18 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         )
         inscr_exam_translator.search_inscrits = lambda *args, **kwargs: set()
         inscr_exam_translator.search_desinscrits = lambda *args, **kwargs: {desinscrit_tardivement}
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=inscr_exam_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        mock_inscr_exam.return_value = inscr_exam_translator
+        result = message_bus_instance.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertTrue(note_etudiant.desinscrit_tardivement)
 
     def test_should_renvoyer_note_est_soumise(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = message_bus_instance.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertFalse(note_etudiant.est_soumise)
 
     def test_should_renvoyer_valeur_note(self):
-        result = get_feuille_de_notes(
-            self.cmd,
-            feuille_de_note_repo=self.repository,
-            responsable_notes_repo=self.resp_notes_repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            inscription_examen_translator=self.inscr_examen_translator,
-            signaletique_etudiant_translator=self.signaletique_translator,
-            attribution_translator=self.attribution_translator,
-            unite_enseignement_translator=self.unite_enseignement_trans,
-        )
+        result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         expected_result = ""
         self.assertEqual(expected_result, note_etudiant.note)

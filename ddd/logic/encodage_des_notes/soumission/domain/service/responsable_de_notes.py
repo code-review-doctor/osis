@@ -23,23 +23,30 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-from typing import Optional
-
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
+    ResponsableDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
+from osis_common.ddd import interface
 
 
-class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
-    @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None, **kwargs) -> List['RootEntity']:
-        raise NotImplementedError
+class ResponsableDeNotes(interface.DomainService):
 
     @classmethod
-    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
-        return EnseignantDTO(nom='Chileng', prenom='Jean-Michel')
-
-    entities = list()  # type: List[ResponsableDeNotes]
+    def verifier(
+            cls,
+            matricule_fgs_enseignant: str,
+            feuille_de_notes_id: 'IdentiteFeuilleDeNotes',
+            responsable_notes_repo: 'IResponsableDeNotesRepository',
+    ) -> None:
+        resp_notes_identity = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
+        resp_notes = responsable_notes_repo.get(resp_notes_identity)
+        if not resp_notes:
+            raise PasResponsableDeNotesException(feuille_de_notes_id.code_unite_enseignement)
+        est_responsable = resp_notes.is_responsable_unite_enseignement(
+            feuille_de_notes_id.code_unite_enseignement,
+            feuille_de_notes_id.annee_academique,
+        )
+        if not est_responsable:
+            raise PasResponsableDeNotesException(feuille_de_notes_id.code_unite_enseignement)

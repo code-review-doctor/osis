@@ -28,7 +28,6 @@ from typing import Set
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from infrastructure.messages_bus import message_bus_instance
 
 
 class UniteEnseignementTranslator(IUniteEnseignementTranslator):
@@ -45,6 +44,7 @@ class UniteEnseignementTranslator(IUniteEnseignementTranslator):
 
     @classmethod
     def search_by_codes(cls, codes: Set[str], annee: int) -> Set['UniteEnseignementDTO']:  # TODO :: unit test
+        from infrastructure.messages_bus import message_bus_instance
         results = message_bus_instance.invoke(LearningUnitSearchCommand(codes=codes, year=annee))
         if results:
             return {
