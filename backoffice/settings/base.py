@@ -144,6 +144,8 @@ APPS_TO_TEST = (
     'education_group',
     'learning_unit',
     'program_management',
+    'ddd',
+    'infrastructure',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
