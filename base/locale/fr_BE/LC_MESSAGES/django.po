@@ -546,6 +546,9 @@ msgstr "Ville"
 msgid "City of institution"
 msgstr "Ville de l'institution"
 
+msgid "Class"
+msgstr "Classe"
+
 #, python-format
 msgid ""
 "Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
@@ -1261,12 +1264,18 @@ msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
 
+msgid "January"
+msgstr "Janvier"
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
 msgstr ""
 "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas "
 "sans JavaScript."
+
+msgid "June"
+msgstr "Juin"
 
 msgid "Junior year"
 msgstr "Junior year"
@@ -1911,6 +1920,9 @@ msgstr ""
 "Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
 "dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
 
+msgid "Please report this incident to the Service Desk"
+msgstr "Merci de signaler cet incident au Service Desk"
+
 msgid "Please select a country and a city first"
 msgstr "Veuillez d'abord sélectionner un pays et une ville"
 
@@ -2299,6 +2311,9 @@ msgstr "Envoyer un rappel sur les événements académiques"
 
 msgid "Separate"
 msgstr "Séparer"
+
+msgid "September"
+msgstr "Septembre"
 
 msgid "Service courses"
 msgstr "Cours de service"
@@ -3010,9 +3025,6 @@ msgstr "Les volumes de {} sont incohérents"
 
 msgid "We detected inconsistencies in the following data :"
 msgstr "Nous avons détecté des incohérences dans les données suivantes :"
-
-msgid "We will fix this as soon as possible"
-msgstr "Nous mettons tout en oeuvre pour résoudre ce problème"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
