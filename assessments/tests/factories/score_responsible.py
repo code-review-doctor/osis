@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
+
+import factory.fuzzy
 
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.tutor import TutorFactory

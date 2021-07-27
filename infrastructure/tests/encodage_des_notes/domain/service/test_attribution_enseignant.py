@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import skip
+
 from django.test import TestCase
 
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -58,5 +60,6 @@ class AttributionEnseignantTest(TestCase):
         }
         self.assertSetEqual(expected_result, result)
 
+    @skip("Waiting for domain to be implemented")
     def test_should_trouver_repartition_classes(self):
         raise NotImplementedError  # TODO :: en attente du domaine 'effective_class_repartition'
