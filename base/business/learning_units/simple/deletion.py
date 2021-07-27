@@ -222,7 +222,7 @@ def _delete_learning_component_year(learning_component_year):
         l_class_year.delete()
         msg.append(
             _("The class %(acronym)s has been deleted for the year %(year)s") % {
-                'acronym': l_class_year,
+                'acronym': l_class_year.effective_class_complete_acronym,
                 'year': learning_component_year.learning_unit_year.academic_year
             })
     learning_component_year.delete()
