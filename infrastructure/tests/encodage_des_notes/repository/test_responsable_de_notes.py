@@ -105,7 +105,7 @@ class ResponsableDeNotesRepositoryTest(TestCase):
 
         self.responsable_de_notes_repository.save(responsable)
 
-        responsable_retrieved = self.responsable_de_notes_repository.get_for_cours("LDROI1001", 2020)
+        responsable_retrieved = self.responsable_de_notes_repository.get_for_unite_enseignement("LDROI1001", 2020)
 
         assert_attrs_instances_are_equal(responsable, responsable_retrieved)
 

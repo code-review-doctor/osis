@@ -62,7 +62,7 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+    def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
         pass
 
     @classmethod

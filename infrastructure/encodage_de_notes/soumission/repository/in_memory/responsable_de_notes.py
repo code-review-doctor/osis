@@ -42,7 +42,7 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
         return EnseignantDTO(nom='Chileng', prenom='Jean-Michel')
 
     @classmethod
-    def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+    def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
         ue_identite = UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
             code_unite_enseignement,
             annee_academique

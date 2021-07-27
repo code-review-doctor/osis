@@ -172,7 +172,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         return cls.search([entity_id])[0]
 
     @classmethod
-    def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+    def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
         return cls.search(code_unite_enseignement=code_unite_enseignement, annee_academique=annee_academique)[0]
 
     @classmethod

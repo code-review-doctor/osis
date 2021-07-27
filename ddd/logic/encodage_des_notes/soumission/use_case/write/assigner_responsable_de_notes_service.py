@@ -44,7 +44,7 @@ def assigner_responsable_de_notes(
     EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
 
     # When
-    responsable_actuel = responsable_de_notes_repo.get_for_cours(
+    responsable_actuel = responsable_de_notes_repo.get_for_unite_enseignement(
         cmd.code_unite_enseignement,
         cmd.annee_unite_enseignement
     )
