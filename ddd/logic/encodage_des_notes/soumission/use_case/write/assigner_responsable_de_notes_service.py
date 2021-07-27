@@ -44,18 +44,18 @@ def assigner_responsable_de_notes(
     EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
 
     # When
-    actuelle_responsable = responsable_de_notes_repo.get_for_cours(
+    responsable_actuel = responsable_de_notes_repo.get_for_cours(
         cmd.code_unite_enseignement,
         cmd.annee_unite_enseignement
     )
-    actuelle_responsable.desassigner(cmd.code_unite_enseignement, cmd.annee_unite_enseignement)
+    responsable_actuel.desassigner(cmd.code_unite_enseignement, cmd.annee_unite_enseignement)
 
     nouveau_responsable = responsable_de_notes_repo.get(ResponsableDeNotesIdentityBuilder.build_from_command(cmd)) or \
         ResponsableDeNotesBuilder().build_from_command(cmd)
     nouveau_responsable.assigner(cmd.code_unite_enseignement, cmd.annee_unite_enseignement)
 
     # Then
-    responsable_de_notes_repo.save(actuelle_responsable)
+    responsable_de_notes_repo.save(responsable_actuel)
     responsable_de_notes_repo.save(nouveau_responsable)
 
     return nouveau_responsable.entity_id
