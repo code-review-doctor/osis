@@ -58,7 +58,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
     ) -> List['ResponsableDeNotes']:
         filter = {}
         if entity_ids:
-            filter["global_id__in"] = [str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids]
+            filter["global_id__in"] = {str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids}
 
         if code_unite_enseignement:
             filter["acronym"] = code_unite_enseignement
