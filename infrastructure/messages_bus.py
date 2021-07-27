@@ -44,8 +44,11 @@ from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_s
     has_class_repartition_service
 from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
     has_enrollments_to_class_service
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
+    AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
+    assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
     encoder_feuille_de_notes
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
@@ -186,6 +189,11 @@ class MessageBus:
             FeuilleDeNotesRepository(),
             PeriodeSoumissionNotesTranslator(),
             AttributionEnseignantTranslator(),
+        ),
+        AssignerResponsableDeNotesCommand: lambda cmd: assigner_responsable_de_notes(
+            cmd,
+            ResponsableDeNotesRepository(),
+            AttributionEnseignantTranslator()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

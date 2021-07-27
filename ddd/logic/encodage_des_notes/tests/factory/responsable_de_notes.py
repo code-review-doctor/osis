@@ -51,7 +51,7 @@ class _UniteEnseignementIdentiteFactory(factory.Factory):
         model = UniteEnseignementIdentite
         abstract = False
 
-    code_unite_enseignement = "LOSIS1254"
+    code_unite_enseignement = "LDROI1001"
     annee_academique = 2020
 
 
@@ -66,12 +66,13 @@ class _ResponsableDeNotesFactory(factory.Factory):
 
 class ResponsableDeNotesPourUneUniteEnseignement(_ResponsableDeNotesFactory):
     unites_enseignements = factory.List(
-        [_UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1254")],
+        [_UniteEnseignementIdentiteFactory(code_unite_enseignement="LDROI1001")],
         list_factory=SetFactory
     )
 
 
 class ResponsableDeNotesPourMultipleUniteEnseignements(_ResponsableDeNotesFactory):
+    entity_id = factory.SubFactory(_IdentiteResponsableDeNotesFactory, matricule_fgs_enseignant='12345678')
     unites_enseignements = factory.List(
         [
             _UniteEnseignementIdentiteFactory(code_unite_enseignement="LOSIS1354"),

@@ -23,21 +23,22 @@
 #
 ##############################################################################
 import attr
+import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EnseignantNonAttribueUniteEnseignementException
-from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesPourUneUniteEnseignement, \
     ResponsableDeNotesPourMultipleUniteEnseignements
-from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
-    AttributionEnseignantTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+    AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
 class TestAssignerResponsableDeNotes(SimpleTestCase):
@@ -49,33 +50,40 @@ class TestAssignerResponsableDeNotes(SimpleTestCase):
         self.repo.save(self.responsable)
 
         self.cmd = AssignerResponsableDeNotesCommand(
-            code_unite_enseignement="LOSIS1254",
+            code_unite_enseignement="LDROI1001",
             annee_unite_enseignement=2020,
-            matricule_fgs_enseignant="25987111"
+            matricule_fgs_enseignant="00321234"
         )
 
-        self.attribution_dto = AttributionEnseignantDTO(
-            code_unite_enseignement=self.cmd.code_unite_enseignement,
-            annee=self.cmd.annee_unite_enseignement,
-        )
-        self.attribution_translator = AttributionEnseignantTranslator()
-        self.attribution_translator.search_attributions_enseignant = lambda **kwargs: {self.attribution_dto}
+        self.attribution_translator = AttributionEnseignantTranslatorInMemory()
 
         self.addCleanup(lambda *args, **kwargs: self.repo.entities.clear())
+        self.__mock_service_bus()
+
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch.multiple(
+            'infrastructure.messages_bus',
+            ResponsableDeNotesRepository=lambda: self.repo,
+            AttributionEnseignantTranslator=lambda: self.attribution_translator,
+        )
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
+
+        self.message_bus = message_bus_instance
 
     def test_cannot_assigner_enseignant_en_tant_que_responsable_de_notes_pour_unite_enseignement_non_attribuee(self):
         cmd = attr.evolve(self.cmd, code_unite_enseignement='LOSIS7896')
 
         with self.assertRaises(EnseignantNonAttribueUniteEnseignementException):
-            assigner_responsable_de_notes(cmd, self.repo, self.attribution_translator)
+            self.message_bus.invoke(cmd)
 
     def test_should_desassigner_responsable_de_notes_actuelle_de_unite_enseignement(self):
-        assigner_responsable_de_notes(self.cmd, self.repo, self.attribution_translator)
+        self.message_bus.invoke(self.cmd)
 
         self.assertSetEqual(self.responsable.unites_enseignements, set())
 
     def test_should_assigner_responsable_de_notes_pour_enseignant_non_encore_responsable_de_notes(self):
-        entity_id = assigner_responsable_de_notes(self.cmd, self.repo, self.attribution_translator)
+        entity_id = self.message_bus.invoke(self.cmd)
 
         responsable_retrieved = self.repo.get(entity_id)
         self.assertTrue(
@@ -90,7 +98,7 @@ class TestAssignerResponsableDeNotes(SimpleTestCase):
         self.repo.save(responsable)
         cmd = attr.evolve(self.cmd, matricule_fgs_enseignant=responsable.matricule_fgs_enseignant)
 
-        entity_id = assigner_responsable_de_notes(cmd, self.repo, self.attribution_translator)
+        entity_id = self.message_bus.invoke(cmd)
 
         responsable_retrieved = self.repo.get(entity_id)
         self.assertTrue(responsable, responsable_retrieved)
