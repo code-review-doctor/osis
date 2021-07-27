@@ -197,7 +197,7 @@
                                 {{ note_etudiant.note }}
                             </td>
                             <td headers="deadline">
-                                {{note_etudiant.date_remise_de_notes.jour}} / {{note_etudiant.date_remise_de_notes.mois}} / {{note_etudiant.date_remise_de_notes.annee}}
+                                {{note_etudiant.date_remise_de_notes.to_date|date:"d/m/Y"}}
                             </td>
                         </tr>
                      {% endfor %}
