@@ -41,7 +41,12 @@ def assigner_responsable_de_notes(
         attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteResponsableDeNotes':
     # Given
-    EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
+    EnseignantAttribueUniteEnseignement().verifier(
+        cmd.code_unite_enseignement,
+        cmd.annee_unite_enseignement,
+        cmd.matricule_fgs_enseignant,
+        attribution_translator
+    )
 
     # When
     responsable_actuel = responsable_de_notes_repo.get_for_unite_enseignement(

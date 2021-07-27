@@ -144,7 +144,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             code_unite_enseignement=feuille_de_notes_sans_responsable.code_unite_enseignement,
             annee_unite_enseignement=feuille_de_notes_sans_responsable.annee,
             numero_session=feuille_de_notes_sans_responsable.numero_session,
-            matricule_fgs_enseignant=self.matricule_enseignant,
+            matricule_fgs_enseignant="124889",
         )
         with self.assertRaises(PasResponsableDeNotesException):
             soumettre_feuille_de_notes(
