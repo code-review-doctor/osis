@@ -115,6 +115,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
                 code_unite_enseignement=values['code_unite_enseignement'],
                 nom_cohorte=values['nom_cohorte'],
                 date_inscription=DateDTO.build_from_date(values['date_inscription'])
+                if values['date_inscription'] else None
             ) for values in qs_as_values
         }
 

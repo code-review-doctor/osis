@@ -30,6 +30,7 @@ import factory
 from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteManquante, NoteChiffree, Justification
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
 
 
 def generate_noma() -> str:
@@ -66,12 +67,12 @@ class NoteManquanteEtudiantFactory(factory.Factory):
     entity_id = factory.SubFactory(_IdentiteNoteEtudiantFactory)
     note = NoteManquante()
     email = factory.Faker('email')
-    date_limite_de_remise = factory.LazyFunction(datetime.date.today)
+    date_limite_de_remise = DateDTO.build_from_date(datetime.date.today())
     est_soumise = False
 
 
 class NoteManquanteEtudiantDateLimiteDepasseeFactory(NoteManquanteEtudiantFactory):
-    date_limite_de_remise = datetime.date.today() - datetime.timedelta(days=1)
+    date_limite_de_remise = DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1))
 
 
 class NoteChiffreEtudiantFactory(NoteManquanteEtudiantFactory):
