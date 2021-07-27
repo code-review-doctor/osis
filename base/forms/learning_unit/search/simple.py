@@ -69,12 +69,12 @@ class LearningUnitFilter(FilterSet):
     requirement_entity = filters.CharFilter(
         method='filter_entity',
         max_length=20,
-        label=_('Req. Entity'),
+        label=_('Req.Entity'),
     )
     allocation_entity = filters.CharFilter(
         method='filter_entity',
         max_length=20,
-        label=_('Alloc. Entity'),
+        label=_('Alloc.Entity'),
     )
     with_entity_subordinated = filters.BooleanFilter(
         method=lambda queryset, *args, **kwargs: queryset,
