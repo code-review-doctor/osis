@@ -25,7 +25,7 @@
 ##############################################################################
 
 import attr
-from django.test import SimpleTestCase
+from django.test import TestCase
 
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -39,10 +39,11 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 from infrastructure.learning_unit.repository.in_memory.ucl_entity import UclEntityRepository
 
 
-class TestCreateLearningUnitService(SimpleTestCase):
+class TestCreateLearningUnitService(TestCase):
 
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
+        self.learning_unit_repository.entities.clear()
         self.entity_repository = UclEntityRepository()
         self.fac_drt = DRTEntityFactory()
         self.entity_repository.save(self.fac_drt)
@@ -74,7 +75,7 @@ class TestCreateLearningUnitService(SimpleTestCase):
         )
 
     def test_mapping_command_to_domain_obj(self):
-        cmd = attr.evolve(self.command, type=LearningContainerYearType.COURSE.name)
+        cmd = self.command
         identity = create_learning_unit_service.create_learning_unit(
             cmd,
             self.learning_unit_repository,

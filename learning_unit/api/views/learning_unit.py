@@ -38,10 +38,11 @@ class LearningUnitFilter(filters.FilterSet):
     acronym_like = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
     year = filters.NumberFilter(field_name="academic_year__year")
     campus = filters.CharFilter(field_name='campus__name', lookup_expr='icontains')
+    stage_dimona = filters.BooleanFilter(field_name='stage_dimona')
 
     class Meta:
         model = LearningUnitYear
-        fields = ['acronym', 'acronym_like', 'year']
+        fields = ['acronym', 'acronym_like', 'year', 'stage_dimona']
 
 
 class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
