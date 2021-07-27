@@ -138,7 +138,7 @@ class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
             max_year = luy_parent.learning_unit.end_year.year \
                 if luy_parent and luy_parent.learning_unit.end_year else None
         academic_years = AcademicYear.objects.filter(year__gte=self.luy_current_year, year__in=target_years_opened)
-        return academic_years.filter(year__lte=max_year) if max_year else academic_years
+        return academic_years.filter(year__lte=max_year).order_by("-year") if max_year else academic_years.order_by("-year")
 
 
 def has_proposal(learning_unit):
