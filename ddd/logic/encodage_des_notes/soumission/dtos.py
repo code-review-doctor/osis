@@ -85,12 +85,16 @@ class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class DateDTO(interface.DTO):
-    jour = attr.ib(type=str)
-    mois = attr.ib(type=str)
-    annee = attr.ib(type=str)
+    jour = attr.ib(type=int)
+    mois = attr.ib(type=int)
+    annee = attr.ib(type=int)
 
     def to_date(self) -> date:
         return date(day=self.jour, month=self.mois, year=self.annee)
+
+    @staticmethod
+    def build_from_date(d: date):
+        return DateDTO(jour=d.day, mois=d.month, annee=d.year)
 
 
 @attr.s(frozen=True, slots=True)

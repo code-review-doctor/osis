@@ -133,7 +133,7 @@ class LearningUnitRepository(ILearningUnitRepository):
             "responsible_entity_title",
         )
         result = []
-        for data_dict in qs.values():
+        for data_dict in qs:
             result.append(LearningUnitSearchDTO(**data_dict))
         return result
 

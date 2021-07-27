@@ -31,7 +31,7 @@ from django.db.models.functions import Concat, Replace
 from base.models.enums import exam_enrollment_state
 from base.models.exam_enrollment import ExamEnrollment
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO, DateDTO
 
 
 class InscriptionExamenTranslator(IInscriptionExamenTranslator):
@@ -108,7 +108,15 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             'nom_cohorte',
             'date_inscription',
         )
-        return {InscriptionExamenDTO(**values) for values in qs_as_values}
+        return {
+            InscriptionExamenDTO(
+                annee=values['annee'],
+                noma=values['noma'],
+                code_unite_enseignement=values['code_unite_enseignement'],
+                nom_cohorte=values['nom_cohorte'],
+                date_inscription=DateDTO.build_from_date(values['date_inscription'])
+            ) for values in qs_as_values
+        }
 
 
 def _get_common_queryset(
