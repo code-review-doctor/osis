@@ -86,3 +86,10 @@ class TestGenerateTransitionCode(SimpleTestCase):
         result = GenerateNodeCode().generate_transition_code(base_code)
 
         self.assertEqual("T107107R", result)
+
+    def test_should_ensure_numeric_part_has_3_digits_and_does_not_begin_by_0(self):
+        base_code = "LOSIS010R"
+
+        result = GenerateNodeCode(existing_codes={"TOSIS100R", "TOSIS101R"}).generate_transition_code(base_code)
+
+        self.assertEqual("TOSIS102R", result)

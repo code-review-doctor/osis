@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import mock
 from django.test import TestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -97,9 +97,8 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasNoVolumeException, raised_exceptions)
 
-    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self):
-        self.learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
-
+    @mock.patch("infrastructure.messages_bus.has_enrollments_to_class_service", return_value=True)
+    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self, mock_has_enrollments):
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
 
@@ -114,7 +113,7 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         self.assertIn(LearningUnitHasEnrollmentException, raised_exceptions)
 
     def test_check_cannot_create_effective_class_for_lu_with_proposal(self):
-        self.learning_unit_repository.has_proposal = lambda *args, **kwargs: True
+        self.learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
 
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
