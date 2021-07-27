@@ -28,6 +28,7 @@ from typing import List, Optional
 
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -62,4 +63,9 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
         pass

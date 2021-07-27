@@ -23,21 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import mock
+from django.test import TestCase
 
-from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
-def search_learning_units(
-        cmd: LearningUnitSearchCommand,
-        repository: 'ILearningUnitRepository'
-) -> List['LearningUnitSearchDTO']:
-    return repository.search_learning_units_dto(
-        code=cmd.code,
-        year=cmd.year,
-        full_title=cmd.full_title,
-        type=cmd.type,
-        responsible_entity_code=cmd.responsible_entity_code,
-    )
+class UniteEnseignementTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.code_unite_enseignement = "LDROI1001"
+        cls.annee = 2020
+        cls.translator = UniteEnseignementTranslator()
+        cls.unite_enseignement_repo = LearningUnitRepository()
+
+    @mock.patch('infrastructure.messages_bus.search_learning_units')
+    def test_should_appeler_message_bus(self, mock_search):
+        self.translator.get(self.code_unite_enseignement, self.annee)
+        self.assertTrue(mock_search.called)

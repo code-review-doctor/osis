@@ -39,27 +39,39 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
     @classmethod
     def search_attributions_enseignant(
             cls,
-            matricule_fgs_enseignant: str,
+            code_unite_enseignement: str,
             annee: int,
     ) -> Set['AttributionEnseignantDTO']:
-        dtos = _search_attributions_unite_enseignement(matricule_fgs_enseignant, annee)
-        dtos |= _search_repartition_classes(matricule_fgs_enseignant, annee)
+        dtos = _search_attributions_unite_enseignement(code_unite_enseignement, annee)
+        dtos |= _search_repartition_classes(code_unite_enseignement, annee)
         return dtos
 
 
-def _search_attributions_unite_enseignement(matricule_fgs: str, annee: int) -> Set['AttributionEnseignantDTO']:
+def _search_attributions_unite_enseignement(
+        code_unite_enseignement: str,
+        annee: int
+) -> Set['AttributionEnseignantDTO']:
     attributions_unite_enseignement = AttributionNew.objects.filter(
-        tutor__person__global_id=matricule_fgs,
         learning_container_year__academic_year__year=annee,
+        learning_container_year__acronym=code_unite_enseignement,
     ).annotate(
+        matricule_fgs_enseignant=F('tutor__person__global_id'),
         code_unite_enseignement=F('learning_container_year__acronym'),
+        nom=F('tutor__person__last_name'),
+        prenom=F('tutor__person__first_name'),
     ).values(
+        'matricule_fgs_enseignant',
         'code_unite_enseignement',
+        'nom',
+        'prenom',
     ).distinct()
     return {
         AttributionEnseignantDTO(
+            matricule_fgs_enseignant=attribution_as_dict['matricule_fgs_enseignant'],
             code_unite_enseignement=attribution_as_dict['code_unite_enseignement'],
             annee=annee,
+            prenom=attribution_as_dict['prenom'],
+            nom=attribution_as_dict['nom'],
         )
         for attribution_as_dict in attributions_unite_enseignement
     }
@@ -73,9 +85,13 @@ def _search_repartition_classes(matricule_fgs: str, annee: int) -> Set['Attribut
     ).annotate(
         learning_unit_code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
         class_code=F('learning_class_year__acronym'),
+        nom=F('attribution_charge__attribution__tutor__person__last_name'),
+        prenom=F('attribution_charge__attribution__tutor__person__first_name'),
     ).values(
         'learning_unit_code',
         'class_code',
+        'nom',
+        'prenom',
     ).distinct()
     dtos = set()
     for class_repartition_as_dict in classes_repartition:
@@ -84,6 +100,8 @@ def _search_repartition_classes(matricule_fgs: str, annee: int) -> Set['Attribut
         dto = AttributionEnseignantDTO(
             code_unite_enseignement=code_unite_enseignement,
             annee=annee,
+            prenom=class_repartition_as_dict['prenom'],
+            nom=class_repartition_as_dict['nom'],
         )
         dtos.add(dto)
     return dtos

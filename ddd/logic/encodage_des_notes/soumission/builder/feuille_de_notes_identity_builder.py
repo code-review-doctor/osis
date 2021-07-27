@@ -52,8 +52,9 @@ class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
             annee_academique=dto_object.annee_academique
         )
 
+    @classmethod
     def build_from_session_and_unit_enseignement_datas(
-            self,
+            cls,
             numero_session: int,
             code_unite_enseignement: str,
             annee_academique: int

@@ -35,22 +35,25 @@ class AttributionEnseignantTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        cls.matricule_fgs_enseignant = "00323214"
+        cls.code_unite_enseignement = "LDROI1001"
         cls.annee = 2020
         cls.translator = AttributionEnseignantTranslator()
 
     def test_should_trouver_attribution_unite_enseignement(self):
         AttributionNewFactory()
         attribution_db = AttributionNewFactory(
-            tutor__person__global_id=self.matricule_fgs_enseignant,
+            learning_container_year__acronym=self.code_unite_enseignement,
             learning_container_year__academic_year__year=self.annee,
         )
-        result = self.translator.search_attributions_enseignant(self.matricule_fgs_enseignant, self.annee)
+        result = self.translator.search_attributions_enseignant(self.code_unite_enseignement, self.annee)
         self.assertEqual(len(result), 1)
         expected_result = {
             AttributionEnseignantDTO(
+                matricule_fgs_enseignant=attribution_db.tutor.person.global_id,
                 code_unite_enseignement=attribution_db.learning_container_year.acronym,
                 annee=self.annee,
+                nom=attribution_db.tutor.person.last_name,
+                prenom=attribution_db.tutor.person.first_name,
             )
         }
         self.assertSetEqual(expected_result, result)

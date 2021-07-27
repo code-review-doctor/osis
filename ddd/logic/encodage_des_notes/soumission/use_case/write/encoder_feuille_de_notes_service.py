@@ -46,11 +46,7 @@ def encoder_feuille_de_notes(
         attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
-    PeriodeSoumissionOuverte().verifier(
-        cmd.annee_unite_enseignement,
-        cmd.numero_session,
-        periode_soumission_note_translator,
-    )
+    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
     EnseignantAttribueUniteEnseignement().verifier(cmd, attribution_translator)
     feuille_de_note_identity = FeuilleDeNotesIdentityBuilder.build_from_command(cmd)
     feuille_de_notes = feuille_de_note_repo.get(feuille_de_note_identity)

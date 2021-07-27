@@ -24,8 +24,8 @@
 #
 ##############################################################################
 import datetime
-from datetime import date
 from decimal import Decimal
+from unittest import mock
 
 import attr
 from django.test import SimpleTestCase
@@ -39,20 +39,19 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     NomaNeCorrespondPasEmailException, AucunEtudiantTrouveException, NoteIncorrecteException, \
     NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
-    encoder_feuille_de_notes
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
     FeuilleDeNotesDecimalesAutorisees, FeuilleDeNotesAvecToutesNotesSoumises, \
     FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier
-from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
-    AttributionEnseignantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+    AttributionEnseignantTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
+    PeriodeSoumissionNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
     FeuilleDeNotesInMemoryRepository
+from infrastructure.messages_bus import message_bus_instance
 
 
-class EncoderFeuilleDeNoesTest(SimpleTestCase):
+class EncoderFeuilleDeNotesTest(SimpleTestCase):
 
     def setUp(self) -> None:
         self.matricule_enseignant = '00321234'
@@ -70,135 +69,125 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             notes_etudiants=[],
         )
 
-        self.periode_soumission_ouverte = PeriodeSoumissionNotesDTO(
-            annee_concernee=self.feuille_de_notes.annee,
-            session_concernee=self.feuille_de_notes.numero_session,
-            debut_periode_soumission=DateDTO(jour=1, mois=1, annee=date.today().year),
-            fin_periode_soumission=DateDTO(jour=31, mois=12, annee=date.today().year),
-        )
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslator()
-        self.periode_soumission_translator.get = lambda *args: self.periode_soumission_ouverte
+        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.attribution_translator = AttributionEnseignantTranslatorInMemory()
+        self.__mock_service_bus()
 
-        self.attribution_dto = AttributionEnseignantDTO(
-            code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
-            annee=self.feuille_de_notes.annee,
+    def __mock_service_bus(self):
+        message_bus_patcher = mock.patch.multiple(
+            'infrastructure.messages_bus',
+            FeuilleDeNotesRepository=lambda: self.repository,
+            PeriodeSoumissionNotesTranslator=lambda: PeriodeSoumissionNotesTranslatorInMemory(),
+            AttributionEnseignantTranslator=lambda: AttributionEnseignantTranslatorInMemory(),
         )
-        self.attribution_translator = AttributionEnseignantTranslator()
-        self.attribution_translator.search_attributions_enseignant = lambda **kwargs: {self.attribution_dto}
+        message_bus_patcher.start()
+        self.addCleanup(message_bus_patcher.stop)
+        self.message_bus = message_bus_instance
 
-    def test_should_empecher_si_periode_fermee_depuis_hier(self):
+    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = attr.evolve(
-            self.periode_soumission_ouverte,
+        periode_fermee = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_fermee
+        mock_periode_translator.return_value = periode_soumission_translator
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
 
-    def test_should_autoriser_si_periode_ferme_aujourdhui(self):
+    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    def test_should_autoriser_si_periode_ferme_aujourdhui(self, mock_periode_translator):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
-        periode_ouverte = attr.evolve(
-            self.periode_soumission_ouverte,
+        periode_ouverte = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_aujourdhui,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_ouverte
+        mock_periode_translator.return_value = periode_soumission_translator
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         self.assertTrue(
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            ),
+            self.message_bus.invoke(cmd),
             "Si la date de fermeture est aujourdhui, alors l'encodage est autorisé jusqu'à aujourdhui 23h59"
         )
 
-    def test_should_autoriser_si_periode_ouvre_aujourdhui(self):
+    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    def test_should_autoriser_si_periode_ouvre_aujourdhui(self, mock_periode_translator):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
-        periode_ouverte = attr.evolve(
-            self.periode_soumission_ouverte,
+        periode_ouverte = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_aujourdhui,
             fin_periode_soumission=date_dans_le_futur,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_ouverte
+        mock_periode_translator.return_value = periode_soumission_translator
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         self.assertTrue(
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            ),
+            self.message_bus.invoke(cmd),
             "Si la période d'encodage ouvre aujourdhui, alors l'encodage est autorisé à partir de aujourd'hui 00h01"
         )
 
-    def test_should_empecher_si_aucune_periode_trouvee(self):
+    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    def test_should_empecher_si_aucune_periode_trouvee(self, mock_periode_translator):
         aucune_periode_trouvee = None
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: aucune_periode_trouvee
+        mock_periode_translator.return_value = periode_soumission_translator
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
 
-    def test_should_empecher_si_utilisateur_non_attribue_unite_enseignement(self):
-        attribution_autre_unite_enseignement = attr.evolve(self.attribution_dto, code_unite_enseignement='LAUTRE1234')
-        attribution_translator = AttributionEnseignantTranslator()
+    @mock.patch("infrastructure.messages_bus.AttributionEnseignantTranslator")
+    def test_should_empecher_si_utilisateur_non_attribue_unite_enseignement(self, mock_attribution_translator):
+        attribution_autre_unite_enseignement = AttributionEnseignantDTO(
+            matricule_fgs_enseignant=self.matricule_enseignant,
+            code_unite_enseignement="LAUTRE1234",
+            annee=self.feuille_de_notes.annee,
+            nom="Smith",
+            prenom="Charles",
+        )
+        attribution_translator = AttributionEnseignantTranslatorInMemory()
         attribution_translator.search_attributions_enseignant = lambda **kwargs: {attribution_autre_unite_enseignement}
+        mock_attribution_translator.return_value = attribution_translator
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(EnseignantNonAttribueUniteEnseignementException):
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
 
-    def test_should_empecher_si_utilisateur_aucune_attribution(self):
+    @mock.patch("infrastructure.messages_bus.AttributionEnseignantTranslator")
+    def test_should_empecher_si_utilisateur_aucune_attribution(self, mock_attribution_translator):
         aucune_attribution = set()
-        attribution_translator = AttributionEnseignantTranslator()
+        attribution_translator = AttributionEnseignantTranslatorInMemory()
         attribution_translator.search_attributions_enseignant = lambda **kwargs: aucune_attribution
+        mock_attribution_translator.return_value = attribution_translator
 
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email=self.note_manquante.email, note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(EnseignantNonAttribueUniteEnseignementException):
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
 
     def test_should_empecher_si_date_de_remise_est_hier(self):
         feuille_de_notes = FeuilleDeNotesDateLimiteRemiseHier()
@@ -217,12 +206,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             ],
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             DateRemiseNoteAtteinteException
@@ -245,12 +229,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             ],
         )
         self.assertTrue(
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            ),
+            self.message_bus.invoke(cmd),
             """Si la date de remise est aujourd'hui, l'encodage de la note est autorisée jusqu'à aujourd'hui 23h59"""
         )
 
@@ -258,12 +237,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         note_etudiant = NoteEtudiantCommand(noma=self.note_manquante.noma, email="email@ne_corespond_pas.be", note='12')
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NomaNeCorrespondPasEmailException
@@ -278,12 +252,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             AucunEtudiantTrouveException
@@ -298,12 +267,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
@@ -318,12 +282,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
@@ -338,12 +297,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
@@ -358,12 +312,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
@@ -378,12 +327,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
         )
         cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NoteDecimaleNonAutoriseeException
@@ -406,12 +350,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                 )
             ],
         )
-        entity_id = encoder_feuille_de_notes(
-            cmd=cmd,
-            feuille_de_note_repo=self.repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            attribution_translator=self.attribution_translator,
-        )
+        entity_id = self.message_bus.invoke(cmd)
         self.assertEqual(list(self.repository.get(entity_id).notes)[0].note.value, Decimal(12.5))
 
     def test_should_empecher_si_note_deja_soumise(self):
@@ -431,12 +370,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             ],
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
             NoteDejaSoumiseException
@@ -458,12 +392,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                 ) for note in feuille_de_notes.notes
             ],
         )
-        entity_id = encoder_feuille_de_notes(
-            cmd=cmd,
-            feuille_de_note_repo=self.repository,
-            periode_soumission_note_translator=self.periode_soumission_translator,
-            attribution_translator=self.attribution_translator,
-        )
+        entity_id = self.message_bus.invoke(cmd)
         expected_result = NoteChiffree(value=Decimal(12.0))
         for note in self.repository.get(entity_id).notes:
             self.assertEqual(note.note, expected_result)
@@ -477,12 +406,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                     note=absence_injustifiee,
                 )
                 cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
-                entity_id = encoder_feuille_de_notes(
-                    cmd=cmd,
-                    feuille_de_note_repo=self.repository,
-                    periode_soumission_note_translator=self.periode_soumission_translator,
-                    attribution_translator=self.attribution_translator,
-                )
+                entity_id = self.message_bus.invoke(cmd)
                 expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
                 self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
@@ -495,12 +419,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
                     note=tricherie,
                 )
                 cmd = attr.evolve(self.cmd, notes_etudiants=[note_etudiant])
-                entity_id = encoder_feuille_de_notes(
-                    cmd=cmd,
-                    feuille_de_note_repo=self.repository,
-                    periode_soumission_note_translator=self.periode_soumission_translator,
-                    attribution_translator=self.attribution_translator,
-                )
+                entity_id = self.message_bus.invoke(cmd)
                 expected_result = Justification(value=TutorJustificationTypes.CHEATING)
                 self.assertEqual(list(self.repository.get(entity_id).notes)[0].note, expected_result)
 
@@ -532,12 +451,7 @@ class EncoderFeuilleDeNoesTest(SimpleTestCase):
             ],
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            encoder_feuille_de_notes(
-                cmd=cmd,
-                feuille_de_note_repo=self.repository,
-                periode_soumission_note_translator=self.periode_soumission_translator,
-                attribution_translator=self.attribution_translator,
-            )
+            self.message_bus.invoke(cmd)
 
         exceptions = class_exceptions.exception.exceptions
         self.assertEqual(len(exceptions), 3)

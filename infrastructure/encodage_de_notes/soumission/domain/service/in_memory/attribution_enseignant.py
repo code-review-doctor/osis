@@ -23,34 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union
+from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, \
-    AssignerResponsableDeNotesCommand
+from django.db.models import F
+
+from attribution.models.attribution_class import AttributionClass
+from attribution.models.attribution_new import AttributionNew
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    EnseignantNonAttribueUniteEnseignementException
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
 
-class EnseignantAttribueUniteEnseignement(interface.DomainService):
+class AttributionEnseignantTranslatorInMemory(IAttributionEnseignantTranslator):
+
+    attributions_dtos = {
+        AttributionEnseignantDTO(
+            matricule_fgs_enseignant="00321234",
+            code_unite_enseignement="LDROI1001",
+            annee=2020,
+            nom="Smith",
+            prenom="Charles",
+        ),
+        AttributionEnseignantDTO(
+            matricule_fgs_enseignant="12345678",
+            code_unite_enseignement="LDROI1001",
+            annee=2020,
+            nom="Jolypas",
+            prenom="Michelle",
+        ),
+    }  # type: Set[AttributionEnseignantDTO]
 
     @classmethod
-    def verifier(
+    def search_attributions_enseignant(
             cls,
-            cmd: Union['EncoderFeuilleDeNotesCommand', 'AssignerResponsableDeNotesCommand'],
-            attribution_translator: 'IAttributionEnseignantTranslator'
-    ) -> None:
-        attributions = attribution_translator.search_attributions_enseignant(
-            code_unite_enseignement=cmd.code_unite_enseignement,
-            annee=cmd.annee_unite_enseignement,
+            code_unite_enseignement: str,
+            annee: int,
+    ) -> Set['AttributionEnseignantDTO']:
+        return set(
+            filter(
+                lambda dto: dto.code_unite_enseignement == code_unite_enseignement and dto.annee == annee,
+                cls.attributions_dtos,
+            )
         )
-        est_attribue_unite_enseignement = any(
-            attribution for attribution in attributions
-            if attribution.matricule_fgs_enseignant == cmd.matricule_fgs_enseignant
-            and attribution.code_unite_enseignement == cmd.code_unite_enseignement
-            and attribution.annee == cmd.annee_unite_enseignement
-        )
-        if not est_attribue_unite_enseignement:
-            raise EnseignantNonAttribueUniteEnseignementException(cmd.code_unite_enseignement)

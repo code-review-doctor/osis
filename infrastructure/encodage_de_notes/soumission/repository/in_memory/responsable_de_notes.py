@@ -28,12 +28,18 @@ from typing import List
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
     UniteEnseignementIdentiteBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
 class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
     entities = list()  # type: List[ResponsableDeNotes]
+
+    @classmethod
+    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
+        return EnseignantDTO(nom='Chileng', prenom='Jean-Michel')
 
     @classmethod
     def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':

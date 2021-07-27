@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,21 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import operator
 
-from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
-from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
+import factory.fuzzy
+
+from base.tests.factories.entity import EntityFactory
+from education_group.models.cohort_year import CohortYear
+from education_group.models.enums.cohort_name import CohortName
 
 
-def search_learning_units(
-        cmd: LearningUnitSearchCommand,
-        repository: 'ILearningUnitRepository'
-) -> List['LearningUnitSearchDTO']:
-    return repository.search_learning_units_dto(
-        code=cmd.code,
-        year=cmd.year,
-        full_title=cmd.full_title,
-        type=cmd.type,
-        responsible_entity_code=cmd.responsible_entity_code,
-    )
+class CohortYearFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CohortYear
+        django_get_or_create = ('education_group_year', 'name',)
+
+    education_group_year = factory.SubFactory("base.tests.factories.education_group_year.EducationGroupYearFactory")
+    administration_entity = factory.SubFactory(EntityFactory)
+    name = factory.Iterator(CohortName.choices(), getter=operator.itemgetter(0))

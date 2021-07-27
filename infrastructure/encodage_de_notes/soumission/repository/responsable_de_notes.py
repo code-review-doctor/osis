@@ -29,18 +29,17 @@ import operator
 import string
 from typing import Optional, List
 
-from django.db.models import F, Q, Value, CharField
-from django.db.models.functions import Coalesce, Concat
+from django.db.models import F, Q, CharField
+from django.db.models.functions import Concat
 
 from assessments.models.score_responsible import ScoreResponsible
-from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.models.attribution_class import AttributionClass
 from base.auth.roles.tutor import Tutor
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
     UniteEnseignementIdentiteFromRepositoryDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
@@ -175,6 +174,19 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
     @classmethod
     def get_for_cours(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
         return cls.search(code_unite_enseignement=code_unite_enseignement, annee_academique=annee_academique)[0]
+
+    @classmethod
+    def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
+        detail_enseignant_as_values = ScoreResponsible.objects.filter(
+            tutor__person__global_id=entity_id.matricule_fgs_enseignant,
+        ).annotate(
+            nom=F('tutor__person__last_name'),
+            prenom=F('tutor__person__first_name'),
+        ).values(
+            'nom',
+            'prenom',
+        ).get()
+        return EnseignantDTO(**detail_enseignant_as_values)
 
 
 def _fetch_responsable_de_notes():

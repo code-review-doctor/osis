@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
     IPeriodeSoumissionNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
@@ -37,8 +36,6 @@ class PeriodeSoumissionOuverte(interface.DomainService):
     @classmethod
     def verifier(
             cls,
-            annee_unite_enseignement: int,
-            numero_session: int,
             periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
     ) -> None:
         periode = periode_soumission_note_translator.get()
@@ -50,9 +47,5 @@ class PeriodeSoumissionOuverte(interface.DomainService):
         fin_periode = periode.fin_periode_soumission.to_date()
         periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
 
-        annee_est_concernee = annee_unite_enseignement == periode.annee_concernee
-
-        session_est_concernee = numero_session == periode.session_concernee
-
-        if not periode_est_ouverte or not annee_est_concernee or not session_est_concernee:
+        if not periode_est_ouverte:
             raise PeriodeSoumissionNotesFermeeException()
