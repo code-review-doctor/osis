@@ -27,7 +27,8 @@ from typing import Set
 
 import attr
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentite, UniteEnseignementIdentiteBuilder
 from osis_common.ddd import interface
 
 
@@ -46,10 +47,14 @@ class ResponsableDeNotes(interface.RootEntity):
         return self.entity_id.matricule_fgs_enseignant
 
     def assigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
+        self.unites_enseignements.add(
+            UniteEnseignementIdentiteBuilder.build_from_code_and_annee(code_unite_enseignement, annee_academique)
+        )
 
     def desassigner(self, code_unite_enseignement: str, annee_academique: int) -> None:
-        raise NotImplementedError
+        self.unites_enseignements.remove(
+            UniteEnseignementIdentiteBuilder.build_from_code_and_annee(code_unite_enseignement, annee_academique)
+        )
 
     def is_responsable_unite_enseignement(self, code_unite_enseignement: str, annee: int) -> bool:
         return any(

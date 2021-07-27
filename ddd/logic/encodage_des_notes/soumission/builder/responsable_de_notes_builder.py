@@ -25,6 +25,7 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
     ResponsableDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
     UniteEnseignementIdentiteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
@@ -34,8 +35,11 @@ from osis_common.ddd import interface
 
 class ResponsableDeNotesBuilder(interface.RootEntityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'ResponsableDeNotes':
-        pass
+    def build_from_command(cls, cmd: 'AssignerResponsableDeNotesCommand') -> 'ResponsableDeNotes':
+        return ResponsableDeNotes(
+            entity_id=ResponsableDeNotesIdentityBuilder().build_from_command(cmd),
+            unites_enseignements=set()
+        )
 
     @classmethod
     def build_from_repository_dto(cls, dto_object: 'ResponsableDeNotesFromRepositoryDTO') -> 'ResponsableDeNotes':
