@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,18 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import string
+
 import factory.fuzzy
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
-class AttributionClassFactory(factory.DjangoModelFactory):
+class AttributionClassFactory(factory.django.DjangoModelFactory):
     class Meta:
-        model = 'attribution.AttributionClass'
+        model = "attribution.AttributionClass"
 
-    learning_class_year = factory.SubFactory(LearningClassYearFactory)
+    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     attribution_charge = factory.SubFactory(AttributionChargeNewFactory)
-    allocation_charge = factory.fuzzy.FuzzyDecimal(0, 30, precision=0)
-
-
+    learning_class_year = factory.SubFactory(LearningClassYearFactory)
+    allocation_charge = 0
