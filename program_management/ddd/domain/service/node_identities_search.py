@@ -61,6 +61,6 @@ class NodeIdentitiesSearch(interface.DomainService):
         ).values_list(
             'year',
             'partial_acronym'
-        ).distinct().order_by('year')
+        ).distinct().order_by('-year')
 
         return [NodeIdentity(code=group_year[1], year=group_year[0]) for group_year in group_years]
