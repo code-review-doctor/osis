@@ -85,16 +85,7 @@ class UpdateClassView(CommonClassView, FormView):
         })
 
     def redirect_to_effective_class_identification(self):
-        return redirect(
-            reverse(
-                'class_identification',
-                kwargs={
-                    'learning_unit_year': self.year,
-                    'learning_unit_code': self.learning_unit_code,
-                    'class_code': self.effective_class.entity_id.class_code
-                }
-            )
-        )
+        return redirect(self.common_url_tabs()['url_class_identification'])
 
     @staticmethod
     def get_success_msg(effective_class_identity: 'EffectiveClassIdentity') -> str:
