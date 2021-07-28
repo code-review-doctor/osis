@@ -741,5 +741,5 @@ def _get_attribution_volume(volume, is_attribution_class):
 def _get_class_score_responsibles(effective_class: LearningClassYear) -> List[Person]:
     score_responsibles = set()
     for a in effective_class.attributionclass_set.all():
-        score_responsibles = [a.attribution_charge.attribution.tutor.person for _ in a.scoreresponsible_set.all()]
-    return score_responsibles
+        score_responsibles.update([a.attribution_charge.attribution.tutor.person for _ in a.scoreresponsible_set.all()])
+    return list(score_responsibles)

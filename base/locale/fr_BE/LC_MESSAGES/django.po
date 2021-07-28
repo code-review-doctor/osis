@@ -1450,6 +1450,9 @@ msgstr "Liste des utilisateurs avec leurs groupes et entités liés."
 msgid "List proposals"
 msgstr "Liste des propositions"
 
+msgid "List_of_users"
+msgstr "Liste_des_utilisateurs"
+
 msgid "Local credits"
 msgstr "Crédits locaux"
 

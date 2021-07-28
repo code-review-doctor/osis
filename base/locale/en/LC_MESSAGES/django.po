@@ -1415,6 +1415,9 @@ msgstr ""
 msgid "List proposals"
 msgstr ""
 
+msgid "List_of_users"
+msgstr ""
+
 msgid "Local credits"
 msgstr ""
 
