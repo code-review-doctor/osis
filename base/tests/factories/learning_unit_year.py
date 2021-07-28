@@ -160,6 +160,11 @@ class LearningUnitYearFullFactory(LearningUnitYearFactory):
 
 class LearningUnitYearPartimFactory(LearningUnitYearFactory):
     subtype = learning_unit_year_subtypes.PARTIM
+    learning_container_year = factory.SubFactory(
+        LearningContainerYearFactory,
+        academic_year=factory.SelfAttribute('..academic_year'),
+    )
+    acronym = factory.LazyAttribute(lambda o: o.learning_container_year.acronym + random.choice(string.ascii_letters))
 
 
 def create_learning_unit_year(academic_yr, title, learning_unit):
