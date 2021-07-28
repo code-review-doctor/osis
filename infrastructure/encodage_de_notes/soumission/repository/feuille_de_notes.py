@@ -28,17 +28,14 @@ import itertools
 import operator
 from typing import Optional, List
 
-from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, Subquery, \
-    OuterRef
+from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
 from django.db.models.functions import Coalesce, Cast, Concat
 
 from base.models.exam_enrollment import ExamEnrollment
-from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_builder import FeuilleDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes, FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, NoteEtudiantFromRepositoryDTO, \
-    ProgressionGeneraleEncodageNotesDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, NoteEtudiantFromRepositoryDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 from osis_common.ddd.interface import ApplicationService
 
