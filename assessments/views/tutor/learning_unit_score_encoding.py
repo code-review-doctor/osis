@@ -78,7 +78,9 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
         return ""
 
     def get_learning_unit_print_url(self):
-        return ""
+        return reverse('score_sheet_pdf_export', kwargs={
+            'learning_unit_code': self.kwargs['learning_unit_code']
+        })
 
     def get_learning_unit_download_xls_url(self):
         return ""

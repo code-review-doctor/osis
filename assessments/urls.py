@@ -33,6 +33,7 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
     ProgramManagerPersonDeleteView
 from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
+from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportView
 
 urlpatterns = [
     url(r'^scores_encoding/', include([
@@ -66,7 +67,8 @@ urlpatterns = [
 
         # New URL's
         path('<str:learning_unit_code>/', include(([
-            path('', LearningUnitScoreEncodingTutorView.as_view(), name='learning_unit_score_encoding')
+            path('', LearningUnitScoreEncodingTutorView.as_view(), name='learning_unit_score_encoding'),
+            path('pdf_export', ScoreSheetPDFExportView.as_view(), name='score_sheet_pdf_export'),
         ]))),
     ])),
 
