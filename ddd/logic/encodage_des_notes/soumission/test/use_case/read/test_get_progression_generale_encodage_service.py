@@ -30,11 +30,10 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, \
-    NoteManquanteEtudiantDateLimiteDepasseeFactory
+from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
-    FeuilleDeNotesAvecNotesEncodees, FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier, \
-    FeuilleDeNotesAvecNotesEncodeesEtNotesManquantes, FeuilleDeNotesAvecNotesSoumises
+    FeuilleDeNotesAvecNotesEncodeesEtNotesManquantes, FeuilleDeNotesAvecNotesSoumises, \
+    FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
@@ -129,13 +128,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         hier = aujourdhui - datetime.timedelta(days=1)
 
-        feuille_de_notes = FeuilleDeNotesAvecNotesEncodees(
-            notes={
-                FeuilleDeNotesDateLimiteRemiseAujourdhui(),
-                FeuilleDeNotesDateLimiteRemiseAujourdhui(),
-                FeuilleDeNotesDateLimiteRemiseHier(),
-            }
-        )
+        feuille_de_notes = FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui()
         self.repository.save(feuille_de_notes)
 
         result = self.message_bus.invoke(self.cmd)

@@ -188,7 +188,7 @@ class AttributionEnseignantDTO(interface.DTO):
 @attr.s(frozen=True, slots=True)
 class PeriodeSoumissionNotesDTO(interface.DTO):
     annee_concernee = attr.ib(type=int)
-    session_concernee = attr.ib(type=str)
+    session_concernee = attr.ib(type=int)
     debut_periode_soumission = attr.ib(type=DateDTO)
     fin_periode_soumission = attr.ib(type=DateDTO)
 
