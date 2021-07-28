@@ -23,16 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+from osis_common.ddd.interface import EntityIdentityBuilder
 
 
 class ResponsableDeNotesIdentityBuilder(EntityIdentityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'IdentiteResponsableDeNotes':
-        raise NotImplementedError
+    def build_from_command(cls, cmd: 'AssignerResponsableDeNotesCommand') -> 'IdentiteResponsableDeNotes':
+        return IdentiteResponsableDeNotes(matricule_fgs_enseignant=cmd.matricule_fgs_enseignant)
 
     @classmethod
     def build_from_repository_dto(

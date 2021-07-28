@@ -23,8 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, \
+    AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
@@ -37,18 +39,20 @@ class EnseignantAttribueUniteEnseignement(interface.DomainService):
     @classmethod
     def verifier(
             cls,
-            cmd: 'EncoderFeuilleDeNotesCommand',
+            code_unite_enseignement: str,
+            annee_unite_enseignement: int,
+            matricule_fgs_enseignant: str,
             attribution_translator: 'IAttributionEnseignantTranslator'
     ) -> None:
         attributions = attribution_translator.search_attributions_enseignant(
-            code_unite_enseignement=cmd.code_unite_enseignement,
-            annee=cmd.annee_unite_enseignement,
+            code_unite_enseignement=code_unite_enseignement,
+            annee=annee_unite_enseignement,
         )
         est_attribue_unite_enseignement = any(
             attribution for attribution in attributions
-            if attribution.matricule_fgs_enseignant == cmd.matricule_fgs_enseignant
-            and attribution.code_unite_enseignement == cmd.code_unite_enseignement
-            and attribution.annee == cmd.annee_unite_enseignement
+            if attribution.matricule_fgs_enseignant == matricule_fgs_enseignant
+            and attribution.code_unite_enseignement == code_unite_enseignement
+            and attribution.annee == annee_unite_enseignement
         )
         if not est_attribue_unite_enseignement:
-            raise EnseignantNonAttribueUniteEnseignementException(cmd.code_unite_enseignement)
+            raise EnseignantNonAttribueUniteEnseignementException(code_unite_enseignement)

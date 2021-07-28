@@ -62,5 +62,10 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
+    def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
     def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
         pass

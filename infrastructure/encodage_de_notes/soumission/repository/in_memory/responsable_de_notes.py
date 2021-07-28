@@ -24,9 +24,10 @@
 #
 ##############################################################################
 from typing import List
-from typing import Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
+    UniteEnseignementIdentiteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
@@ -34,12 +35,16 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes i
 
 
 class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsableDeNotesRepository):
-    @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None, **kwargs) -> List['RootEntity']:
-        raise NotImplementedError
+    entities = list()  # type: List[ResponsableDeNotes]
 
     @classmethod
     def get_detail_enseignant(cls, entity_id: 'IdentiteResponsableDeNotes') -> 'EnseignantDTO':
         return EnseignantDTO(nom='Chileng', prenom='Jean-Michel')
 
-    entities = list()  # type: List[ResponsableDeNotes]
+    @classmethod
+    def get_for_unite_enseignement(cls, code_unite_enseignement: 'str', annee_academique: int) -> 'ResponsableDeNotes':
+        ue_identite = UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
+            code_unite_enseignement,
+            annee_academique
+        )
+        return next(entity for entity in cls.entities if ue_identite in entity.unites_enseignements)

@@ -43,8 +43,6 @@ def soumettre_feuille_de_notes(
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
     PeriodeSoumissionOuverte().verifier(
-        cmd.annee_unite_enseignement,
-        cmd.numero_session,
         periode_soumission_note_translator,
     )
     feuille_de_note_identity = FeuilleDeNotesIdentityBuilder.build_from_command(cmd)

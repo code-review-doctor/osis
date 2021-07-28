@@ -543,6 +543,9 @@ msgstr "Ville"
 msgid "City of institution"
 msgstr "Ville de l'institution"
 
+msgid "Class"
+msgstr "Classe"
+
 #, python-format
 msgid ""
 "Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "

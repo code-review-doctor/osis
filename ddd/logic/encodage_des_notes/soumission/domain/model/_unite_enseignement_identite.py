@@ -38,6 +38,16 @@ class UniteEnseignementIdentiteBuilder(interface.EntityIdentity):
             annee_academique=dto_object.annee_academique
         )
 
+    @staticmethod
+    def build_from_code_and_annee(
+            code_unite_enseignement: str,
+            annee_academique: int
+    ) -> 'UniteEnseignementIdentite':
+        return UniteEnseignementIdentite(
+            code_unite_enseignement=code_unite_enseignement,
+            annee_academique=annee_academique
+        )
+
 
 @attr.s(frozen=True, slots=True)
 class UniteEnseignementIdentite(interface.EntityIdentity):

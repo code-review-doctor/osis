@@ -58,6 +58,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             entity_id__code_unite_enseignement='LDROI1001',
         )
         self.feuille_notes_repo = FeuilleDeNotesInMemoryRepository()
+        self.feuille_notes_repo.entities.clear()
         self.feuille_notes_repo.save(self.feuille_de_notes)
 
         self.cmd = SoumettreFeuilleDeNotesCommand(
@@ -144,7 +145,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             code_unite_enseignement=feuille_de_notes_sans_responsable.code_unite_enseignement,
             annee_unite_enseignement=feuille_de_notes_sans_responsable.annee,
             numero_session=feuille_de_notes_sans_responsable.numero_session,
-            matricule_fgs_enseignant=self.matricule_enseignant,
+            matricule_fgs_enseignant="124889",
         )
         with self.assertRaises(PasResponsableDeNotesException):
             soumettre_feuille_de_notes(
@@ -155,12 +156,12 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             )
 
     def test_should_soumettre_plusieurs_notes(self):
-        soumettre_feuille_de_notes(
+        entity_id = soumettre_feuille_de_notes(
             self.cmd,
             self.feuille_notes_repo,
             self.responsables_notes_repo,
             self.periode_soumission_translator,
         )
-        feuille_de_notes_apres_soumettre = self.feuille_notes_repo.get(self.feuille_de_notes.entity_id)
+        feuille_de_notes_apres_soumettre = self.feuille_notes_repo.get(entity_id)
         for note in feuille_de_notes_apres_soumettre.notes:
             self.assertTrue(note.est_soumise)
