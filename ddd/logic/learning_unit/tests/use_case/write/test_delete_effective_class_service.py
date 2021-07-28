@@ -167,15 +167,3 @@ class DeleteEffectiveClassService(SimpleTestCase):
             class_exceptions.exception.exceptions.pop(),
             EffectiveClassHasTutorAssignedException
         )
-
-        self.assertEqual(
-            list(exceptions)[0].message,
-            _("The class %(class_complete_code)s is assigned to %(tutor_full_name)s in %(year)s") % {
-                'class_complete_code': "{}{}".format(
-                    effective_class.entity_id.learning_unit_identity.code,
-                    effective_class.entity_id.class_code
-                ),
-                'tutor_full_name': tutor_full_name,
-                'year': effective_class.entity_id.learning_unit_identity.year,
-            }
-        )
