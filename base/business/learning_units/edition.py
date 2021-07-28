@@ -612,9 +612,8 @@ def _check_postponement_conflict_on_volumes_data(current_component, next_year_co
     error_list = []
     volumes_fields_diff = _get_volumes_diff(current_volumes_data, next_year_volumes_data)
     for field in volumes_fields_diff:
-        if not field == "real_classes":
-            values_diff = {'current': current_volumes_data.get(field), 'next_year': next_year_volumes_data.get(field)}
-            error_list.append(_get_error_volume_field_diff(field, current_component, next_year_component, values_diff))
+        values_diff = {'current': current_volumes_data.get(field), 'next_year': next_year_volumes_data.get(field)}
+        error_list.append(_get_error_volume_field_diff(field, current_component, next_year_component, values_diff))
     return error_list
 
 
