@@ -24,48 +24,55 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block content_tab %}
-    <table class="table">
-        <thead>
-        <tr>
-            <th>{% trans 'Tutors' %} {% trans 'Complete LU' %}</th>
-            <th>{% trans 'Function' %}</th>
-            <th>
-                {% trans 'Volume' %}
-            </th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for learning_unit_attribution in learning_unit_attributions %}
+    {% if learning_unit_attributions %}
+        <table class="table">
+            <thead>
             <tr>
-                <td>{{ learning_unit_attribution.full_name }}</td>
-                <td>{{ learning_unit_attribution.function_text }}</td>
-                <td>
-                    {% if effective_class.is_lecturing %}
-                        {{ learning_unit_attribution.lecturing_volume_attributed | floatformat:2 }}
-                    {% else %}
-                        {{ learning_unit_attribution.practical_volume_attributed | floatformat:2 }}
-                    {% endif %}
-                </td>
-                <td>
-                    {% if can_add_charge_repartition %}
-                        <button class="btn btn-primary trigger_modal"
-                                role="button"
-                                data-url="{% url "edit_charge_repartition" learning_unit_year=learning_unit_attribution.learning_unit_year learning_unit_code=learning_unit_attribution.learning_unit_code class_code=effective_class.entity_id.class_code attribution_uuid=learning_unit_attribution.attribution_uuid %}"
-                                data-modal_class="modal-lg"
-                                {% if learning_unit_attribution.personal_id_number in personal_id_numbers_already_assigned %}
-                                disabled
-                                title="{% trans 'Tutor already assigned to the class' %}"
-                                {% endif %}>
-                            {% trans "Add over the current year" %}
-                        </button>
-                    {% endif %}
-                </td>
+                <th>{% trans 'Tutors' %} {% trans 'Complete LU' %}</th>
+                <th>{% trans 'Function' %}</th>
+                <th>
+                    {% trans 'Volume' %}
+                </th>
+                <th></th>
             </tr>
+            </thead>
+            <tbody>
+            {% for learning_unit_attribution in learning_unit_attributions %}
+                <tr>
+                    <td>{{ learning_unit_attribution.full_name }}</td>
+                    <td>{{ learning_unit_attribution.function_text }}</td>
+                    <td>
+                        {% if effective_class.is_lecturing %}
+                            {{ learning_unit_attribution.lecturing_volume_attributed | floatformat:2 }}
+                        {% else %}
+                            {{ learning_unit_attribution.practical_volume_attributed | floatformat:2 }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if can_add_charge_repartition %}
+                            <button class="btn btn-primary trigger_modal"
+                                    role="button"
+                                    data-url="{% url "edit_charge_repartition" learning_unit_year=learning_unit_attribution.learning_unit_year learning_unit_code=learning_unit_attribution.learning_unit_code class_code=effective_class.entity_id.class_code attribution_uuid=learning_unit_attribution.attribution_uuid %}"
+                                    data-modal_class="modal-lg"
+                                    {% if learning_unit_attribution.personal_id_number in personal_id_numbers_already_assigned %}
+                                    disabled
+                                    title="{% trans 'Tutor already assigned to the class' %}"
+                                    {% endif %}>
+                                {% trans "Add over the current year" %}
+                            </button>
+                        {% endif %}
+                    </td>
+                </tr>
 
-        {% endfor %}
-        </tbody>
-    </table>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <br>
+        <p class="text-center">
+            <strong>{% trans "No attributions exist for the UE" %}</strong>
+        </p>
+    {% endif %}
     <a href="{{ url_class_tutors }}" class="btn btn-default" role="button">
         {% trans "Cancel" %}
     </a>
