@@ -2439,6 +2439,10 @@ msgstr ""
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr ""
 
+#, python-format
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
+msgstr ""
+
 msgid "The configuration of you user profile"
 msgstr ""
 
