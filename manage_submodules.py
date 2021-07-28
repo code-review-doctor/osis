@@ -16,8 +16,11 @@ modules = {
     "dissertation": "git@github.com:uclouvain/osis-dissertation.git",
     "internship": "git@github.com:uclouvain/osis-internship.git",
     "osis_common": "git@github.com:uclouvain/osis-common.git",
+    "osis_document": "git@github.com:uclouvain/osis-document.git",
     "osis_history": "git@github.com:uclouvain/osis-history.git",
     "osis_mail_template": "git@github.com:uclouvain/osis-mail-template.git",
+    "osis_notification": "git@github.com:uclouvain/osis-notification.git",
+    "osis_signature": "git@github.com:uclouvain/osis-signature.git",
     "partnership": "git@github.com:uclouvain/osis-partnership.git",
 }
 arguments = len(sys.argv) - 1
