@@ -43,14 +43,13 @@ class UniteEnseignementTranslator(IUniteEnseignementTranslator):
             return list(dtos)[0]
 
     @classmethod
-    def search_by_codes(cls, codes: Set[str], annee: int) -> Set['UniteEnseignementDTO']:  # TODO :: unit test
+    def search_by_codes(cls, codes: Set[str], annee: int) -> Set['UniteEnseignementDTO']:
         from infrastructure.messages_bus import message_bus_instance
         results = message_bus_instance.invoke(LearningUnitSearchCommand(codes=codes, year=annee))
-        if results:
-            return {
-                UniteEnseignementDTO(
-                    annee=annee,
-                    code=dto.code,
-                    intitule_complet=dto.full_title,
-                ) for dto in results
-            }
+        return {
+            UniteEnseignementDTO(
+                annee=annee,
+                code=dto.code,
+                intitule_complet=dto.full_title,
+            ) for dto in results
+        }
