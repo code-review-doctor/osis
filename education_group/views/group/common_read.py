@@ -95,11 +95,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
             "group": self.get_group(),
             "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
-            "academic_year_choices": get_academic_year_choices_for_groups(
+            "academic_year_choices": reversed(get_academic_year_choices_for_groups(
                 self.node_identity,
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab)
-            ) if self.is_root_node else None,
+            )) if self.is_root_node else None,
             "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
                                             args=[self.get_group_year().academic_year.year,
                                                   self.get_group_year().partial_acronym]
