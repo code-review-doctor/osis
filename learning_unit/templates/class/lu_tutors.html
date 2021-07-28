@@ -42,9 +42,9 @@
                 <td>{{ learning_unit_attribution.function_text }}</td>
                 <td>
                     {% if effective_class.is_lecturing %}
-                        {{ learning_unit_attribution.lecturing_attributed_volume | floatformat:2 }}
+                        {{ learning_unit_attribution.lecturing_volume_attributed | floatformat:2 }}
                     {% else %}
-                        {{ learning_unit_attribution.practical_attributed_volume | floatformat:2 }}
+                        {{ learning_unit_attribution.practical_volume_attributed | floatformat:2 }}
                     {% endif %}
                 </td>
                 <td>
@@ -53,7 +53,8 @@
                            role="button"
                            data-url="{% url "edit_charge_repartition" learning_unit_year=learning_unit_attribution.learning_unit_year learning_unit_code=learning_unit_attribution.learning_unit_code class_code=effective_class.entity_id.class_code attribution_uuid=learning_unit_attribution.attribution_uuid %}"
                            data-modal_class="modal-lg"
-                           {% if learning_unit_attribution.personal_id_number in personal_id_numbers_already_assigned %} disabled
+                                {% if learning_unit_attribution.personal_id_number in personal_id_numbers_already_assigned %}
+                           disabled
                            title="{% trans 'Tutor already assigned to the class' %}"{% endif %}>
                             {% trans "Add over the current year" %}
                         </a>
