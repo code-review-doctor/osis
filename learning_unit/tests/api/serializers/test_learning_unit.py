@@ -156,7 +156,10 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'summary_status',
             'professional_integration',
             'remark',
-            'remark_en'
+            'remark_en',
+            'is_french_friendly',
+            'is_english_friendly',
+            'student_exchange',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -220,6 +223,9 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'professional_integration',
             'remark',
             'remark_en',
+            'is_french_friendly',
+            'is_english_friendly',
+            'student_exchange',
             'local_code',
             'local_url'
         ]
