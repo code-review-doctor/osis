@@ -129,7 +129,7 @@
                                 <td>
                                     <ul>
                                         {% for row in entities_managed %}
-                                            <li>{{ row.entity_recent_acronym }} </li>
+                                            <li>{{ row.entity_recent_acronym }}{% if row.scope != 'ALL' %}({{ row.scope }}){% endif %}</li>
                                         {% endfor %}
                                     </ul>
                                 </td>

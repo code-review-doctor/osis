@@ -213,7 +213,7 @@ def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[
     if 'education_group' in settings.INSTALLED_APPS:
         data.extend(
             [
-                '\n'.join([row.entity_recent_acronym for row in central_managers_for_of_entities_managed]),
+                _build_acronyms_with_scope(central_managers_for_of_entities_managed),
                 _build_acronyms_with_scope(faculty_managers_for_of_entities_managed)
             ]
         )
