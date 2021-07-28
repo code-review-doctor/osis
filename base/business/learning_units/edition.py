@@ -448,6 +448,7 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
         'quadrimester': _('Quadrimester'),
         'campus': _('Campus'),
         'language': _('Language'),
+        'stage_dimona': _('Stage-Dimona'),
     }
     return _get_differences(luy, next_luy, fields_to_compare)
 

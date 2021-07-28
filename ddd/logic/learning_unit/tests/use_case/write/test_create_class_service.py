@@ -163,9 +163,10 @@ class CreateEffectiveClassService(SimpleTestCase):
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            ClassTypeInvalidException
+
+        self.assertIn(
+            ClassTypeInvalidException,
+            [type(exception) for exception in class_exceptions.exception.exceptions]
         )
 
     @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
