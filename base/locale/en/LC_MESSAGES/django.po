@@ -524,6 +524,9 @@ msgstr ""
 msgid "City of institution"
 msgstr ""
 
+msgid "Class"
+msgstr ""
+
 #, python-format
 msgid ""
 "Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
@@ -1407,6 +1410,9 @@ msgid "List of users with their groups and linked entities"
 msgstr ""
 
 msgid "List proposals"
+msgstr ""
+
+msgid "List_of_users"
 msgstr ""
 
 msgid "Local credits"
@@ -2425,6 +2431,10 @@ msgstr ""
 
 #, python-format
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
+msgstr ""
+
+#, python-format
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr ""
 
 msgid "The configuration of you user profile"
