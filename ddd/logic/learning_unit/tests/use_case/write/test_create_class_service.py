@@ -48,6 +48,7 @@ from infrastructure.learning_unit.repository.in_memory.learning_unit import Lear
 class CreateEffectiveClassService(SimpleTestCase):
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
+        self.learning_unit_repository.entities.clear()
         self.ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
         self.learning_unit_repository.save(self.ue_with_lecturing_and_practical_volumes)
 
