@@ -84,13 +84,6 @@ class LearningClassYear(models.Model):
         )
 
     @property
-    def full_acronym(self) -> str:
-        return '{}{}'.format(
-            self.learning_component_year.learning_unit_year.acronym,
-            self.acronym,
-        )
-
-    @property
     def effective_class_complete_acronym(self):
         return "{}{}{}".format(
             self.learning_component_year.learning_unit_year.acronym,

@@ -90,10 +90,13 @@ class AttributionEnseignantTest(TestCase):
 
     def _convert_class_attribution_db_data_to_dto(self, class_attribution_db):
         attribution_db = class_attribution_db.attribution_charge.attribution
-
+        class_year = class_attribution_db.learning_class_year
         return AttributionEnseignantDTO(
             matricule_fgs_enseignant=attribution_db.tutor.person.global_id,
-            code_unite_enseignement=class_attribution_db.learning_class_year.full_acronym,
+            code_unite_enseignement='{}{}'.format(
+                class_year.learning_component_year.learning_unit_year.acronym,
+                class_year.acronym,
+            ),
             annee=attribution_db.learning_container_year.academic_year.year,
             nom=attribution_db.tutor.person.last_name,
             prenom=attribution_db.tutor.person.first_name,
