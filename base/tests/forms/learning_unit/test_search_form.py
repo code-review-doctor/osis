@@ -77,21 +77,19 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
-                                      (_('Req. Entity'), "INFO"),
+        expected_research_criteria = [(_('Req. Entity'), "INFO"),
                                       (_('Tutor'), "Jean Marcel")]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
     def test_get_research_criteria_with_choice_field(self):
         self.data.update({
-            "academic_year": str(self.academic_years[0].id),
+            "academic_year": str(self.academic_years[0].year),
             "container_type": learning_container_year_types.COURSE
         })
         form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
-                                      (_('Type'), _("Course"))]
+        expected_research_criteria = [(_('Type'), _("Course"))]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
