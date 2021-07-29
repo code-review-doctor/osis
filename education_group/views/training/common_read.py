@@ -163,10 +163,10 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "training": self.training,  # TODO: Rename to training (DDD concept)
             "node_path": self.path,
             "form_xls_custom": CustomXlsForm(year=self.node_identity.year, code=self.node_identity.code),
-            "academic_year_choices": reversed(get_academic_year_choices_for_trainings_and_mini_training(
+            "academic_year_choices": get_academic_year_choices_for_trainings_and_mini_training(
                 self.program_tree_version_identity,
                 _get_view_name_from_tab(self.active_tab),
-            )) if self.is_root_node else None,
+            ) if self.is_root_node else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),

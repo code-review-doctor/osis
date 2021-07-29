@@ -170,10 +170,10 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "tree_root_id": self.get_root_id(),
             "form_xls_custom": CustomXlsForm(year=self.get_group().year, code=self.get_group().code),
             "education_group_version": self.get_education_group_version(),
-            "academic_year_choices": reversed(get_academic_year_choices_for_trainings_and_mini_training(
+            "academic_year_choices": get_academic_year_choices_for_trainings_and_mini_training(
                 self.program_tree_version_identity,
                 _get_view_name_from_tab(self.active_tab),
-            )) if self.is_root_node() else None,
+            ) if self.is_root_node() else None,
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "version_label": version_label(self.program_tree_version_identity),
