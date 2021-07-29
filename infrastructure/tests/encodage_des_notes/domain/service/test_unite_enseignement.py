@@ -60,7 +60,7 @@ class UniteEnseignementTest(TestCase):
     @mock.patch('infrastructure.messages_bus.search_learning_units')
     def test_search_by_codes_should_return_empty_set_if_no_matching_unite_enseignement(self, mock_search):
         mock_search.return_value = []
-        result = self.translator.search_by_codes({self.code_unite_enseignement}, self.annee)
+        result = self.translator.search({(self.code_unite_enseignement, self.annee)})
 
         expected_result = set()
         self.assertEqual(expected_result, result)
@@ -68,7 +68,7 @@ class UniteEnseignementTest(TestCase):
     @mock.patch('infrastructure.messages_bus.search_learning_units')
     def test_search_by_codes_should_return_set_of_unite_enseignement_dto(self, mock_search):
         mock_search.return_value = [self.fake_dto]
-        result = self.translator.search_by_codes({self.code_unite_enseignement}, self.annee)
+        result = self.translator.search({(self.code_unite_enseignement, self.annee)})
 
         expected_result = {self._convert_learning_unit_search_dto_to_unit_enseignement_dto(self.fake_dto)}
         self.assertEqual(expected_result, result)

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import Set, Tuple
 
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
@@ -38,17 +38,20 @@ class UniteEnseignementTranslator(IUniteEnseignementTranslator):
             code: str,
             annee: int,
     ) -> 'UniteEnseignementDTO':
-        dtos = cls.search_by_codes({code}, annee)
+        dtos = cls.search({(code, annee)})
         if dtos:
             return list(dtos)[0]
 
     @classmethod
-    def search_by_codes(cls, codes: Set[str], annee: int) -> Set['UniteEnseignementDTO']:
+    def search(
+            cls,
+            code_annee_values: Set[Tuple[str, int]],
+    ) -> Set['UniteEnseignementDTO']:
         from infrastructure.messages_bus import message_bus_instance
-        results = message_bus_instance.invoke(LearningUnitSearchCommand(codes=codes, year=annee))
+        results = message_bus_instance.invoke(LearningUnitSearchCommand(code_annee_values=code_annee_values))
         return {
             UniteEnseignementDTO(
-                annee=annee,
+                annee=dto.year,
                 code=dto.code,
                 intitule_complet=dto.full_title,
             ) for dto in results

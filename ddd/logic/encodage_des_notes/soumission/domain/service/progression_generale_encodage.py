@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List, Dict, Set
+from typing import List, Dict, Set, Tuple
 
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
@@ -71,8 +71,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
 
         codes_concernes = {f.code_unite_enseignement for f in feuilles_de_notes}
         detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
-            codes_concernes,
-            annee_academique,
+            {(code, annee_academique) for code in codes_concernes},
             unite_enseignement_translator,
         )
 
@@ -145,9 +144,8 @@ def _get_nomas_avec_peps(
 
 
 def _get_detail_unite_enseignement_par_code(
-        codes: Set[str],
-        annee: int,
+        code_annee_valeurs: Set[Tuple[str, int]],
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
 ) -> Dict[str, UniteEnseignementDTO]:
-    unites_enseignement = unite_enseignement_translator.search_by_codes(codes, annee)
+    unites_enseignement = unite_enseignement_translator.search(code_annee_valeurs)
     return {ue.code: ue for ue in unites_enseignement}

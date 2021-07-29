@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import abc
-from typing import Set
+from typing import Set, Tuple
 
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from osis_common.ddd import interface
@@ -43,9 +43,9 @@ class IUniteEnseignementTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search_by_codes(
+    def search(
             cls,
-            codes: Set[str],
-            annee: int,
+            values: Set[Tuple[str, int]],
     ) -> Set['UniteEnseignementDTO']:
         raise NotImplementedError
+

@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set
+from typing import Set, Tuple
 
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
@@ -37,12 +37,15 @@ class UniteEnseignementTranslatorInMemory(IUniteEnseignementTranslator):
             code: str,
             annee: int,
     ) -> 'UniteEnseignementDTO':
-        dtos = cls.search_by_codes({code}, annee)
+        dtos = cls.search({(code, annee)})
         if dtos:
             return list(dtos)[0]
 
     @classmethod
-    def search_by_codes(cls, codes: Set[str], annee: int) -> Set['UniteEnseignementDTO']:
+    def search(
+            cls,
+            values: Set[Tuple[str, int]],
+    ) -> Set['UniteEnseignementDTO']:
         return {
             UniteEnseignementDTO(
                 annee=2020,
