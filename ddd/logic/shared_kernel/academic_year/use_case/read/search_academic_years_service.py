@@ -34,4 +34,4 @@ def search_academic_years(
         cmd: SearchAcademicYearCommand,
         repository: 'IAcademicYearRepository'
 ) -> List['AcademicYear']:
-    return repository.search()
+    return repository.search(year=cmd.year)

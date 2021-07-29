@@ -106,6 +106,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['current_academic_year'] = self.current_academic_year
+        context['learning_unit_year_choices'] = \
+            reversed(self.object.learning_unit.learningunityear_set.all()),
         context['is_person_linked_to_entity'] = self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
             self.object
         )

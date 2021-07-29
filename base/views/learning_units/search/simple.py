@@ -50,9 +50,9 @@ class LearningUnitSearch(BaseLearningUnitSearch):
         context = super().get_context_data(**kwargs)
 
         form = context["form"]
-        select_comparison_form_academic_year = context["proposal_academic_year"]
+        select_comparison_form_academic_year = context["proposal_academic_year"].year
         if form.is_valid():
-            select_comparison_form_academic_year = form.cleaned_data["academic_year"] or \
+            select_comparison_form_academic_year = form.cleaned_data["academic_year__year"] or \
                                                    select_comparison_form_academic_year
 
         context.update({

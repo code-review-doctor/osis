@@ -108,7 +108,7 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             self.data['acronym_0'] = LearningUnitExternalSite.E.value
             self.fields['academic_year'].queryset = AcademicYear.objects.filter(
                 year__gt=settings.YEAR_LIMIT_LUE_MODIFICATION,
-                year__lte=compute_max_academic_year_adjournment()).order_by('year')
+                year__lte=compute_max_academic_year_adjournment()).order_by('-year')
             self.fields['academic_year'].empty_label = None
         else:
             self.data['acronym_0'] = self.instance.acronym[0]
@@ -207,7 +207,9 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
                 target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
             else:
                 target_years_opened = []
-            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(
+                year__in=target_years_opened
+            ).order_by('-year')
 
     def _restrict_academic_years_choice_for_daily_management(self):
         if EntityRoleHelper.has_role(self.person, FacultyManager):
@@ -216,7 +218,9 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         else:
             target_years_opened = []
-        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(
+            year__in=target_years_opened
+        ).order_by('-year')
 
     @property
     def learning_unit_external_form(self):
