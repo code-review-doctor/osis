@@ -46,9 +46,7 @@ class ScoreSheetPDFExportView(PermissionRequiredMixin, View):
         score_sheet_serialized = ScoreSheetPDFSerializer(instance={
             'feuille_de_notes': feuille_de_notes
         }, context={'person': self.person})
-        return paper_sheet.print_notes(
-            dict(score_sheet_serialized.data)
-        )
+        return paper_sheet.print_notes(score_sheet_serialized.data)
 
     def get_feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(

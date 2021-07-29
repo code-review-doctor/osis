@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import json
+
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -39,7 +41,7 @@ class _EnrollmentSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True, source='prenom')
     score = serializers.CharField(read_only=True, source='note')
     justification = serializers.CharField(read_only=True, source='note')
-    deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date()')
+    deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date')
     enrollment_state_color = serializers.SerializerMethodField()
 
     def get_enrollment_state_color(self, note_etudiant: NoteEtudiantDTO) -> str:
@@ -51,6 +53,7 @@ class _EnrollmentSerializer(serializers.Serializer):
 
 
 class _ProgramAddressSerializer(serializers.Serializer):
+    # TODO: Use data from administrative data service
     recipient = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
     location = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
     postal_code = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
@@ -62,8 +65,8 @@ class _ProgramAddressSerializer(serializers.Serializer):
 
 
 class _ProgramSerializer(serializers.Serializer):
-    deliberation_date = serializers.CharField(read_only=True)
-    acronym = serializers.CharField(read_only=True)
+    deliberation_date = serializers.SerializerMethodField()
+    acronym = serializers.SerializerMethodField()
     address = _ProgramAddressSerializer(source='*')
     enrollments = serializers.SerializerMethodField()
 
@@ -80,9 +83,9 @@ class _ProgramSerializer(serializers.Serializer):
 
 
 class _ScoreResponsibleAddressSerializer(serializers.Serializer):
-    location = serializers.CharField(read_only=True)
-    postal_code = serializers.CharField(read_only=True)
-    city = serializers.CharField(read_only=True)
+    location = serializers.SerializerMethodField()
+    postal_code = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField()
 
     def get_location(self, obj) -> str:
         return ""
@@ -103,9 +106,9 @@ class _ScoreResponsibleSerializer(serializers.Serializer):
 class _LearningUnitYearsSerializer(serializers.Serializer):
     session_number = serializers.IntegerField(read_only=True, source='feuille_de_notes.numero_session')
     title = serializers.CharField(read_only=True, source='feuille_de_notes.intitule_complet_unite_enseignement')
-    academic_year = serializers.CharField(read_only=True)
+    academic_year = serializers.SerializerMethodField()
     acronym = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    decimal_scores = serializers.BooleanField(read_only=True)
+    decimal_scores = serializers.SerializerMethodField()
     scores_responsible = _ScoreResponsibleSerializer(source="*")
     programs = serializers.SerializerMethodField()
 
@@ -148,3 +151,11 @@ class ScoreSheetPDFSerializer(serializers.Serializer):
     def get_learning_unit_years(self, obj):
         serializer = _LearningUnitYearsSerializer(instance=obj)
         return [serializer.data]
+
+    def to_representation(self, instance):
+        """
+        Need in order to ensure backward compatibility with voluptuous library
+        """
+        representation = super().to_representation(instance)
+        json_str = json.dumps(representation)
+        return json.loads(json_str)
