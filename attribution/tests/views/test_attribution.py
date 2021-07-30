@@ -154,10 +154,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
             learning_component_year=cls.full_lecturing_component,
             hourly_volume_partial_q1=20
         )
-        cls.pract_learning_class_year = LearningClassYearFactory(
-            learning_component_year=cls.full_practical_component,
-            hourly_volume_partial_q1=20
-        )
         AttributionClassFactory(
             learning_class_year=cls.lect_learning_class_year,
             attribution_charge=cls.charge_lecturing,
