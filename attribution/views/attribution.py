@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import itertools
-from typing import List
+from typing import Set
 
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import models
@@ -36,7 +36,6 @@ from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.enums.function import Functions
 from base.models.enums import learning_unit_year_subtypes
-from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
@@ -89,7 +88,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
     return msgs
 
 
-def _get_classes_charge_repartition_warning_messages(learning_unit_year: LearningUnitYear) -> List[str]:
+def _get_classes_charge_repartition_warning_messages(learning_unit_year: LearningUnitYear) -> Set[str]:
     msgs = set()
 
     charges_by_attribution_and_type = _get_charges_by_attribution_and_type_or_func(
@@ -102,7 +101,7 @@ def _get_classes_charge_repartition_warning_messages(learning_unit_year: Learnin
 
     for attribution_key, charges in charges_by_attribution_and_type:
         for charge in list(charges):
-            if _get_component_volume_total_of_classes(charge.learning_component_year) > (charge.total_volume or 0):
+            if _get_component_volume_total_of_classes(charge) > (charge.total_volume or 0):
                 msgs.add(msg_warning % {
                     "tutor": _get_tutor_name_with_function(charge),
                     "ue_type": learning_unit_year.get_subtype_display().lower()
@@ -132,8 +131,8 @@ def _get_charges_by_attribution_and_type_or_func(learning_container_year: Learni
     return charges_by_attribution_and_type_or_func
 
 
-def _get_component_volume_total_of_classes(component: LearningComponentYear) -> float:
-    return sum([eff_class.volume_annual for eff_class in component.classes])
+def _get_component_volume_total_of_classes(charge: AttributionChargeNew) -> float:
+    return sum([class_attrib.allocation_charge for class_attrib in charge.attributionclass_set.all()])
 
 
 def _get_tutor_name_with_function(charge: AttributionChargeNew) -> str:
