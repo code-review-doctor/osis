@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 13:42+0200\n"
+"POT-Creation-Date: 2021-07-30 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -176,6 +176,9 @@ msgid "Manage repartition"
 msgstr ""
 
 msgid "New class"
+msgstr ""
+
+msgid "No attributions exist for the UE"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -439,9 +442,6 @@ msgid "You do not have sufficient access rights to update a class."
 msgstr ""
 
 msgid "external acronym rules"
-msgstr ""
-
-msgid "full"
 msgstr ""
 
 msgid "hourly volume partial q1"
