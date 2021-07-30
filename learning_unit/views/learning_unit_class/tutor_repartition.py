@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.shortcuts import render
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -44,12 +43,14 @@ class TutorRepartitionView(CommonClassView, FormView):
     template_name = "class/add_charge_repartition.html"
     permission_required = 'attribution.can_change_class_repartition'
     form_class = ClassTutorRepartitionForm
+    force_reload = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
                 'learning_unit': self.learning_unit,
+                'learning_unit_year': self.learning_unit_year,
                 'effective_class': self.effective_class,
                 'can_add_charge_repartition': self.request.user.has_perm(
                     "attribution.can_change_class_repartition", self.get_permission_object()
@@ -89,6 +90,7 @@ class TutorRepartitionView(CommonClassView, FormView):
 
         if not form.errors:
             display_success_messages(request, self.get_success_msg())
+            # return redirect(self.common_url_tabs()['url_class_tutors'])
         return render(request, self.template_name, {
             "form": form,
         })
