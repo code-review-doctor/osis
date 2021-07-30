@@ -63,4 +63,15 @@ class ClassDistributionWithAttribution(interface.DomainService):
                     )
                 )
 
+        return cls._order_tutors_by_last_name_and_first_name(result)
+
+    @classmethod
+    def _order_tutors_by_last_name_and_first_name(
+            cls,
+            result: List['TutorClassRepartitionDTO']
+    ) -> List['TutorClassRepartitionDTO']:
+        def last_name_first_name(tutor: 'TutorClassRepartitionDTO') -> str:
+            return tutor.last_name + tutor.first_name
+
+        result = sorted(result, key=last_name_first_name)
         return result
