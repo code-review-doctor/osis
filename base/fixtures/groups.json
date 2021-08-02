@@ -181,21 +181,6 @@
                     "internshipspeciality"
                 ],
                 [
-                    "add_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "change_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "delete_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
                     "add_internshipstudentaffectationstat",
                     "internship",
                     "internshipstudentaffectationstat"
@@ -239,21 +224,6 @@
                     "delete_organization",
                     "internship",
                     "organization"
-                ],
-                [
-                    "add_organizationaddress",
-                    "internship",
-                    "organizationaddress"
-                ],
-                [
-                    "change_organizationaddress",
-                    "internship",
-                    "organizationaddress"
-                ],
-                [
-                    "delete_organizationaddress",
-                    "internship",
-                    "organizationaddress"
                 ],
                 [
                     "add_period",
@@ -317,16 +287,6 @@
                     "can_access_externallearningunityear",
                     "base",
                     "externallearningunityear"
-                ],
-                [
-                    "can_access_learningunitcomponentclass",
-                    "base",
-                    "learningunitcomponentclass"
-                ],
-                [
-                    "can_access_catalog",
-                    "base",
-                    "offer"
                 ],
                 [
                     "view_educationgroup",
