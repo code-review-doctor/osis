@@ -31,13 +31,14 @@ from ddd.logic.effective_class_repartition.domain.validator.exceptions import Tu
 
 @attr.s(frozen=True, slots=True)
 class ShouldTutorNotBeAlreadyAssignedToClass(BusinessValidator):
-
     attribution_uuid = attr.ib(type=str)
     tutor = attr.ib(type='Tutor')  # type: Tutor
+    class_code = attr.ib(type='EffectiveClassCode')
 
     def validate(self, *args, **kwargs):
         attribution_uuids_already_distributed = [
-            distributed_class.attribution_uuid for distributed_class in self.tutor.distributed_effective_classes
+            (distributed_class.attribution_uuid, distributed_class.class_code)
+            for distributed_class in self.tutor.distributed_effective_classes
         ]
-        if self.attribution_uuid in attribution_uuids_already_distributed:
+        if (self.attribution_uuid, self.class_code) in attribution_uuids_already_distributed:
             raise TutorAlreadyAssignedException()

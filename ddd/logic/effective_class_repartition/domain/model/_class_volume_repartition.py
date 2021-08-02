@@ -48,3 +48,7 @@ class ClassVolumeRepartition(interface.ValueObject):
     @property
     def attribution_uuid(self) -> str:
         return self.attribution.uuid
+
+    @property
+    def class_code(self) -> str:
+        return self.effective_class.class_code

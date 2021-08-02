@@ -36,11 +36,12 @@ from ddd.logic.effective_class_repartition.domain.validator._should_tutor_not_be
 class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     tutor = attr.ib(type='Tutor')
     attribution_uuid = attr.ib(type=str)
+    class_code = attr.ib(type='EffectiveClassCode')
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return []
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldTutorNotBeAlreadyAssignedToClass(self.attribution_uuid, self.tutor),
+            ShouldTutorNotBeAlreadyAssignedToClass(self.attribution_uuid, self.tutor, self.class_code),
         ]
