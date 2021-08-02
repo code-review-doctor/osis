@@ -23,40 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from django.utils.functional import cached_property
+from django.views import View
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
-from osis_common.ddd import interface
-
-Noma = str
-
-
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from infrastructure.messages_bus import message_bus_instance
+from osis_common.document import paper_sheet
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=DateDTO)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
+class ScoreSheetPDFExportView(PermissionRequiredMixin, View):
+    # PermissionRequiredMixin
+    permission_required = "assessments.can_access_scoreencoding"
 
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
+    @cached_property
+    def person(self):
+        return self.request.user.person
 
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
+    def get(self, request, *args, **kwargs):
+        feuille_de_notes = self.get_feuille_de_notes()
+        score_sheet_serialized = ScoreSheetPDFSerializer(instance={
+            'feuille_de_notes': feuille_de_notes
+        }, context={'person': self.person})
+        return paper_sheet.print_notes(score_sheet_serialized.data)
 
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    def get_feuille_de_notes(self):
+        cmd = GetFeuilleDeNotesCommand(
+            matricule_fgs_enseignant=self.person.global_id,
+            code_unite_enseignement=self.kwargs['learning_unit_code']
+        )
+        return message_bus_instance.invoke(cmd)

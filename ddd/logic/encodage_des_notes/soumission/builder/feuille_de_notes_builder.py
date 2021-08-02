@@ -28,7 +28,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_b
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, NoteEtudiantFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, \
+    NoteEtudiantFromRepositoryDTO, DateDTO
 from osis_common.ddd import interface
 
 
@@ -51,6 +52,6 @@ class FeuilleDeNotesBuilder(interface.RootEntityBuilder):
             entity_id=IdentiteNoteEtudiant(noma=dto_object.noma),
             email=dto_object.email,
             note=NoteBuilder.build(dto_object.note),
-            date_limite_de_remise=dto_object.date_limite_de_remise,
+            date_limite_de_remise=DateDTO.build_from_date(dto_object.date_limite_de_remise),
             est_soumise=dto_object.est_soumise
         )

@@ -106,7 +106,7 @@ class FeuilleDeNotes(interface.RootEntity):
 
     def get_date_limite_de_remise(self, noma: str) -> date:
         note = self.__get_note_etudiant(noma)
-        return note.date_limite_de_remise
+        return note.date_limite_de_remise.to_date()
 
     def __get_note_etudiant(self, noma: str) -> 'NoteEtudiant':
         return next(note for note in self.notes if note.noma == noma)

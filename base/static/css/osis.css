@@ -338,6 +338,9 @@ div.dataTables_wrapper div.dataTables_processing {
  * Take on https://www.starconfig.com.au/bootstrap-3-and-4-utilities-display-properties-how-to-hide-elements/
  * TODO: Need to remove after update to bootstrap 4
  */
+.w-100 {
+    width: 100%;
+}
 .d-none {
     display: none ! important;
 }
@@ -730,4 +733,3 @@ https://stackoverflow.com/questions/16897285/bootstrap-datepicker-is-displaying-
 .bootstrap-datetimepicker-widget {
     z-index: 1600;
 }
-

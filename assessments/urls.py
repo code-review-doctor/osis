@@ -24,13 +24,16 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
+from django.urls import path
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
+from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
+from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportView
 
 urlpatterns = [
     url(r'^scores_encoding/', include([
@@ -61,6 +64,12 @@ urlpatterns = [
             score_encoding.export_xls, name='scores_encoding_download'),
         url(r'^upload/(?P<learning_unit_year_id>[0-9]+)/$',
             upload_xls_utils.upload_scores_file, name='upload_encoding'),
+
+        # New URL's
+        path('<str:learning_unit_code>/', include(([
+            path('', LearningUnitScoreEncodingTutorView.as_view(), name='learning_unit_score_encoding'),
+            path('pdf_export', ScoreSheetPDFExportView.as_view(), name='score_sheet_pdf_export'),
+        ]))),
     ])),
 
     url(r'^offers/', include([
