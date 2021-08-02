@@ -106,9 +106,9 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             intitule_complet_unite_enseignement=detail_unite_enseignement.intitule_complet,
             dates_echeance=[
                 DateEcheanceDTO(
-                    jour=echeance.day,
-                    mois=echeance.month,
-                    annee=echeance.year,
+                    jour=echeance.jour,
+                    mois=echeance.mois,
+                    annee=echeance.annee,
                     quantite_notes_soumises=feuille_de_notes.get_nombre_notes_soumises_par_echeance().get(echeance, 0),
                     quantite_total_notes=total_notes,
                 ) for echeance, total_notes in nombre_total_notes_par_echeance_trie_par_echeance

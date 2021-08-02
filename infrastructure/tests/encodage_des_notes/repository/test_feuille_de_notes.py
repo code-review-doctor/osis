@@ -123,6 +123,6 @@ class FeuilleDeNotesRepositoryTest(TestCase):
             )
             SessionExamDeadlineFactory(
                 offer_enrollment=enrollment.learning_unit_enrollment.offer_enrollment,
-                deadline=note.date_limite_de_remise,
+                deadline=note.date_limite_de_remise.to_date(),
                 deadline_tutor=0
             )

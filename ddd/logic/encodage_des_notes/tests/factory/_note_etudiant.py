@@ -72,10 +72,10 @@ class NoteManquanteEtudiantFactory(factory.Factory):
 
     class Params:
         date_remise_hier = factory.Trait(
-            date_limite_de_remise=factory.LazyFunction(lambda: datetime.date.today() - datetime.timedelta(days=1))
+            date_limite_de_remise=DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1))
         )
         date_remise_aujourdhui = factory.Trait(
-            date_limite_de_remise=factory.LazyFunction(datetime.date.today)
+            date_limite_de_remise=DateDTO.build_from_date(datetime.date.today())
         )
 
 
