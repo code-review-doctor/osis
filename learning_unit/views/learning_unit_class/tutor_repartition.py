@@ -30,6 +30,7 @@ from django.views.generic import FormView
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.views.common import display_success_messages, display_error_messages
+from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.effective_class_repartition.commands import SearchAttributionCommand, \
     SearchTutorsDistributedToClassCommand
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
@@ -39,11 +40,10 @@ from learning_unit.forms.classes.tutor_repartition import ClassTutorRepartitionF
 from learning_unit.views.learning_unit_class.common import CommonClassView
 
 
-class TutorRepartitionView(CommonClassView, FormView):
-    template_name = "class/add_charge_repartition.html"
+class TutorRepartitionView(CommonClassView, AjaxTemplateMixin, FormView):
+    template_name = "class/add_charge_repartition_inner.html"
     permission_required = 'attribution.can_change_class_repartition'
     form_class = ClassTutorRepartitionForm
-    force_reload = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -90,10 +90,13 @@ class TutorRepartitionView(CommonClassView, FormView):
 
         if not form.errors:
             display_success_messages(request, self.get_success_msg())
-            # return redirect(self.common_url_tabs()['url_class_tutors'])
+            return self._ajax_response()
         return render(request, self.template_name, {
             "form": form,
         })
+
+    def get_success_url(self):
+        return self.common_url_tabs()['url_class_tutors']
 
     def get_success_msg(self) -> str:
         return _("Repartition added for %(tutor)s (%(function)s)") % {
@@ -103,7 +106,7 @@ class TutorRepartitionView(CommonClassView, FormView):
 
 
 class TutorRepartitionRemoveView(TutorRepartitionView):
-    template_name = "class/remove_charge_repartition.html"
+    template_name = "class/remove_charge_repartition_inner.html"
     permission_required = 'attribution.can_delete_class_repartition'
     form_class = ClassRemoveTutorRepartitionForm
 
@@ -121,7 +124,7 @@ class TutorRepartitionRemoveView(TutorRepartitionView):
 
 
 class TutorRepartitionEditView(TutorRepartitionView):
-    template_name = "class/add_charge_repartition.html"
+    template_name = "class/add_charge_repartition_inner.html"
     permission_required = 'attribution.can_change_class_repartition'
     form_class = ClassEditTutorRepartitionForm
 
