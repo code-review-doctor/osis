@@ -13,11 +13,6 @@
                     "is_institution_administrator",
                     "base",
                     "person"
-                ],
-                [
-                    "can_access_structure",
-                    "base",
-                    "structure"
                 ]
             ]
         }
@@ -357,11 +352,6 @@
                     "is_institution_administrator",
                     "base",
                     "person"
-                ],
-                [
-                    "can_access_structure",
-                    "base",
-                    "structure"
                 ],
                 [
                     "view_learningclassyear",
