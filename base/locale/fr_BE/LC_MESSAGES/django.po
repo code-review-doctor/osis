@@ -1447,6 +1447,9 @@ msgstr "Liste des utilisateurs avec leurs groupes et entités liés."
 msgid "List proposals"
 msgstr "Liste des propositions"
 
+msgid "List_of_users"
+msgstr "Liste_des_utilisateurs"
+
 msgid "Local credits"
 msgstr "Crédits locaux"
 
@@ -2504,6 +2507,9 @@ msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
 
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
+msgstr "La classe %(acronym)s est attribuée à %(tutor)s l’année %(year)s"
+
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
 
@@ -3008,8 +3014,24 @@ msgstr "Volume total annuel"
 msgid "Volumes are inconsistent"
 msgstr "Les volumes sont incohérents"
 
+msgid ""
+"Volumes are inconsistent: you can't delete volume on a component having "
+"classes."
+msgstr ""
+"Les volumes sont incohérents: vous ne pouvez pas supprimer le volume sur un "
+"composant ayant des classes."
+
 msgid "Volumes management"
 msgstr "Gestion des volumes"
+
+#, python-format
+msgid ""
+"Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning "
+"unit whose volume has been deleted on a component having classes"
+msgstr ""
+"Les volumes de %(code_ue)s sont incohérents: vous ne pouvez pas consolider "
+"une unité d'enseignement dont le volume a été supprimé sur un composant "
+"ayant des classes."
 
 msgid "Volumes of {} are inconsistent"
 msgstr "Les volumes de {} sont incohérents"

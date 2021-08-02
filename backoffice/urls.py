@@ -84,6 +84,10 @@ if 'osis_notification' in settings.INSTALLED_APPS:
     )
 if 'learning_unit' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^learning_unit/', include('learning_unit.urls')),)
+if 'osis_async' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^tasks/v1/', include('osis_async.api.urls_v1')),
+    )
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

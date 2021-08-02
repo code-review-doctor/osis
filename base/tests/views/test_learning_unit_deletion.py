@@ -37,6 +37,7 @@ from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_class import AttributionClassFactory
 from base.models.enums import entity_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
@@ -247,6 +248,51 @@ class LearningUnitDelete(TestCase):
                          'tutor': attrib_new_1.tutor,
                          'year': ly1.academic_year},
                       msg)
+
+        # Check that record is not deleted
+        self.assertTrue(LearningUnitYear.objects.filter(pk=ly1.pk).exists())
+
+        # Check redirection to identification
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('learning_unit', kwargs={'learning_unit_year_id': ly1.pk}))
+
+    def test_delete_all_learning_units_year_case_error_have_attribution_on_class(self):
+        learning_unit_years = self.learning_unit_year_list
+        ly1 = learning_unit_years[1]
+        attrib_new_1 = AttributionNewFactory(learning_container_year=ly1.learning_container_year)
+        learning_component_year_1 = LearningComponentYearFactory(learning_unit_year=ly1)
+        attribution_charge = AttributionChargeNewFactory(
+            attribution=attrib_new_1,
+            learning_component_year=learning_component_year_1
+        )
+        classe = LearningClassYearFactory(learning_component_year=attribution_charge.learning_component_year)
+        AttributionClassFactory(learning_class_year=classe, attribution_charge=attribution_charge)
+        request_factory = RequestFactory()
+
+        request = request_factory.post(reverse(delete_all_learning_units_year, args=[ly1.id]))
+        request.user = self.user
+
+        setattr(request, 'session', 'session')
+        setattr(request, '_messages', FallbackStorage(request))
+
+        response = delete_all_learning_units_year(request, learning_unit_year_id=ly1.id)
+
+        # Get message from context
+        msg = [m.message for m in get_messages(request)]
+        msg_level = [m.level for m in get_messages(request)]
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.ERROR, msg_level)
+
+        # Check error message
+        self.assertIn(
+            _("The class %(acronym)s is assigned to %(tutor)s for the year %(year)s")
+            % {
+                'acronym': classe.effective_class_complete_acronym,
+                'tutor': attrib_new_1.tutor,
+                'year': ly1.academic_year
+            },
+            msg
+        )
 
         # Check that record is not deleted
         self.assertTrue(LearningUnitYear.objects.filter(pk=ly1.pk).exists())

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -25,13 +25,25 @@
 ##############################################################################
 from django.contrib.auth.models import Permission, Group
 from django.http import HttpResponse
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.utils.translation import gettext_lazy as _
 from rest_framework.reverse import reverse
 
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, TUTOR
+from base.tests.factories.entity_manager import EntityManagerFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.views.user_list import UserListView
+from base.views.user_list import _prepare_xls_content, _get_headers
+from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
+
+COL_FOR_LAST_NAME = 0
+COL_FOR_FIRST_NAME = 1
+COL_FOR_GLOBAL_ID = 2
+COL_FOR_GROUP_NAMES = 3
+COL_FOR_MANAGED_ENTITIES = 4
+COL_FOR_FACULTY_MGR_UE_MANAGED_ENTITIES = 6
 
 
 class UserListViewTestCase(TestCase):
@@ -73,3 +85,54 @@ class UserListViewTestCase(TestCase):
         a_central_manager_person.save()
 
         self.assertCountEqual(UserListView().get_queryset(), [a_central_manager_person])
+
+
+@override_settings(INSTALLED_APPS=['learning_unit', 'education_group', 'partnership'])
+class XlsUserListTestCase(TestCase):
+    def setUp(self):
+        self.view = UserListView()
+
+        self.entity_drt = EntityVersionFactory(acronym="DRT").entity
+        self.entity_espo = EntityVersionFactory(acronym="ESPO").entity
+
+    def test_prepare_xls_content_no_data(self):
+        self.assertEqual(_prepare_xls_content(self.view, []), [])
+
+    def test_prepare_xls_content_check_data(self):
+        person_faculty_manager = PersonFactory(global_id='12345678')
+        FacultyManagerFactory(person=person_faculty_manager, entity=self.entity_drt)
+        EntityManagerFactory(person=person_faculty_manager, entity=self.entity_espo)
+        FacultyManagerFactory(person=person_faculty_manager, entity=self.entity_drt)
+        data = _prepare_xls_content(self.view, [person_faculty_manager])
+        self.assertEqual(len(data), 1)
+        date_first_user = data[0]
+        self.assertEqual(date_first_user[COL_FOR_LAST_NAME], person_faculty_manager.last_name)
+        self.assertEqual(date_first_user[COL_FOR_FIRST_NAME], person_faculty_manager.first_name)
+        self.assertEqual(date_first_user[COL_FOR_GLOBAL_ID], person_faculty_manager.global_id)
+        self.assertListEqual(
+            date_first_user[COL_FOR_GROUP_NAMES].split('\n'),
+            ["faculty_managers_for_ue", "entity_managers"]
+        )
+        self.assertEqual(date_first_user[COL_FOR_MANAGED_ENTITIES], "ESPO")
+        self.assertEqual(date_first_user[COL_FOR_FACULTY_MGR_UE_MANAGED_ENTITIES], "DRT")
+
+    def test_headers(self):
+        titles = _get_headers()
+        expected_titles = [
+            _('Lastname'),
+            _('Firstname'),
+            _('Global ID'),
+            _('Groups'),
+            _('Entity managers'),
+            _('Central Manager (Learning units)'),
+            _('Faculty Manager (Learning units)'),
+            _('Central Manager (Trainings)'),
+            _('Faculty Manager (Trainings)'),
+            _('Partnership entities'),
+            _('Program managers')
+
+        ]
+        self.assertListEqual(
+            titles,
+            expected_titles
+        )

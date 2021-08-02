@@ -46,7 +46,7 @@ def get_academic_year_choices_for_groups(
 
     result = [
         (_get_href(node_id, _get_path(map_element_id_by_year, element_ids, node_id), active_view_name), node_id.year)
-        for node_id in node_ids
+        for node_id in reversed(node_ids)
     ]
     return result
 
@@ -59,7 +59,7 @@ def get_academic_year_choices_for_trainings_and_mini_training(
 
     result = [
         (_get_href(node_id, '', active_view_name), node_id.year)
-        for node_id in node_ids
+        for node_id in reversed(node_ids)
     ]
     return result
 
