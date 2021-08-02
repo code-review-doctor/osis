@@ -48,4 +48,3 @@ class IUniteEnseignementTranslator(interface.DomainService):
             values: Set[Tuple[str, int]],
     ) -> Set['UniteEnseignementDTO']:
         raise NotImplementedError
-
