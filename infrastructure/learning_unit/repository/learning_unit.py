@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+import functools
+import operator
+from typing import Optional, List, Set, Tuple
 
 from django.db.models import F, OuterRef, Subquery, Case, When, Q, CharField, Value, QuerySet
 from django.db.models.functions import Concat, Substr, Length
@@ -65,37 +67,21 @@ class LearningUnitRepository(ILearningUnitRepository):
         ).exists()
 
     @classmethod
-    def search_learning_units_dto(
-            cls,
-            code: str = None,
-            year: int = None,
-            full_title: str = None,
-            type: str = None,
-            responsible_entity_code: str = None
-    ) -> List['LearningUnitSearchDTO']:
+    def search_learning_units_dto(cls, code_annee_values: Set[Tuple[str, int]] = None) -> List['LearningUnitSearchDTO']:
         qs = _get_common_queryset()
         # FIXME :: reuse Django filter
-        if code is not None:
-            qs = qs.filter(
-                acronym__icontains=code,
+        if code_annee_values is not None:
+            q_filters = functools.reduce(
+                operator.or_,
+                [
+                    Q(
+                        acronym__icontains=code,
+                        academic_year__year=year,
+                    )
+                    for code, year in code_annee_values
+                ]
             )
-        if year is not None:
-            qs = qs.filter(
-                academic_year__year=year,
-            )
-        if type is not None:
-            qs = qs.filter(
-                learning_container_year__container_type=type,
-            )
-        if responsible_entity_code is not None:
-            qs = qs.filter(
-                requirement_entity__entityversion__acronym__icontains=responsible_entity_code,
-            )
-        if full_title is not None:
-            qs = qs.filter(
-                Q(learning_container_year__common_title__icontains=full_title)
-                | Q(specific_title__icontains=full_title),
-            )
+            qs = qs.filter(q_filters)
 
         qs = qs.annotate(
             code=F('acronym'),

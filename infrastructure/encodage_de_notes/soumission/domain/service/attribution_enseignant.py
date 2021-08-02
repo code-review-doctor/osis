@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F
+from django.db.models import F, CharField
+from django.db.models.functions import Concat
 
 from attribution.models.attribution_class import AttributionClass
 from attribution.models.attribution_new import AttributionNew
@@ -42,26 +43,45 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
             code_unite_enseignement: str,
             annee: int,
     ) -> Set['AttributionEnseignantDTO']:
-        dtos = _search_attributions_unite_enseignement(code_unite_enseignement, annee)
-        dtos |= _search_repartition_classes(code_unite_enseignement, annee)
+        dtos = _search_attributions_unite_enseignement(code_unite_enseignement=code_unite_enseignement, annee=annee)
+        dtos |= _search_repartition_classes(code_unite_enseignement=code_unite_enseignement, annee=annee)
+        return dtos
+
+    @classmethod
+    def search_attributions_enseignant_par_matricule(
+            cls,
+            matricule_enseignant: str,
+    ) -> Set['AttributionEnseignantDTO']:
+        dtos = _search_attributions_unite_enseignement(matricule_enseignant=matricule_enseignant)
+        dtos |= _search_repartition_classes(matricule_enseignant=matricule_enseignant)
         return dtos
 
 
 def _search_attributions_unite_enseignement(
-        code_unite_enseignement: str,
-        annee: int
+        code_unite_enseignement: str = None,
+        annee: int = None,
+        matricule_enseignant: str = None,
 ) -> Set['AttributionEnseignantDTO']:
-    attributions_unite_enseignement = AttributionNew.objects.filter(
-        learning_container_year__academic_year__year=annee,
-        learning_container_year__acronym=code_unite_enseignement,
-    ).annotate(
+    qs = AttributionNew.objects
+    if code_unite_enseignement:
+        qs = qs.filter(
+            learning_container_year__academic_year__year=annee,
+            learning_container_year__acronym=code_unite_enseignement,
+        )
+    if matricule_enseignant:
+        qs = qs.filter(
+            tutor__person__global_id=matricule_enseignant,
+        )
+    qs = qs.annotate(
         matricule_fgs_enseignant=F('tutor__person__global_id'),
         code_unite_enseignement=F('learning_container_year__acronym'),
         nom=F('tutor__person__last_name'),
         prenom=F('tutor__person__first_name'),
+        annee=F('learning_container_year__academic_year__year'),
     ).values(
         'matricule_fgs_enseignant',
         'code_unite_enseignement',
+        'annee',
         'nom',
         'prenom',
     ).distinct()
@@ -69,39 +89,55 @@ def _search_attributions_unite_enseignement(
         AttributionEnseignantDTO(
             matricule_fgs_enseignant=attribution_as_dict['matricule_fgs_enseignant'],
             code_unite_enseignement=attribution_as_dict['code_unite_enseignement'],
-            annee=annee,
+            annee=attribution_as_dict['annee'],
             prenom=attribution_as_dict['prenom'],
             nom=attribution_as_dict['nom'],
         )
-        for attribution_as_dict in attributions_unite_enseignement
+        for attribution_as_dict in qs
     }
 
 
-def _search_repartition_classes(matricule_fgs: str, annee: int) -> Set['AttributionEnseignantDTO']:
+def _search_repartition_classes(
+        code_unite_enseignement: str = None,
+        annee: int = None,
+        matricule_enseignant: str = None,
+) -> Set['AttributionEnseignantDTO']:
     # TODO :: réutiliser message_bus et domaine "effective_class_repartition"
-    classes_repartition = AttributionClass.objects.filter(
-        attribution_charge__attribution__tutor__person__global_id=matricule_fgs,
-        learning_class_year__learning_component_year__learning_unit_year__academic_year__year=annee,
-    ).annotate(
-        learning_unit_code=F('learning_class_year__learning_component_year__learning_unit_year__acronym'),
-        class_code=F('learning_class_year__acronym'),
+    qs = AttributionClass.objects
+
+    if code_unite_enseignement:
+        qs = qs.filter(
+            learning_class_year__learning_component_year__learning_unit_year__acronym=code_unite_enseignement,
+            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=annee,
+        )
+
+    if matricule_enseignant:
+        qs = qs.filter(attribution_charge__attribution__tutor__person__global_id=matricule_enseignant)
+
+    qs = qs.annotate(
+        matricule_fgs_enseignant=F('attribution_charge__attribution__tutor__person__global_id'),
+        code_unite_enseignement=Concat(
+            'learning_class_year__learning_component_year__learning_unit_year__acronym',
+            'learning_class_year__acronym',
+            output_field=CharField()
+        ),
+        annee=F('learning_class_year__learning_component_year__learning_unit_year__academic_year__year'),
         nom=F('attribution_charge__attribution__tutor__person__last_name'),
         prenom=F('attribution_charge__attribution__tutor__person__first_name'),
     ).values(
-        'learning_unit_code',
-        'class_code',
+        'matricule_fgs_enseignant',
+        'code_unite_enseignement',
+        'annee',
         'nom',
         'prenom',
     ).distinct()
-    dtos = set()
-    for class_repartition_as_dict in classes_repartition:
-        code_classe = class_repartition_as_dict['class_code']
-        code_unite_enseignement = class_repartition_as_dict['code_unite_enseignement'] + code_classe
-        dto = AttributionEnseignantDTO(
-            code_unite_enseignement=code_unite_enseignement,
-            annee=annee,
+
+    return {
+        AttributionEnseignantDTO(
+            matricule_fgs_enseignant=class_repartition_as_dict['matricule_fgs_enseignant'],
+            code_unite_enseignement=class_repartition_as_dict['code_unite_enseignement'],
+            annee=class_repartition_as_dict['annee'],
             prenom=class_repartition_as_dict['prenom'],
             nom=class_repartition_as_dict['nom'],
-        )
-        dtos.add(dto)
-    return dtos
+        ) for class_repartition_as_dict in qs
+    }

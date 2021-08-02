@@ -25,10 +25,6 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F
-
-from attribution.models.attribution_class import AttributionClass
-from attribution.models.attribution_new import AttributionNew
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
@@ -62,6 +58,18 @@ class AttributionEnseignantTranslatorInMemory(IAttributionEnseignantTranslator):
         return set(
             filter(
                 lambda dto: dto.code_unite_enseignement == code_unite_enseignement and dto.annee == annee,
+                cls.attributions_dtos,
+            )
+        )
+
+    @classmethod
+    def search_attributions_enseignant_par_matricule(
+            cls,
+            matricule_enseignant: str,
+    ) -> Set['AttributionEnseignantDTO']:
+        return set(
+            filter(
+                lambda dto: dto.matricule_fgs_enseignant == matricule_enseignant,
                 cls.attributions_dtos,
             )
         )
