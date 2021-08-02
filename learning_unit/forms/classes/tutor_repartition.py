@@ -125,7 +125,7 @@ class ClassEditTutorRepartitionForm(ClassTutorRepartitionForm):
             tutor_personal_id_number=self.tutor.personal_id_number,
             learning_unit_attribution_uuid=self.tutor.attribution_uuid,
             class_code=self.effective_class.entity_id.class_code,
-            distributed_volume=self.cleaned_data['volume'] or 0,
+            distributed_volume=self.cleaned_data['volume'],
             learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
             year=self.effective_class.entity_id.learning_unit_identity.year
         )
