@@ -30,6 +30,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.exceptions import ErrorDetail
 from rest_framework.test import APITestCase
 
+from base.models.person import Person
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from webservices.api.views.auth_token import AuthToken
 
@@ -93,3 +95,48 @@ class AuthTokenTestCase(APITestCase):
         self.assertEqual(response_2.status_code, status.HTTP_200_OK)
 
         self.assertDictEqual(response.data, response_2.data)
+
+    def test_auth_token_ensure_create_person_when_custom_header_provided(self):
+        response = self.client.post(
+            self.url,
+            data={'username': self.user_who_want_token.username},
+            **{
+                'Accept-Language': 'en',
+                'X-User-FirstName': 'Durant',
+                'X-User-LastName': 'Thomas',
+                'X-User-Email': 'thomas@dummy.com',
+                'X-User-GlobalID': '0123456789',
+            }
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        person_created = Person.objects.get(global_id='0123456789')
+
+        self.assertEqual(person_created.user.username, self.user_who_want_token.username)
+        self.assertEqual(person_created.first_name, 'Durant')
+        self.assertEqual(person_created.last_name, 'Thomas')
+        self.assertEqual(person_created.email, 'thomas@dummy.com')
+        self.assertEqual(person_created.language, 'en')
+
+    def test_auth_token_ensure_update_person_when_custom_header_provided(self):
+        person = PersonFactory(global_id='9876543210', user=self.user_who_want_token)
+        response = self.client.post(
+            self.url,
+            data={'username': self.user_who_want_token.username},
+            **{
+                'Accept-Language': 'en',
+                'X-User-FirstName': 'Luc',
+                'X-User-LastName': 'Pollow',
+                'X-User-Email': 'lpollow@dummy.com',
+                'X-User-GlobalID': person.global_id,
+            }
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        person.refresh_from_db()
+
+        self.assertEqual(person.user.username, self.user_who_want_token.username)
+        self.assertEqual(person.first_name, 'Luc')
+        self.assertEqual(person.last_name, 'Pollow')
+        self.assertEqual(person.email, 'lpollow@dummy.com')
+        self.assertEqual(person.language, 'en')
