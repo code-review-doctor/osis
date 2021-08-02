@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 13:42+0200\n"
+"POT-Creation-Date: 2021-07-30 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,6 +183,9 @@ msgstr "Gérer la répartition"
 
 msgid "New class"
 msgstr "Nouvelle classe"
+
+msgid "No attributions exist for the UE"
+msgstr "Aucune attributions sur l'UE"
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
@@ -487,9 +490,6 @@ msgstr ""
 "partie alphabétique: 2 à 4 lettres\n"
 "partie numérique: 4 chiffres , dont le premier ne peut pas être 0\n"
 "Subdivision: 1 caractère"
-
-msgid "full"
-msgstr "complète"
 
 msgid "hourly volume partial q1"
 msgstr "volume horaire partiel q1"

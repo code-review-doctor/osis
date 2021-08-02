@@ -67,7 +67,7 @@ class DistributeClassToTutorService(SimpleTestCase):
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[0]
         self.assertEqual(class_volume.distributed_volume, self.distribute_class_cmd.distributed_volume)
-        self.assertEqual(class_volume.attribution.uuid, 'uuid')
+        self.assertEqual(class_volume.attribution_uuid, self.distribute_class_cmd.learning_unit_attribution_uuid)
         self.assertEqual(class_volume.effective_class, self.effective_class.entity_id)
 
     def test_should_distribute_effective_class_when_any_distribution_exists_for_tutor(self):
@@ -90,7 +90,7 @@ class DistributeClassToTutorService(SimpleTestCase):
         tutor = self.tutor_repository.get(tutor_id)
         class_volume = tutor.distributed_effective_classes[0]
         self.assertEqual(class_volume.distributed_volume, cmd.distributed_volume)
-        self.assertEqual(class_volume.attribution.uuid, 'uuid')
+        self.assertEqual(class_volume.attribution_uuid, self.distribute_class_cmd.learning_unit_attribution_uuid)
         self.assertEqual(class_volume.effective_class, effective_class.entity_id)
 
     def test_should_have_available_and_greater_than_0_distributed_volume(self):
@@ -107,7 +107,7 @@ class DistributeClassToTutorService(SimpleTestCase):
             AssignedVolumeInvalidValueException
         )
 
-    def test_should_tutor_not_be_already_assigned(self):
+    def test_should_raise_if_already_assigned_to_class_for_same_attribution(self):
         distribute_class_to_tutor(
             self.distribute_class_cmd,
             self.tutor_repository,
@@ -120,3 +120,17 @@ class DistributeClassToTutorService(SimpleTestCase):
                 self.effective_class_repository,
             )
         self.assertIsInstance(e.exception.exceptions.pop(), TutorAlreadyAssignedException)
+
+    def test_should_not_raise_if_already_assigned_to_class_of_other_attribution(self):
+        distribute_class_to_tutor(
+            self.distribute_class_cmd,
+            self.tutor_repository,
+            self.effective_class_repository,
+        )
+        cmd = attr.evolve(self.distribute_class_cmd, learning_unit_attribution_uuid='uuid2', distributed_volume=1)
+        tutor_id = distribute_class_to_tutor(cmd, self.tutor_repository, self.effective_class_repository)
+        tutor = self.tutor_repository.get(tutor_id)
+        class_volume = tutor.distributed_effective_classes[-1]
+        self.assertEqual(class_volume.distributed_volume, cmd.distributed_volume)
+        self.assertEqual(class_volume.attribution_uuid, cmd.learning_unit_attribution_uuid)
+        self.assertEqual(class_volume.effective_class, self.effective_class.entity_id)

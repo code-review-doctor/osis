@@ -44,3 +44,11 @@ class ClassVolumeRepartition(interface.ValueObject):
 
     def __eq__(self, other):
         return hash(self) == hash(other)
+
+    @property
+    def attribution_uuid(self) -> str:
+        return self.attribution.uuid
+
+    @property
+    def class_code(self) -> str:
+        return self.effective_class.class_code

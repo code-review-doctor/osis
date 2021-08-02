@@ -48,7 +48,7 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
                 'learning_unit_attributions': self.get_learning_unit_attributions(),
                 'learning_unit': self.learning_unit,
                 'learning_unit_year': self.learning_unit_year,
-                'personal_id_numbers_already_assigned': self.get_personal_id_numbers_assigned_to_class(),
+                'attributions_uuid_already_assigned': self.get_attribution_uuids_assigned_to_class(),
                 'can_add_charge_repartition': self.request.user.has_perm(
                     "attribution.can_change_class_repartition", self.get_permission_object()
                 )
@@ -65,7 +65,7 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
             )
         )
 
-    def get_personal_id_numbers_assigned_to_class(self) -> List[str]:
+    def get_attribution_uuids_assigned_to_class(self) -> List[str]:
         tutor_dtos = message_bus_instance.invoke(
             SearchTutorsDistributedToClassCommand(
                 learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
@@ -73,4 +73,4 @@ class LearningUnitTutorsView(CommonClassView, TemplateView):
                 class_code=self.effective_class.class_code,
             )
         )
-        return [tutor.personal_id_number for tutor in tutor_dtos]
+        return [tutor.attribution_uuid for tutor in tutor_dtos]

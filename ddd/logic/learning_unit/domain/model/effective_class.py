@@ -96,7 +96,7 @@ class EffectiveClass(interface.RootEntity, abc.ABC):
         self.teaching_place = UclouvainCampusIdentity(uuid=cmd.teaching_place_uuid)
         quadri = cmd.derogation_quadrimester
         self.derogation_quadrimester = DerogationQuadrimester[quadri] if quadri else None
-        self.session_derogation = DerogationSession(cmd.session_derogation).name if cmd.session_derogation else None
+        self.session_derogation = DerogationSession(cmd.session_derogation) if cmd.session_derogation else None
         self.volumes = ClassVolumes(
             volume_first_quadrimester=cmd.volume_first_quadrimester,
             volume_second_quadrimester=cmd.volume_second_quadrimester

@@ -28,7 +28,6 @@ from typing import List
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
-from attribution.views.attribution import _get_classes_charge_repartition_warning_messages
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
 from infrastructure.messages_bus import message_bus_instance
@@ -41,6 +40,7 @@ class ClassTutorsView(CommonClassView, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        permission_object = self.get_permission_object()
         context.update(
             {
                 'year': self.year,
@@ -49,10 +49,10 @@ class ClassTutorsView(CommonClassView, TemplateView):
                 'learning_unit': self.learning_unit,
                 'tutors': self.tutors,
                 'can_delete_attribution': self.request.user.has_perm(
-                    "attribution.can_delete_class_repartition", self.get_permission_object()
+                    "attribution.can_delete_class_repartition", permission_object
                 ),
                 'can_change_attribution': self.request.user.has_perm(
-                    "attribution.can_change_class_repartition", self.get_permission_object()
+                    "attribution.can_change_class_repartition", permission_object
                 ),
             }
         )
