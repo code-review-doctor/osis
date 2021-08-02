@@ -23,12 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 class FeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IFeuilleDeNotesRepository):
     entities = list()  # type: List[FeuilleDeNotes]
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
+        return list(
+            filter(
+                lambda obj: obj.entity_id in entity_ids,
+                cls.entities
+            )
+        )

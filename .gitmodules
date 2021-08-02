@@ -35,3 +35,6 @@
 [submodule "osis_signature"]
 	path = osis_signature
 	url = https://github.com/uclouvain/osis-signature.git
+[submodule "osis_async"]
+	path = osis_async
+	url = https://github.com/uclouvain/osis-async.git

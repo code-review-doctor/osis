@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import operator
+import random
 
 import factory
 import factory.fuzzy
@@ -43,6 +44,12 @@ def generate_person_email(person, domain=None):
     return '{0.first_name}.{0.last_name}@{1}'.format(person, domain).lower()
 
 
+def generate_global_id() -> str:
+    first_digit = str(random.randint(1, 9))
+    other_digits = [str(random.randint(0, 9)) for _ in range(8)]
+    return "".join([first_digit] + other_digits)
+
+
 class PersonFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Person'
@@ -59,12 +66,11 @@ class PersonFactory(factory.DjangoModelFactory):
     language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))
     gender = factory.Iterator(mdl.person.Person.GENDER_CHOICES, getter=operator.itemgetter(0))
     user = factory.SubFactory(UserFactory)
-    global_id = None
+    global_id = factory.LazyFunction(generate_global_id)
 
     class Params:
         french = factory.Trait(language=settings.LANGUAGE_CODE_FR)
         english = factory.Trait(language=settings.LANGUAGE_CODE_EN)
-
 
 
 class SuperUserPersonFactory(PersonFactory):

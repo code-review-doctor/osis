@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from decimal import Decimal
+from typing import Set, Tuple
 
 import attr
 
@@ -105,11 +106,7 @@ class CreateCommand(interface.CommandRequest):
 
 @attr.s(frozen=True, slots=True)
 class LearningUnitSearchCommand(interface.CommandRequest):
-    code = attr.ib(type=str, default=None)
-    year = attr.ib(type=int, default=None)
-    type = attr.ib(type=str, default=None)
-    full_title = attr.ib(type=str, default=None)
-    responsible_entity_code = attr.ib(type=str, default=None)
+    code_annee_values = attr.ib(type=Set[Tuple[str, int]])
 
 
 @attr.s(frozen=True, slots=True)

@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import Counter
 from datetime import date
-from typing import Set
+from typing import Set, Dict
 
 import attr
 
@@ -68,6 +69,20 @@ class FeuilleDeNotes(interface.RootEntity):
 
     def note_decimale_est_autorisee(self) -> bool:
         return self.credits_unite_enseignement >= CREDITS_MIN_POUR_NOTE_DECIMALE
+
+    def get_all_nomas(self) -> Set[str]:
+        return {note.noma for note in self.notes}
+
+    def get_nombre_notes_soumises_par_echeance(self) -> Dict[date, int]:
+        dates_limite_de_remise_pour_notes_soumises = [
+            note.date_limite_de_remise
+            for note in self.notes if note.est_soumise
+        ]
+        return dict(Counter(dates_limite_de_remise_pour_notes_soumises))
+
+    def get_nombre_total_notes_par_echeance(self) -> Dict[date, int]:
+        dates_limite_de_remise_pour_notes = [note.date_limite_de_remise for note in self.notes]
+        return dict(Counter(dates_limite_de_remise_pour_notes))
 
     def encoder_note(
             self,

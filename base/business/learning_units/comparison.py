@@ -68,10 +68,6 @@ def compare_learning_component_year(obj_ref, obj_prev, obj_next):
     d = compare_l_component_yr_attribute(d, data, 'acronym')
 
     d = compare_l_component_yr_attribute(d, data, 'planned_classes')
-    if _real_classes_is_different(obj_prev, obj_ref) or \
-            _real_classes_is_different(obj_next, obj_ref):
-        d.update({'real_classes': [obj_prev.real_classes, obj_ref.real_classes, obj_next.real_classes]})
-
     return d
 
 

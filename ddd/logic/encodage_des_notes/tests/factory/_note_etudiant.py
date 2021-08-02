@@ -70,6 +70,14 @@ class NoteManquanteEtudiantFactory(factory.Factory):
     date_limite_de_remise = DateDTO.build_from_date(datetime.date.today())
     est_soumise = False
 
+    class Params:
+        date_remise_hier = factory.Trait(
+            date_limite_de_remise=factory.LazyFunction(lambda: datetime.date.today() - datetime.timedelta(days=1))
+        )
+        date_remise_aujourdhui = factory.Trait(
+            date_limite_de_remise=factory.LazyFunction(datetime.date.today)
+        )
+
 
 class NoteManquanteEtudiantDateLimiteDepasseeFactory(NoteManquanteEtudiantFactory):
     date_limite_de_remise = DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1))

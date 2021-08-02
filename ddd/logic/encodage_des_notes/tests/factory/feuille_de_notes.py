@@ -110,14 +110,23 @@ class FeuilleDeNotesDecimalesAutorisees(_FeuilleDeNotesFactory):
 class FeuilleDeNotesDateLimiteRemiseAujourdhui(_FeuilleDeNotesFactory):
     credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
-        NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today()),
+        NoteManquanteEtudiantFactory(date_remise_aujourdhui=True),
     }
 
 
 class FeuilleDeNotesDateLimiteRemiseHier(_FeuilleDeNotesFactory):
     credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
     notes = {
-        NoteManquanteEtudiantFactory(date_limite_de_remise=datetime.date.today() - datetime.timedelta(days=1)),
+        NoteManquanteEtudiantFactory(date_remise_hier=True),
+    }
+
+
+class FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui(_FeuilleDeNotesFactory):
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
+    notes = {
+        NoteManquanteEtudiantFactory(date_remise_aujourdhui=True),
+        NoteManquanteEtudiantFactory(date_remise_aujourdhui=True),
+        NoteManquanteEtudiantFactory(date_remise_hier=True),
     }
 
 

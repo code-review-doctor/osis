@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from datetime import date
-from typing import List, Set
+from typing import List, Set, Optional
 
 import attr
 
@@ -61,9 +61,6 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
     dates_echeance = attr.ib(type=List[DateEcheanceDTO])
     a_etudiants_peps = attr.ib(type=bool)  # signaletique
-    enseignant = attr.ib(type=EnseignantDTO)  # FIXME :: enseignant = responsable de notes ? Ou utilisateur connecté ?
-    annee_academique = attr.ib(type=int)
-    numero_session = attr.ib(type=int)
 
     @property
     def quantite_notes_soumises(self) -> int:
@@ -80,6 +77,8 @@ class ProgressionEncodageNotesUniteEnseignementDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
+    annee_academique = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
     progression_generale = attr.ib(type=List[ProgressionEncodageNotesUniteEnseignementDTO])
 
 
@@ -116,7 +115,7 @@ class NoteEtudiantDTO(interface.DTO):
     noma = attr.ib(type=str)  # matricule
     nom = attr.ib(type=str)  # signaletique
     prenom = attr.ib(type=str)  # signaletique
-    peps = attr.ib(type=EtudiantPepsDTO)  # signaletique
+    peps = attr.ib(type=Optional[EtudiantPepsDTO])  # signaletique
     email = attr.ib(type=str)
     note = attr.ib(type=str)
     inscrit_tardivement = attr.ib(type=bool)  # inscription examen
@@ -193,7 +192,7 @@ class AttributionEnseignantDTO(interface.DTO):
 @attr.s(frozen=True, slots=True)
 class PeriodeSoumissionNotesDTO(interface.DTO):
     annee_concernee = attr.ib(type=int)
-    session_concernee = attr.ib(type=str)
+    session_concernee = attr.ib(type=int)
     debut_periode_soumission = attr.ib(type=DateDTO)
     fin_periode_soumission = attr.ib(type=DateDTO)
 
@@ -221,7 +220,7 @@ class SignaletiqueEtudiantDTO(interface.DTO):
     noma = attr.ib(type=str)
     nom = attr.ib(type=str)
     prenom = attr.ib(type=int)
-    peps = attr.ib(type=EtudiantPepsDTO)
+    peps = attr.ib(type=Optional[EtudiantPepsDTO])
 
 
 @attr.s(frozen=True, slots=True)

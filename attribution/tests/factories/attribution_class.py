@@ -36,6 +36,9 @@ class AttributionClassFactory(factory.django.DjangoModelFactory):
         model = "attribution.AttributionClass"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    attribution_charge = factory.SubFactory(AttributionChargeNewFactory)
+    attribution_charge = factory.SubFactory(
+        AttributionChargeNewFactory,
+        learning_component_year=factory.SelfAttribute('..learning_class_year.learning_component_year')
+    )
     learning_class_year = factory.SubFactory(LearningClassYearFactory)
     allocation_charge = 0
