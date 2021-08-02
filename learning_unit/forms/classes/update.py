@@ -36,7 +36,8 @@ from base.models.enums.internship_subtypes import InternshipSubtype
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.utils.mixins_for_forms import DisplayExceptionsByFieldNameMixin
-from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand
+from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand, UpdateEffectiveClassCommand, \
+    DeleteEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.learning_unit.domain.validator import exceptions
@@ -306,3 +307,30 @@ class UpdateClassForm(ClassForm):
             None
         )
         self.initial['learning_unit_campus'] = campus.entity_id.uuid
+
+
+class DeleteClassForm(DisplayExceptionsByFieldNameMixin, forms.Form):
+    confirm_message = forms.CharField(disabled=True, max_length=15, required=False)
+
+    def __init__(
+            self,
+            *args,
+            effective_class: 'EffectiveClass' = None,
+            **kwargs
+    ):
+        self.effective_class = effective_class
+        super(DeleteClassForm, self).__init__()
+
+        self.fields['confirm_message'].initial = \
+            _("Are you certain that you want to definitively delete the class in %(year)s ?") % {
+                'year': self.effective_class.entity_id.learning_unit_identity.year
+            }
+
+    def save(self):
+        message_bus_instance.invoke(
+            DeleteEffectiveClassCommand(
+                class_code=self.effective_class.class_code,
+                learning_unit_code=self.effective_class.entity_id.learning_unit_identity.code,
+                year=self.effective_class.entity_id.learning_unit_identity.year
+            )
+        )

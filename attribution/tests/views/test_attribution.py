@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
@@ -140,10 +141,12 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
 
         cls.attribution_partim_1 = cls.attribution_full
         cls.attribution_partim_1.id = None
+        cls.attribution_partim_1.uuid = uuid.uuid4()
         cls.attribution_partim_1.save()
 
         cls.attribution_partim_2 = cls.attribution_full
         cls.attribution_partim_2.id = None
+        cls.attribution_partim_2.uuid = uuid.uuid4()
         cls.attribution_partim_2.save()
 
         cls.lect_learning_class_year = LearningClassYearFactory(

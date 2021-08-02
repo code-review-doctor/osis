@@ -164,3 +164,30 @@ class UpdateEffectiveClassCommand(interface.CommandRequest):
     session_derogation = attr.ib(type=str, default=None)
     volume_first_quadrimester = attr.ib(type=float, default=None)
     volume_second_quadrimester = attr.ib(type=float, default=None)
+
+
+@attr.s(frozen=True, slots=True)
+class DeleteEffectiveClassCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class CanDeleteEffectiveClassCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class HasClassRepartitionCommand(interface.CommandRequest):
+    class_code = attr.ib(type=str)
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class HasEnrollmentsToClassCommand(interface.CommandRequest):
+    learning_unit_code = attr.ib(type=str)
+    year = attr.ib(type=int)

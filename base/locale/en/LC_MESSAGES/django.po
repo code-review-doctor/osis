@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-13 10:44+0200\n"
+"POT-Creation-Date: 2021-07-13 13:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -522,6 +522,9 @@ msgid "City"
 msgstr ""
 
 msgid "City of institution"
+msgstr ""
+
+msgid "Class"
 msgstr ""
 
 #, python-format
@@ -1409,6 +1412,9 @@ msgstr ""
 msgid "List proposals"
 msgstr ""
 
+msgid "List_of_users"
+msgstr ""
+
 msgid "Local credits"
 msgstr ""
 
@@ -1864,6 +1870,9 @@ msgid ""
 "12, 23, 46"
 msgstr ""
 
+msgid "Please report this incident to the Service Desk"
+msgstr ""
+
 msgid "Please select a country and a city first"
 msgstr ""
 
@@ -2279,6 +2288,9 @@ msgstr ""
 msgid "Sport"
 msgstr ""
 
+msgid "Stage-Dimona"
+msgstr ""
+
 msgid "Start"
 msgstr ""
 
@@ -2421,6 +2433,10 @@ msgstr ""
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr ""
 
+#, python-format
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
+msgstr ""
+
 msgid "The configuration of you user profile"
 msgstr ""
 
@@ -2522,6 +2538,11 @@ msgstr ""
 msgid ""
 "The learning unit is in proposal, the report from %(proposal_year)s will be "
 "done at consolidation"
+msgstr ""
+
+msgid ""
+"The learning unit is not a Stage-Dimona activity although it is an "
+"internship type."
 msgstr ""
 
 msgid "The learning units"
@@ -2870,9 +2891,6 @@ msgid "Volumes of {} are inconsistent"
 msgstr ""
 
 msgid "We detected inconsistencies in the following data :"
-msgstr ""
-
-msgid "We will fix this as soon as possible"
 msgstr ""
 
 msgid "Web re-registration"

@@ -25,6 +25,7 @@
 ##############################################################################
 
 import attr
+import mock
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
@@ -65,7 +66,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             teaching_place_uuid="35bbb236-7de6-4322-a496-fa8397054305"
         )
 
-    def test_should_save_type_practical(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_save_type_practical(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         ue_with_practical_volumes_only = CourseWithPracticalVolumesOnly()
         self.learning_unit_repository.save(ue_with_practical_volumes_only)
 
@@ -78,7 +82,10 @@ class CreateEffectiveClassService(SimpleTestCase):
         effective_class = self.effective_class_repository.get(effective_class_id)
         self.assertIsInstance(effective_class, PracticalEffectiveClass)
 
-    def test_should_save_type_lecturing(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_save_type_lecturing(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         ue_with_lecturing_volumes_only = CourseWithLecturingVolumesOnly()
         self.learning_unit_repository.save(ue_with_lecturing_volumes_only)
 
@@ -91,7 +98,10 @@ class CreateEffectiveClassService(SimpleTestCase):
         effective_class = self.effective_class_repository.get(effective_class_id)
         self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
-    def test_should_save_type_lecturing_when_both_volumes_are_filled(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_save_type_lecturing_when_both_volumes_are_filled(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         ue_with_lecturing_and_practical_volumes = CourseWithLecturingAndPracticalVolumes()
         self.learning_unit_repository.save(ue_with_lecturing_and_practical_volumes)
 
@@ -104,7 +114,10 @@ class CreateEffectiveClassService(SimpleTestCase):
         effective_class = self.effective_class_repository.get(effective_class_id)
         self.assertIsInstance(effective_class, LecturingEffectiveClass)
 
-    def test_should_class_code_be_alphanumeric(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_class_code_be_alphanumeric(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code='*',
@@ -116,7 +129,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             ShouldBeAlphanumericException
         )
 
-    def test_should_class_code_be_unique_for_ue(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_class_code_be_unique_for_ue(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="B",
@@ -132,7 +148,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             CodeClassAlreadyExistForUeException
         )
 
-    def test_should_not_be_type_mobility_or_external(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_not_be_type_mobility_or_external(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         ue_external = LDROI1002ExternalLearningUnitFactory()
         self.learning_unit_repository.save(ue_external)
 
@@ -144,12 +163,16 @@ class CreateEffectiveClassService(SimpleTestCase):
         )
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             create_effective_class(cmd, self.learning_unit_repository, self.effective_class_repository)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            ClassTypeInvalidException
+
+        self.assertIn(
+            ClassTypeInvalidException,
+            [type(exception) for exception in class_exceptions.exception.exceptions]
         )
 
-    def test_should_learning_unit_not_have_proposal(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_learning_unit_not_have_proposal(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         learning_unit_repository = LearningUnitRepository()
         learning_unit_repository.has_proposal_this_year_or_in_past = lambda *args, **kwargs: True
 
@@ -164,9 +187,11 @@ class CreateEffectiveClassService(SimpleTestCase):
             LearningUnitHasProposalException
         )
 
-    def test_should_learning_unit_not_have_enrollment(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_learning_unit_not_have_enrollment(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = True
         learning_unit_repository = LearningUnitRepository()
-        learning_unit_repository.has_enrollments = lambda *args, **kwargs: True
 
         cmd = attr.evolve(
             self.create_class_cmd,
@@ -179,7 +204,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             LearningUnitHasEnrollmentException
         )
 
-    def test_should_learning_unit_not_have_partim(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_learning_unit_not_have_partim(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         ue_with_one_partim = CourseWithOnePartim()
         self.learning_unit_repository.save(ue_with_one_partim)
 
@@ -196,7 +224,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             LearningUnitHasPartimException
         )
 
-    def test_should_learning_unit_have_volumes(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_learning_unit_have_volumes(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         ue_without_volumes = LDROI1004CourseWithoutVolumesLearningUnitFactory(partims=[])
         self.learning_unit_repository.save(ue_without_volumes)
 
@@ -213,7 +244,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             LearningUnitHasNoVolumeException
         )
 
-    def test_should_class_volumes_be_consistent_with_learning_unit(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_class_volumes_be_consistent_with_learning_unit(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         annual_volume = self.ue_with_lecturing_and_practical_volumes.lecturing_part.volumes.volume_annual
         bad_repartition = annual_volume + 10.0
         cmd = attr.evolve(
@@ -229,7 +263,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             AnnualVolumeInvalidException
         )
 
-    def test_should_ignore_volumes_consistency_when_no_volumes_encoded(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_ignore_volumes_consistency_when_no_volumes_encoded(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="D",
@@ -244,7 +281,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             )
         )
 
-    def test_should_teaching_place_be_required(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_teaching_place_be_required(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="B",
@@ -257,7 +297,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             TeachingPlaceRequiredException
         )
 
-    def test_should_quadrimester_be_valid_choice(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_quadrimester_be_valid_choice(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="B",
@@ -270,7 +313,10 @@ class CreateEffectiveClassService(SimpleTestCase):
             DerogationQuadrimesterInvalidChoiceException
         )
 
-    def test_should_session_be_valid_choice(self):
+    @mock.patch('infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class.'
+                'StudentEnrollmentsToEffectiveClass.has_enrollments_to_class')
+    def test_should_session_be_valid_choice(self, mock_has_enrollments_to_class):
+        mock_has_enrollments_to_class.return_value = False
         cmd = attr.evolve(
             self.create_class_cmd,
             class_code="B",

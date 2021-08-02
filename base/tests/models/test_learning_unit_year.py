@@ -38,7 +38,7 @@ from base.business.learning_units.quadrimester_strategy import LearningComponent
     LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
 from base.models import learning_unit_year
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, quadrimesters, \
-    learning_unit_year_session
+    learning_unit_year_session, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -638,6 +638,14 @@ class LearningUnitYearWarningsTest(TestCase):
         warning_messages = ''.join(str(e) for e in partim_a_with_warnings._check_learning_component_year_warnings())
         self.assertIn(partim_a_with_warnings.acronym, warning_messages)
         self.assertNotIn(partim_b_with_warnings.acronym, warning_messages)
+
+    def test_warning_no_stage_dimona_with_internship(self):
+        """In this test, we ensure that the warning is displayed when internship is set and not stage_dimona"""
+        self.luy_full.stage_dimona = False
+        self.luy_full.learning_container_year.container_type = learning_container_year_types.INTERNSHIP
+        self.luy_full.save()
+        excepted_error = _('The learning unit is not a Stage-Dimona activity although it is an internship type.')
+        self.assertIn(excepted_error, self.luy_full._check_stage_dimona())
 
 
 class TestQuadriConsistency(TestCase):
