@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List
 
 import attr
@@ -31,19 +30,17 @@ import attr
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.effective_class_repartition.domain.validator._should_tutor_not_be_already_assigned_to_class import \
     ShouldTutorNotBeAlreadyAssignedToClass
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
 
 @attr.s(frozen=True, slots=True)
 class DistributeClassToTutorValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
     tutor = attr.ib(type='Tutor')
-    distributed_volume = attr.ib(type=Decimal)
-    effective_class_id = attr.ib(type=EffectiveClassIdentity)
+    attribution_uuid = attr.ib(type=str)
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return []
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldTutorNotBeAlreadyAssignedToClass(self.effective_class_id, self.tutor),
+            ShouldTutorNotBeAlreadyAssignedToClass(self.attribution_uuid, self.tutor),
         ]

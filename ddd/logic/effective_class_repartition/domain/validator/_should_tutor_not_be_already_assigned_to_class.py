@@ -27,18 +27,17 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.effective_class_repartition.domain.validator.exceptions import TutorAlreadyAssignedException
-from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
 
 
 @attr.s(frozen=True, slots=True)
 class ShouldTutorNotBeAlreadyAssignedToClass(BusinessValidator):
 
-    class_identity_to_assign = attr.ib(type='EffectiveClassIdentity')  # type: EffectiveClassIdentity
+    attribution_uuid = attr.ib(type=str)
     tutor = attr.ib(type='Tutor')  # type: Tutor
 
     def validate(self, *args, **kwargs):
-        effective_classes_already_distributed = [
-            distributed_class.effective_class for distributed_class in self.tutor.distributed_effective_classes
+        attribution_uuids_already_distributed = [
+            distributed_class.attribution_uuid for distributed_class in self.tutor.distributed_effective_classes
         ]
-        if self.class_identity_to_assign in effective_classes_already_distributed:
+        if self.attribution_uuid in attribution_uuids_already_distributed:
             raise TutorAlreadyAssignedException()
