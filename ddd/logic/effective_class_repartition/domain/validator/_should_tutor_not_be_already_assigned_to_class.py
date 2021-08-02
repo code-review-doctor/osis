@@ -36,9 +36,9 @@ class ShouldTutorNotBeAlreadyAssignedToClass(BusinessValidator):
     class_code = attr.ib(type='EffectiveClassCode')
 
     def validate(self, *args, **kwargs):
-        attribution_uuids_already_distributed = [
+        attribution_uuids_already_distributed = {
             (distributed_class.attribution_uuid, distributed_class.class_code)
             for distributed_class in self.tutor.distributed_effective_classes
-        ]
+        }
         if (self.attribution_uuid, self.class_code) in attribution_uuids_already_distributed:
             raise TutorAlreadyAssignedException()
