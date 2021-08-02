@@ -196,21 +196,6 @@
                     "internshipspecialitygroup"
                 ],
                 [
-                    "add_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
-                    "change_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
-                    "delete_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
                     "add_internshipstudentaffectationstat",
                     "internship",
                     "internshipstudentaffectationstat"
