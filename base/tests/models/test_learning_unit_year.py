@@ -1763,7 +1763,9 @@ class LearningUnitYearCheckClassesQuadrimesterWarnings(TestCase):
         )
         effective_class = LearningClassYearFactory(
             learning_component_year=component,
-            quadrimester=random.choice(wrong_values)
+            quadrimester=random.choice(wrong_values),
+            hourly_volume_partial_q1=1,
+            hourly_volume_partial_q2=1
         )
 
         messages = learning_unit_year._check_classes_quadrimester(
