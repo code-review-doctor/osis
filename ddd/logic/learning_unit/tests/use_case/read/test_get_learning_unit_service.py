@@ -24,10 +24,10 @@
 #
 ##############################################################################
 
-from ddd.logic.learning_unit.test.factory.learning_unit import LDROI1001CourseLearningUnitFactory
 from django.test import SimpleTestCase
 
 from ddd.logic.learning_unit.commands import GetLearningUnitCommand
+from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001CourseLearningUnitFactory
 from ddd.logic.learning_unit.use_case.read import get_learning_unit_service
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 

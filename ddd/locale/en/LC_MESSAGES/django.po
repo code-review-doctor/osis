@@ -57,6 +57,9 @@ msgstr ""
 msgid "Class can't be neither mobility nor external"
 msgstr ""
 
+msgid "Class of learning unit having enrollment can't be delete"
+msgstr ""
+
 msgid "Credits should be greather than 0"
 msgstr ""
 
@@ -84,7 +87,6 @@ msgstr ""
 msgid "Subdivision should be one character A-Z or 0-9"
 msgstr ""
 
-#, python-format
 msgid ""
 "The %(code_class)s derogation session is inconsistent with the LU derogation "
 "session (should be %(should_be_values)s)"
@@ -118,6 +120,12 @@ msgstr ""
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(the "
 "%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The class %(class_complete_code)s is assigned to %(tutor_full_name)s in "
+"%(year)s"
 msgstr ""
 
 #, python-format

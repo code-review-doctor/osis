@@ -56,7 +56,7 @@ from base.utils import send_mail as send_mail_util
 from osis_role.errors import get_permission_error
 from reference.models import language
 
-BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
+BOOLEAN_FIELDS = ('professional_integration', 'stage_dimona', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
     'language', 'campus', 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
 )
@@ -78,7 +78,7 @@ INITIAL_DATA_FIELDS = {
     'learning_unit_year': [
         "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
         "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
-        "faculty_remark", "other_remark", "other_remark_english"
+        "faculty_remark", "other_remark", "other_remark_english", "stage_dimona"
     ],
     'learning_component_year': [
         "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
