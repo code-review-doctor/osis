@@ -12,6 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='country',
             name='name_en',
-            field=models.CharField(blank=True, max_length=80, null=True, unique=True),
+            field=models.CharField(blank=True, max_length=80, unique=True),
         ),
     ]
