@@ -77,9 +77,7 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
-                                      (_('Req.Entity'), "INFO"),
-                                      (_('Tutor'), "Jean Marcel")]
+        expected_research_criteria = [(_('Req.Entity'), "INFO"), (_('Tutor'), "Jean Marcel")]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
