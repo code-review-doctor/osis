@@ -42,12 +42,13 @@ from ddd.logic.formation_catalogue.domain.model.bachelor import Bachelor
 from education_group.ddd.domain import exception
 from education_group.ddd.domain.training import Training, TrainingIdentity
 from education_group.ddd.repository.training import TrainingRepository
-from education_group.tests.ddd.factories.domain.campus import CampusFactory
 from education_group.models.cohort_year import CohortYear as CohortYearModelDb
+from education_group.tests.ddd.factories.domain.campus import CampusFactory
 from education_group.tests.ddd.factories.domain.diploma import DiplomaAimFactory, DiplomaAimIdentityFactory
 from education_group.tests.ddd.factories.domain.isced_domain import IscedDomainIdentityFactory
 from education_group.tests.ddd.factories.domain.study_domain import StudyDomainIdentityFactory, StudyDomainFactory
-from education_group.tests.ddd.factories.domain.training import TrainingFactory, TrainingIdentityFactory, BachelorFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory, TrainingIdentityFactory, \
+    BachelorFactory
 from reference.models.domain import Domain
 from reference.tests.factories.domain import DomainFactory as DomainModelDbFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory as DomainIscedFactoryModelDb

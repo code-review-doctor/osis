@@ -42,7 +42,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 class CommonListFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+        queryset=AcademicYear.objects.all().order_by("-year"),
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),

@@ -113,6 +113,11 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     remark = serializers.CharField(source='other_remark', read_only=True)
     remark_en = serializers.CharField(source='other_remark_english', read_only=True)
 
+    # TODO: Refactor with OSIS-5977
+    is_french_friendly = serializers.SerializerMethodField()
+    is_english_friendly = serializers.SerializerMethodField()
+    student_exchange = serializers.SerializerMethodField()
+
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear
         fields = LearningUnitSerializer.Meta.fields + (
@@ -130,7 +135,10 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'summary_status',
             'professional_integration',
             'remark',
-            'remark_en'
+            'remark_en',
+            'is_french_friendly',
+            'is_english_friendly',
+            'student_exchange',
         )
 
     @staticmethod
@@ -150,6 +158,18 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
         elif learning_unit_year.summary_locked:
             return SummaryStatus.BLOCKED.value
         return SummaryStatus.NOT_MODIFIED.value
+
+    # TODO: Refactor with OSIS-5977 - use source on serializerfield
+    def get_is_french_friendly(self, learning_unit_year) -> bool:
+        return True
+
+    # TODO: Refactor with OSIS-5977 - use source on serializerfield
+    def get_is_english_friendly(self, learning_unit_year) -> bool:
+        return False
+
+    # TODO: Refactor with OSIS-5977 - use source on serializerfield
+    def get_student_exchange(self, learning_unit_year) -> bool:
+        return True
 
 
 class ExternalLearningUnitDetailedSerializer(LearningUnitDetailedSerializer):

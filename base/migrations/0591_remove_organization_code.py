@@ -10,8 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='organization',
-            name='code',
-        ),
+        # Cannot delete organization code field because it's used in partnership
     ]

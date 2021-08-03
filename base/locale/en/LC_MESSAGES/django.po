@@ -527,6 +527,9 @@ msgstr ""
 msgid "City of institution"
 msgstr ""
 
+msgid "Class"
+msgstr ""
+
 #, python-format
 msgid ""
 "Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
@@ -1231,9 +1234,15 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr ""
 
+msgid "January"
+msgstr ""
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
+msgstr ""
+
+msgid "June"
 msgstr ""
 
 msgid "Junior year"
@@ -1404,6 +1413,9 @@ msgid "List of users with their groups and linked entities"
 msgstr ""
 
 msgid "List proposals"
+msgstr ""
+
+msgid "List_of_users"
 msgstr ""
 
 msgid "Local credits"
@@ -1864,6 +1876,9 @@ msgid ""
 "12, 23, 46"
 msgstr ""
 
+msgid "Please report this incident to the Service Desk"
+msgstr ""
+
 msgid "Please select a country and a city first"
 msgstr ""
 
@@ -2239,6 +2254,9 @@ msgstr ""
 msgid "Separate"
 msgstr ""
 
+msgid "September"
+msgstr ""
+
 msgid "Service courses"
 msgstr ""
 
@@ -2422,6 +2440,10 @@ msgstr ""
 
 #, python-format
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
+msgstr ""
+
+#, python-format
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr ""
 
 msgid "The configuration of you user profile"
@@ -2871,16 +2893,24 @@ msgstr ""
 msgid "Volumes are inconsistent"
 msgstr ""
 
+msgid ""
+"Volumes are inconsistent: you can't delete volume on a component having "
+"classes."
+msgstr ""
+
 msgid "Volumes management"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning "
+"unit whose volume has been deleted on a component having classes"
 msgstr ""
 
 msgid "Volumes of {} are inconsistent"
 msgstr ""
 
 msgid "We detected inconsistencies in the following data :"
-msgstr ""
-
-msgid "We will fix this as soon as possible"
 msgstr ""
 
 msgid "Web re-registration"

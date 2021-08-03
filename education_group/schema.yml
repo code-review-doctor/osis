@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/education_group/
    description: 'Production server'
 info:
-  version: '1.07'
+  version: '1.08'
   title: 'Education Group Service'
   description: |-
     A set of API endpoints that allow you to get, update, delete an education group.
@@ -109,6 +109,11 @@ paths:
           schema:
             description: UUID of main study domain
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -139,6 +144,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -169,6 +179,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -201,6 +216,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -239,6 +259,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -277,6 +302,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -319,6 +349,11 @@ paths:
           name: lang
           schema:
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -354,6 +389,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -390,6 +430,11 @@ paths:
           name: lang
           schema:
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -425,6 +470,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -457,6 +507,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -493,6 +548,11 @@ paths:
           name: lang
           schema:
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -522,6 +582,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -613,6 +678,11 @@ paths:
           schema:
             description: A search term.
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -643,6 +713,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -675,6 +750,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -705,6 +785,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -737,6 +822,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -773,6 +863,11 @@ paths:
           name: lang
           schema:
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -814,6 +909,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -852,6 +952,11 @@ paths:
           schema:
             description: ''
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -894,6 +999,11 @@ paths:
           name: lang
           schema:
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -919,6 +1029,39 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
   responses:
     Unauthorized:
       description: Unauthorized
@@ -939,6 +1082,11 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
     Pagination:
       type: object
       properties:
