@@ -40,6 +40,7 @@ class Country(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     iso_code = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=80, unique=True)
+    name_en = models.CharField(max_length=80, unique=True, blank=True, null=True)
     nationality = models.CharField(max_length=80, blank=True, null=True)
     european_union = models.BooleanField(default=False)
     dialing_code = models.CharField(max_length=3, blank=True, null=True)
