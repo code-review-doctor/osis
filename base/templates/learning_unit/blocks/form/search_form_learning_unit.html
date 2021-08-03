@@ -1,5 +1,6 @@
 {% extends "blocks/forms/search_form.html" %}
 {% load bootstrap3 static %}
+{% load waffle_tags %}
 
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
@@ -39,7 +40,9 @@
     {% bootstrap_field form.container_type form_group_class="col-md-2" %}
     {% bootstrap_field form.subtype form_group_class="col-md-2" %}
     <div class="col-md-3">
-        {% bootstrap_field form.only_ue_having_classes %}
+        {% flag "learning_class_create" %}
+            {% bootstrap_field form.only_ue_having_classes %}
+        {% endflag %}
         {% bootstrap_field form.with_only_proposals %}
     </div>
     {{ form.media }}
