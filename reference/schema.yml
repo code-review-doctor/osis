@@ -142,6 +142,39 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - study-domains
+  /languages:
+    get:
+      description: Return a list of languages
+      operationId: languages_list
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfLanguages'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - languages
 components:
   securitySchemes:
     Token:
@@ -235,6 +268,22 @@ components:
         name:
           type: string
           description: The name of study domain
+    ArrayOfLanguages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Language'
+    Language:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        code:
+          type: string
+          description: The language code
+        name:
+          type: string
+          description: The language name
     AcceptedLanguageEnum:
       type: string
       enum:
