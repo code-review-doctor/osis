@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -46,19 +46,19 @@ class AuthToken(APIView):
         serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
-        if self.request.META.get('X-User-GlobalID'):
+        if self.request.META.get('HTTP_X_USER_GLOBALID'):
             self._handle_user_headers(user)
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key})
 
     def _handle_user_headers(self, user: User):
         Person.objects.update_or_create(
-            global_id=self.request.META['X-User-GlobalID'],
+            global_id=self.request.META['HTTP_X_USER_GLOBALID'],
             defaults={
                 'user_id': user.pk,
-                'first_name': self.request.META['X-User-FirstName'],
-                'last_name': self.request.META['X-User-LastName'],
-                'email': self.request.META['X-User-Email'],
-                'language': self.request.META['Accept-Language'],
+                'first_name': self.request.META['HTTP_X_USER_FIRSTNAME'],
+                'last_name': self.request.META['HTTP_X_USER_LASTNAME'],
+                'email': self.request.META['HTTP_X_USER_EMAIL'],
+                'language': self.request.META.get('HTTP_ACCEPT_LANGUAGE', 'en'),
             }
         )
