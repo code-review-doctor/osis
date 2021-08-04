@@ -251,7 +251,10 @@ components:
             The country code according to ISO 3166-1 specification
         name:
           type: string
-          description: The name of the country
+          description: The french name of the country
+        name_en:
+          type: string
+          description: The english name of the country
     ArrayOfStudyDomain:
       type: array
       items:
