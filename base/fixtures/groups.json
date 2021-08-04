@@ -13,11 +13,6 @@
                     "is_institution_administrator",
                     "base",
                     "person"
-                ],
-                [
-                    "can_access_structure",
-                    "base",
-                    "structure"
                 ]
             ]
         }
@@ -186,36 +181,6 @@
                     "internshipspeciality"
                 ],
                 [
-                    "add_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "change_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "delete_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "add_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
-                    "change_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
-                    "delete_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
                     "add_internshipstudentaffectationstat",
                     "internship",
                     "internshipstudentaffectationstat"
@@ -259,21 +224,6 @@
                     "delete_organization",
                     "internship",
                     "organization"
-                ],
-                [
-                    "add_organizationaddress",
-                    "internship",
-                    "organizationaddress"
-                ],
-                [
-                    "change_organizationaddress",
-                    "internship",
-                    "organizationaddress"
-                ],
-                [
-                    "delete_organizationaddress",
-                    "internship",
-                    "organizationaddress"
                 ],
                 [
                     "add_period",
@@ -339,16 +289,6 @@
                     "externallearningunityear"
                 ],
                 [
-                    "can_access_learningunitcomponentclass",
-                    "base",
-                    "learningunitcomponentclass"
-                ],
-                [
-                    "can_access_catalog",
-                    "base",
-                    "offer"
-                ],
-                [
                     "view_educationgroup",
                     "base",
                     "educationgroup"
@@ -357,11 +297,6 @@
                     "is_institution_administrator",
                     "base",
                     "person"
-                ],
-                [
-                    "can_access_structure",
-                    "base",
-                    "structure"
                 ],
                 [
                     "view_learningclassyear",
