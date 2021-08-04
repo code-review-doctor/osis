@@ -1,40 +1,38 @@
 import csv
+from typing import List, Tuple, Dict
 
 from django.core.management.base import BaseCommand
 
+from reference.models.continent import Continent
 from reference.models.country import Country
 
 CSV_PATH = 'base/fixtures/countries.csv'
 
 
 class Command(BaseCommand):
-    def add_arguments(self, parser):
-        parser.add_argument('--iso_position', nargs='+', type=int)
-        parser.add_argument('--fr_position', nargs='+', type=int)
-        parser.add_argument('--en_position', nargs='+', type=int)
-
     def handle(self, *args, **kwargs):
-        iso_position = kwargs.get('iso_position', 2)
-        fr_position = kwargs.get('fr_position', 4)
-        en_position = kwargs.get('en_position', 5)
-        self.load_countries(iso_position, fr_position, en_position)
+        antarctica = self.create_antarctica_continent()
+        self.load_countries(antarctica)
 
     @staticmethod
-    def load_countries(iso_position: int, fr_position: int, en_position: int):
+    def create_antarctica_continent() -> Continent:
+        print("===== Getting or creating Antarctica continent ====\n")
+        antarctica, _ = Continent.objects.get_or_create(
+            code='AN',
+            defaults={'name': "Antarctica"}
+        )
+        return antarctica
+
+    def load_countries(self, antarctica: Continent):
         created_countries, total = 0, 0
         print("===== Loading countries =====\n")
         with open(CSV_PATH, newline='') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=',')
-            for row in spamreader:
-                iso_code = row[iso_position]
-                name_fr = row[fr_position]
-                name_en = row[en_position]
+            reader = csv.reader(csvfile, delimiter=',')
+            for row in reader:
+                iso_code, defaults_value = self._get_iso_code_and_default_values(antarctica, row)
                 country, created = Country.objects.update_or_create(
                     iso_code=iso_code,
-                    defaults={
-                        'name': name_fr,
-                        'name_en': name_en
-                    }
+                    defaults=defaults_value
                 )
                 if created:
                     created_countries += 1
@@ -48,3 +46,24 @@ class Command(BaseCommand):
             n_update=total - created_countries,
             n_create=created_countries
         ))
+
+        # print("===== {number} countries without name in english".format(
+        #     number=Country.objects.filter(Q(name_en='') | Q(name_en__isnull=True)).count()
+        # ))
+        # print("===== {number} countries without continent".format(
+        #     number=Country.objects.filter(continent_id__isnull=True).count()
+        # ))
+        # print("===== {number} countries without cref code".format(
+        #     number=Country.objects.filter(cref_code__isnull=True).count()
+        # ))
+
+    @staticmethod
+    def _get_iso_code_and_default_values(antarctica: Continent, row: List[str]) -> Tuple[str, Dict[str, str]]:
+        iso_code, name_fr, name_en = row
+        defaults_value = {
+            'name': name_fr,
+            'name_en': name_en,
+        }
+        if iso_code == 'AQ':
+            defaults_value.update({'continent_id': antarctica.id})
+        return iso_code, defaults_value
