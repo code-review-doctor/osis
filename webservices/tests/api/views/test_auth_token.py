@@ -101,11 +101,11 @@ class AuthTokenTestCase(APITestCase):
             self.url,
             data={'username': self.user_who_want_token.username},
             **{
-                'Accept-Language': 'en',
-                'X-User-FirstName': 'Durant',
-                'X-User-LastName': 'Thomas',
-                'X-User-Email': 'thomas@dummy.com',
-                'X-User-GlobalID': '0123456789',
+                'HTTP_ACCEPT_LANGUAGE': 'en',
+                'HTTP_X_USER_FIRSTNAME': 'Durant',
+                'HTTP_X_USER_LASTNAME': 'Thomas',
+                'HTTP_X_USER_EMAIL': 'thomas@dummy.com',
+                'HTTP_X_USER_GLOBALID': '0123456789',
             }
         )
 
@@ -124,11 +124,11 @@ class AuthTokenTestCase(APITestCase):
             self.url,
             data={'username': self.user_who_want_token.username},
             **{
-                'Accept-Language': 'en',
-                'X-User-FirstName': 'Luc',
-                'X-User-LastName': 'Pollow',
-                'X-User-Email': 'lpollow@dummy.com',
-                'X-User-GlobalID': person.global_id,
+                'HTTP_ACCEPT_LANGUAGE': 'en',
+                'HTTP_X_USER_FIRSTNAME': 'Luc',
+                'HTTP_X_USER_LASTNAME': 'Pollow',
+                'HTTP_X_USER_EMAIL': 'lpollow@dummy.com',
+                'HTTP_X_USER_GLOBALID': person.global_id,
             }
         )
 
