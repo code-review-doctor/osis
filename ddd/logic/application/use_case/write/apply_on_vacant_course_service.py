@@ -50,7 +50,7 @@ def apply_on_vacant_course(
     vacant_course = vacant_course_repository.get(
         entity_id=VacantCourseIdentity(code=cmd.code, academic_year=application_calendar.authorized_target_year)
     )
-    all_existing_applications = application_repository.search(global_id=cmd.global_id)
+    all_existing_applications = application_repository.search(applicant_id=applicant.entity_id)
 
     # WHEN
     application = ApplyOnVacantCourse.apply(applicant, vacant_course, all_existing_applications, cmd)
