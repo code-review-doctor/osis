@@ -2,6 +2,7 @@ import csv
 from typing import List, Tuple, Dict
 
 from django.core.management.base import BaseCommand
+from django.db.models import Q
 
 from reference.models.continent import Continent
 from reference.models.country import Country
@@ -10,9 +11,13 @@ COUNTRY_PATH = 'base/fixtures/countries.csv'
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument('--debug', nargs='?', default=False, type=bool)
+
     def handle(self, *args, **kwargs):
+        debug = kwargs['debug']
         self.create_antarctica_continent()
-        self.load_countries()
+        self.load_countries(debug)
 
     @staticmethod
     def create_antarctica_continent() -> Continent:
@@ -23,7 +28,7 @@ class Command(BaseCommand):
         )
         return antarctica
 
-    def load_countries(self):
+    def load_countries(self, debug: bool):
         created_countries, total = 0, 0
         print("===== Loading countries =====\n")
         with open(COUNTRY_PATH, newline='') as csvfile:
@@ -46,16 +51,16 @@ class Command(BaseCommand):
             n_update=total - created_countries,
             n_create=created_countries
         ))
-
-        # print("===== {number} countries without name in english".format(
-        #     number=Country.objects.filter(Q(name_en='') | Q(name_en__isnull=True)).count()
-        # ))
-        # print("===== {number} countries without continent".format(
-        #     number=Country.objects.filter(continent_id__isnull=True).count()
-        # ))
-        # print("===== {number} countries without cref code".format(
-        #     number=Country.objects.filter(cref_code__isnull=True).count()
-        # ))
+        if debug:
+            print("===== {number} countries without name in english".format(
+                number=Country.objects.filter(Q(name_en='') | Q(name_en__isnull=True)).count()
+            ))
+            print("===== {number} countries without continent".format(
+                number=Country.objects.filter(continent_id__isnull=True).count()
+            ))
+            print("===== {number} countries without cref code".format(
+                number=Country.objects.filter(cref_code__isnull=True).count()
+            ))
 
     @staticmethod
     def _get_iso_code_and_default_values(row: List[str]) -> Tuple[str, Dict[str, str]]:
