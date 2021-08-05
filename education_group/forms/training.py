@@ -352,7 +352,7 @@ class CreateTrainingForm(ValidationRuleMixin, forms.Form):
 
         self.fields['end_year'].queryset = self.fields['end_year'].queryset.filter(
             year__gte=getattr(
-                self.fields['academic_year'].queryset.first(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION
+                self.fields['academic_year'].queryset.last(), 'year', settings.YEAR_LIMIT_EDG_MODIFICATION
             )
         ).order_by('-year')
 
