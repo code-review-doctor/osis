@@ -6,13 +6,12 @@ from django.core.management.base import BaseCommand
 from reference.models.continent import Continent
 from reference.models.country import Country
 
-CSV_PATH = 'base/fixtures/countries.csv'
+COUNTRY_PATH = 'base/fixtures/countries.csv'
 
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        antarctica = self.create_antarctica_continent()
-        self.load_countries(antarctica)
+        self.load_countries()
 
     @staticmethod
     def create_antarctica_continent() -> Continent:
@@ -23,10 +22,11 @@ class Command(BaseCommand):
         )
         return antarctica
 
-    def load_countries(self, antarctica: Continent):
+    def load_countries(self):
+        antarctica = self.create_antarctica_continent()
         created_countries, total = 0, 0
         print("===== Loading countries =====\n")
-        with open(CSV_PATH, newline='') as csvfile:
+        with open(COUNTRY_PATH, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 iso_code, defaults_value = self._get_iso_code_and_default_values(antarctica, row)
