@@ -38,7 +38,7 @@ class ZipCodeAdmin(osis_model_admin.OsisModelAdmin):
 class ZipCode(models.Model):
     zip_code = models.CharField(max_length=4)
     municipality = models.CharField(max_length=80, unique=True)
-    country = models.ForeignKey('Country', blank=True, null=True, on_delete=models.CASCADE)
+    country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return "{} - {}".format(self.zip_code, self.municipality)
