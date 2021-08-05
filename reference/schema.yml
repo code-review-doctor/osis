@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.11'
+  version: '1.12'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -142,6 +142,44 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - study-domains
+  /languages:
+    get:
+      description: Return a list of languages
+      operationId: languages_list
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: search
+          schema:
+            description: A search term which will look up at country name
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfLanguages'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - languages
 components:
   securitySchemes:
     Token:
@@ -218,7 +256,10 @@ components:
             The country code according to ISO 3166-1 specification
         name:
           type: string
-          description: The name of the country
+          description: The french name of the country
+        name_en:
+          type: string
+          description: The english name of the country
     ArrayOfStudyDomain:
       type: array
       items:
@@ -235,6 +276,22 @@ components:
         name:
           type: string
           description: The name of study domain
+    ArrayOfLanguages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Language'
+    Language:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        code:
+          type: string
+          description: The language code
+        name:
+          type: string
+          description: The language name
     AcceptedLanguageEnum:
       type: string
       enum:
