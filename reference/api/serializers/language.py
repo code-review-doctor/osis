@@ -32,7 +32,6 @@ class LanguageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Language
         fields = (
-            'uuid',
             'code',
             'name',
         )
