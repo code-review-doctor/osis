@@ -157,6 +157,11 @@ paths:
           schema:
             description: The initial index from which to return the results.
             type: integer
+        - in: query
+          name: search
+          schema:
+            description: A search term which will look up at country name
+            type: string
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/X-User-FirstName'
         - $ref: '#/components/parameters/X-User-LastName'
