@@ -132,7 +132,11 @@ def _get_charges_by_attribution_and_type_or_func(learning_container_year: Learni
 
 
 def _get_component_volume_total_of_classes(charge: AttributionChargeNew) -> float:
-    return sum([class_attrib.allocation_charge for class_attrib in charge.attributionclass_set.all()])
+    return sum([
+        class_attrib.allocation_charge
+        for class_attrib in charge.attributionclass_set.all()
+        if class_attrib.allocation_charge
+    ])
 
 
 def _get_tutor_name_with_function(charge: AttributionChargeNew) -> str:
