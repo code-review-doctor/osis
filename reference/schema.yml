@@ -283,9 +283,9 @@ components:
     Language:
       type: object
       properties:
-        url:
+        uuid:
           type: string
-          format: uri
+          description: The identifier of language
         code:
           type: string
           description: The language code

@@ -23,16 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from django.test import TestCase
 
-from reference.api.views.country import CountryList, CountryDetail
-from reference.api.views.language import LanguageList
-from reference.api.views.study_domain import StudyDomainList
+from reference.api.serializers.language import LanguageSerializer
+from reference.models.language import Language
 
-app_name = "reference"
-urlpatterns = [
-    url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
-    url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
-    url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
-    url(r'^languages$', LanguageList.as_view(), name=LanguageList.name),
-]
+
+class LanguageSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.language = Language()
+        cls.serializer = LanguageSerializer(cls.language)
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'uuid',
+            'code',
+            'name',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
