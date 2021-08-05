@@ -11,6 +11,7 @@ COUNTRY_PATH = 'base/fixtures/countries.csv'
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
+        self.create_antarctica_continent()
         self.load_countries()
 
     @staticmethod
@@ -23,13 +24,12 @@ class Command(BaseCommand):
         return antarctica
 
     def load_countries(self):
-        antarctica = self.create_antarctica_continent()
         created_countries, total = 0, 0
         print("===== Loading countries =====\n")
         with open(COUNTRY_PATH, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
-                iso_code, defaults_value = self._get_iso_code_and_default_values(antarctica, row)
+                iso_code, defaults_value = self._get_iso_code_and_default_values(row)
                 country, created = Country.objects.update_or_create(
                     iso_code=iso_code,
                     defaults=defaults_value
@@ -58,12 +58,14 @@ class Command(BaseCommand):
         # ))
 
     @staticmethod
-    def _get_iso_code_and_default_values(antarctica: Continent, row: List[str]) -> Tuple[str, Dict[str, str]]:
-        iso_code, name_fr, name_en = row
+    def _get_iso_code_and_default_values(row: List[str]) -> Tuple[str, Dict[str, str]]:
+        iso_code, name_fr, name_en, continent_code = row
         defaults_value = {
             'name': name_fr,
             'name_en': name_en,
         }
-        if iso_code == 'AQ':
-            defaults_value.update({'continent_id': antarctica.id})
+        if continent_code:
+            defaults_value.update({
+                'continent_id': Continent.objects.get(code=continent_code)
+            })
         return iso_code, defaults_value
