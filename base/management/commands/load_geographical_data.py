@@ -66,6 +66,6 @@ class Command(BaseCommand):
         }
         if continent_code:
             defaults_value.update({
-                'continent_id': Continent.objects.get(code=continent_code)
+                'continent_id': Continent.objects.get(code=continent_code).id
             })
         return iso_code, defaults_value
