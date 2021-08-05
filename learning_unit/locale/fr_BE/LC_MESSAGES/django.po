@@ -185,7 +185,7 @@ msgid "New class"
 msgstr "Nouvelle classe"
 
 msgid "No attributions exist for the UE"
-msgstr "Aucune attributions sur l'UE"
+msgstr "Aucune attribution sur l'UE"
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
