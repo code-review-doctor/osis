@@ -14,8 +14,8 @@ class Migration(migrations.Migration):
             name='ZipCode',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('zip_code', models.CharField(max_length=4)),
-                ('municipality', models.CharField(max_length=80, unique=True)),
+                ('zip_code', models.CharField(max_length=255)),
+                ('municipality', models.CharField(max_length=255, unique=True)),
                 ('country',
                  models.ForeignKey(blank=True, on_delete=django.db.models.deletion.CASCADE, to='reference.Country')),
             ],
