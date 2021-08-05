@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 14:35+0200\n"
+"POT-Creation-Date: 2021-06-30 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -78,6 +78,9 @@ msgstr "Code étude ARES"
 
 msgid "ARES-GRACA"
 msgstr "ARES-GRACA"
+
+msgid "Abbreviated title"
+msgstr "Intitulé abrégé"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -258,6 +261,9 @@ msgstr "Le code existe déjà en %(academic_year)s"
 
 msgid "Code co-graduation inter CfB"
 msgstr "Code co-diplômation intra CfB"
+
+msgid "Cohort year"
+msgstr "Cohort annualisée"
 
 msgid "Comment"
 msgstr "Commentaire"
@@ -468,6 +474,9 @@ msgstr "Gestionnaires facultaires"
 msgid "Fill program tree content from last year"
 msgstr "Remplir le contenu du programme depuis l'année dernière"
 
+msgid "First year bachelor"
+msgstr "Première année de bachelier"
+
 msgid "For all students"
 msgstr "Pour tous les étudiants"
 
@@ -677,6 +686,9 @@ msgstr "Modifier l'ordre des contacts"
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr "Plusieurs entités '{entity_acronym}' trouvées pour l'année {year}"
 
+msgid "Name"
+msgstr "Nom"
+
 msgid "New Education Group"
 msgstr "Nouveau Groupement"
 
@@ -709,9 +721,6 @@ msgstr "Activités dans d'autres langues"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
-
-msgid "Own comment"
-msgstr "Commentaire propre"
 
 msgid "Partial deliberation"
 msgstr "Sous-épreuve"
@@ -927,6 +936,9 @@ msgid "This education group is not editable during this period."
 msgstr ""
 "La période de modification des formations n'est pas ouverte durant cette "
 "période."
+
+msgid "This education group is not editable in the past."
+msgstr "Il n'est pas possible de modifier dans le passé."
 
 msgid "Title"
 msgstr "Intitulé"

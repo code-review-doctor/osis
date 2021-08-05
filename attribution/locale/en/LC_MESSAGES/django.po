@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -83,6 +82,9 @@ msgstr ""
 msgid "Deputy authority"
 msgstr ""
 
+msgid "Deputy disease or maternity"
+msgstr ""
+
 msgid "Deputy sabbatical"
 msgstr ""
 
@@ -159,7 +161,7 @@ msgstr ""
 msgid "Manage repartition"
 msgstr ""
 
-msgid "No attributions exist for the full UE"
+msgid "No attributions exist for the UE"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -171,6 +173,9 @@ msgstr ""
 msgid "Part-time teaching supply"
 msgstr ""
 
+msgid "Please precise at least a faculty or a code (or a part of a code)"
+msgstr ""
+
 msgid "Practical exercises"
 msgstr ""
 
@@ -178,12 +183,6 @@ msgid "Professor"
 msgstr ""
 
 msgid "Program modification"
-msgstr ""
-
-msgid "Publish application to portal"
-msgstr ""
-
-msgid "Publish attribution to portal"
 msgstr ""
 
 #, python-format
@@ -211,6 +210,12 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The sum of volumes for the classes for professor %(tutor)s is superior to "
+"the volume of UE(%(ue_type)s) for this professor"
+msgstr ""
+
+#, python-format
+msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
 "the volume of full UE for this professor"
 msgstr ""
@@ -227,7 +232,7 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for UE full"
+msgid "Tutor for UE "
 msgstr ""
 
 msgid "Tutors"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-07 11:24+0200\n"
+"POT-Creation-Date: 2021-07-27 11:19+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -94,11 +94,32 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr "%(title)s a été modifié(e)"
 
+msgid "1"
+msgstr "1"
+
+msgid "12"
+msgstr "12"
+
+msgid "123"
+msgstr "123"
+
+msgid "13"
+msgstr "13"
+
 msgid "1st quadri"
 msgstr "1er quadri"
 
+msgid "2"
+msgstr "2"
+
+msgid "23"
+msgstr "23"
+
 msgid "2nd quadri"
 msgstr "2e quadri"
+
+msgid "3"
+msgstr "3"
 
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
@@ -187,6 +208,9 @@ msgstr "Année académique"
 
 msgid "Accepted"
 msgstr "Accepté"
+
+msgid "Access based on application"
+msgstr "Accès sur dossier"
 
 msgid "Access condition"
 msgstr "Condition d'accès"
@@ -300,6 +324,9 @@ msgstr "Accords"
 msgid "Alert"
 msgstr "Alerte"
 
+msgid "All"
+msgstr "Tous"
+
 msgctxt "female plural"
 msgid "All"
 msgstr "Toutes"
@@ -314,8 +341,8 @@ msgstr "Toutes les notes ont été soumises."
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
-msgid "Alloc. Entity"
-msgstr "Ent. attrib."
+msgid "Alloc.Entity"
+msgstr "Ent.attrib."
 
 msgid "Allocation entity"
 msgstr "Entité d'attribution"
@@ -519,6 +546,17 @@ msgstr "Ville"
 msgid "City of institution"
 msgstr "Ville de l'institution"
 
+msgid "Class"
+msgstr "Classe"
+
+#, python-format
+msgid ""
+"Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
+"inconsistent (Annual volume must be equal to the sum of volume Q1 and Q2)"
+msgstr ""
+"Les volumes de la classe %(code_ue)s%(separator)s%(code_class)s sont "
+"incohérents (Volume annuel doit être égal à la somme des volumes Q1 et Q2)"
+
 msgid "Classes"
 msgstr "Classes"
 
@@ -691,6 +729,9 @@ msgstr "Supprimer cette version définitivement"
 msgid "Deliberation"
 msgstr "Délibération"
 
+msgid "Derogation's session"
+msgstr "Session de dérogation"
+
 msgid "Description"
 msgstr "Description"
 
@@ -738,6 +779,9 @@ msgstr "Remise du mémoire"
 
 msgid "Dissertation submission"
 msgstr "Remise du mémoire"
+
+msgid "Dissertations"
+msgstr "Mémoires"
 
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
@@ -1220,12 +1264,18 @@ msgstr "Il est nécessaire d'indiquer le sous-type de stage."
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
 
+msgid "January"
+msgstr "Janvier"
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
 msgstr ""
 "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas "
 "sans JavaScript."
+
+msgid "June"
+msgstr "Juin"
 
 msgid "Junior year"
 msgstr "Junior year"
@@ -1238,9 +1288,6 @@ msgstr "Justification"
 
 msgid "Keywords"
 msgstr "Mots clés"
-
-msgid "LU"
-msgstr "UE"
 
 msgid "Language"
 msgstr "Langue"
@@ -1403,6 +1450,9 @@ msgstr "Liste des utilisateurs avec leurs groupes et entités liés."
 msgid "List proposals"
 msgstr "Liste des propositions"
 
+msgid "List_of_users"
+msgstr "Liste_des_utilisateurs"
+
 msgid "Local credits"
 msgstr "Crédits locaux"
 
@@ -1535,9 +1585,6 @@ msgstr "Master de spécialisation"
 msgid "Masters"
 msgstr "Masters"
 
-msgid "Max. credits"
-msgstr "Créd. max."
-
 msgid "Maximum number of permitted relationships"
 msgstr "Nombre maximum de relations autorisées"
 
@@ -1549,9 +1596,6 @@ msgstr "Messages"
 
 msgid "Method not allowed"
 msgstr "Methode non autorisée"
-
-msgid "Min. credits"
-msgstr "Créd. min."
 
 msgid "Minerval complete"
 msgstr "Minerval complet"
@@ -1621,6 +1665,9 @@ msgstr "Nouvelle Mini-Formation"
 
 msgid "New Training"
 msgstr "Nouvelle Formation"
+
+msgid "New class"
+msgstr "Nouvelle classe"
 
 msgid "New external learning unit"
 msgstr "Nouvelle unité d'enseignement externe"
@@ -1709,15 +1756,14 @@ msgstr "Inscriptions aux formations"
 msgid "Ok"
 msgstr "Ok"
 
-msgid "On the file: direct access or access with additional training"
-msgstr ""
-"Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
-
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-msgid "Only proposals"
-msgstr "Uniquement les propositions"
+msgid "Only UE in proposal"
+msgstr "Uniquement les UE en proposition"
+
+msgid "Only UE with classes"
+msgstr "Uniquement les UE ayant des classes"
 
 msgid "Only the volume Q1 must have a value"
 msgstr "Seul le volume Q1 doit avoir une valeur"
@@ -1787,6 +1833,9 @@ msgstr "Composants propres"
 
 msgid "P."
 msgstr "P."
+
+msgid "P23"
+msgstr "P23"
 
 msgid "Page not found."
 msgstr "Page inexistante."
@@ -1873,6 +1922,9 @@ msgid ""
 msgstr ""
 "Veuillez entrer des chiffres compris entre 1 et %(max_authorized_value)s "
 "dans un ordre croissant, sans duplications. Exemples: 12, 23, 46"
+
+msgid "Please report this incident to the Service Desk"
+msgstr "Merci de signaler cet incident au Service Desk"
 
 msgid "Please select a country and a city first"
 msgstr "Veuillez d'abord sélectionner un pays et une ville"
@@ -2106,9 +2158,6 @@ msgstr "Quadri"
 msgid "Quadrimester"
 msgstr "Quadrimestre"
 
-msgid "Quadrimester derogation"
-msgstr "Quadrimestre dérogation"
-
 msgid "Rate code"
 msgstr "Code tarif"
 
@@ -2151,6 +2200,9 @@ msgstr "Ent. charges"
 
 msgid "Req. Entity"
 msgstr "Ent. charge"
+
+msgid "Req.Entity"
+msgstr "Ent.charge"
 
 msgid "Requesting entity"
 msgstr "Entité demandeuse"
@@ -2263,6 +2315,9 @@ msgstr "Envoyer un rappel sur les événements académiques"
 msgid "Separate"
 msgstr "Séparer"
 
+msgid "September"
+msgstr "Septembre"
+
 msgid "Service courses"
 msgstr "Cours de service"
 
@@ -2303,6 +2358,9 @@ msgstr "Cahier des charges"
 msgid "Sport"
 msgstr "Sport"
 
+msgid "Stage-Dimona"
+msgstr "Stage-Dimona"
+
 msgid "Start"
 msgstr "Début"
 
@@ -2332,6 +2390,9 @@ msgstr "Parcours de l'étudiant"
 
 msgid "Student search"
 msgstr "Recherche étudiants"
+
+msgid "Student's dissertations management"
+msgstr "Gestion des mémoires des étudiants"
 
 msgid "Students"
 msgstr "Étudiants"
@@ -2396,6 +2457,55 @@ msgstr "Clôturé"
 msgid "The"
 msgstr "Le"
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+"La session de dérogation de %(code_class)s est incohérente avec celle de "
+"l'unité d'enseignement (la session de dérogation doit être "
+"%(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+"Le quadrimestre de %(code_class)s est incohérent avec celui de l'unité "
+"d'enseignement (le quadrimestre doit être %(should_be_values)s)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les "
+"volumes Q1 et Q2 doivent avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed but not both)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul "
+"le volume %(quadrimester)s doit avoir une valeur)"
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume %(quadrimester)s doit avoir une valeur)"
+
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
@@ -2405,6 +2515,9 @@ msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 #, python-format
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
+
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
+msgstr "La classe %(acronym)s est attribuée à %(tutor)s l’année %(year)s"
 
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
@@ -2530,6 +2643,13 @@ msgstr ""
 "L'UE étant en proposition, le report à partir de %(proposal_year)s sera "
 "effectué lors de la consolidation"
 
+msgid ""
+"The learning unit is not a Stage-Dimona activity although it is an "
+"internship type."
+msgstr ""
+"L'unité d'enseignement n'est pas une activité Stage-Dimona alors qu'elle est "
+"de type stage."
+
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
@@ -2564,6 +2684,14 @@ msgstr "Le partim"
 msgid "The period to edit scores responsibles is not opened yet"
 msgstr ""
 "La période d'édition des responsables de notes n'est pas encore ouverte."
+
+#, python-format
+msgid ""
+"The planned classes number and the effective classes number of %(code_ue)s/"
+"%(component_code)s is not consistent"
+msgstr ""
+"Le nombre de classes prévues et de classes effectives de %(code_ue)s/"
+"%(component_code)s est incohérent."
 
 #, python-format
 msgid "The repartition volume of %(col_name)s has been already modified."
@@ -2620,7 +2748,7 @@ msgstr ""
 "l'année %(next_year)s - %(next_value)s"
 
 msgid "The volume Q1 or Q2 must have a value but not both"
-msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
+msgstr "Le volume Q1 ou Q2 doit avoir une valeur mais pas les deux"
 
 msgid "The volume can not be set to 0."
 msgstr "Le volume ne peut pas être mis à 0."
@@ -2686,8 +2814,10 @@ msgstr "Ce champ ne peut pas être défini"
 msgid "This field is required."
 msgstr "Ce champ est obligatoire."
 
-msgid "This learning unit has application"
-msgstr "L'unité d'enseignement a au moins une candidature"
+msgid "This learning unit has application this year or in the future"
+msgstr ""
+"L'unité d'enseignement a au moins une candidature cette année ou dans le "
+"futur"
 
 #, python-format
 msgid ""
@@ -2788,9 +2918,6 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
-
-msgid "UE full"
-msgstr "UE complète"
 
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
@@ -2896,17 +3023,30 @@ msgstr "Volume total annuel"
 msgid "Volumes are inconsistent"
 msgstr "Les volumes sont incohérents"
 
+msgid ""
+"Volumes are inconsistent: you can't delete volume on a component having "
+"classes."
+msgstr ""
+"Les volumes sont incohérents: vous ne pouvez pas supprimer le volume sur un "
+"composant ayant des classes."
+
 msgid "Volumes management"
 msgstr "Gestion des volumes"
+
+#, python-format
+msgid ""
+"Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning "
+"unit whose volume has been deleted on a component having classes"
+msgstr ""
+"Les volumes de %(code_ue)s sont incohérents: vous ne pouvez pas consolider "
+"une unité d'enseignement dont le volume a été supprimé sur un composant "
+"ayant des classes."
 
 msgid "Volumes of {} are inconsistent"
 msgstr "Les volumes de {} sont incohérents"
 
 msgid "We detected inconsistencies in the following data :"
 msgstr "Nous avons détecté des incohérences dans les données suivantes :"
-
-msgid "We will fix this as soon as possible"
-msgstr "Nous mettons tout en oeuvre pour résoudre ce problème"
 
 msgid "Web re-registration"
 msgstr "Ré-inscription par internet"
@@ -2932,6 +3072,13 @@ msgstr "Oui, je confirme."
 
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
+
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year "
+"or in the future"
+msgstr ""
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant une "
+"ou plusieurs classes cette année ou dans le futur"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"
@@ -3006,9 +3153,19 @@ msgstr "activités en anglais"
 msgid "aim number"
 msgstr "numéro de l'attendu"
 
+msgid "and"
+msgstr "et"
+
 #, python-format
 msgid "and postponed until %(year)s"
 msgstr "et reportée jusque %(year)s"
+
+#, python-format
+msgid ""
+"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
+msgstr ""
+"au moins une valeur de volume de classe est supérieure à celle du volume "
+"correspondant de l'UE(%(sub_type)s)"
 
 msgid "author"
 msgstr "auteur"
@@ -3017,10 +3174,10 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 msgid "biennial even"
-msgstr "bisannuelle paire"
+msgstr "Bisannuelle paire"
 
 msgid "biennial odd"
-msgstr "bisannuelle impaire"
+msgstr "Bisannuelle impaire"
 
 msgid "blocked update for tutor"
 msgstr "mise à jour bloquée pour l'enseignant"
@@ -3135,6 +3292,9 @@ msgstr "ressources en ligne"
 msgid "optional"
 msgstr "optionnel"
 
+msgid "or"
+msgstr "ou"
+
 msgid "parameters"
 msgstr "paramètres"
 
@@ -3214,6 +3374,9 @@ msgstr "texte en français"
 
 msgid "the"
 msgstr "le"
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr "le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
 #, python-format
 msgid ""

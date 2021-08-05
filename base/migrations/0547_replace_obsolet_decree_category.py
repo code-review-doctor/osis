@@ -19,5 +19,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(replace_aess_by_aessb),
+        migrations.RunPython(replace_aess_by_aessb, elidable=True),
     ]

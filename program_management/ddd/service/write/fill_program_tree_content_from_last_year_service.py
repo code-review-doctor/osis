@@ -22,13 +22,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
 
 from education_group.ddd.service.write import copy_group_service
 from program_management.ddd.command import FillProgramTreeContentFromLastYearCommand
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity, ProgramTreeBuilder
 from program_management.ddd.domain.report import Report, ReportIdentity
 from program_management.ddd.domain.service import copy_tree_cms
+from program_management.ddd.domain.service.get_next_year_node import GetNextYearNode
 from program_management.ddd.repositories import program_tree as tree_repository, node as node_repository
 
 
@@ -48,16 +48,18 @@ def fill_program_tree_content_from_last_year(cmd: 'FillProgramTreeContentFromLas
             for node in last_year_tree.root_node.get_all_children_as_nodes()
         ]
     )
-    existing_learning_unit_nodes = node_repo.search(
-        [
-            attr.evolve(node.entity_id, year=cmd.to_year)
-            for node in last_year_tree.root_node.get_all_children_as_learning_unit_nodes()
-        ]
+    learning_unit_nodes = GetNextYearNode().search_for_learning_unit_years(
+        last_year_tree.root_node.get_all_children_as_learning_unit_nodes(),
+        node_repo
     )
+    existing_group_nodes = [tree.root_node for tree in existing_trees]
 
-    existing_nodes = [tree.root_node for tree in existing_trees] + existing_learning_unit_nodes
-
-    ProgramTreeBuilder().fill_from_last_year_program_tree(last_year_tree, tree, set(existing_nodes))
+    ProgramTreeBuilder().fill_from_last_year_program_tree(
+        last_year_tree,
+        tree,
+        set(existing_group_nodes),
+        learning_unit_nodes
+    )
     ProgramTreeBuilder().copy_prerequisites_from_program_tree(last_year_tree, tree)
 
     repo.create(tree, copy_group_service=copy_group_service.copy_group)

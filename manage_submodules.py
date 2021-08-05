@@ -15,6 +15,7 @@ modules = {
     "continuing_education": "git@github.com:uclouvain/osis-continuing-education.git",
     "dissertation": "git@github.com:uclouvain/osis-dissertation.git",
     "internship": "git@github.com:uclouvain/osis-internship.git",
+    "osis_async": "git@github.com:uclouvain/osis-async.git",
     "osis_common": "git@github.com:uclouvain/osis-common.git",
     "osis_document": "git@github.com:uclouvain/osis-document.git",
     "osis_history": "git@github.com:uclouvain/osis-history.git",

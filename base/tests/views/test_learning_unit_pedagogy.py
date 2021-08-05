@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -67,15 +67,11 @@ class LearningUnitPedagogyTestCase(TestCase):
     def setUpTestData(cls):
         now = datetime.datetime.now()
 
-        cls.academic_year = create_current_academic_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
-        cls.previous_academic_year = GenerateAcademicYear(
-            cls.old_academic_year,
-            cls.old_academic_year
-        ).academic_years[0]
         AcademicCalendarFactory(
-            data_year=cls.previous_academic_year,
+            data_year=cls.old_academic_year,
             start_date=now - datetime.timedelta(days=5),
             end_date=now + datetime.timedelta(days=15),
             reference=AcademicCalendarTypes.SUMMARY_COURSE_SUBMISSION.name
@@ -95,7 +91,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse('learning_units_summary')
-        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity)
+        cls.faculty_manager = FacultyManagerFactory(entity=cls.requirement_entity_version.entity, person__french=True)
         TranslatedTextLabelFactory(text_label__label='resume')
 
     def setUp(self):
@@ -118,7 +114,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_learning_units_summary_list_filter_academic_year(self):
-        response = self.client.get(self.url, data={'academic_year': self.learning_unit_year.academic_year.pk})
+        response = self.client.get(self.url, data={'academic_year__year': self.learning_unit_year.academic_year.year})
 
         self.assertTemplateUsed(response, 'learning_unit/search/description_fiche.html')
         self.assertTrue(response.context['is_faculty_manager'])
@@ -148,7 +144,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         response = self.client.get(
             self.url,
             data={
-                'academic_year': self.learning_unit_year.academic_year.pk,
+                'academic_year__year': self.learning_unit_year.academic_year.year,
                 'requirement_entity': self.requirement_entity_version.acronym,
                 'with_entity_subordinated': False
             }
@@ -160,7 +156,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         response = self.client.get(
             self.url,
             data={
-                'academic_year': self.learning_unit_year.academic_year.pk,
+                'academic_year__year': self.learning_unit_year.academic_year.year,
                 'requirement_entity': self.requirement_entity_version.acronym,
                 'with_entity_subordinated': True
             }
@@ -182,7 +178,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         url = reverse("learning_unit_pedagogy", args=[self.learning_unit_year.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(response.context['cms_labels_translated'])
+        self.assertTrue('cms_labels_translated' in response.context.keys())
 
     def test_learning_unit_pedagogy_read_with_code_and_year(self):
         url = reverse("learning_unit_pedagogy", args=[
@@ -191,7 +187,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         ])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue(response.context['cms_labels_translated'])
+        self.assertTrue('cms_labels_translated' in response.context.keys())
 
 
 class LearningUnitPedagogyExportXLSTestCase(TestCase):
@@ -279,7 +275,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         )
 
         response = self.client.get(self.url, data={
-            'academic_year': self.academic_year.pk,
+            'academic_year__year': self.academic_year.year,
             'xls_status': 'xls_teaching_material'
         })
 
@@ -324,7 +320,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
 
         form_data = {
             'acronym': self.learning_unit_year_without_mandatory_teaching_materials.acronym,
-            'academic_year': self.academic_year.id,
+            'academic_year__year': self.academic_year.year,
             'xls_status': 'xls_teaching_material'
         }
 

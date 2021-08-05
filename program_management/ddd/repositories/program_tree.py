@@ -28,11 +28,10 @@ from typing import Dict, Any
 from typing import Optional, List
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, Max, OuterRef, Subquery
 
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimester
 from base.models.group_element_year import GroupElementYear
 from education_group.ddd.command import CreateOrphanGroupCommand, CopyGroupCommand
 from education_group.models.group_year import GroupYear
@@ -67,10 +66,13 @@ class ProgramTreeRepository(interface.AbstractRepository):
     def search(
             cls,
             entity_ids: Optional[List['ProgramTreeIdentity']] = None,
-            root_ids: List[int] = None
+            root_ids: List[int] = None,
+            code: str = None
     ) -> List['ProgramTree']:
         if entity_ids:
             root_ids = _search_root_ids(entity_ids)
+        if code:
+            root_ids = Element.objects.filter(group_year__partial_acronym=code).values_list('pk', flat=True)
         if root_ids:
             return _load_trees(root_ids)
         return []
@@ -170,6 +172,26 @@ class ProgramTreeRepository(interface.AbstractRepository):
         qs = GroupYear.objects.all().values_list("partial_acronym", "academic_year__year")
         return [program_tree.ProgramTreeIdentity(code=row[0], year=row[1]) for row in qs]
 
+    @classmethod
+    def search_last_occurence(cls, from_year: int) -> List['ProgramTree']:
+        subquery_max_existing_year_for_group = GroupYear.objects.filter(
+            academic_year__year__gte=from_year,
+            group=OuterRef("group_year__group"),
+        ).values(
+            "group"
+        ).annotate(
+            max_year=Max("academic_year__year")
+        ).order_by(
+            "group"
+        ).values("max_year")
+
+        qs = Element.objects.filter(
+            group_year__academic_year__year=Subquery(subquery_max_existing_year_for_group[:1])
+        ).values_list(
+            "id", flat=True
+        )
+        return _load_trees(list(qs))
+
 
 def _load(tree_root_id: int) -> 'ProgramTree':
     trees = _load_trees([tree_root_id])
@@ -241,15 +263,11 @@ def _load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).values(
         'pk',
         'relative_credits',
-        'min_credits',
-        'max_credits',
         'access_condition',
         'is_mandatory',
         'block',
         'comment',
         'comment_english',
-        'own_comment',
-        'quadrimester_derogation',
         'link_type',
         'parent_element_id',
         'child_element_id',
@@ -261,7 +279,6 @@ def _load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         parent_id = gey_dict.pop('parent_element_id')
         child_id = gey_dict.pop('child_element_id')
         __convert_link_type_to_enum(gey_dict)
-        __convert_quadrimester_to_enum(gey_dict)
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
         tree_links[tree_id] = link_factory.get_link(parent=None, child=None, **gey_dict)
@@ -272,11 +289,6 @@ def __convert_link_type_to_enum(link_data: dict) -> None:
     link_type = link_data['link_type']
     if link_type:
         link_data['link_type'] = LinkTypes[link_type]
-
-
-def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
-    if gey_dict.get('quadrimester_derogation'):
-        gey_dict['quadrimester_derogation'] = DerogationQuadrimester[gey_dict['quadrimester_derogation']]
 
 
 def _build_tree(

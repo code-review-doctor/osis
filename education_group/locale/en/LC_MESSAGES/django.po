@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-17 14:35+0200\n"
+"POT-Creation-Date: 2021-06-30 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Abbreviated title"
 msgstr ""
 
 msgid "Ac yr."
@@ -244,6 +247,9 @@ msgid "Code already exists in %(academic_year)s"
 msgstr ""
 
 msgid "Code co-graduation inter CfB"
+msgstr ""
+
+msgid "Cohort year"
 msgstr ""
 
 msgid "Comment"
@@ -449,6 +455,9 @@ msgstr ""
 msgid "Fill program tree content from last year"
 msgstr ""
 
+msgid "First year bachelor"
+msgstr ""
+
 msgid "For all students"
 msgstr ""
 
@@ -639,6 +648,9 @@ msgstr ""
 msgid "Multiple entities {entity_acronym} found in {year}"
 msgstr ""
 
+msgid "Name"
+msgstr ""
+
 msgid "New Education Group"
 msgstr ""
 
@@ -670,9 +682,6 @@ msgid "Other languages activities"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
-msgstr ""
-
-msgid "Own comment"
 msgstr ""
 
 msgid "Partial deliberation"
@@ -868,6 +877,9 @@ msgid "There can only be one type 2 expectation"
 msgstr ""
 
 msgid "This education group is not editable during this period."
+msgstr ""
+
+msgid "This education group is not editable in the past."
 msgstr ""
 
 msgid "Title"

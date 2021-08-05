@@ -23,6 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import gettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
+
+
 SESSION_P23 = "P23"
 SESSION_XX3 = "3"
 SESSION_X2X = "2"
@@ -40,3 +45,15 @@ LEARNING_UNIT_YEAR_SESSION = ((SESSION_1XX, SESSION_1XX),
                               (SESSION_X23, SESSION_X23),
                               (SESSION_123, SESSION_123),
                               (SESSION_P23, SESSION_P23))
+
+
+# TODO :: move this into ddd/domain layer
+class DerogationSession(ChoiceEnum):
+    DEROGATION_SESSION_1XX = _("1")
+    DEROGATION_SESSION_X2X = _("2")
+    DEROGATION_SESSION_XX3 = _("3")
+    DEROGATION_SESSION_12X = _("12")
+    DEROGATION_SESSION_1X3 = _("13")
+    DEROGATION_SESSION_X23 = _("23")
+    DEROGATION_SESSION_123 = _("123")
+    DEROGATION_SESSION_P23 = _("P23")

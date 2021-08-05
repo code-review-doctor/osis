@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
@@ -107,6 +106,8 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['current_academic_year'] = self.current_academic_year
+        context['learning_unit_year_choices'] = \
+            reversed(self.object.learning_unit.learningunityear_set.all()),
         context['is_person_linked_to_entity'] = self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
             self.object
         )
@@ -139,7 +140,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
     def get_context_permission(self, proposal):
         obj = self.object
-
         context = {
             'can_create_partim': self.person.user.has_perm('base.can_create_partim', obj),
             'can_manage_volume': self.person.user.has_perm('base.can_edit_learningunit', obj),
@@ -149,7 +149,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
             'can_delete': self.person.user.has_perm('base.can_delete_learningunit', obj),
             'can_cancel_proposal': self.person.user.has_perm('base.can_cancel_proposal', obj),
             'can_edit_learning_unit_proposal': self.person.user.has_perm('base.can_edit_learning_unit_proposal', obj),
-            'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj)
+            'can_consolidate_proposal': self.person.user.has_perm('base.can_consolidate_learningunit_proposal', obj),
         }
 
         return context

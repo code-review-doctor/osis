@@ -26,16 +26,17 @@
 import copy
 import unicodedata
 from decimal import Decimal, Context, Inexact
+from typing import Set
 
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from base.models import exam_enrollment, learning_unit_year, education_group_year
 from base.auth.roles import program_manager, tutor
+from base.models import exam_enrollment, learning_unit_year, education_group_year
+from base.models import session_exam_calendar
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import exam_enrollment_justification_type
-from base.models import session_exam_calendar
 
 
 def get_scores_encoding_list(user, **kwargs):
@@ -250,7 +251,7 @@ def set_score_and_justification(enrollment, is_program_manager):
         enrollment.score_final = enrollment.score_encoded
         enrollment.justification_final = enrollment.justification_encoded
 
-    #Validation
+    # Validation
     enrollment.full_clean()
     enrollment.save()
 
@@ -262,7 +263,18 @@ class ScoresEncodingList:
         self.academic_year = kwargs.get('academic_year')
         self.number_session = kwargs.get('number_session')
         self.learning_unit_year = kwargs.get('learning_unit_year')
-        self.enrollments = kwargs.get('enrollments')
+        self.enrollments = kwargs.get('enrollments', [])
+        self.__init_education_groups_where_scores_completed_before_update()
+
+    def __init_education_groups_where_scores_completed_before_update(self):
+        educ_groups = {
+            enrol.learning_unit_enrollment.offer_enrollment.education_group_year for enrol in self.enrollments
+        }
+        self.educ_groups_which_encoding_was_complete_before_update = {
+            educ_group_year
+            for educ_group_year in educ_groups
+            if self.__is_encoding_completed_for_education_group(self.enrollments, educ_group_year)
+        }  # type: Set[EducationGroupYear]
 
     @property
     def progress_int(self):
@@ -283,6 +295,16 @@ class ScoresEncodingList:
     def enrollment_encoded(self):
         return list(filter(lambda e: e.is_final, self.enrollments))
 
+    @classmethod
+    def __is_encoding_completed_for_education_group(cls, enrollments, educ_group_year) -> bool:
+        if any(
+                enrol for enrol in enrollments
+                if enrol.learning_unit_enrollment.offer_enrollment.education_group_year == educ_group_year
+                and not enrol.is_final
+        ):
+            return False
+        return True
+
 
 def sort_encodings(exam_enrollments):
     """
@@ -294,6 +316,7 @@ def sort_encodings(exam_enrollments):
     :param exam_enrollments: List of examEnrollments to sort
     :return:
     """
+
     def _sort(key):
         learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         off_enroll = key.learning_unit_enrollment.offer_enrollment

@@ -2,7 +2,7 @@
 {% load bootstrap3 i18n %}
 
 {% block search_form_row_1 %}
-    {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
+    {% bootstrap_field form.academic_year__year form_group_class="col-md-2" %}
     <div class="col-md-2">
         {% bootstrap_label form.acronym.label %}
         {% bootstrap_field form.acronym show_label=False %}

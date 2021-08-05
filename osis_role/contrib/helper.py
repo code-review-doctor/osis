@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 import collections
 from typing import List, Set, Iterable
 
-from django.db.models import Subquery, OuterRef, Value, CharField
+from django.db.models import Subquery, OuterRef, Value, CharField, Func, F
 
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
@@ -34,7 +34,7 @@ from base.models.person import Person
 from osis_role import role
 from osis_role.contrib.models import EntityRoleModel
 
-Row = collections.namedtuple("Row", ['group_name', 'person_id', 'entity_id', 'entity_recent_acronym'])
+Row = collections.namedtuple("Row", ['group_name', 'person_id', 'entity_id', 'entity_recent_acronym', 'scope'])
 
 
 class EntityRoleHelper:
@@ -76,6 +76,11 @@ class EntityRoleHelper:
                     ).order_by('-start_date').values('acronym')[:1]
                 )
             )
+            if hasattr(role_mdl, 'scopes'):
+                subqs = subqs.annotate(scope=Func(F('scopes'), function='unnest'))
+            else:
+                subqs = subqs.annotate(scope=Value('', output_field=CharField()))
+
             subqs = subqs.values_list(*Row._fields)
             qs = subqs if qs is None else qs.union(subqs)
 
