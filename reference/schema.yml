@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.11'
+  version: '1.12'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
