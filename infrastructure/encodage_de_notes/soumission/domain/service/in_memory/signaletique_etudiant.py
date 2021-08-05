@@ -47,7 +47,21 @@ class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):
                 details_autre_amenagement="Details autre aménagement",
                 accompagnateur="Accompagnateur",
             ),
-        )
+        ),
+        SignaletiqueEtudiantDTO(
+            noma='99999999',
+            nom="Arogan",
+            prenom="Adrien",
+            peps=EtudiantPepsDTO(
+                type_peps=PepsTypes.ARRANGEMENT_JURY.name,
+                tiers_temps=False,
+                copie_adaptee=False,
+                local_specifique=True,
+                autre_amenagement=True,
+                details_autre_amenagement="Detail",
+                accompagnateur="Thomas",
+            ),
+        ),
     }
 
     @classmethod
