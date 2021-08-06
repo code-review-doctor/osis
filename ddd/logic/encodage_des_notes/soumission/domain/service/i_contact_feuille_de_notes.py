@@ -23,35 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import abc
+from typing import Set, List, Tuple
 
-import attr
-
+from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO, ContactFeuilleDeNotesDTO
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+CodeUniteEnseignement = str
+Annee = int
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
+class IContactFeuilleDeNotesTranslator(interface.DomainService):
 
-
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+    @classmethod
+    @abc.abstractmethod
+    def search(
+            cls,
+            unites_enseignement: List[Tuple[CodeUniteEnseignement, Annee]]
+    ) -> Set['ContactFeuilleDeNotesDTO']:
+        raise NotImplementedError

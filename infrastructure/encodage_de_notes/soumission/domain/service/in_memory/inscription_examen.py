@@ -43,6 +43,17 @@ class InscriptionExamenTranslatorInMemory(IInscriptionExamenTranslator):
                 annee=2020,
             ),
         ),
+        InscriptionExamenDTO(
+            annee=2020,
+            noma='99999999',
+            code_unite_enseignement='LDROI1001',
+            nom_cohorte='DROI1BA',
+            date_inscription=DateDTO(
+                jour=1,
+                mois=1,
+                annee=2020,
+            ),
+        ),
     }
 
     desinscrits = {

@@ -25,33 +25,16 @@
 ##############################################################################
 from typing import List
 
-import attr
-
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+from ddd.logic.encodage_des_notes.encodage.commands import SearchNotesCommand
+from ddd.logic.encodage_des_notes.encodage.dtos import NoteEtudiantDTO
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
+def search_notes(
+        cmd: 'SearchNotesCommand',
+) -> List['NoteEtudiantDTO']:
+    # GIVEN
+    # PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
 
+    # WHEN
 
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+    return

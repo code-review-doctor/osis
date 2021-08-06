@@ -23,35 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+import abc
+from typing import List, Optional
 
-import attr
-
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+class INoteEtudiantRepository(interface.AbstractRepository):
 
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
+        pass
 
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:
+        pass
 
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: 'NoteEtudiant') -> None:
+        pass
 
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
+    @classmethod
+    @abc.abstractmethod
+    def get_all_identities(cls) -> List['IdentiteNoteEtudiant']:
+        pass
 
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
+        pass

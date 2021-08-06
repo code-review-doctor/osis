@@ -45,6 +45,7 @@ class IdentiteFeuilleDeNotes(interface.EntityIdentity):
     annee_academique = attr.ib(type=int)
 
 
+# TODO :: remplacer par aggrégat "NoteEtudiant" (et adapter repo) pour encoder 2 feuilles de notes en même temps.
 @attr.s(slots=True, eq=False)
 class FeuilleDeNotes(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
