@@ -283,12 +283,9 @@ components:
     Language:
       type: object
       properties:
-        url:
-          type: string
-          format: uri
         code:
           type: string
-          description: The language code
+          description: The language iso_code
         name:
           type: string
           description: The language name
