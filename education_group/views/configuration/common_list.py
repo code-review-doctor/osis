@@ -31,6 +31,7 @@ from django_filters import FilterSet, filters, OrderingFilter
 from django_filters.views import FilterView
 from rest_framework import serializers
 
+from backoffice.settings.base import MINIMUM_EDG_YEAR
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
@@ -42,7 +43,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 
 class CommonListFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all().order_by("-year"),
+        queryset=AcademicYear.objects.filter(year__gte=MINIMUM_EDG_YEAR).order_by("-year"),
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),

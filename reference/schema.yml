@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/reference/
    description: Production server
 info:
-  version: '1.10'
+  version: '1.11'
   title: Reference Service
   description: |-
     A set of API endpoints that allow you to get reference data.
@@ -21,31 +21,36 @@ paths:
       description: Return a list of countries with optional filtering.
       operationId: countries_list
       parameters:
-      - in: query
-        name: limit
-        schema:
-          description: Number of results to return per page.
-          type: integer
-      - in: query
-        name: offset
-        schema:
-          description: The initial index from which to return the results.
-          type: integer
-      - in: query
-        name: search
-        schema:
-          description: A search term which will look up at country name
-          type: string
-      - in: query
-        name: iso_code
-        schema:
-          description: Search by ISO 3166-1 2-letter country code
-          type: string
-      - in: query
-        name: name
-        schema:
-          description: Search by country name. It can be partial/full name
-          type: string
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: search
+          schema:
+            description: A search term which will look up at country name
+            type: string
+        - in: query
+          name: iso_code
+          schema:
+            description: Search by ISO 3166-1 2-letter country code
+            type: string
+        - in: query
+          name: name
+          schema:
+            description: Search by country name. It can be partial/full name
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -64,12 +69,17 @@ paths:
       description: Return the detail of country
       operationId: countries_read
       parameters:
-      - in: path
-        name: uuid
-        required: true
-        schema:
-          description: Universal unique identifier in version 4
-          type: string
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            description: Universal unique identifier in version 4
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -114,6 +124,11 @@ paths:
               - 'BEFORE_BOLOGNE'
               - 'BOLOGNE'
               - 'PAYSAGE'
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -134,6 +149,39 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
   responses:
     Unauthorized:
       description: Unauthorized
@@ -187,6 +235,11 @@ components:
         name:
           type: string
           description: The name of study domain
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
     Error:
       type: object
       properties:
