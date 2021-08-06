@@ -67,7 +67,7 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
     def get_feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
-            code_unite_enseignement=self.kwargs['learning_unit_code']
+            code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
 

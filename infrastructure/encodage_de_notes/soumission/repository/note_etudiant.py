@@ -27,10 +27,12 @@ import functools
 import operator
 from typing import Optional, List
 
-from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
+from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, OuterRef, \
+    Subquery
 from django.db.models.functions import Coalesce, Cast, Concat
 
 from base.models.exam_enrollment import ExamEnrollment
+from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
@@ -147,6 +149,15 @@ def _save_note(note: 'NoteEtudiant'):
 
 
 def _fetch_session_exams():
+    subqs_deadline = SessionExamDeadline.objects.filter(
+        number_session=OuterRef("session_exam__number_session"),
+        offer_enrollment=OuterRef('learning_unit_enrollment__offer_enrollment')
+    ).annotate(
+        date_limite_de_remise=Case(
+            When(deadline_tutor__isnull=True, then=F('deadline')),
+            default=ExpressionWrapper(F('deadline') - F('deadline_tutor'), output_field=DateField())
+        )
+    ).values('date_limite_de_remise')
     return ExamEnrollment.objects.annotate(
         acronym=Concat(
             'learning_unit_enrollment__learning_unit_year__acronym',
@@ -167,22 +178,15 @@ def _fetch_session_exams():
             Cast('score_draft', output_field=CharField()),
             Value(''),
         ),
-        date_limite_de_remise=Case(
-            When(
-                learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline_tutor__isnull=True,
-                then=F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline')
-            ),
-            default=ExpressionWrapper(
-                F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline') -
-                F('learning_unit_enrollment__offer_enrollment__sessionexamdeadline__deadline_tutor'),
-                output_field=DateField()
-            )
-        ),
         est_soumise=Case(
             When(score_final__isnull=False, then=Value(True)),
             When(justification_final__isnull=False, then=Value(True)),
             default=Value(False),
             output_field=BooleanField()
+        ),
+        date_limite_de_remise=Subquery(
+            subqs_deadline[:1],
+            output_field=DateField()
         )
     ).values_list(
         'acronym',

@@ -155,6 +155,9 @@ class FeuilleDeNotesEnseignantDTO(interface.DTO):
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
 
+    def get_email_for_noma(self, noma: str) -> str:
+        return next(note.email for note in self.notes_etudiants if note.noma == noma)
+
 
 @attr.s(frozen=True, slots=True)
 class AdresseDTO(interface.DTO):
