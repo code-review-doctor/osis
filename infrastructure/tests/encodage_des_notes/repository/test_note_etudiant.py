@@ -104,6 +104,19 @@ class NoteEtudiantRepositoryTest(TestCase):
         for note in notes_etudiant:
             self.assertIn(note, notes_retrieved)
 
+    def test_should_search_notes_etudiant_by_code_unite_enseignment_annee_session(self):
+        notes_etudiant = [NoteChiffreEtudiantFactory(), NoteChiffreEtudiantFactory()]
+        for note in notes_etudiant:
+            self._create_save_necessary_data(note)
+            self.note_etudiant_repository.save(note)
+
+        notes_retrieved = self.note_etudiant_repository.search_by_code_unite_enseignement_annee_session(
+            [('LDROI1001', 2020, 2)]
+        )
+
+        for note in notes_etudiant:
+            self.assertIn(note, notes_retrieved)
+
     def _create_save_necessary_data(self, note_etudiant_to_save, for_class: bool = False):
         luy_acronym = note_etudiant_to_save.code_unite_enseignement
         if for_class:

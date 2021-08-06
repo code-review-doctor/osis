@@ -34,7 +34,7 @@ from base.models.exam_enrollment import ExamEnrollment
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository, SearchCriteria
 from osis_common.ddd.interface import ApplicationService
 
 
@@ -54,6 +54,39 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
                     noma=entity_id.noma
                 )
                 for entity_id in entity_ids
+            ]
+        )
+        rows = _fetch_session_exams().filter(q_filters)
+        result = []
+        for row in rows:
+            dto_object = NoteEtudiantFromRepositoryDTO(
+                noma=row.noma,
+                email=row.email,
+                note=row.note,
+                date_limite_de_remise=row.date_limite_de_remise,
+                est_soumise=row.est_soumise,
+                numero_session=row.number_session,
+                code_unite_enseignement=row.acronym,
+                annee_academique=row.year,
+                credits_unite_enseignement=row.credits_unite_enseignement
+            )
+            result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
+        return result
+
+    @classmethod
+    def search_by_code_unite_enseignement_annee_session(cls, criterias: List[SearchCriteria]) -> List['NoteEtudiant']:
+        if not criterias:
+            return []
+
+        q_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(
+                    acronym=criteria[0],
+                    year=criteria[1],
+                    number_session=criteria[2],
+                )
+                for criteria in criterias
             ]
         )
         rows = _fetch_session_exams().filter(q_filters)
