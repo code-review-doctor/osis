@@ -33,7 +33,8 @@ from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCo
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
     AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante
+from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
+    FeuilleDeNotesAvecToutesNotesSoumises, FeuilleDeNotesAvecNotesManquantes
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
@@ -206,3 +207,22 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         note_etudiant = result.notes_etudiants[0]
         expected_result = ""
         self.assertEqual(expected_result, note_etudiant.note)
+
+    def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
+        self.repository.delete(self.feuille_de_notes.entity_id)
+
+        feuille_de_notes_with_multiple_students = FeuilleDeNotesAvecNotesManquantes(
+            notes={
+                NoteManquanteEtudiantFactory(entity_id__noma=self.noma),
+                NoteManquanteEtudiantFactory(entity_id__noma='99999999'),
+            }
+        )
+        self.repository.save(feuille_de_notes_with_multiple_students)
+
+        result = message_bus_instance.invoke(self.cmd)
+        self.assertEqual(len(result.notes_etudiants), 2)
+
+        self.assertEqual(result.notes_etudiants[0].nom, 'Arogan')
+        self.assertEqual(result.notes_etudiants[0].prenom, 'Adrien')
+        self.assertEqual(result.notes_etudiants[1].nom, 'Dupont')
+        self.assertEqual(result.notes_etudiants[1].prenom, 'Marie')

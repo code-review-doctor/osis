@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import itertools
 import json
 
 from django.utils import timezone
@@ -41,7 +42,7 @@ class _EnrollmentSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True, source='prenom')
     score = serializers.CharField(read_only=True, source='note')
     justification = serializers.CharField(read_only=True, source='note')
-    deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date')
+    deadline = serializers.DateField(read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y")
     enrollment_state_color = serializers.SerializerMethodField()
 
     def get_enrollment_state_color(self, note_etudiant: NoteEtudiantDTO) -> str:
@@ -54,32 +55,27 @@ class _EnrollmentSerializer(serializers.Serializer):
 
 class _ProgramAddressSerializer(serializers.Serializer):
     # TODO: Use data from administrative data service
-    recipient = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    location = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    postal_code = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    city = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    country = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    phone = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    fax = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    email = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
+    recipient = serializers.CharField(read_only=True, source='nom_cohorte')
+    location = serializers.CharField(read_only=True, source='nom_cohorte')
+    postal_code = serializers.CharField(read_only=True, source='nom_cohorte')
+    city = serializers.CharField(read_only=True, source='nom_cohorte')
+    country = serializers.CharField(read_only=True, source='nom_cohorte')
+    phone = serializers.CharField(read_only=True, source='nom_cohorte')
+    fax = serializers.CharField(read_only=True, source='nom_cohorte')
+    email = serializers.CharField(read_only=True, source='nom_cohorte')
 
 
 class _ProgramSerializer(serializers.Serializer):
     deliberation_date = serializers.SerializerMethodField()
     acronym = serializers.SerializerMethodField()
     address = _ProgramAddressSerializer(source='*')
-    enrollments = serializers.SerializerMethodField()
+    enrollments = _EnrollmentSerializer(source='notes_etudiants_cohorte', many=True)
 
     def get_deliberation_date(self, obj):
         return str(_('Not passed'))
 
     def get_acronym(self, obj):
-        return "MISSING"
-
-    def get_enrollments(self, obj):
-        notes_etudiants = obj['feuille_de_notes'].notes_etudiants
-        serializer = _EnrollmentSerializer(instance=notes_etudiants, many=True)
-        return serializer.data
+        return obj['nom_cohorte']
 
 
 class _ScoreResponsibleAddressSerializer(serializers.Serializer):
@@ -119,8 +115,16 @@ class _LearningUnitYearsSerializer(serializers.Serializer):
         return False
 
     def get_programs(self, obj):
-        serializer = _ProgramSerializer(instance=obj)
-        return [serializer.data]
+        programs = []
+        rows_sorted_by_cohorte = sorted(obj['feuille_de_notes'].notes_etudiants, key=lambda note: note.nom_cohorte)
+        for nom_cohorte, notes_etudiants_cohorte \
+                in itertools.groupby(rows_sorted_by_cohorte, key=lambda note: note.nom_cohorte):
+            serializer = _ProgramSerializer(instance={
+                'notes_etudiants_cohorte': notes_etudiants_cohorte,
+                'nom_cohorte': nom_cohorte
+            })
+            programs.append(serializer.data)
+        return programs
 
 
 class ScoreSheetPDFSerializer(serializers.Serializer):
