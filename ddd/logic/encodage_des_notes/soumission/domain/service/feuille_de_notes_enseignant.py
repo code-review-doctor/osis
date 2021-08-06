@@ -109,7 +109,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
                     desinscrit_tardivement=bool(desinscription),
                 )
             )
-
+        notes_etudiants.sort(key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
         return FeuilleDeNotesEnseignantDTO(
             code_unite_enseignement=code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,

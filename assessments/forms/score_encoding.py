@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,35 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
-from osis_common.ddd import interface
+from django import forms
+from django.forms import HiddenInput
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
-
-
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+class ScoreEncodingForm(forms.Form):
+    note = forms.CharField(max_length=100, required=False)
+    noma = forms.CharField(widget=HiddenInput())

@@ -33,14 +33,16 @@ from osis_common.ddd import interface
 Noma = str
 
 
+@attr.s(frozen=True, slots=True)
 class IdentiteNoteEtudiant(interface.EntityIdentity):
     noma = attr.ib(type=Noma)
-    sigle_formation = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
 
 
-class NotesEtudiant(interface.RootEntity):
+@attr.s(slots=True)
+class NoteEtudiant(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     note = attr.ib(type=Note)
     date_echeance = attr.ib(type=date)
@@ -48,6 +50,28 @@ class NotesEtudiant(interface.RootEntity):
     def encoder(self, note: str) -> None:
         raise NotImplementedError
 
+    # def __encoder_note_de_presence(self):
+    #     pass
+    #
+    # def __encoder_absence_justifiee(self):
+    #     pass
+    #
+    # def __corriger_note(self):
+    #     pass
+
+
+@attr.s(frozen=True, slots=True)
+class IdentiteFeuilleDeNotes(interface.EntityIdentity):
+    numero_session = attr.ib(type=int)
+    # code_unite_enseignement = attr.ib(type=str)
+    sigle_cohorte = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
+
+
+class FeuilleDeNotesParFormation(interface.RootEntity):
+    entity_id = attr.ib(type=IdentiteFeuilleDeNotes)
+    credits_unite_enseignement = attr.ib(type=float)
+    notes = attr.ib(type=Set[NoteEtudiant])  # type: Set[NoteEtudiant]
 
 # from datetime import date
 # from typing import List

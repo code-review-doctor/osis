@@ -164,12 +164,14 @@ class AdresseDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
-    sigle_formation = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    date_deliberation = attr.ib(type=str)
-    adresse_responsable_notes = attr.ib(type=AdresseDTO)
+class DetailContactDTO(interface.DTO):
+    matricule_fgs = attr.ib(type=str)
+    email = attr.ib(type=str)
+    adresse_professionnelle = attr.ib(type=AdresseDTO)
 
+
+@attr.s(frozen=True, slots=True)
+class ContactFeuilleDeNotesDTO(interface.DTO):
     destinataire = attr.ib(type=str)
     rue_et_numero = attr.ib(type=str)
     code_postal = attr.ib(type=str)
@@ -178,6 +180,15 @@ class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     telephone = attr.ib(type=str)
     fax = attr.ib(type=str)
     email = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
+    sigle_formation = attr.ib(type=str)
+    code_unite_enseignement = attr.ib(type=str)
+    date_deliberation = attr.ib(type=str)
+    contact_responsable_notes = attr.ib(type=DetailContactDTO)
+    contact_feuille_de_notes = attr.ib(type=ContactFeuilleDeNotesDTO)
 
 
 @attr.s(frozen=True, slots=True)

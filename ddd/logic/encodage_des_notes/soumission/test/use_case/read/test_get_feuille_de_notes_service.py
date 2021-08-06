@@ -63,6 +63,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.note_etudiant = NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
 
         self.repository = NoteEtudiantInMemoryRepository()
+        self.repository.entities.clear()
         self.repository.save(self.note_etudiant)
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
@@ -202,3 +203,17 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         note_etudiant = result.notes_etudiants[0]
         expected_result = ""
         self.assertEqual(expected_result, note_etudiant.note)
+
+    def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
+        self.repository.delete(self.note_etudiant.entity_id)
+
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma=self.noma))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma='99999999'))
+
+        result = message_bus_instance.invoke(self.cmd)
+        self.assertEqual(len(result.notes_etudiants), 2)
+
+        self.assertEqual(result.notes_etudiants[0].nom, 'Arogan')
+        self.assertEqual(result.notes_etudiants[0].prenom, 'Adrien')
+        self.assertEqual(result.notes_etudiants[1].nom, 'Dupont')
+        self.assertEqual(result.notes_etudiants[1].prenom, 'Marie')

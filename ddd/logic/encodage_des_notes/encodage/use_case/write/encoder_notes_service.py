@@ -27,14 +27,15 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 
 
 def encoder_notes(
         cmd: 'EncoderNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNoteRepository',
+        note_etudiant_repo: 'INoteEtudiantRepository',
 ) -> List['IdentiteNoteEtudiant']:
     # Given
-    # Anticorruption layer : réutiliser un DomainService/repository interface pour récupérer le current numéro de session + le current year (data_target_year)
+    # Anticorruption layer : cf. DomainService dans contexte "soumission"
 
     # When
     for note_cmd in cmd.notes_encodees:
