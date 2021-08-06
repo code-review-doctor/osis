@@ -44,15 +44,17 @@ from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_s
     has_class_repartition_service
 from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
     has_enrollments_to_class_service
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
-    GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
+    AssignerResponsableDeNotesCommand, EncoderNoteCommand, SoumettreNoteCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
-from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
-    encoder_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
+    encoder_note_etudiant
+from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_feuille_de_notes_service import \
+    soumettre_note_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -90,7 +92,7 @@ from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumissi
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
+from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
@@ -178,7 +180,7 @@ class MessageBus:
         ),
         GetFeuilleDeNotesCommand: lambda cmd: get_feuille_de_notes(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
             PeriodeSoumissionNotesTranslator(),
             InscriptionExamenTranslator(),
@@ -186,15 +188,21 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             UniteEnseignementTranslator(),
         ),
-        EncoderFeuilleDeNotesCommand: lambda cmd: encoder_feuille_de_notes(
+        EncoderNoteCommand: lambda cmd: encoder_note_etudiant(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             PeriodeSoumissionNotesTranslator(),
             AttributionEnseignantTranslator(),
         ),
+        SoumettreNoteCommand: lambda cmd: soumettre_note_etudiant(
+            cmd,
+            NoteEtudiantRepository(),
+            ResponsableDeNotesRepository(),
+            PeriodeSoumissionNotesTranslator(),
+        ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             PeriodeSoumissionNotesTranslator(),
             SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),

@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import functools
-import itertools
 import operator
 from typing import Optional, List
 
@@ -32,17 +31,16 @@ from django.db.models import F, Case, CharField, Value, When, BooleanField, Expr
 from django.db.models.functions import Coalesce, Cast, Concat
 
 from base.models.exam_enrollment import ExamEnrollment
-from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_builder import FeuilleDeNotesBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes, FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, NoteEtudiantFromRepositoryDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from osis_common.ddd.interface import ApplicationService
 
 
-class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
+class NoteEtudiantRepository(INoteEtudiantRepository):
     @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
+    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
         if not entity_ids:
             return []
 
@@ -52,55 +50,47 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
                 Q(
                     acronym=entity_id.code_unite_enseignement,
                     year=entity_id.annee_academique,
-                    number_session=entity_id.numero_session
+                    number_session=entity_id.numero_session,
+                    noma=entity_id.noma
                 )
                 for entity_id in entity_ids
             ]
         )
         rows = _fetch_session_exams().filter(q_filters)
-        rows_group_by_identity = itertools.groupby(rows, key=lambda row: (row.acronym, row.year, row.number_session))
-
         result = []
-        for identity, group_rows in rows_group_by_identity:
-            group_rows = list(group_rows)
-            dto_object = FeuilleDeNotesFromRepositoryDTO(
-                numero_session=identity[2],
-                code_unite_enseignement=identity[0],
-                annee_academique=identity[1],
-                credits_unite_enseignement=float(group_rows[0].credits_unite_enseignement),
-                notes=set(
-                    NoteEtudiantFromRepositoryDTO(
-                        noma=row.noma,
-                        email=row.email,
-                        note=row.note,
-                        date_limite_de_remise=row.date_limite_de_remise,
-                        est_soumise=row.est_soumise
-                    )
-                    for row in group_rows
-                )
+        for row in rows:
+            dto_object = NoteEtudiantFromRepositoryDTO(
+                noma=row.noma,
+                email=row.email,
+                note=row.note,
+                date_limite_de_remise=row.date_limite_de_remise,
+                est_soumise=row.est_soumise,
+                numero_session=row.number_session,
+                code_unite_enseignement=row.acronym,
+                annee_academique=row.year,
+                credits_unite_enseignement=row.credits_unite_enseignement
             )
-            result.append(FeuilleDeNotesBuilder().build_from_repository_dto(dto_object))
+            result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
         return result
 
     @classmethod
-    def delete(cls, entity_id: 'IdentiteFeuilleDeNotes', **kwargs: ApplicationService) -> None:
+    def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:
         raise NotImplementedError
 
     @classmethod
-    def save(cls, entity: 'FeuilleDeNotes') -> None:
-        for note in entity.notes:
-            _save_note(entity.entity_id, note)
+    def save(cls, entity: 'NoteEtudiant') -> None:
+        _save_note(entity)
 
     @classmethod
-    def get_all_identities(cls) -> List['IdentiteFeuilleDeNotes']:
+    def get_all_identities(cls) -> List['IdentiteNoteEtudiant']:
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'IdentiteFeuilleDeNotes') -> 'FeuilleDeNotes':
+    def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
         return cls.search([entity_id])[0]
 
 
-def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteEtudiant'):
+def _save_note(note: 'NoteEtudiant'):
     db_obj = ExamEnrollment.objects.annotate(
         code_unite_enseignement=Concat(
             'learning_unit_enrollment__learning_unit_year__acronym',
@@ -108,9 +98,9 @@ def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteE
             output_field=CharField()
         )
     ).get(
-        code_unite_enseignement=feuille_de_note_entity_id.code_unite_enseignement,
-        learning_unit_enrollment__learning_unit_year__academic_year__year=feuille_de_note_entity_id.annee_academique,
-        session_exam__number_session=feuille_de_note_entity_id.numero_session,
+        code_unite_enseignement=note.code_unite_enseignement,
+        learning_unit_enrollment__learning_unit_year__academic_year__year=note.annee,
+        session_exam__number_session=note.numero_session,
         learning_unit_enrollment__offer_enrollment__student__registration_id=note.entity_id.noma
     )
     if note.est_soumise:

@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
-    FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.feuille_de_notes_enseignant import FeuilleDeNotesEnseignant
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
@@ -37,13 +35,13 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudi
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeSoumissionOuverte
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
 def get_feuille_de_notes(
         cmd: 'GetFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+        note_etudiant_repo: 'INoteEtudiantRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
         periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
         inscription_examen_translator: 'IInscriptionExamenTranslator',
@@ -54,15 +52,16 @@ def get_feuille_de_notes(
     # GIVEN
     PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
     periode_soumission = periode_soumission_note_translator.get()
-    feuille_notes_entity_id = FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
-        numero_session=periode_soumission.session_concernee,
-        code_unite_enseignement=cmd.code_unite_enseignement,
-        annee_academique=periode_soumission.annee_concernee,
+
+    notes = note_etudiant_repo.search_by_code_unite_enseignement_annee_session(
+        criterias=[
+            (cmd.code_unite_enseignement, periode_soumission.annee_concernee, periode_soumission.session_concernee)
+        ]
     )
 
     # WHEN
     feuille_de_notes_dto = FeuilleDeNotesEnseignant().get(
-        feuille_de_note_repo.get(feuille_notes_entity_id),
+        notes,
         cmd.matricule_fgs_enseignant,
         responsable_notes_repo,
         periode_soumission_note_translator,

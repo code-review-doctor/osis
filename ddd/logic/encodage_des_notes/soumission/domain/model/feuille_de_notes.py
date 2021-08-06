@@ -30,9 +30,9 @@ from typing import Set, Dict
 import attr
 
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.validator.validators_by_business_action import \
-    EncoderFeuilleDeNotesValidatorList
+    EncoderNoteEtudiantValidatorList
 from osis_common.ddd import interface
 
 CREDITS_MIN_POUR_NOTE_DECIMALE = 15.0
@@ -90,7 +90,7 @@ class FeuilleDeNotes(interface.RootEntity):
             email: str,
             note_encodee: str,
     ) -> None:
-        EncoderFeuilleDeNotesValidatorList(
+        EncoderNoteEtudiantValidatorList(
             noma=noma,
             email=email,
             note=note_encodee,

@@ -37,13 +37,13 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 @attr.s(frozen=True, slots=True)
 class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
     note = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
 
     def validate(self, *args, **kwargs):
         note_chiffree = self.__get_note_chiffree()
         if note_chiffree:
             is_integer = note_chiffree % 1 == 0
-            if not self.feuille_de_note.note_decimale_est_autorisee() and not is_integer:
+            if not self.note_etudiant.note_decimale_est_autorisee() and not is_integer:
                 raise NoteDecimaleNonAutoriseeException()
 
     def __get_note_chiffree(self) -> Optional[Decimal]:

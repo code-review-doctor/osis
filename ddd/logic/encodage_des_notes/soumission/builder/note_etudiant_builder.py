@@ -23,35 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
-    FeuilleDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, \
-    NoteEtudiantFromRepositoryDTO, DateDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO, DateDTO
 from osis_common.ddd import interface
 
 
-class FeuilleDeNotesBuilder(interface.RootEntityBuilder):
+class NoteEtudiantBuilder(interface.RootEntityBuilder):
     @classmethod
-    def build_from_command(cls, cmd: 'CommandRequest') -> 'FeuilleDeNotes':
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'NoteEtudiant':
         pass
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'FeuilleDeNotesFromRepositoryDTO') -> 'FeuilleDeNotes':
-        return FeuilleDeNotes(
-            entity_id=FeuilleDeNotesIdentityBuilder().build_from_repository_dto(dto_object),
-            credits_unite_enseignement=dto_object.credits_unite_enseignement,
-            notes={cls.__build_note_etudiant_from_repository_dto(note_dto) for note_dto in dto_object.notes}
-        )
-
-    @classmethod
-    def __build_note_etudiant_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
+    def build_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
         return NoteEtudiant(
-            entity_id=IdentiteNoteEtudiant(noma=dto_object.noma),
-            email=dto_object.email,
-            note=NoteBuilder.build(dto_object.note),
+            entity_id=NoteEtudiantIdentityBuilder().build_from_repository_dto(dto_object),
+            credits_unite_enseignement=dto_object.credits_unite_enseignement,
             date_limite_de_remise=DateDTO.build_from_date(dto_object.date_limite_de_remise),
-            est_soumise=dto_object.est_soumise
+            email=dto_object.email,
+            est_soumise=dto_object.est_soumise,
+            note=NoteBuilder.build(dto_object.note),
         )

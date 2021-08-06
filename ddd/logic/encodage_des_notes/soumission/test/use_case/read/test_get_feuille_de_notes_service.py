@@ -33,7 +33,6 @@ from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCo
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
     AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
@@ -44,8 +43,8 @@ from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signal
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
-    FeuilleDeNotesInMemoryRepository
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
+    NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -61,13 +60,10 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.noma = '11111111'
         self.nom_cohorte = 'DROI1BA'
 
-        self.feuille_de_notes = FeuilleDeNotesAvecUneSeuleNoteManquante(
-            notes={
-                NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
-            }
-        )
-        self.repository = FeuilleDeNotesInMemoryRepository()
-        self.repository.save(self.feuille_de_notes)
+        self.note_etudiant = NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
+
+        self.repository = NoteEtudiantInMemoryRepository()
+        self.repository.save(self.note_etudiant)
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
 
@@ -86,7 +82,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            FeuilleDeNotesRepository=lambda: self.repository,
+            NoteEtudiantRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
             PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,

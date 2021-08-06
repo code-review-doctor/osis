@@ -23,17 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from unittest import mock
 
 from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
-    FeuilleDeNotesAvecNotesEncodeesEtNotesManquantes, FeuilleDeNotesAvecNotesSoumises, \
-    FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui
+from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, NoteDejaSoumise
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
@@ -42,8 +38,8 @@ from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signal
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
-    FeuilleDeNotesInMemoryRepository
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
+    NoteEtudiantInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -57,13 +53,12 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         self.noma = '11111111'
         self.nom_cohorte = 'DROI1BA'
 
-        self.feuille_de_notes = FeuilleDeNotesAvecUneSeuleNoteManquante(
-            notes={
-                NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
-            }
+        self.note_etudiant = NoteManquanteEtudiantFactory(
+            entity_id__noma=self.noma,
+            entity_id__code_unite_enseignement='LDROI1001',
         )
-        self.repository = FeuilleDeNotesInMemoryRepository()
-        self.repository.save(self.feuille_de_notes)
+        self.repository = NoteEtudiantInMemoryRepository()
+        self.repository.save(self.note_etudiant)
 
         self.cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.matricule_enseignant)
 
@@ -77,7 +72,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            FeuilleDeNotesRepository=lambda: self.repository,
+            NoteEtudiantRepository=lambda: self.repository,
             PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
@@ -124,44 +119,66 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         self.assertFalse(progression_premiere_unite_enseign.a_etudiants_peps)
 
     def test_should_grouper_et_ordonner_par_date_echeance(self):
-        nombre_de_dates_echeances = 2
-        aujourdhui = datetime.date.today()
-        hier = aujourdhui - datetime.timedelta(days=1)
-
-        feuille_de_notes = FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui()
-        self.repository.save(feuille_de_notes)
+        note_date_remise_hier = NoteManquanteEtudiantFactory(
+            entity_id__code_unite_enseignement='LDROI1001',
+            date_remise_hier=True
+        )
+        self.repository.save(note_date_remise_hier)
 
         result = self.message_bus.invoke(self.cmd)
+
         progression_premiere_unite_enseign = result.progression_generale[0]
-        self.assertEqual(len(progression_premiere_unite_enseign.dates_echeance), nombre_de_dates_echeances)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].jour, hier.day)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].mois, hier.month)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].annee, hier.year)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[1].jour, aujourdhui.day)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[1].mois, aujourdhui.month)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[1].annee, aujourdhui.year)
+
+        self.assertEqual(len(progression_premiere_unite_enseign.dates_echeance), 2)
+        self.assertEqual(
+            progression_premiere_unite_enseign.dates_echeance[0].jour,
+            note_date_remise_hier.date_limite_de_remise.jour
+        )
+        self.assertEqual(
+            progression_premiere_unite_enseign.dates_echeance[0].mois,
+            note_date_remise_hier.date_limite_de_remise.mois
+        )
+        self.assertEqual(
+            progression_premiere_unite_enseign.dates_echeance[0].annee,
+            note_date_remise_hier.date_limite_de_remise.annee
+        )
+        self.assertEqual(
+            progression_premiere_unite_enseign.dates_echeance[1].jour,
+            self.note_etudiant.date_limite_de_remise.jour
+        )
+        self.assertEqual(
+            progression_premiere_unite_enseign.dates_echeance[1].mois,
+            self.note_etudiant.date_limite_de_remise.mois
+        )
+        self.assertEqual(
+            progression_premiere_unite_enseign.dates_echeance[1].annee,
+            self.note_etudiant.date_limite_de_remise.annee
+        )
 
     def test_should_calculer_aucune_note_soumise(self):
-        feuille_de_notes = FeuilleDeNotesAvecNotesEncodeesEtNotesManquantes()
-        self.repository.save(feuille_de_notes)
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement='LDROI1001'))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement='LDROI1001'))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement='LDROI1001'))
+
         result = self.message_bus.invoke(self.cmd)
         progression_premiere_unite_enseign = result.progression_generale[0]
+
         self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].quantite_notes_soumises, 0)
         self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].quantite_total_notes, 4)
 
     def test_should_calculer_1_note_soumise(self):
-        feuille_de_notes = FeuilleDeNotesAvecNotesSoumises()
-        self.repository.save(feuille_de_notes)
+        self.repository.save(NoteDejaSoumise(entity_id__code_unite_enseignement='LDROI1001'))
+
         result = self.message_bus.invoke(self.cmd)
         progression_premiere_unite_enseign = result.progression_generale[0]
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].quantite_notes_soumises, 2)
-        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].quantite_total_notes, 4)
+        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].quantite_notes_soumises, 1)
+        self.assertEqual(progression_premiere_unite_enseign.dates_echeance[0].quantite_total_notes, 2)
 
     @mock.patch("infrastructure.messages_bus.AttributionEnseignantTranslator")
     def test_should_ordonner_plusieurs_unites_enseignement(self, mock_attrib_translator):
-        self.repository.save(FeuilleDeNotesAvecUneSeuleNoteManquante(entity_id__code_unite_enseignement="LDROI1003"))
-        self.repository.save(FeuilleDeNotesAvecUneSeuleNoteManquante(entity_id__code_unite_enseignement="LDROI1001"))
-        self.repository.save(FeuilleDeNotesAvecUneSeuleNoteManquante(entity_id__code_unite_enseignement="LDROI1002"))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement="LDROI1003"))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement="LDROI1001"))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__code_unite_enseignement="LDROI1002"))
         attribution_translator = AttributionEnseignantTranslatorInMemory()
         attribution_translator.search_attributions_enseignant_par_matricule = lambda *args, **kwargs: {
             AttributionEnseignantDTO(

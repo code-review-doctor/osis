@@ -23,12 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
-from typing import List, Dict, Set, Tuple
+import collections
+from typing import List, Dict, Set, Tuple, Any, Callable, Iterable
 
-from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
-    FeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
@@ -38,7 +36,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudi
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO, \
     ProgressionEncodageNotesUniteEnseignementDTO, DateEcheanceDTO, UniteEnseignementDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from osis_common.ddd import interface
 
 
@@ -48,7 +46,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
     def get(
             cls,
             matricule_fgs_enseignant: str,
-            feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+            note_etudiant_repo: 'INoteEtudiantRepository',
             attribution_translator: 'IAttributionEnseignantTranslator',
             periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
@@ -58,81 +56,86 @@ class ProgressionGeneraleEncodage(interface.DomainService):
         annee_academique = periode_soumission.annee_concernee
         numero_session = periode_soumission.session_concernee
 
-        feuilles_de_notes = _search_feuille_de_notes(
+        notes = _search_notes(
             attribution_translator,
-            feuille_de_note_repo,
+            note_etudiant_repo,
             matricule_fgs_enseignant,
             numero_session,
             annee_academique
         )
 
-        nomas_concernes = itertools.chain.from_iterable((feuille.get_all_nomas() for feuille in feuilles_de_notes))
-        nomas_avec_peps = _get_nomas_avec_peps(list(nomas_concernes), signaletique_etudiant_translator)
+        nomas_concernes = [note.noma for note in notes]
+        nomas_avec_peps = _get_nomas_avec_peps(nomas_concernes, signaletique_etudiant_translator)
 
-        codes_concernes = {f.code_unite_enseignement for f in feuilles_de_notes}
         detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
-            {(code, annee_academique) for code in codes_concernes},
+            {(note.code_unite_enseignement, note.annee) for note in notes},
             unite_enseignement_translator,
         )
 
+        notes_grouped_by_code_unite_enseignement = group_by(notes, lambda note: note.code_unite_enseignement)
+
         progressions = [
-            cls._compute_progression_pour_feuille_de_notes(
-                feuille_de_note,
+            cls._compute_progression_pour_notes_de_meme_unite_enseignement(
+                notes,
                 nomas_avec_peps,
-                detail_unite_enseignement_par_code
-            ) for feuille_de_note in sorted(feuilles_de_notes, key=lambda f: f.code_unite_enseignement)
+                detail_unite_enseignement_par_code[code_unite_enseignement]
+            ) for code_unite_enseignement, notes in notes_grouped_by_code_unite_enseignement.items()
         ]
 
         return ProgressionGeneraleEncodageNotesDTO(
             annee_academique=annee_academique,
             numero_session=numero_session,
-            progression_generale=progressions,
+            progression_generale=sorted(progressions, key=lambda progression: progression.code_unite_enseignement),
         )
 
     @classmethod
-    def _compute_progression_pour_feuille_de_notes(
+    def _compute_progression_pour_notes_de_meme_unite_enseignement(
             cls,
-            feuille_de_notes: 'FeuilleDeNotes',
+            notes: List['NoteEtudiant'],
             nomas_avec_peps: Set[str],
-            detail_unite_enseignement_par_code: Dict[str, UniteEnseignementDTO]
+            detail_unite_enseignement: UniteEnseignementDTO
     ):
-        detail_unite_enseignement = detail_unite_enseignement_par_code[feuille_de_notes.code_unite_enseignement]
-        nombre_total_notes_par_echeance_trie_par_echeance = sorted(
-            feuille_de_notes.get_nombre_total_notes_par_echeance().items(),
-            key=lambda tuple_echeance_nombre_total_notes: tuple_echeance_nombre_total_notes[0]
+        notes_grouped_by_echeance = group_by(notes, lambda note: note.date_limite_de_remise)
+        list_tuple_echeance_notes = sorted(
+            notes_grouped_by_echeance.items(),
+            key=lambda tuple_echeance_notes: tuple_echeance_notes[0]
         )
         return ProgressionEncodageNotesUniteEnseignementDTO(
-            code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
+            code_unite_enseignement=detail_unite_enseignement.code,
             intitule_complet_unite_enseignement=detail_unite_enseignement.intitule_complet,
             dates_echeance=[
                 DateEcheanceDTO(
                     jour=echeance.jour,
                     mois=echeance.mois,
                     annee=echeance.annee,
-                    quantite_notes_soumises=feuille_de_notes.get_nombre_notes_soumises_par_echeance().get(echeance, 0),
-                    quantite_total_notes=total_notes,
-                ) for echeance, total_notes in nombre_total_notes_par_echeance_trie_par_echeance
+                    quantite_notes_soumises=len([note for note in notes if note.est_soumise]),
+                    quantite_total_notes=len(notes),
+                ) for echeance, notes in list_tuple_echeance_notes
             ],
-            a_etudiants_peps=any(note.noma in nomas_avec_peps for note in feuille_de_notes.notes),
+            a_etudiants_peps=any(note.noma in nomas_avec_peps for note in notes),
         )
 
 
-def _search_feuille_de_notes(
+#  TODO to move
+def group_by(iterable: Iterable[Any], key_func: Callable) -> Dict:
+    result = collections.defaultdict(list)
+
+    for element in iterable:
+        result[key_func(element)].append(element)
+
+    return result
+
+
+def _search_notes(
         attribution_translator: 'IAttributionEnseignantTranslator',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+        note_etudiant_repo: 'INoteEtudiantRepository',
         matricule_fgs_enseignant: str,
         session_concerne: int,
         annee_concerne: int
-        ):
+) -> List['NoteEtudiant']:
     attributions = attribution_translator.search_attributions_enseignant_par_matricule(matricule_fgs_enseignant)
-    identities = [
-        FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
-            numero_session=session_concerne,
-            code_unite_enseignement=attrib.code_unite_enseignement,
-            annee_academique=annee_concerne,
-        ) for attrib in attributions
-    ]
-    return feuille_de_note_repo.search(entity_ids=identities)
+    search_criterias = [(attrib.code_unite_enseignement, annee_concerne, session_concerne) for attrib in attributions]
+    return note_etudiant_repo.search_by_code_unite_enseignement_annee_session(criterias=search_criterias)
 
 
 def _get_nomas_avec_peps(
