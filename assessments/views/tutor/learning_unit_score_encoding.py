@@ -72,7 +72,9 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
         return message_bus_instance.invoke(cmd)
 
     def get_learning_unit_encoding_url(self):
-        return ""
+        return reverse('learning_unit_score_encoding_form', kwargs={
+            'learning_unit_code': self.kwargs['learning_unit_code']
+        })
 
     def get_learning_unit_double_encoding_url(self):
         return ""
