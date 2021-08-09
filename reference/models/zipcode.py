@@ -41,7 +41,7 @@ class ZipCode(models.Model):
     country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{} - {}".format(self.zip_code, self.municipality)
+        return "{} - {} ({})".format(self.zip_code, self.municipality, self.country.iso_code)
 
     class Meta:
         ordering = ('zip_code',)

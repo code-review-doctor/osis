@@ -10,7 +10,7 @@ from reference.models.zipcode import ZipCode
 
 PATH = 'base/fixtures/{file_name}'
 COUNTRY_FILE = 'countries.csv'
-ZIPCODE_FILE = 'belgium_zipcode.csv'
+ZIPCODE_FILE = 'zipcode.csv'
 
 
 class Command(BaseCommand):
@@ -25,7 +25,7 @@ class Command(BaseCommand):
             self.create_antarctica_continent()
             self.load_countries(debug)
         if kwargs['zipcodes'] is True:
-            self.load_belgium_zipcodes()
+            self.load_zipcodes()
 
     @staticmethod
     def create_antarctica_continent() -> Continent:
@@ -85,19 +85,18 @@ class Command(BaseCommand):
         return iso_code, defaults_value
 
     @staticmethod
-    def load_belgium_zipcodes():
+    def load_zipcodes():
         zip_to_create = []
-        belgium = Country.objects.get(iso_code='BE')
-        print("===== Loading belgium zip codes =====\n")
+        print("===== Loading zip codes =====\n")
         zip_path = PATH.format(file_name=ZIPCODE_FILE)
         with open(zip_path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
-                zip_code, municipality = row
+                zip_code, municipality, country_code = row
                 zip_object = ZipCode(
                     zip_code=zip_code,
                     municipality=municipality,
-                    country_id=belgium.id
+                    country_id=Country.objects.get(iso_code=country_code)
                 )
                 print("Creating Zipcode {zip}".format(zip=zip_object))
                 zip_to_create.append(zip_object)
