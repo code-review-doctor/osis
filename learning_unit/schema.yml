@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/learning_unit/
    description: 'Production server'
 info:
-  version: '1.04'
+  version: '1.05'
   title: 'Learning Unit Service'
   description: |-
     A set of API endpoints that allow you to get information about learning unit
@@ -21,43 +21,48 @@ paths:
       description: Return a list of all the learning unit with optional filtering.
       operationId: learningunits_list
       parameters:
-      - in: query
-        name: limit
-        schema:
-          description: Number of results to return per page.
-          type: integer
-      - in: query
-        name: offset
-        schema:
-          description: The initial index from which to return the results.
-          type: integer
-      - in: query
-        name: acronym
-        schema:
-          description: Filter acronym in exact match
-          type: string
-      - in: query
-        name: acronym_like
-        schema:
-          description: Filter acronym in contains match case insensitive
-          type: string
-      - in: query
-        name: year
-        schema:
-          type: integer
-      - in: query
-        name: lang
-        schema:
-          type: string
-      - in: query
-        name: campus
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: stage_dimona
-        schema:
-          type: boolean
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: acronym
+          schema:
+            description: Filter acronym in exact match
+            type: string
+        - in: query
+          name: acronym_like
+          schema:
+            description: Filter acronym in contains match case insensitive
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - in: query
+          name: campus
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: stage_dimona
+          schema:
+            type: boolean
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -83,22 +88,27 @@ paths:
       description: Return the detail of the learning unit
       operationId: learningunits_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: lang
-        schema:
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -121,22 +131,27 @@ paths:
       description: Return the title of the learning unit
       operationId: learningunitstitle_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: lang
-        schema:
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -160,22 +175,27 @@ paths:
       description: Return all attributions assign to the learning unit
       operationId: learningunitattributions_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: lang
-        schema:
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -198,27 +218,32 @@ paths:
       description: Return all education groups root which utilize the learning unit specified
       operationId: learningunitutilization_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: lang
-        schema:
-          type: string
-      - in: query
-        name: ignore_complementary_module
-        schema:
-          description: True if we want to filter roots if the learning unit is inside a complementary module behind the root. By default, all roots of the learning unit are returned.
-          type: boolean
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - in: query
+          name: ignore_complementary_module
+          schema:
+            description: True if we want to filter roots if the learning unit is inside a complementary module behind the root. By default, all roots of the learning unit are returned.
+            type: boolean
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -241,22 +266,27 @@ paths:
       description: Return all achievement in order according of the learning unit specified.
       operationId: learningunitachievements_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: lang
-        schema:
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -279,22 +309,27 @@ paths:
       description: Return all summary and specification information of the learning unit specified
       operationId: learningunitsummaryspecification_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: query
-        name: lang
-        schema:
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -315,18 +350,23 @@ paths:
       description: Returns all education groups for which this learning unit year had prerequisites
       operationId: learningunitprerequisites_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: integer
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -363,6 +403,11 @@ paths:
           name: lang
           schema:
             type: string
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -385,6 +430,39 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
   responses:
     Unauthorized:
       description: Unauthorized
@@ -800,6 +878,11 @@ components:
         - 'ACCESS_MINOR'
         - 'OPEN_MINOR'
         - 'DISCIPLINARY_COMPLEMENT_MINOR'
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
     Error:
       type: object
       properties:
