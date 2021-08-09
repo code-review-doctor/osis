@@ -88,7 +88,9 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
         return ""
 
     def get_learning_unit_upload_xls_url(self):
-        return ""
+        return reverse('score_sheet_xls_import', kwargs={
+            'learning_unit_code': self.kwargs['learning_unit_code']
+        })
 
     def get_learning_unit_submit_url(self):
         return ""

@@ -23,58 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
 from django.test import TestCase
 from django.urls import reverse
 
+from assessments.forms.score_file import ScoreFileForm
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO
 
 
-class LearningUnitScoreEncodingTutorFormViewTest(TestCase):
+class ScoreSheetXLSImportViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.tutor = TutorFactory(person__global_id="123456789")
         cls.academic_year = AcademicYearFactory()
 
-        cls.url = reverse('learning_unit_score_encoding_form', kwargs={
+        cls.url = reverse('score_sheet_xls_import', kwargs={
             'learning_unit_code': 'LEPL1509'
         })
 
     def setUp(self) -> None:
         self.client.force_login(self.tutor.person.user)
         self.session_exam_calendar = SessionExamCalendarFactory.create_academic_event(self.academic_year)
-
-        self.patch_message_bus = mock.patch(
-            "assessments.views.tutor.learning_unit_score_encoding.message_bus_instance.invoke",
-            side_effect=self.__mock_message_bus_invoke
-        )
-        self.message_bus_mocked = self.patch_message_bus.start()
-        self.addCleanup(self.patch_message_bus.stop)
-
-    def __mock_message_bus_invoke(self, cmd):
-        if isinstance(cmd, GetFeuilleDeNotesCommand):
-            return FeuilleDeNotesEnseignantDTO(
-                code_unite_enseignement='LEPL1509',
-                intitule_complet_unite_enseignement='Introduction au data-mining',
-                responsable_note=EnseignantDTO(nom="Durant", prenom="Thomas"),
-                autres_enseignants=[],
-                annee_academique=2020,
-                numero_session=2,
-                notes_etudiants=[],
-            )
-        return None
-
-    def __get_management_formset(self):
-        return {
-            'form-TOTAL_FORMS': '0',
-            'form-INITIAL_FORMS': '0',
-            'form-MIN_NUM_FORMS': '0',
-            'form-MAX_NUM_FORMS': '',
-        }
 
     def test_case_user_not_logged(self):
         self.client.logout()
@@ -93,21 +63,8 @@ class LearningUnitScoreEncodingTutorFormViewTest(TestCase):
     def test_assert_template_used(self):
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, "assessments/tutor/learning_unit_score_encoding_form.html")
+        self.assertTemplateUsed(response, "assessments/common/xls_import_modal_inner.html")
 
     def test_assert_contexts(self):
         response = self.client.get(self.url)
-
-        self.assertTrue('feuille_de_notes' in response.context)
-        expected_cancel_url = reverse('learning_unit_score_encoding', kwargs={
-            'learning_unit_code': 'LEPL1509'
-        })
-        self.assertEqual(response.context['cancel_url'], expected_cancel_url)
-
-    def test_assert_redirection_when_post_valid(self):
-        response = self.client.post(self.url, self.__get_management_formset())
-
-        expected_redirect = reverse('learning_unit_score_encoding', kwargs={
-            'learning_unit_code': 'LEPL1509'
-        })
-        self.assertRedirects(response, expected_redirect, fetch_redirect_response=False)
+        self.assertIsInstance(response.context['form'], ScoreFileForm)
