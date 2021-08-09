@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import zipfile
+
 from django import forms
 from django.forms import ClearableFileInput
 from django.utils.translation import gettext_lazy as _
@@ -44,9 +46,10 @@ class ScoreFileForm(forms.Form):
         xls_error = forms.ValidationError(_("The file must be a valid 'XLSX' excel file"), code='invalid')
         if ".xlsx" not in file.name or not valid_content_type:
             self.add_error('file', xls_error)
+            return None
 
         try:
             workbook = load_workbook(file, read_only=True, data_only=True)
             return workbook
-        except KeyError:
+        except (KeyError, zipfile.BadZipFile,):
             self.add_error('file', xls_error)
