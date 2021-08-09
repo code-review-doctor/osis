@@ -96,7 +96,7 @@ class Command(BaseCommand):
                 zip_object = ZipCode(
                     zip_code=zip_code,
                     municipality=municipality,
-                    country_id=Country.objects.get(iso_code=country_code)
+                    country_id=Country.objects.get(iso_code=country_code).id
                 )
                 print("Creating Zipcode {zip}".format(zip=zip_object))
                 zip_to_create.append(zip_object)
