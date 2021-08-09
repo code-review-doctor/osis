@@ -56,10 +56,10 @@ class ScoreSheetXLSExportView(PermissionRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         score_sheet_serialized = ScoreSheetXLSSerializer(instance={
             'feuille_de_notes': self.feuille_de_notes
-        })
+        }).data
 
         if len(score_sheet_serialized['rows']):
-            virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized.data)
+            virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
             response = HttpResponse(
                 virtual_workbook,
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'

@@ -98,6 +98,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         return FeuilleDeNotesEnseignantDTO(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
+            note_decimale_est_autorisee=feuille_de_notes.note_decimale_est_autorisee(),
             responsable_note=EnseignantDTO(
                 nom=responsable_notes.nom,
                 prenom=responsable_notes.prenom,

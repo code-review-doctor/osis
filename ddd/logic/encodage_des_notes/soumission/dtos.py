@@ -137,6 +137,7 @@ class FeuilleDeNotesEnseignantDTO(interface.DTO):
     autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
+    note_decimale_est_autorisee = attr.ib(type=bool)
     notes_etudiants = attr.ib(type=List[NoteEtudiantDTO])
 
     @property

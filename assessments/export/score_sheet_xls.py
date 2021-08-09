@@ -111,8 +111,7 @@ def _build_legends(worksheet, feuille_de_notes_serialized):
     worksheet.append([
         str(''),
         str(_('Decimals authorized for this learning unit'))
-        # TODO : Add is decimal score to FeuilleDeNoteDTO
-        if feuille_de_notes_serialized else
+        if feuille_de_notes_serialized['note_decimale_est_autorisee'] else
         str(_('Unauthorized decimal for this learning unit'))
     ])
 

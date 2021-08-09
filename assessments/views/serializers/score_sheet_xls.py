@@ -33,18 +33,18 @@ from education_group.templatetags.academic_year_display import display_as_academ
 
 
 class _NoteEtudiantRowSerializer(serializers.Serializer):
-    noma = serializers.CharField(read_only=True)
-    nom = serializers.CharField(read_only=True,)
-    prenom = serializers.CharField(read_only=True)
-    note = serializers.CharField(read_only=True)
-    nom_cohorte = serializers.CharField(read_only=True)
-    email = serializers.CharField(read_only=True)
+    noma = serializers.CharField(read_only=True, default='')
+    nom = serializers.CharField(read_only=True, default='')
+    prenom = serializers.CharField(read_only=True, default='')
+    note = serializers.CharField(read_only=True, default='')
+    nom_cohorte = serializers.CharField(read_only=True, default='')
+    email = serializers.CharField(read_only=True, default='')
     date_remise_de_notes = serializers.DateField(
         read_only=True, source='date_remise_de_notes.to_date', format="%d/%m/%Y"
     )
-    est_soumise = serializers.BooleanField(read_only=True)
-    inscrit_tardivement = serializers.BooleanField(read_only=True)
-    desinscrit_tardivement = serializers.BooleanField(read_only=True)
+    est_soumise = serializers.BooleanField(read_only=True, default=False)
+    inscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
+    desinscrit_tardivement = serializers.BooleanField(read_only=True, default=False)
     type_peps = serializers.SerializerMethodField()
     tiers_temps = serializers.SerializerMethodField()
     copie_adaptee = serializers.SerializerMethodField()
@@ -105,13 +105,16 @@ class _NoteEtudiantRowSerializer(serializers.Serializer):
 
 
 class ScoreSheetXLSSerializer(serializers.Serializer):
-    numero_session = serializers.IntegerField(read_only=True, source='feuille_de_notes.numero_session')
+    numero_session = serializers.IntegerField(read_only=True, source='feuille_de_notes.numero_session', default='')
     titre = serializers.SerializerMethodField()
-    code_unite_enseignement = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
+    code_unite_enseignement = serializers.CharField(
+        read_only=True, source='feuille_de_notes.code_unite_enseignement', default=''
+    )
     annee_academique = serializers.SerializerMethodField()
-    is_decimal_score = serializers.BooleanField(
+    note_decimale_est_autorisee = serializers.BooleanField(
         read_only=True,
-        source='feuille_de_notes.is_decimal_score',
+        source='feuille_de_notes.note_decimale_est_autorisee',
+        default=False
     )
     rows = serializers.SerializerMethodField()
 
@@ -125,9 +128,10 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         )
 
     def get_rows(self, obj):
-        notes_etudiants_non_soumises = obj['feuille_de_notes'].notes_etudiants
-        #notes_etudiants_non_soumises = filter(lambda n: not n.est_soumise, obj['feuille_de_notes'].notes_etudiants)
-        serializer = _NoteEtudiantRowSerializer(instance=notes_etudiants_non_soumises, many=True)
+        notes_etudiants_avec_date_echeance_non_atteinte = filter(
+            lambda n: not n.date_echeance_atteinte, obj['feuille_de_notes'].notes_etudiants
+        )
+        serializer = _NoteEtudiantRowSerializer(instance=notes_etudiants_avec_date_echeance_non_atteinte, many=True)
         return serializer.data
 
     def to_representation(self, instance):
