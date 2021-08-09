@@ -406,10 +406,12 @@ class LearningUnitYearDeletion(TestCase):
 
     @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
     def test_cannot_delete_if_has_application_another_year(self, mock_is_linked):
+        next_anac = AcademicYearFactory(year=self.academic_year.year + 1)
         luy_next_year = LearningUnitYearFactory(
             learning_unit=self.learning_unit,
-            academic_year=AcademicYearFactory(year=self.academic_year.year + 1),
+            academic_year=next_anac,
             learning_container_year=LearningContainerYearFactory(
+                academic_year=next_anac,
                 learning_container=self.l_container_year.learning_container
             ),
             subtype=learning_unit_year_subtypes.FULL,

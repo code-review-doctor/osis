@@ -278,6 +278,7 @@ class TestEditLearningUnit(TestCase):
                 "attribution_procedure": self.learning_unit_year.attribution_procedure,
                 "internship_subtype": self.learning_unit_year.internship_subtype,
                 "professional_integration": self.learning_unit_year.professional_integration,
+                'stage_dimona': self.learning_unit_year.stage_dimona,
                 "campus": self.learning_unit_year.campus.pk,
                 "language": self.learning_unit_year.language.pk,
                 "periodicity": self.learning_unit_year.periodicity,
