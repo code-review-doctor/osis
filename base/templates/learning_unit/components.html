@@ -145,15 +145,12 @@
                             <td></td>
                         {% endif %}
                         <td colspan="1">
-                            {% a_tag_has_perm class_identification_url learning_class_year.used_by_learning_units_year 'learning_unit.view_learningclassyear' user %}
+                            {% a_tag_has_perm class_identification_url learning_class_year.effective_class_complete_acronym 'learning_unit.view_learningclassyear' user %}
                         </td>
                         <td colspan="2">
                             {{ learning_class_year.title_fr }}
                         </td>
                         <td>
-                            {% with "/ "|add:component.learning_component_year.type_letter_acronym|add:" - "|add:learning_class_year.acronym as class_code %}
-                                {% a_tag_has_perm class_identification_url class_code 'learning_unit.view_learningclassyear' user %}
-                            {% endwith %}
                         </td>
                         <td>{{ learning_class_year.hourly_volume_partial_q1 | floatformat | default_if_none:'' }}</td>
                         <td>{{ learning_class_year.hourly_volume_partial_q2 | floatformat | default_if_none:''}}</td>
