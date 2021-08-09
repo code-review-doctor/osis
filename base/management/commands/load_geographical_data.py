@@ -6,18 +6,26 @@ from django.db.models import Q
 
 from reference.models.continent import Continent
 from reference.models.country import Country
+from reference.models.zipcode import ZipCode
 
-COUNTRY_PATH = 'base/fixtures/countries.csv'
+PATH = 'base/fixtures/{file_name}'
+COUNTRY_FILE = 'countries.csv'
+ZIPCODE_FILE = 'belgium_zipcode.csv'
 
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('--debug', nargs='?', default=False, type=bool)
+        parser.add_argument('--countries', nargs='?', default=True)
+        parser.add_argument('--zipcodes', nargs='?', default=True)
 
     def handle(self, *args, **kwargs):
         debug = kwargs['debug']
-        self.create_antarctica_continent()
-        self.load_countries(debug)
+        if kwargs['countries'] is True:
+            self.create_antarctica_continent()
+            self.load_countries(debug)
+        if kwargs['zipcodes'] is True:
+            self.load_belgium_zipcodes()
 
     @staticmethod
     def create_antarctica_continent() -> Continent:
@@ -31,7 +39,8 @@ class Command(BaseCommand):
     def load_countries(self, debug: bool):
         created_countries, total = 0, 0
         print("===== Loading countries =====\n")
-        with open(COUNTRY_PATH, newline='') as csvfile:
+        country_path = PATH.format(file_name=COUNTRY_FILE)
+        with open(country_path, newline='') as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             for row in reader:
                 iso_code, defaults_value = self._get_iso_code_and_default_values(row)
@@ -74,3 +83,23 @@ class Command(BaseCommand):
                 'continent_id': Continent.objects.get(code=continent_code).id
             })
         return iso_code, defaults_value
+
+    @staticmethod
+    def load_belgium_zipcodes():
+        zip_to_create = []
+        belgium = Country.objects.get(iso_code='BE')
+        print("===== Loading belgium zip codes =====\n")
+        zip_path = PATH.format(file_name=ZIPCODE_FILE)
+        with open(zip_path, newline='') as csvfile:
+            reader = csv.reader(csvfile, delimiter=',')
+            for row in reader:
+                zip_code, municipality = row
+                zip_object = ZipCode(
+                    zip_code=zip_code,
+                    municipality=municipality,
+                    country_id=belgium.id
+                )
+                print("Creating Zipcode {zip}".format(zip=zip_object))
+                zip_to_create.append(zip_object)
+        ZipCode.objects.bulk_create(zip_to_create, batch_size=1000)
+        print("\n===== {n} zipcodes created =====".format(n=len(zip_to_create)))
