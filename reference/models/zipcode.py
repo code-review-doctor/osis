@@ -37,11 +37,11 @@ class ZipCodeAdmin(osis_model_admin.OsisModelAdmin):
 
 class ZipCode(models.Model):
     zip_code = models.CharField(max_length=255)
-    municipality = models.CharField(max_length=255, unique=True)
+    municipality = models.CharField(max_length=255)
     country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "{} - {}".format(self.zip_code, self.municipality)
+        return "{} - {} ({})".format(self.zip_code, self.municipality, self.country.iso_code)
 
     class Meta:
         ordering = ('zip_code',)
