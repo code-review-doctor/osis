@@ -23,36 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Set
 
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
+    IContactFeuilleDeNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 
 
-class InMemoryGenericRepository(interface.AbstractRepository):
-    entities = list()  # type: List[RootEntity]
+class ContactFeuilleDeNotesTranslatorInMemory(IContactFeuilleDeNotesTranslator):
+
+    contacts = {
+        AdresseFeuilleDeNotesDTO(
+            nom_cohorte='DROI1BA',
+            destinataire='Faculté de Droit',
+            rue_et_numero='Rue de la Fac, 19',
+            code_postal='1321',
+            ville='Louvain-La-Neuve',
+            pays='Belgique',
+            telephone='0106601122',
+            fax='0106601123',
+            email='email-fac-droit@email.be',
+        ),
+    }
 
     @classmethod
-    def get(cls, entity_id: 'EntityIdentity') -> 'RootEntity':
-        return next(
-            (entity for entity in cls.entities if entity.entity_id == entity_id),
-            None
+    def search(
+            cls,
+            noms_cohortes: Set[str]
+    ) -> Set['AdresseFeuilleDeNotesDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, noms_cohortes),
+                cls.contacts,
+            )
         )
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
-        raise NotImplementedError
 
-    @classmethod
-    def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
-        cls.entities.remove(next(ent for ent in cls.entities if ent.entity_id == entity_id))
-
-    @classmethod
-    def save(cls, entity: 'RootEntity') -> None:
-        if entity in cls.entities:
-            cls.entities.remove(entity)
-        cls.entities.append(entity)
-
-    @classmethod
-    def get_all_identities(cls) -> List['EntityIdentity']:
-        return [entity.entity_id for entity in cls.entities]
+def _filter(dto, cohortes: Set[str]):
+    return dto.nom_cohorte in cohortes

@@ -23,36 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Set
 
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO
 
 
-class InMemoryGenericRepository(interface.AbstractRepository):
-    entities = list()  # type: List[RootEntity]
-
-    @classmethod
-    def get(cls, entity_id: 'EntityIdentity') -> 'RootEntity':
-        return next(
-            (entity for entity in cls.entities if entity.entity_id == entity_id),
-            None
-        )
+class DeliberationTranslator(IDeliberationTranslator):
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
+    def search(
+            cls,
+            annee: int,
+            session: int,
+            noms_cohortes: Set[str],
+    ) -> Set['DeliberationDTO']:
         raise NotImplementedError
-
-    @classmethod
-    def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
-        cls.entities.remove(next(ent for ent in cls.entities if ent.entity_id == entity_id))
-
-    @classmethod
-    def save(cls, entity: 'RootEntity') -> None:
-        if entity in cls.entities:
-            cls.entities.remove(entity)
-        cls.entities.append(entity)
-
-    @classmethod
-    def get_all_identities(cls) -> List['EntityIdentity']:
-        return [entity.entity_id for entity in cls.entities]

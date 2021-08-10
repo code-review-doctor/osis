@@ -63,7 +63,7 @@ class InscriptionExamenTranslatorInMemory(IInscriptionExamenTranslator):
     ) -> Set['DesinscriptionExamenDTO']:
         return set(
             filter(
-                lambda dto: _filter(dto, code_unite_enseignement, annee),
+                lambda dto: _filter(dto, {code_unite_enseignement}, annee),
                 cls.desinscrits,
             )
         )
@@ -77,12 +77,25 @@ class InscriptionExamenTranslatorInMemory(IInscriptionExamenTranslator):
     ) -> Set['InscriptionExamenDTO']:
         return set(
             filter(
-                lambda dto: _filter(dto, code_unite_enseignement, annee),
+                lambda dto: _filter(dto, {code_unite_enseignement}, annee),
+                cls.inscrits,
+            )
+        )
+
+    @classmethod
+    def search_inscrits_pour_plusieurs_unites_enseignement(
+            cls,
+            codes_unites_enseignement: Set[str],
+            numero_session: int,
+            annee: int,
+    ) -> Set['InscriptionExamenDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, codes_unites_enseignement, annee),
                 cls.inscrits,
             )
         )
 
 
-def _filter(dto, code_unite_enseignement, annee):
-    return dto.code_unite_enseignement == code_unite_enseignement \
-           and dto.annee == annee
+def _filter(dto, codes_unite_enseignement: Set[str], annee):
+    return dto.code_unite_enseignement in codes_unite_enseignement and dto.annee == annee

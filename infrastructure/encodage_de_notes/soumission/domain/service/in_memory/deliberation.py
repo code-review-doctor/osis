@@ -23,36 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Set
 
-from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO, DateDTO
 
 
-class InMemoryGenericRepository(interface.AbstractRepository):
-    entities = list()  # type: List[RootEntity]
+class DeliberationTranslatorInMemory(IDeliberationTranslator):
+
+    deliberations = {
+        DeliberationDTO(
+            annee=2020,
+            session=2,
+            nom_cohorte='DROI1BA',
+            date=DateDTO(
+                jour=15,
+                mois=6,
+                annee=2020,
+            ),
+        ),
+    }
 
     @classmethod
-    def get(cls, entity_id: 'EntityIdentity') -> 'RootEntity':
-        return next(
-            (entity for entity in cls.entities if entity.entity_id == entity_id),
-            None
+    def search(
+            cls,
+            annee: int,
+            session: int,
+            noms_cohortes: Set[str],
+    ) -> Set['DeliberationDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, annee, session, noms_cohortes),
+                cls.deliberations,
+            )
         )
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
-        raise NotImplementedError
 
-    @classmethod
-    def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
-        cls.entities.remove(next(ent for ent in cls.entities if ent.entity_id == entity_id))
+def _filter(dto, annee: int, session: int, noms_cohortes: Set[str]):
+    return dto.nom_cohorte in noms_cohortes and dto.annee == annee and dto.session == session
 
-    @classmethod
-    def save(cls, entity: 'RootEntity') -> None:
-        if entity in cls.entities:
-            cls.entities.remove(entity)
-        cls.entities.append(entity)
-
-    @classmethod
-    def get_all_identities(cls) -> List['EntityIdentity']:
-        return [entity.entity_id for entity in cls.entities]

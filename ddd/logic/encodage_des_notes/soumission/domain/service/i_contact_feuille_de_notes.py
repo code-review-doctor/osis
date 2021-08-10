@@ -24,14 +24,10 @@
 #
 ##############################################################################
 import abc
-from typing import Set, List, Tuple
+from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO, ContactFeuilleDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from osis_common.ddd import interface
-
-
-CodeUniteEnseignement = str
-Annee = int
 
 
 class IContactFeuilleDeNotesTranslator(interface.DomainService):
@@ -40,6 +36,6 @@ class IContactFeuilleDeNotesTranslator(interface.DomainService):
     @abc.abstractmethod
     def search(
             cls,
-            unites_enseignement: List[Tuple[CodeUniteEnseignement, Annee]]
-    ) -> Set['ContactFeuilleDeNotesDTO']:
+            noms_cohortes: Set[str]
+    ) -> Set['AdresseFeuilleDeNotesDTO']:
         raise NotImplementedError
