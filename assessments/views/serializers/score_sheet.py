@@ -104,15 +104,12 @@ class _LearningUnitYearsSerializer(serializers.Serializer):
     title = serializers.CharField(read_only=True, source='feuille_de_notes.intitule_complet_unite_enseignement')
     academic_year = serializers.SerializerMethodField()
     acronym = serializers.CharField(read_only=True, source='feuille_de_notes.code_unite_enseignement')
-    decimal_scores = serializers.SerializerMethodField()
+    decimal_scores = serializers.BooleanField(read_only=True, source='feuille_de_notes.note_decimale_est_autorisee')
     scores_responsible = _ScoreResponsibleSerializer(source="*")
     programs = serializers.SerializerMethodField()
 
     def get_academic_year(self, obj) -> str:
         return display_as_academic_year(obj['feuille_de_notes'].annee_academique)
-
-    def get_decimal_scores(self, obj) -> bool:
-        return False
 
     def get_programs(self, obj):
         programs = []
