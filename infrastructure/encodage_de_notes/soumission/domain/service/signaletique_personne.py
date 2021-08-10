@@ -25,7 +25,7 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F, Prefetch, CharField, Value, Case, When
+from django.db.models import F, Prefetch
 
 from base.models.enums.person_address_type import PersonAddressType
 from base.models.person import Person
@@ -42,42 +42,6 @@ class SignaletiquePersonneTranslator(ISignaletiquePersonneTranslator):
             cls,
             matricules_fgs: Set[str]
     ) -> Set['DetailContactDTO']:
-        # qs = Person.objects.filter(
-        #     global_id__in=matricules_fgs,
-        #     personaddress__label=PersonAddressType.PROFESSIONAL.name,
-        # ).annotate(
-        #     matricule_fgs=F('global_id'),
-        #     code_postal=Case(
-        #         When(
-        #             personaddress__isnull=False,
-        #             then='personaddress__postal_code',
-        #         ),
-        #         default=Value(''),
-        #         output_field=CharField(),
-        #     ),
-        #     ville=Case(
-        #         When(
-        #             personaddress__isnull=False,
-        #             then='personaddress__city',
-        #         ),
-        #         default=Value(''),
-        #         output_field=CharField(),
-        #     ),
-        #     rue_numero_boite=Case(
-        #         When(
-        #             personaddress__isnull=False,
-        #             then='personaddress__location',
-        #         ),
-        #         default=Value(''),
-        #         output_field=CharField(),
-        #     ),
-        # ).values(
-        #     'matricule_fgs',
-        #     'email',
-        #     'code_postal',
-        #     'ville',
-        #     'rue_numero_boite',
-        # ).distinct()
         qs = Person.objects.filter(
             global_id__in=matricules_fgs,
         ).prefetch_related(
