@@ -11,6 +11,7 @@
     <mapping directory="$PROJECT_DIR$/osis_document" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/osis_history" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/osis_mail_template" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/osis_notification" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/partnership" vcs="Git" />
   </component>
 </project>

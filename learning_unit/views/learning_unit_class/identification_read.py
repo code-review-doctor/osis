@@ -25,88 +25,60 @@
 ##############################################################################
 from typing import List, Dict
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from reversion.models import Version
 
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES, COMPONENT_TYPES, DEFAULT_ACRONYM_COMPONENT
 from base.models.learning_unit_year import LearningUnitYear
-from ddd.logic.learning_unit.commands import GetLearningUnitCommand, GetEffectiveClassCommand, \
-    GetEffectiveClassWarningsCommand
+from ddd.logic.learning_unit.commands import GetEffectiveClassWarningsCommand
+from ddd.logic.learning_unit.domain.model._volumes_repartition import Volumes
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnit
 from ddd.logic.shared_kernel.campus.commands import GetCampusCommand
-from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus
+from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampus, UclouvainCampusIdentity
 from ddd.logic.shared_kernel.language.commands import GetLanguageCommand
+from ddd.logic.shared_kernel.language.domain.model.language import Language
 from infrastructure.messages_bus import message_bus_instance
 from learning_unit.forms.classes.update import DeleteClassForm
 from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.views.learning_unit_class.common import CommonClassView
 
 
-class ClassIdentificationView(PermissionRequiredMixin, TemplateView):
+class ClassIdentificationView(CommonClassView, TemplateView):
     template_name = "class/identification_tab.html"
     permission_required = 'learning_unit.view_learningclassyear'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        learning_unit = self.get_learning_unit()
-        effective_class = self.get_effective_class()
-        learning_unit_year = self.get_learning_unit_year()
         context.update(
             {
-                'learning_unit_year': learning_unit_year,
-                'learning_unit': learning_unit,
-                'effective_class': effective_class,
+                'learning_unit_year': self.learning_unit_year,
+                'learning_unit': self.learning_unit,
+                'effective_class': self.effective_class,
                 'show_button': True,
-                'class_type': get_class_type(learning_unit),
-                'volumes': get_volumes(learning_unit),
-                'history': get_related_history(learning_unit_year, effective_class),
+                'class_type': get_class_type(self.learning_unit),
+                'volumes': get_volumes(self.learning_unit),
+                'history': get_related_history(self.learning_unit_year, self.effective_class),
                 'language':
                     message_bus_instance.invoke(
-                        GetLanguageCommand(code_iso=learning_unit.language_id.code_iso)
+                        GetLanguageCommand(code_iso=self.learning_unit.language_id.code_iso)
                     ),  # type: Language
-                'teaching_place': get_teaching_place(effective_class.teaching_place),
-                'form_delete': DeleteClassForm(effective_class=effective_class),
-                'warnings': self.warnings
+                'teaching_place': get_teaching_place(self.effective_class.teaching_place),
+                'form_delete': DeleteClassForm(effective_class=self.effective_class),
+                'warnings': self.warnings,
+                'learning_class_year': self.get_permission_object()
             }
         )
+        context.update(self.common_url_tabs())
         return context
-
-    def get_learning_unit_year(self):
-        return LearningUnitYear.objects.get(
-            acronym=self.kwargs['learning_unit_code'],
-            academic_year__year=self.kwargs['learning_unit_year']
-        )
-
-    def get_permission_object(self):
-        return LearningClassYear.objects.filter(
-            acronym=self.kwargs['class_code'],
-            learning_component_year__learning_unit_year__academic_year__year=self.kwargs['learning_unit_year'],
-            learning_component_year__learning_unit_year__acronym=self.kwargs['learning_unit_code']
-        ).select_related(
-            'learning_component_year__learning_unit_year',
-            'learning_component_year__learning_unit_year__academic_year'
-        )
-
-    def get_learning_unit(self) -> 'LearningUnit':
-        command = GetLearningUnitCommand(code=self.kwargs['learning_unit_code'], year=self.kwargs['learning_unit_year'])
-        return message_bus_instance.invoke(command)
-
-    def get_effective_class(self) -> 'EffectiveClass':
-        command = GetEffectiveClassCommand(
-            class_code=self.kwargs['class_code'],
-            learning_unit_code=self.kwargs['learning_unit_code'],
-            learning_unit_year=self.kwargs['learning_unit_year']
-        )
-        return message_bus_instance.invoke(command)
 
     @cached_property
     def warnings(self) -> List[str]:
         command = GetEffectiveClassWarningsCommand(
-            class_code=self.kwargs['class_code'],
-            learning_unit_code=self.kwargs['learning_unit_code'],
-            learning_unit_year=self.kwargs['learning_unit_year']
+            class_code=self.class_code,
+            learning_unit_code=self.learning_unit_code,
+            learning_unit_year=self.year
         )
         return message_bus_instance.invoke(command)
 
@@ -155,7 +127,7 @@ def get_related_history(
     return versions.order_by('-revision__date_created').distinct('revision__date_created')
 
 
-def get_teaching_place(teaching_place: 'UclouvainCampus') -> UclouvainCampus:
+def get_teaching_place(teaching_place: 'UclouvainCampusIdentity') -> 'UclouvainCampus':
     return message_bus_instance.invoke(
         GetCampusCommand(uuid=teaching_place.uuid)
     )  # type: UclouvainCampus

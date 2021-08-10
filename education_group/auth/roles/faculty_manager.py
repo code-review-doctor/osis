@@ -7,6 +7,7 @@ from base.models.enums.education_group_categories import Categories
 from education_group.auth import predicates
 from education_group.auth.roles.utils import EducationGroupTypeScopeRoleMixin
 from education_group.auth.scope import Scope
+from learning_unit.auth import predicates as lu_predicates
 from osis_role.contrib import admin as osis_role_admin
 from osis_role.contrib import models as osis_role_models
 from osis_role.contrib import predicates as osis_role_predicates
@@ -201,4 +202,10 @@ class FacultyManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &
                 predicates.is_education_group_type_authorized_according_to_user_scope,
             'base.view_publish_btn': rules.always_allow,
+            'attribution.can_change_class_repartition':
+                lu_predicates.is_effective_class_edition_for_faculty_manager_period_open &
+                lu_predicates.is_user_attached_to_learning_unit_current_requirement_entity,
+            'attribution.can_delete_class_repartition':
+                lu_predicates.is_effective_class_edition_for_faculty_manager_period_open &
+                lu_predicates.is_user_attached_to_learning_unit_current_requirement_entity,
         })

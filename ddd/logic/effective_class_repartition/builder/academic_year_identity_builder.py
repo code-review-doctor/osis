@@ -23,15 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Optional
-
-from osis_common.ddd import interface
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
+from osis_common.ddd.interface import CommandRequest, EntityIdentityBuilder, DTO
 
 
-class ITutorDistributedToClass(interface.DomainService):
+class AcademicYearIdentityBuilder(EntityIdentityBuilder):
 
     @classmethod
-    @abc.abstractmethod
-    def get_first_tutor_full_name_if_exists(cls, effective_class_identity: 'EffectiveClassIdentity') -> Optional[str]:
-        pass
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'AcademicYearIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'AcademicYearIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def build_from_year(cls, year: int) -> 'AcademicYearIdentity':
+        return AcademicYearIdentity(year=year)

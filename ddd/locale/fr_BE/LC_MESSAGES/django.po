@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-21 14:15+0200\n"
+"POT-Creation-Date: 2021-07-08 17:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,11 +68,14 @@ msgstr "Le type de l'UE ne peut être ni de type mobilité, ni de type externe"
 
 msgid "Class of learning unit having enrollment can't be delete"
 msgstr ""
-"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne pouvez "
-"pas supprimer cette classe."
+"Il y a des inscriptions sur l'unité d'enseignement de la classe. Vous ne "
+"pouvez pas supprimer cette classe."
 
 msgid "Credits should be greather than 0"
 msgstr "Les crédits doivent être > 0"
+
+msgid "Distributed volume should be filled in and be greater than 0"
+msgstr "Le volume attribué doit être supérieur à 0"
 
 msgid "Following fields are required : {}"
 msgstr "Les champs suivants sont requis : {}"
@@ -120,29 +123,32 @@ msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
 "and Q2 volumes have to be completed)"
 msgstr ""
-"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les volumes Q1 et Q2 doivent avoir une valeur)"
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (les "
+"volumes Q1 et Q2 doivent avoir une valeur)"
 
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
 "Q2 volume has to be completed but not both)"
-msgstr "Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
+msgstr ""
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume Q1 ou Q2 doit avoir une valeur mais pas les deux)"
 
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
 "%(quadrimester)s volume has to be completed)"
 msgstr ""
-"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul le volume %(quadrimester)s doit avoir une "
-"valeur)"
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (seul "
+"le volume %(quadrimester)s doit avoir une valeur)"
 
 #, python-format
 msgid ""
 "The %(effective_class_complete_acronym)s volumes are inconsistent(the "
 "%(quadrimester)s volume has to be completed)"
 msgstr ""
-"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le volume %(quadrimester)s doit avoir une "
-"valeur)"
+"Les volumes de %(effective_class_complete_acronym)s sont incohérents (le "
+"volume %(quadrimester)s doit avoir une valeur)"
 
 #, python-format
 msgid ""
@@ -152,6 +158,7 @@ msgstr ""
 "La classe %(class_complete_code)s est attribuée à %(tutor_full_name)s en "
 "%(year)s"
 
+#, python-format
 msgid "The code %(ue_code)s - %(code)s already exists for %(ue)s"
 msgstr "Le code %(ue_code)s - %(code)s existe déjà pour l'UE %(ue)s"
 
@@ -185,6 +192,26 @@ msgstr ""
 "Ce cours est géré en équipe. La candidature des équipes d'enseignants "
 "s'effectue via la procédure papier."
 
+msgid "Tutor already assigned to the class"
+msgstr "L'enseignant est déjà assigné à cette classe"
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the attribution volume "
+"(%(attribution_volume)s)"
+msgstr ""
+"Le volume de %(assigned_volume)s est invalide. Il doit être >= 0, et <= au "
+"volume de la classe (%(attribution_volume)s)"
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the class volume (%(class_volume)s)"
+msgstr ""
+"Le volume de %(assigned_volume)s est invalide. Il doit être >= à 0, et <= "
+"volume de la classe (%(class_volume)s)"
+
 msgid "Volumes asked should be lower or equal to volume available"
 msgstr "Le volume demandé doit être plus petit ou égal au volume disponible"
 
@@ -211,7 +238,9 @@ msgid "You have already applied on vacant course"
 msgstr "Vous avez déjà candidaté pour cette activité"
 
 msgid "at least one class volume is greater than the volume of the LU"
-msgstr "au moins un des volumes de la classe est plus élevé que celui de l'unité d'enseignement"
+msgstr ""
+"au moins un des volumes de la classe est plus élevé que celui de l'unité "
+"d'enseignement"
 
 msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
