@@ -26,19 +26,12 @@
 from django.test import TestCase
 
 from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
-from base.models.enums import exam_enrollment_state
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
-from education_group.tests.ddd.factories.domain.training import BachelorFactory
 from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
-from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class AdresseFeuilleDeNotesTest(TestCase):

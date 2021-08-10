@@ -167,7 +167,7 @@ class AdresseDTO(interface.DTO):
 class DetailContactDTO(interface.DTO):
     matricule_fgs = attr.ib(type=str)
     email = attr.ib(type=str)
-    adresse_professionnelle = attr.ib(type=AdresseDTO)
+    adresse_professionnelle = attr.ib(type=Optional[AdresseDTO])
 
 
 @attr.s(frozen=True, slots=True)

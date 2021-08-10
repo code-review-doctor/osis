@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import Set
 
+from base.models.offer_year_calendar import OfferYearCalendar
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO
 
@@ -39,3 +40,17 @@ class DeliberationTranslator(IDeliberationTranslator):
             noms_cohortes: Set[str],
     ) -> Set['DeliberationDTO']:
         raise NotImplementedError
+        # ????
+
+        # calendar = ScoresExamSubmissionCalendar()
+        # events = calendar.get_opened_academic_events(date=datetime.date.today())
+        # if events:
+        #     event = events[0]
+        #     date_debut = event.start_date
+        #     date_fin = event.end_date
+        #     return PeriodeSoumissionNotesDTO(
+        #         annee_concernee=event.authorized_target_year,
+        #         session_concernee=event.session,
+        #         debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
+        #         fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
+        #     )
