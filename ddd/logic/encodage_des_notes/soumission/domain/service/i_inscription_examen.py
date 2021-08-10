@@ -54,7 +54,7 @@ class IInscriptionExamenTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search_inscrits_pour_plusieurs_unites_enseignement(  # TODO :: implementation
+    def search_inscrits_pour_plusieurs_unites_enseignement(
             cls,
             codes_unites_enseignement: Set[str],
             numero_session: int,
