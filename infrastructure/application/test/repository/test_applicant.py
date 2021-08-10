@@ -31,7 +31,7 @@ from django.test import TestCase
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_component_year_type
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.application.domain.model.applicant import ApplicantIdentity, Applicant
 from ddd.logic.application.domain.model._attribution import Attribution
@@ -45,11 +45,11 @@ class ApplicantRepositoryGet(TestCase):
     def setUpTestData(cls):
         cls.global_id = '7989898985'
         cls.tutor_db = TutorFactory(person__global_id=cls.global_id)
-        cls.ldroi1200 = LearningUnitYearFactory(
+        cls.ldroi1200 = LearningUnitYearFullFactory(
             acronym='LDROI1200',
             academic_year__year=2018,
             learning_container_year__acronym='LDROI1200',
-            learning_container_year__academic_year__year=2018
+            learning_container_year__academic_year__year=2018,
         )
 
         cls.attribution_practical_ldroi1200 = AttributionChargeNewFactory(

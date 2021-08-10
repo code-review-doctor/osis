@@ -93,6 +93,7 @@ urlpatterns = [
         path('employee/', EmployeeAutocomplete.as_view(), name='employee_autocomplete'),
     ])),
     url(r'^list-of-users/$', user_list.UserListView.as_view(), name='academic_actors_list'),
+    url(r'^list-of-users/xls/$', user_list.create_xls, name='xls_user_list'),
 
     url(r'^academic_actors/', include([
         url(r'^$', institution.academic_actors, name='academic_actors'),

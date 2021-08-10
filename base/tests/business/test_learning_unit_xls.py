@@ -24,23 +24,25 @@
 #
 ##############################################################################
 import datetime
+from typing import List
 
 from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-from typing import List
 
+from assessments.tests.factories.score_responsible import ClassAttributionScoreResponsibleFactory
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_class import AttributionClassFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data, _get_wrapped_cells, \
     _get_font_rows, _get_attribution_line, _add_training_data, \
     get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
-    prepare_xls_content_with_attributions, BOLD_FONT, _prepare_titles, HEADER_TEACHERS
+    prepare_xls_content_with_attributions, BOLD_FONT, _prepare_titles, HEADER_TEACHERS, _get_class_score_responsibles
 from base.business.learning_unit_xls import _get_col_letter
 from base.business.learning_unit_xls import get_significant_volume
 from base.models.entity_version import EntityVersion
@@ -59,15 +61,17 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
 from program_management.tests.factories.education_group_version import \
     ParticularTransitionEducationGroupVersionFactory, StandardEducationGroupVersionFactory
@@ -80,6 +84,10 @@ PARENT_ACRONYM = 'LBIR'
 PARENT_TITLE = 'TITLE 1'
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
+ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST = [
+        'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+        'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE'
+    ]
 
 
 class TestLearningUnitXls(TestCase):
@@ -342,7 +350,7 @@ class TestLearningUnitXls(TestCase):
 
     def test_get_data_part1(self):
         luy = self.proposal_creation_3.learning_unit_year
-        data = get_data_part1(luy, is_external_ue_list=False)
+        data = get_data_part1(learning_unit_yr=luy, effective_class=None, is_external_ue_list=False)
         self.assertEqual(data[0], luy.acronym)
         self.assertEqual(data[1], luy.academic_year.name)
         self.assertEqual(data[2], luy.complete_title)
@@ -441,18 +449,22 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             "",
+            str(_('yes')) if luy.stage_dimona else str(_('no')),
         ]
-        self.assertEqual(get_data_part2(luy, False), expected_common)
+        self.assertEqual(
+            get_data_part2(learning_unit_yr=luy, effective_class=None, with_attributions=False),
+            expected_common
+        )
         self.assertListEqual(
-            get_data_part2(luy, True)[2:],
+            get_data_part2(learning_unit_yr=luy, effective_class=None, with_attributions=True)[2:],
             _expected_attribution_data(expected_common, luy)[2:]
         )
         self.assertCountEqual(
-            get_data_part2(luy, True)[0].split(';'),
+            get_data_part2(learning_unit_yr=luy, effective_class=None, with_attributions=True)[0].split(';'),
             _expected_attribution_data(expected_common, luy)[0].split(';')
         )
         self.assertCountEqual(
-            get_data_part2(luy, True)[1].split(';'),
+            get_data_part2(learning_unit_yr=luy, effective_class=None,with_attributions=True)[1].split(';'),
             _expected_attribution_data(expected_common, luy)[1].split(';')
         )
 
@@ -589,6 +601,7 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
+            str(_('yes')) if luy.stage_dimona else str(_('no')),
             "{} ({}) - {} - {}".format(
                 self.a_group_year_parent.partial_acronym,
                 "{0:.2f}".format(self.group_element_child.relative_credits),
@@ -645,20 +658,22 @@ class TestLearningUnitXls(TestCase):
                                                                     'Q2', 'R2', 'S2', 'T2', 'U2', 'V2', 'W2', 'X2',
                                                                     'Y2', 'Z2', 'AA2', 'AB2', 'AC2', 'AD2', 'AE2']
                               )
-        self.assertCountEqual(result.get('cells_with_white_font'), ['A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3',
-                                                                    'I3', 'J3', 'K3', 'L3', 'M3', 'N3', 'O3', 'P3',
-                                                                    'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3']
+        self.assertCountEqual(result.get('cells_with_white_font'),
+                              [
+                                  'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3', 'K3', 'L3', 'M3', 'N3',
+                                  'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3'
+                              ]
                               )
         first_attribution = result.get('data')[0]
-
-        self.assertEqual(first_attribution[24], 'Dupuis Tom')
-        self.assertEqual(first_attribution[25], 'dupuis@gmail.com')
-        self.assertEqual(first_attribution[26], _("Coordinator"))
-        self.assertEqual(first_attribution[27], "")
-        self.assertEqual(first_attribution[28], 2017)
-        self.assertEqual(first_attribution[29], '')
-        self.assertEqual(first_attribution[30], 15)
-        self.assertEqual(first_attribution[31], 5)
+        self.assertEqual(first_attribution[24], _('no'))
+        self.assertEqual(first_attribution[25], 'Dupuis Tom')
+        self.assertEqual(first_attribution[26], 'dupuis@gmail.com')
+        self.assertEqual(first_attribution[27], _("Coordinator"))
+        self.assertEqual(first_attribution[28], "")
+        self.assertEqual(first_attribution[29], 2017)
+        self.assertEqual(first_attribution[30], '')
+        self.assertEqual(first_attribution[31], 15)
+        self.assertEqual(first_attribution[32], 5)
 
     def test_add_training_data_for_version(self):
         luy = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_version.pk).annotate(
@@ -676,6 +691,183 @@ class TestLearningUnitXls(TestCase):
             )
         )
         self.assertEqual(expected, formations)
+
+
+class TestLearningUnitXlsClassesDetail(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.luy = LearningUnitYearFullFactory()
+
+        entities = [
+            EntityVersionFactory(
+                start_date=datetime.datetime(1900, 1, 1),
+                end_date=None,
+                entity_type=entity_type.FACULTY,
+                entity__organization__type=organization_type.MAIN
+            ) for _ in range(4)
+        ]
+        cls.luy.entity_requirement = entities[0]
+        cls.luy.entity_allocation = entities[0]
+
+        cls.lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.luy)
+        cls.class_a = LearningClassYearFactory(learning_component_year=cls.lecturing_component, acronym="A")
+        cls.class_b = LearningClassYearFactory(learning_component_year=cls.lecturing_component, acronym="B")
+
+        cls.attribution_1 = AttributionChargeNewFactory(
+            learning_component_year=cls.lecturing_component,
+            attribution__tutor__person__last_name='Arnould'
+        )
+        cls.attribution_2 = AttributionChargeNewFactory(
+            learning_component_year=cls.lecturing_component,
+            attribution__tutor__person__last_name='Martin'
+        )
+        cls.attribution_3 = AttributionChargeNewFactory(learning_component_year=cls.lecturing_component)
+        cls.attribution_1_on_class_a = AttributionClassFactory(
+            learning_class_year=cls.class_a,
+            attribution_charge=cls.attribution_1,
+            allocation_charge=10
+        )
+        cls.attribution_2_on_class_a = AttributionClassFactory(
+            learning_class_year=cls.class_a,
+            attribution_charge=cls.attribution_2,
+            allocation_charge=20
+        )
+        cls.attribution_3_on_class_b = AttributionClassFactory(
+            learning_class_year=cls.class_b,
+            attribution_charge=cls.attribution_3,
+            allocation_charge=30
+        )
+
+        practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.luy)
+        cls.class_practical_c = LearningClassYearFactory(learning_component_year=practical_component)
+        cls.attribution_practical_1 = AttributionChargeNewFactory(learning_component_year=practical_component)
+
+        cls.entity_requirement = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        cls.entity_allocation = EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        cls.score_responsible = ClassAttributionScoreResponsibleFactory(
+            learning_unit_year=cls.luy,
+            attribution_class=cls.attribution_1_on_class_a
+        )
+
+    def test_get_data_part1_with_effective_class_for_lecturing(self):
+        luy = self.luy
+        effective_class = self.class_a
+        data = get_data_part1(learning_unit_yr=luy, effective_class=effective_class, is_external_ue_list=False)
+        # Specific class data
+        self.assertEqual(data[0], "{}-{}".format(luy.acronym, effective_class.acronym))
+        self.assertEqual(data[2], "{} - {}".format(luy.complete_title, effective_class.title_fr))
+        self.assertEqual(data[3], _('Class'))
+        self.assertEqual(data[10], "{} - {}".format(luy.complete_title_english, effective_class.title_en))
+        # UE data
+        self.assertEqual(data[1], luy.academic_year.name)
+        self.assertEqual(data[4], _('Full'))
+        self.assertEqual(data[5], luy.entity_requirement)
+        self.assertEqual(data[6], '')
+        self.assertEqual(data[7], '')
+        self.assertEqual(data[8], luy.credits)
+        self.assertEqual(data[9], luy.entity_allocation)
+
+    def test_get_data_part1_with_effective_class_for_practical_acronym_column(self):
+        luy = self.luy
+        effective_class = self.class_practical_c
+        data = get_data_part1(learning_unit_yr=luy, effective_class=effective_class, is_external_ue_list=False)
+        self.assertEqual(data[0], "{}_{}".format(luy.acronym, effective_class.acronym))
+
+    def test_get_data_part2_with_effective_class_for_lecturing(self):
+        luy = self.luy
+        effective_class = self.class_a
+
+        expected_common = [
+            dict(PERIODICITY_TYPES)[luy.periodicity],
+            str(_('yes')) if luy.status else str(_('no')),
+            effective_class.hourly_volume_partial_q1 + effective_class.hourly_volume_partial_q2,
+            effective_class.hourly_volume_partial_q1,
+            effective_class.hourly_volume_partial_q2,
+            '',
+            '',
+            '',
+            '',
+            '',
+            effective_class.get_quadrimester_display() or '',
+            effective_class.get_session_display() or '',
+            luy.language,
+            yesno(luy.stage_dimona).strip(),
+        ]
+
+        self.assertEqual(
+            get_data_part2(learning_unit_yr=luy, effective_class=effective_class, with_attributions=False),
+            expected_common
+        )
+
+    def test_get_attribution_lines_with_effective_class_for_lecturing(self):
+        qs = LearningUnitYear.objects.filter(pk=self.luy.pk).annotate(
+            entity_requirement=Subquery(self.entity_requirement),
+            entity_allocation=Subquery(self.entity_allocation),
+        )
+        result = prepare_xls_content_with_attributions(qs, 31)
+        data = result.get('data')
+
+        # 4 UE attributions = 3 attributions on lecturing + 1 on practical
+        # 3 Effective Class attributions = 2 on class a and 1 on class b
+        # 1 Line for class c without attribution
+        self.assertEqual(len(result.get('data')), 8)
+
+        # Check classes content
+        xls_class_a_attribution_1 = data[4]
+        self.assertEqual(xls_class_a_attribution_1[0], "{}-{}".format(self.luy.acronym, self.class_a.acronym))
+        self.assertEqual(xls_class_a_attribution_1[2], "{} - {}".format(self.luy.complete_title, self.class_a.title_fr))
+        self.assertEqual(xls_class_a_attribution_1[3], _('Class'))
+        self.assertEqual(xls_class_a_attribution_1[10],
+                         "{} - {}".format(self.luy.complete_title_english, self.class_a.title_en)
+                         )
+        # Check classes attributions volumes
+        self._assert_class_attribution_volumes(xls_class_a_attribution_1, self.attribution_1_on_class_a)
+        self._assert_class_attribution_volumes(data[5], self.attribution_2_on_class_a)
+        self._assert_class_attribution_volumes(data[6], self.attribution_3_on_class_b)
+
+        # Check style
+        cells_with_top_border = result.get('cells_with_top_border')
+        cells_with_white_font = result.get('cells_with_white_font')
+        # xls structure
+        # titles - line 1
+        # UE attr 1- line 2
+        # UE attr 2- line 3
+        # UE attr 3- line 4
+        # UE attr 4- line 5
+        # Class A attr 1- line 6
+        # Class A attr 2 - line 7
+        # Class B attr 1  - line 8
+        # Class C no attr - line 9
+        expected = _build_cells_ref(ALL_COLUMNS_FOR_ATTRIBUTIONS_LIST, [2, 6, 8, 9])
+        self.assertSetEqual(cells_with_top_border, expected)
+
+        expected = _build_cells_ref(
+            ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+             'V', 'W', 'X', 'Y'], [3, 4, 5, 7])
+        expected.remove('Y7')
+
+        self.assertSetEqual(
+            cells_with_white_font,
+            expected
+        )
+
+    def _assert_class_attribution_volumes(self, class_attribution_line_data, attribution_class):
+        self.assertEqual(class_attribution_line_data[30], '')
+        self.assertEqual(class_attribution_line_data[31], attribution_class.allocation_charge)
+
+    def test_get_class_score_responsibles(self):
+        score_responsibles = _get_class_score_responsibles(self.class_a)
+        self.assertEqual(len(score_responsibles), 1)
 
 
 def _expected_attribution_data(expected: List, luy: LearningUnitYear) -> List[str]:
@@ -732,6 +924,7 @@ def _expected_titles_common_part2_b() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
+        str(_('Stage-Dimona')),
     ]
 
 
@@ -762,3 +955,12 @@ def _get_persons_names(attributions):
         expected_attribution.get('person').last_name.upper(),
         expected_attribution.get('person').first_name
     ) for expected_attribution in attributions)
+
+
+def _build_cells_ref(columns, line_numbers: List[int]):
+
+    references = []
+    for line_number in line_numbers:
+        for letter in columns:
+            references.append("{}{}".format(letter, line_number))
+    return set(references)
