@@ -60,6 +60,7 @@ class LearningUnitScoreEncodingTutorFormViewTest(TestCase):
             return FeuilleDeNotesEnseignantDTO(
                 code_unite_enseignement='LEPL1509',
                 intitule_complet_unite_enseignement='Introduction au data-mining',
+                note_decimale_est_autorisee=True,
                 responsable_note=EnseignantDTO(nom="Durant", prenom="Thomas"),
                 autres_enseignants=[],
                 annee_academique=2020,
@@ -75,7 +76,6 @@ class LearningUnitScoreEncodingTutorFormViewTest(TestCase):
             'form-MIN_NUM_FORMS': '0',
             'form-MAX_NUM_FORMS': '',
         }
-
 
     def test_case_user_not_logged(self):
         self.client.logout()
