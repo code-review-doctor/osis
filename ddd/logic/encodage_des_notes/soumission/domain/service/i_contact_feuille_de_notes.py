@@ -30,7 +30,7 @@ from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDT
 from osis_common.ddd import interface
 
 
-class IContactFeuilleDeNotesTranslator(interface.DomainService):
+class IAdresseFeuilleDeNotesTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod

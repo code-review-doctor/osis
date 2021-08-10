@@ -38,8 +38,8 @@ from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleD
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.contact_feuille_de_notes import \
-    ContactFeuilleDeNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.deliberation import \
     DeliberationTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
@@ -79,7 +79,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
 
         self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
-        self.contact_feuille_notes_translator = ContactFeuilleDeNotesTranslatorInMemory()
+        self.contact_feuille_notes_translator = AdresseFeuilleDeNotesTranslatorInMemory()
         self.deliberation_translator = DeliberationTranslatorInMemory()
         self.signaletique_translator = SignaletiquePersonneTranslatorInMemory()
         self.__mock_service_bus()

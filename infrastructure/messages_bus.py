@@ -86,8 +86,8 @@ from infrastructure.application.services.applications_summary import Application
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.contact_feuille_de_notes import \
-    ContactFeuilleDeNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
@@ -215,7 +215,7 @@ class MessageBus:
         SearchAdressesFeuilleDeNotesCommand: lambda cmd: search_donnees_administratives_feuille_de_notes(
             cmd,
             PeriodeSoumissionNotesTranslator(),
-            ContactFeuilleDeNotesTranslator(),
+            AdresseFeuilleDeNotesTranslator(),
             SignaletiquePersonneTranslator(),
             InscriptionExamenTranslator(),
             ResponsableDeNotesRepository(),

@@ -27,7 +27,7 @@ import itertools
 from typing import List
 
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
-    IContactFeuilleDeNotesTranslator
+    IAdresseFeuilleDeNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
@@ -45,7 +45,7 @@ class DonneesAdministratives(interface.DomainService):
             cls,
             codes_unites_enseignement: List['str'],
             periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
-            contact_feuille_notes_translator: 'IContactFeuilleDeNotesTranslator',
+            contact_feuille_notes_translator: 'IAdresseFeuilleDeNotesTranslator',
             signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             inscr_exam_translator: 'IInscriptionExamenTranslator',
             responsable_notes_repo: 'IResponsableDeNotesRepository',

@@ -25,39 +25,48 @@
 ##############################################################################
 from typing import Set
 
+from django.db.models import F, Subquery, OuterRef
+
+from assessments.models.score_sheet_address import ScoreSheetAddress
+from base.models.education_group_year import EducationGroupYear
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
-    IContactFeuilleDeNotesTranslator
+    IAdresseFeuilleDeNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 
 
-class ContactFeuilleDeNotesTranslatorInMemory(IContactFeuilleDeNotesTranslator):
-
-    contacts = {
-        AdresseFeuilleDeNotesDTO(
-            nom_cohorte='DROI1BA',
-            destinataire='Faculté de Droit',
-            rue_et_numero='Rue de la Fac, 19',
-            code_postal='1321',
-            ville='Louvain-La-Neuve',
-            pays='Belgique',
-            telephone='0106601122',
-            fax='0106601123',
-            email='email-fac-droit@email.be',
-        ),
-    }
+class AdresseFeuilleDeNotesTranslator(IAdresseFeuilleDeNotesTranslator):
 
     @classmethod
     def search(
             cls,
             noms_cohortes: Set[str]
     ) -> Set['AdresseFeuilleDeNotesDTO']:
-        return set(
-            filter(
-                lambda dto: _filter(dto, noms_cohortes),
-                cls.contacts,
-            )
-        )
+        # TODO :: migrer les données des adresses des Entités dans ScoreSheetAddress (actuellement, c'est calculé à chaque fois à la volée...)
+        # TODO :: implémenter le filtre sur les 11BA
+        qs = ScoreSheetAddress.objects.filter(
+            education_group__educationgroupyear__acronym__in=noms_cohortes,
+        ).annotate(
+            nom_cohorte=Subquery(
+                EducationGroupYear.objects.filter(
+                    education_group_id=OuterRef('education_group_id'),
+                ).order_by('-academic_year__year').values('acronym')[:1]
+            ),
+            destinataire=F('recipient'),
+            rue_et_numero=F('location'),
+            code_postal=F('postal_code'),
+            ville=F('city'),
+            pays=F('country__name'),
+            telephone=F('phone'),
+        ).values(
+            'nom_cohorte',
+            'destinataire',
+            'rue_et_numero',
+            'code_postal',
+            'ville',
+            'pays',
+            'telephone',
+            'fax',
+            'email',
+        ).distinct()
 
-
-def _filter(dto, cohortes: Set[str]):
-    return dto.nom_cohorte in cohortes
+        return {AdresseFeuilleDeNotesDTO(**values) for values in qs}

@@ -26,15 +26,38 @@
 from typing import Set
 
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
-    IContactFeuilleDeNotesTranslator
+    IAdresseFeuilleDeNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 
 
-class ContactFeuilleDeNotesTranslator(IContactFeuilleDeNotesTranslator):
+class AdresseFeuilleDeNotesTranslatorInMemory(IAdresseFeuilleDeNotesTranslator):
+
+    contacts = {
+        AdresseFeuilleDeNotesDTO(
+            nom_cohorte='DROI1BA',
+            destinataire='Faculté de Droit',
+            rue_et_numero='Rue de la Fac, 19',
+            code_postal='1321',
+            ville='Louvain-La-Neuve',
+            pays='Belgique',
+            telephone='0106601122',
+            fax='0106601123',
+            email='email-fac-droit@email.be',
+        ),
+    }
 
     @classmethod
     def search(
             cls,
             noms_cohortes: Set[str]
     ) -> Set['AdresseFeuilleDeNotesDTO']:
-        raise NotImplementedError
+        return set(
+            filter(
+                lambda dto: _filter(dto, noms_cohortes),
+                cls.contacts,
+            )
+        )
+
+
+def _filter(dto, cohortes: Set[str]):
+    return dto.nom_cohorte in cohortes
