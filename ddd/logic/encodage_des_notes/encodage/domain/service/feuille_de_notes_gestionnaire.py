@@ -61,10 +61,12 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
             matricule_gestionnaire,
         )
 
-        notes_etudiants = []
-        for note in feuille_notes_enseignant.notes_etudiants:
+        etudiants_gestionnaire = []
+        etudiants_enseignant = feuille_notes_enseignant.notes_etudiants
+        test = sorted(etudiants_enseignant, key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
+        for note in test:
             if note.nom_cohorte in cohortes_gerees_par_gestionnaire:
-                notes_etudiants.append(
+                etudiants_gestionnaire.append(
                     NoteEtudiantDTO(
                         est_soumise=note.est_soumise,
                         echeance_enseignant=note.date_remise_de_notes,
@@ -87,7 +89,7 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
             autres_enseignants=feuille_notes_enseignant.autres_enseignants,
             annee_academique=feuille_notes_enseignant.annee_academique,
             numero_session=feuille_notes_enseignant.numero_session,
-            notes_etudiants=feuille_notes_enseignant.notes_etudiants,
+            notes_etudiants=etudiants_gestionnaire,
         )
 
 

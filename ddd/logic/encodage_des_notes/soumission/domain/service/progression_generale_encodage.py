@@ -124,7 +124,10 @@ def _search_feuille_de_notes(
         session_concerne: int,
         annee_concerne: int
         ):
-    attributions = attribution_translator.search_attributions_enseignant_par_matricule(matricule_fgs_enseignant)
+    attributions = attribution_translator.search_attributions_enseignant_par_matricule(
+        annee_concerne,
+        matricule_fgs_enseignant,
+    )
     identities = [
         FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
             numero_session=session_concerne,

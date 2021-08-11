@@ -65,6 +65,7 @@ class AttributionEnseignantTranslatorInMemory(IAttributionEnseignantTranslator):
     @classmethod
     def search_attributions_enseignant_par_matricule(
             cls,
+            annee: int,
             matricule_enseignant: str,
     ) -> Set['AttributionEnseignantDTO']:
         return set(

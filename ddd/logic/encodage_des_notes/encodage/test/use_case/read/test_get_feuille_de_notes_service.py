@@ -23,14 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from unittest import mock
 
+import attr
 from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO, \
-    AttributionEnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
+    PasGestionnaireParcoursExceptionException
+from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, PeriodeSoumissionNotesDTO
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.feuille_de_notes_enseignant import \
@@ -77,54 +80,45 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
 
         self.message_bus = message_bus_instance
 
-    def test_should_empecher_si_periode_fermee(self):
-        # TODO : to implement
-        result = self.message_bus.invoke(self.cmd)
+    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
+        hier = datetime.date.today() - datetime.timedelta(days=1)
+        date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
+        periode_fermee = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.annee,
+            session_concernee=self.numero_session,
+            debut_periode_soumission=date_dans_le_passe,
+            fin_periode_soumission=date_dans_le_passe,
+        )
+        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        periode_soumission_translator.get = lambda *args: periode_fermee
+        mock_periode_translator.return_value = periode_soumission_translator
+
+        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+            self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_utilisateur_pas_gestionnaire(self):
-        # TODO : to implement
-        result = self.message_bus.invoke(self.cmd)
+        matricule_nongestionnaire = self.matricule_enseignant
+        cmd = attr.evolve(self.cmd, matricule_fgs_gestionnaire=matricule_nongestionnaire)
+        with self.assertRaises(PasGestionnaireParcoursExceptionException):
+            self.message_bus.invoke(cmd)
 
     def test_should_renvoyer_responsable_de_notes(self):
         result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.responsable_note.nom, 'Chileng')
         self.assertEqual(result.responsable_note.prenom, 'Jean-Michel')
 
-    @mock.patch("infrastructure.messages_bus.AttributionEnseignantTranslator")
-    def test_should_ignorer_responsable_notes_dans_autres_enseignants(self, mock_attrib_translator):
-        attribution_translator = AttributionEnseignantTranslatorInMemory()
-        responsable_notes = AttributionEnseignantDTO(
-            matricule_fgs_enseignant=self.matricule_enseignant,
-            code_unite_enseignement=self.code_unite_enseignement,
-            annee=self.annee,
-            nom="Chileng",  # Responsable de notes
-            prenom="Jean-Michel"  # Responsable de notes
-        )
-        attribution_translator.search_attributions_enseignant = lambda *args, **kwargs: {responsable_notes}
-        mock_attrib_translator.return_value = attribution_translator
-        result = self.message_bus.invoke(self.cmd)
-        self.assertEqual(result.autres_enseignants, list())
-
     def test_should_renvoyer_unite_enseignement(self):
         result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.code_unite_enseignement, self.code_unite_enseignement)
         self.assertEqual(result.intitule_complet_unite_enseignement, "Intitule complet unite enseignement")
 
-    def test_should_renvoyer_autres_enseignants_ordonnes(self):
-        result = self.message_bus.invoke(self.cmd)
-        resultat_ordonne = [
-            EnseignantDTO(nom="Jolypas", prenom="Michelle"),
-            EnseignantDTO(nom="Smith", prenom="Charles"),
-            EnseignantDTO(nom="Yolo", prenom="Ana"),
-        ]
-        self.assertListEqual(resultat_ordonne, result.autres_enseignants)
-
     def test_should_renvoyer_signaletique_etudiant(self):
         result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertEqual(note_etudiant.noma, self.noma)
-        self.assertEqual(note_etudiant.nom, "Dupont")
-        self.assertEqual(note_etudiant.prenom, "Marie")
+        self.assertEqual(note_etudiant.nom, "NomEtudiant1")
+        self.assertEqual(note_etudiant.prenom, "PrenomEtudiant1")
         self.assertEqual(note_etudiant.peps.type_peps, PepsTypes.ARRANGEMENT_JURY.name)
         self.assertEqual(note_etudiant.peps.tiers_temps, True)
         self.assertEqual(note_etudiant.peps.copie_adaptee, True)
@@ -159,22 +153,8 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         expected_result = ""
         self.assertEqual(expected_result, note_etudiant.note)
 
-    # TODO :: à implémenter
-    # def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
-    #     self.repository.delete(self.feuille_de_notes.entity_id)
-    #
-    #     feuille_de_notes_with_multiple_students = FeuilleDeNotesAvecNotesManquantes(
-    #         notes={
-    #             NoteManquanteEtudiantFactory(entity_id__noma=self.noma),
-    #             NoteManquanteEtudiantFactory(entity_id__noma='99999999'),
-    #         }
-    #     )
-    #     self.repository.save(feuille_de_notes_with_multiple_students)
-    #
-    #     result = message_bus_instance.invoke(self.cmd)
-    #     self.assertEqual(len(result.notes_etudiants), 2)
-    #
-    #     self.assertEqual(result.notes_etudiants[0].nom, 'Arogan')
-    #     self.assertEqual(result.notes_etudiants[0].prenom, 'Adrien')
-    #     self.assertEqual(result.notes_etudiants[1].nom, 'Dupont')
-    #     self.assertEqual(result.notes_etudiants[1].prenom, 'Marie')
+    def test_should_renvoyer_echeance_enseignant(self):
+        result = self.message_bus.invoke(self.cmd)
+        note_etudiant = result.notes_etudiants[0]
+        expected_result = DateDTO(jour=5, mois=6, annee=2020)
+        self.assertEqual(expected_result, note_etudiant.echeance_enseignant)

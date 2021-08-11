@@ -57,7 +57,7 @@ from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGest
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
-    GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand
+    GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand, SoumettreFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
@@ -65,6 +65,8 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
     encoder_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_feuille_de_notes_service import \
+    soumettre_feuille_de_notes
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -255,6 +257,12 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             FeuilleDeNotesEnseignantTranslator(),
             CohortesDuGestionnaire(),
+        ),
+        SoumettreFeuilleDeNotesCommand: lambda cmd: soumettre_feuille_de_notes(
+            cmd,
+            FeuilleDeNotesRepository(),
+            ResponsableDeNotesRepository(),
+            PeriodeSoumissionNotesTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
