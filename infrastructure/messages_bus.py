@@ -80,7 +80,6 @@ from education_group.ddd.repository.mini_training import MiniTrainingRepository
 from education_group.ddd.repository.training import TrainingRepository
 from education_group.ddd.service.write.postpone_certificate_aims_modification_service import \
     postpone_certificate_aims_modification
-from infrastructure.learning_unit.repository.entity_repository import UclEntityRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -100,18 +99,18 @@ from infrastructure.shared_kernel.academic_year.repository.academic_year import 
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
+from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
 from program_management.ddd.command import PostponeTrainingAndRootGroupModificationWithProgramTreeCommand, \
     PostponeMiniTrainingAndRootGroupModificationWithProgramTreeCommand, UpdateAndPostponeRootGroupCommand
+from program_management.ddd.repositories import program_tree as program_tree_repo
+from program_management.ddd.repositories.report import ReportRepository
+from program_management.ddd.service.read.get_report_service import get_report
+from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 from program_management.ddd.service.write.postpone_mini_training_and_program_tree_modifications_service import \
     postpone_mini_training_and_program_tree_modifications
 from program_management.ddd.service.write.postpone_training_and_program_tree_modifications_service import \
     postpone_training_and_program_tree_modifications
 from program_management.ddd.service.write.update_and_postpone_root_group_service import update_and_postpone_root_group
-from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
-from program_management.ddd.repositories import program_tree as program_tree_repo
-from program_management.ddd.repositories.report import ReportRepository
-from program_management.ddd.service.read.get_report_service import get_report
-from program_management.ddd.service.write.bulk_update_link_service import bulk_update_and_postpone_links
 
 
 class MessageBus:
@@ -134,7 +133,7 @@ class MessageBus:
         ),
         PostponeCertificateAimsCommand: lambda cmd: postpone_certificate_aims_modification(
             cmd, AcademicYearRepository()
-        )
+        ),
         GetReportCommand: lambda cmd: get_report(cmd),
         BulkUpdateLinkCommand: lambda cmd: bulk_update_and_postpone_links(
             cmd, program_tree_repo.ProgramTreeRepository(), ReportRepository()
