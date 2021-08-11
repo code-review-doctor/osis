@@ -23,21 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from unittest import mock
 
 from django.test import SimpleTestCase
 
-from base.models.enums.peps_type import PepsTypes
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
-    SearchAdressesFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
-    AttributionEnseignantDTO, AdresseDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante
+from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, AdresseDTO
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
-    AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.deliberation import \
@@ -46,14 +38,8 @@ from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscri
     InscriptionExamenTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
     PeriodeSoumissionNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
-    SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
     SignaletiquePersonneTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.unite_enseignement import \
-    UniteEnseignementTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
-    FeuilleDeNotesInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -103,6 +89,16 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         cmd = SearchAdressesFeuilleDeNotesCommand(codes_unite_enseignement=['EXISTEPAS'])
         result = self.message_bus.invoke(cmd)
         self.assertEqual(result, list())
+
+    @mock.patch("infrastructure.messages_bus.DeliberationTranslator")
+    def test_should_renvoyer_aucune_date_deliberation(self, mock_delibe_translator):
+        translator = DeliberationTranslatorInMemory()
+        translator.search = lambda *args, **kwargs: set()
+        mock_delibe_translator.return_value = translator
+        result = self.message_bus.invoke(self.cmd)
+        dto = list(result)[0]
+        self.assertEqual(dto.sigle_formation, self.nom_cohorte)
+        self.assertIsNone(dto.date_deliberation)
 
     def test_should_renvoyer_date_deliberation(self):
         result = self.message_bus.invoke(self.cmd)

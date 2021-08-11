@@ -25,9 +25,12 @@
 ##############################################################################
 from typing import Set
 
+from django.db.models import F
+
+from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.models.offer_year_calendar import OfferYearCalendar
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO, DateDTO
 
 
 class DeliberationTranslator(IDeliberationTranslator):
@@ -39,18 +42,27 @@ class DeliberationTranslator(IDeliberationTranslator):
             session: int,
             noms_cohortes: Set[str],
     ) -> Set['DeliberationDTO']:
-        raise NotImplementedError
-        # ????
-
-        # calendar = ScoresExamSubmissionCalendar()
-        # events = calendar.get_opened_academic_events(date=datetime.date.today())
-        # if events:
-        #     event = events[0]
-        #     date_debut = event.start_date
-        #     date_fin = event.end_date
-        #     return PeriodeSoumissionNotesDTO(
-        #         annee_concernee=event.authorized_target_year,
-        #         session_concernee=event.session,
-        #         debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
-        #         fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
-        #     )
+        # TODO :: gérer date délibé des 11BA
+        qs = OfferYearCalendar.objects.filter(
+            academic_calendar__reference=AcademicCalendarTypes.DELIBERATION.name,
+            education_group_year__academic_year__year=annee,
+            academic_calendar__sessionexamcalendar__number_session=session,
+        ).annotate(
+            date=F('start_date'),
+            nom_cohorte=F('education_group_year__acronym'),
+        ).values(
+            'date',
+            'nom_cohorte',
+        ).distinct()
+        deliberation_dtos = set()
+        for values in qs:
+            datetime_delibe = values['date']
+            deliberation_dtos.add(
+                DeliberationDTO(
+                    annee=annee,
+                    session=session,
+                    nom_cohorte=values['nom_cohorte'],
+                    date=DateDTO(jour=datetime_delibe.day, mois=datetime_delibe.month, annee=datetime_delibe.year),
+                )
+            )
+        return deliberation_dtos

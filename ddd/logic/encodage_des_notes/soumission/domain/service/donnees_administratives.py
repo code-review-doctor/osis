@@ -32,7 +32,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation impor
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
     IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_personne import ISignaletiquePersonneTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_personne import \
+    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
@@ -83,10 +84,11 @@ class DonneesAdministratives(interface.DomainService):
             matric_fgs_responsable = _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_notes)
             contact_responsable_notes = signaletiques_par_matricule.get(matric_fgs_responsable)
             for nom_cohorte in cohortes_par_unite_enseignement.get(code, []):
+                deliberation = deliberation_par_cohorte.get(nom_cohorte)
                 dto = DonneesAdministrativesFeuilleDeNotesDTO(
                     sigle_formation=nom_cohorte,
                     code_unite_enseignement=code,
-                    date_deliberation=deliberation_par_cohorte[nom_cohorte].date,
+                    date_deliberation=deliberation.date if deliberation else None,
                     contact_responsable_notes=contact_responsable_notes,  # FIXME :: déplacer dans FeuilleDeNotesEnseignantDTO ?
                     contact_feuille_de_notes=adresse_par_cohorte[nom_cohorte],
                 )
