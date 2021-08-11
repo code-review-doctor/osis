@@ -29,7 +29,7 @@ from typing import List, Dict, Set, Tuple
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator

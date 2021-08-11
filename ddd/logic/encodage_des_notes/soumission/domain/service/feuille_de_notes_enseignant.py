@@ -27,7 +27,7 @@ from typing import List, Dict
 
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import Noma
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \

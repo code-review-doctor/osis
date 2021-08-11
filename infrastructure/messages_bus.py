@@ -101,10 +101,10 @@ from infrastructure.effective_class_repartition.repository.tutor import TutorRep
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import CohortesDuGestionnaire
 from infrastructure.encodage_de_notes.encodage.domain.service.feuille_de_notes_enseignant import \
     FeuilleDeNotesEnseignantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
+from infrastructure.encodage_de_notes.common_domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator

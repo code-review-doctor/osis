@@ -38,7 +38,7 @@ from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.feuille_de_notes_enseignant import \
     FeuilleDeNotesEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory

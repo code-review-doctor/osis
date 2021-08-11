@@ -42,7 +42,7 @@ from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesD
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
     FeuilleDeNotesDecimalesAutorisees, FeuilleDeNotesAvecToutesNotesSoumises, \
     FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory

@@ -32,7 +32,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesPourUneUniteEnseignement, \
     ResponsableDeNotesPourMultipleUniteEnseignements
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository

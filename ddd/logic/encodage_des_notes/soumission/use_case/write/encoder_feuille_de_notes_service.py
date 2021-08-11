@@ -30,7 +30,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes impor
 from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_feuille_de_notes import EncoderFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
     EnseignantAttribueUniteEnseignement
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator

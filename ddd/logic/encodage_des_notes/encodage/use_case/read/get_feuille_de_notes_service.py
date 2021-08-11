@@ -31,7 +31,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_gesti
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_feuille_de_notes_enseignant import \
     IFeuilleDeNotesEnseignantTranslator
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
