@@ -65,7 +65,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             filter["global_id__in"] = {str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids}
 
         if codes_unites_enseignement:
-            filter["acronym__in"] = codes_unites_enseignement
+            filter["acronym__in"] = set(codes_unites_enseignement)
 
         if annee_academique:
             filter["year"] = annee_academique

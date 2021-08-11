@@ -70,9 +70,12 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
 def _filter(entity, codes_unites_enseignement, annee_academique, feuille_notes_identities):
     matches = set()
     if codes_unites_enseignement:
-        matches.add(entity.code_unite_enseignement in codes_unites_enseignement)
-    if annee_academique:
-        matches.add(entity.annee_academique == annee_academique)
+        matches.add(
+            any(
+                entity.is_responsable_unite_enseignement(code, annee_academique)
+                for code in codes_unites_enseignement
+            )
+        )
     if feuille_notes_identities:
         matches.add(entity.entity_id in feuille_notes_identities)
     return all(matches)

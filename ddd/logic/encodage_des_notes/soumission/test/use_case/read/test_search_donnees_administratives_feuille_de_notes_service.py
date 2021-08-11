@@ -79,7 +79,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
 
         self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
-        self.contact_feuille_notes_translator = AdresseFeuilleDeNotesTranslatorInMemory()
+        self.adresse_feuille_notes_translator = AdresseFeuilleDeNotesTranslatorInMemory()
         self.deliberation_translator = DeliberationTranslatorInMemory()
         self.signaletique_translator = SignaletiquePersonneTranslatorInMemory()
         self.__mock_service_bus()
@@ -88,7 +88,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
-            ContactFeuilleDeNotesTranslator=lambda: self.contact_feuille_notes_translator,
+            AdresseFeuilleDeNotesTranslator=lambda: self.adresse_feuille_notes_translator,
             SignaletiquePersonneTranslator=lambda: self.signaletique_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,

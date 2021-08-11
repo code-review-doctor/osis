@@ -54,43 +54,33 @@ class DonneesAdministratives(interface.DomainService):
         periode_soumission_ouverte = periode_soumission_note_translator.get()
 
         responsables_de_notes = responsable_notes_repo.search(
-            codes_annees=[(code, periode_soumission_ouverte.annee_concernee) for code in codes_unites_enseignement]
+            codes_unites_enseignement=[code for code in codes_unites_enseignement],
+            annee_academique=periode_soumission_ouverte.annee_concernee,
         )
 
-        signaletiques = signaletique_personne_translator.search(
-            matricules_fgs={r.matricule_fgs_enseignant for r in responsables_de_notes}
+        signaletiques_par_matricule = _get_signaletique_par_matricule(
+            responsables_de_notes,
+            signaletique_personne_translator,
         )
-        signaletiques_par_matricule = {signal.matricule_fgs: signal for signal in signaletiques}
 
-        inscr_examens = inscr_exam_translator.search_inscrits_pour_plusieurs_unites_enseignement(
-            codes_unites_enseignement=set(codes_unites_enseignement),
-            annee=periode_soumission_ouverte.annee_concernee,
-            numero_session=periode_soumission_ouverte.session_concernee,
+        cohortes_par_unite_enseignement = _get_cohortes_par_unite_enseignement(
+            codes_unites_enseignement,
+            inscr_exam_translator,
+            periode_soumission_ouverte,
         )
-        cohortes_par_unite_enseignement = dict()
-        for inscr in inscr_examens:
-            cohortes_par_unite_enseignement.setdefault(inscr.code_unite_enseignement, set()).add(inscr.nom_cohorte)
-        noms_cohortes = {inscr.nom_cohorte for inscr in inscr_examens}
+        noms_cohortes = set(itertools.chain.from_iterable(cohortes_par_unite_enseignement.values()))
 
-        deliberations = deliberation_translator.search(
-            periode_soumission_ouverte.annee_concernee,
-            periode_soumission_ouverte.session_concernee,
+        deliberation_par_cohorte = _get_deliberation_par_cohorte(
+            deliberation_translator,
             noms_cohortes,
+            periode_soumission_ouverte,
         )
-        deliberation_par_cohorte = {delib.nom_cohorte: delib for delib in deliberations}
 
-        adresses_feuilles_de_notes = contact_feuille_notes_translator.search(noms_cohortes)
-        adresse_par_cohorte = {adresse.nom_cohorte: adresse for adresse in adresses_feuilles_de_notes}
+        adresse_par_cohorte = _get_adresse_par_cohorte(contact_feuille_notes_translator, noms_cohortes)
 
         result = []
         for code in codes_unites_enseignement:
-            matric_fgs_responsable = next(
-                (
-                    resp.matricule_fgs_enseignant for resp in responsables_de_notes
-                    if resp.is_responsable_unite_enseignement(code,  periode_soumission_ouverte.annee_concernee)
-                ),
-                None
-            )
+            matric_fgs_responsable = _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_notes)
             contact_responsable_notes = signaletiques_par_matricule.get(matric_fgs_responsable)
             for nom_cohorte in cohortes_par_unite_enseignement.get(code, []):
                 dto = DonneesAdministrativesFeuilleDeNotesDTO(
@@ -102,3 +92,47 @@ class DonneesAdministratives(interface.DomainService):
                 )
                 result.append(dto)
         return result
+
+
+def _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_notes):
+    matric_fgs_responsable = next(
+        (
+            resp.matricule_fgs_enseignant for resp in responsables_de_notes
+            if resp.is_responsable_unite_enseignement(code, periode_soumission_ouverte.annee_concernee)
+        ),
+        None
+    )
+    return matric_fgs_responsable
+
+
+def _get_adresse_par_cohorte(contact_feuille_notes_translator, noms_cohortes):
+    adresses_feuilles_de_notes = contact_feuille_notes_translator.search(noms_cohortes)
+    return {adresse.nom_cohorte: adresse for adresse in adresses_feuilles_de_notes}
+
+
+def _get_deliberation_par_cohorte(deliberation_translator, noms_cohortes, periode_soumission_ouverte):
+    deliberations = deliberation_translator.search(
+        periode_soumission_ouverte.annee_concernee,
+        periode_soumission_ouverte.session_concernee,
+        noms_cohortes,
+    )
+    return {delib.nom_cohorte: delib for delib in deliberations}
+
+
+def _get_cohortes_par_unite_enseignement(codes_unites_enseignement, inscr_exam_translator, periode_soumission_ouverte):
+    inscr_examens = inscr_exam_translator.search_inscrits_pour_plusieurs_unites_enseignement(
+        codes_unites_enseignement=set(codes_unites_enseignement),
+        annee=periode_soumission_ouverte.annee_concernee,
+        numero_session=periode_soumission_ouverte.session_concernee,
+    )
+    cohortes_par_unite_enseignement = dict()
+    for inscr in inscr_examens:
+        cohortes_par_unite_enseignement.setdefault(inscr.code_unite_enseignement, set()).add(inscr.nom_cohorte)
+    return cohortes_par_unite_enseignement
+
+
+def _get_signaletique_par_matricule(responsables_de_notes, signaletique_personne_translator):
+    signaletiques = signaletique_personne_translator.search(
+        matricules_fgs={r.matricule_fgs_enseignant for r in responsables_de_notes}
+    )
+    return {signal.matricule_fgs: signal for signal in signaletiques}
