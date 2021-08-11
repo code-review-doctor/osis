@@ -32,7 +32,7 @@ from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmi
 from base.business.academic_calendar import AcademicSessionEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
 
 

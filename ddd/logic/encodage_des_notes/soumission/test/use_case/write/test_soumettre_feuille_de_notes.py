@@ -37,9 +37,9 @@ from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleD
     FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
     FeuilleDeNotesInMemoryRepository
@@ -76,7 +76,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             'infrastructure.messages_bus',
             FeuilleDeNotesRepository=lambda: self.feuille_notes_repo,
             ResponsableDeNotesRepository=lambda: self.responsables_notes_repo,
-            PeriodeSoumissionNotesTranslator=lambda: PeriodeEncodageNotesTranslatorInMemory(),
+            PeriodeEncodageNotesTranslator=lambda: PeriodeEncodageNotesTranslatorInMemory(),
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -99,7 +99,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
         for note in feuille_de_notes_apres_soumettre.notes:
             self.assertFalse(note.est_soumise)
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_empecher_si_periode_soumission_fermee(self, mock_periode_translator):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
@@ -115,7 +115,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_empecher_si_acune_periode_soumission_trouvee(self, mock_periode_translator):
         aucune_periode_trouvee = None
         periode_soumission_translator = PeriodeEncodageNotesTranslator()

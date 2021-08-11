@@ -32,7 +32,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_
     EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
     PeriodeEncodageOuverte

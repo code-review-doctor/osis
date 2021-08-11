@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
 from osis_common.ddd import interface

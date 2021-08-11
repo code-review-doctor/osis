@@ -36,7 +36,7 @@ from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleD
     FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
@@ -78,7 +78,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             FeuilleDeNotesRepository=lambda: self.repository,
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
             UniteEnseignementTranslator=lambda: self.unite_enseignement_trans,

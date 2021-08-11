@@ -35,13 +35,13 @@ from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExa
     AttributionEnseignantDTO, PeriodeSoumissionNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
-    FeuilleDeNotesAvecToutesNotesSoumises, FeuilleDeNotesAvecNotesManquantes
+    FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
@@ -94,7 +94,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             'infrastructure.messages_bus',
             FeuilleDeNotesRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
@@ -105,7 +105,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
 
         self.message_bus = message_bus_instance
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)

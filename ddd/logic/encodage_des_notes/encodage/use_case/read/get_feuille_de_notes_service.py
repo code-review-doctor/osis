@@ -33,14 +33,14 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.i_feuille_de_notes_ens
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeEncodageOuverte
 
 
 def get_feuille_de_notes_gestionnaire(
         cmd: 'GetFeuilleDeNotesGestionnaireCommand',
-        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',  # FIXME :: domain service partagé - à déplacer
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',  # FIXME :: domain service partagé - à déplacer
         feuille_notes_enseignant_translator: 'IFeuilleDeNotesEnseignantTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',

@@ -44,7 +44,7 @@ from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleD
     FeuilleDeNotesDateLimiteRemiseAujourdhui, FeuilleDeNotesDateLimiteRemiseHier
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
     FeuilleDeNotesInMemoryRepository
@@ -77,14 +77,14 @@ class EncoderFeuilleDeNotesTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             FeuilleDeNotesRepository=lambda: self.repository,
-            PeriodeSoumissionNotesTranslator=lambda: PeriodeEncodageNotesTranslatorInMemory(),
+            PeriodeEncodageNotesTranslator=lambda: PeriodeEncodageNotesTranslatorInMemory(),
             AttributionEnseignantTranslator=lambda: AttributionEnseignantTranslatorInMemory(),
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
         self.message_bus = message_bus_instance
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
@@ -103,7 +103,7 @@ class EncoderFeuilleDeNotesTest(SimpleTestCase):
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
             self.message_bus.invoke(cmd)
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_autoriser_si_periode_ferme_aujourdhui(self, mock_periode_translator):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
@@ -125,7 +125,7 @@ class EncoderFeuilleDeNotesTest(SimpleTestCase):
             "Si la date de fermeture est aujourdhui, alors l'encodage est autorisé jusqu'à aujourdhui 23h59"
         )
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_autoriser_si_periode_ouvre_aujourdhui(self, mock_periode_translator):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
@@ -147,7 +147,7 @@ class EncoderFeuilleDeNotesTest(SimpleTestCase):
             "Si la période d'encodage ouvre aujourdhui, alors l'encodage est autorisé à partir de aujourd'hui 00h01"
         )
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_empecher_si_aucune_periode_trouvee(self, mock_periode_translator):
         aucune_periode_trouvee = None
         periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()

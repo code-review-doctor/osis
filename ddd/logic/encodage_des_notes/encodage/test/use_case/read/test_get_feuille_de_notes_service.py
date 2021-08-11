@@ -40,7 +40,7 @@ from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.feuille_
     FeuilleDeNotesEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.messages_bus import message_bus_instance
 
@@ -70,7 +70,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
             FeuilleDeNotesEnseignantTranslator=lambda: self.feuille_notes_enseignant_translator,
             CohortesDuGestionnaire=lambda: self.cohortes_gestionnaire_translator,
@@ -80,7 +80,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
 
         self.message_bus = message_bus_instance
 
-    @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
     def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
