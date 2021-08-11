@@ -40,8 +40,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.feuille_
     FeuilleDeNotesEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -61,7 +61,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
             matricule_fgs_gestionnaire=self.matricule_gestionnaire,
         )
 
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.cohortes_gestionnaire_translator = CohortesDuGestionnaireInMemory()
         self.feuille_notes_enseignant_translator = FeuilleDeNotesEnseignantTranslatorInMemory()
@@ -90,7 +90,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_fermee
         mock_periode_translator.return_value = periode_soumission_translator
 

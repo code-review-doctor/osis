@@ -25,25 +25,20 @@
 ##############################################################################
 import datetime
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
 
 
-class PeriodeSoumissionNotesTranslator(IPeriodeSoumissionNotesTranslator):
+class PeriodeEncodageNotesTranslatorInMemory(IPeriodeEncodageNotesTranslator):
+
+    periode_soumission_ouverte = PeriodeSoumissionNotesDTO(
+        annee_concernee=2020,
+        session_concernee=2,
+        debut_periode_soumission=DateDTO(jour=1, mois=1, annee=datetime.date.today().year),
+        fin_periode_soumission=DateDTO(jour=31, mois=12, annee=datetime.date.today().year),
+    )
 
     @classmethod
     def get(cls) -> 'PeriodeSoumissionNotesDTO':
-        calendar = ScoresExamSubmissionCalendar()
-        events = calendar.get_opened_academic_events(date=datetime.date.today())
-        if events:
-            event = events[0]
-            date_debut = event.start_date
-            date_fin = event.end_date
-            return PeriodeSoumissionNotesDTO(
-                annee_concernee=event.authorized_target_year,
-                session_concernee=event.session,
-                debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
-                fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
-            )
+        return cls.periode_soumission_ouverte

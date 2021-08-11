@@ -32,8 +32,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_
     EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
     PeriodeSoumissionOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
@@ -42,7 +42,7 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes impor
 def encoder_feuille_de_notes(
         cmd: 'EncoderFeuilleDeNotesCommand',
         feuille_de_note_repo: 'IFeuilleDeNotesRepository',
-        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteFeuilleDeNotes':
     # Given

@@ -27,8 +27,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_b
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeSoumissionOuverte
 from ddd.logic.encodage_des_notes.soumission.domain.service.responsable_de_notes import ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
@@ -39,7 +39,7 @@ def soumettre_feuille_de_notes(
         cmd: 'SoumettreFeuilleDeNotesCommand',
         feuille_de_note_repo: 'IFeuilleDeNotesRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
-        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
     PeriodeSoumissionOuverte().verifier(

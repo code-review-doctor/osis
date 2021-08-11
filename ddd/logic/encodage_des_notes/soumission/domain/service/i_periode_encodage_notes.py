@@ -29,7 +29,7 @@ from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesD
 from osis_common.ddd import interface
 
 
-class IPeriodeSoumissionNotesTranslator(interface.DomainService):
+class IPeriodeEncodageNotesTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod

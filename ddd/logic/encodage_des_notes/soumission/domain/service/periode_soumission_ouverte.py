@@ -25,8 +25,8 @@
 ##############################################################################
 import datetime
 
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
 from osis_common.ddd import interface
 
@@ -36,7 +36,7 @@ class PeriodeSoumissionOuverte(interface.DomainService):
     @classmethod
     def verifier(
             cls,
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator'
     ) -> None:
         periode = periode_soumission_note_translator.get()
         if not periode:

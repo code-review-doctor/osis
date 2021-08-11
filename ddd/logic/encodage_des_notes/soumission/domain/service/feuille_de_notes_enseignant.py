@@ -32,8 +32,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes impor
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
@@ -49,7 +49,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
     def get(
             feuille_de_notes: 'FeuilleDeNotes',
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',

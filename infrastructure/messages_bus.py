@@ -104,8 +104,8 @@ from infrastructure.encodage_de_notes.encodage.domain.service.feuille_de_notes_e
 from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
@@ -226,7 +226,7 @@ class MessageBus:
             cmd,
             FeuilleDeNotesRepository(),
             ResponsableDeNotesRepository(),
-            PeriodeSoumissionNotesTranslator(),
+            PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
             SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),
@@ -235,13 +235,13 @@ class MessageBus:
         EncoderFeuilleDeNotesCommand: lambda cmd: encoder_feuille_de_notes(
             cmd,
             FeuilleDeNotesRepository(),
-            PeriodeSoumissionNotesTranslator(),
+            PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
         ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
             FeuilleDeNotesRepository(),
-            PeriodeSoumissionNotesTranslator(),
+            PeriodeEncodageNotesTranslator(),
             SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),
             UniteEnseignementTranslator(),
@@ -253,7 +253,7 @@ class MessageBus:
         ),
         GetFeuilleDeNotesGestionnaireCommand: lambda cmd: get_feuille_de_notes_gestionnaire(
             cmd,
-            PeriodeSoumissionNotesTranslator(),
+            PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
             FeuilleDeNotesEnseignantTranslator(),
             CohortesDuGestionnaire(),
@@ -262,7 +262,7 @@ class MessageBus:
             cmd,
             FeuilleDeNotesRepository(),
             ResponsableDeNotesRepository(),
-            PeriodeSoumissionNotesTranslator(),
+            PeriodeEncodageNotesTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

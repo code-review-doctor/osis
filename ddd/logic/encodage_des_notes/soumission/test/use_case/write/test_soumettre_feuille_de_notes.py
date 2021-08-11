@@ -37,10 +37,10 @@ from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleD
     FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
     FeuilleDeNotesInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
@@ -76,7 +76,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             'infrastructure.messages_bus',
             FeuilleDeNotesRepository=lambda: self.feuille_notes_repo,
             ResponsableDeNotesRepository=lambda: self.responsables_notes_repo,
-            PeriodeSoumissionNotesTranslator=lambda: PeriodeSoumissionNotesTranslatorInMemory(),
+            PeriodeSoumissionNotesTranslator=lambda: PeriodeEncodageNotesTranslatorInMemory(),
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -109,7 +109,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
         )
-        periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         periode_soumission_translator.get = lambda *args: periode_fermee
         mock_periode_translator.return_value = periode_soumission_translator
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
@@ -118,7 +118,7 @@ class SoumettreFeuilleDeNotesTest(SimpleTestCase):
     @mock.patch("infrastructure.messages_bus.PeriodeSoumissionNotesTranslator")
     def test_should_empecher_si_acune_periode_soumission_trouvee(self, mock_periode_translator):
         aucune_periode_trouvee = None
-        periode_soumission_translator = PeriodeSoumissionNotesTranslator()
+        periode_soumission_translator = PeriodeEncodageNotesTranslator()
         periode_soumission_translator.get = lambda *args: aucune_periode_trouvee
         mock_periode_translator.return_value = periode_soumission_translator
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):

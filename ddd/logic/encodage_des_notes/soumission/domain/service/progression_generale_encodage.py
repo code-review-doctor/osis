@@ -31,8 +31,8 @@ from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_b
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
@@ -50,7 +50,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             matricule_fgs_enseignant: str,
             feuille_de_note_repo: 'IFeuilleDeNotesRepository',
             attribution_translator: 'IAttributionEnseignantTranslator',
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':

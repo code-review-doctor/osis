@@ -36,8 +36,8 @@ from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleD
     FeuilleDeNotesDateLimiteRemiseHierEtAujourdhui
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.unite_enseignement import \
@@ -67,7 +67,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
 
         self.cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.matricule_enseignant)
 
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
         self.unite_enseignement_trans = UniteEnseignementTranslatorInMemory()

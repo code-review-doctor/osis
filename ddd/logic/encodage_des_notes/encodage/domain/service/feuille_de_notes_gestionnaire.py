@@ -30,8 +30,8 @@ from ddd.logic.encodage_des_notes.encodage.domain.service.i_feuille_de_notes_ens
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO, NoteEtudiantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
 from osis_common.ddd import interface
 
 
@@ -42,7 +42,7 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
             cls,
             code_unite_enseignement: str,
             matricule_gestionnaire: str,
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
             feuille_notes_enseignant_translator: 'IFeuilleDeNotesEnseignantTranslator',
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
