@@ -31,7 +31,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 from osis_common.ddd import interface
 
 
-class PeriodeSoumissionOuverte(interface.DomainService):
+class PeriodeEncodageOuverte(interface.DomainService):
 
     @classmethod
     def verifier(

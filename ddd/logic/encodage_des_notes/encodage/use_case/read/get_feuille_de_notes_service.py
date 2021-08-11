@@ -35,22 +35,22 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseig
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeSoumissionOuverte
+from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeEncodageOuverte
 
 
 def get_feuille_de_notes_gestionnaire(
         cmd: 'GetFeuilleDeNotesGestionnaireCommand',
-        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',  # FIXME :: domain service partagé - à déplacer
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',  # FIXME :: domain service partagé - à déplacer
         attribution_translator: 'IAttributionEnseignantTranslator',  # FIXME :: domain service partagé - à déplacer
         feuille_notes_enseignant_translator: 'IFeuilleDeNotesEnseignantTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
 ) -> 'FeuilleDeNotesGestionnaireDTO':
-    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)  # FIXME :: domain service partagé - à déplacer
+    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)  # FIXME :: domain service partagé - à déplacer
     GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
     return FeuilleDeNotesGestionnaire().get(
         code_unite_enseignement=cmd.code_unite_enseignement,
         matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
-        periode_soumission_note_translator=periode_soumission_note_translator,
+        periode_soumission_note_translator=periode_encodage_note_translator,
         attribution_translator=attribution_translator,
         feuille_notes_enseignant_translator=feuille_notes_enseignant_translator,
         cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,

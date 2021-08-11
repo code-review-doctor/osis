@@ -31,7 +31,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_n
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeSoumissionOuverte
+from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.domain.service.progression_generale_encodage import \
     ProgressionGeneraleEncodage
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO

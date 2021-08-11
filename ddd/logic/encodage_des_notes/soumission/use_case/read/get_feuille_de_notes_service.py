@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_n
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeSoumissionOuverte
+from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
@@ -52,7 +52,7 @@ def get_feuille_de_notes(
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
 ) -> 'FeuilleDeNotesEnseignantDTO':
     # GIVEN
-    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
+    PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
     periode_soumission = periode_soumission_note_translator.get()
     feuille_notes_entity_id = FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
         numero_session=periode_soumission.session_concernee,

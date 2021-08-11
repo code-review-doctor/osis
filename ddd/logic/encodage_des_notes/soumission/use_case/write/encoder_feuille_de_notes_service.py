@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseig
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
-    PeriodeSoumissionOuverte
+    PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
@@ -46,7 +46,7 @@ def encoder_feuille_de_notes(
         attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
-    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
+    PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
     EnseignantAttribueUniteEnseignement().verifier(
         cmd.code_unite_enseignement,
         cmd.annee_unite_enseignement,
