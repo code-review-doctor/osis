@@ -25,15 +25,35 @@
 ##############################################################################
 from typing import Set
 
+from django.db.models import Subquery, OuterRef, F
+
+from base.auth.roles.program_manager import ProgramManager
+from base.models.education_group_year import EducationGroupYear
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
 
 
-class CohortesDuGestionnaire(ICohortesDuGestionnaire):
+class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
 
     @classmethod
     def search(
             cls,
             matricule_gestionnaire: str,
     ) -> Set['CohorteGestionnaireDTO']:
-        raise NotImplementedError
+        # TODO :: intégrer 11BA
+        qs = ProgramManager.objects.filter(
+            person__global_id=matricule_gestionnaire
+        ).annotate(
+            nom_cohorte=Subquery(
+                EducationGroupYear.objects.filter(
+                    education_group_id=OuterRef('education_group_id')
+                ).order_by(
+                    '-academic_year__year'
+                ).values('acronym')[:1]
+            ),
+            matricule_gestionnaire=F('person__global_id'),
+        ).values(
+            'nom_cohorte',
+            'matricule_gestionnaire',
+        )
+        return {CohorteGestionnaireDTO(**values) for values in qs}

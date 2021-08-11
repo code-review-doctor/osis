@@ -98,7 +98,8 @@ from infrastructure.application.services.learning_unit_service import LearningUn
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
-from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import CohortesDuGestionnaire
+from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
+    CohortesDuGestionnaireTranslator
 from infrastructure.encodage_de_notes.encodage.domain.service.feuille_de_notes_enseignant import \
     FeuilleDeNotesEnseignantTranslator
 from infrastructure.encodage_de_notes.common_domain.service.attribution_enseignant import \
@@ -256,7 +257,7 @@ class MessageBus:
             PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
             FeuilleDeNotesEnseignantTranslator(),
-            CohortesDuGestionnaire(),
+            CohortesDuGestionnaireTranslator(),
         ),
         SoumettreFeuilleDeNotesCommand: lambda cmd: soumettre_feuille_de_notes(
             cmd,
