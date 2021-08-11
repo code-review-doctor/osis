@@ -55,7 +55,8 @@ class AttributionEnseignantTest(TestCase):
 
     def test_should_trouver_attribution_par_matricule(self):
         result = self.translator.search_attributions_enseignant_par_matricule(
-            self.attribution_db.tutor.person.global_id
+            self.annee,
+            self.attribution_db.tutor.person.global_id,
         )
 
         expected_result = {self._convert_attribution_db_data_to_dto(self.attribution_db)}
@@ -65,7 +66,8 @@ class AttributionEnseignantTest(TestCase):
         attribution_class = AttributionClassFactory()
 
         result = self.translator.search_attributions_enseignant_par_matricule(
-            attribution_class.attribution_charge.attribution.tutor.person.global_id
+            self.annee,
+            attribution_class.attribution_charge.attribution.tutor.person.global_id,
         )
 
         expected_result = {

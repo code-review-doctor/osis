@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.common_domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository

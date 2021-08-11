@@ -35,17 +35,17 @@ from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.common_domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 
 
 def get_feuille_de_notes_gestionnaire(
         cmd: 'GetFeuilleDeNotesGestionnaireCommand',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
-        attribution_translator: 'IAttributionEnseignantTranslator',  # FIXME :: domain service partagé - à déplacer
+        attribution_translator: 'IAttributionEnseignantTranslator',
         feuille_notes_enseignant_translator: 'IFeuilleDeNotesEnseignantTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
 ) -> 'FeuilleDeNotesGestionnaireDTO':
-    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)  # FIXME :: domain service partagé - à déplacer
+    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
     return FeuilleDeNotesGestionnaire().get(
         code_unite_enseignement=cmd.code_unite_enseignement,

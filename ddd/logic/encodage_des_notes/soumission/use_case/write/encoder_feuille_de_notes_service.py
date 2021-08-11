@@ -34,7 +34,7 @@ from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
+from ddd.logic.encodage_des_notes.common_domain.service.periode_encodage_ouverte import \
     PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
