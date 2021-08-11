@@ -38,6 +38,12 @@ class EnseignantDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
+class CohorteGestionnaireDTO(interface.DTO):
+    matricule_gestionnaire = attr.ib(type=str)
+    nom_cohorte = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class DateDTO(interface.DTO):
     jour = attr.ib(type=int)
     mois = attr.ib(type=int)

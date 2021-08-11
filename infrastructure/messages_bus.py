@@ -53,6 +53,9 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
+from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
+    get_feuille_de_notes_gestionnaire
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
     GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
@@ -93,6 +96,9 @@ from infrastructure.application.services.learning_unit_service import LearningUn
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
+from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import CohortesDuGestionnaire
+from infrastructure.encodage_de_notes.encodage.domain.service.feuille_de_notes_enseignant import \
+    FeuilleDeNotesEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
@@ -242,7 +248,14 @@ class MessageBus:
             cmd,
             ResponsableDeNotesRepository(),
             AttributionEnseignantTranslator()
-        )
+        ),
+        GetFeuilleDeNotesGestionnaireCommand: lambda cmd: get_feuille_de_notes_gestionnaire(
+            cmd,
+            PeriodeSoumissionNotesTranslator(),
+            AttributionEnseignantTranslator(),
+            FeuilleDeNotesEnseignantTranslator(),
+            CohortesDuGestionnaire(),
+        ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

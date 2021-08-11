@@ -45,11 +45,9 @@ from osis_common.ddd import interface
 
 class FeuilleDeNotesEnseignant(interface.DomainService):
 
-    @classmethod
+    @staticmethod
     def get(
-            cls,
             feuille_de_notes: 'FeuilleDeNotes',
-            matricule_fgs_enseignant: str,
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
@@ -63,7 +61,11 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
             feuille_de_notes.code_unite_enseignement,
             feuille_de_notes.annee,
         )
-        responsable_notes = _get_responsable_de_notes(matricule_fgs_enseignant, responsable_notes_repo)
+        responsable_notes = _get_responsable_de_notes(
+            feuille_de_notes.code_unite_enseignement,
+            feuille_de_notes.annee,
+            responsable_notes_repo,
+        )
         autres_enseignants = _get_autres_enseignants(attribution_translator, feuille_de_notes, responsable_notes)
 
         nomas_concernes = [note.noma for note in feuille_de_notes.notes]
@@ -159,8 +161,9 @@ def _get_autres_enseignants(
 
 
 def _get_responsable_de_notes(
-        matricule_fgs_enseignant: str,
+        code_unite_enseignement: str,
+        annee: int,
         responsable_notes_repo: 'IResponsableDeNotesRepository'
 ) -> EnseignantDTO:
-    responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
-    return responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
+    resp_notes = responsable_notes_repo.get_for_unite_enseignement(code_unite_enseignement, annee)
+    return responsable_notes_repo.get_detail_enseignant(resp_notes.entity_id)

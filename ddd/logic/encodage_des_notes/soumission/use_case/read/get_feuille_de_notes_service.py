@@ -63,7 +63,6 @@ def get_feuille_de_notes(
     # WHEN
     feuille_de_notes_dto = FeuilleDeNotesEnseignant().get(
         feuille_de_note_repo.get(feuille_notes_entity_id),
-        cmd.matricule_fgs_enseignant,
         responsable_notes_repo,
         periode_soumission_note_translator,
         inscription_examen_translator,
