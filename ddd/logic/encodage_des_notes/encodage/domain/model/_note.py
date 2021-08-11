@@ -28,20 +28,58 @@ from typing import Any
 
 import attr
 
+from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes, JustificationTypes
 from osis_common.ddd import interface
 
+NOTE_MIN = 0
+NOTE_MAX = 20
+ABSENCE_JUSTIFIEE = 'M'
+ABSENCE_INJUSTIFIEE = 'A'
+TRICHERIE = 'T'
+LETTRES_AUTORISEES = [ABSENCE_JUSTIFIEE, ABSENCE_INJUSTIFIEE, TRICHERIE]
+JUSTIFICATIONS_AUTORISEES = LETTRES_AUTORISEES + JustificationTypes.get_names()
 
+
+class NoteBuilder:
+    @staticmethod
+    def build(value: str) -> 'Note':
+        if value in LETTRES_AUTORISEES:
+            map_to_enum = {
+                ABSENCE_JUSTIFIEE: JustificationTypes.ABSENCE_UNJUSTIFIED,
+                ABSENCE_INJUSTIFIEE: JustificationTypes.ABSENCE_JUSTIFIED,
+                TRICHERIE: TutorJustificationTypes.CHEATING,
+            }
+            return Justification(value=map_to_enum[value])
+        if value in TutorJustificationTypes.get_names():
+            return Justification(value=TutorJustificationTypes[value])
+        if NoteBuilder.__is_float(value):
+            return NoteChiffree(value=float(value))
+        return NoteManquante()
+
+    @staticmethod
+    def __is_float(value) -> bool:
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
+
+
+@attr.s(slots=True, frozen=True)
 class Note(interface.ValueObject, abc.ABC):
     value = attr.ib(type=Any)
 
 
+@attr.s(slots=True, frozen=True)
 class NoteChiffree(Note):
-    value = attr.ib(type=int)
+    value = attr.ib(type=float)
 
 
+@attr.s(slots=True, frozen=True)
 class NoteManquante(Note):
-    value = ""
+    value = attr.ib(init=False, default='', type=str)
 
 
+@attr.s(slots=True, frozen=True)
 class Justification(Note):
-    value = attr.ib(type=str)  # TODO : remplacer avec Enum (avec "absence justifiée")
+    value = attr.ib(type=JustificationTypes)

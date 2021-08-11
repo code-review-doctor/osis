@@ -23,37 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from osis_common.ddd.interface import EntityIdentityBuilder, DTO
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    email = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+class NoteEtudiantIdentityBuilder(EntityIdentityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'EncoderNoteCommand') -> 'IdentiteNoteEtudiant':
+        raise NotImplementedError
 
+    @classmethod
+    def build_from_repository_dto(
+            cls,
+            dto_object: 'DTO'
+    ) -> 'IdentiteNoteEtudiant':
+        raise NotImplementedError
 
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
-
-
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+    @classmethod
+    def build(
+            cls,
+            noma: str,
+            code_unite_enseignement: str,
+            annee: int,
+            numero_session: int
+    ) -> 'IdentiteNoteEtudiant':
+        return IdentiteNoteEtudiant(
+            noma=noma,
+            code_unite_enseignement=code_unite_enseignement,
+            annee_academique=annee,
+            numero_session=numero_session,
+        )
