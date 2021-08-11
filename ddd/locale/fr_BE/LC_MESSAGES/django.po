@@ -80,6 +80,9 @@ msgstr "Date d'échéance atteinte"
 msgid "Decimal scores not authorized"
 msgstr "Notes décimales non authorisées"
 
+msgid "Distributed volume should be filled in and be greater than 0"
+msgstr "Le volume attribué doit être supérieur à 0"
+
 msgid "Following fields are required : {}"
 msgstr "Les champs suivants sont requis : {}"
 
@@ -208,6 +211,26 @@ msgid ""
 msgstr ""
 "Ce cours est géré en équipe. La candidature des équipes d'enseignants "
 "s'effectue via la procédure papier."
+
+msgid "Tutor already assigned to the class"
+msgstr "L'enseignant est déjà assigné à cette classe"
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the attribution volume "
+"(%(attribution_volume)s)"
+msgstr ""
+"Le volume de %(assigned_volume)s est invalide. Il doit être >= 0, et <= au "
+"volume de la classe (%(attribution_volume)s)"
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the class volume (%(class_volume)s)"
+msgstr ""
+"Le volume de %(assigned_volume)s est invalide. Il doit être >= à 0, et <= "
+"volume de la classe (%(class_volume)s)"
 
 msgid "Volumes asked should be lower or equal to volume available"
 msgstr "Le volume demandé doit être plus petit ou égal au volume disponible"

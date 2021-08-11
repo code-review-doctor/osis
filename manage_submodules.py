@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
 
 import os.path
 from os import path
@@ -49,13 +50,11 @@ print('')
 
 for module, git_url in modules.items():
     module_dir = os.path.join(project_dir, module)
-    specific_module_branch = default_module_branch
+    specific_module_branch = modules_branches.get(module, default_module_branch)
     if path.exists(module_dir) and path.isdir(module_dir):
         print('')
         print('Module {} exists in project directory'.format(module))
         print('Updating module {} from branch {}'.format(module, default_module_branch))
-        if module in modules_branches:
-            specific_module_branch = modules_branches.get(module)
         fetch_command = 'git fetch origin {branch}'.format(branch=specific_module_branch)
         switch_branch_command = 'git checkout {branch}'.format(branch=specific_module_branch)
         new_branch_command = 'git checkout -b {branch} origin/{branch}'.format(branch=specific_module_branch)

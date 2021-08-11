@@ -1,0 +1,75 @@
+{% extends "class_detail_layout.html" %}
+{% load i18n static %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block action_top %}
+{% endblock %}
+{% block action_bottom %}
+{% endblock %}
+
+{% block content_tab %}
+    <div role="tabpanel" class="tab-pane active" id="tutors">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>{% trans 'Tutors' %}</th>
+                <th>{% trans 'Function' %}</th>
+                <th>{% trans 'Volume' %}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for tutor in tutors %}
+                <tr>
+                    <td>{{ tutor.full_name }}</td>
+                    <td>{{ tutor.function_text }}</td>
+                    <td>
+                        {{ tutor.distributed_volume_to_class | floatformat:2 }}
+                    </td>
+                    <td>
+                        {% if can_change_attribution %}
+                            <a class="trigger_modal"
+                               data-url="{% url "edit_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </a>
+                        {% endif %}
+                        {% if can_delete_attribution %}
+                            <a class="trigger_modal"
+                               data-url="{% url "remove_class_attribution" learning_unit_year=year learning_unit_code=learning_unit_code class_code=class_code attribution_uuid=tutor.attribution_uuid %}">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_lu_tutors }}" id="manage_repartition"
+           class="btn btn-default"
+           role="button">
+            {% trans "Manage repartition" %}
+        </a>
+    </div>
+{% endblock %}

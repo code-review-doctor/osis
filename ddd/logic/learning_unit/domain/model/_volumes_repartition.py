@@ -36,6 +36,10 @@ class ClassVolumes(interface.ValueObject):
     volume_first_quadrimester = attr.ib(type=DurationUnit)
     volume_second_quadrimester = attr.ib(type=DurationUnit)
 
+    @property
+    def total_volume(self) -> DurationUnit:
+        return (self.volume_first_quadrimester or 0) + (self.volume_second_quadrimester or 0)
+
 
 @attr.s(frozen=True, slots=True)
 class Volumes(interface.ValueObject):

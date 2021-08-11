@@ -40,10 +40,19 @@ from ddd.logic.application.use_case.write.delete_application_service import dele
 from ddd.logic.application.use_case.write.renew_multiple_attributions_service import renew_multiple_attributions
 from ddd.logic.application.use_case.write.send_applications_summary import send_applications_summary
 from ddd.logic.application.use_case.write.update_application_service import update_application
-from ddd.logic.effective_class_repartition.use_case.read.has_class_repartition_service import \
-    has_class_repartition_service
-from ddd.logic.effective_class_repartition.use_case.read.has_enrollments_to_class_service import \
-    has_enrollments_to_class_service
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
+    SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
+from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
+    search_attributions_to_learning_unit
+from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
+    search_tutors_distributed_to_class
+from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
+    distribute_class_to_tutor
+from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
+    edit_class_volume_repartition_to_tutor
+from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
     GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
@@ -56,8 +65,7 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_n
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
-    HasClassRepartitionCommand, HasEnrollmentsToClassCommand, GetEffectiveClassWarningsCommand, \
-    LearningUnitSearchCommand
+    GetEffectiveClassWarningsCommand, LearningUnitSearchCommand
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
 from ddd.logic.learning_unit.use_case.read.check_can_delete_class_service import check_can_delete_effective_class
 from ddd.logic.learning_unit.use_case.read.get_effective_class_service import get_effective_class
@@ -82,6 +90,9 @@ from infrastructure.application.repository.application_calendar import Applicati
 from infrastructure.application.repository.vacant_course import VacantCourseRepository
 from infrastructure.application.services.applications_summary import ApplicationsMailSummary
 from infrastructure.application.services.learning_unit_service import LearningUnitTranslator
+from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
+    TutorAttributionToLearningUnitTranslator
+from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
@@ -92,6 +103,9 @@ from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etu
 from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsTranslator
+from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorAssignedToClassTranslator
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
@@ -120,11 +134,17 @@ class MessageBus:
         GetLearningUnitCommand: lambda cmd: get_learning_unit(cmd, LearningUnitRepository()),
         LearningUnitSearchCommand: lambda cmd: search_learning_units(cmd, LearningUnitRepository()),
         CreateEffectiveClassCommand: lambda cmd: create_effective_class(
-            cmd, LearningUnitRepository(), EffectiveClassRepository()
+            cmd, LearningUnitRepository(), EffectiveClassRepository(), StudentEnrollmentsTranslator()
         ),
-        CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(cmd, LearningUnitRepository()),
+        CanCreateEffectiveClassCommand: lambda cmd: check_can_create_effective_class(
+            cmd, LearningUnitRepository(), StudentEnrollmentsTranslator()
+        ),
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
+        SearchAttributionsToLearningUnitCommand: lambda cmd: search_attributions_to_learning_unit(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+        ),
         UpdateEffectiveClassCommand: lambda cmd: update_effective_class(
             cmd,
             LearningUnitRepository(),
@@ -135,16 +155,22 @@ class MessageBus:
         DeleteEffectiveClassCommand: lambda cmd: delete_effective_class(
             cmd,
             EffectiveClassRepository(),
-            LearningUnitRepository()
+            TutorAssignedToClassTranslator(),
+            StudentEnrollmentsTranslator(),
         ),
         CanDeleteEffectiveClassCommand: lambda cmd: check_can_delete_effective_class(
             cmd,
             EffectiveClassRepository(),
+            TutorAssignedToClassTranslator(),
+            StudentEnrollmentsTranslator(),
         ),
-        HasClassRepartitionCommand: lambda cmd: has_class_repartition_service(cmd),
-        HasEnrollmentsToClassCommand: lambda cmd: has_enrollments_to_class_service(cmd),
         GetEffectiveClassWarningsCommand: lambda cmd: get_effective_class_warnings(
             cmd, EffectiveClassRepository(), LearningUnitRepository()
+        ),
+        SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
         ),
         ApplyOnVacantCourseCommand: lambda cmd: apply_on_vacant_course(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(),
@@ -175,6 +201,18 @@ class MessageBus:
         SendApplicationsSummaryCommand: lambda cmd: send_applications_summary(
             cmd, ApplicationRepository(), ApplicationCalendarRepository(), ApplicantRepository(),
             ApplicationsMailSummary()
+        ),
+        SearchAttributionCommand: lambda cmd: get_attribution(cmd, TutorAttributionToLearningUnitTranslator()),
+        DistributeClassToTutorCommand: lambda cmd: distribute_class_to_tutor(
+            cmd,
+            TutorRepository(),
+            EffectiveClassRepository(),
+        ),
+        UnassignTutorClassCommand: lambda cmd: unassign_tutor_class(cmd, TutorRepository()),
+        EditClassVolumeRepartitionToTutorCommand: lambda cmd: edit_class_volume_repartition_to_tutor(
+            cmd,
+            TutorRepository(),
+            EffectiveClassRepository()
         ),
         GetFeuilleDeNotesCommand: lambda cmd: get_feuille_de_notes(
             cmd,

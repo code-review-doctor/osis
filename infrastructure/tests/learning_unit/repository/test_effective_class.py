@@ -88,6 +88,7 @@ class EffectiveClassRepositoryTestCase(TestCase):
         # assert lists contain same elements regardless order
         self.assertCountEqual(identities, self.class_repository.get_all_identities())
 
+    # Isn't it redundant with first test ?
     def test_get_effective_class(self):
         ue = LearningUnitYearFactory()
         class_db = LearningClassYearFactory(learning_component_year__learning_unit_year=ue)
