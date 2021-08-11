@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 14:37+0100\n"
+"POT-Creation-Date: 2021-07-30 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,141 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Academic year"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Add over the current year"
+msgstr ""
+
+msgid "Additional requirement entity 1"
+msgstr ""
+
+msgid "Additional requirement entity 2"
+msgstr ""
+
+msgid "Allocation entity"
+msgstr ""
+
+msgid "Annual volume"
+msgstr ""
+
+#, python-format
+msgid ""
+"Are you certain that you want to definitively delete the class in %(year)s ?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+msgid "Attribution entity"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
 msgid "Central manager"
 msgstr ""
 
 msgid "Central managers"
 msgstr ""
 
+msgid "Class"
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully created."
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully deleted."
+msgstr ""
+
+#, python-format
+msgid "Class %(effective_class_complete_acronym)s successfully updated."
+msgstr ""
+
+msgid "Class specific complement"
+msgstr ""
+
+msgid "Classes can only be created by a faculty manager"
+msgstr ""
+
+msgid "Code"
+msgstr ""
+
+msgid "Common part"
+msgstr ""
+
+msgid "Complete LU"
+msgstr ""
+
+msgid "Components"
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "Credits"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete class definitively"
+msgstr ""
+
+msgid "Derogation's session"
+msgstr ""
+
 msgid "Faculty manager"
 msgstr ""
 
 msgid "Faculty managers"
+msgstr ""
+
+msgid "Faculty remark (unpublished)"
+msgstr ""
+
+msgid "Formation catalogue"
+msgstr ""
+
+msgid "Full"
+msgstr ""
+
+msgid "Function"
+msgstr ""
+
+msgid "Identification"
+msgstr ""
+
+msgid "Inactive"
+msgstr ""
+
+msgid "Institution"
+msgstr ""
+
+msgid "Internship subtype"
+msgstr ""
+
+msgid "LU"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Learning location"
+msgstr ""
+
+msgid "Learning unit"
+msgstr ""
+
+msgid "Learning unit credits"
 msgstr ""
 
 msgid "Learning unit is not full"
@@ -41,22 +166,91 @@ msgid ""
 "has the following type: %(types)s"
 msgstr ""
 
+msgid "Learning units"
+msgstr ""
+
+msgid "Lecturing"
+msgstr ""
+
+msgid "Manage repartition"
+msgstr ""
+
+msgid "New class"
+msgstr ""
+
+msgid "No attributions exist for the UE"
+msgstr ""
+
 msgid "Not in period to edit description fiche."
 msgstr ""
 
 msgid "Not in period to edit force majeure section."
 msgstr ""
 
-msgid "Only letters are allowed."
+msgid "Only alphanumeric characters are allowed."
+msgstr ""
+
+msgid "Other remark (intended for publication)"
+msgstr ""
+
+msgid "Other remark in english (intended for publication)"
+msgstr ""
+
+msgid "Periodicity"
 msgstr ""
 
 msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Planned classes"
+msgstr ""
+
+msgid "Practical exercises"
+msgstr ""
+
+msgid "Professional integration"
 msgstr ""
 
 msgid "Proposal is of modification type"
 msgstr ""
 
 msgid "Proposal not in eligible state for consolidation"
+msgstr ""
+
+msgid "Quadrimester"
+msgstr ""
+
+msgid "Refer to learning unit"
+msgstr ""
+
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Repartition deleted for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Repartition edited for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Requirement entity"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Session derogation"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid ""
+"The derogation session field must be completed ONLY if you want to encode an "
+"exception in relation to the sessions calculated according to the "
+"quadrimesters."
 msgstr ""
 
 #, python-format
@@ -90,6 +284,12 @@ msgstr ""
 msgid "The proposal is not on this academic year"
 msgstr ""
 
+msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
+msgid "This effective class is not editable this period."
+msgstr ""
+
 msgid "This learning unit has an application in the future"
 msgstr ""
 
@@ -102,10 +302,16 @@ msgstr ""
 msgid "This learning unit has application this year"
 msgstr ""
 
+msgid "This learning unit has application this year or in the future"
+msgstr ""
+
 msgid "This learning unit has attribution"
 msgstr ""
 
 msgid "This learning unit has attribution this year"
+msgstr ""
+
+msgid "This learning unit has attribution this year or in the future"
 msgstr ""
 
 msgid "This learning unit has teachers"
@@ -135,6 +341,51 @@ msgid ""
 "is not among those types: %(types)s"
 msgstr ""
 
+msgid "Title"
+msgstr ""
+
+msgid "Title in English"
+msgstr ""
+
+msgid "Title in French"
+msgstr ""
+
+msgid "Tutor"
+msgstr ""
+
+msgid "Tutor already assigned to the class"
+msgstr ""
+
+msgid "Tutors"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Vol. Q1"
+msgstr ""
+
+msgid "Vol. Q2"
+msgstr ""
+
+msgid "Vol. annual"
+msgstr ""
+
+msgid "Volume"
+msgstr ""
+
+msgid "Volume Q1"
+msgstr ""
+
+msgid "Volume Q2"
+msgstr ""
+
+msgid "Yes, I confirm."
+msgstr ""
+
 msgid "You are not allowed to create proposal during this academic year"
 msgstr ""
 
@@ -159,6 +410,17 @@ msgid ""
 "entity"
 msgstr ""
 
+msgid ""
+"You can only modify an effective class when your are linked to learning unit "
+"requirement entity"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can't modify effective class under year : %(year)d. Modifications should "
+"be made in EPC under year %(year)d"
+msgstr ""
+
 #, python-format
 msgid ""
 "You can't modify learning unit under year : %(year)d. Modifications should "
@@ -174,4 +436,16 @@ msgid "You cannot edit this type of learning unit"
 msgstr ""
 
 msgid "You cannot modify a learning unit of a previous year"
+msgstr ""
+
+msgid "You do not have sufficient access rights to update a class."
+msgstr ""
+
+msgid "external acronym rules"
+msgstr ""
+
+msgid "hourly volume partial q1"
+msgstr ""
+
+msgid "hourly volume partial q2"
 msgstr ""

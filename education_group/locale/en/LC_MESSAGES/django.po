@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-29 11:03+0200\n"
+"POT-Creation-Date: 2021-06-30 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,9 @@ msgid "ARES study code"
 msgstr ""
 
 msgid "ARES-GRACA"
+msgstr ""
+
+msgid "Abbreviated title"
 msgstr ""
 
 msgid "Ac yr."
@@ -246,6 +249,9 @@ msgstr ""
 msgid "Code co-graduation inter CfB"
 msgstr ""
 
+msgid "Cohort year"
+msgstr ""
+
 msgid "Comment"
 msgstr ""
 
@@ -300,6 +306,12 @@ msgid "Contact has been created (with postpone)"
 msgstr ""
 
 msgid "Contact has been created (without postpone)"
+msgstr ""
+
+msgid "Contact has been moved (with postpone)"
+msgstr ""
+
+msgid "Contact has been moved (without postpone)"
 msgstr ""
 
 msgid "Contact has been removed (with postpone)"
@@ -440,12 +452,19 @@ msgstr ""
 msgid "Faculty managers"
 msgstr ""
 
+msgid "Fill program tree content from last year"
+msgstr ""
+
+msgid "First year bachelor"
+msgstr ""
+
 msgid "For all students"
 msgstr ""
 
 msgid ""
-"For formation of types : PhD, attestation, certificate, university certificate and CAPAES; "
-"the fields 'ARES study code' and 'ARES ability' have to be filled-in or none of the ARES fields"
+"For formation of types : PhD, attestation, certificate, university "
+"certificate and CAPAES; the fields 'ARES study code' and 'ARES ability' have "
+"to be filled-in or none of the ARES fields"
 msgstr ""
 
 msgid "Foreign Bachelors"
@@ -622,8 +641,14 @@ msgstr ""
 msgid "Modify order of condition"
 msgstr ""
 
+msgid "Modify order of the contacts"
+msgstr ""
+
 #, python-brace-format
 msgid "Multiple entities {entity_acronym} found in {year}"
+msgstr ""
+
+msgid "Name"
 msgstr ""
 
 msgid "New Education Group"
@@ -657,9 +682,6 @@ msgid "Other languages activities"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
-msgstr ""
-
-msgid "Own comment"
 msgstr ""
 
 msgid "Partial deliberation"
@@ -855,6 +877,9 @@ msgid "There can only be one type 2 expectation"
 msgstr ""
 
 msgid "This education group is not editable during this period."
+msgstr ""
+
+msgid "This education group is not editable in the past."
 msgstr ""
 
 msgid "Title"

@@ -77,21 +77,18 @@ class TestSearchForm(TestCase):
         })
         form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
-                                      (_('Req. Entity'), "INFO"),
-                                      (_('Tutor'), "Jean Marcel")]
+        expected_research_criteria = [(_('Req.Entity'), "INFO"), (_('Tutor'), "Jean Marcel")]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
     def test_get_research_criteria_with_choice_field(self):
         self.data.update({
-            "academic_year": str(self.academic_years[0].id),
+            "academic_year": str(self.academic_years[0].year),
             "container_type": learning_container_year_types.COURSE
         })
         form = LearningUnitFilter(self.data).form
         self.assertTrue(form.is_valid())
-        expected_research_criteria = [(_('Ac yr.'), self.academic_years[0]),
-                                      (_('Type'), _("Course"))]
+        expected_research_criteria = [(_('Type'), _("Course"))]
         actual_research_criteria = get_research_criteria(form)
         self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
@@ -166,7 +163,7 @@ class TestSearchForm(TestCase):
         campus_form_choices = list(form.fields["campus"].choices)
         self.assertEqual(campus_form_choices[0], ('', '---------'))
         self.assertEqual(campus_form_choices[1][1], 'organization 1')
-        self.assertEqual(campus_form_choices[2], (campus_3.id, 'organization 2'))
+        self.assertEqual(campus_form_choices[2][1], 'organization 2')
 
         city_form_choices = list(form.fields['city'].choices)
         self.assertEqual(city_form_choices,

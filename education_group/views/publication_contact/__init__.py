@@ -23,5 +23,6 @@
 #
 ##############################################################################
 from .create import CreateEducationGroupPublicationContactView
-from .update import UpdateEducationGroupPublicationContactView, UpdateEducationGroupEntityPublicationContactView
 from .delete import EducationGroupPublicationContactDeleteView
+from .move import MoveDownEducationGroupPublicationContactView, MoveUpEducationGroupPublicationContactView
+from .update import UpdateEducationGroupPublicationContactView, UpdateEducationGroupEntityPublicationContactView

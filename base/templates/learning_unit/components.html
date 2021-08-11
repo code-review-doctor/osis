@@ -3,29 +3,30 @@
 {% load learning_unit %}
 {% load components_classes %}
 {% load waffle_tags %}
+{% load osis_role %}
 
 {% comment "License" %}
-* OSIS stands for Open Student Information System. It's an application
-* designed to manage the core business of higher education institutions,
-* such as universities, faculties, institutes and professional schools.
-* The core business involves the administration of students, teachers,
-* courses, programs and so on.
-*
-* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* A copy of this license - GNU General Public License - is available
-* at the root of the source code of this program.  If not,
-* see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block action_top %}
@@ -43,7 +44,8 @@
             <thead class="components">
             <tr>
                 <th></th>
-                <th>{% trans 'LU' %}</th>
+                <th>{% trans 'Code' %}</th>
+                <th>{% trans 'Title' %}</th>
                 <th>{% trans 'Components' %}</th>
                 <th>{% trans 'Code' %}</th>
                 <th>{% trans 'Vol. Q1' %}</th>
@@ -64,6 +66,9 @@
                 {% block additional_entities_titles %}
                     {% include "learning_unit/blocks/additional_entities_titles.html" %}
                 {% endblock %}
+                <th>{% trans 'Quadrimester' %}</th>
+                <th>{% trans "Derogation's session" %}</th>
+                <th>{% trans 'Learning location' %}</th>
                 <th></th>
             </tr>
             </thead>
@@ -85,7 +90,7 @@
                     {% if component.learning_component_year.classes %}
                         <a role="button" data-toggle="collapse"
                            href=".collapse_classes{{ forloop.counter0 }}"
-                           aria-expanded="false" aria-controls="collapse_classes{{ forloop.counter0 }}"
+                           aria-expanded="true" aria-controls="collapse_classes{{ forloop.counter0 }}"
                            style="border:0;padding:0;"
                            onclick="changeOrientation(expandButton{{ forloop.counter0 }})">
                                         <span id="expandButton{{ forloop.counter0 }}" class="glyphicon glyphicon-expand"
@@ -93,7 +98,9 @@
                         </a>
                     {% endif %}
                 </td>
-                <td>{{ component.learning_unit_usage }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.acronym }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.learning_container_year.common_title }} -
+                    {{ component.learning_component_year.learning_unit_year.specific_title | default_if_none:'' }}</td>
                 <td>{% if component.learning_component_year.type %}
                     {{ component.learning_component_year.get_type_display }}
                 {% endif %}
@@ -107,9 +114,10 @@
                 <td>{% dl_component_tooltip 'VOLUME_TOTAL' value=component.volumes.VOLUME_TOTAL default_if_none='' %}</td>
 
                 <td>
-                     {# FIXME :: Temporary solution - Waiting for real classes in OSIS #}
+                    {# FIXME :: Temporary solution - Waiting for real classes in OSIS #}
                     {% with component.learning_component_year.real_classes as real_classes %}
-                        <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:real_classes }}">
+                        <span class="badge fixed_width
+                                {{ component.learning_component_year.planned_classes |get_css_class:real_classes }}">
                                     {% if component.learning_component_year.planned_classes > 0 and real_classes == 0 %}
                                         1
                                     {% else %} {{ real_classes| default_if_none:'0' }}{% endif %} /
@@ -121,28 +129,46 @@
                 {% block additional_requirement_entity_volumes %}
                     {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
                 {% endblock %}
-                <td></td>
+                <td>
+                    {{ component.learning_component_year.learning_unit_year.get_quadrimester_display | default_if_none:'' }}</td>
+                <td>{{ component.learning_component_year.learning_unit_year.session | default_if_none:'' }}</td>
+                <td>{% if component.learning_component_year.learning_unit_year.campus %}
+                    {{ component.learning_component_year.learning_unit_year.campus.name }}{% endif %}</td>
             </tr>
             {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
-                <tr class="class_year class_year_head collapse collapse_classes{{ component_number }}">
-                    <td rowspan="{{ classes_count }}"></td>
-                    <td rowspan="{{ classes_count }}">{% trans 'Classes' %}</td>
-                    <td colspan="1">{% trans 'LU' %}</td>
-                    <td colspan="2">{% trans 'code' %}</td>
-                    <td colspan="6">{% trans 'Description' %}</td>
-                </tr>
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
-                    <tr class="class_year collapse collapse_classes{{ component_number }}">
-                        <td colspan="1">{{ learning_class_year.used_by_learning_units_year }}</td>
-                        <td colspan="2">
-                            /{% if component.learning_component_year.type_letter_acronym %}
-                            {{ component.learning_component_year.type_letter_acronym }}
+                    {% url 'class_identification' learning_unit_year.academic_year.year learning_unit_year.acronym learning_class_year.acronym as class_identification_url %}
+                    <tr class="class_year collapse collapse_classes{{ component_number }} in">
+                        {% if forloop.first %}
+                            <td><strong>{% trans 'Classes' %}</strong></td>
+                        {% else %}
+                            <td></td>
                         {% endif %}
-                            - {{ learning_class_year.acronym }}
+                        <td colspan="1">
+                            {% a_tag_has_perm class_identification_url learning_class_year.effective_class_complete_acronym 'learning_unit.view_learningclassyear' user %}
                         </td>
-                        <td colspan="6">
-                            {{ learning_class_year.description|default_if_none:'' }}
+                        <td colspan="2">
+                            {{ learning_class_year.title_fr }}
                         </td>
+                        <td>
+                        </td>
+                        <td>{{ learning_class_year.hourly_volume_partial_q1 | floatformat | default_if_none:'' }}</td>
+                        <td>{{ learning_class_year.hourly_volume_partial_q2 | floatformat | default_if_none:''}}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        {% if REQUIREMENT_ENTITY %}
+                            <td></td>
+                        {% endif %}
+                        {% if ADDITIONAL_REQUIREMENT_ENTITY_1 %}
+                            <td></td>
+                        {% endif %}
+                        {% if ADDITIONAL_REQUIREMENT_ENTITY_2 %}
+                            <td></td>
+                        {% endif %}
+                        <td>{{ learning_class_year.get_quadrimester_display | default_if_none:'' }}</td>
+                        <td>{{ learning_class_year.session | default_if_none:'' }}</td>
+                        <td>{% if learning_class_year.campus %}{{ learning_class_year.campus.name }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             {% endwith %}

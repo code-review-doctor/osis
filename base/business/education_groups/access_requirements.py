@@ -22,7 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 from django.core.exceptions import PermissionDenied
 
@@ -32,6 +32,15 @@ from base.models.education_group_year import EducationGroupYear
 
 def can_postpone_access_requirements(education_group_year: 'EducationGroupYear') -> bool:
     return not education_group_year.academic_year.is_past
+
+
+def bulk_postpone_access_requirements(education_group_years_from: List['EducationGroupYear']) -> None:
+    fields = [field.name for field in AdmissionCondition._meta.get_fields(include_parents=False)]
+    for egy in education_group_years_from:
+        try:
+            postpone_access_requirements(egy, fields)
+        except AdmissionCondition.DoesNotExist:
+            pass
 
 
 def postpone_access_requirements(education_group_year_from: "EducationGroupYear", fields: List[str]) -> None:
@@ -56,7 +65,7 @@ def _postpone_admission_condition(
 ) -> None:
     values_to_upsert = {
         field: getattr(admission_condition_to_postpone, field) for field in fields
-        if field not in ("education_group_year", "education_group_year_id")
+        if field not in ("education_group_year", "education_group_year_id", "admissionconditionline", "id")
     }
     obj, created = AdmissionCondition.objects.update_or_create(
         education_group_year=egy,
@@ -64,7 +73,18 @@ def _postpone_admission_condition(
     )
 
 
-def postpone_access_requirements_line(education_group_year_from: 'EducationGroupYear', section: 'str') -> None:
+def bulk_postpone_access_requirements_line(education_group_years_from: List['EducationGroupYear']) -> None:
+    for egy in education_group_years_from:
+        try:
+            postpone_access_requirements_line(egy, None)
+        except AdmissionConditionLine.DoesNotExist:
+            pass
+
+
+def postpone_access_requirements_line(
+        education_group_year_from: 'EducationGroupYear',
+        section: Optional['str']
+) -> None:
     if not can_postpone_access_requirements(education_group_year_from):
         raise PermissionDenied
 
@@ -73,21 +93,24 @@ def postpone_access_requirements_line(education_group_year_from: 'EducationGroup
         academic_year__year__gt=education_group_year_from.academic_year.year
     ).select_related("admissioncondition")
 
-    admission_condition_lines_to_postpone = list(AdmissionConditionLine.objects.filter(
+    admission_condition_lines_to_postpone = AdmissionConditionLine.objects.filter(
         admission_condition__education_group_year=education_group_year_from,
-        section=section
-    ))
+    )
+    if section:
+        admission_condition_lines_to_postpone = admission_condition_lines_to_postpone.filter(section=section)
+    admission_condition_lines_to_postpone = list(admission_condition_lines_to_postpone)
 
     for egy in next_qs:
         _purge_admission_lines(egy, section)
         _postpone_admission_condition_line(egy, admission_condition_lines_to_postpone)
 
 
-def _purge_admission_lines(egy: 'EducationGroupYear', section: str):
+def _purge_admission_lines(egy: 'EducationGroupYear', section: Optional[str]):
     qs = AdmissionConditionLine.objects.filter(
         admission_condition__education_group_year=egy,
-        section=section
     )
+    if section:
+        qs = qs.filter(section=section)
     for line in qs:
         line.delete()
 
@@ -96,6 +119,8 @@ def _postpone_admission_condition_line(
         egy: 'EducationGroupYear',
         admission_condition_lines_to_postpone: List['AdmissionConditionLine']
 ) -> None:
+    if not admission_condition_lines_to_postpone:
+        return
 
     egy_admission_condition, created = AdmissionCondition.objects.get_or_create(
         education_group_year=egy

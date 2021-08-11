@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ class FullForm(LearningUnitBaseForm):
         learning_unit = self.learning_unit_form.save(
             start_year=self.start_year,
             learning_container=learning_container,
-            commit=commit
+            commit=commit,
         )
 
         container_year = self.learning_container_year_form.save(
@@ -344,7 +344,9 @@ class FullForm(LearningUnitBaseForm):
                 target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
             else:
                 target_years_opened = []
-            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(
+                year__in=target_years_opened
+            ).order_by('-year')
 
     def _restrict_academic_years_choice_for_daily_management(self):
         if EntityRoleHelper.has_role(self.person, FacultyManager):
@@ -353,4 +355,6 @@ class FullForm(LearningUnitBaseForm):
             target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         else:
             target_years_opened = []
-        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(
+            year__in=target_years_opened
+        ).order_by('-year')

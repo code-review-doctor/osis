@@ -44,7 +44,6 @@ from psycopg2._psycopg import OperationalError as PsycopOperationalError, Interf
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
-from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from attribution import models as mdl_attr
 from base import models as mdl
@@ -56,7 +55,6 @@ from base.models.person import Person
 from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
@@ -85,18 +83,24 @@ def outside_period(request):
     closest_new_session_exam = mdl.session_exam_calendar.get_closest_new_session_exam()
 
     if latest_session_exam:
-        session_number = latest_session_exam.session
+        month_session = latest_session_exam.month_session_name()
         str_date = latest_session_exam.end_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING,
-                             _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
-                             % {'session_number': session_number, 'str_date': str_date})
+        messages.add_message(
+            request,
+            messages.WARNING,
+            _("The period of scores' encoding for %(month_session)s session is closed since %(str_date)s")
+            % {'month_session': month_session, 'str_date': str_date}
+        )
 
     if closest_new_session_exam:
-        session_number = closest_new_session_exam.session
+        month_session = closest_new_session_exam.month_session_name()
         str_date = closest_new_session_exam.start_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING,
-                             _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
-                             % {'session_number': session_number, 'str_date': str_date})
+        messages.add_message(
+            request,
+            messages.WARNING,
+            _("The period of scores' encoding for %(month_session)s session will be open %(str_date)s")
+            % {'month_session': month_session, 'str_date': str_date}
+        )
 
     if not messages.get_messages(request):
         messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
@@ -259,7 +263,8 @@ def online_encoding_form(request, learning_unit_year_id=None):
                 is_program_manager=context["is_program_manager"],
                 updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=_is_encoding_completed_before_update(scores_list_before_update)
+                encoding_already_completed_before_update=scores_list_before_update.
+                educ_groups_which_encoding_was_complete_before_update
             )
     else:
         context = _get_common_encoding_context(request, learning_unit_year_id)
@@ -396,7 +401,8 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
                 is_program_manager=is_program_manager,
                 updated_enrollments=updated_enrollments,
                 pgm_manager=mdl.person.find_by_user(request.user),
-                encoding_already_completed_before_update=_is_encoding_completed_before_update(scores_list_before_update)
+                encoding_already_completed_before_update=scores_list_before_update.
+                educ_groups_which_encoding_was_complete_before_update
             )
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
@@ -510,6 +516,7 @@ def __send_message_for_education_group_year(
     enrollments = filter_enrollments_by_education_group_year(all_enrollments, education_group_year)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
     offer_acronym = education_group_year.acronym
+    # TODO :: fix here
     sent_error_message = None
     if progress == 100:
         receivers = list(
@@ -589,7 +596,8 @@ def bulk_send_messages_to_notify_encoding_progress(logged_user, updated_enrollme
                 is_program_manager=is_program_manager,
                 updated_enrollments=updated_enrollments,
                 pgm_manager=pgm_manager,
-                encoding_already_completed_before_update=_is_encoding_completed_before_update(scores_list_before_update)
+                encoding_already_completed_before_update=scores_list_before_update.
+                educ_groups_which_encoding_was_complete_before_update
             )
             mail_already_sent_by_learning_unit.add(learning_unit_year)
 
@@ -774,7 +782,3 @@ def _get_count_still_enrolled(enrollments):
         if enrollment.enrollment_state == enrollment_states.ENROLLED:
             nb_enrolled += 1
     return nb_enrolled
-
-
-def _is_encoding_completed_before_update(scores_list_before_update: ScoresEncodingList) -> bool:
-    return scores_list_before_update.enrollment_encoded == scores_list_before_update.enrollments

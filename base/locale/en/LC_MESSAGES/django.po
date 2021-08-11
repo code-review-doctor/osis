@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-26 14:57+0100\n"
+"POT-Creation-Date: 2021-07-27 11:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,10 +83,31 @@ msgstr ""
 msgid "%(title)s has been updated"
 msgstr ""
 
+msgid "1"
+msgstr ""
+
+msgid "12"
+msgstr ""
+
+msgid "123"
+msgstr ""
+
+msgid "13"
+msgstr ""
+
 msgid "1st quadri"
 msgstr ""
 
+msgid "2"
+msgstr ""
+
+msgid "23"
+msgstr ""
+
 msgid "2nd quadri"
+msgstr ""
+
+msgid "3"
 msgstr ""
 
 msgid "<b>create</b> a new learning unit using that acronym"
@@ -171,6 +192,9 @@ msgid "Academic year"
 msgstr ""
 
 msgid "Accepted"
+msgstr ""
+
+msgid "Access based on application"
 msgstr ""
 
 msgid "Access condition"
@@ -285,6 +309,9 @@ msgstr ""
 msgid "Alert"
 msgstr ""
 
+msgid "All"
+msgstr ""
+
 msgctxt "female plural"
 msgid "All"
 msgstr ""
@@ -299,7 +326,7 @@ msgstr ""
 msgid "Alloc. Ent."
 msgstr ""
 
-msgid "Alloc. Entity"
+msgid "Alloc.Entity"
 msgstr ""
 
 msgid "Allocation entity"
@@ -500,6 +527,15 @@ msgstr ""
 msgid "City of institution"
 msgstr ""
 
+msgid "Class"
+msgstr ""
+
+#, python-format
+msgid ""
+"Class volumes of class %(code_ue)s%(separator)s%(code_class)s are "
+"inconsistent (Annual volume must be equal to the sum of volume Q1 and Q2)"
+msgstr ""
+
 msgid "Classes"
 msgstr ""
 
@@ -672,6 +708,9 @@ msgstr ""
 msgid "Deliberation"
 msgstr ""
 
+msgid "Derogation's session"
+msgstr ""
+
 msgid "Description"
 msgstr ""
 
@@ -718,6 +757,9 @@ msgid "Dissertation presentation"
 msgstr ""
 
 msgid "Dissertation submission"
+msgstr ""
+
+msgid "Dissertations"
 msgstr ""
 
 msgid "Do not assign"
@@ -1192,9 +1234,15 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr ""
 
+msgid "January"
+msgstr ""
+
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
+msgstr ""
+
+msgid "June"
 msgstr ""
 
 msgid "Junior year"
@@ -1207,9 +1255,6 @@ msgid "Justification"
 msgstr ""
 
 msgid "Keywords"
-msgstr ""
-
-msgid "LU"
 msgstr ""
 
 msgid "Language"
@@ -1370,6 +1415,9 @@ msgstr ""
 msgid "List proposals"
 msgstr ""
 
+msgid "List_of_users"
+msgstr ""
+
 msgid "Local credits"
 msgstr ""
 
@@ -1495,9 +1543,6 @@ msgstr ""
 msgid "Masters"
 msgstr ""
 
-msgid "Max. credits"
-msgstr ""
-
 msgid "Maximum number of permitted relationships"
 msgstr ""
 
@@ -1508,9 +1553,6 @@ msgid "Messages"
 msgstr ""
 
 msgid "Method not allowed"
-msgstr ""
-
-msgid "Min. credits"
 msgstr ""
 
 msgid "Minerval complete"
@@ -1580,6 +1622,9 @@ msgid "New Mini-Training"
 msgstr ""
 
 msgid "New Training"
+msgstr ""
+
+msgid "New class"
 msgstr ""
 
 msgid "New external learning unit"
@@ -1669,14 +1714,13 @@ msgstr ""
 msgid "Ok"
 msgstr ""
 
-msgid "On the file: direct access or access with additional training"
-msgstr ""
-"Based on application: accepted, conditional on further training, or refusal"
-
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
-msgid "Only proposals"
+msgid "Only UE in proposal"
+msgstr ""
+
+msgid "Only UE with classes"
 msgstr ""
 
 msgid "Only the volume Q1 must have a value"
@@ -1746,6 +1790,9 @@ msgid "Own components"
 msgstr ""
 
 msgid "P."
+msgstr ""
+
+msgid "P23"
 msgstr ""
 
 msgid "Page not found."
@@ -1827,6 +1874,9 @@ msgid ""
 "Please register a maximum of %(max_authorized_value)s digits in ascending "
 "order, without any duplication. Authorized values are from 1 to 6. Examples: "
 "12, 23, 46"
+msgstr ""
+
+msgid "Please report this incident to the Service Desk"
 msgstr ""
 
 msgid "Please select a country and a city first"
@@ -2047,9 +2097,6 @@ msgstr ""
 msgid "Quadrimester"
 msgstr ""
 
-msgid "Quadrimester derogation"
-msgstr ""
-
 msgid "Rate code"
 msgstr ""
 
@@ -2091,6 +2138,9 @@ msgid "Req. Entities"
 msgstr ""
 
 msgid "Req. Entity"
+msgstr ""
+
+msgid "Req.Entity"
 msgstr ""
 
 msgid "Requesting entity"
@@ -2204,6 +2254,9 @@ msgstr ""
 msgid "Separate"
 msgstr ""
 
+msgid "September"
+msgstr ""
+
 msgid "Service courses"
 msgstr ""
 
@@ -2244,6 +2297,9 @@ msgstr ""
 msgid "Sport"
 msgstr ""
 
+msgid "Stage-Dimona"
+msgstr ""
+
 msgid "Start"
 msgstr ""
 
@@ -2272,6 +2328,9 @@ msgid "Student path"
 msgstr ""
 
 msgid "Student search"
+msgstr ""
+
+msgid "Student's dissertations management"
 msgstr ""
 
 msgid "Students"
@@ -2337,6 +2396,42 @@ msgstr ""
 msgid "The"
 msgstr ""
 
+#, python-format
+msgid ""
+"The %(code_class)s derogation session is inconsistent with the LU derogation "
+"session (should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(code_class)s quadrimester is inconsistent with the LU quadrimester "
+"(should be %(should_be_values)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 "
+"and Q2 volumes have to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent (the Q1 or "
+"Q2 volume has to be completed but not both)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(only the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
+#, python-format
+msgid ""
+"The %(effective_class_complete_acronym)s volumes are inconsistent(the "
+"%(quadrimester)s volume has to be completed)"
+msgstr ""
+
 msgid "The acronym <b>already exists</b>."
 msgstr ""
 
@@ -2345,6 +2440,10 @@ msgstr ""
 
 #, python-format
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
+msgstr ""
+
+#, python-format
+msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr ""
 
 msgid "The configuration of you user profile"
@@ -2450,6 +2549,11 @@ msgid ""
 "done at consolidation"
 msgstr ""
 
+msgid ""
+"The learning unit is not a Stage-Dimona activity although it is an "
+"internship type."
+msgstr ""
+
 msgid "The learning units"
 msgstr ""
 
@@ -2475,6 +2579,15 @@ msgid "The parent is inactive and there is at least one partim active"
 msgstr ""
 
 msgid "The partim"
+msgstr ""
+
+msgid "The period to edit scores responsibles is not opened yet"
+msgstr ""
+
+#, python-format
+msgid ""
+"The planned classes number and the effective classes number of %(code_ue)s/"
+"%(component_code)s is not consistent"
 msgstr ""
 
 #, python-format
@@ -2577,7 +2690,7 @@ msgstr ""
 msgid "This field is required."
 msgstr ""
 
-msgid "This learning unit has application"
+msgid "This learning unit has application this year or in the future"
 msgstr ""
 
 #, python-format
@@ -2642,9 +2755,6 @@ msgstr ""
 msgid "Trainings"
 msgstr ""
 
-msgid "Trainings/gathering"
-msgstr ""
-
 msgid "Transformation"
 msgstr ""
 
@@ -2679,9 +2789,6 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
-msgstr ""
-
-msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
@@ -2786,16 +2893,24 @@ msgstr ""
 msgid "Volumes are inconsistent"
 msgstr ""
 
+msgid ""
+"Volumes are inconsistent: you can't delete volume on a component having "
+"classes."
+msgstr ""
+
 msgid "Volumes management"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning "
+"unit whose volume has been deleted on a component having classes"
 msgstr ""
 
 msgid "Volumes of {} are inconsistent"
 msgstr ""
 
 msgid "We detected inconsistencies in the following data :"
-msgstr ""
-
-msgid "We will fix this as soon as possible"
 msgstr ""
 
 msgid "Web re-registration"
@@ -2821,6 +2936,11 @@ msgid "Yes, I confirm."
 msgstr ""
 
 msgid "You are succesfully logout."
+msgstr ""
+
+msgid ""
+"You cannot create a partim for a learning unit having classes for this year "
+"or in the future"
 msgstr ""
 
 msgid ""
@@ -2881,8 +3001,16 @@ msgstr ""
 msgid "aim number"
 msgstr ""
 
+msgid "and"
+msgstr ""
+
 #, python-format
 msgid "and postponed until %(year)s"
+msgstr ""
+
+#, python-format
+msgid ""
+"at least one class volume is greater than the volume of the LU (%(sub_type)s)"
 msgstr ""
 
 msgid "author"
@@ -3010,6 +3138,9 @@ msgstr ""
 msgid "optional"
 msgstr ""
 
+msgid "or"
+msgstr ""
+
 msgid "parameters"
 msgstr ""
 
@@ -3085,6 +3216,9 @@ msgid "text in French"
 msgstr ""
 
 msgid "the"
+msgstr ""
+
+msgid "the annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr ""
 
 #, python-format

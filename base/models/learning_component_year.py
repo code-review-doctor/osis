@@ -35,13 +35,11 @@ from base.business.learning_units.quadrimester_strategy import LearningComponent
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriNoStrategy
 from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
-from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2, \
     ADDITIONAL_REQUIREMENT_ENTITY_1
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
+class LearningComponentYearAdmin(VersionAdmin):
     list_display = ('learning_unit_year', 'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_unit_year__acronym']
     list_filter = ('learning_unit_year__academic_year',)
@@ -55,7 +53,7 @@ class RepartitionVolumeField(models.DecimalField):
         self.decimal_places = 2
 
 
-class LearningComponentYear(SerializableModel):
+class LearningComponentYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
@@ -188,10 +186,6 @@ class LearningComponentYear(SerializableModel):
     def set_repartition_volumes(self, repartition_volumes):
         for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type().items():
             setattr(self, attr, repartition_volumes[entity_container_type])
-
-
-def find_by_id(learning_component_year_id):
-    return LearningComponentYear.objects.get(pk=learning_component_year_id)
 
 
 def find_by_learning_container_year(learning_container_year, with_classes=False):

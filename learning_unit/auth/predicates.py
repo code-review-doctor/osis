@@ -4,6 +4,7 @@ from rules import predicate
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.tutor_application import TutorApplication
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types as container_types, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.proposal_state import ProposalState
@@ -36,6 +37,15 @@ FACULTY_DATE_EDITABLE_CONTAINER_TYPES = (
     LearningContainerYearType.EXTERNAL
 )
 
+CONTAINER_TYPES_TO_CREATE_CLASS = [
+    LearningContainerYearType.COURSE,
+    LearningContainerYearType.INTERNSHIP,
+    LearningContainerYearType.DISSERTATION,
+    LearningContainerYearType.OTHER_COLLECTIVE,
+    LearningContainerYearType.OTHER_INDIVIDUAL,
+    LearningContainerYearType.MASTER_THESIS,
+]
+
 PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES = (ProposalState.ACCEPTED.name, ProposalState.REFUSED.name)
 
 DELETABLE_CONTAINER_TYPES = [LearningContainerYearType.DISSERTATION, LearningContainerYearType.INTERNSHIP]
@@ -64,6 +74,20 @@ def is_user_attached_to_current_requirement_entity(self, user, learning_unit_yea
     return learning_unit_year
 
 
+@predicate(bind=True)
+@predicate_failed_msg(
+    message=_("You can only modify an effective class when your are linked to learning unit requirement entity")
+)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_user_attached_to_learning_unit_current_requirement_entity(self, user, learning_class_year=None):
+    if learning_class_year:
+        current_container_year = learning_class_year.learning_component_year.learning_unit_year.learning_container_year
+        return current_container_year is not None and _is_attached_to_entity(
+            current_container_year.requirement_entity_id, self
+        )
+    return learning_class_year
+
+
 def _is_attached_to_entity(requirement_entity, self):
     user_entity_ids = self.context['role_qs'].get_entities_ids()
     return requirement_entity in user_entity_ids
@@ -79,6 +103,21 @@ def _is_attached_to_entity(requirement_entity, self):
 def is_learning_unit_year_older_or_equals_than_limit_settings_year(self, user, learning_unit_year=None):
     if learning_unit_year:
         return learning_unit_year.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(
+    message=_(
+        "You can't modify effective class under year : %(year)d. "
+        "Modifications should be made in EPC under year %(year)d"
+    ) % {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
+)
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_class_year_older_or_equals_than_limit_settings_year(self, user, learning_class_year=None):
+    if learning_class_year:
+        luy = learning_class_year.learning_component_year.learning_unit_year
+        return luy.academic_year.year >= settings.YEAR_LIMIT_LUE_MODIFICATION
     return None
 
 
@@ -167,9 +206,23 @@ def is_learning_unit_edition_for_central_manager_period_open(self, user, learnin
 @predicate_failed_msg(message=_("This learning unit is not editable this period."))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def is_learning_unit_edition_for_faculty_manager_period_open(self, user, learning_unit_year):
+    academic_year = learning_unit_year.academic_year if learning_unit_year else None
+    return _check_if_education_group_limited_daily_management_is_open(academic_year)
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This effective class is not editable this period."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_effective_class_edition_for_faculty_manager_period_open(self, user, learning_class_year):
+    academic_year = learning_class_year.learning_component_year.learning_unit_year.academic_year \
+        if learning_class_year else None
+    return _check_if_education_group_limited_daily_management_is_open(academic_year)
+
+
+def _check_if_education_group_limited_daily_management_is_open(academic_year: 'AcademicYear'):
     calendar = EducationGroupLimitedDailyManagementCalendar()
-    if learning_unit_year:
-        return calendar.is_target_year_authorized(target_year=learning_unit_year.academic_year.year)
+    if academic_year:
+        return calendar.is_target_year_authorized(target_year=academic_year.year)
     return bool(calendar.get_target_years_opened())
 
 
@@ -380,13 +433,25 @@ def has_learning_unit_no_application_this_year(self, user, learning_unit_year):
 
 
 @predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has application this year or in the future"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_application_now_and_in_future(self, user, learning_unit_year):
+    if learning_unit_year and learning_unit_year.is_full():
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not TutorApplication.objects.filter(
+            learning_container_year__learning_container=learning_container,
+            learning_container_year__academic_year__year__gte=learning_unit_year.academic_year.year
+        ).exists()
+
+
+@predicate(bind=True)
 @predicate_failed_msg(message=_("This learning unit has application"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_application_all_years(self, user, learning_unit_year):
     if learning_unit_year and learning_unit_year.is_full():
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not TutorApplication.objects.filter(
-            learning_container_year__learning_container=learning_container
+            learning_container_year__learning_container=learning_container,
         ).exists()
 
 
@@ -404,7 +469,7 @@ def has_learning_unit_partim_no_application_all_years(self, user, learning_unit_
 @predicate_failed_msg(message=_("This learning unit has an application in the future"))
 @predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
 def has_learning_unit_no_application_in_future(self, user, learning_unit_year):
-    if learning_unit_year:
+    if learning_unit_year and not learning_unit_year.is_partim():
         learning_container = learning_unit_year.learning_container_year.learning_container
         return not TutorApplication.objects.filter(
             learning_container_year__learning_container=learning_container,
@@ -469,6 +534,19 @@ def has_learning_unit_no_attribution_this_year(self, user, learning_unit_year):
         learning_container_year = learning_unit_year.learning_container_year
         return not AttributionChargeNew.objects.filter(
             learning_component_year__learning_unit_year__learning_container_year=learning_container_year
+        ).exists()
+    return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit has attribution this year or in the future"))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def has_learning_unit_no_attribution_now_and_future(self, user, learning_unit_year):
+    if learning_unit_year:
+        learning_container = learning_unit_year.learning_container_year.learning_container
+        return not AttributionChargeNew.objects.filter(
+            learning_component_year__learning_unit_year__learning_container_year__learning_container=learning_container,
+            learning_component_year__learning_unit_year__academic_year__year__gte=learning_unit_year.academic_year.year
         ).exists()
     return None
 

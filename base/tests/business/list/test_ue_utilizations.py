@@ -65,9 +65,9 @@ from program_management.tests.factories.education_group_version import \
 from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 
-TRAINING_TITLE_COLUMN = 30
-TRAINING_CODE_COLUMN = 29
-GATHERING_COLUMN = 28
+TRAINING_TITLE_COLUMN = 31
+TRAINING_CODE_COLUMN = 30
+GATHERING_COLUMN = 29
 ROOT_ACRONYM = 'DRTI'
 VERSION_ACRONYM = 'CRIM'
 
@@ -190,6 +190,7 @@ class TestUeUtilization(TestCase):
                                  str(_('Quadrimester')),
                                  str(_('Session derogation')),
                                  str(_('Language')),
+                                 str(_('Stage-Dimona')),
                                  str(_('Gathering')), str(_('Training code')), str(_('Training title')),
                                  str(_('Training management entity')),
                                  str(_('Training management entity faculty')),
@@ -238,12 +239,12 @@ class TestUeUtilization(TestCase):
         res1 = "{} ({})".format(
             self.a_group_year_parent.partial_acronym,
             "{0:.2f}".format(self.group_element_child_1.relative_credits),
-            )
+        )
 
         res2 = "{} ({})".format(
             self.a_group_year_parent_2.partial_acronym,
             "{0:.2f}".format(self.group_element_child_2.relative_credits),
-            )
+        )
         results = [res1, res2]
         self.assertCountEqual(
             results,
@@ -290,23 +291,22 @@ class TestUeUtilization(TestCase):
 
         first_row_cells_without_training_data = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1'
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
 
-    def test_colored_cells_because_of_proposal(self):    
-
+    def test_colored_cells_because_of_proposal(self):
         dict_to_update = defaultdict(list)
         result = _check_cell_to_color(
             dict_to_update=dict_to_update, learning_unit_yr=self.proposal.learning_unit_year, row_number=1
-        )        
+        )
         row_colored_because_of_proposal = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1', 'AH1'
         ]
         self.assertDictEqual(result, {PROPOSAL_LINE_STYLES.get(self.proposal.type): row_colored_because_of_proposal})
 
-    def test_colored_cells_because_of_proposal_on_second_training_usage(self):    
+    def test_colored_cells_because_of_proposal_on_second_training_usage(self):
         proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_yr_1,
             type=proposal_type.ProposalType.MODIFICATION.name,
@@ -317,13 +317,13 @@ class TestUeUtilization(TestCase):
             learning_unit_yr=proposal.learning_unit_year,
             row_number=1,
             training_occurence=2
-        )        
+        )
         first_row_cells_without_training_data = [
             'A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1', 'I1', 'J1', 'K1', 'L1', 'M1', 'N1', 'O1', 'P1', 'Q1', 'R1',
-            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1'
+            'S1', 'T1', 'U1', 'V1', 'W1', 'X1', 'Y1', 'Z1', 'AA1', 'AB1', 'AC1'
         ]
         row_colored_because_of_proposal = [
-            'AB1', 'AC1', 'AD1', 'AE1', 'AF1', 'AG1'
+            'AD1', 'AE1', 'AF1', 'AG1', 'AH1'
         ]
         self.assertListEqual(result[WHITE_FONT], first_row_cells_without_training_data)
         self.assertListEqual(result[PROPOSAL_LINE_STYLES.get(proposal.type)], row_colored_because_of_proposal)
@@ -387,6 +387,7 @@ class TestUeUtilization(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             luy.language or "",
+            _('yes') if luy.stage_dimona else _('no'),
             "{} ({})".format(self.a_group_year_parent.partial_acronym,
                              "{0:.2f}".format(self.group_element_child.relative_credits)),
             self.a_group_year_parent.acronym,

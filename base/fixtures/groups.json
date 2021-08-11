@@ -13,11 +13,6 @@
                     "is_institution_administrator",
                     "base",
                     "person"
-                ],
-                [
-                    "can_access_structure",
-                    "base",
-                    "structure"
                 ]
             ]
         }
@@ -186,36 +181,6 @@
                     "internshipspeciality"
                 ],
                 [
-                    "add_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "change_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "delete_internshipspecialitygroup",
-                    "internship",
-                    "internshipspecialitygroup"
-                ],
-                [
-                    "add_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
-                    "change_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
-                    "delete_internshipspecialitygroupmember",
-                    "internship",
-                    "internshipspecialitygroupmember"
-                ],
-                [
                     "add_internshipstudentaffectationstat",
                     "internship",
                     "internshipstudentaffectationstat"
@@ -259,21 +224,6 @@
                     "delete_organization",
                     "internship",
                     "organization"
-                ],
-                [
-                    "add_organizationaddress",
-                    "internship",
-                    "organizationaddress"
-                ],
-                [
-                    "change_organizationaddress",
-                    "internship",
-                    "organizationaddress"
-                ],
-                [
-                    "delete_organizationaddress",
-                    "internship",
-                    "organizationaddress"
                 ],
                 [
                     "add_period",
@@ -339,16 +289,6 @@
                     "externallearningunityear"
                 ],
                 [
-                    "can_access_learningunitcomponentclass",
-                    "base",
-                    "learningunitcomponentclass"
-                ],
-                [
-                    "can_access_catalog",
-                    "base",
-                    "offer"
-                ],
-                [
                     "view_educationgroup",
                     "base",
                     "educationgroup"
@@ -359,100 +299,10 @@
                     "person"
                 ],
                 [
-                    "can_access_structure",
-                    "base",
-                    "structure"
+                    "view_learningclassyear",
+                    "learning_unit",
+                    "learningclassyear"
                 ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "continuing_education_managers",
-            "permissions": [
-                [
-                    "view_admission",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "change_admission",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "validate_registration",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "view_persontraining",
-                    "continuing_education",
-                    "persontraining"
-                ],
-                [
-                    "add_persontraining",
-                    "continuing_education",
-                    "persontraining"
-                ],
-                [
-                    "delete_persontraining",
-                    "continuing_education",
-                    "persontraining"
-                ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "continuing_education_training_managers",
-            "permissions": [
-                [
-                    "view_admission",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "change_admission",
-                    "continuing_education",
-                    "admission"
-                ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "continuing_education_student_workers",
-            "permissions": [
-                [
-                    "view_admission",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "change_received_file_state",
-                    "continuing_education",
-                    "admission"
-                ],
-                [
-                    "validate_registration",
-                    "continuing_education",
-                    "admission"
-                ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "partnership_viewers",
-            "permissions": [
-                ["can_access_partnerships","partnership","partnership"],
-                ["can_access_partners","partnership","partner"],
-                ["can_access_partnerships_agreements", "partnership", "partnershipagreement"]
             ]
         }
     }

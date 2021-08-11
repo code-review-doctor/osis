@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('base', '0248_auto_20180328_1347'),
-        ('attribution', '0032_auto_20180327_1458'),
+        # ('attribution', '0032_auto_20180327_1458'),
     ]
 
     operations = [
@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
                         WHERE base_learningunitcomponent.deleted is null AND
                            ( base_learningunityear is not null OR base_learningunit.deleted is not null)
                    )
-           """),
+           """, elidable=True),
         migrations.RunSQL("""
                DELETE FROM base_entitycomponentyear
                WHERE deleted is not null OR
@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
                        WHERE base_entitycomponentyear.deleted is null AND
                        ( base_entitycontaineryear.deleted is not null OR base_learningcontaineryear.deleted is not null OR base_learningcontainer.deleted is not null )
                      )
-           """),
+           """, elidable=True),
         migrations.RunSQL("""
                DELETE FROM base_entitycontaineryear
                WHERE deleted is not null OR
@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
                        WHERE base_entitycontaineryear.deleted is null AND
                        ( base_learningcontaineryear.deleted is not null OR base_learningcontainer.deleted is not null )
                      )
-           """),
+           """, elidable=True),
         migrations.RunSQL("""
             DELETE FROM base_learningclassyear
             WHERE deleted is not null OR
@@ -74,7 +74,7 @@ class Migration(migrations.Migration):
                        base_learningcontaineryear.deleted is not null OR
                        base_learningcontainer.deleted is not null )
                 )
-        """),
+        """, elidable=True),
         migrations.RunSQL("""
                DELETE FROM base_learningcomponentyear
                WHERE deleted is not null OR
@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                         WHERE base_learningcomponentyear.deleted is null AND
                          ( base_learningcontaineryear.deleted is not null OR base_learningcontainer.deleted is not null )
                      )
-           """),
+           """, elidable=True),
         migrations.RunSQL("""
                DELETE FROM base_learningunityear
                WHERE deleted is not null OR
@@ -96,8 +96,8 @@ class Migration(migrations.Migration):
                        JOIN base_learningunit on (base_learningunit.id = base_learningunityear.learning_unit_id)
                         WHERE base_learningunityear.deleted is null AND base_learningunit.deleted is not null
                      )
-           """),
-        migrations.RunSQL("DELETE FROM base_learningunit WHERE deleted is not null"),
+           """, elidable=True),
+        migrations.RunSQL("DELETE FROM base_learningunit WHERE deleted is not null", elidable=True),
         migrations.RunSQL("""
                DELETE FROM base_learningcontaineryear
                WHERE deleted is not null OR
@@ -107,11 +107,11 @@ class Migration(migrations.Migration):
                        JOIN base_learningcontainer on (base_learningcontainer.id = base_learningcontaineryear.learning_container_id)
                        WHERE base_learningcontaineryear.deleted is null AND base_learningcontainer.deleted is not null
                      )
-           """),
-        migrations.RunSQL("DELETE FROM base_learningcontainer WHERE deleted is not null"),
+           """, elidable=True),
+        migrations.RunSQL("DELETE FROM base_learningcontainer WHERE deleted is not null", elidable=True),
         # Remove constraint unique index SQL
-        migrations.RunSQL("DROP INDEX IF EXISTS learningcontaineryear_learningcontainerid_academicyearid_deleted"),
-        migrations.RunSQL("DROP INDEX IF EXISTS learningunityear_learningunitid_academicyearid_deleted"),
-        migrations.RunSQL("DROP INDEX IF EXISTS entitycontaineryear_entityid_learningcontaineryearid_type_deleted"),
-        migrations.RunSQL("DROP INDEX IF EXISTS entitycomponentyear_entitycontaineryear_learningcomponentyearid_deleted")
+        migrations.RunSQL("DROP INDEX IF EXISTS learningcontaineryear_learningcontainerid_academicyearid_deleted", elidable=True),
+        migrations.RunSQL("DROP INDEX IF EXISTS learningunityear_learningunitid_academicyearid_deleted", elidable=True),
+        migrations.RunSQL("DROP INDEX IF EXISTS entitycontaineryear_entityid_learningcontaineryearid_type_deleted", elidable=True),
+        migrations.RunSQL("DROP INDEX IF EXISTS entitycomponentyear_entitycontaineryear_learningcomponentyearid_deleted", elidable=True)
     ]

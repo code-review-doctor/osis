@@ -36,8 +36,8 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.exception import GroupNotFoundException
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.factories.group import GroupFactory
 from education_group.forms.group import GroupUpdateForm
+from education_group.tests.ddd.factories.domain.group import GroupFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
@@ -162,7 +162,7 @@ class TestUpdateGroupPostMethod(TestCase):
 
         self.update_group_patcher = mock.patch(
             "education_group.views.group.update.update_group_service.update_group",
-            return_value=self.group
+            return_value=[self.group]
         )
         self.mocked_update_group = self.update_group_patcher.start()
         self.addCleanup(self.update_group_patcher.stop)

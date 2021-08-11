@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+import uuid
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -65,6 +65,7 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
     def test_should_exclude_attributions_for_which_repartition_has_been_done(self):
         attribution = self.attribution_full
         attribution.id = None
+        attribution.uuid = uuid.uuid4()
         attribution.save()
 
         AttributionChargeNewFactory(

@@ -31,9 +31,9 @@ from base.models.enums.academic_calendar_type import AcademicCalendarTypes
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.person import PersonFactory
 from education_group.ddd.domain.group import GroupIdentity
-from education_group.ddd.factories.group import GroupFactory
-from education_group.tests.ddd.factories.diploma import DiplomaAimFactory
-from education_group.tests.ddd.factories.training import TrainingFactory
+from education_group.tests.ddd.factories.domain.diploma import DiplomaAimFactory
+from education_group.tests.ddd.factories.domain.group import GroupFactory
+from education_group.tests.ddd.factories.domain.training import TrainingFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.group_year import GroupYearFactory as GroupYearDBFactory
 from program_management.forms.transition import UpdateTrainingTransitionVersionForm
@@ -52,7 +52,7 @@ class TestTrainingVersionUpdateGetView(TestCase):
             entity_identity=GroupIdentity(
                 code=cls.training_version_obj.tree.root_node.code,
                 year=cls.training_version_obj.tree.root_node.year
-            )
+            ),
         )
 
         cls.diploma_aims = [DiplomaAimFactory(), DiplomaAimFactory()]
@@ -202,7 +202,7 @@ class TestTrainingVersionUpdatePostView(TestCase):
             entity_identity=GroupIdentity(
                 code=cls.training_version_obj.tree.root_node.code,
                 year=cls.training_version_obj.tree.root_node.year
-            )
+            ),
         )
         cls.training_obj = TrainingFactory()
 

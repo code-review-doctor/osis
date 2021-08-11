@@ -46,6 +46,7 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
+from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -70,6 +71,7 @@ class LearningUnitPostponementFormContextMixin(TestCase):
         # Creation of a LearingContainerYear and all related models - FOR 6 years
         cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, end_year_6)
         cls.person = PersonFactory()
+        FacultyManagerGroupFactory()
         for entity in cls.learn_unit_structure.entities:
             FacultyManagerFactory(person=cls.person, entity=entity)
 

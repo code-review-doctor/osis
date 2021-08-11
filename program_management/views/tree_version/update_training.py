@@ -13,9 +13,7 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models import entity_version
 from base.utils import operator
 from base.utils.urls import reverse_with_get
-from base.views.common import check_formations_impacted_by_update
-from base.views.common import display_error_messages, display_warning_messages
-from base.views.common import display_success_messages
+from base.views.common import display_error_messages, display_warning_messages, display_success_messages
 from education_group.ddd import command as command_education_group
 from education_group.ddd.business_types import *
 from education_group.ddd.domain import exception as exception_education_group
@@ -76,9 +74,6 @@ class TrainingVersionUpdateView(PermissionRequiredMixin, View):
             if not self.training_version_form.errors:
                 self.display_success_messages(version_identities)
                 self.display_delete_messages(version_identities)
-                check_formations_impacted_by_update(self.get_group_obj().code,
-                                                    self.get_group_obj().year,
-                                                    request, self.get_group_obj().type)
                 return HttpResponseRedirect(self.get_success_url())
         display_error_messages(self.request, self._get_default_error_messages())
         return self.get(request, *args, **kwargs)

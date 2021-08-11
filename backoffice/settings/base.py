@@ -48,6 +48,7 @@ CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 't
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'backoffice.urls')
 WSGI_APPLICATION = os.environ.get('WSGI_APPLICATION', 'backoffice.wsgi.application')
 MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.storage.fallback.FallbackStorage')
+EMAIL_SERVICE_DESK = os.environ.get('EMAIL_SERVICE_DESK', '')
 
 
 # Application definition
@@ -90,6 +91,7 @@ INSTALLED_APPS = (
     'hijack_admin',
     'reversion',
     'django.contrib.gis',
+    'ddd',
 )
 
 
@@ -142,6 +144,8 @@ APPS_TO_TEST = (
     'education_group',
     'learning_unit',
     'program_management',
+    'ddd',
+    'infrastructure',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
 SKIP_QUEUES_TESTS = os.environ.get('SKIP_QUEUES_TESTS', 'False').lower() == 'true'
@@ -212,6 +216,7 @@ MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
                  'application/zip', 'image/jpeg', 'image/gif', 'image/png', 'text/html', 'text/plain']
 MAX_UPLOAD_SIZE = int(os.environ.get('MAX_UPLOAD_SIZE', 5242880))
+OSIS_DOCUMENT_BASE_URL = os.environ.get('OSIS_DOCUMENT_BASE_URL', '/osis_document/')
 
 # Logging settings
 # Logging framework is defined in env settings (ex: dev.py)
@@ -402,6 +407,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'EXCEPTION_HANDLER': 'backoffice.settings.rest_framework.exception_handler.handle',
     'DEFAULT_PAGINATION_CLASS': 'backoffice.settings.rest_framework.pagination.LimitOffsetPaginationWithUpperBound',
     'PAGE_SIZE': 25,
     'DEFAULT_FILTER_BACKENDS':	(
@@ -498,6 +504,10 @@ REQUESTS_TIMEOUT = 20
 
 # PEDAGOGY INFORMATION
 URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
+
+MINIMUM_SELECTABLE_YEAR = int(os.environ.get("MINIMUM_SELECTABLE_YEAR", 0))
+MINIMUM_EDG_YEAR = int(os.environ.get("MINIMUM_EDG_YEAR", 0))
+MINIMUM_LUE_YEAR = int(os.environ.get("MINIMUM_LUE_YEAR", 0))
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 0))
 YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 0))  # By default, no restriction

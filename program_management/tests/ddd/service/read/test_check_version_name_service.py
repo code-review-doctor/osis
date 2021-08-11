@@ -32,6 +32,7 @@ from program_management.tests.ddd.factories.program_tree_version import ProgramT
 from testing.mocks import MockPatcherMixin
 
 
+# TODO refactor
 class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
     def setUp(self) -> None:
         self.mock_get_last_version = self.mock_service(
@@ -70,7 +71,7 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions)),
-            exception.VersionNameAlreadyExist
+            exception.VersionNameExistsCurrentYearAndInFuture
         )
 
     def test_should_check_if_version_name_has_existed(self):
@@ -87,5 +88,5 @@ class TestCheckVersionName(SimpleTestCase, MockPatcherMixin):
 
         self.assertIsInstance(
             next(iter(e.exception.exceptions)),
-            exception.VersionNameExistedException
+            exception.VersionNameExistsInPast
         )

@@ -48,8 +48,8 @@ CELLS_TO_COLOR = 'cells_to_color'
 XLS_DESCRIPTION = _('List of learning units with one line per training')
 WORKSHEET_TITLE = _('Learning units training list')
 WHITE_FONT = Font(color=Color('00FFFFFF'))
-FIRST_TRAINING_COLUMN = 28
-TOTAL_NB_OF_COLUMNS = 33
+FIRST_TRAINING_COLUMN = 30
+TOTAL_NB_OF_COLUMNS = 34
 HEADER_PROGRAMS = [
     str(_('Gathering')),
     str(_('Training code')),
@@ -107,8 +107,8 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
     cells_with_border_top = []
     cells_to_color = defaultdict(list)
     for learning_unit_yr in qs:
-        lu_data_part1 = get_data_part1(learning_unit_yr, is_external_ue_list=False)
-        lu_data_part2 = get_data_part2(learning_unit_yr, with_attributions=True)
+        lu_data_part1 = get_data_part1(learning_unit_yr, None, is_external_ue_list=False)
+        lu_data_part2 = get_data_part2(learning_unit_yr, None, with_attributions=True)
 
         if hasattr(learning_unit_yr, "element") and learning_unit_yr.element.children_elements.all():
             training_occurence = 1
@@ -136,12 +136,12 @@ def _prepare_xls_content(learning_unit_years: QuerySet) -> Dict:
                                 cells_to_color, learning_unit_yr, len(lines) + 1, training_occurence
                             )
                             if training_occurence == 1:
-                                cells_with_border_top.extend(_add_border_top(len(lines)+1))
+                                cells_with_border_top.extend(_add_border_top(len(lines) + 1))
 
                             training_occurence += 1
         else:
             lines.append(lu_data_part1 + lu_data_part2)
-            cells_with_border_top.extend(_add_border_top(len(lines)+1))
+            cells_with_border_top.extend(_add_border_top(len(lines) + 1))
             cells_to_color = _check_cell_to_color(cells_to_color, learning_unit_yr, len(lines) + 1)
 
     return {
@@ -212,7 +212,7 @@ def _check_cell_to_color(dict_to_update: dict, learning_unit_yr: LearningUnitYea
     cells_with_white_font = []
     if training_occurence > 1:
         cells_with_white_font = [
-            "{}{}".format(letter, row_number) for letter in _get_all_columns_reference(FIRST_TRAINING_COLUMN-1)
+            "{}{}".format(letter, row_number) for letter in _get_all_columns_reference(FIRST_TRAINING_COLUMN - 1)
         ]
 
         colored_cells[WHITE_FONT].extend(cells_with_white_font)

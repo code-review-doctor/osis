@@ -74,6 +74,20 @@ if 'admission' in settings.INSTALLED_APPS:
         # API
         url(r'^admissions/v1/', include('admission.api.urls_v1', namespace='admission_api_v1')),
     )
+if 'osis_mail_template' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^osis_mail_template/', include('osis_mail_template.urls')),)
+if 'osis_signature' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^osis_signature/', include('osis_signature.urls')),)
+if 'osis_notification' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^notifications/v1/', include('osis_notification.api.urls_v1')),
+    )
+if 'learning_unit' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^learning_unit/', include('learning_unit.urls')),)
+if 'osis_async' in settings.INSTALLED_APPS:
+    urlpatterns += (
+        url(r'^tasks/v1/', include('osis_async.api.urls_v1')),
+    )
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

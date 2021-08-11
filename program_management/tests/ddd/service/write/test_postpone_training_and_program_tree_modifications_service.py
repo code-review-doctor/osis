@@ -21,129 +21,142 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import mock
-from django.test import TestCase
+import attr
 
-from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
-from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
-from education_group.ddd.repository.training import TrainingRepository
-from education_group.tests.ddd.factories.training import TrainingFactory
-from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
+from base.models.enums.active_status import ActiveStatusEnum
+from base.models.enums.schedule_type import ScheduleTypeEnum
+from education_group.ddd.command import GetTrainingCommand
+from education_group.ddd.domain.exception import CreditShouldBeGreaterOrEqualsThanZero, ContentConstraintTypeMissing, \
+    HopsFieldsAllOrNone
+from education_group.ddd.service.read import get_training_service
+from program_management.ddd.command import PostponeTrainingAndRootGroupModificationWithProgramTreeCommand
+from program_management.ddd.domain.exception import Program2MEndDateLowerThanItsFinalitiesException, \
+    FinalitiesEndDateGreaterThanTheirMasters2MException
 from program_management.ddd.service.write import postpone_training_and_program_tree_modifications_service
-from program_management.tests.ddd.factories.commands.postpone_training_and_root_group_modification_with_program_tree \
-    import PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory
+from program_management.tests.ddd.factories.domain.program_tree_version.training.OSIS2M import OSIS2MFactory
+from testing.testcases import DDDTestCase
 
 
-class TestPostponeTrainingAndProgramTreeModificationsService(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.offer_year = 2020
-        cls.cmd = PostponeTrainingAndRootGroupModificationWithProgramTreeCommandFactory(
-            code="LDROI1200M",
-            postpone_from_acronym="DROI2M",
-            postpone_from_year=cls.offer_year
-        )
-
+class TestPostponeTrainingAndProgramTreeModificationsService(DDDTestCase):
     def setUp(self):
-        self.postpone_training_and_group_modification_patcher = mock.patch(
-            "program_management.ddd.service.write"
-            ".postpone_training_and_program_tree_modifications_service."
-            "postpone_training_and_group_modification_service.postpone_training_and_group_modification",
-            return_value=[]
-        )
-        self.mocked_postpone_training_and_group_modification = \
-            self.postpone_training_and_group_modification_patcher.start()
-        self.addCleanup(self.postpone_training_and_group_modification_patcher.stop)
+        super().setUp()
 
-        self.postpone_pgrm_tree_patcher = mock.patch(
-            "program_management.ddd.service.write."
-            "postpone_training_and_program_tree_modifications_service."
-            "postpone_program_tree_service.postpone_program_tree",
-            return_value=[]
+        self.osis2m = OSIS2MFactory()[0]
+        self.osis2m_training = get_training_service.get_training(
+            GetTrainingCommand(acronym=self.osis2m.entity_id.offer_acronym, year=self.osis2m.entity_id.year)
         )
-        self.mocked_postpone_pgrm_tree = self.postpone_pgrm_tree_patcher.start()
-        self.addCleanup(self.postpone_pgrm_tree_patcher.stop)
 
-        self.postpone_pgrm_tree_version_patcher = mock.patch(
-            "program_management.ddd.service.write."
-            "postpone_training_and_program_tree_modifications_service."
-            "postpone_tree_specific_version_service.postpone_program_tree_version",
-            return_value=[]
+        self.cmd = PostponeTrainingAndRootGroupModificationWithProgramTreeCommand(
+            postpone_from_acronym=self.osis2m.entity_id.offer_acronym,
+            postpone_from_year=self.osis2m.entity_id.year,
+            status=ActiveStatusEnum.ACTIVE.name,
+            code=self.osis2m.program_tree_identity.code,
+            credits=23,
+            duration=3,
+            title_fr=self.osis2m_training.titles.title_fr,
+            title_en=self.osis2m_training.titles.title_en,
+            partial_title_fr="",
+            partial_title_en="",
+            keywords="hello world",
+            internship_presence=self.osis2m_training.internship_presence.name,
+            is_enrollment_enabled=self.osis2m_training.is_enrollment_enabled,
+            has_online_re_registration=self.osis2m_training.has_online_re_registration,
+            has_partial_deliberation=self.osis2m_training.has_partial_deliberation,
+            has_admission_exam=self.osis2m_training.has_admission_exam,
+            has_dissertation=self.osis2m_training.has_dissertation,
+            produce_university_certificate=self.osis2m_training.produce_university_certificate,
+            main_language=self.osis2m_training.main_language,
+            english_activities=False,
+            other_language_activities=False,
+            internal_comment=self.osis2m_training.internal_comment,
+            main_domain_code=self.osis2m_training.main_domain.code,
+            main_domain_decree=self.osis2m_training.main_domain.decree_name,
+            secondary_domains=[],
+            isced_domain_code=self.osis2m_training.isced_domain.code,
+            management_entity_acronym="OSIS",
+            administration_entity_acronym="OSIS",
+            end_year=self.osis2m.end_year_of_existence,
+            teaching_campus_name="OSIS",
+            teaching_campus_organization_name="OSIS",
+            enrollment_campus_name="OSIS",
+            enrollment_campus_organization_name="OSIS",
+            other_campus_activities=self.osis2m_training.other_campus_activities.name,
+            funding_orientation=self.osis2m_training.funding.funding_orientation.name,
+            can_be_international_funded=self.osis2m_training.funding.can_be_international_funded,
+            international_funding_orientation=self.osis2m_training.funding.international_funding_orientation.name,
+            ares_code=None,
+            ares_graca=None,
+            ares_authorization=None,
+            code_inter_cfb=None,
+            coefficient=None,
+            duration_unit=None,
+            leads_to_diploma=None,
+            printing_title=None,
+            professional_title=None,
+            constraint_type=None,
+            min_constraint=None,
+            max_constraint=None,
+            remark_fr=None,
+            remark_en=None,
+            can_be_funded=None,
+            organization_name="ORG",
+            schedule_type=ScheduleTypeEnum.DAILY.name,
+            decree_category=self.osis2m_training.decree_category.name,
+            rate_code=None,
         )
-        self.mocked_postpone_pgrm_tree_version = self.postpone_pgrm_tree_version_patcher.start()
-        self.addCleanup(self.postpone_pgrm_tree_version_patcher.stop)
 
-        self.update_version_end_date_patcher = mock.patch(
-            "program_management.ddd.service.write.update_program_tree_version_end_date_service."
-            "update_program_tree_version_end_date"
-        )
-        self.mocked_update_version_end_date = self.update_version_end_date_patcher.start()
-        self.addCleanup(self.update_version_end_date_patcher.stop)
+    def test_credits_must_be_greater_than_0(self):
+        cmd = attr.evolve(self.cmd, credits=-1)
 
-        self.update_training_and_group_patcher = mock.patch(
-            "education_group.ddd.service.write.update_training_and_group_service."
-            "update_training_and_group"
-        )
-        self.mocked_update_training_and_group = self.update_training_and_group_patcher.start()
-        self.addCleanup(self.update_training_and_group_patcher.stop)
+        with self.assertRaisesBusinessException(CreditShouldBeGreaterOrEqualsThanZero):
+            postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
+                cmd
+            )
 
-        self.mock_anac_repository = mock.create_autospec(AcademicYearRepository)
-        current_anac = AcademicYear(
-            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year - 1),
-            start_date=None,
-            end_date=None
-        )
-        self.mock_anac_repository.get_current.return_value = current_anac
-        self.mock_training_repository = mock.create_autospec(TrainingRepository)
-        self.mock_training_repository.get.return_value = TrainingFactory(end_year=None)
+    def test_constraints_must_be_legit(self):
+        cmd = attr.evolve(self.cmd, min_constraint=150)
 
-    def test_assert_call_multiple_service(self):
-        postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
+        with self.assertRaisesBusinessException(ContentConstraintTypeMissing):
+            postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
+                cmd
+            )
+
+    def test_hops_value_should_be_legit(self):
+        cmd = attr.evolve(self.cmd, ares_code=10)
+
+        with self.assertRaisesBusinessException(HopsFieldsAllOrNone):
+            postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
+                cmd
+            )
+
+    def test_cannot_reduce_end_year_of_program_2m_to_one_shorter_to_its_finalities(self):
+        cmd = attr.evolve(self.cmd, end_year=self.cmd.postpone_from_year)
+
+        with self.assertRaisesBusinessException(Program2MEndDateLowerThanItsFinalitiesException):
+            postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
+                cmd
+            )
+
+    def test_cannot_increase_end_year_of_finality_to_one_greater_than_its_program(self):
+        cmd = attr.evolve(
             self.cmd,
-            self.mock_anac_repository,
-            self.mock_training_repository
+            postpone_from_acronym="OSIS2MD",
+            end_year=self.osis2m.end_year_of_existence + 1
         )
 
-        self.assertTrue(self.mocked_postpone_training_and_group_modification.called)
-        self.assertTrue(self.mocked_postpone_pgrm_tree.called)
-        self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)
-        self.assertTrue(self.mocked_update_version_end_date.called)
+        with self.assertRaisesBusinessException(FinalitiesEndDateGreaterThanTheirMasters2MException):
+            postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
+                cmd
+            )
 
-    def test_assert_call_not_postponement_services_if_in_past(self):
-        current_anac = AcademicYear(
-            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year + 1),
-            start_date=None,
-            end_date=None
-        )
-        self.mock_anac_repository.get_current.return_value = current_anac
-        postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
-            self.cmd,
-            self.mock_anac_repository,
-            self.mock_training_repository
-        )
+    def test_should_return_training_identities(self):
+        result = postpone_training_and_program_tree_modifications_service.\
+            postpone_training_and_program_tree_modifications(
+                self.cmd
+            )
 
-        self.assertFalse(self.mocked_postpone_training_and_group_modification.called)
-        self.assertFalse(self.mocked_postpone_pgrm_tree.called)
-        self.assertFalse(self.mocked_postpone_pgrm_tree_version.called)
-
-        self.assertTrue(self.mocked_update_version_end_date.called)
-        self.assertTrue(self.mocked_update_training_and_group.called)
-
-    def test_assert_call_postponement_services_if_in_past_but_end_year_changed(self):
-        current_anac = AcademicYear(
-            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.offer_year + 1),
-            start_date=None,
-            end_date=None
-        )
-        self.mock_anac_repository.get_current.return_value = current_anac
-        self.mock_training_repository.get.return_value = TrainingFactory(end_year=2025)
-        postpone_training_and_program_tree_modifications_service.postpone_training_and_program_tree_modifications(
-            self.cmd,
-            self.mock_anac_repository,
-            self.mock_training_repository
-        )
-
-        self.assertTrue(self.mocked_postpone_training_and_group_modification.called)
-        self.assertTrue(self.mocked_postpone_pgrm_tree.called)
-        self.assertTrue(self.mocked_postpone_pgrm_tree_version.called)
-        self.assertTrue(self.mocked_update_version_end_date.called)
+        expected = [
+            attr.evolve(self.osis2m_training.entity_id, year=year)
+            for year in range(self.cmd.postpone_from_year, 2026)
+        ]
+        self.assertListEqual(expected, result)

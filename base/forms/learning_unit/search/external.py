@@ -28,6 +28,7 @@ from django.db.models import BLANK_CHOICE_DASH, OuterRef, Exists
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
+from backoffice.settings.base import MINIMUM_LUE_YEAR
 from base.forms.utils.filter_field import filter_field_by_regex
 from base.models.academic_year import AcademicYear, current_academic_year
 from base.models.campus import Campus
@@ -36,13 +37,14 @@ from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.learning_units.search.common import SearchTypes
+from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from education_group.calendar.education_group_switch_calendar import EducationGroupSwitchCalendar
+from infrastructure.messages_bus import message_bus_instance
 from reference.models.country import Country
 
 
 class ExternalLearningUnitFilter(FilterSet):
-    academic_year = filters.ModelChoiceFilter(
-        queryset=AcademicYear.objects.all(),
+    academic_year__year = filters.ChoiceFilter(
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("female plural", "All"),
@@ -110,7 +112,7 @@ class ExternalLearningUnitFilter(FilterSet):
     class Meta:
         model = LearningUnitYear
         fields = [
-            "academic_year",
+            "academic_year__year",
             "acronym",
             "title",
             "credits",
@@ -120,14 +122,17 @@ class ExternalLearningUnitFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.queryset = self.get_queryset()
-        # prendre le basculement event
-        targeted_year_opened = EducationGroupSwitchCalendar().get_target_years_opened()
-        self.form.fields["academic_year"].initial = AcademicYear.objects.filter(
-            year__in=targeted_year_opened
-        ).first() or current_academic_year()
+        self.__init_academic_year_field()
 
         if self.data.get('country'):
             self._init_dropdown_list()
+
+    def __init_academic_year_field(self):
+        all_academic_year = message_bus_instance.invoke(SearchAcademicYearCommand(year=MINIMUM_LUE_YEAR))
+        choices = [(ac_year.year, str(ac_year)) for ac_year in all_academic_year]
+        self.form.fields['academic_year__year'].choices = choices
+        self.form.fields['academic_year__year'].initial = \
+            EducationGroupSwitchCalendar().get_target_years_opened()
 
     def _init_dropdown_list(self):
         if self.data.get('country'):
