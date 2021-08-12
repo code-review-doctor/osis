@@ -30,14 +30,12 @@ from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO
 from osis_common.ddd import interface
 
 
-class ISignaletiqueTranslator(interface.DomainService):
+class ISignaletiquePersonneTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
     def search(
             cls,
-            code_unite_enseignement: str,
-            numero_session: int,
-            annee: int,
+            matricules_fgs: Set[str]
     ) -> Set['DetailContactDTO']:
         raise NotImplementedError

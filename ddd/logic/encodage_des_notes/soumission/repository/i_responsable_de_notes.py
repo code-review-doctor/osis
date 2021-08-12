@@ -26,6 +26,7 @@
 import abc
 from typing import List, Optional
 
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
@@ -37,7 +38,14 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search(cls, entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None, **kwargs) -> List['ResponsableDeNotes']:
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
+            codes_unites_enseignement: List[str] = None,
+            annee_academique: Optional[int] = None,
+            feuille_notes_identities: List['IdentiteFeuilleDeNotes'] = None,
+            **kwargs
+    ) -> List['ResponsableDeNotes']:
         pass
 
     @classmethod

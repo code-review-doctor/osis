@@ -27,7 +27,7 @@ import functools
 import itertools
 import operator
 import string
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 from django.db.models import F, Q, CharField
 from django.db.models.functions import Concat
@@ -37,6 +37,7 @@ from base.auth.roles.tutor import Tutor
 from base.models.learning_unit_year import LearningUnitYear
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import EnseignantDTO
@@ -52,16 +53,19 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
     def search(
             cls,
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
-            code_unite_enseignement: Optional[str] = None,
+            codes_unites_enseignement: List[str] = None,
             annee_academique: Optional[int] = None,
+            feuille_notes_identities: List['IdentiteFeuilleDeNotes'] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
+        qs = _fetch_responsable_de_notes()
+
         filter = {}
         if entity_ids:
             filter["global_id__in"] = {str(entity_id.matricule_fgs_enseignant) for entity_id in entity_ids}
 
-        if code_unite_enseignement:
-            filter["acronym"] = code_unite_enseignement
+        if codes_unites_enseignement:
+            filter["acronym__in"] = set(codes_unites_enseignement)
 
         if annee_academique:
             filter["year"] = annee_academique
@@ -69,7 +73,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
         if not filter:
             return []
 
-        rows = _fetch_responsable_de_notes().filter(**filter)
+        rows = qs.filter(**filter)
         rows_grouped_by_global_id = itertools.groupby(rows, key=lambda row: row.global_id)
 
         return [
@@ -192,7 +196,7 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
 def _fetch_responsable_de_notes():
     return ScoreResponsible.objects.annotate(
         global_id=F('tutor__person__global_id'),
-        acronym=Concat('learning_unit_year__acronym', 'learning_class_year__acronym', output_field=CharField()),
+        acronym=Concat('learning_unit_year__acronym', 'learning_class_year__acronym', output_field=CharField()),  # FIXME :: quid si learning_class_year__acronym n'existe pas ?
         year=F('learning_unit_year__academic_year__year'),
     ).values_list(
         'global_id',

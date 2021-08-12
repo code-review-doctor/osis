@@ -44,7 +44,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             annee: int
     ) -> Set['DesinscriptionExamenDTO']:
         qs_as_values = _get_common_queryset(
-            code_unite_enseignement=code_unite_enseignement,
+            codes_unites_enseignement={code_unite_enseignement},
             numero_session=numero_session,
             annee=annee,
         ).exclude(
@@ -79,8 +79,21 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             numero_session: int,
             annee: int,
     ) -> Set['InscriptionExamenDTO']:
+        return cls.search_inscrits_pour_plusieurs_unites_enseignement(
+            {code_unite_enseignement},
+            numero_session,
+            annee,
+        )
+
+    @classmethod
+    def search_inscrits_pour_plusieurs_unites_enseignement(
+            cls,
+            codes_unites_enseignement: Set[str],
+            numero_session: int,
+            annee: int,
+    ) -> Set['InscriptionExamenDTO']:
         qs_as_values = _get_common_queryset(
-            code_unite_enseignement=code_unite_enseignement,
+            codes_unites_enseignement=codes_unites_enseignement,
             numero_session=numero_session,
             annee=annee,
         ).filter(
@@ -121,7 +134,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
 
 
 def _get_common_queryset(
-        code_unite_enseignement: str,
+        codes_unites_enseignement: Set[str],
         numero_session: int,
         annee: int,
 ) -> QuerySet:
@@ -140,5 +153,5 @@ def _get_common_queryset(
             default='learning_unit_enrollment__learning_unit_year__acronym',
         ),
     ).filter(
-        code_unite_enseignement=code_unite_enseignement,
+        code_unite_enseignement__in=codes_unites_enseignement,
     )
