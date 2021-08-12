@@ -26,7 +26,7 @@
 import attr
 
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from osis_common.ddd import interface
 
 Noma = str

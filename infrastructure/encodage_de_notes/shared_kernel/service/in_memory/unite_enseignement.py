@@ -23,31 +23,43 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set
+from typing import Set, Tuple
 
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 
 
-class IInscriptionExamenTranslator(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def search_inscrits(
-            cls,
-            code_unite_enseignement: str,
-            numero_session: int,
-            annee: int,
-    ) -> Set['InscriptionExamenDTO']:
-        raise NotImplementedError
+class UniteEnseignementTranslatorInMemory(IUniteEnseignementTranslator):
 
     @classmethod
-    @abc.abstractmethod
-    def search_desinscrits(
+    def get(
             cls,
-            code_unite_enseignement: str,
-            numero_session: int,
+            code: str,
             annee: int,
-    ) -> Set['DesinscriptionExamenDTO']:
-        raise NotImplementedError
+    ) -> 'UniteEnseignementDTO':
+        dtos = cls.search({(code, annee)})
+        if dtos:
+            return list(dtos)[0]
+
+    @classmethod
+    def search(
+            cls,
+            values: Set[Tuple[str, int]],
+    ) -> Set['UniteEnseignementDTO']:
+        return {
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1001',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1002',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1003',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+        }

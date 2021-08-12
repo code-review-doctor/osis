@@ -31,17 +31,31 @@ from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
     PasGestionnaireParcoursExceptionException
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
+    InscriptionExamenDTO
+from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
+    FeuilleDeNotesAvecNotesManquantes
+from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
-from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.feuille_de_notes_enseignant import \
-    FeuilleDeNotesEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.common_domain.service.in_memory.attribution_enseignant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
+    SignaletiqueEtudiantTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
+    UniteEnseignementTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
+    FeuilleDeNotesInMemoryRepository
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
+    ResponsableDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
 
@@ -56,28 +70,47 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         self.noma = '11111111'
         self.nom_cohorte = 'DROI1BA'
 
+        self.feuille_de_notes = FeuilleDeNotesAvecUneSeuleNoteManquante(
+            notes={
+                NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
+            }
+        )
+        self.repository = FeuilleDeNotesInMemoryRepository()
+        self.repository.save(self.feuille_de_notes)
+
+        self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
+        self.resp_notes_repository.save(
+            ResponsableDeNotesLDROI1001Annee2020Factory(entity_id__matricule_fgs_enseignant=self.matricule_enseignant)
+        )
+
         self.cmd = GetFeuilleDeNotesGestionnaireCommand(
             code_unite_enseignement=self.code_unite_enseignement,
             matricule_fgs_gestionnaire=self.matricule_gestionnaire,
         )
 
-        self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
+        self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
+        self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
+        self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
+        self.unite_enseignement_trans = UniteEnseignementTranslatorInMemory()
         self.cohortes_gestionnaire_translator = CohortesDuGestionnaireInMemory()
-        self.feuille_notes_enseignant_translator = FeuilleDeNotesEnseignantTranslatorInMemory()
+
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
+            FeuilleDeNotesRepository=lambda: self.repository,
+            ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
+            InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
+            SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
-            FeuilleDeNotesEnseignantTranslator=lambda: self.feuille_notes_enseignant_translator,
-            CohortesDuGestionnaire=lambda: self.cohortes_gestionnaire_translator,
+            UniteEnseignementTranslator=lambda: self.unite_enseignement_trans,
+            CohortesDuGestionnaireTranslator=lambda: self.cohortes_gestionnaire_translator,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
-
         self.message_bus = message_bus_instance
 
     @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
@@ -108,17 +141,40 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         self.assertEqual(result.responsable_note.nom, 'Chileng')
         self.assertEqual(result.responsable_note.prenom, 'Jean-Michel')
 
+    @mock.patch("infrastructure.messages_bus.AttributionEnseignantTranslator")
+    def test_should_ignorer_responsable_notes_dans_autres_enseignants(self, mock_attrib_translator):
+        attribution_translator = AttributionEnseignantTranslatorInMemory()
+        responsable_notes = AttributionEnseignantDTO(
+            matricule_fgs_enseignant=self.matricule_enseignant,
+            code_unite_enseignement=self.code_unite_enseignement,
+            annee=self.annee,
+            nom="Chileng",  # Responsable de notes
+            prenom="Jean-Michel"  # Responsable de notes
+        )
+        attribution_translator.search_attributions_enseignant = lambda *args, **kwargs: {responsable_notes}
+        mock_attrib_translator.return_value = attribution_translator
+        result = self.message_bus.invoke(self.cmd)
+        self.assertEqual(result.autres_enseignants, list())
+
     def test_should_renvoyer_unite_enseignement(self):
         result = self.message_bus.invoke(self.cmd)
         self.assertEqual(result.code_unite_enseignement, self.code_unite_enseignement)
         self.assertEqual(result.intitule_complet_unite_enseignement, "Intitule complet unite enseignement")
 
+    def test_should_renvoyer_autres_enseignants_ordonnes(self):
+        result = self.message_bus.invoke(self.cmd)
+        resultat_ordonne = [
+            EnseignantDTO(nom="Jolypas", prenom="Michelle"),
+            EnseignantDTO(nom="Smith", prenom="Charles"),
+        ]
+        self.assertListEqual(resultat_ordonne, result.autres_enseignants)
+
     def test_should_renvoyer_signaletique_etudiant(self):
         result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertEqual(note_etudiant.noma, self.noma)
-        self.assertEqual(note_etudiant.nom, "NomEtudiant1")
-        self.assertEqual(note_etudiant.prenom, "PrenomEtudiant1")
+        self.assertEqual(note_etudiant.nom, "Dupont")
+        self.assertEqual(note_etudiant.prenom, "Marie")
         self.assertEqual(note_etudiant.peps.type_peps, PepsTypes.ARRANGEMENT_JURY.name)
         self.assertEqual(note_etudiant.peps.tiers_temps, True)
         self.assertEqual(note_etudiant.peps.copie_adaptee, True)
@@ -132,14 +188,49 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         self.assertEqual(result.annee_academique, self.annee)
         self.assertEqual(result.numero_session, self.numero_session)
 
-    def test_should_renvoyer_inscrit_tardivement(self):
+    @mock.patch("infrastructure.messages_bus.InscriptionExamenTranslator")
+    def test_should_renvoyer_inscrit_tardivement(self, mock_inscr_exam):
+        periode_ouverte = self.periode_encodage_translator.get()
+        date_apres_ouverture = periode_ouverte.debut_periode_soumission.to_date() + datetime.timedelta(days=1)
+        inscr_exam_translator = InscriptionExamenTranslatorInMemory()
+        inscrit_tardivement = InscriptionExamenDTO(
+            annee=self.annee,
+            noma=self.noma,
+            code_unite_enseignement=self.code_unite_enseignement,
+            nom_cohorte=self.nom_cohorte,
+            date_inscription=DateDTO(
+                jour=date_apres_ouverture.day,
+                mois=date_apres_ouverture.month,
+                annee=date_apres_ouverture.year,
+            ),
+        )
+        inscr_exam_translator.search_inscrits = lambda *args, **kwargs: {inscrit_tardivement}
+        mock_inscr_exam.return_value = inscr_exam_translator
         result = message_bus_instance.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         self.assertTrue(note_etudiant.inscrit_tardivement)
 
-    def test_should_renvoyer_desinscrit_tardivement(self):
+    @mock.patch("infrastructure.messages_bus.InscriptionExamenTranslator")
+    def test_should_renvoyer_desinscrit_tardivement(self, mock_inscr_exam):
+        periode_ouverte = self.periode_encodage_translator.get()
+        date_apres_ouverture = periode_ouverte.debut_periode_soumission.to_date() + datetime.timedelta(days=1)
+        inscr_exam_translator = InscriptionExamenTranslatorInMemory()
+        desinscrit_tardivement = InscriptionExamenDTO(
+            annee=self.annee,
+            noma=self.noma,
+            code_unite_enseignement=self.code_unite_enseignement,
+            nom_cohorte=self.nom_cohorte,
+            date_inscription=DateDTO(
+                jour=date_apres_ouverture.day,
+                mois=date_apres_ouverture.month,
+                annee=date_apres_ouverture.year,
+            ),
+        )
+        inscr_exam_translator.search_inscrits = lambda *args, **kwargs: set()
+        inscr_exam_translator.search_desinscrits = lambda *args, **kwargs: {desinscrit_tardivement}
+        mock_inscr_exam.return_value = inscr_exam_translator
         result = message_bus_instance.invoke(self.cmd)
-        note_etudiant = result.notes_etudiants[1]
+        note_etudiant = result.notes_etudiants[0]
         self.assertTrue(note_etudiant.desinscrit_tardivement)
 
     def test_should_renvoyer_note_est_soumise(self):
@@ -156,5 +247,24 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def test_should_renvoyer_echeance_enseignant(self):
         result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
-        expected_result = DateDTO(jour=5, mois=6, annee=2020)
-        self.assertEqual(expected_result, note_etudiant.echeance_enseignant)
+        expected_result = DateDTO(jour=12, mois=8, annee=2021)
+        self.assertEqual(expected_result, note_etudiant.date_remise_de_notes)
+
+    def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
+        self.repository.delete(self.feuille_de_notes.entity_id)
+
+        feuille_de_notes_with_multiple_students = FeuilleDeNotesAvecNotesManquantes(
+            notes={
+                NoteManquanteEtudiantFactory(entity_id__noma=self.noma),
+                NoteManquanteEtudiantFactory(entity_id__noma='99999999'),
+            }
+        )
+        self.repository.save(feuille_de_notes_with_multiple_students)
+
+        result = message_bus_instance.invoke(self.cmd)
+        self.assertEqual(len(result.notes_etudiants), 2)
+
+        self.assertEqual(result.notes_etudiants[0].nom, 'Arogan')
+        self.assertEqual(result.notes_etudiants[0].prenom, 'Adrien')
+        self.assertEqual(result.notes_etudiants[1].nom, 'Dupont')
+        self.assertEqual(result.notes_etudiants[1].prenom, 'Marie')

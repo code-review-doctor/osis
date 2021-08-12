@@ -23,20 +23,41 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO, FeuilleDeNotesEnseignantDTO
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
+    IAdresseFeuilleDeNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 
 
-class IFeuilleDeNotesEnseignantTranslator(interface.DomainService):
+class AdresseFeuilleDeNotesTranslatorInMemory(IAdresseFeuilleDeNotesTranslator):
+
+    contacts = {
+        AdresseFeuilleDeNotesDTO(
+            nom_cohorte='DROI1BA',
+            destinataire='Faculté de Droit',
+            rue_et_numero='Rue de la Fac, 19',
+            code_postal='1321',
+            ville='Louvain-La-Neuve',
+            pays='Belgique',
+            telephone='0106601122',
+            fax='0106601123',
+            email='email-fac-droit@email.be',
+        ),
+    }
 
     @classmethod
-    @abc.abstractmethod
-    def get(
+    def search(
             cls,
-            code_unite_enseignement: str,
-            matricule_fgs_enseignant: str,
-    ) -> 'FeuilleDeNotesEnseignantDTO':
-        raise NotImplementedError
+            noms_cohortes: Set[str]
+    ) -> Set['AdresseFeuilleDeNotesDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, noms_cohortes),
+                cls.contacts,
+            )
+        )
+
+
+def _filter(dto, cohortes: Set[str]):
+    return dto.nom_cohorte in cohortes

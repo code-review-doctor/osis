@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from datetime import date
 from typing import List, Set, Optional
 
 import attr
 
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO
 from osis_common.ddd import interface
 
 
@@ -47,12 +47,6 @@ class DateEcheanceDTO(interface.DTO):
     @property
     def encodage_est_complet(self) -> bool:
         return self.quantite_notes_manquantes == 0
-
-
-@attr.s(frozen=True, slots=True)
-class EnseignantDTO(interface.DTO):
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
@@ -83,81 +77,6 @@ class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class DateDTO(interface.DTO):
-    jour = attr.ib(type=int)
-    mois = attr.ib(type=int)
-    annee = attr.ib(type=int)
-
-    def to_date(self) -> date:
-        return date(day=self.jour, month=self.mois, year=self.annee)
-
-    @staticmethod
-    def build_from_date(d: date):
-        return DateDTO(jour=d.day, mois=d.month, annee=d.year)
-
-
-@attr.s(frozen=True, slots=True)
-class EtudiantPepsDTO(interface.DTO):
-    type_peps = attr.ib(type=str)
-    tiers_temps = attr.ib(type=bool)
-    copie_adaptee = attr.ib(type=bool)
-    local_specifique = attr.ib(type=bool)
-    autre_amenagement = attr.ib(type=bool)
-    details_autre_amenagement = attr.ib(type=str)
-    accompagnateur = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class NoteEtudiantDTO(interface.DTO):
-    est_soumise = attr.ib(type=bool)
-    date_remise_de_notes = attr.ib(type=DateDTO)
-    nom_cohorte = attr.ib(type=str)  # inscription examen
-    noma = attr.ib(type=str)  # matricule
-    nom = attr.ib(type=str)  # signaletique
-    prenom = attr.ib(type=str)  # signaletique
-    peps = attr.ib(type=Optional[EtudiantPepsDTO])  # signaletique
-    email = attr.ib(type=str)
-    note = attr.ib(type=str)
-    inscrit_tardivement = attr.ib(type=bool)  # inscription examen
-    desinscrit_tardivement = attr.ib(type=bool)  # inscription examen
-
-    @property
-    def date_echeance_atteinte(self) -> bool:
-        date_dto = self.date_remise_de_notes
-        date_de_remise = datetime.date(day=date_dto.jour, month=date_dto.mois, year=date_dto.annee)
-        aujourdhui = datetime.date.today()
-        return aujourdhui > date_de_remise
-
-
-@attr.s(frozen=True, slots=True)
-class FeuilleDeNotesEnseignantDTO(interface.DTO):
-    code_unite_enseignement = attr.ib(type=str)
-    intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
-    responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?
-    autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
-    annee_academique = attr.ib(type=int)
-    numero_session = attr.ib(type=int)
-    note_decimale_est_autorisee = attr.ib(type=bool)
-    notes_etudiants = attr.ib(type=List[NoteEtudiantDTO])
-
-    @property
-    def encodage_est_complet(self) -> bool:
-        return self.quantite_notes_soumises / self.quantite_total_notes == 0
-
-    @property
-    def quantite_notes_soumises(self) -> int:
-        return sum(1 for note in self.notes_etudiants if note.note is not None and note.est_soumise)
-
-    @property
-    def quantite_total_notes(self) -> int:
-        return len(self.notes_etudiants)
-
-    @property
-    def nombre_inscriptions(self) -> int:
-        return self.quantite_total_notes
-
-
-@attr.s(frozen=True, slots=True)
 class AdresseDTO(interface.DTO):
     code_postal = attr.ib(type=str)
     ville = attr.ib(type=str)
@@ -168,11 +87,12 @@ class AdresseDTO(interface.DTO):
 class DetailContactDTO(interface.DTO):
     matricule_fgs = attr.ib(type=str)
     email = attr.ib(type=str)
-    adresse_professionnelle = attr.ib(type=AdresseDTO)
+    adresse_professionnelle = attr.ib(type=Optional[AdresseDTO])
 
 
 @attr.s(frozen=True, slots=True)
-class ContactFeuilleDeNotesDTO(interface.DTO):
+class AdresseFeuilleDeNotesDTO(interface.DTO):
+    nom_cohorte = attr.ib(type=str)
     destinataire = attr.ib(type=str)
     rue_et_numero = attr.ib(type=str)
     code_postal = attr.ib(type=str)
@@ -187,9 +107,9 @@ class ContactFeuilleDeNotesDTO(interface.DTO):
 class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     sigle_formation = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
-    date_deliberation = attr.ib(type=str)
-    contact_responsable_notes = attr.ib(type=DetailContactDTO)
-    contact_feuille_de_notes = attr.ib(type=ContactFeuilleDeNotesDTO)
+    date_deliberation = attr.ib(type=DateDTO)
+    contact_responsable_notes = attr.ib(type=DetailContactDTO)  # FIXME :: déplacer dans FeuilleDeNotesEnseignantDTO ?
+    contact_feuille_de_notes = attr.ib(type=AdresseFeuilleDeNotesDTO)
 
 
 @attr.s(frozen=True, slots=True)
@@ -242,6 +162,21 @@ class InscriptionExamenDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     nom_cohorte = attr.ib(type=str)
     date_inscription = attr.ib(type=DateDTO)
+
+
+@attr.s(frozen=True, slots=True)
+class InscriptionCohorteDTO(interface.DTO):
+    annee = attr.ib(type=int)
+    noma = attr.ib(type=str)
+    nom_cohorte = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DeliberationDTO(interface.DTO):
+    annee = attr.ib(type=int)
+    session = attr.ib(type=int)
+    nom_cohorte = attr.ib(type=str)
+    date = attr.ib(type=DateDTO)
 
 
 @attr.s(frozen=True, slots=True)

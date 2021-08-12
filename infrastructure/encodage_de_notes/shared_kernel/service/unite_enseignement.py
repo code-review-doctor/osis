@@ -23,18 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set, Tuple
 
-from ddd.logic.encodage_des_notes.encodage.domain.service.i_feuille_de_notes_enseignant import \
-    IFeuilleDeNotesEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
+from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
 
 
-class FeuilleDeNotesEnseignantTranslator(IFeuilleDeNotesEnseignantTranslator):
+class UniteEnseignementTranslator(IUniteEnseignementTranslator):
 
     @classmethod
     def get(
             cls,
-            code_unite_enseignement: str,
-            matricule_fgs_enseignant: str,
-    ) -> 'FeuilleDeNotesEnseignantDTO':
-        raise NotImplementedError
+            code: str,
+            annee: int,
+    ) -> 'UniteEnseignementDTO':
+        dtos = cls.search({(code, annee)})
+        if dtos:
+            return list(dtos)[0]
+
+    @classmethod
+    def search(
+            cls,
+            code_annee_values: Set[Tuple[str, int]],
+    ) -> Set['UniteEnseignementDTO']:
+        from infrastructure.messages_bus import message_bus_instance
+        results = message_bus_instance.invoke(LearningUnitSearchCommand(code_annee_values=code_annee_values))
+        return {
+            UniteEnseignementDTO(
+                annee=dto.year,
+                code=dto.code,
+                intitule_complet=dto.full_title,
+            ) for dto in results
+        }

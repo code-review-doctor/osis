@@ -23,36 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set, Tuple
+import abc
+from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
-from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO
+from osis_common.ddd import interface
 
 
-class UniteEnseignementTranslator(IUniteEnseignementTranslator):
-
-    @classmethod
-    def get(
-            cls,
-            code: str,
-            annee: int,
-    ) -> 'UniteEnseignementDTO':
-        dtos = cls.search({(code, annee)})
-        if dtos:
-            return list(dtos)[0]
+class ISignaletiquePersonneTranslator(interface.DomainService):
 
     @classmethod
+    @abc.abstractmethod
     def search(
             cls,
-            code_annee_values: Set[Tuple[str, int]],
-    ) -> Set['UniteEnseignementDTO']:
-        from infrastructure.messages_bus import message_bus_instance
-        results = message_bus_instance.invoke(LearningUnitSearchCommand(code_annee_values=code_annee_values))
-        return {
-            UniteEnseignementDTO(
-                annee=dto.year,
-                code=dto.code,
-                intitule_complet=dto.full_title,
-            ) for dto in results
-        }
+            matricules_fgs: Set[str]
+    ) -> Set['DetailContactDTO']:
+        raise NotImplementedError

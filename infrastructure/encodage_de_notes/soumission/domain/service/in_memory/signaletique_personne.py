@@ -23,27 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from typing import Set
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO, AdresseDTO
 
 
-class PeriodeEncodageNotesTranslator(IPeriodeEncodageNotesTranslator):
+class SignaletiquePersonneTranslatorInMemory(ISignaletiquePersonneTranslator):
+
+    signaletiques = {
+        DetailContactDTO(
+            matricule_fgs='00321234',
+            email='charles.smith@email.com',
+            adresse_professionnelle=AdresseDTO(
+                code_postal='1410',
+                ville='Waterloo',
+                rue_numero_boite='Rue de Waterloo, 123',
+            ),
+        ),
+    }
 
     @classmethod
-    def get(cls) -> 'PeriodeSoumissionNotesDTO':
-        calendar = ScoresExamSubmissionCalendar()
-        events = calendar.get_opened_academic_events(date=datetime.date.today())
-        if events:
-            event = events[0]
-            date_debut = event.start_date
-            date_fin = event.end_date
-            return PeriodeSoumissionNotesDTO(
-                annee_concernee=event.authorized_target_year,
-                session_concernee=event.session,
-                debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
-                fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
+    def search(
+            cls,
+            matricules_fgs: Set[str]
+    ) -> Set['DetailContactDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, matricules_fgs),
+                cls.signaletiques,
             )
+        )
+
+
+def _filter(dto, matricules_fgs):
+    return dto.matricule_fgs in matricules_fgs

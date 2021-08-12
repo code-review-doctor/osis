@@ -31,7 +31,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, EnseignantDTO
 
 
 class LearningUnitScoreEncodingTutorFormViewTest(TestCase):
@@ -57,7 +57,7 @@ class LearningUnitScoreEncodingTutorFormViewTest(TestCase):
 
     def __mock_message_bus_invoke(self, cmd):
         if isinstance(cmd, GetFeuilleDeNotesCommand):
-            return FeuilleDeNotesEnseignantDTO(
+            return FeuilleDeNotesDTO(
                 code_unite_enseignement='LEPL1509',
                 intitule_complet_unite_enseignement='Introduction au data-mining',
                 note_decimale_est_autorisee=True,

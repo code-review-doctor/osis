@@ -25,35 +25,48 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import Subquery, OuterRef, F
+from django.db.models import F, Subquery, OuterRef
 
-from base.auth.roles.program_manager import ProgramManager
+from assessments.models.score_sheet_address import ScoreSheetAddress
 from base.models.education_group_year import EducationGroupYear
-from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
+    IAdresseFeuilleDeNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 
 
-class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
+class AdresseFeuilleDeNotesTranslator(IAdresseFeuilleDeNotesTranslator):
 
     @classmethod
     def search(
             cls,
-            matricule_gestionnaire: str,
-    ) -> Set['CohorteGestionnaireDTO']:
-        # TODO :: intégrer 11BA
-        qs = ProgramManager.objects.filter(
-            person__global_id=matricule_gestionnaire
+            noms_cohortes: Set[str]
+    ) -> Set['AdresseFeuilleDeNotesDTO']:
+        # TODO :: migrer les données des adresses des Entités dans ScoreSheetAddress (actuellement, c'est calculé à chaque fois à la volée...)
+        # TODO :: implémenter le filtre sur les 11BA
+        qs = ScoreSheetAddress.objects.filter(
+            education_group__educationgroupyear__acronym__in=noms_cohortes,
         ).annotate(
             nom_cohorte=Subquery(
                 EducationGroupYear.objects.filter(
-                    education_group_id=OuterRef('education_group_id')
-                ).order_by(
-                    '-academic_year__year'
-                ).values('acronym')[:1]
+                    education_group_id=OuterRef('education_group_id'),
+                ).order_by('-academic_year__year').values('acronym')[:1]
             ),
-            matricule_gestionnaire=F('person__global_id'),
+            destinataire=F('recipient'),
+            rue_et_numero=F('location'),
+            code_postal=F('postal_code'),
+            ville=F('city'),
+            pays=F('country__name'),
+            telephone=F('phone'),
         ).values(
             'nom_cohorte',
-            'matricule_gestionnaire',
-        )
-        return {CohorteGestionnaireDTO(**values) for values in qs}
+            'destinataire',
+            'rue_et_numero',
+            'code_postal',
+            'ville',
+            'pays',
+            'telephone',
+            'fax',
+            'email',
+        ).distinct()
+
+        return {AdresseFeuilleDeNotesDTO(**values) for values in qs}

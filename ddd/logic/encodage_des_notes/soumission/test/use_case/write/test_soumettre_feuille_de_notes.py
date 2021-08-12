@@ -32,14 +32,15 @@ from django.test import SimpleTestCase
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
     PasResponsableDeNotesException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesEncodees, \
     FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
-from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.common_domain.service.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
     FeuilleDeNotesInMemoryRepository

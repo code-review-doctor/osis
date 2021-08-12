@@ -57,10 +57,13 @@ from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGest
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
-    GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand, SoumettreFeuilleDeNotesCommand
+    GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand, SoumettreFeuilleDeNotesCommand, \
+    SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
+from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service import \
+    search_donnees_administratives_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
@@ -98,17 +101,21 @@ from infrastructure.application.services.learning_unit_service import LearningUn
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
-from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import CohortesDuGestionnaire
-from infrastructure.encodage_de_notes.encodage.domain.service.feuille_de_notes_enseignant import \
-    FeuilleDeNotesEnseignantTranslator
-from infrastructure.encodage_de_notes.common_domain.service.attribution_enseignant import \
+from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
+    CohortesDuGestionnaireTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
-from infrastructure.encodage_de_notes.common_domain.service.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.shared_kernel.service.inscription_examen import InscriptionExamenTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
+    SignaletiquePersonneTranslator
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
@@ -253,10 +260,14 @@ class MessageBus:
         ),
         GetFeuilleDeNotesGestionnaireCommand: lambda cmd: get_feuille_de_notes_gestionnaire(
             cmd,
+            FeuilleDeNotesRepository(),
+            ResponsableDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
+            InscriptionExamenTranslator(),
+            SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),
-            FeuilleDeNotesEnseignantTranslator(),
-            CohortesDuGestionnaire(),
+            UniteEnseignementTranslator(),
+            CohortesDuGestionnaireTranslator(),
         ),
         SoumettreFeuilleDeNotesCommand: lambda cmd: soumettre_feuille_de_notes(
             cmd,
@@ -264,6 +275,16 @@ class MessageBus:
             ResponsableDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
         ),
+        SearchAdressesFeuilleDeNotesCommand: lambda cmd: search_donnees_administratives_feuille_de_notes(
+            cmd,
+            PeriodeEncodageNotesTranslator(),
+            AdresseFeuilleDeNotesTranslator(),
+            SignaletiquePersonneTranslator(),
+            InscriptionExamenTranslator(),
+            ResponsableDeNotesRepository(),
+            DeliberationTranslator(),
+        ),
+
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 
     def invoke(self, command: CommandRequest) -> ApplicationServiceResult:

@@ -26,7 +26,7 @@
 import functools
 import itertools
 import operator
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q
 from django.db.models.functions import Coalesce, Cast, Concat
@@ -45,19 +45,10 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
     def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
         if not entity_ids:
             return []
-
-        q_filters = functools.reduce(
-            operator.or_,
-            [
-                Q(
-                    acronym=entity_id.code_unite_enseignement,
-                    year=entity_id.annee_academique,
-                    number_session=entity_id.numero_session
-                )
-                for entity_id in entity_ids
-            ]
-        )
-        rows = _fetch_session_exams().filter(q_filters)
+        number_sessions = {ent.numero_session for ent in entity_ids}
+        years = {ent.annee_academique for ent in entity_ids}
+        acronyms = {ent.code_unite_enseignement for ent in entity_ids}
+        rows = _fetch_session_exams(number_sessions, years).filter(acronym__in=acronyms)
         rows_group_by_identity = itertools.groupby(rows, key=lambda row: (row.acronym, row.year, row.number_session))
 
         result = []
@@ -123,11 +114,23 @@ def _save_note(feuille_de_note_entity_id: 'IdentiteFeuilleDeNotes', note: 'NoteE
     db_obj.save()
 
 
-def _fetch_session_exams():
-    return ExamEnrollment.objects.annotate(
-        acronym=Concat(
-            'learning_unit_enrollment__learning_unit_year__acronym',
-            'learning_unit_enrollment__learning_class_year__acronym',
+def _fetch_session_exams(number_sessions: Set[int] = None, years: Set[int] = None):
+    qs = ExamEnrollment.objects
+    if number_sessions:
+        qs = qs.filter(session_exam__number_session__in=number_sessions)
+    if years:
+        qs = qs.filter(learning_unit_enrollment__learning_unit_year__academic_year__year__in=years)
+    qs = qs.annotate(
+        acronym=Case(
+            When(
+                learning_unit_enrollment__learning_class_year__isnull=False,
+                then=Concat(
+                    'learning_unit_enrollment__learning_unit_year__acronym',
+                    'learning_unit_enrollment__learning_class_year__acronym',
+                    output_field=CharField()
+                )
+            ),
+            default='learning_unit_enrollment__learning_unit_year__acronym',
             output_field=CharField()
         ),
         year=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
@@ -177,3 +180,4 @@ def _fetch_session_exams():
         'year',
         'number_session',
     )
+    return qs

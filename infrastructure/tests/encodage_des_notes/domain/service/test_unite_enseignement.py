@@ -28,7 +28,7 @@ from django.test import TestCase
 
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 from ddd.logic.learning_unit.dtos import LearningUnitSearchDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 

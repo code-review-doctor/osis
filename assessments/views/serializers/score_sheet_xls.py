@@ -28,7 +28,7 @@ import operator
 
 from rest_framework import serializers
 
-from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
 from education_group.templatetags.academic_year_display import display_as_academic_year
 
 

@@ -23,43 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set, Tuple
+from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
+from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import DeliberationDTO, DateDTO
 
 
-class UniteEnseignementTranslatorInMemory(IUniteEnseignementTranslator):
+class DeliberationTranslatorInMemory(IDeliberationTranslator):
 
-    @classmethod
-    def get(
-            cls,
-            code: str,
-            annee: int,
-    ) -> 'UniteEnseignementDTO':
-        dtos = cls.search({(code, annee)})
-        if dtos:
-            return list(dtos)[0]
+    deliberations = {
+        DeliberationDTO(
+            annee=2020,
+            session=2,
+            nom_cohorte='DROI1BA',
+            date=DateDTO(
+                jour=15,
+                mois=6,
+                annee=2020,
+            ),
+        ),
+    }
 
     @classmethod
     def search(
             cls,
-            values: Set[Tuple[str, int]],
-    ) -> Set['UniteEnseignementDTO']:
-        return {
-            UniteEnseignementDTO(
-                annee=2020,
-                code='LDROI1001',
-                intitule_complet="Intitule complet unite enseignement",
-            ),
-            UniteEnseignementDTO(
-                annee=2020,
-                code='LDROI1002',
-                intitule_complet="Intitule complet unite enseignement",
-            ),
-            UniteEnseignementDTO(
-                annee=2020,
-                code='LDROI1003',
-                intitule_complet="Intitule complet unite enseignement",
-            ),
-        }
+            annee: int,
+            session: int,
+            noms_cohortes: Set[str],
+    ) -> Set['DeliberationDTO']:
+        return set(
+            filter(
+                lambda dto: _filter(dto, annee, session, noms_cohortes),
+                cls.deliberations,
+            )
+        )
+
+
+def _filter(dto, annee: int, session: int, noms_cohortes: Set[str]):
+    return dto.nom_cohorte in noms_cohortes and dto.annee == annee and dto.session == session
+

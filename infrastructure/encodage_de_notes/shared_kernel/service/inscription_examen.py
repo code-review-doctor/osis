@@ -30,8 +30,9 @@ from django.db.models.functions import Concat, Replace
 
 from base.models.enums import exam_enrollment_state
 from base.models.exam_enrollment import ExamEnrollment
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO, DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 
 
 class InscriptionExamenTranslator(IInscriptionExamenTranslator):
@@ -44,7 +45,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             annee: int
     ) -> Set['DesinscriptionExamenDTO']:
         qs_as_values = _get_common_queryset(
-            code_unite_enseignement=code_unite_enseignement,
+            codes_unites_enseignement={code_unite_enseignement},
             numero_session=numero_session,
             annee=annee,
         ).exclude(
@@ -79,8 +80,21 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
             numero_session: int,
             annee: int,
     ) -> Set['InscriptionExamenDTO']:
+        return cls.search_inscrits_pour_plusieurs_unites_enseignement(
+            {code_unite_enseignement},
+            numero_session,
+            annee,
+        )
+
+    @classmethod
+    def search_inscrits_pour_plusieurs_unites_enseignement(
+            cls,
+            codes_unites_enseignement: Set[str],
+            numero_session: int,
+            annee: int,
+    ) -> Set['InscriptionExamenDTO']:
         qs_as_values = _get_common_queryset(
-            code_unite_enseignement=code_unite_enseignement,
+            codes_unites_enseignement=codes_unites_enseignement,
             numero_session=numero_session,
             annee=annee,
         ).filter(
@@ -121,7 +135,7 @@ class InscriptionExamenTranslator(IInscriptionExamenTranslator):
 
 
 def _get_common_queryset(
-        code_unite_enseignement: str,
+        codes_unites_enseignement: Set[str],
         numero_session: int,
         annee: int,
 ) -> QuerySet:
@@ -140,5 +154,5 @@ def _get_common_queryset(
             default='learning_unit_enrollment__learning_unit_year__acronym',
         ),
     ).filter(
-        code_unite_enseignement=code_unite_enseignement,
+        code_unite_enseignement__in=codes_unites_enseignement,
     )

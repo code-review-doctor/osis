@@ -26,18 +26,38 @@
 import abc
 from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
 from osis_common.ddd import interface
 
 
-class ISignaletiqueTranslator(interface.DomainService):
+class IInscriptionExamenTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def search(
+    def search_inscrits(
             cls,
             code_unite_enseignement: str,
             numero_session: int,
             annee: int,
-    ) -> Set['DetailContactDTO']:
+    ) -> Set['InscriptionExamenDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_desinscrits(
+            cls,
+            code_unite_enseignement: str,
+            numero_session: int,
+            annee: int,
+    ) -> Set['DesinscriptionExamenDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def search_inscrits_pour_plusieurs_unites_enseignement(
+            cls,
+            codes_unites_enseignement: Set[str],
+            numero_session: int,
+            annee: int,
+    ) -> Set['InscriptionExamenDTO']:
         raise NotImplementedError

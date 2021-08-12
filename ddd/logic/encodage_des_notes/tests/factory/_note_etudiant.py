@@ -30,7 +30,7 @@ import factory
 from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteManquante, NoteChiffree, Justification
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 
 
 def generate_noma() -> str:
