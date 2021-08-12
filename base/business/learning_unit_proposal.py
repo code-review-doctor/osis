@@ -80,7 +80,7 @@ INITIAL_DATA_FIELDS = {
         "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
         "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
         "faculty_remark", "other_remark", "other_remark_english", "stage_dimona", 'individual_loan', 'french_friendly',
-        'english_friendly', 'exchange_students'
+        'english_friendly', 'exchange_students',
     ],
     'learning_component_year': [
         "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
