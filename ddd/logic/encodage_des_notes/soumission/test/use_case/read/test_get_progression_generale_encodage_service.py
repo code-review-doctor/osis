@@ -29,14 +29,15 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, NoteDejaSoumise
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteDejaSoumise
+from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.unite_enseignement import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
@@ -62,7 +63,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
 
         self.cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.matricule_enseignant)
 
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
         self.unite_enseignement_trans = UniteEnseignementTranslatorInMemory()
@@ -73,7 +74,7 @@ class GetProgressionGeneraleEncodageTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             NoteEtudiantRepository=lambda: self.repository,
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
             UniteEnseignementTranslator=lambda: self.unite_enseignement_trans,

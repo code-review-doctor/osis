@@ -147,7 +147,9 @@
                            title="{% trans 'Download the Excel file' %}">
                             <em class="fas fa-download"></em> {% trans 'Get Excel file'%}
                         </a>
-                         <a id="lnk_xls_upload" class="btn btn-default" href="{{ learning_unit_upload_xls_url }}"
+                         <a id="lnk_xls_upload"
+                            class="btn btn-default trigger_modal"
+                            data-url="{{ learning_unit_upload_xls_url }}"
                            data-toggle="tooltip"
                            data-placement="bottom"
                            title="{% trans 'Select an excel file to inject scores.' %}">

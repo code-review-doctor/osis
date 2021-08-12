@@ -29,19 +29,22 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, InscriptionExamenDTO, EnseignantDTO, \
-    AttributionEnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, AttributionEnseignantDTO, \
+    PeriodeSoumissionNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.unite_enseignement import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
@@ -67,13 +70,16 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.repository.save(self.note_etudiant)
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
+        self.resp_notes_repository.save(
+            ResponsableDeNotesLDROI1001Annee2020Factory(entity_id__matricule_fgs_enseignant=self.matricule_enseignant)
+        )
 
         self.cmd = GetFeuilleDeNotesCommand(
             code_unite_enseignement=self.code_unite_enseignement,
             matricule_fgs_enseignant=self.matricule_enseignant,
         )
 
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
         self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
@@ -85,7 +91,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             'infrastructure.messages_bus',
             NoteEtudiantRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
             SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
@@ -95,6 +101,23 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.addCleanup(message_bus_patcher.stop)
 
         self.message_bus = message_bus_instance
+
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
+    def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
+        hier = datetime.date.today() - datetime.timedelta(days=1)
+        date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
+        periode_fermee = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.annee,
+            session_concernee=self.numero_session,
+            debut_periode_soumission=date_dans_le_passe,
+            fin_periode_soumission=date_dans_le_passe,
+        )
+        periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
+        periode_soumission_translator.get = lambda *args: periode_fermee
+        mock_periode_translator.return_value = periode_soumission_translator
+
+        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+            self.message_bus.invoke(self.cmd)
 
     def test_should_renvoyer_responsable_de_notes(self):
         result = self.message_bus.invoke(self.cmd)

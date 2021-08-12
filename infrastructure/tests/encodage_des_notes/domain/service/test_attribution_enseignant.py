@@ -27,11 +27,10 @@ from unittest import skip
 
 from django.test import TestCase
 
-from attribution.models.attribution_class import AttributionClass
 from attribution.tests.factories.attribution_class import AttributionClassFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.attribution_enseignant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 
 
@@ -56,7 +55,8 @@ class AttributionEnseignantTest(TestCase):
 
     def test_should_trouver_attribution_par_matricule(self):
         result = self.translator.search_attributions_enseignant_par_matricule(
-            self.attribution_db.tutor.person.global_id
+            self.annee,
+            self.attribution_db.tutor.person.global_id,
         )
 
         expected_result = {self._convert_attribution_db_data_to_dto(self.attribution_db)}
@@ -66,7 +66,8 @@ class AttributionEnseignantTest(TestCase):
         attribution_class = AttributionClassFactory()
 
         result = self.translator.search_attributions_enseignant_par_matricule(
-            attribution_class.attribution_charge.attribution.tutor.person.global_id
+            self.annee,
+            attribution_class.attribution_charge.attribution.tutor.person.global_id,
         )
 
         expected_result = {

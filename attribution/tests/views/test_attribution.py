@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_class import AttributionClassFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.views.attribution import get_charge_repartition_warning_messages, \
     _get_classes_charge_repartition_warning_messages
@@ -153,9 +154,10 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
             learning_component_year=cls.full_lecturing_component,
             hourly_volume_partial_q1=20
         )
-        cls.pract_learning_class_year = LearningClassYearFactory(
-            learning_component_year=cls.full_practical_component,
-            hourly_volume_partial_q1=20
+        AttributionClassFactory(
+            learning_class_year=cls.lect_learning_class_year,
+            attribution_charge=cls.charge_lecturing,
+            allocation_charge=21
         )
 
     def setUp(self):

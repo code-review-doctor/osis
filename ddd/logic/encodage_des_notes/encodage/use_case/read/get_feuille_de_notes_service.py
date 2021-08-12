@@ -23,18 +23,58 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
-from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO
+from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_par_cohorte import \
+    FeuilleDeNotesParCohorte
+from ddd.logic.encodage_des_notes.encodage.domain.service.gestionnaire_parcours import GestionnaireParcours
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
+from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
+from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
+    FeuilleDeNotesIdentityBuilder
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
+    ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-def get_feuille_de_notes(
+def get_feuille_de_notes_gestionnaire(
         cmd: 'GetFeuilleDeNotesGestionnaireCommand',
-) -> 'FeuilleDeNotesGestionnaireDTO':
+        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+        responsable_notes_repo: 'IResponsableDeNotesRepository',
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
+        inscription_examen_translator: 'IInscriptionExamenTranslator',
+        signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
+        attribution_translator: 'IAttributionEnseignantTranslator',
+        unite_enseignement_translator: 'IUniteEnseignementTranslator',
+        cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
+) -> 'FeuilleDeNotesParCohorteDTO':
     # GIVEN
-    # PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
-    # periode_soumission = periode_soumission_note_translator.get()
-    # TODO :: FeuilleDeNotesDTO doit être commun aux 2 contextes et les filtres sont faits dans chaque contexte
+    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
+    GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
 
-    # WHEN
+    periode_encodage = periode_encodage_note_translator.get()
+    feuille_notes_entity_id = FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
+        numero_session=periode_encodage.session_concernee,
+        code_unite_enseignement=cmd.code_unite_enseignement,
+        annee_academique=periode_encodage.annee_concernee,
+    )
+    feuille_de_notes = feuille_de_note_repo.get(feuille_notes_entity_id)
 
-    return
+    return FeuilleDeNotesParCohorte().get(
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        feuille_de_notes=feuille_de_notes,
+        responsable_notes_repo=responsable_notes_repo,
+        periode_encodage=periode_encodage_note_translator.get(),
+        inscription_examen_translator=inscription_examen_translator,
+        signaletique_etudiant_translator=signaletique_etudiant_translator,
+        attribution_translator=attribution_translator,
+        unite_enseignement_translator=unite_enseignement_translator,
+        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
+    )

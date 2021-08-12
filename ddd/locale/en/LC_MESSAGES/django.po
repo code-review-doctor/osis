@@ -69,6 +69,9 @@ msgstr ""
 msgid "Decimal scores not authorized"
 msgstr ""
 
+msgid "Distributed volume should be filled in and be greater than 0"
+msgstr ""
+
 msgid "Following fields are required : {}"
 msgstr ""
 
@@ -176,6 +179,22 @@ msgstr ""
 msgid ""
 "This course is team-managed. The application to this activity is based on a "
 "paper transmission."
+msgstr ""
+
+msgid "Tutor already assigned to the class"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the attribution volume "
+"(%(attribution_volume)s)"
+msgstr ""
+
+#, python-format
+msgid ""
+"Volume of %(assigned_volume)s is not a valid volume. It should be greater or "
+"equal than 0 and less or equal than the class volume (%(class_volume)s)"
 msgstr ""
 
 msgid "Volumes asked should be lower or equal to volume available"

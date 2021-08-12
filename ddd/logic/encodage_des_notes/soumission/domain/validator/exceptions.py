@@ -87,3 +87,9 @@ class PasResponsableDeNotesException(BusinessException):
             code_unite_enseignement=code_unite_enseignement
         )
         super().__init__(message, **kwargs)
+
+
+class PasGestionnaireParcoursExceptionException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("You're not a program manager (no assigned formations found)")
+        super().__init__(message, **kwargs)

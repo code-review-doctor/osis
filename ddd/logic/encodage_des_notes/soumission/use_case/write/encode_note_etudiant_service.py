@@ -23,28 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import \
+    PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
     EnseignantAttribueUniteEnseignement
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
-    IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.periode_soumission_ouverte import \
-    PeriodeSoumissionOuverte
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 
 
 def encoder_note_etudiant(
         cmd: 'EncoderNoteCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
-        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteFeuilleDeNotes':
     # Given
-    PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
+    PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
     EnseignantAttribueUniteEnseignement().verifier(
         cmd.code_unite_enseignement,
         cmd.annee_unite_enseignement,

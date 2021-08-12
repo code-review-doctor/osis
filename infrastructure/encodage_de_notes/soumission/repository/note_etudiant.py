@@ -25,7 +25,7 @@
 ##############################################################################
 import functools
 import operator
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from django.db.models import F, Case, CharField, Value, When, BooleanField, ExpressionWrapper, DateField, Q, OuterRef, \
     Subquery
@@ -148,6 +148,11 @@ def _save_note(note: 'NoteEtudiant'):
     db_obj.save()
 
 
+# qs = ExamEnrollment.objects
+# if number_sessions:
+#     qs = qs.filter(session_exam__number_session__in=number_sessions)
+# if years:
+#     qs = qs.filter(learning_unit_enrollment__learning_unit_year__academic_year__year__in=years)
 def _fetch_session_exams():
     subqs_deadline = SessionExamDeadline.objects.filter(
         number_session=OuterRef("session_exam__number_session"),

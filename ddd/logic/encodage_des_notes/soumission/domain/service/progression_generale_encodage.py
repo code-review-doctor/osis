@@ -26,14 +26,14 @@
 import collections
 from typing import List, Dict, Set, Tuple, Any, Callable, Iterable
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO, \
     ProgressionEncodageNotesUniteEnseignementDTO, DateEcheanceDTO, UniteEnseignementDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
@@ -48,7 +48,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             matricule_fgs_enseignant: str,
             note_etudiant_repo: 'INoteEtudiantRepository',
             attribution_translator: 'IAttributionEnseignantTranslator',
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
@@ -133,7 +133,10 @@ def _search_notes(
         session_concerne: int,
         annee_concerne: int
 ) -> List['NoteEtudiant']:
-    attributions = attribution_translator.search_attributions_enseignant_par_matricule(matricule_fgs_enseignant)
+    attributions = attribution_translator.search_attributions_enseignant_par_matricule(
+        annee_concerne,
+        matricule_fgs_enseignant
+    )
     search_criterias = [(attrib.code_unite_enseignement, annee_concerne, session_concerne) for attrib in attributions]
     return note_etudiant_repo.search_by_code_unite_enseignement_annee_session(criterias=search_criterias)
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-30 13:51+0200\n"
+"POT-Creation-Date: 2021-07-30 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,6 +26,9 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
+msgid "Add over the current year"
+msgstr ""
+
 msgid "Additional requirement entity 1"
 msgstr ""
 
@@ -41,6 +44,9 @@ msgstr ""
 #, python-format
 msgid ""
 "Are you certain that you want to definitively delete the class in %(year)s ?"
+msgstr ""
+
+msgid "Are you sure?"
 msgstr ""
 
 msgid "Attribution entity"
@@ -82,6 +88,9 @@ msgstr ""
 msgid "Common part"
 msgstr ""
 
+msgid "Complete LU"
+msgstr ""
+
 msgid "Components"
 msgstr ""
 
@@ -89,6 +98,9 @@ msgid "Confirm"
 msgstr ""
 
 msgid "Credits"
+msgstr ""
+
+msgid "Delete"
 msgstr ""
 
 msgid "Delete class definitively"
@@ -110,6 +122,9 @@ msgid "Formation catalogue"
 msgstr ""
 
 msgid "Full"
+msgstr ""
+
+msgid "Function"
 msgstr ""
 
 msgid "Identification"
@@ -157,7 +172,13 @@ msgstr ""
 msgid "Lecturing"
 msgstr ""
 
+msgid "Manage repartition"
+msgstr ""
+
 msgid "New class"
+msgstr ""
+
+msgid "No attributions exist for the UE"
 msgstr ""
 
 msgid "Not in period to edit description fiche."
@@ -202,7 +223,22 @@ msgstr ""
 msgid "Refer to learning unit"
 msgstr ""
 
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Repartition deleted for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Repartition edited for %(tutor)s (%(function)s)"
+msgstr ""
+
 msgid "Requirement entity"
+msgstr ""
+
+msgid "Save"
 msgstr ""
 
 msgid "Session derogation"
@@ -249,6 +285,9 @@ msgid "The proposal is not on this academic year"
 msgstr ""
 
 msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+
+msgid "This effective class is not editable this period."
 msgstr ""
 
 msgid "This learning unit has an application in the future"
@@ -311,6 +350,15 @@ msgstr ""
 msgid "Title in French"
 msgstr ""
 
+msgid "Tutor"
+msgstr ""
+
+msgid "Tutor already assigned to the class"
+msgstr ""
+
+msgid "Tutors"
+msgstr ""
+
 msgid "Type"
 msgstr ""
 
@@ -326,10 +374,16 @@ msgstr ""
 msgid "Vol. annual"
 msgstr ""
 
+msgid "Volume"
+msgstr ""
+
 msgid "Volume Q1"
 msgstr ""
 
 msgid "Volume Q2"
+msgstr ""
+
+msgid "Yes, I confirm."
 msgstr ""
 
 msgid "You are not allowed to create proposal during this academic year"
@@ -354,6 +408,17 @@ msgstr ""
 msgid ""
 "You can only modify a learning unit when your are linked to its requirement "
 "entity"
+msgstr ""
+
+msgid ""
+"You can only modify an effective class when your are linked to learning unit "
+"requirement entity"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can't modify effective class under year : %(year)d. Modifications should "
+"be made in EPC under year %(year)d"
 msgstr ""
 
 #, python-format

@@ -708,7 +708,7 @@ msgstr ""
 "fichier excel par unité d'enseignement."
 
 msgid "You have to select a file to upload."
-msgstr "Vous avez sélectionné un fichier à téléversé"
+msgstr "Vous devez sélectionner un fichier à téléverser"
 
 msgid "You haven't any score to encode."
 msgstr "Vous n'avez pas de note à encoder."

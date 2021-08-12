@@ -30,10 +30,14 @@ var formAjaxSubmit = function (form, modal) {
         // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
         addDispatchEventOnSubmitAjaxForm(e);
+
+        const isUploadForm = $(this).attr('enctype') === 'multipart/form-data';
         $.ajax({
             type: $(this).attr('method'),
             url: $(this).attr('action'),
-            data: $(this).serialize(),
+            data: isUploadForm ? new FormData($(this)[0]) : $(this).serialize() ,
+            processData: !isUploadForm,
+            contentType: (isUploadForm) ? false : 'application/x-www-form-urlencoded; charset=UTF-8',
             context: this,
             success: function (xhr, ajaxOptions, thrownError) {
                 //Stay on the form if there are errors.

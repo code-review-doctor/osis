@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO, DateDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
 from osis_common.ddd import interface
 
 

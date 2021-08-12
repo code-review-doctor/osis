@@ -23,69 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from typing import List, Optional
+from typing import List
 
 import attr
 
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO, NoteEtudiantDTO
 from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
-class EnseignantDTO(interface.DTO):
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
+class CohorteGestionnaireDTO(interface.DTO):
+    matricule_gestionnaire = attr.ib(type=str)
+    nom_cohorte = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
-class DateDTO(interface.DTO):
-    jour = attr.ib(type=int)
-    mois = attr.ib(type=int)
-    annee = attr.ib(type=int)
-
-    def to_date(self) -> datetime.date:
-        return datetime.date(day=self.jour, month=self.mois, year=self.annee)
-
-    @staticmethod
-    def build_from_date(d: datetime.date):
-        return DateDTO(jour=d.day, mois=d.month, annee=d.year)
-
-
-@attr.s(frozen=True, slots=True)
-class EtudiantPepsDTO(interface.DTO):
-    type_peps = attr.ib(type=str)
-    tiers_temps = attr.ib(type=bool)
-    copie_adaptee = attr.ib(type=bool)
-    local_specifique = attr.ib(type=bool)
-    autre_amenagement = attr.ib(type=bool)
-    details_autre_amenagement = attr.ib(type=str)
-    accompagnateur = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class NoteEtudiantDTO(interface.DTO):
-    est_soumise = attr.ib(type=bool)
-    echeance_enseignant = attr.ib(type=DateDTO)
-    nom_cohorte = attr.ib(type=str)  # inscription examen
-    noma = attr.ib(type=str)  # matricule
-    nom = attr.ib(type=str)  # signaletique
-    prenom = attr.ib(type=str)  # signaletique
-    peps = attr.ib(type=Optional[EtudiantPepsDTO])  # signaletique
-    email = attr.ib(type=str)
-    note = attr.ib(type=str)
-    inscrit_tardivement = attr.ib(type=bool)  # inscription examen
-    desinscrit_tardivement = attr.ib(type=bool)  # inscription examen
-
-    @property
-    def date_echeance_atteinte(self) -> bool:
-        date_dto = self.echeance_enseignant
-        date_de_remise = datetime.date(day=date_dto.jour, month=date_dto.mois, year=date_dto.annee)
-        aujourdhui = datetime.date.today()
-        return aujourdhui > date_de_remise
-
-
-@attr.s(frozen=True, slots=True)
-class FeuilleDeNotesGestionnaireDTO(interface.DTO):
+class FeuilleDeNotesParCohorteDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
     responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?

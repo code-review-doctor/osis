@@ -28,8 +28,9 @@ from django.test import TestCase
 from base.models.enums.peps_type import PepsTypes
 from base.tests.factories.student import StudentFactory
 from base.tests.factories.student_specific_profile import StudentSpecificProfileFactory
-from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, EtudiantPepsDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EtudiantPepsDTO
+from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 
 

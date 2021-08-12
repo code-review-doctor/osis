@@ -23,22 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from datetime import date
+from unittest import mock
 
 import attr
 import mock
 from django.test import SimpleTestCase
 
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
     PasResponsableDeNotesException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteChiffreEtudiantFactory, \
     NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslator
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
@@ -66,6 +67,7 @@ class SoumettreNoteTest(SimpleTestCase):
             matricule_fgs_enseignant=self.matricule_enseignant,
             noma_etudiant=self.note_etudiant.noma
         )
+        self.__mock_service_bus()
 
         self.periode_soumission_ouverte = PeriodeSoumissionNotesDTO(
             annee_concernee=self.note_etudiant.annee,
@@ -73,8 +75,6 @@ class SoumettreNoteTest(SimpleTestCase):
             debut_periode_soumission=DateDTO(jour=1, mois=1, annee=date.today().year),
             fin_periode_soumission=DateDTO(jour=31, mois=12, annee=date.today().year),
         )
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslator()
-        self.periode_soumission_translator.get = lambda *args: self.periode_soumission_ouverte
 
         self.__mock_service_bus()
 
@@ -107,10 +107,13 @@ class SoumettreNoteTest(SimpleTestCase):
 
         self.assertFalse(note_etudiant_apres_soumettre.est_soumise)
 
-    def test_should_empecher_si_periode_soumission_fermee(self):
-        date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
-        periode_fermee = attr.evolve(
-            self.periode_soumission_ouverte,
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
+    def test_should_empecher_si_periode_soumission_fermee(self, mock_periode_translator):
+        hier = datetime.date.today() - datetime.timedelta(days=1)
+        date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
+        periode_fermee = PeriodeSoumissionNotesDTO(
+            annee_concernee=self.feuille_de_notes.annee,
+            session_concernee=self.feuille_de_notes.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
         )
@@ -119,7 +122,8 @@ class SoumettreNoteTest(SimpleTestCase):
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
-    def test_should_empecher_si_acune_periode_soumission_trouvee(self):
+    @mock.patch("infrastructure.messages_bus.PeriodeEncodageNotesTranslator")
+    def test_should_empecher_si_acune_periode_soumission_trouvee(self, mock_periode_translator):
         aucune_periode_trouvee = None
         self.periode_soumission_translator.get = lambda *args: aucune_periode_trouvee
 
