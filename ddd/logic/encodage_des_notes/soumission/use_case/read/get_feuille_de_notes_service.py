@@ -45,26 +45,26 @@ def get_feuille_de_notes(
         cmd: 'GetFeuilleDeNotesCommand',
         feuille_de_note_repo: 'IFeuilleDeNotesRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
-        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         inscription_examen_translator: 'IInscriptionExamenTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
 ) -> 'FeuilleDeNotesEnseignantDTO':
     # GIVEN
-    PeriodeEncodageOuverte().verifier(periode_soumission_note_translator)
-    periode_soumission = periode_soumission_note_translator.get()
+    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
+    periode_encodage = periode_encodage_note_translator.get()
     feuille_notes_entity_id = FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
-        numero_session=periode_soumission.session_concernee,
+        numero_session=periode_encodage.session_concernee,
         code_unite_enseignement=cmd.code_unite_enseignement,
-        annee_academique=periode_soumission.annee_concernee,
+        annee_academique=periode_encodage.annee_concernee,
     )
 
     # WHEN
     feuille_de_notes_dto = FeuilleDeNotesEnseignant().get(
         feuille_de_note_repo.get(feuille_notes_entity_id),
         responsable_notes_repo,
-        periode_soumission_note_translator,
+        periode_encodage,
         inscription_examen_translator,
         signaletique_etudiant_translator,
         attribution_translator,

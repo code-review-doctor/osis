@@ -36,25 +36,24 @@ from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudi
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO, NoteEtudiantDTO, \
-    SignaletiqueEtudiantDTO, InscriptionExamenDTO, DesinscriptionExamenDTO
+    SignaletiqueEtudiantDTO, InscriptionExamenDTO, DesinscriptionExamenDTO, PeriodeSoumissionNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
 
-class FeuilleDeNotesEnseignant(interface.DomainService):
+class FeuilleDeNotesEnseignant(interface.DomainService):  # TODO :: déplacer dans domain common
 
     @staticmethod
     def get(
             feuille_de_notes: 'FeuilleDeNotes',
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            periode_encodage: 'PeriodeSoumissionNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'FeuilleDeNotesEnseignantDTO':
 
-        periode_soumission_ouverte = periode_soumission_note_translator.get()
         unite_enseignement = unite_enseignement_translator.get(
             feuille_de_notes.code_unite_enseignement,
             feuille_de_notes.annee,
@@ -75,7 +74,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         notes_etudiants = []
         for note in feuille_de_notes.notes:
             inscr_exmen = inscr_examen_par_noma.get(note.noma)
-            ouverture_periode_soumission = periode_soumission_ouverte.debut_periode_soumission.to_date()
+            ouverture_periode_soumission = periode_encodage.debut_periode_soumission.to_date()
             inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > ouverture_periode_soumission
             desinscription = desinscr_exam_par_noma.get(note.noma)
             signaletique = signaletique_par_noma[note.noma]

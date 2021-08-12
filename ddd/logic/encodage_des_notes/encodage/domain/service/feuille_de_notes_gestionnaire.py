@@ -24,14 +24,13 @@
 #
 ##############################################################################
 
-from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.domain.service.i_feuille_de_notes_enseignant import \
-    IFeuilleDeNotesEnseignantTranslator
-from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO, NoteEtudiantDTO
 from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
-    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
+from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO, NoteEtudiantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.feuille_de_notes_enseignant import FeuilleDeNotesEnseignant
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from osis_common.ddd import interface
 
 
@@ -40,20 +39,25 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
     @classmethod
     def get(
             cls,
-            code_unite_enseignement: str,
             matricule_gestionnaire: str,
-            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+            feuille_de_notes: 'FeuilleDeNotes',
+            responsable_notes_repo: 'IResponsableDeNotesRepository',
+            periode_encodage: 'PeriodeSoumissionNotesDTO',
+            inscription_examen_translator: 'IInscriptionExamenTranslator',
+            signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
-            feuille_notes_enseignant_translator: 'IFeuilleDeNotesEnseignantTranslator',
+            unite_enseignement_translator: 'IUniteEnseignementTranslator',
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
     ) -> 'FeuilleDeNotesGestionnaireDTO':
-        periode_soumission_ouverte = periode_soumission_note_translator.get()
 
-        feuille_notes_enseignant = _get_feuille_de_notes_enseignant(
-            attribution_translator,
-            code_unite_enseignement,
-            feuille_notes_enseignant_translator,
-            periode_soumission_ouverte.annee_concernee,
+        feuille_notes_enseignant = FeuilleDeNotesEnseignant().get(
+            feuille_de_notes=feuille_de_notes,
+            responsable_notes_repo=responsable_notes_repo,
+            periode_encodage=periode_encodage,
+            inscription_examen_translator=inscription_examen_translator,
+            signaletique_etudiant_translator=signaletique_etudiant_translator,
+            attribution_translator=attribution_translator,
+            unite_enseignement_translator=unite_enseignement_translator,
         )
 
         cohortes_gerees_par_gestionnaire = _get_cohortes_gerees_par_gestionnaire(
@@ -82,11 +86,20 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
                     )
                 )
 
+        autres_enseignants = [
+            EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
+            for enseignant in feuille_notes_enseignant.autres_enseignants
+        ]
+        responsable_notes = EnseignantDTO(
+            prenom=feuille_notes_enseignant.responsable_note.prenom,
+            nom=feuille_notes_enseignant.responsable_note.nom,
+        )
+
         return FeuilleDeNotesGestionnaireDTO(
             code_unite_enseignement=feuille_notes_enseignant.code_unite_enseignement,
             intitule_complet_unite_enseignement=feuille_notes_enseignant.intitule_complet_unite_enseignement,
-            responsable_note=feuille_notes_enseignant.responsable_note,
-            autres_enseignants=feuille_notes_enseignant.autres_enseignants,
+            responsable_note=responsable_notes,
+            autres_enseignants=autres_enseignants,
             annee_academique=feuille_notes_enseignant.annee_academique,
             numero_session=feuille_notes_enseignant.numero_session,
             notes_etudiants=etudiants_gestionnaire,
@@ -96,21 +109,3 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
 def _get_cohortes_gerees_par_gestionnaire(cohortes_gestionnaire_translator, matricule_gestionnaire):
     cohortes_gestionnaire = cohortes_gestionnaire_translator.search(matricule_gestionnaire=matricule_gestionnaire)
     return {gestionnaire.nom_cohorte for gestionnaire in cohortes_gestionnaire}
-
-
-def _get_feuille_de_notes_enseignant(
-        attribution_translator,
-        code_unite_enseignement,
-        feuille_notes_enseignant_translator,
-        annee_concernee,
-):
-    attributions = attribution_translator.search_attributions_enseignant(
-        code_unite_enseignement,
-        annee_concernee,
-    )
-    # Peu importe l'enseignant, l'objectif est de récupérer la feuille de notes => on récupère le premier
-    matricule_fgs_enseignant = list(attributions)[0].matricule_fgs_enseignant
-    return feuille_notes_enseignant_translator.get(
-        code_unite_enseignement=code_unite_enseignement,
-        matricule_fgs_enseignant=matricule_fgs_enseignant,
-    )
