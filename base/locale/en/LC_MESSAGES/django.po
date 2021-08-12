@@ -883,7 +883,7 @@ msgstr ""
 msgid "English title specific complement"
 msgstr ""
 
-msgid "English-Friendly"
+msgid "English-friendly"
 msgstr ""
 
 msgid "Enrolled"
@@ -1082,7 +1082,7 @@ msgstr ""
 msgid "French title proper"
 msgstr ""
 
-msgid "French-Friendly"
+msgid "French-friendly"
 msgstr ""
 
 msgid "From"
