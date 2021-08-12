@@ -30,14 +30,14 @@ from django.test import SimpleTestCase
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, AdresseDTO
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
+    InscriptionExamenTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.deliberation import \
     DeliberationTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
-    InscriptionExamenTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
     SignaletiquePersonneTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
@@ -63,7 +63,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
             codes_unite_enseignement=[self.code_unite_enseignement],
         )
 
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.periode_encodage_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
         self.adresse_feuille_notes_translator = AdresseFeuilleDeNotesTranslatorInMemory()
         self.deliberation_translator = DeliberationTranslatorInMemory()
@@ -73,7 +73,7 @@ class SearchDonneesAdministrativesTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
             AdresseFeuilleDeNotesTranslator=lambda: self.adresse_feuille_notes_translator,
             SignaletiquePersonneTranslator=lambda: self.signaletique_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,

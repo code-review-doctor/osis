@@ -29,7 +29,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuild
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO, \
-    NoteEtudiantFromRepositoryDTO, DateDTO
+    NoteEtudiantFromRepositoryDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from osis_common.ddd import interface
 
 

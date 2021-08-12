@@ -26,7 +26,7 @@
 from typing import List
 
 from ddd.logic.encodage_des_notes.encodage.commands import SearchNotesCommand
-from ddd.logic.encodage_des_notes.encodage.dtos import NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
 
 
 def search_notes(

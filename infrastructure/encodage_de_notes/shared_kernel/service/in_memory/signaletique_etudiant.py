@@ -26,9 +26,10 @@
 from typing import Set, List
 
 from base.models.enums.peps_type import PepsTypes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, EtudiantPepsDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EtudiantPepsDTO
 
 
 class SignaletiqueEtudiantTranslatorInMemory(ISignaletiqueEtudiantTranslator):

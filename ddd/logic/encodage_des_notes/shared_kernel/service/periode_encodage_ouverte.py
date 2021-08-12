@@ -23,15 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
+import datetime
 
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
 from osis_common.ddd import interface
 
 
-class IPeriodeSoumissionNotesTranslator(interface.DomainService):
+class PeriodeEncodageOuverte(interface.DomainService):
 
     @classmethod
-    @abc.abstractmethod
-    def get(cls) -> 'PeriodeSoumissionNotesDTO':
-        raise NotImplementedError
+    def verifier(
+            cls,
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator'
+    ) -> None:
+        periode = periode_soumission_note_translator.get()
+        if not periode:
+            raise PeriodeSoumissionNotesFermeeException()
+
+        aujourdhui = datetime.date.today()
+        debut_periode = periode.debut_periode_soumission.to_date()
+        fin_periode = periode.fin_periode_soumission.to_date()
+        periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
+
+        if not periode_est_ouverte:
+            raise PeriodeSoumissionNotesFermeeException()

@@ -30,7 +30,7 @@ from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.inscription_examen import InscriptionExamenTranslator
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 

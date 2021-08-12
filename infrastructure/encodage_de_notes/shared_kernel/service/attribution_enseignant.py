@@ -30,7 +30,7 @@ from django.db.models.functions import Concat
 
 from attribution.models.attribution_class import AttributionClass
 from attribution.models.attribution_new import AttributionNew
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
@@ -50,10 +50,11 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
     @classmethod
     def search_attributions_enseignant_par_matricule(
             cls,
+            annee: int,
             matricule_enseignant: str,
     ) -> Set['AttributionEnseignantDTO']:
-        dtos = _search_attributions_unite_enseignement(matricule_enseignant=matricule_enseignant)
-        dtos |= _search_repartition_classes(matricule_enseignant=matricule_enseignant)
+        dtos = _search_attributions_unite_enseignement(annee=annee, matricule_enseignant=matricule_enseignant)
+        dtos |= _search_repartition_classes(annee=annee, matricule_enseignant=matricule_enseignant)
         return dtos
 
 

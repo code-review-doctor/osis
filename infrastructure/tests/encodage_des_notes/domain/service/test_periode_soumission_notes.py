@@ -31,9 +31,10 @@ from django.test import SimpleTestCase
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base.business.academic_calendar import AcademicSessionEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
-from infrastructure.encodage_de_notes.soumission.domain.service.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslator
 
 
 @patch.object(ScoresExamSubmissionCalendar, 'get_opened_academic_events')
@@ -41,7 +42,7 @@ class PeriodeSoumissionNotesTest(SimpleTestCase):
 
     def setUp(self):
         self.annee_concernee = 2020
-        self.translator = PeriodeSoumissionNotesTranslator()
+        self.translator = PeriodeEncodageNotesTranslator()
 
     def test_should_renvoyer_aucune_periode_trouvee(self, mock_opened_events):
         mock_opened_events.return_value = []

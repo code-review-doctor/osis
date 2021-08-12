@@ -25,45 +25,43 @@
 ##############################################################################
 from typing import List, Dict
 
-from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
-    ResponsableDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import Noma
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO, NoteEtudiantDTO, \
-    SignaletiqueEtudiantDTO, InscriptionExamenDTO, DesinscriptionExamenDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, InscriptionExamenDTO, \
+    DesinscriptionExamenDTO, PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
 
-class FeuilleDeNotesEnseignant(interface.DomainService):
+class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: déplacer dans domain common
 
-    @classmethod
+    @staticmethod
     def get(
-            cls,
             feuille_de_notes: 'FeuilleDeNotes',
-            matricule_fgs_enseignant: str,
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            periode_encodage: 'PeriodeSoumissionNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
-    ) -> 'FeuilleDeNotesEnseignantDTO':
+    ) -> 'FeuilleDeNotesDTO':
 
-        periode_soumission_ouverte = periode_soumission_note_translator.get()
         unite_enseignement = unite_enseignement_translator.get(
             feuille_de_notes.code_unite_enseignement,
             feuille_de_notes.annee,
         )
-        responsable_notes = _get_responsable_de_notes(matricule_fgs_enseignant, responsable_notes_repo)
+        responsable_notes = _get_responsable_de_notes(
+            feuille_de_notes.code_unite_enseignement,
+            feuille_de_notes.annee,
+            responsable_notes_repo,
+        )
         autres_enseignants = _get_autres_enseignants(attribution_translator, feuille_de_notes, responsable_notes)
 
         nomas_concernes = [note.noma for note in feuille_de_notes.notes]
@@ -75,7 +73,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
         notes_etudiants = []
         for note in feuille_de_notes.notes:
             inscr_exmen = inscr_examen_par_noma.get(note.noma)
-            ouverture_periode_soumission = periode_soumission_ouverte.debut_periode_soumission.to_date()
+            ouverture_periode_soumission = periode_encodage.debut_periode_soumission.to_date()
             inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > ouverture_periode_soumission
             desinscription = desinscr_exam_par_noma.get(note.noma)
             signaletique = signaletique_par_noma[note.noma]
@@ -95,7 +93,7 @@ class FeuilleDeNotesEnseignant(interface.DomainService):
                 )
             )
         notes_etudiants.sort(key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
-        return FeuilleDeNotesEnseignantDTO(
+        return FeuilleDeNotesDTO(
             code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
             note_decimale_est_autorisee=feuille_de_notes.note_decimale_est_autorisee(),
@@ -159,8 +157,9 @@ def _get_autres_enseignants(
 
 
 def _get_responsable_de_notes(
-        matricule_fgs_enseignant: str,
+        code_unite_enseignement: str,
+        annee: int,
         responsable_notes_repo: 'IResponsableDeNotesRepository'
 ) -> EnseignantDTO:
-    responsable_notes_entity_id = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
-    return responsable_notes_repo.get_detail_enseignant(responsable_notes_entity_id)
+    resp_notes = responsable_notes_repo.get_for_unite_enseignement(code_unite_enseignement, annee)
+    return responsable_notes_repo.get_detail_enseignant(resp_notes.entity_id)

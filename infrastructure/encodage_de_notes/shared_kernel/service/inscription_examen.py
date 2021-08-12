@@ -30,8 +30,9 @@ from django.db.models.functions import Concat, Replace
 
 from base.models.enums import exam_enrollment_state
 from base.models.exam_enrollment import ExamEnrollment
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO, DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, DesinscriptionExamenDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 
 
 class InscriptionExamenTranslator(IInscriptionExamenTranslator):

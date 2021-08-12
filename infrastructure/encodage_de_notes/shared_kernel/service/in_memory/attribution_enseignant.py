@@ -23,28 +23,54 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import Set
 
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
-from osis_common.ddd import interface
 
 
-class IAttributionEnseignantTranslator(interface.DomainService):
+class AttributionEnseignantTranslatorInMemory(IAttributionEnseignantTranslator):
+
+    attributions_dtos = {
+        AttributionEnseignantDTO(
+            matricule_fgs_enseignant="00321234",
+            code_unite_enseignement="LDROI1001",
+            annee=2020,
+            nom="Smith",
+            prenom="Charles",
+        ),
+        AttributionEnseignantDTO(
+            matricule_fgs_enseignant="12345678",
+            code_unite_enseignement="LDROI1001",
+            annee=2020,
+            nom="Jolypas",
+            prenom="Michelle",
+        ),
+    }  # type: Set[AttributionEnseignantDTO]
 
     @classmethod
-    @abc.abstractmethod
     def search_attributions_enseignant(
             cls,
             code_unite_enseignement: str,
             annee: int,
     ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
+        return set(
+            filter(
+                lambda dto: dto.code_unite_enseignement == code_unite_enseignement and dto.annee == annee,
+                cls.attributions_dtos,
+            )
+        )
 
     @classmethod
-    @abc.abstractmethod
     def search_attributions_enseignant_par_matricule(
             cls,
+            annee: int,
             matricule_enseignant: str,
     ) -> Set['AttributionEnseignantDTO']:
-        raise NotImplementedError
+        return set(
+            filter(
+                lambda dto: dto.matricule_fgs_enseignant == matricule_enseignant,
+                cls.attributions_dtos,
+            )
+        )

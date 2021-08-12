@@ -23,29 +23,43 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from typing import Set, Tuple
 
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
 
 
-class PeriodeSoumissionOuverte(interface.DomainService):
+class UniteEnseignementTranslatorInMemory(IUniteEnseignementTranslator):
 
     @classmethod
-    def verifier(
+    def get(
             cls,
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator'
-    ) -> None:
-        periode = periode_soumission_note_translator.get()
-        if not periode:
-            raise PeriodeSoumissionNotesFermeeException()
+            code: str,
+            annee: int,
+    ) -> 'UniteEnseignementDTO':
+        dtos = cls.search({(code, annee)})
+        if dtos:
+            return list(dtos)[0]
 
-        aujourdhui = datetime.date.today()
-        debut_periode = periode.debut_periode_soumission.to_date()
-        fin_periode = periode.fin_periode_soumission.to_date()
-        periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
-
-        if not periode_est_ouverte:
-            raise PeriodeSoumissionNotesFermeeException()
+    @classmethod
+    def search(
+            cls,
+            values: Set[Tuple[str, int]],
+    ) -> Set['UniteEnseignementDTO']:
+        return {
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1001',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1002',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+            UniteEnseignementDTO(
+                annee=2020,
+                code='LDROI1003',
+                intitule_complet="Intitule complet unite enseignement",
+            ),
+        }

@@ -23,27 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
+from typing import Set, Tuple
 
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO
+from ddd.logic.learning_unit.commands import LearningUnitSearchCommand
 
 
-class PeriodeSoumissionNotesTranslator(IPeriodeSoumissionNotesTranslator):
+class UniteEnseignementTranslator(IUniteEnseignementTranslator):
 
     @classmethod
-    def get(cls) -> 'PeriodeSoumissionNotesDTO':
-        calendar = ScoresExamSubmissionCalendar()
-        events = calendar.get_opened_academic_events(date=datetime.date.today())
-        if events:
-            event = events[0]
-            date_debut = event.start_date
-            date_fin = event.end_date
-            return PeriodeSoumissionNotesDTO(
-                annee_concernee=event.authorized_target_year,
-                session_concernee=event.session,
-                debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),
-                fin_periode_soumission=DateDTO(jour=date_fin.day, mois=date_fin.month, annee=date_fin.year),
-            )
+    def get(
+            cls,
+            code: str,
+            annee: int,
+    ) -> 'UniteEnseignementDTO':
+        dtos = cls.search({(code, annee)})
+        if dtos:
+            return list(dtos)[0]
+
+    @classmethod
+    def search(
+            cls,
+            code_annee_values: Set[Tuple[str, int]],
+    ) -> Set['UniteEnseignementDTO']:
+        from infrastructure.messages_bus import message_bus_instance
+        results = message_bus_instance.invoke(LearningUnitSearchCommand(code_annee_values=code_annee_values))
+        return {
+            UniteEnseignementDTO(
+                annee=dto.year,
+                code=dto.code,
+                intitule_complet=dto.full_title,
+            ) for dto in results
+        }

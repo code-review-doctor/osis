@@ -25,23 +25,21 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.service.donnees_administratives import DonneesAdministratives
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
     IAdresseFeuilleDeNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_inscription_examen import IInscriptionExamenTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_personne import \
-    ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
 def search_donnees_administratives_feuille_de_notes(
         cmd: 'SearchAdressesFeuilleDeNotesCommand',
-        periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         contact_feuille_notes_translator: 'IAdresseFeuilleDeNotesTranslator',
         signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
         inscr_exam_translator: 'IInscriptionExamenTranslator',

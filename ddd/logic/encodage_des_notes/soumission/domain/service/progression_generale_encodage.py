@@ -29,13 +29,13 @@ from typing import List, Dict, Set, Tuple
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_periode_soumission_notes import \
-    IPeriodeSoumissionNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
+    IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO, \
     ProgressionEncodageNotesUniteEnseignementDTO, DateEcheanceDTO, UniteEnseignementDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
@@ -50,7 +50,7 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             matricule_fgs_enseignant: str,
             feuille_de_note_repo: 'IFeuilleDeNotesRepository',
             attribution_translator: 'IAttributionEnseignantTranslator',
-            periode_soumission_note_translator: 'IPeriodeSoumissionNotesTranslator',
+            periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
@@ -124,7 +124,10 @@ def _search_feuille_de_notes(
         session_concerne: int,
         annee_concerne: int
         ):
-    attributions = attribution_translator.search_attributions_enseignant_par_matricule(matricule_fgs_enseignant)
+    attributions = attribution_translator.search_attributions_enseignant_par_matricule(
+        annee_concerne,
+        matricule_fgs_enseignant,
+    )
     identities = [
         FeuilleDeNotesIdentityBuilder.build_from_session_and_unit_enseignement_datas(
             numero_session=session_concerne,
