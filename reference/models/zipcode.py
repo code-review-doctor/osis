@@ -23,30 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
+from django.db import models
 
-from reference.models import *
+from osis_common.models import osis_model_admin
 
-admin.site.register(continent.Continent,
-                    continent.ContinentAdmin)
 
-admin.site.register(currency.Currency,
-                    currency.CurrencyAdmin)
+class ZipCodeAdmin(osis_model_admin.OsisModelAdmin):
+    list_display = ('zip_code', 'municipality', 'country')
+    list_filter = ('country',)
+    ordering = ('zip_code',)
+    search_fields = ['municipality']
 
-admin.site.register(country.Country,
-                    country.CountryAdmin)
 
-admin.site.register(decree.Decree,
-                    decree.DecreeAdmin)
+class ZipCode(models.Model):
+    zip_code = models.CharField(max_length=255)
+    municipality = models.CharField(max_length=255)
+    country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
 
-admin.site.register(domain.Domain,
-                    domain.DomainAdmin)
+    def __str__(self):
+        return "{} - {} ({})".format(self.zip_code, self.municipality, self.country.iso_code)
 
-admin.site.register(domain_isced.DomainIsced,
-                    domain_isced.DomainIscedAdmin)
-
-admin.site.register(language.Language,
-                    language.LanguageAdmin)
-
-admin.site.register(zipcode.ZipCode,
-                    zipcode.ZipCodeAdmin)
+    class Meta:
+        ordering = ('zip_code',)
