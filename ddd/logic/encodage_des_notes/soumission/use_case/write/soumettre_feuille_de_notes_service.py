@@ -27,9 +27,9 @@ from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_b
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.common_domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.domain.service.responsable_de_notes import ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository

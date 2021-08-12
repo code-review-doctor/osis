@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO, NoteEtudiantDTO, EnseignantDTO

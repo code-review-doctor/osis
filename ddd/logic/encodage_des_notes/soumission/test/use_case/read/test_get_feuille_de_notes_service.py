@@ -37,11 +37,11 @@ from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManqua
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
     FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
-from infrastructure.encodage_de_notes.common_domain.service.in_memory.attribution_enseignant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
-from infrastructure.encodage_de_notes.common_domain.service.in_memory.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory

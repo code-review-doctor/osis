@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
-from ddd.logic.encodage_des_notes.common_domain.service.i_attribution_enseignant import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
-from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import \
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
