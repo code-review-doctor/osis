@@ -48,17 +48,6 @@ class FeuilleDeNotesRepository(IFeuilleDeNotesRepository):
         number_sessions = {ent.numero_session for ent in entity_ids}
         years = {ent.annee_academique for ent in entity_ids}
         acronyms = {ent.code_unite_enseignement for ent in entity_ids}
-        # q_filters = functools.reduce(
-        #     operator.or_,
-        #     [
-        #         Q(
-        #             acronym=entity_id.code_unite_enseignement,
-        #             # year=entity_id.annee_academique,
-        #             # number_session=entity_id.numero_session
-        #         )
-        #         for entity_id in entity_ids
-        #     ]
-        # )
         rows = _fetch_session_exams(number_sessions, years).filter(acronym__in=acronyms)
         rows_group_by_identity = itertools.groupby(rows, key=lambda row: (row.acronym, row.year, row.number_session))
 
@@ -144,7 +133,6 @@ def _fetch_session_exams(number_sessions: Set[int] = None, years: Set[int] = Non
             default='learning_unit_enrollment__learning_unit_year__acronym',
             output_field=CharField()
         ),
-        # code_unite_enseignement=F('learning_unit_enrollment__learning_unit_year__acronym'),
         year=F('learning_unit_enrollment__learning_unit_year__academic_year__year'),
         number_session=F('session_exam__number_session'),
         credits_unite_enseignement=F('learning_unit_enrollment__learning_unit_year__credits'),
