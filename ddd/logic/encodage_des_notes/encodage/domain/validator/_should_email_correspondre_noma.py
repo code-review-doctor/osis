@@ -23,31 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import decimal
-from decimal import Decimal
-from typing import Optional
 
 import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import NoteDecimaleNonAutoriseeException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import NomaNeCorrespondPasEmailException
 
 
 @attr.s(frozen=True, slots=True)
-class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
-    note = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class ShouldEmailCorrespondreNoma(BusinessValidator):
+
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
+    email_etudiant = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):
-        note_chiffree = self.__get_note_chiffree()
-        if note_chiffree:
-            is_integer = note_chiffree % 1 == 0
-            if not self.feuille_de_note.note_decimale_est_autorisee() and not is_integer:
-                raise NoteDecimaleNonAutoriseeException()
-
-    def __get_note_chiffree(self) -> Optional[Decimal]:
-        try:
-            return decimal.Decimal(self.note)
-        except decimal.InvalidOperation:
-            return
+        if self.note_etudiant.email != self.email_etudiant:
+            raise NomaNeCorrespondPasEmailException()

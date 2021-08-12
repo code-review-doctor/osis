@@ -4,3 +4,4 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+    from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant

@@ -23,19 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 from typing import List
 
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.business_types import *
+from ddd.logic.encodage_des_notes.encodage.domain.validator._should_date_echeance_non_atteinte import \
+    ShouldDateEcheanceNonAtteinte
+from ddd.logic.encodage_des_notes.encodage.domain.validator._should_email_correspondre_noma import \
+    ShouldEmailCorrespondreNoma
+from ddd.logic.encodage_des_notes.encodage.domain.validator._should_note_etre_choix_valide import \
+    ShouldNoteEtreChoixValide
+from ddd.logic.encodage_des_notes.encodage.domain.validator._should_verifier_note_decimale import \
+    ShouldVerifierNoteDecimaleAutorisee
 
 
 @attr.s(frozen=True, slots=True)
 class EncoderNotesValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    note_etudiant = attr.ib(type=NoteEtudiant)
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
     email = attr.ib(type=str)
     note = attr.ib(type=str)
 
@@ -44,8 +51,8 @@ class EncoderNotesValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            # TODO :: ShouldEmailCorrespondreNoma(self.note_etudiant, self.email),
-            # TODO :: ShouldDateEcheancePasEtreAtteinte(self.noma, self.note_etudiant),
-            # TODO :: ShouldNoteEtreChoixValide(self.note),
-            # TODO :: ShouldVerifierNoteDecimaleAutorisee(self.note, self.note_etudiant),
+            ShouldEmailCorrespondreNoma(self.note_etudiant, self.email),
+            ShouldDateEcheanceNonAtteinte(self.note_etudiant),
+            ShouldNoteEtreChoixValide(self.note),
+            ShouldVerifierNoteDecimaleAutorisee(self.note, self.note_etudiant),
         ]

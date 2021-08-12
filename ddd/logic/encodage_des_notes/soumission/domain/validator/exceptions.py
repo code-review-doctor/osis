@@ -41,23 +41,11 @@ class PeriodeSoumissionNotesFermeeException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class DateRemiseNoteAtteinteException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("Deadline reached")
-        super().__init__(message, **kwargs)
-
-
 class AucunEtudiantTrouveException(BusinessException):
     def __init__(self, learning_unit_code: str, **kwargs):
         message = _("The enrollment to the learning unit {learning_unit_code} doesn't exist").format(
             learning_unit_code=learning_unit_code,
         )
-        super().__init__(message, **kwargs)
-
-
-class NomaNeCorrespondPasEmailException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("Registration ID does not match email")
         super().__init__(message, **kwargs)
 
 
@@ -72,12 +60,6 @@ class NoteIncorrecteException(BusinessException):
 class NoteDejaSoumiseException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Score already submitted")
-        super().__init__(message, **kwargs)
-
-
-class NoteDecimaleNonAutoriseeException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("Decimal scores not authorized")
         super().__init__(message, **kwargs)
 
 

@@ -24,22 +24,23 @@
 #
 ##############################################################################
 from collections import OrderedDict
-from typing import List, Dict, Tuple
+from typing import List, Tuple
+from typing import OrderedDict as OrderedDictType
 
-from ddd.logic.encodage_des_notes.common_domain.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.common_domain.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
-from typing import OrderedDict as OrderedDictType
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 
 NouvelleNote = str
 EmailEtudiant = str
 
 
+# TODO :: unit tests
 def encoder_notes(
         cmd: 'EncoderNotesCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
@@ -48,9 +49,7 @@ def encoder_notes(
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
-    # TODO :: PeriodeEncodageOuverte(periode_encodage_note_translator).verifier() ?? qui implémente le .get() (cache résultat du translator) ?
     GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
-    # TODO :: GestionnaireParcours(cohortes_gestionnaire_translator).verifier(cmd.matricule_fgs_gestionnaire) ? qui cache le résultat du translator ?
     periode_ouverte = periode_encodage_note_translator.get()
     note_par_identite = __associer_nouvelle_note_a_son_identite(cmd, periode_ouverte)
     identites_notes_a_modifier = list(note_par_identite.keys())

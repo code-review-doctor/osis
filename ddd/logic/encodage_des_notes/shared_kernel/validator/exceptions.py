@@ -23,31 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import decimal
-from decimal import Decimal
-from typing import Optional
 
-import attr
+from django.utils.translation import gettext_lazy as _
 
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import NoteDecimaleNonAutoriseeException
+from osis_common.ddd.interface import BusinessException
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
-    note = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class NomaNeCorrespondPasEmailException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Registration ID does not match email")
+        super().__init__(message, **kwargs)
 
-    def validate(self, *args, **kwargs):
-        note_chiffree = self.__get_note_chiffree()
-        if note_chiffree:
-            is_integer = note_chiffree % 1 == 0
-            if not self.feuille_de_note.note_decimale_est_autorisee() and not is_integer:
-                raise NoteDecimaleNonAutoriseeException()
 
-    def __get_note_chiffree(self) -> Optional[Decimal]:
-        try:
-            return decimal.Decimal(self.note)
-        except decimal.InvalidOperation:
-            return
+class DateEcheanceNoteAtteinteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Deadline reached")
+        super().__init__(message, **kwargs)
+
+
+class NoteDecimaleNonAutoriseeException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Decimal scores not authorized")
+        super().__init__(message, **kwargs)

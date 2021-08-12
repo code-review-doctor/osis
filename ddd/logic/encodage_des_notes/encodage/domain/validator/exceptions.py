@@ -23,31 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import decimal
-from decimal import Decimal
-from typing import Optional
 
-import attr
+from django.utils.translation import gettext_lazy as _
 
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import NoteDecimaleNonAutoriseeException
+from osis_common.ddd.interface import BusinessException
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
-    note = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class PasGestionnaireParcoursExceptionException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("You're not a program manager (no assigned formations found)")
+        super().__init__(message, **kwargs)
 
-    def validate(self, *args, **kwargs):
-        note_chiffree = self.__get_note_chiffree()
-        if note_chiffree:
-            is_integer = note_chiffree % 1 == 0
-            if not self.feuille_de_note.note_decimale_est_autorisee() and not is_integer:
-                raise NoteDecimaleNonAutoriseeException()
 
-    def __get_note_chiffree(self) -> Optional[Decimal]:
-        try:
-            return decimal.Decimal(self.note)
-        except decimal.InvalidOperation:
-            return
+class NoteIncorrecteException(BusinessException):
+    def __init__(self, note_incorrecte: str, **kwargs):
+        message = _(
+            "{note} isn't a valid score. Valid scores : 0 - 20 "
+            "(0=Score of presence), A=Absent, T=Cheating, M=Absence justified"
+        ).format(note=note_incorrecte)
+        super().__init__(message, **kwargs)

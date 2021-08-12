@@ -35,9 +35,10 @@ from base.models.enums.exam_enrollment_justification_type import TutorJustificat
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, NoteEtudiantCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification, NoteChiffree
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    EnseignantNonAttribueUniteEnseignementException, DateRemiseNoteAtteinteException, \
-    NomaNeCorrespondPasEmailException, AucunEtudiantTrouveException, NoteIncorrecteException, \
-    NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
+    EnseignantNonAttribueUniteEnseignementException, AucunEtudiantTrouveException, NoteIncorrecteException, \
+    NoteDejaSoumiseException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import NomaNeCorrespondPasEmailException, \
+    DateEcheanceNoteAtteinteException, NoteDecimaleNonAutoriseeException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesManquantes, \
@@ -210,7 +211,7 @@ class EncoderFeuilleDeNotesTest(SimpleTestCase):
             self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
-            DateRemiseNoteAtteinteException
+            DateEcheanceNoteAtteinteException
         )
 
     def test_should_autoriser_si_date_de_remise_est_aujourdhui(self):
