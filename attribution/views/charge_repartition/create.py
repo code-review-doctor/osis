@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import uuid
-
 from django.db.models import Prefetch
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property

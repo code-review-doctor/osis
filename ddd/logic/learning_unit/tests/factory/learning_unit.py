@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import factory.fuzzy
 import uuid
 
@@ -150,7 +151,7 @@ class _PracticalPartFactory(factory.Factory):
     volumes = factory.SubFactory(_VolumesFactory)
 
 
-class _LearningUnitIdentityFactory(factory.Factory):
+class LearningUnitIdentityFactory(factory.Factory):
     class Meta:
         model = LearningUnitIdentity
         abstract = False
@@ -164,7 +165,7 @@ class _LearningUnitFactory(factory.Factory):
         model = LearningUnit
         abstract = False
 
-    entity_id = factory.SubFactory(_LearningUnitIdentityFactory)
+    entity_id = factory.SubFactory(LearningUnitIdentityFactory)
     titles = factory.SubFactory(_TitlesFactory)
     credits = factory.fuzzy.FuzzyInteger(low=1, high=180)
     internship_subtype = factory.fuzzy.FuzzyChoice(InternshipSubtype)
@@ -201,11 +202,13 @@ class _ExternalLearningUnitFactory(_LearningUnitFactory):
         abstract = False
 
 
+class LDROI1001LearningUnitIdentityFactory(LearningUnitIdentityFactory):
+    code = "LDROI1001"
+    academic_year = _AcademicYearIdentityFactory(year=datetime.datetime.now().year)
+
+
 class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
-        code="LDROI1001",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
-    )
+    entity_id = LDROI1001LearningUnitIdentityFactory()
     titles = _TitlesFactory(
         common_fr="Introduction au droit",
         specific_fr="Partie 1 : droit civil",
@@ -246,25 +249,25 @@ class LDROI1001CourseLearningUnitFactory(_CourseLearningUnitFactory):
 
 
 class LDROI1002ExternalLearningUnitFactory(_ExternalLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
+    entity_id = LearningUnitIdentityFactory(
         code="LDROI1002",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
+        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
     partims = []
 
 
 class LDROI1003CourseWithPartimsLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
+    entity_id = LearningUnitIdentityFactory(
         code="LDROI1003",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
+        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
     partims = [_PartimFactory()]
 
 
 class LDROI1004CourseWithoutVolumesLearningUnitFactory(_CourseLearningUnitFactory):
-    entity_id = _LearningUnitIdentityFactory(
+    entity_id = LearningUnitIdentityFactory(
         code="LDROI1004",
-        academic_year=_AcademicYearIdentityFactory(year=2020)
+        academic_year=_AcademicYearIdentityFactory(year=datetime.datetime.now().year)
     )
     lecturing_part = None
     practical_part = None
