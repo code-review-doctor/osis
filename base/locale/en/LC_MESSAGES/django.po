@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-27 11:19+0200\n"
+"POT-Creation-Date: 2021-08-12 13:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -883,6 +883,9 @@ msgstr ""
 msgid "English title specific complement"
 msgstr ""
 
+msgid "English-Friendly"
+msgstr ""
+
 msgid "Enrolled"
 msgstr ""
 
@@ -966,6 +969,9 @@ msgid "Exams Enrollments"
 msgstr ""
 
 msgid "Exceptional procedure"
+msgstr ""
+
+msgid "Exchange students"
 msgstr ""
 
 msgid "Execute"
@@ -1074,6 +1080,9 @@ msgid "French"
 msgstr ""
 
 msgid "French title proper"
+msgstr ""
+
+msgid "French-Friendly"
 msgstr ""
 
 msgid "From"
@@ -1189,6 +1198,9 @@ msgid "Inactive"
 msgstr ""
 
 msgid "Include subordinate entities"
+msgstr ""
+
+msgid "Individual loan"
 msgstr ""
 
 msgid "Initial data"
