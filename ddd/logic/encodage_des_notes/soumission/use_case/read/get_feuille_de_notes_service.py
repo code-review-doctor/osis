@@ -26,7 +26,8 @@
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.service.feuille_de_notes_enseignant import FeuilleDeNotesEnseignant
+from ddd.logic.encodage_des_notes.shared_kernel.service.feuille_de_notes_par_unite_enseignement import \
+    FeuilleDeNotesParUniteEnseignement
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -36,7 +37,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant 
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
@@ -50,7 +51,7 @@ def get_feuille_de_notes(
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
-) -> 'FeuilleDeNotesEnseignantDTO':
+) -> 'FeuilleDeNotesDTO':
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     periode_encodage = periode_encodage_note_translator.get()
@@ -61,7 +62,7 @@ def get_feuille_de_notes(
     )
 
     # WHEN
-    feuille_de_notes_dto = FeuilleDeNotesEnseignant().get(
+    feuille_de_notes_dto = FeuilleDeNotesParUniteEnseignement().get(
         feuille_de_note_repo.get(feuille_notes_entity_id),
         responsable_notes_repo,
         periode_encodage,

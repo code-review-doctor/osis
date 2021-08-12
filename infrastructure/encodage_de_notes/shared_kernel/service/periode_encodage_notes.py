@@ -28,7 +28,8 @@ import datetime
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 
 
 class PeriodeEncodageNotesTranslator(IPeriodeEncodageNotesTranslator):

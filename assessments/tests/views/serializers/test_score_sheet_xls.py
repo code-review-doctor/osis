@@ -28,14 +28,13 @@ import datetime
 from django.test import SimpleTestCase
 
 from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesEnseignantDTO, EnseignantDTO, NoteEtudiantDTO, \
-    DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, DateDTO, NoteEtudiantDTO, EnseignantDTO
 
 
 class ScoreSheetXLSSerializerTest(SimpleTestCase):
     @classmethod
     def setUp(self) -> None:
-        self.feuille_de_notes = FeuilleDeNotesEnseignantDTO(
+        self.feuille_de_notes = FeuilleDeNotesDTO(
             code_unite_enseignement='LDROI1200',
             intitule_complet_unite_enseignement='Introduction au droit',
             note_decimale_est_autorisee=True,

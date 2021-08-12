@@ -23,18 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO, NoteEtudiantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.feuille_de_notes_enseignant import FeuilleDeNotesEnseignant
+from ddd.logic.encodage_des_notes.shared_kernel.service.feuille_de_notes_par_unite_enseignement import \
+    FeuilleDeNotesParUniteEnseignement
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from osis_common.ddd import interface
 
 
-class FeuilleDeNotesGestionnaire(interface.DomainService):
+class FeuilleDeNotesParCohorte(interface.DomainService):
 
     @classmethod
     def get(
@@ -48,9 +49,9 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
             attribution_translator: 'IAttributionEnseignantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-    ) -> 'FeuilleDeNotesGestionnaireDTO':
+    ) -> 'FeuilleDeNotesParCohorteDTO':
 
-        feuille_notes_enseignant = FeuilleDeNotesEnseignant().get(
+        feuille_notes_enseignant = FeuilleDeNotesParUniteEnseignement().get(
             feuille_de_notes=feuille_de_notes,
             responsable_notes_repo=responsable_notes_repo,
             periode_encodage=periode_encodage,
@@ -73,7 +74,7 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
                 etudiants_gestionnaire.append(
                     NoteEtudiantDTO(
                         est_soumise=note.est_soumise,
-                        echeance_enseignant=note.date_remise_de_notes,
+                        date_remise_de_notes=note.date_remise_de_notes,
                         nom_cohorte=note.nom_cohorte,
                         noma=note.noma,
                         nom=note.nom,
@@ -95,7 +96,7 @@ class FeuilleDeNotesGestionnaire(interface.DomainService):
             nom=feuille_notes_enseignant.responsable_note.nom,
         )
 
-        return FeuilleDeNotesGestionnaireDTO(
+        return FeuilleDeNotesParCohorteDTO(
             code_unite_enseignement=feuille_notes_enseignant.code_unite_enseignement,
             intitule_complet_unite_enseignement=feuille_notes_enseignant.intitule_complet_unite_enseignement,
             responsable_note=responsable_notes,

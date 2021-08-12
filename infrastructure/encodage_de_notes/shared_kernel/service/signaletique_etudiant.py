@@ -30,7 +30,8 @@ from django.db.models import F
 from base.models.student import Student
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, EtudiantPepsDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EtudiantPepsDTO
 
 
 class SignaletiqueEtudiantTranslator(ISignaletiqueEtudiantTranslator):

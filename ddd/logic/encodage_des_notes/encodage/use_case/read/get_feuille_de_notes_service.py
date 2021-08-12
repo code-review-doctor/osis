@@ -29,11 +29,11 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
-from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_gestionnaire import \
-    FeuilleDeNotesGestionnaire
+from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_par_cohorte import \
+    FeuilleDeNotesParCohorte
 from ddd.logic.encodage_des_notes.encodage.domain.service.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesGestionnaireDTO
+from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
 from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
     FeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -54,7 +54,7 @@ def get_feuille_de_notes_gestionnaire(
         attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
         cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-) -> 'FeuilleDeNotesGestionnaireDTO':
+) -> 'FeuilleDeNotesParCohorteDTO':
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
     GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
@@ -67,7 +67,7 @@ def get_feuille_de_notes_gestionnaire(
     )
     feuille_de_notes = feuille_de_note_repo.get(feuille_notes_entity_id)
 
-    return FeuilleDeNotesGestionnaire().get(
+    return FeuilleDeNotesParCohorte().get(
         matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
         feuille_de_notes=feuille_de_notes,
         responsable_notes_repo=responsable_notes_repo,

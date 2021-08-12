@@ -31,10 +31,10 @@ from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
-from ddd.logic.encodage_des_notes.encodage.dtos import EnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
     PasGestionnaireParcoursExceptionException
-from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
     InscriptionExamenDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
@@ -248,7 +248,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
         expected_result = DateDTO(jour=12, mois=8, annee=2021)
-        self.assertEqual(expected_result, note_etudiant.echeance_enseignant)
+        self.assertEqual(expected_result, note_etudiant.date_remise_de_notes)
 
     def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
         self.repository.delete(self.feuille_de_notes.entity_id)

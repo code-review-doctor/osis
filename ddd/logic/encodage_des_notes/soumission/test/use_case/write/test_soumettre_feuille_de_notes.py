@@ -32,7 +32,8 @@ from django.test import SimpleTestCase
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
     PasResponsableDeNotesException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecNotesEncodees, \
     FeuilleDeNotesAvecNotesManquantes
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
