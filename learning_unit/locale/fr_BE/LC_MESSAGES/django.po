@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-30 13:51+0200\n"
+"POT-Creation-Date: 2021-07-30 13:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,9 @@ msgstr "Actions"
 
 msgid "Active"
 msgstr "Actif"
+
+msgid "Add over the current year"
+msgstr "Ajouter sur l’année en cours"
 
 msgid "Additional requirement entity 1"
 msgstr "Entité resp. cahier des charges complémentaire 1"
@@ -43,6 +46,9 @@ msgid ""
 msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette classe en "
 "%(year)s ?"
+
+msgid "Are you sure?"
+msgstr "Êtes-vous sûr·e?"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
@@ -86,6 +92,9 @@ msgstr "Code"
 msgid "Common part"
 msgstr "Partie commune"
 
+msgid "Complete LU"
+msgstr "UE complète"
+
 msgid "Components"
 msgstr "Composants"
 
@@ -94,6 +103,9 @@ msgstr "Confirmer"
 
 msgid "Credits"
 msgstr "Crédits"
+
+msgid "Delete"
+msgstr "Supprimer"
 
 msgid "Delete class definitively"
 msgstr "Supprimer la classe définitivement"
@@ -115,6 +127,9 @@ msgstr "Catalogue des formations"
 
 msgid "Full"
 msgstr "Complet"
+
+msgid "Function"
+msgstr "Fonction"
 
 msgid "Identification"
 msgstr "Identification"
@@ -163,8 +178,14 @@ msgstr "Unités d'enseignement"
 msgid "Lecturing"
 msgstr "Partie magistrale"
 
+msgid "Manage repartition"
+msgstr "Gérer la répartition"
+
 msgid "New class"
 msgstr "Nouvelle classe"
+
+msgid "No attributions exist for the UE"
+msgstr "Aucune attribution sur l'UE"
 
 msgid "Not in period to edit description fiche."
 msgstr "Pas en période pour modifier les fiches descriptives."
@@ -210,8 +231,23 @@ msgstr "Quadrimestre"
 msgid "Refer to learning unit"
 msgstr "Voir unité d'enseignement"
 
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
+
+#, python-format
+msgid "Repartition deleted for %(tutor)s (%(function)s)"
+msgstr "Répartition supprimée pour %(tutor)s (%(function)s)"
+
+#, python-format
+msgid "Repartition edited for %(tutor)s (%(function)s)"
+msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
+
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
+
+msgid "Save"
+msgstr "Enregistrer"
 
 msgid "Session derogation"
 msgstr "Session dérogation"
@@ -269,6 +305,9 @@ msgstr "La proposition n'est pas sur cette année académique"
 msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
+
+msgid "This effective class is not editable this period."
+msgstr "La classe n'est pas modifiable durant cette période."
 
 msgid "This learning unit has an application in the future"
 msgstr "L'unité d'enseignement possède au moins une candidature dans le futur"
@@ -336,6 +375,15 @@ msgstr "Intitulé en anglais"
 msgid "Title in French"
 msgstr "Intitulé en français"
 
+msgid "Tutor"
+msgstr "Enseignant·e"
+
+msgid "Tutor already assigned to the class"
+msgstr "L'enseignant est déjà assigné à cette classe"
+
+msgid "Tutors"
+msgstr "Enseignant·e·s"
+
 msgid "Type"
 msgstr "Type"
 
@@ -351,11 +399,17 @@ msgstr "Vol. Q2"
 msgid "Vol. annual"
 msgstr "Vol. annuel"
 
+msgid "Volume"
+msgstr "Volume"
+
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
 msgid "Volume Q2"
 msgstr "Volume Q2"
+
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
 
 msgid "You are not allowed to create proposal during this academic year"
 msgstr "Vous ne pouvez pas créer de proposition durant cette année académique"
@@ -388,6 +442,21 @@ msgid ""
 msgstr ""
 "Vous pouvez seulement modifier une unité d'enseignement pour laquelle vous "
 "êtes lié à l'entité responsable"
+
+msgid ""
+"You can only modify an effective class when your are linked to learning unit "
+"requirement entity"
+msgstr ""
+"Vous pouvez seulement modifier une classe pour laquelle vous êtes lié à "
+"l'entité responsable de l'unité d'enseignement"
+
+#, python-format
+msgid ""
+"You can't modify effective class under year : %(year)d. Modifications should "
+"be made in EPC under year %(year)d"
+msgstr ""
+"Vous ne pouvez pas modifier une classe avant %(year)d. Les modifications "
+"doivent être faites dans EPC avant l'année %(year)d"
 
 #, python-format
 msgid ""

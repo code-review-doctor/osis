@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
-from django.test import TestCase
+
+from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
@@ -35,13 +35,18 @@ from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1002Externa
     LDROI1001CourseLearningUnitFactory, LDROI1003CourseWithPartimsLearningUnitFactory, \
     LDROI1004CourseWithoutVolumesLearningUnitFactory
 from ddd.logic.learning_unit.use_case.read.check_can_create_class_service import check_can_create_effective_class
+from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
+    StudentEnrollmentsTranslator
 from infrastructure.learning_unit.repository.in_memory.learning_unit import LearningUnitRepository
 
 
-class TestCheckCanCreateEffectiveClass(TestCase):
+class TestCheckCanCreateEffectiveClass(SimpleTestCase):
 
     def setUp(self):
         self.learning_unit_repository = LearningUnitRepository()
+        self.has_enrollments_service = StudentEnrollmentsTranslator()
+        self.has_enrollments_service.has_enrollments_to_class = lambda *args: False
+        self.has_enrollments_service.has_enrollments_to_learning_unit = lambda *args: False
 
     def test_check_can_create_effective_class(self):
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
@@ -52,7 +57,13 @@ class TestCheckCanCreateEffectiveClass(TestCase):
             learning_unit_year=LDROI1001_course.entity_id.academic_year.year
         )
 
-        self.assertIsNone(check_can_create_effective_class(self.cmd, self.learning_unit_repository))
+        self.assertIsNone(
+            check_can_create_effective_class(
+                cmd=self.cmd,
+                learning_unit_repository=self.learning_unit_repository,
+                student_enrollment_translator=self.has_enrollments_service,
+            )
+        )
 
     def test_check_cannot_create_effective_class_invalid_learning_unit_type(self):
         LDROI1002_external = LDROI1002ExternalLearningUnitFactory()
@@ -64,7 +75,11 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
-            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+            check_can_create_effective_class(
+                cmd=self.cmd,
+                learning_unit_repository=self.learning_unit_repository,
+                student_enrollment_translator=self.has_enrollments_service,
+            )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(ClassTypeInvalidException, raised_exceptions)
 
@@ -73,13 +88,17 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         LDROI1003_course_with_partims = LDROI1003CourseWithPartimsLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1003_course_with_partims)
 
-        self.cmd = CanCreateEffectiveClassCommand(
+        cmd = CanCreateEffectiveClassCommand(
             learning_unit_code=LDROI1003_course_with_partims.entity_id.code,
             learning_unit_year=LDROI1003_course_with_partims.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
-            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+            check_can_create_effective_class(
+                cmd=cmd,
+                learning_unit_repository=self.learning_unit_repository,
+                student_enrollment_translator=self.has_enrollments_service,
+            )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasPartimException, raised_exceptions)
 
@@ -87,28 +106,37 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         LDROI1004_course_without_volumes = LDROI1004CourseWithoutVolumesLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1004_course_without_volumes)
 
-        self.cmd = CanCreateEffectiveClassCommand(
+        cmd = CanCreateEffectiveClassCommand(
             learning_unit_code=LDROI1004_course_without_volumes.entity_id.code,
             learning_unit_year=LDROI1004_course_without_volumes.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
-            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+            check_can_create_effective_class(
+                cmd=cmd,
+                learning_unit_repository=self.learning_unit_repository,
+                student_enrollment_translator=self.has_enrollments_service,
+            )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasNoVolumeException, raised_exceptions)
 
-    @mock.patch("infrastructure.messages_bus.has_enrollments_to_class_service", return_value=True)
-    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self, mock_has_enrollments):
+    def test_check_cannot_create_effective_class_for_lu_with_enrollments(self):
+        self.has_enrollments_service.has_enrollments_to_learning_unit = lambda *args: True
+
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
 
-        self.cmd = CanCreateEffectiveClassCommand(
+        cmd = CanCreateEffectiveClassCommand(
             learning_unit_code=LDROI1001_course.entity_id.code,
             learning_unit_year=LDROI1001_course.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
-            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+            check_can_create_effective_class(
+                cmd=cmd,
+                learning_unit_repository=self.learning_unit_repository,
+                student_enrollment_translator=self.has_enrollments_service,
+            )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasEnrollmentException, raised_exceptions)
 
@@ -118,12 +146,16 @@ class TestCheckCanCreateEffectiveClass(TestCase):
         LDROI1001_course = LDROI1001CourseLearningUnitFactory()
         self.learning_unit_repository.save(LDROI1001_course)
 
-        self.cmd = CanCreateEffectiveClassCommand(
+        cmd = CanCreateEffectiveClassCommand(
             learning_unit_code=LDROI1001_course.entity_id.code,
             learning_unit_year=LDROI1001_course.entity_id.academic_year.year
         )
 
         with self.assertRaises(MultipleBusinessExceptions) as context:
-            check_can_create_effective_class(self.cmd, self.learning_unit_repository)
+            check_can_create_effective_class(
+                cmd=cmd,
+                learning_unit_repository=self.learning_unit_repository,
+                student_enrollment_translator=self.has_enrollments_service,
+            )
         raised_exceptions = [type(e) for e in context.exception.exceptions]
         self.assertIn(LearningUnitHasProposalException, raised_exceptions)

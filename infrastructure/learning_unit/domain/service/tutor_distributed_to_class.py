@@ -25,24 +25,25 @@
 ##############################################################################
 from typing import Optional
 
-from attribution.models.attribution_class import AttributionClass as AttributionClassDb
+from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.i_tutor_distributed_to_class import ITutorDistributedToClass
+from ddd.logic.learning_unit.domain.service.i_tutor_assigned_to_class import ITutorAssignedToClassTranslator
 
 
-class TutorDistributedToClass(ITutorDistributedToClass):
+class TutorAssignedToClassTranslator(ITutorAssignedToClassTranslator):
 
     @classmethod
     def get_first_tutor_full_name_if_exists(
             cls,
             effective_class_identity: 'EffectiveClassIdentity'
     ) -> Optional[str]:
-        ue_identity = effective_class_identity.learning_unit_identity
-        results = AttributionClassDb.objects.filter(
-            learning_class_year__learning_component_year__learning_unit_year__acronym=ue_identity.code,
-            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=ue_identity.year,
-            learning_class_year__acronym=effective_class_identity.class_code
+        from infrastructure.messages_bus import message_bus_instance
+        tutors_assigned_to_class = message_bus_instance.invoke(
+            SearchTutorsDistributedToClassCommand(
+                class_code=effective_class_identity.class_code,
+                learning_unit_code=effective_class_identity.learning_unit_identity.code,
+                learning_unit_year=effective_class_identity.learning_unit_identity.year
+            )
         )
-        if results:
-            return results[0].attribution_charge.attribution.tutor.person.full_name
-        return None
+        if tutors_assigned_to_class:
+            return tutors_assigned_to_class[0].full_name

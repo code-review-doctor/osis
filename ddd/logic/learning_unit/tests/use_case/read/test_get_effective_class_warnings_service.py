@@ -179,7 +179,7 @@ class TestGetEffectiveClassWarningsService(TestCase):
             self.effective_class,
             volumes=ClassVolumes(
                 volume_first_quadrimester=self.learning_unit.lecturing_part.volumes.volume_first_quadrimester,
-                volume_second_quadrimester=0
+                volume_second_quadrimester=None
             )
         )
         self.effective_class_repository.save(effective_class)
@@ -201,8 +201,8 @@ class TestGetEffectiveClassWarningsService(TestCase):
         effective_class = attr.evolve(
             self.effective_class,
             volumes=ClassVolumes(
-                volume_first_quadrimester=0,
-                volume_second_quadrimester=5
+                volume_second_quadrimester=5,
+                volume_first_quadrimester=None
             ),
             derogation_quadrimester=DerogationQuadrimester.Q1
         )
@@ -227,7 +227,7 @@ class TestGetEffectiveClassWarningsService(TestCase):
             self.effective_class,
             volumes=ClassVolumes(
                 volume_first_quadrimester=0,
-                volume_second_quadrimester=0
+                volume_second_quadrimester=None
             ),
             derogation_quadrimester=DerogationQuadrimester.Q1
         )

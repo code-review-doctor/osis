@@ -23,20 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from abc import abstractmethod
+from typing import Optional, List
 
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
-from ddd.logic.learning_unit.commands import HasEnrollmentsToClassCommand
-from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
-    StudentEnrollmentsToEffectiveClass
+from ddd.logic.effective_class_repartition.domain.model.tutor import Tutor, TutorIdentity
+from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-def has_enrollments_to_class_service(
-        cmd: 'HasEnrollmentsToClassCommand'
-) -> bool:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.year
-    )
-    return StudentEnrollmentsToEffectiveClass.has_enrollments_to_class(
-        learning_unit_identity
-    )
+class ITutorRepository(interface.AbstractRepository):
+    @classmethod
+    @abstractmethod
+    def get(cls, entity_id: 'TutorIdentity') -> 'Tutor':
+        pass
+
+    @classmethod
+    @abstractmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['TutorIdentity']] = None,
+            effective_class_identity: 'EffectiveClassIdentity' = None,
+    ) -> List['Tutor']:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def delete(cls, entity_id: 'TutorIdentity', **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def save(cls, entity: 'Tutor') -> None:
+        pass
