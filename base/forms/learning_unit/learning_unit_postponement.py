@@ -56,7 +56,8 @@ FIELDS_TO_CHECK = ['faculty_remark', 'other_remark', 'other_remark_english', 'ac
                    'specific_title_english', 'credits', 'session', 'quadrimester', 'status', 'internship_subtype',
                    'professional_integration', 'campus', 'language', 'periodicity', 'container_type', 'common_title',
                    'common_title_english', 'team', 'requirement_entity', 'allocation_entity', 'additional_entity_1',
-                   'additional_entity_2', 'stage_dimona']
+                   'additional_entity_2', 'stage_dimona', 'individual_loan', 'exchange_students', 'french_friendly',
+                   'english_friendly']
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year

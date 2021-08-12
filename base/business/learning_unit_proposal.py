@@ -56,7 +56,8 @@ from base.utils import send_mail as send_mail_util
 from osis_role.errors import get_permission_error
 from reference.models import language
 
-BOOLEAN_FIELDS = ('professional_integration', 'stage_dimona', 'is_vacant', 'team')
+BOOLEAN_FIELDS = ('professional_integration', 'stage_dimona', 'is_vacant', 'team', 'individual_loan', 'french_friendly',
+                  'english_friendly', 'exchange_students')
 FOREIGN_KEY_NAME = (
     'language', 'campus', 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
 )
@@ -78,7 +79,8 @@ INITIAL_DATA_FIELDS = {
     'learning_unit_year': [
         "id", "acronym", "specific_title", "internship_subtype", "credits", "campus", "language", "periodicity",
         "status", "professional_integration", "specific_title", "specific_title_english", "quadrimester", "session",
-        "faculty_remark", "other_remark", "other_remark_english", "stage_dimona"
+        "faculty_remark", "other_remark", "other_remark_english", "stage_dimona", 'individual_loan', 'french_friendly',
+        'english_friendly', 'exchange_students'
     ],
     'learning_component_year': [
         "id", "acronym", "hourly_volume_total_annual", "hourly_volume_partial_q1", "hourly_volume_partial_q2",
@@ -463,7 +465,7 @@ def _reinitialize_components_before_proposal(initial_components: dict, luy: Lear
     for initial_data_by_model in initial_components:
         an_id = initial_data_by_model.get('id')
         if an_id:
-            learning_component_year, created = mdl_base.learning_component_year.LearningComponentYear.objects.\
+            learning_component_year, created = mdl_base.learning_component_year.LearningComponentYear.objects. \
                 get_or_create(pk=an_id, defaults={'learning_unit_year': luy})
             update_or_create_learning_unit_component(learning_component_year, initial_data_by_model)
 

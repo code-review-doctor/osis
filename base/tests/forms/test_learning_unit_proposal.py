@@ -364,6 +364,10 @@ def build_initial_data(learning_unit_year, entity):
             "other_remark": learning_unit_year.other_remark,
             'other_remark_english': learning_unit_year.other_remark_english,
             "faculty_remark": learning_unit_year.faculty_remark,
+            "individual_loan": learning_unit_year.individual_loan,
+            "exchange_students": learning_unit_year.exchange_students,
+            "french_friendly": learning_unit_year.french_friendly,
+            "english_friendly": learning_unit_year.english_friendly,
         },
         "learning_unit": {
             "id": learning_unit_year.learning_unit.id,

@@ -119,7 +119,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
                   'professional_integration', 'stage_dimona', 'campus', 'language', 'periodicity',
-                  'other_remark', 'faculty_remark', 'other_remark_english')
+                  'other_remark', 'faculty_remark', 'other_remark_english', 'individual_loan', 'exchange_students',
+                  'french_friendly', 'english_friendly')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
