@@ -100,16 +100,14 @@ from infrastructure.effective_class_repartition.domain.service.tutor_attribution
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireTranslator
-from infrastructure.encodage_de_notes.encodage.domain.service.feuille_de_notes_enseignant import \
-    FeuilleDeNotesEnseignantTranslator
-from infrastructure.encodage_de_notes.common_domain.service.attribution_enseignant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.inscription_examen import InscriptionExamenTranslator
-from infrastructure.encodage_de_notes.common_domain.service.periode_encodage_notes import \
+from infrastructure.encodage_de_notes.shared_kernel.service.inscription_examen import InscriptionExamenTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_etudiant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.unite_enseignement import UniteEnseignementTranslator
+from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
@@ -254,9 +252,13 @@ class MessageBus:
         ),
         GetFeuilleDeNotesGestionnaireCommand: lambda cmd: get_feuille_de_notes_gestionnaire(
             cmd,
+            FeuilleDeNotesRepository(),
+            ResponsableDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
+            InscriptionExamenTranslator(),
+            SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),
-            FeuilleDeNotesEnseignantTranslator(),
+            UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
         ),
         SoumettreFeuilleDeNotesCommand: lambda cmd: soumettre_feuille_de_notes(

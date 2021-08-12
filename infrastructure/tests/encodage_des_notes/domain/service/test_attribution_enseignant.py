@@ -30,7 +30,7 @@ from django.test import TestCase
 from attribution.tests.factories.attribution_class import AttributionClassFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
-from infrastructure.encodage_de_notes.common_domain.service.attribution_enseignant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 
 
