@@ -27,7 +27,8 @@ from django.utils.functional import cached_property
 from django.views import View
 
 from assessments.views.serializers.score_sheet import ScoreSheetPDFSerializer
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
+    SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_common.document import paper_sheet
 from osis_role.contrib.views import PermissionRequiredMixin
@@ -43,8 +44,11 @@ class ScoreSheetPDFExportView(PermissionRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         feuille_de_notes = self.get_feuille_de_notes()
+        donnees_administratives = self.get_donnees_administratives()
+
         score_sheet_serialized = ScoreSheetPDFSerializer(instance={
-            'feuille_de_notes': feuille_de_notes
+            'feuille_de_notes': feuille_de_notes,
+            'donnees_administratives': donnees_administratives
         }, context={'person': self.person})
         return paper_sheet.print_notes(score_sheet_serialized.data)
 
@@ -52,5 +56,11 @@ class ScoreSheetPDFExportView(PermissionRequiredMixin, View):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code']
+        )
+        return message_bus_instance.invoke(cmd)
+
+    def get_donnees_administratives(self):
+        cmd = SearchAdressesFeuilleDeNotesCommand(
+            codes_unite_enseignement=[self.kwargs['learning_unit_code']]
         )
         return message_bus_instance.invoke(cmd)
