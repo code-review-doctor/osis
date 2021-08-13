@@ -23,15 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
-    IAttributionEnseignantTranslator
+from typing import List
+
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
+    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
 
@@ -41,7 +47,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
     def get(
             cls,
             matricule_gestionnaire: str,
-            feuille_de_notes: 'FeuilleDeNotes',
+            notes: List['NoteEtudiant'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             periode_encodage: 'PeriodeSoumissionNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
@@ -52,7 +58,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
     ) -> 'FeuilleDeNotesParCohorteDTO':
 
         feuille_notes_enseignant = FeuilleDeNotesParUniteEnseignement().get(
-            feuille_de_notes=feuille_de_notes,
+            notes=notes,
             responsable_notes_repo=responsable_notes_repo,
             periode_encodage=periode_encodage,
             inscription_examen_translator=inscription_examen_translator,

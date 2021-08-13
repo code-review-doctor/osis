@@ -23,21 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from typing import List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository, SearchCriteria
 
 
-class FeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IFeuilleDeNotesRepository):
-    entities = list()  # type: List[FeuilleDeNotes]
+class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRepository):
+    entities = list()  # type: List[NoteEtudiant]
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
-        return list(
-            filter(
-                lambda obj: obj.entity_id in entity_ids,
-                cls.entities
-            )
-        )
+    def search_by_code_unite_enseignement_annee_session(
+            cls,
+            criterias: List[SearchCriteria]
+    ) -> List['NoteEtudiant']:
+        return [
+            entity
+            for entity in cls.entities
+            if (entity.code_unite_enseignement, entity.annee, entity.numero_session) in criterias
+        ]

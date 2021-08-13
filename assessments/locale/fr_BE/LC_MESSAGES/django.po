@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-12 14:17+0200\n"
+"POT-Creation-Date: 2021-08-13 08:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,6 +45,9 @@ msgstr ""
 "\n"
 "Vous soumettrez %(draft_scores_not_submitted)s notes au(x) faculté(s). "
 "Attention : les notes soumises <b>ne peuvent plus être modifiées.</b>"
+
+msgid "A=Absent"
+msgstr "A=Absent"
 
 msgid "Absence justified cannot be remplaced by absence unjustified"
 msgstr ""
@@ -485,9 +488,6 @@ msgstr "Note contenant plus de 2 décimales"
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
 
-msgid "Score responsible should be link to one attribution"
-msgstr "Le responsable de notes doit être rattaché à une et une seule attribution"
-
 msgid "Score sheet address was successfully saved."
 msgstr "L'adresse de la feuille de notes a été sauvée avec succès."
 
@@ -574,6 +574,9 @@ msgstr "Etudes"
 
 msgid "Submission"
 msgstr "Soumission"
+
+msgid "T=Cheating"
+msgstr "T=Tricherie"
 
 msgid "Teacher deadline"
 msgstr "Date d'échéance de l'enseignant"
@@ -726,6 +729,12 @@ msgstr "%d/%m/%Y"
 
 msgid "learning units in"
 msgstr "unités d'enseignement dans"
+
+msgid "more_than_one_academic_year_error"
+msgstr "plus_de_une_annee_academique_erreur"
+
+msgid "no_valid_academic_year_error"
+msgstr "pas_de_annee_academique_valide_erreur"
 
 msgid "of"
 msgstr "sur"

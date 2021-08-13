@@ -23,40 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
-
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
 from osis_common.ddd import interface
 
-Noma = str
 
+class NoteEtudiantBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'NoteEtudiant':
+        pass
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
-
-
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=DateDTO)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
-
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
-
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    @classmethod
+    def build_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
+        return NoteEtudiant(
+            entity_id=NoteEtudiantIdentityBuilder().build_from_repository_dto(dto_object),
+            credits_unite_enseignement=dto_object.credits_unite_enseignement,
+            date_limite_de_remise=DateDTO.build_from_date(dto_object.date_limite_de_remise),
+            email=dto_object.email,
+            est_soumise=dto_object.est_soumise,
+            note=NoteBuilder.build(dto_object.note),
+        )

@@ -56,20 +56,22 @@ from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_s
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderFeuilleDeNotesCommand, \
-    GetProgressionGeneraleCommand, AssignerResponsableDeNotesCommand, SoumettreFeuilleDeNotesCommand, \
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
+    AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
-from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service import \
+from ddd.logic.encodage_des_notes.soumission.use_case.read.search_donnees_administratives_feuille_de_notes_service \
+    import \
     search_donnees_administratives_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable_de_notes_service import \
     assigner_responsable_de_notes
-from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_feuille_de_notes_service import \
-    encoder_feuille_de_notes
-from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_feuille_de_notes_service import \
-    soumettre_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
+    encoder_note_etudiant
+from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
+    soumettre_note_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -116,7 +118,7 @@ from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
     SignaletiquePersonneTranslator
-from infrastructure.encodage_de_notes.soumission.repository.feuille_de_notes import FeuilleDeNotesRepository
+from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
     StudentEnrollmentsTranslator
@@ -231,7 +233,7 @@ class MessageBus:
         ),
         GetFeuilleDeNotesCommand: lambda cmd: get_feuille_de_notes(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
@@ -239,15 +241,21 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             UniteEnseignementTranslator(),
         ),
-        EncoderFeuilleDeNotesCommand: lambda cmd: encoder_feuille_de_notes(
+        EncoderNoteCommand: lambda cmd: encoder_note_etudiant(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             PeriodeEncodageNotesTranslator(),
             AttributionEnseignantTranslator(),
         ),
+        SoumettreNoteCommand: lambda cmd: soumettre_note_etudiant(
+            cmd,
+            NoteEtudiantRepository(),
+            ResponsableDeNotesRepository(),
+            PeriodeEncodageNotesTranslator(),
+        ),
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             PeriodeEncodageNotesTranslator(),
             SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),
@@ -260,7 +268,7 @@ class MessageBus:
         ),
         GetFeuilleDeNotesGestionnaireCommand: lambda cmd: get_feuille_de_notes_gestionnaire(
             cmd,
-            FeuilleDeNotesRepository(),
+            NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
@@ -268,12 +276,6 @@ class MessageBus:
             AttributionEnseignantTranslator(),
             UniteEnseignementTranslator(),
             CohortesDuGestionnaireTranslator(),
-        ),
-        SoumettreFeuilleDeNotesCommand: lambda cmd: soumettre_feuille_de_notes(
-            cmd,
-            FeuilleDeNotesRepository(),
-            ResponsableDeNotesRepository(),
-            PeriodeEncodageNotesTranslator(),
         ),
         SearchAdressesFeuilleDeNotesCommand: lambda cmd: search_donnees_administratives_feuille_de_notes(
             cmd,

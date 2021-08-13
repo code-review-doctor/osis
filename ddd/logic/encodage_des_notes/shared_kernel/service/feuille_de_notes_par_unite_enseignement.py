@@ -25,17 +25,16 @@
 ##############################################################################
 from typing import List, Dict
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import Noma
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import Noma, NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, InscriptionExamenDTO, \
     DesinscriptionExamenDTO, PeriodeSoumissionNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -44,7 +43,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
 
     @staticmethod
     def get(
-            feuille_de_notes: 'FeuilleDeNotes',
+            notes: List['NoteEtudiant'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             periode_encodage: 'PeriodeSoumissionNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
@@ -52,26 +51,41 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
             attribution_translator: 'IAttributionEnseignantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'FeuilleDeNotesDTO':
+        code_unite_enseignement = notes[0].code_unite_enseignement
+        annee = notes[0].annee
+        numero_session = notes[0].numero_session
 
-        unite_enseignement = unite_enseignement_translator.get(
-            feuille_de_notes.code_unite_enseignement,
-            feuille_de_notes.annee,
-        )
+        unite_enseignement = unite_enseignement_translator.get(code_unite_enseignement, annee)
         responsable_notes = _get_responsable_de_notes(
-            feuille_de_notes.code_unite_enseignement,
-            feuille_de_notes.annee,
+            code_unite_enseignement,
+            annee,
             responsable_notes_repo,
         )
-        autres_enseignants = _get_autres_enseignants(attribution_translator, feuille_de_notes, responsable_notes)
+        autres_enseignants = _get_autres_enseignants(
+            attribution_translator,
+            code_unite_enseignement,
+            annee,
+            responsable_notes
+        )
 
-        nomas_concernes = [note.noma for note in feuille_de_notes.notes]
+        nomas_concernes = [note.noma for note in notes]
 
-        inscr_examen_par_noma = _get_inscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator)
-        desinscr_exam_par_noma = _get_desinscriptions_examens_par_noma(feuille_de_notes, inscription_examen_translator)
+        inscr_examen_par_noma = _get_inscriptions_examens_par_noma(
+            code_unite_enseignement,
+            annee,
+            numero_session,
+            inscription_examen_translator
+        )
+        desinscr_exam_par_noma = _get_desinscriptions_examens_par_noma(
+            code_unite_enseignement,
+            annee,
+            numero_session,
+            inscription_examen_translator
+        )
         signaletique_par_noma = _get_signaletique_etudiant_par_noma(nomas_concernes, signaletique_etudiant_translator)
 
         notes_etudiants = []
-        for note in feuille_de_notes.notes:
+        for note in notes:
             inscr_exmen = inscr_examen_par_noma.get(note.noma)
             ouverture_periode_soumission = periode_encodage.debut_periode_soumission.to_date()
             inscrit_tardivement = inscr_exmen and inscr_exmen.date_inscription.to_date() > ouverture_periode_soumission
@@ -94,16 +108,16 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
             )
         notes_etudiants.sort(key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
         return FeuilleDeNotesDTO(
-            code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
+            code_unite_enseignement=code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
-            note_decimale_est_autorisee=feuille_de_notes.note_decimale_est_autorisee(),
+            note_decimale_est_autorisee=notes[0].note_decimale_est_autorisee(),
             responsable_note=EnseignantDTO(
                 nom=responsable_notes.nom,
                 prenom=responsable_notes.prenom,
             ),
             autres_enseignants=autres_enseignants,
-            annee_academique=feuille_de_notes.annee,
-            numero_session=feuille_de_notes.numero_session,
+            annee_academique=annee,
+            numero_session=numero_session,
             notes_etudiants=notes_etudiants,
         )
 
@@ -117,38 +131,40 @@ def _get_signaletique_etudiant_par_noma(
 
 
 def _get_desinscriptions_examens_par_noma(
-        feuille_de_notes: 'FeuilleDeNotes',
+        code_unite_enseignement: str,
+        annee: int,
+        numero_session: int,
         inscription_examen_translator: 'IInscriptionExamenTranslator'
 ) -> Dict['Noma', 'DesinscriptionExamenDTO']:
     desinscriptions_examens = inscription_examen_translator.search_desinscrits(
-        code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
-        annee=feuille_de_notes.annee,
-        numero_session=feuille_de_notes.numero_session,
+        code_unite_enseignement=code_unite_enseignement,
+        annee=annee,
+        numero_session=numero_session,
     )
     return {desinscr.noma: desinscr for desinscr in desinscriptions_examens}
 
 
 def _get_inscriptions_examens_par_noma(
-        feuille_de_notes: 'FeuilleDeNotes',
+        code_unite_enseignement: str,
+        annee: int,
+        numero_session: int,
         inscription_examen_translator: 'IInscriptionExamenTranslator'
 ) -> Dict['Noma', 'InscriptionExamenDTO']:
     inscr_examens = inscription_examen_translator.search_inscrits(
-        code_unite_enseignement=feuille_de_notes.code_unite_enseignement,
-        annee=feuille_de_notes.annee,
-        numero_session=feuille_de_notes.numero_session,
+        code_unite_enseignement=code_unite_enseignement,
+        annee=annee,
+        numero_session=numero_session,
     )
     return {insc_exam.noma: insc_exam for insc_exam in inscr_examens}
 
 
 def _get_autres_enseignants(
         attribution_translator: 'IAttributionEnseignantTranslator',
-        feuille_de_notes: 'FeuilleDeNotes',
+        code_unite_enseignement: str,
+        annee: int,
         responsable_notes: 'EnseignantDTO'
 ) -> List[EnseignantDTO]:
-    enseignants = attribution_translator.search_attributions_enseignant(
-        feuille_de_notes.code_unite_enseignement,
-        feuille_de_notes.annee,
-    )
+    enseignants = attribution_translator.search_attributions_enseignant(code_unite_enseignement, annee)
     return [
         EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
         for enseignant in sorted(enseignants, key=lambda ens: (ens.nom, ens.prenom))
