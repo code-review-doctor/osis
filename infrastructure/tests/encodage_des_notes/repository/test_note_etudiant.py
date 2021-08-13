@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, \
+from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteChiffreEtudiantFactory, NoteJustificationEtudiantFactory
 from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -145,6 +145,7 @@ class NoteEtudiantRepositoryTest(TestCase):
         )
         SessionExamDeadlineFactory(
             offer_enrollment=enrollment.learning_unit_enrollment.offer_enrollment,
+            number_session=note_etudiant_to_save.numero_session,
             deadline=note_etudiant_to_save.get_date_limite_de_remise(),
             deadline_tutor=0
         )
