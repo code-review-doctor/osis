@@ -116,6 +116,7 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         source='feuille_de_notes.note_decimale_est_autorisee',
         default=False
     )
+    contact_emails = serializers.SerializerMethodField()
     rows = serializers.SerializerMethodField()
 
     def get_annee_academique(self, obj) -> str:
@@ -126,6 +127,12 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
             self.get_annee_academique(obj),
             obj['feuille_de_notes'].intitule_complet_unite_enseignement
         )
+
+    def get_contact_emails(self, obj) -> str:
+        return ";".join([
+            d_admin.contact_feuille_de_notes.email for d_admin in obj['donnees_administratives']
+            if d_admin.contact_feuille_de_notes.email
+        ])
 
     def get_rows(self, obj):
         notes_etudiants_avec_date_echeance_non_atteinte = filter(

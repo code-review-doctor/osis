@@ -66,7 +66,16 @@ def build_xls(feuille_de_notes_serialized):
 
 
 def _build_document_info(worksheet, feuille_de_notes_serialized):
-    worksheet.append([feuille_de_notes_serialized['titre'], '', '', '', '', '', str('Contacts'), ''])
+    worksheet.append([
+        feuille_de_notes_serialized['titre'],
+        '',
+        '',
+        '',
+        '',
+        '',
+        str('Contacts'),
+        feuille_de_notes_serialized['contact_emails']
+    ])
     worksheet.append([str('Session: %s' % feuille_de_notes_serialized['numero_session'])])
     worksheet.append([''])
 
