@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-12 14:17+0200\n"
+"POT-Creation-Date: 2021-08-13 08:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,6 +36,9 @@ msgid ""
 "to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</"
 "b>\n"
 "                    "
+msgstr ""
+
+msgid "A=Absent"
 msgstr ""
 
 msgid "Absence justified cannot be remplaced by absence unjustified"
@@ -455,9 +458,6 @@ msgstr ""
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr ""
 
-msgid "Score responsible should be link to one attribution"
-msgstr ""
-
 msgid "Score sheet address was successfully saved."
 msgstr ""
 
@@ -540,6 +540,9 @@ msgid "Studies"
 msgstr ""
 
 msgid "Submission"
+msgstr ""
+
+msgid "T=Cheating"
 msgstr ""
 
 msgid "Teacher deadline"
@@ -674,6 +677,12 @@ msgid "date_format"
 msgstr "%d %b %Y"
 
 msgid "learning units in"
+msgstr ""
+
+msgid "more_than_one_academic_year_error"
+msgstr ""
+
+msgid "no_valid_academic_year_error"
 msgstr ""
 
 msgid "of"

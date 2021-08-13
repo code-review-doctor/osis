@@ -29,13 +29,12 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
-from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, AttributionEnseignantDTO, PeriodeSoumissionNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
-    FeuilleDeNotesAvecNotesManquantes
+from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, AttributionEnseignantDTO, \
+    PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
@@ -47,8 +46,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletiq
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
-    FeuilleDeNotesInMemoryRepository
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
+    NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -64,13 +63,11 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.noma = '11111111'
         self.nom_cohorte = 'DROI1BA'
 
-        self.feuille_de_notes = FeuilleDeNotesAvecUneSeuleNoteManquante(
-            notes={
-                NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
-            }
-        )
-        self.repository = FeuilleDeNotesInMemoryRepository()
-        self.repository.save(self.feuille_de_notes)
+        self.note_etudiant = NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
+
+        self.repository = NoteEtudiantInMemoryRepository()
+        self.repository.entities.clear()
+        self.repository.save(self.note_etudiant)
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
         self.resp_notes_repository.save(
@@ -92,7 +89,7 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            FeuilleDeNotesRepository=lambda: self.repository,
+            NoteEtudiantRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
@@ -231,15 +228,10 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.assertEqual(expected_result, note_etudiant.note)
 
     def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
-        self.repository.delete(self.feuille_de_notes.entity_id)
+        self.repository.delete(self.note_etudiant.entity_id)
 
-        feuille_de_notes_with_multiple_students = FeuilleDeNotesAvecNotesManquantes(
-            notes={
-                NoteManquanteEtudiantFactory(entity_id__noma=self.noma),
-                NoteManquanteEtudiantFactory(entity_id__noma='99999999'),
-            }
-        )
-        self.repository.save(feuille_de_notes_with_multiple_students)
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma=self.noma))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma='99999999'))
 
         result = message_bus_instance.invoke(self.cmd)
         self.assertEqual(len(result.notes_etudiants), 2)

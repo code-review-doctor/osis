@@ -23,23 +23,48 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import abc
+from typing import List, Optional, Tuple
 
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import AucunEtudiantTrouveException
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from osis_common.ddd import interface
+from osis_common.ddd.interface import ApplicationService
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldEtudiantEtrePresentFeuilleDeNotes(BusinessValidator):
-    noma_etudiant = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+SearchCriteria = Tuple[str, int, int]
 
-    def validate(self, *args, **kwargs):
-        correspondance_existe = any(
-            note for note in self.feuille_de_note.notes
-            if note.noma == self.noma_etudiant
-        )
-        if not correspondance_existe:
-            raise AucunEtudiantTrouveException(self.feuille_de_note.code_unite_enseignement)
+
+class INoteEtudiantRepository(interface.AbstractRepository):
+
+    @classmethod
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_by_code_unite_enseignement_annee_session(
+            cls,
+            criterias: List[SearchCriteria]
+    ) -> List['NoteEtudiant']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: 'NoteEtudiant') -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_all_identities(cls) -> List['IdentiteNoteEtudiant']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
+        pass

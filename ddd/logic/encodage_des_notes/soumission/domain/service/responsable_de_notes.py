@@ -37,16 +37,15 @@ class ResponsableDeNotes(interface.DomainService):
     def verifier(
             cls,
             matricule_fgs_enseignant: str,
-            feuille_de_notes_id: 'IdentiteFeuilleDeNotes',
+            code_unite_enseignement: str,
+            annee_academique: int,
             responsable_notes_repo: 'IResponsableDeNotesRepository',
     ) -> None:
         resp_notes_identity = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
         resp_notes = responsable_notes_repo.get(resp_notes_identity)
         if not resp_notes:
-            raise PasResponsableDeNotesException(feuille_de_notes_id.code_unite_enseignement)
-        est_responsable = resp_notes.is_responsable_unite_enseignement(
-            feuille_de_notes_id.code_unite_enseignement,
-            feuille_de_notes_id.annee_academique,
-        )
+            raise PasResponsableDeNotesException(code_unite_enseignement)
+
+        est_responsable = resp_notes.is_responsable_unite_enseignement(code_unite_enseignement, annee_academique)
         if not est_responsable:
-            raise PasResponsableDeNotesException(feuille_de_notes_id.code_unite_enseignement)
+            raise PasResponsableDeNotesException(code_unite_enseignement)

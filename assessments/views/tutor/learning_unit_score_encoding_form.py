@@ -32,8 +32,7 @@ from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreEncodingForm
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, NoteEtudiantCommand, \
-    EncoderFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, EncoderNoteCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -53,31 +52,29 @@ class LearningUnitScoreEncodingTutorFormView(PermissionRequiredMixin, FormView):
     def feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
-            code_unite_enseignement=self.kwargs['learning_unit_code']
+            code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
 
     def form_valid(self, formset):
-        note_etudiant_commands = [
-            NoteEtudiantCommand(
-                noma=form.cleaned_data['noma'],
-                email='dummy@gmail.com',
-                note=form.cleaned_data['note'],
-            ) for form in formset if form.has_changed()
-        ]
-        if note_etudiant_commands:
-            cmd = EncoderFeuilleDeNotesCommand(
-                code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
-                annee_unite_enseignement=self.feuille_de_notes.annee_academique,
-                numero_session=self.feuille_de_notes.numero_session,
-                matricule_fgs_enseignant=self.person.global_id,
-                notes_etudiants=note_etudiant_commands
-            )
-            message_bus_instance.invoke(cmd)
+        for form in formset:
+            if form.has_changed():
+                cmd = EncoderNoteCommand(
+                    code_unite_enseignement=self.feuille_de_notes.code_unite_enseignement,
+                    annee_unite_enseignement=self.feuille_de_notes.annee_academique,
+                    numero_session=self.feuille_de_notes.numero_session,
+                    matricule_fgs_enseignant=self.person.global_id,
+                    noma_etudiant=form.cleaned_data['noma'],
+                    email_etudiant=self.feuille_de_notes.get_email_for_noma(form.cleaned_data['noma']),
+                    note=form.cleaned_data['note'],
+                )
 
-        redirect_url = reverse('learning_unit_score_encoding', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
+                message_bus_instance.invoke(cmd)
+
+        redirect_url = reverse(
+            'learning_unit_score_encoding',
+            kwargs={'learning_unit_code': self.kwargs['learning_unit_code']}
+        )
         return redirect(redirect_url)
 
     def dispatch(self, request, *args, **kwargs):

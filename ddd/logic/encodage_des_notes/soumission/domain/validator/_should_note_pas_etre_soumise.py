@@ -33,9 +33,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 
 @attr.s(frozen=True, slots=True)
 class ShouldNotePasEtreSoumise(BusinessValidator):
-    noma = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
 
     def validate(self, *args, **kwargs):
-        if self.feuille_de_note.note_est_soumise(self.noma):
+        if self.note_etudiant.est_soumise:
             raise NoteDejaSoumiseException()
