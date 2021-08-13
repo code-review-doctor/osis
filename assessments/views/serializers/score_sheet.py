@@ -54,49 +54,46 @@ class _EnrollmentSerializer(serializers.Serializer):
 
 
 class _ProgramAddressSerializer(serializers.Serializer):
-    # TODO: Use data from administrative data service
-    recipient = serializers.CharField(read_only=True, source='nom_cohorte')
-    location = serializers.CharField(read_only=True, source='nom_cohorte')
-    postal_code = serializers.CharField(read_only=True, source='nom_cohorte')
-    city = serializers.CharField(read_only=True, source='nom_cohorte')
-    country = serializers.CharField(read_only=True, source='nom_cohorte')
-    phone = serializers.CharField(read_only=True, source='nom_cohorte')
-    fax = serializers.CharField(read_only=True, source='nom_cohorte')
-    email = serializers.CharField(read_only=True, source='nom_cohorte')
+    recipient = serializers.CharField(read_only=True, source='destinataire', default='')
+    location = serializers.CharField(read_only=True,  source='rue_et_numero', default='')
+    postal_code = serializers.CharField(read_only=True, source='code_postal', default='')
+    city = serializers.CharField(read_only=True, source='ville', default='')
+    country = serializers.CharField(read_only=True, source='pays', default='')
+    phone = serializers.CharField(read_only=True, source='telephone', default='')
+    fax = serializers.CharField(read_only=True, default='')
+    email = serializers.CharField(read_only=True, default='')
 
 
 class _ProgramSerializer(serializers.Serializer):
     deliberation_date = serializers.SerializerMethodField()
     acronym = serializers.SerializerMethodField()
-    address = _ProgramAddressSerializer(source='*')
+    address = _ProgramAddressSerializer(source='donnees_administratives_cohorte.contact_feuille_de_notes')
     enrollments = _EnrollmentSerializer(source='notes_etudiants_cohorte', many=True)
 
     def get_deliberation_date(self, obj):
-        return str(_('Not passed'))
+        return obj['donnees_administratives_cohorte'].date_deliberation.to_date().strftime("%d/%m/%Y")  \
+            if obj['donnees_administratives_cohorte'].date_deliberation else str(_('Not passed'))
 
     def get_acronym(self, obj):
         return obj['nom_cohorte']
 
 
 class _ScoreResponsibleAddressSerializer(serializers.Serializer):
-    location = serializers.SerializerMethodField()
-    postal_code = serializers.SerializerMethodField()
-    city = serializers.SerializerMethodField()
-
-    def get_location(self, obj) -> str:
-        return ""
-
-    def get_postal_code(self, obj) -> str:
-        return ""
-
-    def get_city(self, obj) -> str:
-        return ""
+    location = serializers.CharField(read_only=True, source='rue_numero_boite', default='')
+    postal_code = serializers.CharField(read_only=True, source='code_postal', default='')
+    city = serializers.CharField(read_only=True, source='ville', default='')
 
 
 class _ScoreResponsibleSerializer(serializers.Serializer):
     first_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.prenom')
     last_name = serializers.CharField(read_only=True, source='feuille_de_notes.responsable_note.nom')
-    address = _ScoreResponsibleAddressSerializer(source='*')
+    address = serializers.SerializerMethodField()
+
+    def get_address(self, obj):
+        # TODO: Move contact_responsable_notes data to score_sheet instead of administrative data
+        return _ScoreResponsibleAddressSerializer(
+            instance=obj['donnees_administratives'][0].contact_responsable_notes.adresse_professionnelle
+        ).data
 
 
 class _LearningUnitYearsSerializer(serializers.Serializer):
@@ -116,9 +113,15 @@ class _LearningUnitYearsSerializer(serializers.Serializer):
         rows_sorted_by_cohorte = sorted(obj['feuille_de_notes'].notes_etudiants, key=lambda note: note.nom_cohorte)
         for nom_cohorte, notes_etudiants_cohorte \
                 in itertools.groupby(rows_sorted_by_cohorte, key=lambda note: note.nom_cohorte):
+            donnees_administratives_cohorte = next((
+                donnee_administrative for donnee_administrative in obj['donnees_administratives'] if
+                donnee_administrative.sigle_formation == nom_cohorte
+            ), None)
+
             serializer = _ProgramSerializer(instance={
                 'notes_etudiants_cohorte': notes_etudiants_cohorte,
-                'nom_cohorte': nom_cohorte
+                'nom_cohorte': nom_cohorte,
+                'donnees_administratives_cohorte': donnees_administratives_cohorte,
             })
             programs.append(serializer.data)
         return programs
