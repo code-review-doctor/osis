@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from typing import Dict, Callable, List
+
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
     RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
@@ -69,7 +70,7 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
     encoder_note_etudiant
-from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_feuille_de_notes_service import \
+from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
     soumettre_note_etudiant
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \

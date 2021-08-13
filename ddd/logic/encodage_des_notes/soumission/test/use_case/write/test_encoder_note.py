@@ -40,12 +40,12 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     NomaNeCorrespondPasEmailException, NoteIncorrecteException, \
     NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory, \
+from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees, NoteDejaSoumise
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.attribution_enseignant import \
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.periode_soumission_notes import \
-    PeriodeSoumissionNotesTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -70,7 +70,7 @@ class EncoderNoteTest(SimpleTestCase):
             note="12"
         )
 
-        self.periode_soumission_translator = PeriodeSoumissionNotesTranslatorInMemory()
+        self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.__mock_service_bus()
 
@@ -78,7 +78,7 @@ class EncoderNoteTest(SimpleTestCase):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             NoteEtudiantRepository=lambda: self.repository,
-            PeriodeSoumissionNotesTranslator=lambda: self.periode_soumission_translator,
+            PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
         )
         message_bus_patcher.start()
@@ -94,7 +94,7 @@ class EncoderNoteTest(SimpleTestCase):
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
         )
-        self.periode_soumission_translator.get = lambda *args: periode_fermee
+        self.periode_encodage_notes_translator.get = lambda *args: periode_fermee
 
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
             self.message_bus.invoke(self.cmd)
@@ -109,7 +109,7 @@ class EncoderNoteTest(SimpleTestCase):
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_aujourdhui,
         )
-        self.periode_soumission_translator.get = lambda *args: periode_ouverte
+        self.periode_encodage_notes_translator.get = lambda *args: periode_ouverte
 
         self.assertTrue(
             self.message_bus.invoke(self.cmd),
@@ -126,7 +126,7 @@ class EncoderNoteTest(SimpleTestCase):
             debut_periode_soumission=date_aujourdhui,
             fin_periode_soumission=date_dans_le_futur,
         )
-        self.periode_soumission_translator.get = lambda *args: periode_ouverte
+        self.periode_encodage_notes_translator.get = lambda *args: periode_ouverte
 
         self.assertTrue(
             self.message_bus.invoke(self.cmd),
@@ -135,7 +135,7 @@ class EncoderNoteTest(SimpleTestCase):
 
     def test_should_empecher_si_aucune_periode_trouvee(self):
         aucune_periode_trouvee = None
-        self.periode_soumission_translator.get = lambda *args: aucune_periode_trouvee
+        self.periode_encodage_notes_translator.get = lambda *args: aucune_periode_trouvee
 
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
             self.message_bus.invoke(self.cmd)
