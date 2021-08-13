@@ -29,17 +29,18 @@ from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+from base.views.mixins import AjaxTemplateMixin
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
-from osis_role.contrib.views import PermissionRequiredMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 
 
-class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
-    # TemplateView
-    template_name = "assessments/tutor/learning_unit_score_encoding.html"
-
+class LearningUnitScoreEncodingTutorSubmitView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = "assessments.can_access_scoreencoding"
+
+    # FormView
+    template_name = "assessments/tutor/learning_unit_score_encoding_submit_inner.html"
 
     @cached_property
     def person(self):
@@ -52,16 +53,21 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
             return HttpResponseRedirect(redirect_url)
         return super().dispatch(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        #  TODO Invoke submit command message_bus
+        return self._ajax_response()
+
+    def get_success_url(self):
+        return reverse(
+            'learning_unit_score_encoding',
+            kwargs={'learning_unit_code': self.kwargs['learning_unit_code']}
+        )
+
     def get_context_data(self, **kwargs):
+        feuille_de_notes = self.get_feuille_de_notes()
         return {
             **super().get_context_data(**kwargs),
-            'feuille_de_notes': self.get_feuille_de_notes(),
-            'learning_unit_encoding_url': self.get_learning_unit_encoding_url(),
-            'learning_unit_double_encoding_url': self.get_learning_unit_double_encoding_url(),
-            'learning_unit_print_url': self.get_learning_unit_print_url(),
-            'learning_unit_download_xls_url': self.get_learning_unit_download_xls_url(),
-            'learning_unit_upload_xls_url': self.get_learning_unit_upload_xls_url(),
-            'learning_unit_submit_url': self.get_learning_unit_submit_url(),
+            'draft_scores_not_submitted': feuille_de_notes.quantite_notes_en_attente_de_soumission,
         }
 
     def get_feuille_de_notes(self):
@@ -70,34 +76,3 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
-
-    def get_learning_unit_encoding_url(self):
-        return reverse('learning_unit_score_encoding_form', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_double_encoding_url(self):
-        return ""
-
-    def get_learning_unit_print_url(self):
-        return reverse('score_sheet_pdf_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_download_xls_url(self):
-        return reverse('score_sheet_xls_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_upload_xls_url(self):
-        return reverse('score_sheet_xls_import', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_submit_url(self):
-        return reverse('learning_unit_score_encoding_submit', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_permission_object(self):
-        return None

@@ -34,6 +34,7 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
 from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 from assessments.views.tutor.learning_unit_score_encoding_form import LearningUnitScoreEncodingTutorFormView
+from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
 from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportView
 from assessments.views.tutor.score_sheet_xls_export import ScoreSheetXLSExportView
 from assessments.views.tutor.score_sheet_xls_import import ScoreSheetXLSImportView
@@ -72,6 +73,11 @@ urlpatterns = [
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingTutorView.as_view(), name='learning_unit_score_encoding'),
             path('form', LearningUnitScoreEncodingTutorFormView.as_view(), name='learning_unit_score_encoding_form'),
+            path(
+                'submit',
+                LearningUnitScoreEncodingTutorSubmitView.as_view(),
+                name='learning_unit_score_encoding_submit',
+            ),
             path('pdf_export', ScoreSheetPDFExportView.as_view(), name='score_sheet_pdf_export'),
             path('xls_export', ScoreSheetXLSExportView.as_view(), name='score_sheet_xls_export'),
             path('xls_import', ScoreSheetXLSImportView.as_view(), name='score_sheet_xls_import'),
