@@ -32,7 +32,8 @@ from django.utils.translation import gettext_lazy as _
 
 from assessments.export import score_sheet_xls
 from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
-from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, \
+    SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -53,9 +54,17 @@ class ScoreSheetXLSExportView(PermissionRequiredMixin, View):
         )
         return message_bus_instance.invoke(cmd)
 
+    @cached_property
+    def donnees_administratives(self):
+        cmd = SearchAdressesFeuilleDeNotesCommand(
+            codes_unite_enseignement=[self.kwargs['learning_unit_code']]
+        )
+        return message_bus_instance.invoke(cmd)
+
     def get(self, request, *args, **kwargs):
         score_sheet_serialized = ScoreSheetXLSSerializer(instance={
-            'feuille_de_notes': self.feuille_de_notes
+            'feuille_de_notes': self.feuille_de_notes,
+            'donnees_administratives': self.donnees_administratives,
         }).data
 
         if len(score_sheet_serialized['rows']):
