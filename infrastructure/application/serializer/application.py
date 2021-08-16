@@ -33,6 +33,7 @@ class ApplicationSerializer:
             'operation': "delete",
             'remark': application.remark,
             'course_summary': application.course_summary,
+            'global_id': application.applicant_id.global_id,
             'lecturing_allocation': str(application.lecturing_volume) if application.lecturing_volume else '0',
             'practical_allocation': str(application.practical_volume) if application.practical_volume else '0',
             'learning_container_year': {
@@ -47,6 +48,7 @@ class ApplicationSerializer:
             'operation': "update",
             'remark': application.remark,
             'course_summary': application.course_summary,
+            'global_id': application.applicant_id.global_id,
             'lecturing_allocation': str(application.lecturing_volume) if application.lecturing_volume else '0',
             'practical_allocation': str(application.practical_volume) if application.practical_volume else '0',
             'learning_container_year': {

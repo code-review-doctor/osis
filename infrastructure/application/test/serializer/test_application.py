@@ -66,6 +66,7 @@ class ApplicationSerializerTest(TestCase):
 
         self.assertEqual(obj_serialized['operation'], 'delete')
         self.assertEqual(obj_serialized['remark'], self.application.remark)
+        self.assertEqual(obj_serialized['global_id'], self.application.applicant_id.global_id)
         self.assertEqual(obj_serialized['course_summary'], self.application.course_summary)
         self.assertEqual(obj_serialized['lecturing_allocation'], str(self.application.lecturing_volume))
         self.assertEqual(obj_serialized['practical_allocation'], str(self.application.practical_volume))
@@ -84,6 +85,7 @@ class ApplicationSerializerTest(TestCase):
         self.assertEqual(obj_serialized['operation'], 'update')
         self.assertEqual(obj_serialized['remark'], self.application.remark)
         self.assertEqual(obj_serialized['course_summary'], self.application.course_summary)
+        self.assertEqual(obj_serialized['global_id'], self.application.applicant_id.global_id)
         self.assertEqual(obj_serialized['lecturing_allocation'], str(self.application.lecturing_volume))
         self.assertEqual(obj_serialized['practical_allocation'], str(self.application.practical_volume))
 
