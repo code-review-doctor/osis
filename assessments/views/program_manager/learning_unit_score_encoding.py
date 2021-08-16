@@ -28,9 +28,9 @@ from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCo
 from infrastructure.messages_bus import message_bus_instance
 
 
-class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
+class LearningUnitScoreEncodingProgramManagerView(LearningUnitScoreEncodingBaseView):
     # TemplateView
-    template_name = "assessments/tutor/learning_unit_score_encoding.html"
+    template_name = "assessments/program_manager/learning_unit_score_encoding.html"
 
     def get_context_data(self, **kwargs):
         return {
