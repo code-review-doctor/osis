@@ -355,10 +355,6 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
         ])
 
     lu_data_part2.append(learning_unit_yr.language or "", )
-    lu_data_part2.append(yesno(learning_unit_yr.english_friendly).strip())
-    lu_data_part2.append(yesno(learning_unit_yr.french_friendly).strip())
-    lu_data_part2.append(yesno(learning_unit_yr.exchange_students).strip())
-    lu_data_part2.append(yesno(learning_unit_yr.individual_loan).strip())
     lu_data_part2.append(yesno(learning_unit_yr.stage_dimona).strip())
     return lu_data_part2
 
@@ -420,10 +416,6 @@ def learning_unit_titles_part2() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
-        str(_('English-friendly')),
-        str(_('French-friendly')),
-        str(_('Exchange students')),
-        str(_('Individual loan')),
         str(_('Stage-Dimona')),
     ]
 
