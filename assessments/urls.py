@@ -31,10 +31,8 @@ from assessments.views import scores_responsible
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
-from assessments.views.score_encoding import LearningUnitScoreEncodingView
-from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
+from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
-from assessments.views.tutor.learning_unit_score_encoding_form import LearningUnitScoreEncodingTutorFormView
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
 from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportView
 from assessments.views.tutor.score_sheet_xls_export import ScoreSheetXLSExportView
@@ -73,7 +71,7 @@ urlpatterns = [
         # New URL's
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingView.as_view(), name='learning_unit_score_encoding'),
-            path('form', LearningUnitScoreEncodingTutorFormView.as_view(), name='learning_unit_score_encoding_form'),
+            path('form', LearningUnitScoreEncodingFormView.as_view(), name='learning_unit_score_encoding_form'),
             path(
                 'submit',
                 LearningUnitScoreEncodingTutorSubmitView.as_view(),

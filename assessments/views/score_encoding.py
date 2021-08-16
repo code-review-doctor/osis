@@ -49,7 +49,10 @@ from assessments.business import score_encoding_progress, score_encoding_list, s
 from assessments.business import score_encoding_sheet
 from assessments.models import score_sheet_address as score_sheet_address_mdl
 from assessments.views.program_manager.learning_unit_score_encoding import LearningUnitScoreEncodingProgramManagerView
+from assessments.views.program_manager.learning_unit_score_encoding_form import \
+    LearningUnitScoreEncodingProgramManagerFormView
 from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
+from assessments.views.tutor.learning_unit_score_encoding_form import LearningUnitScoreEncodingTutorFormView
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
@@ -805,4 +808,20 @@ class LearningUnitScoreEncodingView(LoginRequiredMixin, View):
             return LearningUnitScoreEncodingTutorView.as_view()(request, *args, **kwargs)
         elif EntityRoleHelper.has_role(self.person, ProgramManager):
             return LearningUnitScoreEncodingProgramManagerView.as_view()(request, *args, **kwargs)
+        return self.handle_no_permission()
+
+
+class LearningUnitScoreEncodingFormView(LoginRequiredMixin, View):
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if EntityRoleHelper.has_role(self.person, Tutor):
+            return LearningUnitScoreEncodingTutorFormView.as_view()(request, *args, **kwargs)
+        elif EntityRoleHelper.has_role(self.person, ProgramManager):
+            return LearningUnitScoreEncodingProgramManagerFormView.as_view()(request, *args, **kwargs)
         return self.handle_no_permission()

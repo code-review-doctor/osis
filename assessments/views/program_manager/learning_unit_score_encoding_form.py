@@ -30,9 +30,9 @@ from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCo
 from infrastructure.messages_bus import message_bus_instance
 
 
-class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormView):
+class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingBaseFormView):
     # TemplateView
-    template_name = "assessments/tutor/learning_unit_score_encoding_form.html"
+    template_name = "assessments/program_manager/learning_unit_score_encoding_form.html"
 
     @cached_property
     def feuille_de_notes(self):
