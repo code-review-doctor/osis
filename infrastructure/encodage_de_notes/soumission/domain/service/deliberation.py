@@ -62,7 +62,8 @@ class DeliberationTranslator(IDeliberationTranslator):
                     annee=annee,
                     session=session,
                     nom_cohorte=values['nom_cohorte'],
-                    date=DateDTO(jour=datetime_delibe.day, mois=datetime_delibe.month, annee=datetime_delibe.year),
+                    date=DateDTO(jour=datetime_delibe.day, mois=datetime_delibe.month, annee=datetime_delibe.year)
+                    if datetime_delibe else None,
                 )
             )
         return deliberation_dtos
