@@ -49,7 +49,7 @@ class LearningUnitScoreEncodingProgramManagerFormViewTest(TestCase):
         self.session_exam_calendar = SessionExamCalendarFactory.create_academic_event(self.academic_year)
 
         self.patch_message_bus = mock.patch(
-            "assessments.views.tutor.learning_unit_score_encoding.message_bus_instance.invoke",
+            "assessments.views.program_manager.learning_unit_score_encoding.message_bus_instance.invoke",
             side_effect=self.__mock_message_bus_invoke
         )
         self.message_bus_mocked = self.patch_message_bus.start()
