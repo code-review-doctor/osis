@@ -21,9 +21,12 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import datetime
 
 import attr
 
+from ddd.logic.shared_kernel.academic_year.builder.academic_year_identity_builder import AcademicYearIdentityBuilder
+from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYear
 from education_group.ddd import command
 from education_group.ddd.domain.exception import MaximumCertificateAimType2Reached, \
     CertificateAimsCopyConsistencyException
@@ -31,6 +34,7 @@ from education_group.ddd.domain.training import Training
 from education_group.ddd.service.write import postpone_certificate_aims_modification_service
 from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory
 from education_group.tests.ddd.factories.domain.training import TrainingFactory
+from infrastructure.shared_kernel.academic_year.repository.academic_year_in_memory import AcademicYearInMemoryRepository
 from testing.testcases import DDDTestCase
 
 
@@ -48,10 +52,40 @@ class TestPostponeCertificateAims(DDDTestCase):
             "calculate_end_postponement_year_training",
             self.trainings[0].year + 3
         )
-        self.end_postponement_year = self.training_identity.year + 1
+        self.academic_year = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=datetime.datetime.now().year),
+            start_date=datetime.date(datetime.datetime.now().year-3, 9, 30),
+            end_date=datetime.date(datetime.datetime.now().year-2, 9, 30)
+        )
+        self.academic_year_repository = AcademicYearInMemoryRepository([self.academic_year])
+
+    def test_cannot_have_more_than_one_certificate_aim_of_section_2(self):
+        cmd = attr.evolve(self.cmd, aims=[(1, 2), (4, 2)])
+
+        with self.assertRaisesBusinessException(MaximumCertificateAimType2Reached):
+            postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+                cmd,
+                self.academic_year_repository
+            )
+
+    def test_should_empty_certificate_aims_if_none_given_of_trainings_from_year(self):
+        cmd = attr.evolve(self.cmd, aims=None)
+
+        identities = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+            cmd,
+            self.academic_year_repository
+        )
+
+        for identity in identities:
+            updated_training = self.fake_training_repository.get(identity)
+
+            self.assert_training_certificate_aims_match_command(updated_training, cmd)
 
     def test_should_update_certificate_aims_of_trainings_from_year(self):
-        identities = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
+        identities = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+            self.cmd,
+            self.academic_year_repository
+        )
 
         for identity in identities:
             updated_training = self.fake_training_repository.get(identity)
@@ -61,7 +95,7 @@ class TestPostponeCertificateAims(DDDTestCase):
     def test_should_return_training_identities(self):
         result = postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
             self.cmd,
-            self.mock_repository
+            self.academic_year_repository
         )
 
         expected_identities = [training.entity_id for training in self.trainings]
@@ -71,7 +105,10 @@ class TestPostponeCertificateAims(DDDTestCase):
         self.trainings[2].diploma = DiplomaFactory(with_aims=True)
 
         with self.assertRaisesBusinessException(CertificateAimsCopyConsistencyException) as e:
-            postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(self.cmd)
+            postpone_certificate_aims_modification_service.postpone_certificate_aims_modification(
+                self.cmd,
+                self.academic_year_repository
+            )
 
         self.assertEqual(self.trainings[2].year, e.exception.conflicted_fields_year)
 
