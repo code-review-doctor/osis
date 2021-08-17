@@ -33,7 +33,7 @@ from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    PasGestionnaireParcoursExceptionException
+    PasGestionnaireParcoursException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
     InscriptionExamenDTO
 from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
@@ -133,7 +133,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def test_should_empecher_si_utilisateur_pas_gestionnaire(self):
         matricule_nongestionnaire = self.matricule_enseignant
         cmd = attr.evolve(self.cmd, matricule_fgs_gestionnaire=matricule_nongestionnaire)
-        with self.assertRaises(PasGestionnaireParcoursExceptionException):
+        with self.assertRaises(PasGestionnaireParcoursException):
             self.message_bus.invoke(cmd)
 
     def test_should_renvoyer_responsable_de_notes(self):

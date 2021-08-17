@@ -54,7 +54,11 @@ def encoder_notes(
     note_par_identite = __associer_nouvelle_note_a_son_identite(cmd, periode_ouverte)
     identites_notes_a_modifier = list(note_par_identite.keys())
     notes_a_modifier = note_etudiant_repo.search(entity_ids=identites_notes_a_modifier)
-    # TODO :: GestionnaireParcours().gere_etudiants(notes_a_modifier)
+    GestionnaireParcours().verifier_cohortes_gerees(
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        cohortes_a_verifier={note.nom_cohorte for note in notes_a_modifier},
+        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
+    )
 
     # TODO : capturer dans EncoderNotesEnLotDomainService?
     for note_etudiant in notes_a_modifier:

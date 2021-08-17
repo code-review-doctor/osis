@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
 
 from django.utils.translation import gettext_lazy as _
 
@@ -71,7 +72,13 @@ class PasResponsableDeNotesException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class PasGestionnaireParcoursExceptionException(BusinessException):
+class PasGestionnaireParcoursException(BusinessException):
     def __init__(self, **kwargs):
         message = _("You're not a program manager (no assigned formations found)")
+        super().__init__(message, **kwargs)
+
+
+class PasGestionnaireParcoursCohorteException(BusinessException):
+    def __init__(self, cohortes_non_geres: Set[str], **kwargs):
+        message = _("You're not a program manager of {}").format(','.join(cohortes_non_geres))
         super().__init__(message, **kwargs)
