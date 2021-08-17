@@ -23,28 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
-    ResponsableDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
-from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
-from osis_common.ddd import interface
+from typing import List
+
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 
 
-class ResponsableDeNotes(interface.DomainService):
-
-    @classmethod
-    def verifier(
-            cls,
-            matricule_fgs_enseignant: str,
-            code_unite_enseignement: str,
-            annee_academique: int,
-            responsable_notes_repo: 'IResponsableDeNotesRepository',
-    ) -> None:
-        resp_notes_identity = ResponsableDeNotesIdentityBuilder.build_from_matricule_fgs(matricule_fgs_enseignant)
-        resp_notes = responsable_notes_repo.get(resp_notes_identity)
-        if not resp_notes:
-            raise PasResponsableDeNotesException(code_unite_enseignement)
-
-        est_responsable = resp_notes.is_responsable_unite_enseignement(code_unite_enseignement, annee_academique)
-        if not est_responsable:
-            raise PasResponsableDeNotesException(code_unite_enseignement)
+class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRepository):
+    entities = list()  # type: List[NoteEtudiant]

@@ -26,34 +26,34 @@
 import abc
 from typing import List, Optional
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, IdentiteFeuilleDeNotes
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from osis_common.ddd.interface import ApplicationService
 
 
-class IFeuilleDeNotesRepository(interface.AbstractRepository):
+class NoteEtudiantRepository(INoteEtudiantRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
-        pass
+    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
+        raise NotImplementedError
 
     @classmethod
     @abc.abstractmethod
-    def delete(cls, entity_id: 'IdentiteFeuilleDeNotes', **kwargs: ApplicationService) -> None:
-        pass
+    def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
 
     @classmethod
     @abc.abstractmethod
-    def save(cls, entity: 'FeuilleDeNotes') -> None:
-        pass
+    def save(cls, entity: 'NoteEtudiant') -> None:
+        raise NotImplementedError
 
     @classmethod
     @abc.abstractmethod
-    def get_all_identities(cls) -> List['IdentiteFeuilleDeNotes']:
-        pass
+    def get_all_identities(cls) -> List['IdentiteNoteEtudiant']:
+        raise NotImplementedError
 
     @classmethod
     @abc.abstractmethod
-    def get(cls, entity_id: 'IdentiteFeuilleDeNotes') -> 'FeuilleDeNotes':
-        pass
+    def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
+        raise NotImplementedError

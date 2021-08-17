@@ -39,7 +39,6 @@ NouvelleNote = str
 EmailEtudiant = str
 
 
-# TODO :: unit tests
 def encoder_notes(
         cmd: 'EncoderNotesCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
