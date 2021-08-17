@@ -28,7 +28,7 @@ from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCo
 from infrastructure.messages_bus import message_bus_instance
 
 
-class ScoreSheetPDFExportTutorView(ScoreSheetPDFExportBaseView):
+class ScoreSheetPDFExportProgramManagerView(ScoreSheetPDFExportBaseView):
     def get_feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
