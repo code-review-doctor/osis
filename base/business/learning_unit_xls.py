@@ -84,6 +84,7 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
+NB_COLUMNS_WHICH_COULD_BE_WHITENED = 29
 
 
 def learning_unit_titles_part1() -> List[str]:
@@ -516,7 +517,6 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
     cells_with_top_border = []
     cells_with_white_font = []
     line = 2
-    nb_columns_which_could_be_whitened = 29
 
     for learning_unit_yr in qs:
         first = True
@@ -545,7 +545,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                     cells_with_white_font.extend(
                         [
                             "{}{}".format(letter, line-1)
-                            for letter in _get_all_columns_reference(nb_columns_which_could_be_whitened)
+                            for letter in _get_all_columns_reference(NB_COLUMNS_WHICH_COULD_BE_WHITENED)
                         ]
                     )
                 first = False
@@ -575,7 +575,7 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                         cells_with_white_font.extend(
                             [
                                 "{}{}".format(letter, line - 1)
-                                for letter in _get_all_columns_reference(nb_columns_which_could_be_whitened, 1)
+                                for letter in _get_all_columns_reference(NB_COLUMNS_WHICH_COULD_BE_WHITENED, 1)
                             ]
                         )
                     first_attribution = False
