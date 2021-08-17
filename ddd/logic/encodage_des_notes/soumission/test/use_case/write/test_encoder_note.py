@@ -33,11 +33,11 @@ from django.test import SimpleTestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
-    NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException
+    NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
@@ -96,7 +96,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
         self.periode_encodage_notes_translator.get = lambda *args: periode_fermee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_autoriser_si_periode_ferme_aujourdhui(self):
@@ -137,7 +137,7 @@ class EncoderNoteTest(SimpleTestCase):
         aucune_periode_trouvee = None
         self.periode_encodage_notes_translator.get = lambda *args: aucune_periode_trouvee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_utilisateur_non_attribue_unite_enseignement(self):

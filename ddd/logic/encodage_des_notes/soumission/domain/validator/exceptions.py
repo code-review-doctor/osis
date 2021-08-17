@@ -36,12 +36,6 @@ class EnseignantNonAttribueUniteEnseignementException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class PeriodeSoumissionNotesFermeeException(BusinessException):  # TODO :: shared kernel + renommer
-    def __init__(self, **kwargs):
-        message = _("The period of scores' encoding is not opened")
-        super().__init__(message, **kwargs)
-
-
 class AucunEtudiantTrouveException(BusinessException):
     def __init__(self, learning_unit_code: str, **kwargs):
         message = _("The enrollment to the learning unit {learning_unit_code} doesn't exist").format(

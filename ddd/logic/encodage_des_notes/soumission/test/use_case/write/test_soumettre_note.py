@@ -33,8 +33,8 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    PasResponsableDeNotesException
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteChiffreEtudiantFactory, \
     NoteManquanteEtudiantFactory
@@ -115,14 +115,14 @@ class SoumettreNoteTest(SimpleTestCase):
         )
         self.periode_encodage_notes_translator.get = lambda *args: periode_fermee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_acune_periode_soumission_trouvee(self):
         aucune_periode_trouvee = None
         self.periode_encodage_notes_translator.get = lambda *args: aucune_periode_trouvee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_responsable_de_notes_aucune_unite_enseignement(self):

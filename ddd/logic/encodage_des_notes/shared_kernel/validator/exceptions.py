@@ -45,3 +45,9 @@ class NoteDecimaleNonAutoriseeException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Decimal scores not authorized")
         super().__init__(message, **kwargs)
+
+
+class PeriodeEncodageNotesFermeeException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("The period of scores' encoding is not opened")
+        super().__init__(message, **kwargs)

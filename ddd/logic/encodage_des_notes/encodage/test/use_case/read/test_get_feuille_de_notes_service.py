@@ -32,8 +32,8 @@ from django.test import SimpleTestCase
 from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    PasGestionnaireParcoursException
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
     InscriptionExamenDTO
 from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory
@@ -122,7 +122,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         periode_soumission_translator.get = lambda *args: periode_fermee
         mock_periode_translator.return_value = periode_soumission_translator
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_utilisateur_pas_gestionnaire(self):

@@ -41,9 +41,8 @@ from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import Not
     NoteDecimalesAuthorisees
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
-    NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    PasGestionnaireParcoursException, PasGestionnaireParcoursCohorteException
+    NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException, PasGestionnaireParcoursCohorteException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
@@ -100,7 +99,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
         self.periode_encodage_notes_translator.get = lambda *args: periode_fermee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_autoriser_si_periode_ferme_aujourdhui(self):
@@ -141,7 +140,7 @@ class EncoderNoteTest(SimpleTestCase):
         aucune_periode_trouvee = None
         self.periode_encodage_notes_translator.get = lambda *args: aucune_periode_trouvee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_utilisateur_non_gestionnaire(self):
