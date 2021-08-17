@@ -669,7 +669,8 @@ class TestLearningUnitXls(TestCase):
         self.assertCountEqual(result.get('cells_with_white_font'),
                               [
                                   'A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3', 'I3', 'J3', 'K3', 'L3', 'M3', 'N3',
-                                  'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3'
+                                  'O3', 'P3', 'Q3', 'R3', 'S3', 'T3', 'U3', 'V3', 'W3', 'X3', 'Y3', 'Z3', 'AA3', 'AB3',
+                                  'AC3'
                               ]
                               )
         first_attribution = result.get('data')[0]
