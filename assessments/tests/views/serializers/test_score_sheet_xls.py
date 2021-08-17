@@ -29,6 +29,8 @@ from django.test import SimpleTestCase
 
 from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, DateDTO, NoteEtudiantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO, DetailContactDTO, \
+    AdresseFeuilleDeNotesDTO
 
 
 class ScoreSheetXLSSerializerTest(SimpleTestCase):
@@ -72,8 +74,31 @@ class ScoreSheetXLSSerializerTest(SimpleTestCase):
             ],
         )
 
+        self.donnees_administrative = DonneesAdministrativesFeuilleDeNotesDTO(
+            sigle_formation='DROI2M',
+            code_unite_enseignement='LDROI1200',
+            date_deliberation=DateDTO.build_from_date(datetime.date.today() + datetime.timedelta(days=10)),
+            contact_responsable_notes=DetailContactDTO(
+                matricule_fgs="987654321",
+                email="responsable@gmail.com",
+                adresse_professionnelle=None
+            ),
+            contact_feuille_de_notes=AdresseFeuilleDeNotesDTO(
+                nom_cohorte='DROI2M',
+                destinataire='Durant Thomas',
+                rue_et_numero='Chemin de lasne',
+                code_postal=1200,
+                ville="Bruxelles",
+                pays="Belgique",
+                telephone='',
+                fax='',
+                email='',
+            ),
+        )
+
         self.instance = {
-            'feuille_de_notes': self.feuille_de_notes
+            'feuille_de_notes': self.feuille_de_notes,
+            'donnees_administratives': [self.donnees_administrative]
         }
 
     def test_assert_rows_filtered_by_score_which_deadline_is_not_reached(self):

@@ -38,23 +38,34 @@ from django.db.utils import OperationalError as DjangoOperationalError, Interfac
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as PsycopInterfaceError
+from rules.contrib.views import LoginRequiredMixin
 
 import base
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
 from assessments.business import score_encoding_sheet
 from assessments.models import score_sheet_address as score_sheet_address_mdl
+from assessments.views.program_manager.learning_unit_score_encoding import LearningUnitScoreEncodingProgramManagerView
+from assessments.views.program_manager.learning_unit_score_encoding_form import \
+    LearningUnitScoreEncodingProgramManagerFormView
+from assessments.views.tutor.learning_unit_score_encoding import LearningUnitScoreEncodingTutorView
+from assessments.views.tutor.learning_unit_score_encoding_form import LearningUnitScoreEncodingTutorFormView
 from attribution import models as mdl_attr
 from base import models as mdl
 from base.auth.roles import program_manager
 from base.auth.roles import tutor as tutor_mdl
+from base.auth.roles.program_manager import ProgramManager
+from base.auth.roles.tutor import Tutor
 from base.models import session_exam_calendar
 from base.models.enums import exam_enrollment_state as enrollment_states, exam_enrollment_state
 from base.models.person import Person
 from base.utils import send_mail
 from osis_common.document import paper_sheet
 from osis_common.queue.queue_sender import send_message
+from osis_role.contrib.helper import EntityRoleHelper
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
@@ -782,3 +793,35 @@ def _get_count_still_enrolled(enrollments):
         if enrollment.enrollment_state == enrollment_states.ENROLLED:
             nb_enrolled += 1
     return nb_enrolled
+
+
+class LearningUnitScoreEncodingView(LoginRequiredMixin, View):
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if EntityRoleHelper.has_role(self.person, Tutor):
+            return LearningUnitScoreEncodingTutorView.as_view()(request, *args, **kwargs)
+        elif EntityRoleHelper.has_role(self.person, ProgramManager):
+            return LearningUnitScoreEncodingProgramManagerView.as_view()(request, *args, **kwargs)
+        return self.handle_no_permission()
+
+
+class LearningUnitScoreEncodingFormView(LoginRequiredMixin, View):
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if EntityRoleHelper.has_role(self.person, Tutor):
+            return LearningUnitScoreEncodingTutorFormView.as_view()(request, *args, **kwargs)
+        elif EntityRoleHelper.has_role(self.person, ProgramManager):
+            return LearningUnitScoreEncodingProgramManagerFormView.as_view()(request, *args, **kwargs)
+        return self.handle_no_permission()

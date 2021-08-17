@@ -23,19 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.functional import cached_property
-
-from assessments.views.common.learning_unit_score_encoding_form import LearningUnitScoreEncodingBaseFormView
+from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 
 
-class LearningUnitScoreEncodingTutorFormView(LearningUnitScoreEncodingBaseFormView):
+class LearningUnitScoreEncodingProgramManagerView(LearningUnitScoreEncodingBaseView):
     # TemplateView
-    template_name = "assessments/tutor/learning_unit_score_encoding_form.html"
+    template_name = "assessments/program_manager/learning_unit_score_encoding.html"
 
-    @cached_property
-    def feuille_de_notes(self):
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(),
+            'feuille_de_notes': self.get_feuille_de_notes(),
+        }
+
+    def get_feuille_de_notes(self):
         cmd = GetFeuilleDeNotesCommand(
             matricule_fgs_enseignant=self.person.global_id,
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()

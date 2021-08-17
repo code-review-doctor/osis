@@ -23,45 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.utils.functional import cached_property
-from django.views.generic import TemplateView
-
-from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
-from osis_role.contrib.views import PermissionRequiredMixin
 
 
-class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
+class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
     # TemplateView
     template_name = "assessments/tutor/learning_unit_score_encoding.html"
 
-    # PermissionRequiredMixin
-    permission_required = "assessments.can_access_scoreencoding"
-
-    @cached_property
-    def person(self):
-        return self.request.user.person
-
-    def dispatch(self, request, *args, **kwargs):
-        opened_calendars = ScoresExamSubmissionCalendar().get_opened_academic_events()
-        if not opened_calendars:
-            redirect_url = reverse('outside_scores_encodings_period')
-            return HttpResponseRedirect(redirect_url)
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
         return {
-            **super().get_context_data(**kwargs),
+            **super().get_context_data(),
             'feuille_de_notes': self.get_feuille_de_notes(),
-            'learning_unit_encoding_url': self.get_learning_unit_encoding_url(),
-            'learning_unit_double_encoding_url': self.get_learning_unit_double_encoding_url(),
-            'learning_unit_print_url': self.get_learning_unit_print_url(),
-            'learning_unit_download_xls_url': self.get_learning_unit_download_xls_url(),
-            'learning_unit_upload_xls_url': self.get_learning_unit_upload_xls_url(),
-            'learning_unit_submit_url': self.get_learning_unit_submit_url(),
         }
 
     def get_feuille_de_notes(self):
@@ -70,34 +44,3 @@ class LearningUnitScoreEncodingTutorView(PermissionRequiredMixin, TemplateView):
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
-
-    def get_learning_unit_encoding_url(self):
-        return reverse('learning_unit_score_encoding_form', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_double_encoding_url(self):
-        return ""
-
-    def get_learning_unit_print_url(self):
-        return reverse('score_sheet_pdf_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_download_xls_url(self):
-        return reverse('score_sheet_xls_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_upload_xls_url(self):
-        return reverse('score_sheet_xls_import', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_submit_url(self):
-        return reverse('learning_unit_score_encoding_submit', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_permission_object(self):
-        return None
