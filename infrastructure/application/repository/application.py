@@ -160,7 +160,7 @@ class ApplicationRepository(IApplicationRepository):
                 "course_summary": application.course_summary
             }
         )
-        queue.notify_application_deleted(application)
+        queue.notify_application_saved(application)
 
     @classmethod
     def delete(cls, entity_id: ApplicationIdentity, **kwargs: ApplicationService) -> None:
