@@ -866,7 +866,7 @@ class TestLearningUnitXlsClassesDetail(TestCase):
 
         expected = _build_cells_ref(
             ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-             'V', 'W', 'X', 'Y'], [3, 4, 5, 7])
+             'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC'], [3, 4, 5, 7])
         expected.remove('Y7')
 
         self.assertSetEqual(
