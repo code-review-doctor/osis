@@ -33,8 +33,6 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator._should_date_remis
     ShouldDateDeRemiseNotePasEtreAtteinte
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_email_correspondre_noma import \
     ShouldEmailCorrespondreNoma
-from ddd.logic.encodage_des_notes.soumission.domain.validator._should_etudiant_etre_present_feuille_de_notes import \
-    ShouldEtudiantEtrePresentFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_note_etre_choix_valide import \
     ShouldNoteEtreChoixValide
 from ddd.logic.encodage_des_notes.soumission.domain.validator._should_note_pas_etre_soumise import \
@@ -44,23 +42,20 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator._should_verifier_n
 
 
 @attr.s(frozen=True, slots=True)
-class EncoderFeuilleDeNotesValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+class EncoderNoteEtudiantValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    noma = attr.ib(type=str)
     email = attr.ib(type=str)
-    note = attr.ib(type=str)
-    feuille_de_notes = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+    note_encodee = attr.ib(type=str)
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
-        return [
-            ShouldEtudiantEtrePresentFeuilleDeNotes(self.noma, self.feuille_de_notes),
-        ]
+        return []
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return [
-            ShouldEmailCorrespondreNoma(self.noma, self.email, self.feuille_de_notes),
-            ShouldDateDeRemiseNotePasEtreAtteinte(self.noma, self.feuille_de_notes),
-            ShouldNotePasEtreSoumise(self.noma, self.feuille_de_notes),
-            ShouldNoteEtreChoixValide(self.note),
-            ShouldVerifierNoteDecimaleAutorisee(self.note, self.feuille_de_notes),
+            ShouldEmailCorrespondreNoma(self.email, self.note_etudiant),
+            ShouldDateDeRemiseNotePasEtreAtteinte(self.note_etudiant),
+            ShouldNotePasEtreSoumise(self.note_etudiant),
+            ShouldNoteEtreChoixValide(self.note_encodee),
+            ShouldVerifierNoteDecimaleAutorisee(self.note_encodee, self.note_etudiant),
         ]

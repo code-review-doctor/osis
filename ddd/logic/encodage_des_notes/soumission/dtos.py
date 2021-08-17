@@ -32,11 +32,15 @@ from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPep
 from osis_common.ddd import interface
 
 
+def none2emptystr(value) -> str:
+    return value or ''
+
+
 @attr.s(frozen=True, slots=True)
 class DateEcheanceDTO(interface.DTO):
-    jour = attr.ib(type=str)
-    mois = attr.ib(type=str)
-    annee = attr.ib(type=str)
+    jour = attr.ib(type=int)
+    mois = attr.ib(type=int)
+    annee = attr.ib(type=int)
     quantite_notes_soumises = attr.ib(type=int)
     quantite_total_notes = attr.ib(type=int)
 
@@ -92,15 +96,15 @@ class DetailContactDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class AdresseFeuilleDeNotesDTO(interface.DTO):
-    nom_cohorte = attr.ib(type=str)
-    destinataire = attr.ib(type=str)
-    rue_et_numero = attr.ib(type=str)
-    code_postal = attr.ib(type=str)
-    ville = attr.ib(type=str)
-    pays = attr.ib(type=str)
-    telephone = attr.ib(type=str)
-    fax = attr.ib(type=str)
-    email = attr.ib(type=str)
+    nom_cohorte = attr.ib(type=str, converter=none2emptystr)
+    destinataire = attr.ib(type=str, converter=none2emptystr)
+    rue_et_numero = attr.ib(type=str, converter=none2emptystr)
+    code_postal = attr.ib(type=str, converter=none2emptystr)
+    ville = attr.ib(type=str, converter=none2emptystr)
+    pays = attr.ib(type=str, converter=none2emptystr)
+    telephone = attr.ib(type=str, converter=none2emptystr)
+    fax = attr.ib(type=str, converter=none2emptystr)
+    email = attr.ib(type=str, converter=none2emptystr)
 
 
 @attr.s(frozen=True, slots=True)
@@ -136,6 +140,10 @@ class NoteEtudiantFromRepositoryDTO(interface.DTO):
     note = attr.ib(type=str)
     date_limite_de_remise = attr.ib(type=date)
     est_soumise = attr.ib(type=bool)
+    numero_session = attr.ib(type=int)
+    code_unite_enseignement = attr.ib(type=str)
+    annee_academique = attr.ib(type=int)
+    credits_unite_enseignement = attr.ib(type=float)
 
 
 @attr.s(frozen=True, slots=True)

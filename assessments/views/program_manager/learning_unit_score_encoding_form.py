@@ -23,26 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes
-from osis_common.ddd import interface
+from django.utils.functional import cached_property
+
+from assessments.views.common.learning_unit_score_encoding_form import LearningUnitScoreEncodingBaseFormView
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
-class EncoderFeuilleDeNotes(interface.DomainService):
+class LearningUnitScoreEncodingProgramManagerFormView(LearningUnitScoreEncodingBaseFormView):
+    # TemplateView
+    template_name = "assessments/program_manager/learning_unit_score_encoding_form.html"
 
-    @classmethod
-    def encoder(
-            cls,
-            cmd: 'EncoderFeuilleDeNotesCommand',
-            feuille_de_notes: 'FeuilleDeNotes',
-    ) -> None:
-        exceptions = set()
-        for note_etd in cmd.notes_etudiants:
-            try:
-                feuille_de_notes.encoder_note(noma=note_etd.noma, email=note_etd.email, note_encodee=note_etd.note)
-            except MultipleBusinessExceptions as e:
-                exceptions |= e.exceptions
-
-        if exceptions:
-            raise MultipleBusinessExceptions(exceptions=exceptions)
+    @cached_property
+    def feuille_de_notes(self):
+        cmd = GetFeuilleDeNotesCommand(
+            matricule_fgs_enseignant=self.person.global_id,
+            code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
+        )
+        return message_bus_instance.invoke(cmd)

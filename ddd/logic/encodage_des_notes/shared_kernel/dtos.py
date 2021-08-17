@@ -25,7 +25,7 @@
 ##############################################################################
 import datetime
 from datetime import date
-from typing import List, Set, Optional
+from typing import List, Optional
 
 import attr
 
@@ -103,6 +103,10 @@ class FeuilleDeNotesDTO(interface.DTO):
     @property
     def quantite_notes_soumises(self) -> int:
         return sum(1 for note in self.notes_etudiants if note.note is not None and note.est_soumise)
+
+    @property
+    def quantite_notes_en_attente_de_soumission(self) -> int:
+        return sum(1 for note in self.notes_etudiants if note.note != '' and not note.est_soumise)
 
     @property
     def quantite_total_notes(self) -> int:

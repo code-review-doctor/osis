@@ -34,11 +34,9 @@ from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import Date
 
 @attr.s(frozen=True, slots=True)
 class ShouldDateDeRemiseNotePasEtreAtteinte(BusinessValidator):
-    noma = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
 
     def validate(self, *args, **kwargs):
-        date_limite_remise = self.feuille_de_note.get_date_limite_de_remise(self.noma)
         aujourdhui = datetime.date.today()
-        if aujourdhui > date_limite_remise:
+        if aujourdhui > self.note_etudiant.get_date_limite_de_remise():
             raise DateEcheanceNoteAtteinteException()

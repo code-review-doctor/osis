@@ -23,25 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.builder.feuille_de_notes_identity_builder import \
-    FeuilleDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.encoder_feuille_de_notes import EncoderFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
-    EnseignantAttribueUniteEnseignement
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import \
     PeriodeEncodageOuverte
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
+from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
+from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.soumission.domain.service.enseignant_attribue_unite_enseignement import \
+    EnseignantAttribueUniteEnseignement
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 
 
-def encoder_feuille_de_notes(
-        cmd: 'EncoderFeuilleDeNotesCommand',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
+def encoder_note_etudiant(
+        cmd: 'EncoderNoteCommand',
+        note_etudiant_repo: 'INoteEtudiantRepository',
         periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
         attribution_translator: 'IAttributionEnseignantTranslator'
 ) -> 'IdentiteFeuilleDeNotes':
@@ -53,14 +51,14 @@ def encoder_feuille_de_notes(
         cmd.matricule_fgs_enseignant,
         attribution_translator
     )
-    feuille_de_note_identity = FeuilleDeNotesIdentityBuilder.build_from_command(cmd)
-    feuille_de_notes = feuille_de_note_repo.get(feuille_de_note_identity)
+    note_etudiant_identity = NoteEtudiantIdentityBuilder.build_from_command(cmd)
+    note_etudiant = note_etudiant_repo.get(note_etudiant_identity)
 
     # When
-    EncoderFeuilleDeNotes().encoder(cmd, feuille_de_notes)
+    note_etudiant.encoder(cmd.email_etudiant, cmd.note)
 
     # Then
-    feuille_de_note_repo.save(feuille_de_notes)
+    note_etudiant_repo.save(note_etudiant)
     # TODO :: Historiser (DomainService) ?
 
-    return feuille_de_notes.entity_id
+    return note_etudiant.entity_id

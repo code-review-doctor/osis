@@ -33,14 +33,9 @@ from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import Noma
 
 @attr.s(frozen=True, slots=True)
 class ShouldEmailCorrespondreNoma(BusinessValidator):
-    noma_etudiant = attr.ib(type=str)
     email_etudiant = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
 
     def validate(self, *args, **kwargs):
-        correspondance_existe = any(
-            note for note in self.feuille_de_note.notes
-            if note.email == self.email_etudiant and note.noma == self.noma_etudiant
-        )
-        if not correspondance_existe:
+        if self.note_etudiant.email != self.email_etudiant:
             raise NomaNeCorrespondPasEmailException()

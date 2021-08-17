@@ -29,7 +29,8 @@ import factory
 
 from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteManquante, NoteChiffree, Justification
-from ddd.logic.encodage_des_notes.soumission.domain.model._note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant, \
+    CREDITS_MIN_POUR_NOTE_DECIMALE
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 
 
@@ -57,6 +58,9 @@ class _IdentiteNoteEtudiantFactory(factory.Factory):
         abstract = False
 
     noma = factory.LazyFunction(generate_noma)
+    numero_session = 2
+    code_unite_enseignement = 'LDROI1001'
+    annee_academique = 2020
 
 
 class NoteManquanteEtudiantFactory(factory.Factory):
@@ -68,6 +72,7 @@ class NoteManquanteEtudiantFactory(factory.Factory):
     note = NoteManquante()
     email = factory.Faker('email')
     date_limite_de_remise = DateDTO.build_from_date(datetime.date.today())
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE - 5.0  # Non autorisé par défaut
     est_soumise = False
 
     class Params:
@@ -76,6 +81,12 @@ class NoteManquanteEtudiantFactory(factory.Factory):
         )
         date_remise_aujourdhui = factory.Trait(
             date_limite_de_remise=DateDTO.build_from_date(datetime.date.today())
+        )
+        for_class = factory.Trait(
+            entity_id=factory.SubFactory(
+                _IdentiteNoteEtudiantFactory,
+                code_unite_enseignement='LDROI1001A'
+            )
         )
 
 
@@ -89,3 +100,11 @@ class NoteChiffreEtudiantFactory(NoteManquanteEtudiantFactory):
 
 class NoteJustificationEtudiantFactory(NoteManquanteEtudiantFactory):
     note = factory.LazyFunction(generate_note_justification)
+
+
+class NoteDecimalesAuthorisees(NoteManquanteEtudiantFactory):
+    credits_unite_enseignement = CREDITS_MIN_POUR_NOTE_DECIMALE
+
+
+class NoteDejaSoumise(NoteChiffreEtudiantFactory):
+    est_soumise = True

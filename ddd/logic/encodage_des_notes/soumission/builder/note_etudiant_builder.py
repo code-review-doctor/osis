@@ -23,21 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_identity_builder import NoteEtudiantIdentityBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model._note import NoteBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
+from osis_common.ddd import interface
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
-
-class FeuilleDeNotesInMemoryRepository(InMemoryGenericRepository, IFeuilleDeNotesRepository):
-    entities = list()  # type: List[FeuilleDeNotes]
+class NoteEtudiantBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'NoteEtudiant':
+        pass
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
-        return list(
-            filter(
-                lambda obj: obj.entity_id in entity_ids,
-                cls.entities
-            )
+    def build_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'NoteEtudiant':
+        return NoteEtudiant(
+            entity_id=NoteEtudiantIdentityBuilder().build_from_repository_dto(dto_object),
+            credits_unite_enseignement=dto_object.credits_unite_enseignement,
+            date_limite_de_remise=DateDTO.build_from_date(dto_object.date_limite_de_remise),
+            email=dto_object.email,
+            est_soumise=dto_object.est_soumise,
+            note=NoteBuilder.build(dto_object.note),
         )

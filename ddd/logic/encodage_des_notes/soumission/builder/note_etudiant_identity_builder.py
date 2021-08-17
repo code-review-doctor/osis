@@ -25,31 +25,33 @@
 ##############################################################################
 from typing import Union
 
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderFeuilleDeNotesCommand, \
-    SoumettreFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
-from ddd.logic.encodage_des_notes.soumission.dtos import FeuilleDeNotesFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
 
 
-class FeuilleDeNotesIdentityBuilder(EntityIdentityBuilder):
+class NoteEtudiantIdentityBuilder(EntityIdentityBuilder):
     @classmethod
     def build_from_command(
             cls,
-            cmd: Union['EncoderFeuilleDeNotesCommand', 'SoumettreFeuilleDeNotesCommand']
-    ) -> 'IdentiteFeuilleDeNotes':
-        return IdentiteFeuilleDeNotes(
+            cmd: Union['EncoderNoteCommand', 'SoumettreNoteCommand']
+    ) -> 'IdentiteNoteEtudiant':
+        return IdentiteNoteEtudiant(
             numero_session=cmd.numero_session,
             code_unite_enseignement=cmd.code_unite_enseignement,
             annee_academique=cmd.annee_unite_enseignement,
+            noma=cmd.noma_etudiant
         )
 
     @classmethod
-    def build_from_repository_dto(cls, dto_object: 'FeuilleDeNotesFromRepositoryDTO') -> 'IdentiteFeuilleDeNotes':
-        return IdentiteFeuilleDeNotes(
+    def build_from_repository_dto(cls, dto_object: 'NoteEtudiantFromRepositoryDTO') -> 'IdentiteNoteEtudiant':
+        return IdentiteNoteEtudiant(
             numero_session=dto_object.numero_session,
             code_unite_enseignement=dto_object.code_unite_enseignement,
-            annee_academique=dto_object.annee_academique
+            annee_academique=dto_object.annee_academique,
+            noma=dto_object.noma
         )
 
     @classmethod

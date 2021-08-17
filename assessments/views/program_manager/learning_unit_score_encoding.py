@@ -23,23 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-import attr
-
-from base.ddd.utils.business_validator import BusinessValidator
-from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import AucunEtudiantTrouveException
+from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
-@attr.s(frozen=True, slots=True)
-class ShouldEtudiantEtrePresentFeuilleDeNotes(BusinessValidator):
-    noma_etudiant = attr.ib(type=str)
-    feuille_de_note = attr.ib(type='FeuilleDeNotes')  # type: FeuilleDeNotes
+class LearningUnitScoreEncodingProgramManagerView(LearningUnitScoreEncodingBaseView):
+    # TemplateView
+    template_name = "assessments/program_manager/learning_unit_score_encoding.html"
 
-    def validate(self, *args, **kwargs):
-        correspondance_existe = any(
-            note for note in self.feuille_de_note.notes
-            if note.noma == self.noma_etudiant
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(),
+            'feuille_de_notes': self.get_feuille_de_notes(),
+        }
+
+    def get_feuille_de_notes(self):
+        cmd = GetFeuilleDeNotesCommand(
+            matricule_fgs_enseignant=self.person.global_id,
+            code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
-        if not correspondance_existe:
-            raise AucunEtudiantTrouveException(self.feuille_de_note.code_unite_enseignement)
+        return message_bus_instance.invoke(cmd)

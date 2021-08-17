@@ -36,24 +36,22 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     PasGestionnaireParcoursException
 from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
     InscriptionExamenDTO
-from ddd.logic.encodage_des_notes.tests.factory._note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.feuille_de_notes import FeuilleDeNotesAvecUneSeuleNoteManquante, \
-    FeuilleDeNotesAvecNotesManquantes
+from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
-from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
-    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \
     InscriptionExamenTranslatorInMemory
+from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
+    PeriodeEncodageNotesTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletique_etudiant import \
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.feuille_de_notes import \
-    FeuilleDeNotesInMemoryRepository
+from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
+    NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
     ResponsableDeNotesInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
@@ -70,13 +68,10 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         self.noma = '11111111'
         self.nom_cohorte = 'DROI1BA'
 
-        self.feuille_de_notes = FeuilleDeNotesAvecUneSeuleNoteManquante(
-            notes={
-                NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
-            }
-        )
-        self.repository = FeuilleDeNotesInMemoryRepository()
-        self.repository.save(self.feuille_de_notes)
+        self.note = NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
+        self.repository = NoteEtudiantInMemoryRepository()
+        self.repository.entities.clear()
+        self.repository.save(self.note)
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
         self.resp_notes_repository.save(
@@ -100,7 +95,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            FeuilleDeNotesRepository=lambda: self.repository,
+            NoteEtudiantRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
@@ -247,19 +242,16 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def test_should_renvoyer_echeance_enseignant(self):
         result = self.message_bus.invoke(self.cmd)
         note_etudiant = result.notes_etudiants[0]
-        expected_result = DateDTO(jour=12, mois=8, annee=2021)
+
+        today = datetime.date.today()
+        expected_result = DateDTO(jour=today.day, mois=today.month, annee=today.year)
         self.assertEqual(expected_result, note_etudiant.date_remise_de_notes)
 
     def test_should_renvoyer_liste_des_notes_ordonee_par_nom_de_cohorte_nom_prenom(self):
-        self.repository.delete(self.feuille_de_notes.entity_id)
+        self.repository.delete(self.note.entity_id)
 
-        feuille_de_notes_with_multiple_students = FeuilleDeNotesAvecNotesManquantes(
-            notes={
-                NoteManquanteEtudiantFactory(entity_id__noma=self.noma),
-                NoteManquanteEtudiantFactory(entity_id__noma='99999999'),
-            }
-        )
-        self.repository.save(feuille_de_notes_with_multiple_students)
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma=self.noma))
+        self.repository.save(NoteManquanteEtudiantFactory(entity_id__noma='99999999'))
 
         result = message_bus_instance.invoke(self.cmd)
         self.assertEqual(len(result.notes_etudiants), 2)

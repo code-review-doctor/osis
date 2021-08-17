@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,40 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from django.db import models
 
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Note
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
-from osis_common.ddd import interface
-
-Noma = str
+from osis_common.models import osis_model_admin
 
 
-@attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
+class ZipCodeAdmin(osis_model_admin.OsisModelAdmin):
+    list_display = ('zip_code', 'municipality', 'country')
+    list_filter = ('country',)
+    ordering = ('zip_code',)
+    search_fields = ['municipality']
 
 
-@attr.s(slots=True, eq=False)
-class NoteEtudiant(interface.Entity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    note = attr.ib(type=Note)
-    date_limite_de_remise = attr.ib(type=DateDTO)
-    email = attr.ib(type=str)
-    est_soumise = attr.ib(type=bool)
+class ZipCode(models.Model):
+    zip_code = models.CharField(max_length=255)
+    municipality = models.CharField(max_length=255)
+    country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
 
-    @property
-    def noma(self) -> str:
-        return self.entity_id.noma
+    def __str__(self):
+        return "{} - {} ({})".format(self.zip_code, self.municipality, self.country.iso_code)
 
-    @property
-    def is_chiffree(self) -> bool:
-        return type(self.note.value) in (float, int)
-
-    @property
-    def is_manquant(self) -> bool:
-        return not bool(self.note.value)
-
-    @property
-    def is_justification(self) -> bool:
-        return not self.is_manquant and not self.is_chiffree
+    class Meta:
+        ordering = ('zip_code',)
