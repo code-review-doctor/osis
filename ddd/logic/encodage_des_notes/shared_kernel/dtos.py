@@ -115,3 +115,11 @@ class FeuilleDeNotesDTO(interface.DTO):
     @property
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
+
+
+@attr.s(frozen=True, slots=True)
+class PeriodeEncodageNotesDTO(interface.DTO):
+    annee_concernee = attr.ib(type=int)
+    session_concernee = attr.ib(type=int)
+    debut_periode_soumission = attr.ib(type=DateDTO)
+    fin_periode_soumission = attr.ib(type=DateDTO)

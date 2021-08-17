@@ -39,11 +39,10 @@ from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import No
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
     NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException, PasGestionnaireParcoursCohorteException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
@@ -91,7 +90,7 @@ class EncoderNoteTest(SimpleTestCase):
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = PeriodeSoumissionNotesDTO(
+        periode_fermee = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee_academique,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -106,7 +105,7 @@ class EncoderNoteTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
-        periode_ouverte = PeriodeSoumissionNotesDTO(
+        periode_ouverte = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee_academique,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -123,7 +122,7 @@ class EncoderNoteTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
-        periode_ouverte = PeriodeSoumissionNotesDTO(
+        periode_ouverte = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee_academique,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_aujourdhui,

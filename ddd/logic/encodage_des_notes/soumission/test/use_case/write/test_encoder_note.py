@@ -39,7 +39,8 @@ from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justifica
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, AttributionEnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees, NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
@@ -88,7 +89,7 @@ class EncoderNoteTest(SimpleTestCase):
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = PeriodeSoumissionNotesDTO(
+        periode_fermee = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -103,7 +104,7 @@ class EncoderNoteTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
-        periode_ouverte = PeriodeSoumissionNotesDTO(
+        periode_ouverte = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -120,7 +121,7 @@ class EncoderNoteTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
-        periode_ouverte = PeriodeSoumissionNotesDTO(
+        periode_ouverte = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_aujourdhui,

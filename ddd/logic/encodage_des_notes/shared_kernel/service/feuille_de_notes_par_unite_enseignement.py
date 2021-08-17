@@ -25,7 +25,8 @@
 ##############################################################################
 from typing import List, Dict
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO, \
+    PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
@@ -34,7 +35,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import Noma, NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, InscriptionExamenDTO, \
-    DesinscriptionExamenDTO, PeriodeSoumissionNotesDTO
+    DesinscriptionExamenDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -45,7 +46,7 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: d√
     def get(
             notes: List['NoteEtudiant'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            periode_encodage: 'PeriodeSoumissionNotesDTO',
+            periode_encodage: 'PeriodeEncodageNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',

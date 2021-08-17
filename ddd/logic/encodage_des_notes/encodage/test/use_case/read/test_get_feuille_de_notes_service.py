@@ -31,10 +31,10 @@ from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, AttributionEnseignantDTO, \
+from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO, \
     InscriptionExamenDTO
 from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
@@ -112,7 +112,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
     def test_should_empecher_si_periode_fermee_depuis_hier(self, mock_periode_translator):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = PeriodeSoumissionNotesDTO(
+        periode_fermee = PeriodeEncodageNotesDTO(
             annee_concernee=self.annee,
             session_concernee=self.numero_session,
             debut_periode_soumission=date_dans_le_passe,

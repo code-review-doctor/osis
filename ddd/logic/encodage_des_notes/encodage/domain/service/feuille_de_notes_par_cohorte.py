@@ -27,7 +27,7 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO, EnseignantDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.feuille_de_notes_par_unite_enseignement import \
     FeuilleDeNotesParUniteEnseignement
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
@@ -36,7 +36,6 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen imp
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -49,7 +48,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             matricule_gestionnaire: str,
             notes: List['NoteEtudiant'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            periode_encodage: 'PeriodeSoumissionNotesDTO',
+            periode_encodage: 'PeriodeEncodageNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
