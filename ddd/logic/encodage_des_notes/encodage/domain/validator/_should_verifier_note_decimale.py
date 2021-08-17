@@ -37,7 +37,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import Note
 @attr.s(frozen=True, slots=True)
 class ShouldVerifierNoteDecimaleAutorisee(BusinessValidator):
     note = attr.ib(type=str)
-    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
+    note_etudiant = attr.ib(type='NoteEtudiantGestionnaire')  # type: NoteEtudiantGestionnaire
 
     def validate(self, *args, **kwargs):
         note_chiffree = self.__get_note_chiffree()

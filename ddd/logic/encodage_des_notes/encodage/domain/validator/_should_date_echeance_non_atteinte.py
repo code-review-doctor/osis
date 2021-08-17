@@ -35,7 +35,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import Date
 @attr.s(frozen=True, slots=True)
 class ShouldDateEcheanceNonAtteinte(BusinessValidator):
 
-    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
+    note_etudiant = attr.ib(type='NoteEtudiantGestionnaire')  # type: NoteEtudiantGestionnaire
 
     def validate(self, *args, **kwargs):
         date_limite_remise = self.note_etudiant.echeance_gestionnaire

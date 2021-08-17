@@ -39,7 +39,7 @@ CREDITS_MIN_POUR_NOTE_DECIMALE = 15.0
 
 
 @attr.s(frozen=True, slots=True)
-class IdentiteFeuilleDeNotes(interface.EntityIdentity):
+class IdentiteFeuilleDeNotes(interface.EntityIdentity):  # TODO :: rename filename
     numero_session = attr.ib(type=int)
     code_unite_enseignement = attr.ib(type=str)
     annee_academique = attr.ib(type=int)

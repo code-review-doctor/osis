@@ -31,55 +31,59 @@ import attr
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
+from ddd.logic.encodage_des_notes.encodage.domain.model._note import Justification
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import NoteIncorrecteException
+from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
+from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+    NoteDecimalesAuthorisees
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
     NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
-    NoteDecimalesAuthorisees, NoteDejaSoumise
-from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
-    AttributionEnseignantTranslatorInMemory
+    PasGestionnaireParcoursException, PasGestionnaireParcoursCohorteException
+from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
+    CohortesDuGestionnaireInMemory
+from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
     PeriodeEncodageNotesTranslatorInMemory
-from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
-    NoteEtudiantInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
 
 
 class EncoderNoteTest(SimpleTestCase):
 
     def setUp(self) -> None:
-        self.matricule_enseignant = '00321234'
+        self.matricule_gestionnaire = '22220000'
 
         self.note = NoteManquanteEtudiantFactory()
         self.repository = NoteEtudiantInMemoryRepository()
         self.repository.save(self.note)
 
-        self.cmd = EncoderNoteCommand(
-            code_unite_enseignement=self.note.code_unite_enseignement,
-            annee_unite_enseignement=self.note.annee,
-            numero_session=self.note.numero_session,
-            matricule_fgs_enseignant=self.matricule_enseignant,
-            noma_etudiant=self.note.noma,
-            email_etudiant=self.note.email,
-            note="12"
+        self.cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.matricule_gestionnaire,
+            notes_encodees=[
+                EncoderNoteCommand(
+                    noma=self.note.noma,
+                    email=self.note.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="19",
+                )
+            ],
         )
 
         self.periode_encodage_notes_translator = PeriodeEncodageNotesTranslatorInMemory()
-        self.attribution_translator = AttributionEnseignantTranslatorInMemory()
+        self.cohortes_gestionnaire_trans = CohortesDuGestionnaireInMemory()
         self.__mock_service_bus()
 
     def __mock_service_bus(self):
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
-            NoteEtudiantRepository=lambda: self.repository,
+            NoteEtudiantGestionnaireRepository=lambda: self.repository,
             PeriodeEncodageNotesTranslator=lambda: self.periode_encodage_notes_translator,
-            AttributionEnseignantTranslator=lambda: self.attribution_translator,
+            CohortesDuGestionnaireTranslator=lambda: self.cohortes_gestionnaire_trans,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
@@ -89,7 +93,7 @@ class EncoderNoteTest(SimpleTestCase):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
         periode_fermee = PeriodeSoumissionNotesDTO(
-            annee_concernee=self.note.annee,
+            annee_concernee=self.note.annee_academique,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_dans_le_passe,
@@ -104,7 +108,7 @@ class EncoderNoteTest(SimpleTestCase):
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
         periode_ouverte = PeriodeSoumissionNotesDTO(
-            annee_concernee=self.note.annee,
+            annee_concernee=self.note.annee_academique,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
             fin_periode_soumission=date_aujourdhui,
@@ -121,7 +125,7 @@ class EncoderNoteTest(SimpleTestCase):
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
         periode_ouverte = PeriodeSoumissionNotesDTO(
-            annee_concernee=self.note.annee,
+            annee_concernee=self.note.annee_academique,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_aujourdhui,
             fin_periode_soumission=date_dans_le_futur,
@@ -140,25 +144,20 @@ class EncoderNoteTest(SimpleTestCase):
         with self.assertRaises(PeriodeSoumissionNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
-    def test_should_empecher_si_utilisateur_non_attribue_unite_enseignement(self):
-        attribution_autre_unite_enseignement = AttributionEnseignantDTO(
-            matricule_fgs_enseignant=self.matricule_enseignant,
-            code_unite_enseignement="LAUTRE1234",
-            annee=self.note.annee,
-            nom="Smith",
-            prenom="Charles",
-        )
-        self.attribution_translator.\
-            search_attributions_enseignant = lambda **kwargs: {attribution_autre_unite_enseignement}
+    def test_should_empecher_si_utilisateur_non_gestionnaire(self):
+        self.cohortes_gestionnaire_trans.search = lambda *args, **kwargs: set()
 
-        with self.assertRaises(EnseignantNonAttribueUniteEnseignementException):
+        with self.assertRaises(PasGestionnaireParcoursException):
             self.message_bus.invoke(self.cmd)
 
-    def test_should_empecher_si_utilisateur_aucune_attribution(self):
-        aucune_attribution = set()
-        self.attribution_translator.search_attributions_enseignant = lambda **kwargs: aucune_attribution
+    def test_should_empecher_si_utilisateur_pas_gestionnaire_cohorte_etudiant(self):
+        cohorte_gestionnaire = CohorteGestionnaireDTO(
+            matricule_gestionnaire=self.matricule_gestionnaire,
+            nom_cohorte="AUTRECOHORTE",
+        )
+        self.cohortes_gestionnaire_trans.search = lambda *args, **kwargs: {cohorte_gestionnaire}
 
-        with self.assertRaises(EnseignantNonAttribueUniteEnseignementException):
+        with self.assertRaises(PasGestionnaireParcoursCohorteException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_date_de_remise_est_hier(self):
@@ -186,7 +185,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_empecher_si_email_correspond_pas_noma(self):
-        cmd = attr.evolve(self.cmd, email_etudiant="email@ne_corespond_pas.be")
+        cmd = self._evolve_command(email="email@ne_correspond_pas.be")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
@@ -196,14 +195,14 @@ class EncoderNoteTest(SimpleTestCase):
             NomaNeCorrespondPasEmailException
         )
 
-    def test_should_raise_exception_when_noma_ne_dispose_pas_de_note_etudiant(self):
-        cmd = attr.evolve(self.cmd, noma_etudiant="9999999999")
+    def test_should_ignorer_noma_non_inscrit_examen(self):
+        noma_non_insct_examen = '99999999'
+        cmd = self._evolve_command(noma=noma_non_insct_examen)
 
-        with self.assertRaises(AttributeError):
-            self.message_bus.invoke(cmd)
+        self.assertTrue(self.message_bus.invoke(cmd), "Si aucun etudiant n'est trouvé, aucune exception n'est lancée")
 
     def test_should_empecher_si_note_inferieure_0(self):
-        cmd = attr.evolve(self.cmd, note="-1")
+        cmd = self._evolve_command(note="-1")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
@@ -213,7 +212,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_empecher_si_note_superieure_20(self):
-        cmd = attr.evolve(self.cmd, note="21")
+        cmd = self._evolve_command(note="21")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
@@ -223,7 +222,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
-        cmd = attr.evolve(self.cmd, note="S")
+        cmd = self._evolve_command(note="S")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
@@ -233,7 +232,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_empecher_si_note_mal_formatee(self):
-        cmd = attr.evolve(self.cmd, note="T 12")
+        cmd = self._evolve_command(note="T 12")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
@@ -243,7 +242,7 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_empecher_si_note_decimale_non_autorisee(self):
-        cmd = attr.evolve(self.cmd, note="12.5")
+        cmd = self._evolve_command(note="12.5")
 
         with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
             self.message_bus.invoke(cmd)
@@ -253,54 +252,66 @@ class EncoderNoteTest(SimpleTestCase):
         )
 
     def test_should_encoder_si_note_decimale_autorisee(self):
-        note_etudiant = NoteDecimalesAuthorisees()
+        note_etudiant = NoteDecimalesAuthorisees(entity_id=self.note.entity_id)
         self.repository.save(note_etudiant)
 
-        cmd = attr.evolve(self._generate_command_from_note_etudiant(note_etudiant), note="12.5")
+        cmd = self._evolve_command(note="12.5", email=note_etudiant.email)
 
-        entity_id = self.message_bus.invoke(cmd)
+        entity_id = self.message_bus.invoke(cmd)[0]
         self.assertEqual(self.repository.get(entity_id).note.value, Decimal(12.5))
 
-    def test_should_empecher_si_note_deja_soumise(self):
-        note_etudiant = NoteDejaSoumise()
-        self.repository.save(note_etudiant)
-
-        cmd = self._generate_command_from_note_etudiant(note_etudiant)
-
-        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
-            self.message_bus.invoke(cmd)
-        self.assertIsInstance(
-            class_exceptions.exception.exceptions.pop(),
-            NoteDejaSoumiseException
-        )
-
     def test_should_encoder_absence_injustifiee(self):
-        for absence_injustifiee in ['A', TutorJustificationTypes.ABSENCE_UNJUSTIFIED.name]:
+        for absence_injustifiee in ['A', JustificationTypes.ABSENCE_UNJUSTIFIED.name]:
             with self.subTest(absence=absence_injustifiee):
-                cmd = attr.evolve(self.cmd, note=absence_injustifiee)
+                cmd = self._evolve_command(note=absence_injustifiee)
 
-                entity_id = self.message_bus.invoke(cmd)
+                entity_id = self.message_bus.invoke(cmd)[0]
 
-                expected_result = Justification(value=TutorJustificationTypes.ABSENCE_UNJUSTIFIED)
+                expected_result = Justification(value=JustificationTypes.ABSENCE_UNJUSTIFIED)
+                self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_encoder_absence_justifiee(self):
+        for absence_justifiee in ['M', JustificationTypes.ABSENCE_JUSTIFIED.name]:
+            with self.subTest(absence=absence_justifiee):
+                cmd = self._evolve_command(note=absence_justifiee)
+
+                entity_id = self.message_bus.invoke(cmd)[0]
+
+                expected_result = Justification(value=JustificationTypes.ABSENCE_JUSTIFIED)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
     def test_should_encoder_tricherie(self):
-        for tricherie in ['T', TutorJustificationTypes.CHEATING.name]:
+        for tricherie in ['T', JustificationTypes.CHEATING.name]:
             with self.subTest(tricherie=tricherie):
-                cmd = attr.evolve(self.cmd, note=tricherie)
+                cmd = self._evolve_command(note=tricherie)
 
-                entity_id = self.message_bus.invoke(cmd)
+                entity_id = self.message_bus.invoke(cmd)[0]
 
-                expected_result = Justification(value=TutorJustificationTypes.CHEATING)
+                expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
 
     def _generate_command_from_note_etudiant(self, note_etudiant: 'NoteEtudiant'):
-        return EncoderNoteCommand(
-            code_unite_enseignement=note_etudiant.code_unite_enseignement,
-            annee_unite_enseignement=note_etudiant.annee,
-            numero_session=note_etudiant.numero_session,
-            matricule_fgs_enseignant=self.matricule_enseignant,
-            noma_etudiant=note_etudiant.noma,
-            email_etudiant=note_etudiant.email,
-            note='12'
+        return EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.matricule_gestionnaire,
+            notes_encodees=[
+                EncoderNoteCommand(
+                    noma=note_etudiant.noma,
+                    email=note_etudiant.email,
+                    code_unite_enseignement=note_etudiant.code_unite_enseignement,
+                    note="19",
+                )
+            ],
+        )
+
+    def _evolve_command(self, noma=None, email=None, note=None):
+        return attr.evolve(
+            self.cmd,
+            notes_encodees=[
+                EncoderNoteCommand(
+                    noma=noma or self.note.noma,
+                    email=email or self.note.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note=note or "19",
+                )
+            ],
         )

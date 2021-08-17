@@ -28,7 +28,7 @@ from typing import Any
 
 import attr
 
-from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes, JustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from osis_common.ddd import interface
 
 NOTE_MIN = 0
@@ -45,13 +45,13 @@ class NoteBuilder:
     def build(value: str) -> 'Note':
         if value in LETTRES_AUTORISEES:
             map_to_enum = {
-                ABSENCE_JUSTIFIEE: JustificationTypes.ABSENCE_UNJUSTIFIED,
-                ABSENCE_INJUSTIFIEE: JustificationTypes.ABSENCE_JUSTIFIED,
-                TRICHERIE: TutorJustificationTypes.CHEATING,
+                ABSENCE_JUSTIFIEE: JustificationTypes.ABSENCE_JUSTIFIED,
+                ABSENCE_INJUSTIFIEE: JustificationTypes.ABSENCE_UNJUSTIFIED,
+                TRICHERIE: JustificationTypes.CHEATING,
             }
             return Justification(value=map_to_enum[value])
-        if value in TutorJustificationTypes.get_names():
-            return Justification(value=TutorJustificationTypes[value])
+        if value in JustificationTypes.get_names():
+            return Justification(value=JustificationTypes[value])
         if NoteBuilder.__is_float(value):
             return NoteChiffree(value=float(value))
         return NoteManquante()

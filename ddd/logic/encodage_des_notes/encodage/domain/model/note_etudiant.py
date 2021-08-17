@@ -44,7 +44,7 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
 
 
 @attr.s(slots=True)
-class NoteEtudiant(interface.RootEntity):
+class NoteEtudiant(interface.RootEntity):  # FIXME :: Le nom de l'aggrégat est le même dans les 2 sous-contextes
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     email = attr.ib(type=str)
     note = attr.ib(type=Note)
@@ -59,3 +59,19 @@ class NoteEtudiant(interface.RootEntity):
             note=note_encodee,
         ).validate()
         self.note = NoteBuilder.build(note_encodee)
+
+    @property
+    def noma(self):
+        return self.entity_id.noma
+
+    @property
+    def code_unite_enseignement(self):
+        return self.entity_id.code_unite_enseignement
+
+    @property
+    def annee_academique(self):
+        return self.entity_id.annee_academique
+
+    @property
+    def numero_session(self):
+        return self.entity_id.numero_session

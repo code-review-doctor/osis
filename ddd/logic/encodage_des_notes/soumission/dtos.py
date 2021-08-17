@@ -126,7 +126,7 @@ class AttributionEnseignantDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class PeriodeSoumissionNotesDTO(interface.DTO):
+class PeriodeSoumissionNotesDTO(interface.DTO):  # TODO :: shared kernel + rename to PeriodeEncodageNotesDTO
     annee_concernee = attr.ib(type=int)
     session_concernee = attr.ib(type=int)
     debut_periode_soumission = attr.ib(type=DateDTO)

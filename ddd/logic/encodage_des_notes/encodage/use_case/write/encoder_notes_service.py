@@ -24,8 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
-from typing import List, Tuple
-from typing import OrderedDict as OrderedDictType
+from typing import List, Tuple, Dict
 
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
@@ -78,7 +77,7 @@ def encoder_notes(
 def __associer_nouvelle_note_a_son_identite(
         cmd: 'EncoderNotesCommand',
         periode_ouverte,
-) -> OrderedDictType[IdentiteNoteEtudiant, Tuple[NouvelleNote, EmailEtudiant]]:
+) -> Dict[IdentiteNoteEtudiant, Tuple[NouvelleNote, EmailEtudiant]]:
     notes = OrderedDict()
     for note_cmd in cmd.notes_encodees:
         identity = NoteEtudiantIdentityBuilder().build(

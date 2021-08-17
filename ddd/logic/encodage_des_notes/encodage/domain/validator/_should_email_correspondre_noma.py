@@ -34,7 +34,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import Noma
 @attr.s(frozen=True, slots=True)
 class ShouldEmailCorrespondreNoma(BusinessValidator):
 
-    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
+    note_etudiant = attr.ib(type='NoteEtudiantGestionnaire')  # type: NoteEtudiantGestionnaire
     email_etudiant = attr.ib(type=str)
 
     def validate(self, *args, **kwargs):

@@ -36,7 +36,7 @@ class EnseignantNonAttribueUniteEnseignementException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class PeriodeSoumissionNotesFermeeException(BusinessException):
+class PeriodeSoumissionNotesFermeeException(BusinessException):  # TODO :: shared kernel + renommer
     def __init__(self, **kwargs):
         message = _("The period of scores' encoding is not opened")
         super().__init__(message, **kwargs)
