@@ -34,7 +34,19 @@ from assessments.export import score_sheet_xls
 from assessments.views.serializers.score_sheet_xls import ScoreSheetXLSSerializer
 from ddd.logic.encodage_des_notes.soumission.commands import SearchAdressesFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
+from osis_common.document import xls_build
 from osis_role.contrib.views import PermissionRequiredMixin
+
+
+# TODO: Move to osis-common
+class XLSResponse(HttpResponse):
+    def __init__(self, xls_file=b'', filename='', **kwargs):
+        super().__init__(
+            content=xls_file,
+            content_type=xls_build.CONTENT_TYPE_XLS,
+            **kwargs
+        )
+        self._headers['content-disposition'] = ('Content-Disposition',  'attachment; filename=%s' % filename)
 
 
 class ScoreSheetXLSExportBaseView(PermissionRequiredMixin, View):
@@ -44,6 +56,10 @@ class ScoreSheetXLSExportBaseView(PermissionRequiredMixin, View):
     @cached_property
     def person(self):
         return self.request.user.person
+
+    @cached_property
+    def feuille_de_notes(self):
+        raise NotImplementedError()
 
     @cached_property
     def donnees_administratives(self):
@@ -60,12 +76,7 @@ class ScoreSheetXLSExportBaseView(PermissionRequiredMixin, View):
 
         if len(score_sheet_serialized['rows']):
             virtual_workbook = score_sheet_xls.build_xls(score_sheet_serialized)
-            response = HttpResponse(
-                virtual_workbook,
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
-            response['Content-Disposition'] = 'attachment; filename=%s' % self.get_filename()
-            return response
+            return XLSResponse(xls_file=virtual_workbook, filename=self.get_filename())
         else:
             messages.add_message(request, messages.WARNING, _("No students to encode by excel"))
             return HttpResponseRedirect(
