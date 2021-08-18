@@ -93,13 +93,5 @@ class NoteManquanteEtudiantDateLimiteDepasseeFactory(NoteManquanteEtudiantFactor
     date_limite_de_remise = DateDTO.build_from_date(datetime.date.today() - datetime.timedelta(days=1))
 
 
-class NoteChiffreEtudiantFactory(NoteManquanteEtudiantFactory):
-    note = factory.LazyFunction(generate_note_chiffree)
-
-
-class NoteJustificationEtudiantFactory(NoteManquanteEtudiantFactory):
-    note = factory.LazyFunction(generate_note_justification)
-
-
 class NoteDecimalesAuthorisees(NoteManquanteEtudiantFactory):
     note_decimale_autorisee = True

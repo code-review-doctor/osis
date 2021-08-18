@@ -29,6 +29,7 @@ from typing import List, Tuple, Dict
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
 from ddd.logic.encodage_des_notes.encodage.domain.service.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
@@ -58,17 +59,8 @@ def encoder_notes(
         cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
     )
 
-    # TODO : capturer dans EncoderNotesEnLotDomainService?
-    for note_etudiant in notes_a_modifier:
-
-        # When
-        nouvelle_note = note_par_identite[note_etudiant.entity_id][0]
-        email = note_par_identite[note_etudiant.entity_id][1]
-        note_etudiant.encoder(nouvelle_note, email)
-
-        # Then
-        # TODO :: performance : implémenter un repo.save_in_bulk ?
-        note_etudiant_repo.save(note_etudiant)
+    # WHEN
+    EncoderNotesEnLot().execute(notes_a_modifier, note_par_identite, note_etudiant_repo)
 
     return identites_notes_a_modifier
 

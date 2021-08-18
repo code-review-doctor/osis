@@ -213,6 +213,12 @@ class EncoderNoteTest(SimpleTestCase):
             NoteIncorrecteException
         )
 
+    def test_should_encoder_note_de_presence(self):
+        note_de_presence = "0"
+        cmd = attr.evolve(self.cmd, note=note_de_presence)
+        entity_id = self.message_bus.invoke(cmd)
+        self.assertEqual(self.repository.get(entity_id).note.value, Decimal(0.0))
+
     def test_should_empecher_si_note_superieure_20(self):
         cmd = attr.evolve(self.cmd, note="21")
 
@@ -222,6 +228,11 @@ class EncoderNoteTest(SimpleTestCase):
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
         )
+
+    def test_should_encoder_20(self):
+        cmd = attr.evolve(self.cmd, note="20")
+        entity_id = self.message_bus.invoke(cmd)
+        self.assertEqual(self.repository.get(entity_id).note.value, Decimal(20.0))
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
         cmd = attr.evolve(self.cmd, note="S")

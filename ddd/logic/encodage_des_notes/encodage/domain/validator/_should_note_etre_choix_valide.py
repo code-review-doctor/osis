@@ -38,7 +38,7 @@ class ShouldNoteEtreChoixValide(BusinessValidator):
     def validate(self, *args, **kwargs):
         try:
             note_digit = float(self.note)
-            if not NOTE_MIN < note_digit < NOTE_MAX:
+            if not NOTE_MIN <= note_digit <= NOTE_MAX:
                 raise NoteIncorrecteException(self.note)
         except ValueError:
             if self.note not in JUSTIFICATIONS_AUTORISEES:

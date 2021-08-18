@@ -33,7 +33,7 @@ from django.test import SimpleTestCase
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand, EncoderNoteCommand
-from ddd.logic.encodage_des_notes.encodage.domain.model._note import Justification
+from ddd.logic.encodage_des_notes.encodage.domain.model._note import Justification, NoteChiffree
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.validator.exceptions import NoteIncorrecteException
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
@@ -42,7 +42,8 @@ from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import Not
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
     NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException, PasGestionnaireParcoursCohorteException
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException, \
+    PasGestionnaireParcoursCohorteException
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
@@ -209,6 +210,13 @@ class EncoderNoteTest(SimpleTestCase):
             NoteIncorrecteException
         )
 
+    def test_should_encoder_note_de_presence(self):
+        note_de_presence = "0"
+        cmd = self._evolve_command(note=note_de_presence)
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+        self.assertEqual(self.repository.get(entity_id).note.value, Decimal(0.0))
+
     def test_should_empecher_si_note_superieure_20(self):
         cmd = self._evolve_command(note="21")
 
@@ -218,6 +226,13 @@ class EncoderNoteTest(SimpleTestCase):
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
         )
+
+    def test_should_encoder_20(self):
+        note_de_presence = "20"
+        cmd = self._evolve_command(note=note_de_presence)
+
+        entity_id = self.message_bus.invoke(cmd)[0]
+        self.assertEqual(self.repository.get(entity_id).note.value, Decimal(20.0))
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
         cmd = self._evolve_command(note="S")
@@ -287,6 +302,90 @@ class EncoderNoteTest(SimpleTestCase):
 
                 expected_result = Justification(value=JustificationTypes.CHEATING)
                 self.assertEqual(self.repository.get(entity_id).note, expected_result)
+
+    def test_should_afficher_rapport_plusieurs_notes_erreurs(self):
+        note1 = NoteManquanteEtudiantFactory()
+        self.repository.save(note1)
+        note2 = NoteManquanteEtudiantFactory()
+        self.repository.save(note2)
+        note3 = NoteManquanteEtudiantFactory()
+        self.repository.save(note3)
+        cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.matricule_gestionnaire,
+            notes_encodees=[
+                EncoderNoteCommand(  # Note incorrecte
+                    noma=note1.noma,
+                    email=note1.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="valeur note incorrecte",
+                ),
+                EncoderNoteCommand(  # email ne correspond pas au noma
+                    noma=note2.noma,
+                    email="email@ne_correspond_pas.be",
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="20",
+                ),
+                EncoderNoteCommand(  # note valide
+                    noma=self.note.noma,
+                    email=self.note.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="7",
+                ),
+                EncoderNoteCommand(  # note incorrecte
+                    noma=note3.noma,
+                    email=note3.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="valeur note incorrecte",
+                ),
+            ],
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            self.message_bus.invoke(cmd)
+        exceptions = class_exceptions.exception.exceptions
+        self.assertIsInstance(exceptions, list, "Doit être une liste afin de préserver l'ordre des erreurs")
+        self.assertEqual(len(exceptions), 3)  # 3 notes sur 4 en erreur
+
+        # Doit renvoyer une liste ordonnée des erreurs rencontrées pour chaque note
+        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NoteIncorrecteException)
+        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NomaNeCorrespondPasEmailException)
+        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NoteIncorrecteException)
+
+    @mock.patch("infrastructure.messages_bus.NoteEtudiantGestionnaireRepository")
+    def test_should_sauvegarder_note_meme_si_autre_note_en_erreur(self, mock_note_repo):
+        appels_save = []
+        fake_repo = NoteEtudiantInMemoryRepository()
+        fake_repo.save = lambda *args, **kwargs: appels_save.append(1)
+        mock_note_repo.return_value = fake_repo
+        note = NoteManquanteEtudiantFactory()
+        self.repository.save(note)
+        cmd = EncoderNotesCommand(
+            matricule_fgs_gestionnaire=self.matricule_gestionnaire,
+            notes_encodees=[
+                EncoderNoteCommand(  # Note incorrecte
+                    noma=note.noma,
+                    email=note.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="valeur note incorrecte",
+                ),
+                EncoderNoteCommand(  # note valide
+                    noma=self.note.noma,
+                    email=self.note.email,
+                    code_unite_enseignement=self.note.code_unite_enseignement,
+                    note="7",
+                ),
+            ],
+        )
+        with self.assertRaises(MultipleBusinessExceptions) as class_exceptions:
+            self.message_bus.invoke(cmd)
+
+        self.assertIsInstance(class_exceptions.exception.exceptions.pop(), NoteIncorrecteException)
+
+        self.assertEqual(
+            len(appels_save),
+            1,
+            "Meme en cas d'erreur sur certaines notes, les notes valides doivent être persistées. "
+            "Dans notre cas de test ici, 1 note valide == 1 appel à repository.save()",
+        )
 
     def _generate_command_from_note_etudiant(self, note_etudiant: 'NoteEtudiant'):
         return EncoderNotesCommand(

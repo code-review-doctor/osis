@@ -96,7 +96,7 @@ class DetailContactDTO(interface.DTO):
 
 @attr.s(frozen=True, slots=True)
 class AdresseFeuilleDeNotesDTO(interface.DTO):
-    nom_cohorte = attr.ib(type=str, converter=none2emptystr)
+    nom_cohorte = attr.ib(type=str)
     destinataire = attr.ib(type=str, converter=none2emptystr)
     rue_et_numero = attr.ib(type=str, converter=none2emptystr)
     code_postal = attr.ib(type=str, converter=none2emptystr)
