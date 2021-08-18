@@ -135,10 +135,9 @@ class ScoreSheetXLSSerializer(serializers.Serializer):
         ])
 
     def get_rows(self, obj):
-        notes_etudiants_avec_date_echeance_non_atteinte = obj['feuille_de_notes'].notes_etudiants
-        # notes_etudiants_avec_date_echeance_non_atteinte = filter(
-        #     lambda n: not n.date_echeance_atteinte, obj['feuille_de_notes'].notes_etudiants
-        # )
+        notes_etudiants_avec_date_echeance_non_atteinte = filter(
+            lambda n: not n.date_echeance_atteinte, obj['feuille_de_notes'].notes_etudiants
+        )
         serializer = _NoteEtudiantRowSerializer(instance=notes_etudiants_avec_date_echeance_non_atteinte, many=True)
         return serializer.data
 
