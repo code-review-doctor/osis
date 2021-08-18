@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import reverse
+
 from assessments.views.common.learning_unit_score_encoding import LearningUnitScoreEncodingBaseView
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from infrastructure.messages_bus import message_bus_instance
@@ -36,6 +38,7 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
         return {
             **super().get_context_data(),
             'feuille_de_notes': self.get_feuille_de_notes(),
+            'learning_unit_submit_url': self.get_learning_unit_submit_url(),
         }
 
     def get_feuille_de_notes(self):
@@ -44,3 +47,8 @@ class LearningUnitScoreEncodingTutorView(LearningUnitScoreEncodingBaseView):
             code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
         )
         return message_bus_instance.invoke(cmd)
+
+    def get_learning_unit_submit_url(self):
+        return reverse('learning_unit_score_encoding_submit', kwargs={
+            'learning_unit_code': self.kwargs['learning_unit_code']
+        })

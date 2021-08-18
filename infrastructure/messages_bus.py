@@ -53,7 +53,9 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, \
+    GetCohortesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
@@ -286,6 +288,10 @@ class MessageBus:
             ResponsableDeNotesRepository(),
             DeliberationTranslator(),
         ),
+        GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
+            cmd,
+            CohortesDuGestionnaireTranslator()
+        )
 
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

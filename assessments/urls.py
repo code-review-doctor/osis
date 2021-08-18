@@ -32,12 +32,10 @@ from assessments.views.pgm_manager_administration import ProgramManagerListView,
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
 from assessments.views.program_manager.score_search import ScoreSearchFormView
-from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView
+from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
+    ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
-from assessments.views.tutor.score_sheet_pdf_export import ScoreSheetPDFExportView
-from assessments.views.tutor.score_sheet_xls_export import ScoreSheetXLSExportView
-from assessments.views.tutor.score_sheet_xls_import import ScoreSheetXLSImportView
 
 urlpatterns = [
     url(r'^scores_encoding/', include([

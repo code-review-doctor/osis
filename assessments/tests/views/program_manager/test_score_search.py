@@ -23,35 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
+from typing import List
+
 from django.test import TestCase
 from django.urls import reverse
 
+from assessments.forms.score_encoding import ScoreSearchForm
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 
 
-class LearningUnitScoreEncodingProgramManagerViewTest(TestCase):
+class ScoreSearchViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.program_manager = ProgramManagerFactory(person__global_id="123456789")
         cls.academic_year = AcademicYearFactory()
 
-        cls.url = reverse('learning_unit_score_encoding', kwargs={
-            'learning_unit_code': 'LEPL1509'
-        })
+        cls.url = reverse('score_search')
 
     def setUp(self) -> None:
         self.client.force_login(self.program_manager.person.user)
         self.session_exam_calendar = SessionExamCalendarFactory.create_academic_event(self.academic_year)
-
-        self.patch_message_bus = mock.patch(
-            "assessments.views.program_manager.learning_unit_score_encoding.message_bus_instance.invoke",
-            return_value=None
-        )
-        self.message_bus_mocked = self.patch_message_bus.start()
-        self.addCleanup(self.patch_message_bus.stop)
 
     def test_case_user_not_logged(self):
         self.client.logout()
@@ -70,13 +63,9 @@ class LearningUnitScoreEncodingProgramManagerViewTest(TestCase):
     def test_assert_template_used(self):
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, "assessments/program_manager/learning_unit_score_encoding.html")
+        self.assertTemplateUsed(response, "assessments/program_manager/score_search_form.html")
 
     def test_assert_contexts(self):
         response = self.client.get(self.url)
-
-        self.assertIsInstance(response.context['learning_unit_encoding_url'], str)
-        self.assertIsInstance(response.context['learning_unit_double_encoding_url'], str)
-        self.assertIsInstance(response.context['learning_unit_print_url'], str)
-        self.assertIsInstance(response.context['learning_unit_download_xls_url'], str)
-        self.assertIsInstance(response.context['learning_unit_upload_xls_url'], str)
+        self.assertIsInstance(response.context['search_form'], ScoreSearchForm)
+        self.assertIsInstance(response.context['notes_etudiant_filtered'], List)

@@ -23,40 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
-from osis_common.ddd import interface
+from assessments.views.common.score_sheet_pdf_export import ScoreSheetPDFExportBaseView
+from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
-
-
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class GetCohortesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+class ScoreSheetPDFExportProgramManagerView(ScoreSheetPDFExportBaseView):
+    def get_feuille_de_notes(self):
+        cmd = GetFeuilleDeNotesCommand(
+            matricule_fgs_enseignant=self.person.global_id,
+            code_unite_enseignement=self.kwargs['learning_unit_code'].upper()
+        )
+        return message_bus_instance.invoke(cmd)
