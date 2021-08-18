@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2015-2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-18 15:55+0200\n"
+"POT-Creation-Date: 2021-08-18 16:01+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1233,12 +1233,16 @@ msgstr "Inclure les entités subordonnées"
 msgid ""
 "Indicates if the UE can be accessible for a student, even if the UE is not "
 "included in the detailed program of his training"
-msgstr "Indique si l'UE peut être accessible pour un étudiant, même si l'UE ne figure pas dans le programme détaillé de sa formation"
+msgstr ""
+"Indique si l'UE peut être accessible pour un étudiant, même si l'UE ne "
+"figure pas dans le programme détaillé de sa formation"
 
 msgid ""
 "Indicates if the UE includes an internship, so that students enrolled in "
 "this UE must be declared to the DIMONA"
-msgstr "Indique si l'UE comprend un stage, de sorte que les étudiants inscrits à cette UE doivent être déclarés à la DIMONA."
+msgstr ""
+"Indique si l'UE comprend un stage, de sorte que les étudiants inscrits à "
+"cette UE doivent être déclarés à la DIMONA."
 
 msgid "Indicates if this UE is accessible to exchange students"
 msgstr "Indique si cette UE est accessible aux étudiants d'échange."
@@ -1247,13 +1251,19 @@ msgid ""
 "Indicates, for the UE whose language of instruction is not French, if this "
 "UE is nevertheless accessible to French speaking students. If the language "
 "of instruction is French, the value of this field must be 'no'"
-msgstr "Indique, pour les UE dont la langue d'enseignement n'est pas le français, si cette UE est cependant accessible aux étudiants parlant français. Si la langue d'enseignement est le français, la valeur de ce champ doit être 'non'"
+msgstr ""
+"Indique, pour les UE dont la langue d'enseignement n'est pas le français, si "
+"cette UE est cependant accessible aux étudiants parlant français. Si la "
+"langue d'enseignement est le français, la valeur de ce champ doit être 'non'"
 
 msgid ""
 "Indicates, for the UE whose teaching language is not English, if this UE is "
 "however accessible to English speaking students. If the language of "
 "instruction is English, the value of this field must be 'no'"
-msgstr "Indique, pour les UE dont la langue d'enseignement n'est pas l'anglais, si cette UE est cependant accessible aux étudiants parlant anglais. Si la langue d'enseignement est l'anglais, la valeur de ce champ doit être 'non'"
+msgstr ""
+"Indique, pour les UE dont la langue d'enseignement n'est pas l'anglais, si "
+"cette UE est cependant accessible aux étudiants parlant anglais. Si la "
+"langue d'enseignement est l'anglais, la valeur de ce champ doit être 'non'"
 
 msgid "Individual loan"
 msgstr "Emprunt individuel"
