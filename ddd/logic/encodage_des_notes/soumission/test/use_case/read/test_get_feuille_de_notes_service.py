@@ -29,7 +29,7 @@ from unittest import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.peps_type import PepsTypes
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO, PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantDTO, PeriodeEncodageNotesDTO, AdresseDTO
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, AttributionEnseignantDTO
@@ -45,6 +45,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.signaletiq
     SignaletiqueEtudiantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.unite_enseignement import \
     UniteEnseignementTranslatorInMemory
+from infrastructure.encodage_de_notes.soumission.domain.service.in_memory.signaletique_personne import \
+    SignaletiquePersonneTranslatorInMemory
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.note_etudiant import \
     NoteEtudiantInMemoryRepository
 from infrastructure.encodage_de_notes.soumission.repository.in_memory.responsable_de_notes import \
@@ -69,9 +71,10 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.repository.save(self.note_etudiant)
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
-        self.resp_notes_repository.save(
-            ResponsableDeNotesLDROI1001Annee2020Factory(entity_id__matricule_fgs_enseignant=self.matricule_enseignant)
+        self.responsable_notes = ResponsableDeNotesLDROI1001Annee2020Factory(
+            entity_id__matricule_fgs_enseignant=self.matricule_enseignant
         )
+        self.resp_notes_repository.save(self.responsable_notes)
 
         self.cmd = GetFeuilleDeNotesCommand(
             code_unite_enseignement=self.code_unite_enseignement,
@@ -81,7 +84,8 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.periode_soumission_translator = PeriodeEncodageNotesTranslatorInMemory()
         self.attribution_translator = AttributionEnseignantTranslatorInMemory()
         self.inscr_examen_translator = InscriptionExamenTranslatorInMemory()
-        self.signaletique_translator = SignaletiqueEtudiantTranslatorInMemory()
+        self.signaletique_etudiant_translator = SignaletiqueEtudiantTranslatorInMemory()
+        self.signaletique_personne_translator = SignaletiquePersonneTranslatorInMemory()
         self.unite_enseignement_trans = UniteEnseignementTranslatorInMemory()
         self.__mock_service_bus()
 
@@ -90,9 +94,10 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
             'infrastructure.messages_bus',
             NoteEtudiantRepository=lambda: self.repository,
             ResponsableDeNotesRepository=lambda: self.resp_notes_repository,
+            SignaletiquePersonneTranslator=lambda: self.signaletique_personne_translator,
             PeriodeEncodageNotesTranslator=lambda: self.periode_soumission_translator,
             InscriptionExamenTranslator=lambda: self.inscr_examen_translator,
-            SignaletiqueEtudiantTranslator=lambda: self.signaletique_translator,
+            SignaletiqueEtudiantTranslator=lambda: self.signaletique_etudiant_translator,
             AttributionEnseignantTranslator=lambda: self.attribution_translator,
             UniteEnseignementTranslator=lambda: self.unite_enseignement_trans,
         )
@@ -239,3 +244,20 @@ class GetFeuilleDeNotesTest(SimpleTestCase):
         self.assertEqual(result.notes_etudiants[0].prenom, 'Adrien')
         self.assertEqual(result.notes_etudiants[1].nom, 'Dupont')
         self.assertEqual(result.notes_etudiants[1].prenom, 'Marie')
+
+    def test_should_renvoyer_contact_responsable_notes(self):
+        result = self.message_bus.invoke(self.cmd)
+        self.assertEqual(result.contact_responsable_notes.matricule_fgs, self.matricule_enseignant)
+        self.assertEqual(result.contact_responsable_notes.email, "charles.smith@email.com")
+        expected_address = AdresseDTO(
+            code_postal='1410',
+            ville='Waterloo',
+            rue_numero_boite='Rue de Waterloo, 123',
+        )
+        self.assertEqual(result.contact_responsable_notes.adresse_professionnelle, expected_address)
+
+    def test_should_renvoyer_aucun_contact_responsable_notes(self):
+        self.resp_notes_repository.delete(self.responsable_notes.entity_id)
+        result = self.message_bus.invoke(self.cmd)
+        self.assertIsNone(result.contact_responsable_notes)
+        self.resp_notes_repository.save(self.responsable_notes)

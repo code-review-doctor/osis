@@ -47,7 +47,10 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
             code_unite_enseignement,
             annee_academique
         )
-        return next(entity for entity in cls.entities if ue_identite in entity.unites_enseignements)
+        return next(
+            (entity for entity in cls.entities if ue_identite in entity.unites_enseignements),
+            None
+        )
 
     @classmethod
     def search(
