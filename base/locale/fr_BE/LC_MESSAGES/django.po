@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-27 11:19+0200\n"
+"POT-Creation-Date: 2021-08-12 13:40+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -905,6 +905,9 @@ msgstr "Intitulé propre en anglais"
 msgid "English title specific complement"
 msgstr "Intitulé en EN compl. spéc. à l'UE"
 
+msgid "English-friendly"
+msgstr "English-friendly"
+
 msgid "Enrolled"
 msgstr "Inscrit"
 
@@ -995,6 +998,9 @@ msgstr "Inscription aux examens"
 
 msgid "Exceptional procedure"
 msgstr "Procédure exceptionnelle"
+
+msgid "Exchange students"
+msgstr "Etudiants d'échange"
 
 msgid "Execute"
 msgstr "Exécuter"
@@ -1103,6 +1109,9 @@ msgstr "Français"
 
 msgid "French title proper"
 msgstr "Intitulé propre en français"
+
+msgid "French-friendly"
+msgstr "French-friendly"
 
 msgid "From"
 msgstr "De"
@@ -1220,6 +1229,9 @@ msgstr "Inactif"
 
 msgid "Include subordinate entities"
 msgstr "Inclure les entités subordonnées"
+
+msgid "Individual loan"
+msgstr "Emprunt individuel"
 
 msgid "Initial data"
 msgstr "Valeur initiale"
@@ -2516,6 +2528,7 @@ msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
 
+#, python-format
 msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr "La classe %(acronym)s est attribuée à %(tutor)s l’année %(year)s"
 
