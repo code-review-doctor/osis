@@ -23,18 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.functional import cached_property
-from django.views.generic import TemplateView
+from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
-from osis_role.contrib.views import PermissionRequiredMixin
+from assessments.forms.score_file import ScoreFileForm
+from assessments.views.serializers.score_sheet_xls_import import ScoreSheetXLSImportSerializer, \
+    ScoreSheetXLSImportSerializerError
+from base.views.mixins import AjaxTemplateMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 
 
-class LearningUnitScoreEncodingBaseView(PermissionRequiredMixin, TemplateView):
+class ScoreSheetXLSImportBaseView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, FormView):
     # PermissionRequiredMixin
     permission_required = "assessments.can_access_scoreencoding"
+
+    # FormView
+    template_name = "assessments/common/xls_import_modal_inner.html"
+    form_class = ScoreFileForm
 
     @cached_property
     def person(self):
@@ -47,43 +56,20 @@ class LearningUnitScoreEncodingBaseView(PermissionRequiredMixin, TemplateView):
             return HttpResponseRedirect(redirect_url)
         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        return {
-            **super().get_context_data(**kwargs),
-            'learning_unit_encoding_url': self.get_learning_unit_encoding_url(),
-            'learning_unit_double_encoding_url': self.get_learning_unit_double_encoding_url(),
-            'learning_unit_print_url': self.get_learning_unit_print_url(),
-            'learning_unit_download_xls_url': self.get_learning_unit_download_xls_url(),
-            'learning_unit_upload_xls_url': self.get_learning_unit_upload_xls_url(),
-        }
+    def form_valid(self, form):
+        xls_workbook = form.cleaned_data['file']
+        try:
+            score_sheet_serialized = ScoreSheetXLSImportSerializer(xls_workbook.active).data
+            for note_etudiant in score_sheet_serialized['notes_etudiants']:
+                self.call_command(note_etudiant)
+        except ScoreSheetXLSImportSerializerError as e:
+            messages.add_message(self.request, messages.ERROR, e.message)
+        return super().form_valid(form)
 
-    def get_learning_unit_encoding_url(self):
-        return reverse('learning_unit_score_encoding_form', kwargs={
+    def get_success_url(self) -> str:
+        return reverse('learning_unit_score_encoding', kwargs={
             'learning_unit_code': self.kwargs['learning_unit_code']
         })
 
-    def get_learning_unit_double_encoding_url(self):
-        return ""
-
-    def get_learning_unit_print_url(self):
-        return reverse('score_sheet_pdf_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_download_xls_url(self):
-        return reverse('score_sheet_xls_export', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_upload_xls_url(self):
-        return reverse('score_sheet_xls_import', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_learning_unit_submit_url(self):
-        return reverse('learning_unit_score_encoding_submit', kwargs={
-            'learning_unit_code': self.kwargs['learning_unit_code']
-        })
-
-    def get_permission_object(self):
-        return None
+    def call_command(self, note_etudiant):
+        pass
