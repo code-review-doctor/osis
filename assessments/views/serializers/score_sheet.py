@@ -90,9 +90,8 @@ class _ScoreResponsibleSerializer(serializers.Serializer):
     address = serializers.SerializerMethodField()
 
     def get_address(self, obj):
-        # TODO: Move contact_responsable_notes data to score_sheet instead of administrative data
         return _ScoreResponsibleAddressSerializer(
-            instance=obj['donnees_administratives'][0].contact_responsable_notes.adresse_professionnelle
+            instance=obj['feuille_de_notes'].contact_responsable_notes.adresse_professionnelle
         ).data
 
 
