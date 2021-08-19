@@ -52,12 +52,17 @@ class TestPostponeCertificateAims(DDDTestCase):
             "calculate_end_postponement_year_training",
             self.trainings[0].year + 3
         )
-        self.academic_year = AcademicYear(
+        self.current_academic_year = AcademicYear(
             entity_id=AcademicYearIdentityBuilder.build_from_year(year=datetime.datetime.now().year),
-            start_date=datetime.date(datetime.datetime.now().year-3, 9, 30),
-            end_date=datetime.date(datetime.datetime.now().year-2, 9, 30)
+            start_date=datetime.date(datetime.datetime.now().year, 9, 30),
+            end_date=datetime.date(datetime.datetime.now().year+1, 9, 30)
         )
-        self.academic_year_repository = AcademicYearInMemoryRepository([self.academic_year])
+        self.academic_year = AcademicYear(
+            entity_id=AcademicYearIdentityBuilder.build_from_year(year=self.trainings[0].entity_identity.year),
+            start_date=datetime.date(self.trainings[0].entity_identity.year, 9, 30),
+            end_date=datetime.date(self.trainings[0].entity_identity.year+1, 9, 30)
+        )
+        self.academic_year_repository = AcademicYearInMemoryRepository([self.academic_year, self.current_academic_year])
 
     def test_cannot_have_more_than_one_certificate_aim_of_section_2(self):
         cmd = attr.evolve(self.cmd, aims=[(1, 2), (4, 2)])
