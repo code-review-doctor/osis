@@ -198,7 +198,11 @@ class EncoderNoteTest(SimpleTestCase):
         noma_non_insct_examen = '99999999'
         cmd = self._evolve_command(noma=noma_non_insct_examen)
 
-        self.assertTrue(self.message_bus.invoke(cmd), "Si aucun etudiant n'est trouvé, aucune exception n'est lancée")
+        self.assertEqual(
+            list(),
+            self.message_bus.invoke(cmd),
+            "Si aucun etudiant n'est trouvé, aucune exception n'est lancée",
+        )
 
     def test_should_empecher_si_note_inferieure_0(self):
         cmd = self._evolve_command(note="-1")

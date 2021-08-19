@@ -23,19 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Set
+from ddd.logic.encodage_des_notes.encodage.domain.model._note import NoteBuilder
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.validator.validators_by_business_action import \
+    EncoderNotesValidatorList
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DetailContactDTO
 from osis_common.ddd import interface
+from osis_common.ddd.interface import CommandRequest
 
 
-class ISignaletiquePersonneTranslator(interface.DomainService):
+class NoteEtudiantBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'NoteEtudiant':
+        raise NotImplementedError
 
     @classmethod
-    @abc.abstractmethod
-    def search(
-            cls,
-            matricules_fgs: Set[str]
-    ) -> Set['DetailContactDTO']:
+    def build_from_repository_dto(cls, dto_object: 'interface.DTO') -> 'NoteEtudiant':
         raise NotImplementedError
+
+    @classmethod
+    def build_from_ancienne_note(
+            cls,
+            ancienne_note: 'NoteEtudiant',
+            nouvelle_note: str,
+            email_encode: str
+    ) -> 'NoteEtudiant':
+        EncoderNotesValidatorList(
+            note_etudiant=ancienne_note,
+            email=email_encode,
+            note=nouvelle_note,
+        ).validate()
+        return NoteEtudiant(
+            entity_id=ancienne_note.entity_id,
+            email=ancienne_note.email,
+            note=NoteBuilder.build(nouvelle_note),
+            echeance_gestionnaire=ancienne_note.echeance_gestionnaire,
+            nom_cohorte=ancienne_note.nom_cohorte,
+            note_decimale_autorisee=ancienne_note.note_decimale_autorisee,
+        )
+

@@ -28,12 +28,10 @@ from typing import List
 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_contact_feuille_de_notes import \
     IAdresseFeuilleDeNotesTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.service.i_deliberation import IDeliberationTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import DonneesAdministrativesFeuilleDeNotesDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
 
@@ -45,22 +43,10 @@ class DonneesAdministratives(interface.DomainService):
             codes_unites_enseignement: List['str'],
             periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
             contact_feuille_notes_translator: 'IAdresseFeuilleDeNotesTranslator',
-            signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             inscr_exam_translator: 'IInscriptionExamenTranslator',
-            responsable_notes_repo: 'IResponsableDeNotesRepository',
             deliberation_translator: 'IDeliberationTranslator',
     ) -> List['DonneesAdministrativesFeuilleDeNotesDTO']:
         periode_soumission_ouverte = periode_soumission_note_translator.get()
-
-        responsables_de_notes = responsable_notes_repo.search(
-            codes_unites_enseignement=[code for code in codes_unites_enseignement],
-            annee_academique=periode_soumission_ouverte.annee_concernee,
-        )
-
-        signaletiques_par_matricule = _get_signaletique_par_matricule(
-            responsables_de_notes,
-            signaletique_personne_translator,
-        )
 
         cohortes_par_unite_enseignement = _get_cohortes_par_unite_enseignement(
             codes_unites_enseignement,
@@ -79,15 +65,12 @@ class DonneesAdministratives(interface.DomainService):
 
         result = []
         for code in codes_unites_enseignement:
-            matric_fgs_responsable = _get_responsable_de_notes(code, periode_soumission_ouverte, responsables_de_notes)
-            contact_responsable_notes = signaletiques_par_matricule.get(matric_fgs_responsable)
             for nom_cohorte in cohortes_par_unite_enseignement.get(code, []):
                 deliberation = deliberation_par_cohorte.get(nom_cohorte)
                 dto = DonneesAdministrativesFeuilleDeNotesDTO(
                     sigle_formation=nom_cohorte,
                     code_unite_enseignement=code,
                     date_deliberation=deliberation.date if deliberation else None,
-                    contact_responsable_notes=contact_responsable_notes,  # FIXME :: déplacer dans FeuilleDeNotesEnseignantDTO ?
                     contact_feuille_de_notes=adresse_par_cohorte[nom_cohorte],
                 )
                 result.append(dto)

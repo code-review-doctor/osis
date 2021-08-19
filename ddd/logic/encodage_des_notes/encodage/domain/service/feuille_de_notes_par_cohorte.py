@@ -48,6 +48,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             matricule_gestionnaire: str,
             notes: List['NoteEtudiant'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
+            signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
             periode_encodage: 'PeriodeEncodageNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
@@ -59,6 +60,7 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
         feuille_notes_enseignant = FeuilleDeNotesParUniteEnseignement().get(
             notes=notes,
             responsable_notes_repo=responsable_notes_repo,
+            signaletique_personne_translator=signaletique_personne_translator,
             periode_encodage=periode_encodage,
             inscription_examen_translator=inscription_examen_translator,
             signaletique_etudiant_translator=signaletique_etudiant_translator,
@@ -96,15 +98,12 @@ class FeuilleDeNotesParCohorte(interface.DomainService):
             EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
             for enseignant in feuille_notes_enseignant.autres_enseignants
         ]
-        responsable_notes = EnseignantDTO(
-            prenom=feuille_notes_enseignant.responsable_note.prenom,
-            nom=feuille_notes_enseignant.responsable_note.nom,
-        )
 
         return FeuilleDeNotesParCohorteDTO(
             code_unite_enseignement=feuille_notes_enseignant.code_unite_enseignement,
             intitule_complet_unite_enseignement=feuille_notes_enseignant.intitule_complet_unite_enseignement,
-            responsable_note=responsable_notes,
+            responsable_note=feuille_notes_enseignant.responsable_note,
+            contact_responsable_notes=feuille_notes_enseignant.contact_responsable_notes,
             autres_enseignants=autres_enseignants,
             annee_academique=feuille_notes_enseignant.annee_academique,
             numero_session=feuille_notes_enseignant.numero_session,

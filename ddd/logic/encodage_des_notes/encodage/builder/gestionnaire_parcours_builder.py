@@ -23,36 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Set
-
+from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours, \
+    IdentiteGestionnaire
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    PasGestionnaireParcoursException, PasGestionnaireParcoursCohorteException
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursException
+
 from osis_common.ddd import interface
+from osis_common.ddd.interface import CommandRequest
 
 
-class GestionnaireParcours(interface.DomainService):
+class GestionnaireParcoursBuilder(interface.RootEntityBuilder):
+    @classmethod
+    def build_from_command(cls, cmd: 'CommandRequest') -> 'NoteEtudiant':
+        raise NotImplementedError
 
     @classmethod
-    def verifier(
+    def build_from_repository_dto(cls, dto_object: 'interface.DTO') -> 'NoteEtudiant':
+        raise NotImplementedError
+
+    @classmethod
+    def get(
             cls,
             matricule_gestionnaire: str,
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-    ) -> None:
-        if not cohortes_gestionnaire_translator.search(matricule_gestionnaire):
-            # TODO :: perfomance : 'search' est appelé 2 fois dans meme use case
-            # TODO :: perfomance : pareil pour 'PeriodeSoumissionOuverte'
+    ):
+        cohortes_gestionnaire = cohortes_gestionnaire_translator.search(matricule_gestionnaire)
+        if not cohortes_gestionnaire:
             raise PasGestionnaireParcoursException()
-
-    @classmethod
-    def verifier_cohortes_gerees(
-            cls,
-            matricule_gestionnaire: str,
-            cohortes_a_verifier: Set[str],
-            cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-    ) -> None:
-        cohortes_gerees = cohortes_gestionnaire_translator.search(matricule_gestionnaire)
-        noms_cohortes_gerees = {c.nom_cohorte for c in cohortes_gerees}
-        cohortes_non_gerees = cohortes_a_verifier - noms_cohortes_gerees
-        if cohortes_non_gerees:
-            raise PasGestionnaireParcoursCohorteException(cohortes_non_gerees)
+        return GestionnaireParcours(
+            entity_id=IdentiteGestionnaire(matricule_gestionnaire),
+            cohortes_gerees=[dto.nom_cohorte for dto in cohortes_gestionnaire],
+        )

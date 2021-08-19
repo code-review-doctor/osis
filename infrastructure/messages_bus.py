@@ -238,6 +238,7 @@ class MessageBus:
             cmd,
             NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
+            SignaletiquePersonneTranslator(),
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
             SignaletiqueEtudiantTranslator(),
@@ -273,6 +274,7 @@ class MessageBus:
             cmd,
             NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
+            SignaletiquePersonneTranslator(),  # TODO :: merger avec signaletique etudiant ?
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
             SignaletiqueEtudiantTranslator(),
@@ -284,9 +286,7 @@ class MessageBus:
             cmd,
             PeriodeEncodageNotesTranslator(),
             AdresseFeuilleDeNotesTranslator(),
-            SignaletiquePersonneTranslator(),
             InscriptionExamenTranslator(),
-            ResponsableDeNotesRepository(),
             DeliberationTranslator(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(

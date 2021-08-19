@@ -27,9 +27,7 @@ from datetime import date
 
 import attr
 
-from ddd.logic.encodage_des_notes.encodage.domain.model._note import Note, NoteBuilder
-from ddd.logic.encodage_des_notes.encodage.domain.validator.validators_by_business_action import \
-    EncoderNotesValidatorList
+from ddd.logic.encodage_des_notes.encodage.domain.model._note import Note
 from osis_common.ddd import interface
 
 Noma = str
@@ -44,21 +42,13 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
 
 
 @attr.s(slots=True)
-class NoteEtudiant(interface.RootEntity):  # FIXME :: Le nom de l'aggrégat est le même dans les 2 sous-contextes
+class NoteEtudiant(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
     email = attr.ib(type=str)
     note = attr.ib(type=Note)
     echeance_gestionnaire = attr.ib(type=date)
     nom_cohorte = attr.ib(type=str)
     note_decimale_autorisee = attr.ib(type=bool)
-
-    def encoder(self, note_encodee: str, email: str) -> None:
-        EncoderNotesValidatorList(
-            note_etudiant=self,
-            email=email,
-            note=note_encodee,
-        ).validate()
-        self.note = NoteBuilder.build(note_encodee)
 
     @property
     def noma(self):

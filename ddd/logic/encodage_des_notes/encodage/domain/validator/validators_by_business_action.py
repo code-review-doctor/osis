@@ -42,7 +42,7 @@ from ddd.logic.encodage_des_notes.encodage.domain.validator._should_verifier_not
 @attr.s(frozen=True, slots=True)
 class EncoderNotesValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
 
-    note_etudiant = attr.ib(type='NoteEtudiant')  # type: NoteEtudiant
+    note_etudiant = attr.ib(type='NoteEtudiantGestionnaire')  # type: NoteEtudiantGestionnaire
     email = attr.ib(type=str)
     note = attr.ib(type=str)
 
