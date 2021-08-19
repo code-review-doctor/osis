@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from datetime import date
 from typing import List, Set, Optional
 
@@ -43,6 +44,14 @@ class DateEcheanceDTO(interface.DTO):
     annee = attr.ib(type=int)
     quantite_notes_soumises = attr.ib(type=int)
     quantite_total_notes = attr.ib(type=int)
+
+    def to_date(self) -> date:
+        return date(day=self.jour, month=self.mois, year=self.annee)
+
+    @property
+    def est_atteinte(self) -> bool:
+        aujourdhui = datetime.date.today()
+        return aujourdhui > self.to_date()
 
     @property
     def quantite_notes_manquantes(self) -> int:
