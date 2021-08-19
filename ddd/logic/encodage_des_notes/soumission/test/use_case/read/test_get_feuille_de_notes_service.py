@@ -33,8 +33,8 @@ from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EnseignantD
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import InscriptionExamenDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
+from ddd.logic.encodage_des_notes.soumission.test.factory import NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.inscription_examen import \

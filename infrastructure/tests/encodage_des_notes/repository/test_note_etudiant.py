@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
-from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+from ddd.logic.encodage_des_notes.soumission.test.factory import NoteManquanteEtudiantFactory, \
     NoteChiffreEtudiantFactory, NoteJustificationEtudiantFactory
 from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory

@@ -30,7 +30,7 @@ from assessments.models.score_responsible import ScoreResponsible
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory, ScoreResponsibleOfClassFactory
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
-from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
+from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
     ResponsableDeNotesPourUneUniteEnseignement, \
     ResponsableDeNotesPourMultipleUniteEnseignements, ResponsableDeNotesPourClasse
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
