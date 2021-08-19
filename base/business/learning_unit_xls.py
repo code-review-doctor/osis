@@ -84,6 +84,7 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
+NB_COLUMNS_WHICH_COULD_BE_WHITENED = 29
 
 
 def learning_unit_titles_part1() -> List[str]:
@@ -542,7 +543,10 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
-                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(25)]
+                        [
+                            "{}{}".format(letter, line-1)
+                            for letter in _get_all_columns_reference(NB_COLUMNS_WHICH_COULD_BE_WHITENED)
+                        ]
                     )
                 first = False
         else:
@@ -569,7 +573,10 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                     line += 1
                     if not first_attribution:
                         cells_with_white_font.extend(
-                            ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24, 1)]
+                            [
+                                "{}{}".format(letter, line - 1)
+                                for letter in _get_all_columns_reference(NB_COLUMNS_WHICH_COULD_BE_WHITENED, 1)
+                            ]
                         )
                     first_attribution = False
             else:
