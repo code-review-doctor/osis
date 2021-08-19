@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from collections import OrderedDict
+from typing import List, Tuple, Dict
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
@@ -49,29 +50,16 @@ class EncoderNotesEnLot(interface.DomainService):
             note_etudiant_repo: 'INoteEtudiantRepository',
             periode_ouverte: 'PeriodeEncodageNotesDTO'
     ) -> List['IdentiteNoteEtudiant']:
-        identites_a_modifier = [
-            NoteEtudiantIdentityBuilder().build(
-                note_encodee.noma,
-                note_encodee.code_unite_enseignement,
-                periode_ouverte.annee_concernee,
-                periode_ouverte.session_concernee,
-            ) for note_encodee in notes_encodees
-        ]
-        anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=identites_a_modifier)
+        note_encodee_cmd_par_identite = _associer_nouvelle_note_a_son_identite(notes_encodees, periode_ouverte)
+        anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=list(note_encodee_cmd_par_identite.keys()))
+        note_etudiant_par_identite = {n.entity_id: n for n in anciennes_notes_a_modifier}
 
         exceptions = []
         notes_a_persister = list()
-        note_etudiant_par_identite = {n.entity_id: n for n in anciennes_notes_a_modifier}
 
-        for note_encodee in notes_encodees:
-            nouvelle_valeur_note = note_encodee.note
-            email_encode = note_encodee.email
-            identite = NoteEtudiantIdentityBuilder().build(
-                note_encodee.noma,
-                note_encodee.code_unite_enseignement,
-                periode_ouverte.annee_concernee,
-                periode_ouverte.session_concernee,
-            )
+        for identite, note_encodee_cmd in note_encodee_cmd_par_identite.items():
+            nouvelle_valeur_note = note_encodee_cmd.note
+            email_encode = note_encodee_cmd.email
             ancienne_note_etudiant = note_etudiant_par_identite.get(identite)
             if ancienne_note_etudiant:
                 try:
@@ -92,3 +80,19 @@ class EncoderNotesEnLot(interface.DomainService):
             raise MultipleBusinessExceptions(exceptions=exceptions)
 
         return [n.entity_id for n in notes_a_persister]
+
+
+def _associer_nouvelle_note_a_son_identite(
+        notes_encodees: List['EncoderNoteCommand'],
+        periode_ouverte: 'PeriodeEncodageNotesDTO'
+) -> Dict[IdentiteNoteEtudiant, 'EncoderNoteCommand']:
+    notes = OrderedDict()
+    for note_cmd in notes_encodees:
+        identity = NoteEtudiantIdentityBuilder().build(
+            note_cmd.noma,
+            note_cmd.code_unite_enseignement,
+            periode_ouverte.annee_concernee,
+            periode_ouverte.session_concernee,
+        )
+        notes[identity] = note_cmd
+    return notes
