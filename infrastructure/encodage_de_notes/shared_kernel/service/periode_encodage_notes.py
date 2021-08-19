@@ -28,21 +28,20 @@ import datetime
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 
 
 class PeriodeEncodageNotesTranslator(IPeriodeEncodageNotesTranslator):
 
     @classmethod
-    def get(cls) -> 'PeriodeSoumissionNotesDTO':
+    def get(cls) -> 'PeriodeEncodageNotesDTO':
         calendar = ScoresExamSubmissionCalendar()
         events = calendar.get_opened_academic_events(date=datetime.date.today())
         if events:
             event = events[0]
             date_debut = event.start_date
             date_fin = event.end_date
-            return PeriodeSoumissionNotesDTO(
+            return PeriodeEncodageNotesDTO(
                 annee_concernee=event.authorized_target_year,
                 session_concernee=event.session,
                 debut_periode_soumission=DateDTO(jour=date_debut.day, mois=date_debut.month, annee=date_debut.year),

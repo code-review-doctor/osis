@@ -31,11 +31,10 @@ import attr
 import mock
 from django.test import SimpleTestCase
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    PasResponsableDeNotesException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteChiffreEtudiantFactory, \
     NoteManquanteEtudiantFactory
 from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
@@ -107,7 +106,7 @@ class SoumettreNoteTest(SimpleTestCase):
     def test_should_empecher_si_periode_soumission_fermee(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = PeriodeSoumissionNotesDTO(
+        periode_fermee = PeriodeEncodageNotesDTO(
             annee_concernee=self.note_etudiant.annee,
             session_concernee=self.note_etudiant.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -115,14 +114,14 @@ class SoumettreNoteTest(SimpleTestCase):
         )
         self.periode_encodage_notes_translator.get = lambda *args: periode_fermee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_acune_periode_soumission_trouvee(self):
         aucune_periode_trouvee = None
         self.periode_encodage_notes_translator.get = lambda *args: aucune_periode_trouvee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_responsable_de_notes_aucune_unite_enseignement(self):

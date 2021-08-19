@@ -30,6 +30,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand
@@ -41,6 +42,7 @@ def get_feuille_de_notes(
         cmd: 'GetFeuilleDeNotesCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
+        signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         inscription_examen_translator: 'IInscriptionExamenTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
@@ -60,6 +62,7 @@ def get_feuille_de_notes(
     feuille_de_notes_dto = FeuilleDeNotesParUniteEnseignement().get(
         notes,
         responsable_notes_repo,
+        signaletique_personne_translator,
         periode_encodage,
         inscription_examen_translator,
         signaletique_etudiant_translator,

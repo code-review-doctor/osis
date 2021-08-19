@@ -31,7 +31,7 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import NoteDecimaleNonAutoriseeException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import NoteDecimaleNonAutoriseeException
 
 
 @attr.s(frozen=True, slots=True)

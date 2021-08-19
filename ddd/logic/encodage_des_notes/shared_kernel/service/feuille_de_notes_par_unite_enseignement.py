@@ -23,18 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict
+from typing import List, Dict, Optional
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import FeuilleDeNotesDTO, NoteEtudiantDTO, EnseignantDTO, \
+    PeriodeEncodageNotesDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_inscription_examen import IInscriptionExamenTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import Noma, NoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, InscriptionExamenDTO, \
-    DesinscriptionExamenDTO, PeriodeSoumissionNotesDTO
+    DesinscriptionExamenDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -45,7 +47,8 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
     def get(
             notes: List['NoteEtudiant'],
             responsable_notes_repo: 'IResponsableDeNotesRepository',
-            periode_encodage: 'PeriodeSoumissionNotesDTO',
+            signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
+            periode_encodage: 'PeriodeEncodageNotesDTO',
             inscription_examen_translator: 'IInscriptionExamenTranslator',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             attribution_translator: 'IAttributionEnseignantTranslator',
@@ -56,16 +59,16 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
         numero_session = notes[0].numero_session
 
         unite_enseignement = unite_enseignement_translator.get(code_unite_enseignement, annee)
-        responsable_notes = _get_responsable_de_notes(
-            code_unite_enseignement,
-            annee,
-            responsable_notes_repo,
-        )
+        resp_notes = responsable_notes_repo.get_for_unite_enseignement(code_unite_enseignement, annee)
+        responsable_notes_dto = None
+        if resp_notes:
+            responsable_notes_dto = responsable_notes_repo.get_detail_enseignant(resp_notes.entity_id)
+
         autres_enseignants = _get_autres_enseignants(
             attribution_translator,
             code_unite_enseignement,
             annee,
-            responsable_notes
+            responsable_notes_dto
         )
 
         nomas_concernes = [note.noma for note in notes]
@@ -106,15 +109,20 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
                     desinscrit_tardivement=bool(desinscription),
                 )
             )
+
         notes_etudiants.sort(key=lambda note: (note.nom_cohorte, note.nom, note.prenom))
+
+        contact_responsable_notes = None
+        if resp_notes:
+            signaletiques_personnes = signaletique_personne_translator.search({resp_notes.matricule_fgs_enseignant})
+            contact_responsable_notes = list(signaletiques_personnes)[0]
+
         return FeuilleDeNotesDTO(
             code_unite_enseignement=code_unite_enseignement,
             intitule_complet_unite_enseignement=unite_enseignement.intitule_complet,
             note_decimale_est_autorisee=notes[0].note_decimale_est_autorisee(),
-            responsable_note=EnseignantDTO(
-                nom=responsable_notes.nom,
-                prenom=responsable_notes.prenom,
-            ),
+            responsable_note=responsable_notes_dto,
+            contact_responsable_notes=contact_responsable_notes,  # TODO :: merger responsable_note et contact_responsable note ?
             autres_enseignants=autres_enseignants,
             annee_academique=annee,
             numero_session=numero_session,
@@ -162,20 +170,13 @@ def _get_autres_enseignants(
         attribution_translator: 'IAttributionEnseignantTranslator',
         code_unite_enseignement: str,
         annee: int,
-        responsable_notes: 'EnseignantDTO'
+        responsable_notes: Optional['EnseignantDTO']
 ) -> List[EnseignantDTO]:
     enseignants = attribution_translator.search_attributions_enseignant(code_unite_enseignement, annee)
     return [
         EnseignantDTO(nom=enseignant.nom, prenom=enseignant.prenom)
         for enseignant in sorted(enseignants, key=lambda ens: (ens.nom, ens.prenom))
-        if enseignant.nom != responsable_notes.nom and enseignant.prenom != responsable_notes.prenom
+        if not responsable_notes or (
+                enseignant.nom != responsable_notes.nom and enseignant.prenom != responsable_notes.prenom
+        )
     ]
-
-
-def _get_responsable_de_notes(
-        code_unite_enseignement: str,
-        annee: int,
-        responsable_notes_repo: 'IResponsableDeNotesRepository'
-) -> EnseignantDTO:
-    resp_notes = responsable_notes_repo.get_for_unite_enseignement(code_unite_enseignement, annee)
-    return responsable_notes_repo.get_detail_enseignant(resp_notes.entity_id)

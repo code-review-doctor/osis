@@ -33,6 +33,20 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
+class AdresseDTO(interface.DTO):
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    rue_numero_boite = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DetailContactDTO(interface.DTO):
+    matricule_fgs = attr.ib(type=str)
+    email = attr.ib(type=str)
+    adresse_professionnelle = attr.ib(type=Optional[AdresseDTO])
+
+
+@attr.s(frozen=True, slots=True)
 class EnseignantDTO(interface.DTO):
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
@@ -90,6 +104,7 @@ class FeuilleDeNotesDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
     responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?
+    contact_responsable_notes = attr.ib(type=DetailContactDTO)
     autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)
@@ -115,3 +130,11 @@ class FeuilleDeNotesDTO(interface.DTO):
     @property
     def nombre_inscriptions(self) -> int:
         return self.quantite_total_notes
+
+
+@attr.s(frozen=True, slots=True)
+class PeriodeEncodageNotesDTO(interface.DTO):
+    annee_concernee = attr.ib(type=int)
+    session_concernee = attr.ib(type=int)
+    debut_periode_soumission = attr.ib(type=DateDTO)
+    fin_periode_soumission = attr.ib(type=DateDTO)

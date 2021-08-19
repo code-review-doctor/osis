@@ -53,9 +53,10 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
+from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
@@ -112,6 +113,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
     PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
+from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
+    NoteEtudiantGestionnaireRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesTranslator
@@ -235,6 +238,7 @@ class MessageBus:
             cmd,
             NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
+            SignaletiquePersonneTranslator(),
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
             SignaletiqueEtudiantTranslator(),
@@ -270,6 +274,7 @@ class MessageBus:
             cmd,
             NoteEtudiantRepository(),
             ResponsableDeNotesRepository(),
+            SignaletiquePersonneTranslator(),  # TODO :: merger avec signaletique etudiant ?
             PeriodeEncodageNotesTranslator(),
             InscriptionExamenTranslator(),
             SignaletiqueEtudiantTranslator(),
@@ -281,10 +286,14 @@ class MessageBus:
             cmd,
             PeriodeEncodageNotesTranslator(),
             AdresseFeuilleDeNotesTranslator(),
-            SignaletiquePersonneTranslator(),
             InscriptionExamenTranslator(),
-            ResponsableDeNotesRepository(),
             DeliberationTranslator(),
+        ),
+        EncoderNotesCommand: lambda cmd: encoder_notes(
+            cmd,
+            NoteEtudiantGestionnaireRepository(),
+            PeriodeEncodageNotesTranslator(),
+            CohortesDuGestionnaireTranslator(),
         ),
 
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

@@ -27,7 +27,7 @@ import datetime
 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from osis_common.ddd import interface
 
 
@@ -40,7 +40,7 @@ class PeriodeEncodageOuverte(interface.DomainService):
     ) -> None:
         periode = periode_soumission_note_translator.get()
         if not periode:
-            raise PeriodeSoumissionNotesFermeeException()
+            raise PeriodeEncodageNotesFermeeException()
 
         aujourdhui = datetime.date.today()
         debut_periode = periode.debut_periode_soumission.to_date()
@@ -48,4 +48,4 @@ class PeriodeEncodageOuverte(interface.DomainService):
         periode_est_ouverte = debut_periode <= aujourdhui <= fin_periode
 
         if not periode_est_ouverte:
-            raise PeriodeSoumissionNotesFermeeException()
+            raise PeriodeEncodageNotesFermeeException()

@@ -23,37 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import List, Optional
+from typing import Set
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import FeuilleDeNotes, IdentiteFeuilleDeNotes
+import attr
+
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursCohorteException
 from osis_common.ddd import interface
-from osis_common.ddd.interface import ApplicationService
+
+Noma = str
 
 
-class IFeuilleDeNotesRepository(interface.AbstractRepository):
+@attr.s(frozen=True, slots=True)
+class IdentiteGestionnaire(interface.EntityIdentity):
+    matricule_fgs_gestionnaire = attr.ib(type=str)
 
-    @classmethod
-    @abc.abstractmethod
-    def search(cls, entity_ids: Optional[List['IdentiteFeuilleDeNotes']] = None, **kwargs) -> List['FeuilleDeNotes']:
-        pass
 
-    @classmethod
-    @abc.abstractmethod
-    def delete(cls, entity_id: 'IdentiteFeuilleDeNotes', **kwargs: ApplicationService) -> None:
-        pass
+@attr.s(slots=True)
+class GestionnaireParcours(interface.RootEntity):
+    entity_id = attr.ib(type=IdentiteGestionnaire)
+    cohortes_gerees = attr.ib(type=Set[str])
 
-    @classmethod
-    @abc.abstractmethod
-    def save(cls, entity: 'FeuilleDeNotes') -> None:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_all_identities(cls) -> List['IdentiteFeuilleDeNotes']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, entity_id: 'IdentiteFeuilleDeNotes') -> 'FeuilleDeNotes':
-        pass
+    def verifier_gere_cohorte(self, nom_cohorte) -> None:
+        if nom_cohorte not in self.cohortes_gerees:
+            raise PasGestionnaireParcoursCohorteException(nom_cohorte)

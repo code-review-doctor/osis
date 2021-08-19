@@ -26,7 +26,6 @@
 from typing import Union
 
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
 from osis_common.ddd.interface import EntityIdentityBuilder
@@ -52,17 +51,4 @@ class NoteEtudiantIdentityBuilder(EntityIdentityBuilder):
             code_unite_enseignement=dto_object.code_unite_enseignement,
             annee_academique=dto_object.annee_academique,
             noma=dto_object.noma
-        )
-
-    @classmethod
-    def build_from_session_and_unit_enseignement_datas(
-            cls,
-            numero_session: int,
-            code_unite_enseignement: str,
-            annee_academique: int
-    ) -> IdentiteFeuilleDeNotes:
-        return IdentiteFeuilleDeNotes(
-            numero_session=numero_session,
-            code_unite_enseignement=code_unite_enseignement,
-            annee_academique=annee_academique
         )

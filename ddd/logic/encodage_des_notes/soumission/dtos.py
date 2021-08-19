@@ -81,22 +81,8 @@ class ProgressionGeneraleEncodageNotesDTO(interface.DTO):
 
 
 @attr.s(frozen=True, slots=True)
-class AdresseDTO(interface.DTO):
-    code_postal = attr.ib(type=str)
-    ville = attr.ib(type=str)
-    rue_numero_boite = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class DetailContactDTO(interface.DTO):
-    matricule_fgs = attr.ib(type=str)
-    email = attr.ib(type=str)
-    adresse_professionnelle = attr.ib(type=Optional[AdresseDTO])
-
-
-@attr.s(frozen=True, slots=True)
 class AdresseFeuilleDeNotesDTO(interface.DTO):
-    nom_cohorte = attr.ib(type=str, converter=none2emptystr)
+    nom_cohorte = attr.ib(type=str)
     destinataire = attr.ib(type=str, converter=none2emptystr)
     rue_et_numero = attr.ib(type=str, converter=none2emptystr)
     code_postal = attr.ib(type=str, converter=none2emptystr)
@@ -112,7 +98,6 @@ class DonneesAdministrativesFeuilleDeNotesDTO(interface.DTO):
     sigle_formation = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     date_deliberation = attr.ib(type=DateDTO)
-    contact_responsable_notes = attr.ib(type=DetailContactDTO)  # FIXME :: déplacer dans FeuilleDeNotesEnseignantDTO ?
     contact_feuille_de_notes = attr.ib(type=AdresseFeuilleDeNotesDTO)
 
 
@@ -123,14 +108,6 @@ class AttributionEnseignantDTO(interface.DTO):
     annee = attr.ib(type=int)
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class PeriodeSoumissionNotesDTO(interface.DTO):
-    annee_concernee = attr.ib(type=int)
-    session_concernee = attr.ib(type=int)
-    debut_periode_soumission = attr.ib(type=DateDTO)
-    fin_periode_soumission = attr.ib(type=DateDTO)
 
 
 @attr.s(frozen=True, slots=True)
