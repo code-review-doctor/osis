@@ -28,7 +28,8 @@ from typing import Set
 from django.db.models import F
 
 from attribution.models.attribution_new import AttributionNew
-from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand, \
+    SearchAttributionsToLearningUnitCommand
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
@@ -60,40 +61,21 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
 def _search_attributions_unite_enseignement(
         code_unite_enseignement: str = None,
         annee: int = None,
-        matricule_enseignant: str = None,
 ) -> Set['AttributionEnseignantDTO']:
-    qs = AttributionNew.objects
-    if code_unite_enseignement:
-        qs = qs.filter(
-            learning_container_year__academic_year__year=annee,
-            learning_container_year__acronym=code_unite_enseignement,
-        )
-    if matricule_enseignant:
-        qs = qs.filter(
-            tutor__person__global_id=matricule_enseignant,
-        )
-    qs = qs.annotate(
-        matricule_fgs_enseignant=F('tutor__person__global_id'),
-        code_unite_enseignement=F('learning_container_year__acronym'),
-        nom=F('tutor__person__last_name'),
-        prenom=F('tutor__person__first_name'),
-        annee=F('learning_container_year__academic_year__year'),
-    ).values(
-        'matricule_fgs_enseignant',
-        'code_unite_enseignement',
-        'annee',
-        'nom',
-        'prenom',
-    ).distinct()
+    cmd = SearchAttributionsToLearningUnitCommand(
+        learning_unit_code=code_unite_enseignement,
+        learning_unit_year=annee,
+    )
+    from infrastructure.messages_bus import message_bus_instance
+    dtos = message_bus_instance.invoke(cmd)
     return {
         AttributionEnseignantDTO(
-            matricule_fgs_enseignant=attribution_as_dict['matricule_fgs_enseignant'],
-            code_unite_enseignement=attribution_as_dict['code_unite_enseignement'],
-            annee=attribution_as_dict['annee'],
-            prenom=attribution_as_dict['prenom'],
-            nom=attribution_as_dict['nom'],
-        )
-        for attribution_as_dict in qs
+            matricule_fgs_enseignant=dto.personal_id_number,
+            code_unite_enseignement=dto.learning_unit_code,
+            annee=dto.learning_unit_year,
+            nom=dto.last_name,
+            prenom=dto.first_name,
+        ) for dto in dtos
     }
 
 

@@ -33,7 +33,7 @@ from ddd.logic.effective_class_repartition.commands import SearchClassesEnseigna
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
     _ClassVolumeRepartitionFactory
 from infrastructure.effective_class_repartition.domain.service.in_memory.tutor_attribution import \
-    ITutorAttributionToLearningUnitTranslatorInMemory
+    TutorAttributionToLearningUnitTranslatorInMemory
 from infrastructure.effective_class_repartition.repository.in_memory.tutor import TutorRepository as \
     TutorRepositoryInMemory
 from infrastructure.messages_bus import message_bus_instance
@@ -49,7 +49,7 @@ class SearchClassesEnseignantTest(SimpleTestCase):
 
         self.cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant=self.matricule_enseignant)
 
-        self.attributions_translator = ITutorAttributionToLearningUnitTranslatorInMemory()
+        self.attributions_translator = TutorAttributionToLearningUnitTranslatorInMemory()
         self.tutor_repository = TutorRepositoryInMemory()
         self.tutor = TutorWithDistributedEffectiveClassesFactory(
             entity_id__personal_id_number=self.matricule_enseignant,

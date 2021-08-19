@@ -33,7 +33,7 @@ from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearnin
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
 
 
-class ITutorAttributionToLearningUnitTranslatorInMemory(ITutorAttributionToLearningUnitTranslator):
+class TutorAttributionToLearningUnitTranslatorInMemory(ITutorAttributionToLearningUnitTranslator):
 
     attributions = [
         TutorAttributionToLearningUnitDTO(
@@ -76,6 +76,10 @@ class ITutorAttributionToLearningUnitTranslatorInMemory(ITutorAttributionToLearn
     def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
         return next(att for att in cls.attributions if att.attribution_uuid == attribution_uuid)
 
+    @classmethod
+    def get_by_enseignant(cls, matricule_fgs_enseignant: str) -> List['TutorAttributionToLearningUnitDTO']:
+        return [att for att in cls.attributions if att.personal_id_number == matricule_fgs_enseignant]
+
 
 def _filter(dto, learning_unit_identity):
-    return dto.learning_unit_code == learning_unit_identity.code and dto.learning_unit_year == learning_unit_identity.academic_year,
+    return dto.learning_unit_code == learning_unit_identity.code and dto.learning_unit_year == learning_unit_identity.academic_year.year

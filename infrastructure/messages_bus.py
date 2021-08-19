@@ -42,8 +42,11 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, SearchClassesEnseignantCommand
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, SearchClassesEnseignantCommand, \
+    SearchAttributionsEnseignantCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.search_attributions_enseignant_service import \
+    search_attributions_enseignant
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
 from ddd.logic.effective_class_repartition.use_case.read.search_classes_enseignant_service import \
@@ -164,6 +167,10 @@ class MessageBus:
         SearchUclouvainCampusesCommand: lambda cmd: search_uclouvain_campuses(cmd, UclouvainCampusRepository()),
         GetEffectiveClassCommand: lambda cmd: get_effective_class(cmd, EffectiveClassRepository()),
         SearchAttributionsToLearningUnitCommand: lambda cmd: search_attributions_to_learning_unit(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+        ),
+        SearchAttributionsEnseignantCommand: lambda cmd: search_attributions_enseignant(
             cmd,
             TutorAttributionToLearningUnitTranslator(),
         ),

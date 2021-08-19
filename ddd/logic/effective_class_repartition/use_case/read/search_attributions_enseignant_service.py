@@ -23,29 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List
 
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsEnseignantCommand
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
 
 
-class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_to_learning_unit(
-            cls,
-            learning_unit_identity: 'LearningUnitIdentity',
-    ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_by_enseignant(cls, matricule_fgs_enseignant: str) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
+# FIXME :: should be moved in another context "attribution_to_learning_unit"
+def search_attributions_enseignant(
+        cmd: SearchAttributionsEnseignantCommand,
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
+) -> List['TutorAttributionToLearningUnitDTO']:
+    return tutor_attribution_translator.get_by_enseignant(cmd.matricule_fgs_enseignant)
