@@ -60,11 +60,3 @@ class INoteEtudiantRepository(interface.AbstractRepository):
     @abc.abstractmethod
     def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
         pass
-
-    @classmethod
-    @abc.abstractmethod
-    def search_by_code_unite_enseignement_annee_session(
-            cls,
-            criterias: List[SearchCriteria]
-    ) -> List['NoteEtudiant']:
-        pass
