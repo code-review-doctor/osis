@@ -28,6 +28,7 @@ from django.test import TestCase
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
+from education_group.models.enums.cohort_name import CohortName
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireTranslator
 
@@ -59,4 +60,30 @@ class CohorteDuGestionnaireTest(TestCase):
         self.assertSetEqual(expected_result, result)
 
     def test_should_renvoyer_cohorte_11BA(self):
-        raise NotImplementedError  # TODO
+        ProgramManagerFactory(
+            person__global_id=self.matricule_gestionnaire,
+            education_group=self.education_group_droi1ba,
+            cohort=CohortName.FIRST_YEAR.name,
+        )
+        result = self.translator.search(self.matricule_gestionnaire)
+        expected_result = {
+            CohorteGestionnaireDTO(nom_cohorte='DROI11BA', matricule_gestionnaire=self.matricule_gestionnaire),
+        }
+        self.assertSetEqual(expected_result, result)
+
+    def test_should_renvoyer_cohorte_11BA_et_1BA(self):
+        pm = ProgramManagerFactory(
+            person__global_id=self.matricule_gestionnaire,
+            education_group=self.education_group_droi1ba,
+        )
+        ProgramManagerFactory(
+            person=pm.person,
+            education_group=pm.education_group,
+            cohort=CohortName.FIRST_YEAR.name,
+        )
+        result = self.translator.search(self.matricule_gestionnaire)
+        expected_result = {
+            CohorteGestionnaireDTO(nom_cohorte='DROI11BA', matricule_gestionnaire=self.matricule_gestionnaire),
+            CohorteGestionnaireDTO(nom_cohorte='DROI1BA', matricule_gestionnaire=self.matricule_gestionnaire),
+        }
+        self.assertSetEqual(expected_result, result)
