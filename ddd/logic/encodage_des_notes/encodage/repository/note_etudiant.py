@@ -24,11 +24,14 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
+
+
+SearchCriteria = Tuple[str, int, int]
 
 
 class INoteEtudiantRepository(interface.AbstractRepository):
@@ -56,4 +59,12 @@ class INoteEtudiantRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_by_code_unite_enseignement_annee_session(
+            cls,
+            criterias: List[SearchCriteria]
+    ) -> List['NoteEtudiant']:
         pass

@@ -41,7 +41,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
     EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException
 from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, AttributionEnseignantDTO
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
-from ddd.logic.encodage_des_notes.soumission.test.factory import NoteManquanteEtudiantFactory, \
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees, NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory

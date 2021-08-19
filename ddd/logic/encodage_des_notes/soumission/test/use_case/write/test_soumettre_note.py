@@ -34,8 +34,8 @@ from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEnco
 from ddd.logic.encodage_des_notes.soumission.commands import SoumettreNoteCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
-from ddd.logic.encodage_des_notes.soumission.test.factory import NoteChiffreEtudiantFactory, \
-    NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+    NoteChiffreEtudiantFactory
 from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
     ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \

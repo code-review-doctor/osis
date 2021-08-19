@@ -29,8 +29,8 @@ from django.test import SimpleTestCase
 
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import SignaletiqueEtudiantDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.soumission.test.factory import NoteDejaSoumise
-from ddd.logic.encodage_des_notes.soumission.test.factory import NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+    NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.periode_encodage_notes import \
