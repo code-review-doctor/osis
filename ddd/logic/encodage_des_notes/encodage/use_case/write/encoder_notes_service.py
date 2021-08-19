@@ -26,11 +26,11 @@
 from collections import OrderedDict
 from typing import List, Tuple, Dict
 
+from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
 from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
-from ddd.logic.encodage_des_notes.encodage.domain.service.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
@@ -48,34 +48,13 @@ def encoder_notes(
 ) -> List['IdentiteNoteEtudiant']:
     # Given
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
-    GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
-    periode_ouverte = periode_encodage_note_translator.get()
-    note_par_identite = __associer_nouvelle_note_a_son_identite(cmd, periode_ouverte)
-    identites_notes_a_modifier = list(note_par_identite.keys())
-    notes_a_modifier = note_etudiant_repo.search(entity_ids=identites_notes_a_modifier)
-    GestionnaireParcours().verifier_cohortes_gerees(
+    gestionnaire_parcours = GestionnaireParcoursBuilder().get(
         matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
-        cohortes_a_verifier={note.nom_cohorte for note in notes_a_modifier},
         cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
     )
+    periode_ouverte = periode_encodage_note_translator.get()
 
     # WHEN
-    EncoderNotesEnLot().execute(notes_a_modifier, note_par_identite, note_etudiant_repo)
+    notes = EncoderNotesEnLot().execute(cmd.notes_encodees, gestionnaire_parcours, note_etudiant_repo, periode_ouverte)
 
-    return identites_notes_a_modifier
-
-
-def __associer_nouvelle_note_a_son_identite(
-        cmd: 'EncoderNotesCommand',
-        periode_ouverte,
-) -> Dict[IdentiteNoteEtudiant, Tuple[NouvelleNote, EmailEtudiant]]:
-    notes = OrderedDict()
-    for note_cmd in cmd.notes_encodees:
-        identity = NoteEtudiantIdentityBuilder().build(
-            note_cmd.noma,
-            note_cmd.code_unite_enseignement,
-            periode_ouverte.annee_concernee,
-            periode_ouverte.session_concernee,
-        )
-        notes[identity] = (note_cmd.note, note_cmd.email)
     return notes

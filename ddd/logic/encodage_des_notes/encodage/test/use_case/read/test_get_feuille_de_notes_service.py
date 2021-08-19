@@ -73,7 +73,7 @@ class GetFeuilleDeNotesGestionnaireTest(SimpleTestCase):
         self.note = NoteManquanteEtudiantFactory(entity_id__noma=self.noma)
         self.repository = NoteEtudiantInMemoryRepository()
         self.repository.entities.clear()
-        self.repository.save(self.note)
+        self.repository.save(self.note)  # Renommer FeuilleDeNotesDTO en FeuilleDeNotesUniteEnseignementDTO
 
         self.resp_notes_repository = ResponsableDeNotesInMemoryRepository()
         self.responsable_notes = ResponsableDeNotesLDROI1001Annee2020Factory(

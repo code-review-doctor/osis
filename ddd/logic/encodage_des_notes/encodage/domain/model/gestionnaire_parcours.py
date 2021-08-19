@@ -23,45 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
+from typing import Set
 
 import attr
 
-from ddd.logic.encodage_des_notes.encodage.domain.model._note import Note
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursCohorteException
 from osis_common.ddd import interface
 
 Noma = str
 
 
 @attr.s(frozen=True, slots=True)
-class IdentiteNoteEtudiant(interface.EntityIdentity):
-    noma = attr.ib(type=Noma)
-    code_unite_enseignement = attr.ib(type=str)
-    annee_academique = attr.ib(type=int)
-    numero_session = attr.ib(type=int)
+class IdentiteGestionnaire(interface.EntityIdentity):
+    matricule_fgs_gestionnaire = attr.ib(type=str)
 
 
 @attr.s(slots=True)
-class NoteEtudiant(interface.RootEntity):
-    entity_id = attr.ib(type=IdentiteNoteEtudiant)
-    email = attr.ib(type=str)
-    note = attr.ib(type=Note)
-    echeance_gestionnaire = attr.ib(type=date)
-    nom_cohorte = attr.ib(type=str)
-    note_decimale_autorisee = attr.ib(type=bool)
+class GestionnaireParcours(interface.RootEntity):
+    entity_id = attr.ib(type=IdentiteGestionnaire)
+    cohortes_gerees = attr.ib(type=Set[str])
 
-    @property
-    def noma(self):
-        return self.entity_id.noma
-
-    @property
-    def code_unite_enseignement(self):
-        return self.entity_id.code_unite_enseignement
-
-    @property
-    def annee_academique(self):
-        return self.entity_id.annee_academique
-
-    @property
-    def numero_session(self):
-        return self.entity_id.numero_session
+    def verifier_gere_cohorte(self, nom_cohorte) -> None:
+        if nom_cohorte not in self.cohortes_gerees:
+            raise PasGestionnaireParcoursCohorteException(nom_cohorte)

@@ -23,11 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Dict, Tuple
+from typing import List
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
-from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
+from ddd.logic.encodage_des_notes.encodage.builder.note_etudiant_builder import NoteEtudiantBuilder
+from ddd.logic.encodage_des_notes.encodage.commands import EncoderNoteCommand
+from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 from osis_common.ddd import interface
 
 NouvelleNote = str
@@ -39,20 +44,44 @@ class EncoderNotesEnLot(interface.DomainService):
     @classmethod
     def execute(
             cls,
-            notes_a_modifier: List['NoteEtudiant'],
-            note_par_identite: Dict[IdentiteNoteEtudiant, Tuple[NouvelleNote, EmailEtudiant]],
-            note_etudiant_repo: 'INoteEtudiantRepository'
-    ) -> None:
+            notes_encodees: List['EncoderNoteCommand'],
+            gestionnaire_parcours: 'GestionnaireParcours',
+            note_etudiant_repo: 'INoteEtudiantRepository',
+            periode_ouverte: 'PeriodeEncodageNotesDTO'
+    ) -> List['IdentiteNoteEtudiant']:
+        identites_a_modifier = [
+            NoteEtudiantIdentityBuilder().build(
+                note_encodee.noma,
+                note_encodee.code_unite_enseignement,
+                periode_ouverte.annee_concernee,
+                periode_ouverte.session_concernee,
+            ) for note_encodee in notes_encodees
+        ]
+        anciennes_notes_a_modifier = note_etudiant_repo.search(entity_ids=identites_a_modifier)
+
         exceptions = []
         notes_a_persister = list()
-        note_etudiant_par_identite = {n.entity_id: n for n in notes_a_modifier}
-        for identite, t in note_par_identite.items():
-            note_encodee, email_encode = t
-            note_etudiant = note_etudiant_par_identite.get(identite)
-            if note_etudiant:
+        note_etudiant_par_identite = {n.entity_id: n for n in anciennes_notes_a_modifier}
+
+        for note_encodee in notes_encodees:
+            nouvelle_valeur_note = note_encodee.note
+            email_encode = note_encodee.email
+            identite = NoteEtudiantIdentityBuilder().build(
+                note_encodee.noma,
+                note_encodee.code_unite_enseignement,
+                periode_ouverte.annee_concernee,
+                periode_ouverte.session_concernee,
+            )
+            ancienne_note_etudiant = note_etudiant_par_identite.get(identite)
+            if ancienne_note_etudiant:
                 try:
-                    note_etudiant.encoder(note_encodee, email_encode)
-                    notes_a_persister.append(note_etudiant)
+                    gestionnaire_parcours.verifier_gere_cohorte(ancienne_note_etudiant.nom_cohorte)
+                    nouvelle_note = NoteEtudiantBuilder().build_from_ancienne_note(
+                        ancienne_note=ancienne_note_etudiant,
+                        email_encode=email_encode,
+                        nouvelle_note=nouvelle_valeur_note,
+                    )
+                    notes_a_persister.append(nouvelle_note)
                 except MultipleBusinessExceptions as e:
                     exceptions += list(e.exceptions)
 
@@ -61,3 +90,5 @@ class EncoderNotesEnLot(interface.DomainService):
 
         if exceptions:
             raise MultipleBusinessExceptions(exceptions=exceptions)
+
+        return [n.entity_id for n in notes_a_persister]
