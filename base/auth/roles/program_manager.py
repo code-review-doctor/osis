@@ -42,6 +42,7 @@ from base.models.learning_unit_enrollment import LearningUnitEnrollment
 from education_group.auth.predicates import is_education_group_extended_daily_management_calendar_open
 from education_group.contrib.admin import EducationGroupRoleModelAdmin
 from education_group.contrib.models import EducationGroupRoleModel
+from education_group.models.enums.cohort_name import CohortName
 from osis_role.contrib import predicates as osis_role_predicates
 
 
@@ -57,6 +58,12 @@ class ProgramManager(EducationGroupRoleModel):
     person = models.ForeignKey('Person', on_delete=models.PROTECT, verbose_name=gettext_lazy("person"))
     education_group = models.ForeignKey(EducationGroup, on_delete=models.CASCADE)
     is_main = models.BooleanField(default=False, verbose_name=gettext_lazy('Main'))
+    cohort = models.CharField(
+        null=True,
+        max_length=25,
+        choices=CohortName.choices(),
+        verbose_name=_('Name'),
+    )
 
     @property
     def name(self):
@@ -73,7 +80,7 @@ class ProgramManager(EducationGroupRoleModel):
         verbose_name = _("Program manager")
         verbose_name_plural = _("Program managers")
         group_name = "program_managers"
-        unique_together = ('person', 'education_group',)
+        unique_together = ('person', 'education_group', 'cohort')
 
     @classmethod
     def rule_set(cls):
