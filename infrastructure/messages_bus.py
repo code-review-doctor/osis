@@ -42,10 +42,12 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, SearchClassesEnseignantCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
+from ddd.logic.effective_class_repartition.use_case.read.search_classes_enseignant_service import \
+    search_classes_enseignant
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
@@ -188,6 +190,11 @@ class MessageBus:
             cmd, EffectiveClassRepository(), LearningUnitRepository()
         ),
         SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
+        ),
+        SearchClassesEnseignantCommand: lambda cmd: search_classes_enseignant(
             cmd,
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),

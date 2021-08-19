@@ -23,24 +23,47 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List
 
+from attribution.models.enums.function import Functions
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
 
 
-class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
+class ITutorAttributionToLearningUnitTranslatorInMemory(ITutorAttributionToLearningUnitTranslator):
+
+    attributions = [
+        TutorAttributionToLearningUnitDTO(
+            learning_unit_code='LDROI1001',
+            learning_unit_year=2020,
+            attribution_uuid='4587-1988-4a83-a5bf-58a4511471a1',
+            last_name='Smith',
+            first_name='Charles',
+            personal_id_number='00321234',
+            function=Functions.COORDINATOR.name,
+            lecturing_volume_attributed=10.0,
+            practical_volume_attributed=15.0,
+        ),
+    ]
+
     @classmethod
-    @abc.abstractmethod
     def search_attributions_to_learning_unit(
             cls,
             learning_unit_identity: 'LearningUnitIdentity',
     ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
+        return list(
+            filter(
+                lambda dto: _filter(dto, learning_unit_identity),
+                cls.attributions
+            )
+        )
 
     @classmethod
-    @abc.abstractmethod
     def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
-        pass
+        return next(att for att in cls.attributions if att.attribution_uuid == attribution_uuid)
+
+
+def _filter(dto, learning_unit_identity):
+    return dto.learning_unit_code == learning_unit_identity.code and dto.learning_unit_year == learning_unit_identity.academic_year,

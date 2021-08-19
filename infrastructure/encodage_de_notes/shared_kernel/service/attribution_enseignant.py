@@ -25,11 +25,10 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F, CharField
-from django.db.models.functions import Concat
+from django.db.models import F
 
-from attribution.models.attribution_class import AttributionClass
 from attribution.models.attribution_new import AttributionNew
+from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
@@ -101,44 +100,22 @@ def _search_attributions_unite_enseignement(
 def _search_repartition_classes(
         code_unite_enseignement: str = None,
         annee: int = None,
-        matricule_enseignant: str = None,
 ) -> Set['AttributionEnseignantDTO']:
-    # TODO :: réutiliser message_bus et domaine "effective_class_repartition"
-    qs = AttributionClass.objects
-
-    if code_unite_enseignement:
-        qs = qs.filter(
-            learning_class_year__learning_component_year__learning_unit_year__acronym=code_unite_enseignement,
-            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=annee,
-        )
-
-    if matricule_enseignant:
-        qs = qs.filter(attribution_charge__attribution__tutor__person__global_id=matricule_enseignant)
-
-    qs = qs.annotate(
-        matricule_fgs_enseignant=F('attribution_charge__attribution__tutor__person__global_id'),
-        code_unite_enseignement=Concat(
-            'learning_class_year__learning_component_year__learning_unit_year__acronym',
-            'learning_class_year__acronym',
-            output_field=CharField()
-        ),
-        annee=F('learning_class_year__learning_component_year__learning_unit_year__academic_year__year'),
-        nom=F('attribution_charge__attribution__tutor__person__last_name'),
-        prenom=F('attribution_charge__attribution__tutor__person__first_name'),
-    ).values(
-        'matricule_fgs_enseignant',
-        'code_unite_enseignement',
-        'annee',
-        'nom',
-        'prenom',
-    ).distinct()
-
+    code_unite_enseignement = code_unite_enseignement[:-1]
+    code_classe = code_unite_enseignement[-1]
+    cmd = SearchTutorsDistributedToClassCommand(
+        learning_unit_code=code_unite_enseignement,
+        learning_unit_year=annee,
+        class_code=code_classe,
+    )
+    from infrastructure.messages_bus import message_bus_instance
+    dtos = message_bus_instance.invoke(cmd)
     return {
         AttributionEnseignantDTO(
-            matricule_fgs_enseignant=class_repartition_as_dict['matricule_fgs_enseignant'],
-            code_unite_enseignement=class_repartition_as_dict['code_unite_enseignement'],
-            annee=class_repartition_as_dict['annee'],
-            prenom=class_repartition_as_dict['prenom'],
-            nom=class_repartition_as_dict['nom'],
-        ) for class_repartition_as_dict in qs
+            matricule_fgs_enseignant=dto.personal_id_number,
+            code_unite_enseignement=dto.complete_class_code,
+            annee=dto.annee,
+            nom=dto.last_name,
+            prenom=dto.first_name,
+        ) for dto in dtos
     }

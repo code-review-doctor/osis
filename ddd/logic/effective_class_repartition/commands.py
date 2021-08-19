@@ -44,6 +44,11 @@ class SearchTutorsDistributedToClassCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
+class SearchClassesEnseignantCommand(interface.CommandRequest):
+    matricule_fgs_enseignant = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
 class DistributeClassToTutorCommand(interface.CommandRequest):
     tutor_personal_id_number = attr.ib(type=str)
     learning_unit_attribution_uuid = attr.ib(type=str)

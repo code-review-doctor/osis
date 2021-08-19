@@ -23,24 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 from typing import List
 
-from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
-from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
+from ddd.logic.effective_class_repartition.commands import SearchClassesEnseignantCommand
+from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import \
+    ClassDistributionWithAttribution
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 
 
-class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
-    @classmethod
-    @abc.abstractmethod
-    def search_attributions_to_learning_unit(
-            cls,
-            learning_unit_identity: 'LearningUnitIdentity',
-    ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
-
-    @classmethod
-    @abc.abstractmethod
-    def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
-        pass
+def search_classes_enseignant(
+        cmd: 'SearchClassesEnseignantCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository'
+) -> List['TutorClassRepartitionDTO']:
+    return ClassDistributionWithAttribution().search_by_matricule_enseignant(
+        cmd.matricule_fgs_enseignant,
+        tutor_attribution_translator,
+        tutor_repository
+    )
