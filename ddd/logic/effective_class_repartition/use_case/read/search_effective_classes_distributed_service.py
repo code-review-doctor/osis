@@ -35,7 +35,6 @@ from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepos
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
 
 
-# TODO :: unit test
 def search_tutors_distributed_to_class(
         cmd: 'SearchTutorsDistributedToClassCommand',
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',

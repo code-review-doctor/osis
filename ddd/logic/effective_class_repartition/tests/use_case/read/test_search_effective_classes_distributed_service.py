@@ -26,10 +26,11 @@
 import datetime
 from unittest import mock
 
+import attr
 from django.test import SimpleTestCase
 
 from attribution.models.enums.function import Functions
-from ddd.logic.effective_class_repartition.commands import SearchClassesEnseignantCommand
+from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
 from ddd.logic.effective_class_repartition.tests.factory.tutor import TutorWithDistributedEffectiveClassesFactory, \
     _ClassVolumeRepartitionFactory
 from infrastructure.effective_class_repartition.domain.service.in_memory.tutor_attribution import \
@@ -47,13 +48,20 @@ class SearchClassesEnseignantTest(SimpleTestCase):
         self.code_unite_enseignement = 'LDROI1001'
         self.attribution_uuid = 'attribution_uuid1'
 
-        self.cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant=self.matricule_enseignant)
+        self.class_code = 'X'
+        self.cmd = SearchTutorsDistributedToClassCommand(
+            learning_unit_code=self.code_unite_enseignement,
+            learning_unit_year=self.annee,
+            class_code=self.class_code,
+        )
 
         self.attributions_translator = ITutorAttributionToLearningUnitTranslatorInMemory()
         self.tutor_repository = TutorRepositoryInMemory()
         self.tutor = TutorWithDistributedEffectiveClassesFactory(
             entity_id__personal_id_number=self.matricule_enseignant,
-            distributed_effective_classes=[_ClassVolumeRepartitionFactory(attribution__uuid=self.attribution_uuid)]
+            distributed_effective_classes=[
+                _ClassVolumeRepartitionFactory(attribution__uuid=self.attribution_uuid),
+            ]
         )
         self.tutor_repository.save(self.tutor)
         self.__mock_service_bus()
@@ -70,23 +78,21 @@ class SearchClassesEnseignantTest(SimpleTestCase):
         self.message_bus = message_bus_instance
 
     def test_should_renvoyer_aucun_resultat(self):
-        cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant="Inexistant")
+        cmd = attr.evolve(self.cmd, class_code='Inexistant')
         result = self.message_bus.invoke(cmd)
         self.assertEqual(result, list())
 
     def test_should_renvoyer_details_attribution_enseignant(self):
         result = self.message_bus.invoke(self.cmd)
-        self.assertEqual(len(result), 1)
         dto = result[0]
-        self.assertEqual(dto.attribution_uuid, 'attribution_uuid1')
-        self.assertEqual(dto.personal_id_number, self.matricule_enseignant)
-        self.assertEqual(dto.function, Functions.COORDINATOR.name)
+        self.assertEqual(dto.attribution_uuid, 'attribution_uuid2')
+        self.assertEqual(dto.personal_id_number, '00321235')
+        self.assertEqual(dto.function, Functions.CO_HOLDER.name)
         self.assertEqual(dto.last_name, "Smith")
-        self.assertEqual(dto.first_name, "Charles")
+        self.assertEqual(dto.first_name, "Bastos")
 
     def test_should_renvoyer_volume_enseignant_distribue_sur_classe(self):
         result = self.message_bus.invoke(self.cmd)
-        self.assertEqual(len(result), 1)
         dto = result[0]
         self.assertEqual(
             dto.distributed_volume_to_class,
@@ -95,7 +101,6 @@ class SearchClassesEnseignantTest(SimpleTestCase):
 
     def test_should_renvoyer_code_complet_classe_et_annee(self):
         result = self.message_bus.invoke(self.cmd)
-        self.assertEqual(len(result), 1)
         dto = result[0]
         self.assertEqual(
             dto.complete_class_code,
@@ -105,3 +110,19 @@ class SearchClassesEnseignantTest(SimpleTestCase):
             dto.annee,
             self.tutor.distributed_effective_classes[0].effective_class.learning_unit_identity.year,
         )
+
+    def test_should_ordonner_par_nom_prenom_enseignant(self):
+        tutor2 = TutorWithDistributedEffectiveClassesFactory(
+            entity_id__personal_id_number='00321235',
+            distributed_effective_classes=[
+                _ClassVolumeRepartitionFactory(attribution__uuid="attribution_uuid2")
+            ]
+        )
+        self.tutor_repository.save(tutor2)
+
+        result = self.message_bus.invoke(self.cmd)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0].last_name, 'Smith')
+        self.assertEqual(result[0].first_name, 'Bastos')
+        self.assertEqual(result[1].last_name, 'Smith')
+        self.assertEqual(result[1].first_name, 'Charles')

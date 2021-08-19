@@ -41,6 +41,7 @@ class InMemoryGenericRepository(interface.AbstractRepository):
 
     @classmethod
     def search(cls, entity_ids: Optional[List['EntityIdentity']] = None, **kwargs) -> List['RootEntity']:
+        entity_ids = entity_ids or set()
         return [entity for entity in cls.entities if entity.entity_id in entity_ids]
 
     @classmethod
