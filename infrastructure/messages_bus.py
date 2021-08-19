@@ -69,10 +69,16 @@ from ddd.logic.encodage_des_notes.encodage.use_case.read.get_progression_general
     get_progression_generale_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
-from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand
+from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand, SoumettreNoteCommand, \
+    EncoderAdresseFeuilleDeNotes, GetAdresseFeuilleDeNotesServiceCommand, GetChoixEntitesAdresseFeuilleDeNotesCommand, \
+    SupprimerAdresseFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.commands import GetFeuilleDeNotesCommand, GetProgressionGeneraleCommand, \
     AssignerResponsableDeNotesCommand, \
     SearchAdressesFeuilleDeNotesCommand
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_addresse_feuille_de_notes_service import \
+    get_adresse_feuille_de_notes
+from ddd.logic.encodage_des_notes.soumission.use_case.read.get_choix_entites_adresse_feuille_de_notes_service import \
+    get_choix_entites_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_feuille_de_notes_service import get_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.read.get_progression_generale_encodage_service import \
     get_progression_generale
@@ -83,8 +89,12 @@ from ddd.logic.encodage_des_notes.soumission.use_case.write.assigner_responsable
     assigner_responsable_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.encode_note_etudiant_service import \
     encoder_note_etudiant
+from ddd.logic.encodage_des_notes.soumission.use_case.write.encoder_adresse_feuille_de_notes_service import \
+    encoder_adresse_feuille_de_notes
 from ddd.logic.encodage_des_notes.soumission.use_case.write.soumettre_note_etudiant_service import \
     soumettre_note_etudiant
+from ddd.logic.encodage_des_notes.soumission.use_case.write.supprimer_adresse_feuille_de_notes_service import \
+    supprimer_adresse_feuille_de_notes
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -132,8 +142,11 @@ from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement i
 from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
+from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
     SignaletiquePersonneTranslator
+from infrastructure.encodage_de_notes.soumission.repository.adresse_feuille_de_notes import \
+    AdresseFeuilleDeNotesRepository
 from infrastructure.encodage_de_notes.soumission.repository.note_etudiant import NoteEtudiantRepository
 from infrastructure.encodage_de_notes.soumission.repository.responsable_de_notes import ResponsableDeNotesRepository
 from infrastructure.learning_unit.domain.service.student_enrollments_to_effective_class import \
@@ -144,6 +157,7 @@ from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
+from infrastructure.shared_kernel.entite.repository.entite import EntiteRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
 from program_management.ddd.command import BulkUpdateLinkCommand, GetReportCommand
@@ -346,6 +360,26 @@ class MessageBus:
         GetPeriodeEncodageCommand: lambda cmd: get_periode_encodage(
             cmd,
             PeriodeEncodageNotesTranslator(),
+        ),
+        EncoderAdresseFeuilleDeNotes: lambda cmd: encoder_adresse_feuille_de_notes(
+            cmd,
+            AdresseFeuilleDeNotesRepository(),
+            EntiteRepository(),
+            EntitesCohorteTranslator()
+        ),
+        SupprimerAdresseFeuilleDeNotes: lambda cmd: supprimer_adresse_feuille_de_notes(
+            cmd,
+            AdresseFeuilleDeNotesRepository(),
+        ),
+        GetAdresseFeuilleDeNotesServiceCommand: lambda cmd: get_adresse_feuille_de_notes(
+            cmd,
+            AdresseFeuilleDeNotesRepository(),
+            EntiteRepository(),
+        ),
+        GetChoixEntitesAdresseFeuilleDeNotesCommand: lambda cmd: get_choix_entites_adresse_feuille_de_notes(
+            cmd,
+            EntiteRepository(),
+            EntitesCohorteTranslator()
         )
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

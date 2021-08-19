@@ -40,3 +40,8 @@ class CohortYearFactory(factory.django.DjangoModelFactory):
     education_group_year = factory.SubFactory("base.tests.factories.education_group_year.EducationGroupYearFactory")
     administration_entity = factory.SubFactory(EntityFactory)
     name = factory.Iterator(CohortName.choices(), getter=operator.itemgetter(0))
+
+    class Params:
+        first_year_bachelor = factory.Trait(
+            name=CohortName.FIRST_YEAR.name
+        )

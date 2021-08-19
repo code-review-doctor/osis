@@ -168,3 +168,39 @@ class DateEcheanceNoteDTO(interface.DTO):
 
     def to_date(self) -> date:
         return date(day=self.jour, month=self.mois, year=self.annee)
+
+
+@attr.s(frozen=True, slots=True)
+class AdresseFeuilleDeNotesFromRepositoryDTO(interface.DTO):
+    nom_cohorte = attr.ib(type=str)
+    entite = attr.ib(type=str)
+    destinataire = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
+    email = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class AdresseFeuilleDeNotesDTO(interface.DTO):
+    nom_cohorte = attr.ib(type=str)
+    entite = attr.ib(type=str)
+    destinataire = attr.ib(type=str)
+    rue_numero = attr.ib(type=str)
+    code_postal = attr.ib(type=str)
+    ville = attr.ib(type=str)
+    pays = attr.ib(type=str)
+    telephone = attr.ib(type=str)
+    fax = attr.ib(type=str)
+    email = attr.ib(type=str)
+    specifique_a_la_premiere_annee_de_bachelier = attr.ib(type=bool)
+
+
+@attr.s(frozen=True, slots=True)
+class EntiteDTO(interface.DTO):
+    sigle = attr.ib(type=str)
+    sigle_parent = attr.ib(type=str)
+    type = attr.ib(type=str)

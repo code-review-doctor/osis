@@ -24,10 +24,11 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
-from django.urls import path
+from django.urls import path, register_converter
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
+from assessments.views.address.score_sheet import ScoreSheetAddressView, FirstYearBachelorScoreSheetAddressView
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
@@ -36,6 +37,9 @@ from assessments.views.score_encoding import LearningUnitScoreEncodingView, Lear
     ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView, ScoreEncodingProgressOverviewView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
 from assessments.views.tutor.learning_unit_score_encoding_submit import LearningUnitScoreEncodingTutorSubmitView
+from education_group.converters import AcronymConverter
+
+register_converter(AcronymConverter, 'acronym')
 
 urlpatterns = [
     url(r'^scores_encoding/', include([
@@ -88,6 +92,16 @@ urlpatterns = [
         url(r'^(?P<education_group_id>[0-9]+)/', include([
             url(r'^score_encoding/$', score_sheet.offer_score_encoding_tab, name='offer_score_encoding_tab'),
             url(r'^score_sheet_address/save/$', score_sheet.save_score_sheet_address, name='save_score_sheet_address'),
+        ])),
+
+        # New URL's
+        path('<acronym:acronym>/', include([
+            url(r'^score_encoding/$', ScoreSheetAddressView.as_view(), name='score_sheet_address'),
+            url(
+                r'^first_year_bachelor/score_encoding/$',
+                FirstYearBachelorScoreSheetAddressView.as_view(),
+                name='first_year_bachelor_score_sheet_address'
+            ),
         ]))
     ])),
 
