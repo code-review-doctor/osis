@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from reference.api.views.country import CountryList, CountryDetail
-from reference.api.views.language import LanguageList
-from reference.api.views.study_domain import StudyDomainList
+from reference.models.language import Language
 
-app_name = "reference"
-urlpatterns = [
-    url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
-    url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
-    url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
-    url(r'^languages$', LanguageList.as_view(), name=LanguageList.name),
-]
+
+class LanguageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Language
+        fields = (
+            'code',
+            'name',
+        )
