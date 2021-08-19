@@ -55,8 +55,8 @@ class FeuilleDeNotesParUniteEnseignement(interface.DomainService):  # TODO :: dÃ
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'FeuilleDeNotesDTO':
         code_unite_enseignement = notes[0].code_unite_enseignement
-        annee = notes[0].annee
-        numero_session = notes[0].numero_session
+        annee = periode_encodage.annee_concernee
+        numero_session = periode_encodage.session_concernee
 
         unite_enseignement = unite_enseignement_translator.get(code_unite_enseignement, annee)
         resp_notes = responsable_notes_repo.get_for_unite_enseignement(code_unite_enseignement, annee)
