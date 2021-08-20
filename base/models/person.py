@@ -1,4 +1,3 @@
-
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -27,6 +26,7 @@ from datetime import date
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models import Q
 from django.db.models import Value
@@ -56,8 +56,14 @@ class EmployeeManager(SerializableModelManager):
 class Person(SerializableModel):
     GENDER_CHOICES = (
         ('F', _('Female')),
-        ('M', _('Male')),
-        ('U', _('unknown')))
+        ('H', _('Male')),
+        ('X', _('Other'))
+    )
+    SEX_CHOICES = (
+        ('F', _('Female')),
+        ('M', _('Male'))
+    )
+    YEAR_REGEX = r'^[1-9]\d{3}$'
 
     objects = SerializableModelManager()
     employees = EmployeeManager()
@@ -66,15 +72,30 @@ class Person(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, blank=True, null=True)
     global_id = models.CharField(max_length=10, blank=True, null=True, db_index=True)
-    gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES, default='U')
+    gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES)
+    sex = models.CharField(max_length=1, blank=True, null=True, choices=SEX_CHOICES)
+
     first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     middle_name = models.CharField(max_length=50, blank=True, null=True)
     last_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    first_name_in_use = models.CharField(max_length=50, blank=True, null=True)
     email = models.EmailField(max_length=255, default='')
     phone = models.CharField(max_length=30, blank=True, null=True)
     phone_mobile = models.CharField(max_length=30, blank=True, null=True)
     language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
+    birth_year = models.IntegerField(blank=True, null=True, validators=[RegexValidator(YEAR_REGEX)])
+    birth_country = models.ForeignKey(
+        'reference.Country',
+        blank=True, null=True,
+        verbose_name=_('Birth country'),
+        on_delete=models.PROTECT,
+        related_name='birth_persons'
+    )
+    birth_place = models.CharField(blank=True, null=True, max_length=255)
+    country_of_citizenship = models.ForeignKey(
+        'reference.Country', verbose_name=_('Country of citizenship'), on_delete=models.PROTECT, blank=True, null=True
+    )
     source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,
                               default=person_source_type.BASE)
     employee = models.BooleanField(default=False)
@@ -101,8 +122,7 @@ class Person(SerializableModel):
             return self.first_name
         elif self.user:
             return self.user.first_name
-        else:
-            return "-"
+        return "-"
 
     @cached_property
     def is_central_manager(self):
