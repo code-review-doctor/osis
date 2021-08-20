@@ -6,27 +6,23 @@ from base.models.enums.learning_container_year_types import COURSE
 from base.models.enums.learning_unit_year_subtypes import PARTIM
 
 
-def update_year(attribution_charge_new, year: int):
-    attribution_charge_new.attribution.start_year = year
-    attribution_charge_new.attribution.end_year = year
-    attribution_charge_new.save()
-
-
 def update_attribution_start_end_year(apps, shema_editor):
     AttributionChargeNew = apps.get_model('attribution', 'attributionchargenew')
+    AttributionNew = apps.get_model('attribution', 'attributionnew')
 
-    qs = AttributionChargeNew.objects\
+    attribution_charge_news = AttributionChargeNew.objects\
         .filter(
             attribution__start_year__isnull=True,
             attribution__end_year__isnull=True,
             learning_component_year__learning_unit_year__subtype=PARTIM
         ).exclude(attribution__learning_container_year__container_type=COURSE)
-
-    for attribution_charge_new in qs:
-        update_year(
-            attribution_charge_new,
-            attribution_charge_new.learning_component_year.learning_unit_year.academic_year.year
-        )
+    attributions = []
+    for attribution_charge_new in attribution_charge_news:
+        year = attribution_charge_new.learning_component_year.learning_unit_year.academic_year.year
+        attribution_charge_new.attribution.start_year = year
+        attribution_charge_new.attribution.end_year = year
+        attributions.append(attribution_charge_new.attribution)
+    AttributionNew.objects.bulk_update(attributions, ['start_year', 'end_year'], batch_size=1000)
 
 
 class Migration(migrations.Migration):
@@ -38,8 +34,3 @@ class Migration(migrations.Migration):
     operations = [
         migrations.RunPython(update_attribution_start_end_year, migrations.RunPython.noop, elidable=True),
     ]
-
-
-
-
-
