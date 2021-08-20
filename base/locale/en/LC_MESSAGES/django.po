@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-27 11:19+0200\n"
+"POT-Creation-Date: 2021-08-20 13:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -446,6 +446,9 @@ msgstr ""
 msgid "Birth Date"
 msgstr ""
 
+msgid "Birth country"
+msgstr ""
+
 msgid "Block"
 msgstr ""
 
@@ -628,6 +631,9 @@ msgid "Copy Reddot data from previous academic year."
 msgstr ""
 
 msgid "Country"
+msgstr ""
+
+msgid "Country of citizenship"
 msgstr ""
 
 msgid "Course"
@@ -1754,6 +1760,9 @@ msgid "Organizational chart"
 msgstr ""
 
 msgid "Organizations"
+msgstr ""
+
+msgid "Other"
 msgstr ""
 
 msgid "Other academic responsible"
