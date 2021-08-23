@@ -26,6 +26,7 @@
 from django.test import TestCase
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from ddd.logic.learning_unit.tests.factory.learning_unit import LDROI1001LearningUnitIdentityFactory
 from infrastructure.effective_class_repartition.domain.service.tutor_attribution import \
     TutorAttributionToLearningUnitTranslator
@@ -36,28 +37,29 @@ class TestTutorAttributionToLearningUnitTranslator(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.translator = TutorAttributionToLearningUnitTranslator()
+        cls.identity = LDROI1001LearningUnitIdentityFactory()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym=cls.identity.code,
+            academic_year__year=cls.identity.year,
+        )
 
     def test_should_order_by_last_name_and_first_name(self):
-        identity = LDROI1001LearningUnitIdentityFactory()
         for _ in range(3):
             AttributionChargeNewFactory(
-                attribution__learning_container_year__acronym=identity.code,
-                attribution__learning_container_year__academic_year__year=identity.year,
+                learning_component_year__learning_unit_year=self.learning_unit_year,
                 allocation_charge=10.0,
             )
-        result = self.translator.search_attributions_to_learning_unit(identity)
+        result = self.translator.search_attributions_to_learning_unit(self.identity)
         ordered_by_last_name_first_name = list(sorted(result, key=lambda elem: (elem.last_name, elem.first_name)))
         self.assertListEqual(result, ordered_by_last_name_first_name)
 
     def test_should_filter_by_learning_unit(self):
-        identity = LDROI1001LearningUnitIdentityFactory()
         attribution_charge = AttributionChargeNewFactory(
-            attribution__learning_container_year__acronym=identity.code,
-            attribution__learning_container_year__academic_year__year=identity.year,
+            learning_component_year__learning_unit_year=self.learning_unit_year,
             allocation_charge=10.0,
         )
         for _ in range(3):
             AttributionChargeNewFactory()  # Build other attributions
-        result = self.translator.search_attributions_to_learning_unit(identity)
+        result = self.translator.search_attributions_to_learning_unit(self.identity)
         self.assertTrue(len(result) == 1)
         self.assertEqual(result[0].attribution_uuid, attribution_charge.attribution.uuid)

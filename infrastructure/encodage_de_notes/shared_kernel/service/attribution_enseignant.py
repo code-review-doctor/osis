@@ -25,11 +25,8 @@
 ##############################################################################
 from typing import Set
 
-from django.db.models import F
-
-from attribution.models.attribution_new import AttributionNew
 from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand, \
-    SearchAttributionsToLearningUnitCommand
+    SearchAttributionsToLearningUnitCommand, SearchClassesEnseignantCommand, SearchAttributionsEnseignantCommand
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
     IAttributionEnseignantTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
@@ -59,13 +56,17 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
 
 
 def _search_attributions_unite_enseignement(
+        annee: int,
         code_unite_enseignement: str = None,
-        annee: int = None,
+        matricule_enseignant: str = None,
 ) -> Set['AttributionEnseignantDTO']:
-    cmd = SearchAttributionsToLearningUnitCommand(
-        learning_unit_code=code_unite_enseignement,
-        learning_unit_year=annee,
-    )
+    if matricule_enseignant:
+        cmd = SearchAttributionsEnseignantCommand(matricule_fgs_enseignant=matricule_enseignant, annee=annee)
+    else:
+        cmd = SearchAttributionsToLearningUnitCommand(
+            learning_unit_code=code_unite_enseignement,
+            learning_unit_year=annee,
+        )
     from infrastructure.messages_bus import message_bus_instance
     dtos = message_bus_instance.invoke(cmd)
     return {
@@ -80,16 +81,20 @@ def _search_attributions_unite_enseignement(
 
 
 def _search_repartition_classes(
+        annee: int,
         code_unite_enseignement: str = None,
-        annee: int = None,
+        matricule_enseignant: str = None,
 ) -> Set['AttributionEnseignantDTO']:
-    code_unite_enseignement = code_unite_enseignement[:-1]
-    code_classe = code_unite_enseignement[-1]
-    cmd = SearchTutorsDistributedToClassCommand(
-        learning_unit_code=code_unite_enseignement,
-        learning_unit_year=annee,
-        class_code=code_classe,
-    )
+    if matricule_enseignant:
+        cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant=matricule_enseignant, annee=annee)
+    else:
+        code_classe = code_unite_enseignement[-1]
+        code_sans_lettre_classe = code_unite_enseignement[:-1]
+        cmd = SearchTutorsDistributedToClassCommand(
+            learning_unit_code=code_sans_lettre_classe,
+            learning_unit_year=annee,
+            class_code=code_classe,
+        )
     from infrastructure.messages_bus import message_bus_instance
     dtos = message_bus_instance.invoke(cmd)
     return {

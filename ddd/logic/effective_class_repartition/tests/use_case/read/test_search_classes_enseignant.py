@@ -47,7 +47,7 @@ class SearchClassesEnseignantTest(SimpleTestCase):
         self.code_unite_enseignement = 'LDROI1001'
         self.attribution_uuid = 'attribution_uuid1'
 
-        self.cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant=self.matricule_enseignant)
+        self.cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant=self.matricule_enseignant, annee=self.annee)
 
         self.attributions_translator = TutorAttributionToLearningUnitTranslatorInMemory()
         self.tutor_repository = TutorRepositoryInMemory()
@@ -70,7 +70,7 @@ class SearchClassesEnseignantTest(SimpleTestCase):
         self.message_bus = message_bus_instance
 
     def test_should_renvoyer_aucun_resultat(self):
-        cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant="Inexistant")
+        cmd = SearchClassesEnseignantCommand(matricule_fgs_enseignant="Inexistant", annee=self.annee)
         result = self.message_bus.invoke(cmd)
         self.assertEqual(result, list())
 

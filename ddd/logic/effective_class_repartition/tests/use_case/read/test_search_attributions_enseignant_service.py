@@ -48,6 +48,7 @@ class SearchAttributionsToLearningUnitTest(SimpleTestCase):
 
         self.cmd = SearchAttributionsEnseignantCommand(
             matricule_fgs_enseignant=self.matricule_enseignant,
+            annee=self.annee,
         )
 
         self.attributions_translator = TutorAttributionToLearningUnitTranslatorInMemory()

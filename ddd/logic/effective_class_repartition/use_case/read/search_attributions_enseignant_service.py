@@ -36,4 +36,4 @@ def search_attributions_enseignant(
         cmd: SearchAttributionsEnseignantCommand,
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
 ) -> List['TutorAttributionToLearningUnitDTO']:
-    return tutor_attribution_translator.get_by_enseignant(cmd.matricule_fgs_enseignant)
+    return tutor_attribution_translator.get_by_enseignant(cmd.matricule_fgs_enseignant, cmd.annee)

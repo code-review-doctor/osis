@@ -33,6 +33,7 @@ from osis_common.ddd import interface
 @attr.s(frozen=True, slots=True)
 class SearchAttributionsEnseignantCommand(interface.CommandRequest):
     matricule_fgs_enseignant = attr.ib(type=str)
+    annee = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
@@ -51,6 +52,7 @@ class SearchTutorsDistributedToClassCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SearchClassesEnseignantCommand(interface.CommandRequest):
     matricule_fgs_enseignant = attr.ib(type=str)
+    annee = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)

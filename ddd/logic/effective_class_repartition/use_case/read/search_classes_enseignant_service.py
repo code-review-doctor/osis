@@ -41,6 +41,7 @@ def search_classes_enseignant(
 ) -> List['TutorClassRepartitionDTO']:
     return ClassDistributionWithAttribution().search_by_matricule_enseignant(
         cmd.matricule_fgs_enseignant,
+        cmd.annee,
         tutor_attribution_translator,
         tutor_repository
     )

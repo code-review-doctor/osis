@@ -64,6 +64,16 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
         tutor_attribution_db = qs.get()
         return TutorAttributionToLearningUnitDTO(**tutor_attribution_db)
 
+    @classmethod
+    def get_by_enseignant(cls, matricule_fgs_enseignant: str, annee: int) -> List['TutorAttributionToLearningUnitDTO']:
+        qs = _get_common_qs().filter(
+            tutor__person__global_id=matricule_fgs_enseignant,
+            learning_container_year__academic_year__year=annee,
+        )
+        qs = _annotate_qs(qs)
+        qs = _value_qs(qs)
+        return [TutorAttributionToLearningUnitDTO(**tutor_attribution_db) for tutor_attribution_db in qs]
+
 
 def _get_common_qs() -> QuerySet:
     return AttributionNewDb.objects.all()

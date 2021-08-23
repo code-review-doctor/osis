@@ -77,9 +77,13 @@ class TutorAttributionToLearningUnitTranslatorInMemory(ITutorAttributionToLearni
         return next(att for att in cls.attributions if att.attribution_uuid == attribution_uuid)
 
     @classmethod
-    def get_by_enseignant(cls, matricule_fgs_enseignant: str) -> List['TutorAttributionToLearningUnitDTO']:
-        return [att for att in cls.attributions if att.personal_id_number == matricule_fgs_enseignant]
+    def get_by_enseignant(cls, matricule_fgs_enseignant: str, annee: int) -> List['TutorAttributionToLearningUnitDTO']:
+        return [
+            att for att in cls.attributions
+            if att.personal_id_number == matricule_fgs_enseignant and att.learning_unit_year == annee
+        ]
 
 
 def _filter(dto, learning_unit_identity):
-    return dto.learning_unit_code == learning_unit_identity.code and dto.learning_unit_year == learning_unit_identity.academic_year.year
+    return dto.learning_unit_code == learning_unit_identity.code \
+           and dto.learning_unit_year == learning_unit_identity.academic_year.year
