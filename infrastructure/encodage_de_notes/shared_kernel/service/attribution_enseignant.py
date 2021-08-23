@@ -32,7 +32,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
 
-class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):  # TODO :: renommer attributions UE + classes
+class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
 
     @classmethod
     def search_attributions_enseignant(

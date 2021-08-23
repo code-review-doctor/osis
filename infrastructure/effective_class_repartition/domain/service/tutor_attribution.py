@@ -58,11 +58,19 @@ class TutorAttributionToLearningUnitTranslator(ITutorAttributionToLearningUnitTr
 
     @classmethod
     def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
-        qs = _get_common_qs().filter(uuid=attribution_uuid)
+        attributions = cls.search_learning_unit_attributions([attribution_uuid])
+        if attributions:
+            return attributions[0]
+
+    @classmethod
+    def search_learning_unit_attributions(
+            cls,
+            attribution_uuids: List[str]
+    ) -> List['TutorAttributionToLearningUnitDTO']:
+        qs = _get_common_qs().filter(uuid__in=attribution_uuids)
         qs = _annotate_qs(qs)
         qs = _value_qs(qs)
-        tutor_attribution_db = qs.get()
-        return TutorAttributionToLearningUnitDTO(**tutor_attribution_db)
+        return [TutorAttributionToLearningUnitDTO(**tutor_attribution_db) for tutor_attribution_db in qs]
 
     @classmethod
     def get_by_enseignant(cls, matricule_fgs_enseignant: str, annee: int) -> List['TutorAttributionToLearningUnitDTO']:

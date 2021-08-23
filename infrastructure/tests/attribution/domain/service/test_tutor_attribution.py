@@ -130,8 +130,8 @@ class TestGetLearningUnitAttributionsTranslator(TestCase):
 
     def test_should_renvoyer_aucun_resultat(self):
         uuid_inexistant = uuid.uuid4()
-        with self.assertRaises(AttributionNew.DoesNotExist):
-            self.function_to_test(uuid_inexistant)
+        result = self.function_to_test(uuid_inexistant)
+        self.assertIsNone(result)
 
     def test_should_renvoyer_code_annee_unite_enseignement(self):
         attribution_charge = AttributionChargeNewFactory(

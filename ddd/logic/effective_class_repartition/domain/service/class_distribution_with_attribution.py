@@ -66,15 +66,13 @@ class ClassDistributionWithAttribution(interface.DomainService):
         if not tutor:
             return []
 
-        attributions = []
-        for distributed_class in tutor.distributed_effective_classes:
-            # FIXME :: performances
-            if distributed_class.effective_class.learning_unit_identity.year == annee:  # FIXME :: ajouter 'annee' dans l'aggregat Tutor ????
-                attributions.append(
-                    tutor_attribution_translator.get_learning_unit_attribution(
-                        distributed_class.attribution.uuid
-                    )
-                )
+        attribution_uuids = {
+            distributed_class.attribution.uuid
+            for distributed_class in tutor.distributed_effective_classes
+            if distributed_class.effective_class.learning_unit_identity.year == annee
+            # FIXME :: ajouter 'annee' dans l'aggregat Tutor ????
+        }
+        attributions = tutor_attribution_translator.search_learning_unit_attributions(attribution_uuids)
         return _get_tutor_class_repartition_dtos(tutor, attributions)
 
 
