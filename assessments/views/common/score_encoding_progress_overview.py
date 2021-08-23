@@ -23,42 +23,35 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils.functional import cached_property
+from django.views.generic import TemplateView
 
-import attr
-
-from osis_common.ddd import interface
-
-
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    email = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
+from osis_role.contrib.views import PermissionRequiredMixin
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
+class ScoreEncodingProgressOverviewBaseView(PermissionRequiredMixin, TemplateView):
+    # PermissionRequiredMixin
+    permission_required = "assessments.can_access_scoreencoding"
 
+    @cached_property
+    def person(self):
+        return self.request.user.person
 
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
+    def dispatch(self, request, *args, **kwargs):
+        opened_calendars = ScoresExamSubmissionCalendar().get_opened_academic_events()
+        if not opened_calendars:
+            redirect_url = reverse('outside_scores_encodings_period')
+            return HttpResponseRedirect(redirect_url)
+        return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'person': self.person
+        }
 
-@attr.s(frozen=True, slots=True)
-class GetCohortesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+    def get_permission_object(self):
+        return None

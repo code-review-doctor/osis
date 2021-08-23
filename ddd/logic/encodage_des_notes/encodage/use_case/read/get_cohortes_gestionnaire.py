@@ -1,3 +1,4 @@
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -14,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -22,3 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
+
+from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
+from ddd.logic.encodage_des_notes.encodage.dtos import CohorteGestionnaireDTO
+
+
+def get_cohortes_gestionnaire(
+        cmd: GetCohortesGestionnaireCommand,
+        cohortes_gestionnaire_translator: ICohortesDuGestionnaire,
+) -> Set[CohorteGestionnaireDTO]:
+    return cohortes_gestionnaire_translator.search(cmd.matricule_fgs_gestionnaire)

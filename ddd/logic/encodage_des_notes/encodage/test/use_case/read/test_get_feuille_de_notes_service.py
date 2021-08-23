@@ -36,8 +36,9 @@ from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import 
 from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO, \
     InscriptionExamenDTO
-from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory
-from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import ResponsableDeNotesLDROI1001Annee2020Factory
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory
+from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
+    ResponsableDeNotesLDROI1001Annee2020Factory
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \

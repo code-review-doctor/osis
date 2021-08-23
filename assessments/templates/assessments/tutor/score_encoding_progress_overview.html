@@ -1,0 +1,282 @@
+{% extends "layout.html" %}
+{% load i18n academic_year_display %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+{% block breadcrumb %}
+    <li>
+        <a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a>
+    </li>
+    <li>
+        <a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a>
+    </li>
+    <li class="active">{% trans 'Scores encoding' %}</li>
+{% endblock %}
+
+
+{% block content %}
+    <div class="page-header">
+        <h2>{% trans 'Scores encoding' %}</h2>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="w-100">{% trans 'Tutor' %}</label>
+                         <span id="tutor">{{ person }}</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="w-100">{% trans 'Academic year' %}</label>
+                        <span id="academic_year">{{ progression_generale.annee_academique|display_as_academic_year }}</span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="w-100">{% trans 'Session number' %}</label>
+                        <span id="number_session">{{ progression_generale.numero_session }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px;">
+                <p class="col-md-12"><b>{% trans 'Select an encoding type' %}</b></p>
+
+                <div class="col-md-12">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#tab_online" aria-controls="online" role="tab" data-toggle="tab" id="lnk_online">{% trans 'Online' %}</a></li>
+                        <li role="presentation"><a href="#tab_via_paper" aria-controls="via_paper" role="tab" data-toggle="tab" id="lnk_via_paper">{% trans 'Via paper' %}</a></li>
+                        <li role="presentation"><a href="#tab_via_excel" aria-controls="via_excel" role="tab" data-toggle="tab" id="lnk_via_excel">{% trans 'Via excel' %}</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="tab_online">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th id="tab_online_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
+                                        <th id="tab_online_title">{% trans 'Learning unit' %}</th>
+                                        <th id="tab_online_tutor_deadline">{% trans 'Tutor deadlines' %}</th>
+                                        <th id="tab_online_progress">{% trans 'Progress' %}</th>
+                                        <th id="tab_online_peps"></th>
+                                        <th id="tab_online_links"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     {% for progression_encodage in progression_generale.progression_generale %}
+                                        <tr>
+                                            <td headers="tab_online_acronym">{{progression_encodage.code_unite_enseignement}}</td>
+                                            <td headers="tab_online_title">
+                                                <a href="{% url 'learning_unit_score_encoding' progression_encodage.code_unite_enseignement %}"
+                                                   id="lnk_{{ note_detail.learning_unit_year_acronym }}">
+                                                    {{ progression_encodage.intitule_complet_unite_enseignement }}
+                                                </a>
+                                            </td>
+                                            <td headers="tab_online_tutor_deadline">
+                                                {% for echeance in progression_encodage.dates_echeance %}
+                                                    {% if not forloop.first %}
+                                                        <div id="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}" class="collapse in">
+                                                    {% endif %}
+                                                    <div class="row row-score-encoding">
+                                                        {% if echeance.est_atteinte %}
+                                                            <strong class="col-md-5 {% if echeance.quantite_notes_manquantes %} error {% else %} success {% endif %}">
+                                                                {{ echeance.to_date|date:"d/m/Y" }}
+                                                            </strong>
+                                                        {% else %}
+                                                             <span class="col-md-5">{{ echeance.to_date|date:"d/m/Y" }}</span>
+                                                        {% endif %}
+                                                        <div class="col-md-3">
+                                                            <span title="{% trans 'Remaining scores to submit for this deadline' %}"
+                                                                  class="badge badge-default {% if echeance.quantite_notes_manquantes %}background-error{% else %}background-success{% endif %}">
+                                                                {{ echeance.quantite_notes_manquantes }}
+                                                            </span>
+                                                        </div>
+
+                                                        {% if forloop.first and progression_encodage.dates_echeance|length > 1 %}
+                                                             <a role="button" data-toggle="collapse" data-target="#tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
+                                                               aria-expanded="false"
+                                                               aria-controls="tutor_deadlines_collapse_{{ progression_encodage.code_unite_enseignement }}"
+                                                               title="{% trans 'Display all deadlines for this learning unit' %}">
+                                                                <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                                             </a>
+                                                        {% endif %}
+                                                    </div>
+                                                    {% if not forloop.first %}
+                                                        </div>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td headers="tab_online_progress">
+                                                <div class="progress">
+                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_total_notes 1 %}%;">
+                                                       <span>
+                                                            <b>
+                                                                {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
+                                                            </b>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td headers="tab_online_peps">
+                                                {% if progression_encodage.a_etudiants_peps %}
+                                                    <span class="badge warning-color"
+                                                          title="{% trans 'Some of the students enrolled to this course have a PEPS status (Program for Students with a Specific Profile). You will find detailled information in the Excel file to encode notes' %}">
+                                                        PEPS
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                            <td headers="tab_online_links">
+                                                <a class="btn btn-default"
+                                                       role="button"
+                                                       id="lnk_encode_{{ progression_encodage.code_unite_enseignement }}"
+                                                       data-toggle="tooltip" data-placement="top"
+                                                       {% if progression_encodage.encodage_est_complet %}
+                                                        href="#"
+                                                        disabled
+                                                        title="{% trans 'All the scores were submitted. It is not possible to encode scores anymore.' %}"
+                                                       {% else %}
+                                                        href="{% url 'learning_unit_score_encoding_form' progression_encodage.code_unite_enseignement %}"
+                                                        title="{% trans 'Encode scores' %}"
+                                                       {% endif %}>
+                                                    <i class="fa fa-hashtag"></i>
+                                                    {% trans 'Encode' %}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                     {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div role="tabpanel" class="tab-pane fade" id="tab_via_paper">
+                            <a class="btn btn-default download"
+                               href="#"
+                               style="margin:15px 0; "
+                               role="button" id="lnk_notes_printing_all">
+                                <em class="fas fa-print"></em> {% trans 'Print all courses' %}</a>
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th id="tab_paper_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
+                                        <th id="tab_paper_title">{% trans 'Learning unit' %}</th>
+                                        <th id="tab_paper_progress">{% trans 'Progress' %}</th>
+                                        <th id="download_action"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for progression_encodage in progression_generale.progression_generale %}
+                                        <tr class="result_paper">
+                                            <td headers="tab_paper_acronym">{{progression_encodage.code_unite_enseignement}}</td>
+                                            <td headers="tab_paper_title">
+                                                <a href="{% url 'learning_unit_score_encoding' progression_encodage.code_unite_enseignement %}"
+                                                   id="lnk_paper_show_{{ progression_encodage.code_unite_enseignement }}">
+                                                    {{ progression_encodage.intitule_complet_unite_enseignement }}
+                                                </a>
+                                            </td>
+                                            <td headers="tab_paper_progress">
+                                                <div class="progress">
+                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_total_notes 1 %}%;">
+                                                       <span>
+                                                            <b>
+                                                                {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
+                                                            </b>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-default download"
+                                                   href="{% url 'score_sheet_pdf_export' progression_encodage.code_unite_enseignement %}"
+                                                   role="button" id="lnk_notes_printing_{{progression_encodage.code_unite_enseignement}}"
+                                                   data-toggle="tooltip" data-placement="right"
+                                                   title="{% trans 'Print the scores' %}"
+                                                > <em class="fas fa-print"></em> {% trans 'Print' %}</a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                        <div role="tabpanel" class="tab-pane fade" id="tab_via_excel">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th id="tab_excel_acronym">{% trans 'Acronym' context 'UE acronym' %}</th>
+                                        <th id="tab_excel_title">{% trans 'Learning unit' %}</th>
+                                        <th id="tab_excel_progress">{% trans 'Progress' %}</th>
+                                        <th id="tab_excel_links"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for progression_encodage in progression_generale.progression_generale %}
+                                        <tr>
+                                            <td headers="tab_excel_acronym">{{progression_encodage.code_unite_enseignement}}</td>
+                                            <td headers="tab_excel_title">
+                                                <a href="{% url 'learning_unit_score_encoding' progression_encodage.code_unite_enseignement %}"
+                                                   id="lnk_excel_show_{{ progression_encodage.code_unite_enseignement }}">
+                                                    {{ progression_encodage.intitule_complet_unite_enseignement }}
+                                                </a>
+                                            </td>
+                                            <td headers="tab_excel_progress">
+                                                <div class="progress">
+                                                    <div class="progress-bar {% if progression_encodage.encodage_est_complet %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" style="width: {% widthratio progression_encodage.quantite_notes_soumises progression_encodage.quantite_total_notes 1 %}%;">
+                                                       <span>
+                                                            <b>
+                                                                {{ progression_encodage.quantite_notes_soumises}} / {{ progression_encodage.quantite_totale_notes }}
+                                                            </b>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td headers="tab_excel_links">
+                                                <a class="btn btn-default download"
+                                                   href="{% url 'score_sheet_xls_export' progression_encodage.code_unite_enseignement %}"
+                                                   role="button"
+                                                   id="lnk_excel_export_{{progression_encodage.code_unite_enseignement}}"
+                                                   data-toggle="tooltip" data-placement="right"
+                                                   title="{% trans 'Download the Excel file' %}"
+                                                >
+                                                    <em class="fas fa-download"></em> {% trans 'Get Excel file' %}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+

@@ -23,42 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
-import attr
-
-from osis_common.ddd import interface
+from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
+from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
+from infrastructure.messages_bus import message_bus_instance
 
 
-@attr.s(frozen=True, slots=True)
-class EncoderNoteCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    email = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-    note = attr.ib(type=str)
+class ScoreEncodingProgressOverviewTutorView(ScoreEncodingProgressOverviewBaseView):
+    # TemplateView
+    template_name = "assessments/tutor/score_encoding_progress_overview.html"
 
+    def get_context_data(self, **kwargs):
+        return {
+            **super().get_context_data(**kwargs),
+            'progression_generale': self.get_progression_generale(),
+        }
 
-@attr.s(frozen=True, slots=True)
-class EncoderNotesCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    notes_encodees = attr.ib(type=List[EncoderNoteCommand])
-
-
-@attr.s(frozen=True, slots=True)
-class GetFeuilleDeNotesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-    code_unite_enseignement = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class GetCohortesGestionnaireCommand(interface.CommandRequest):
-    matricule_fgs_gestionnaire = attr.ib(type=str)
-
-
-@attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
-    noma = attr.ib(type=str)
-    nom = attr.ib(type=str)
-    prenom = attr.ib(type=str)
-    etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
-    nom_cohorte = attr.ib(type=str)
+    def get_progression_generale(self):
+        cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.person.global_id)
+        return message_bus_instance.invoke(cmd)

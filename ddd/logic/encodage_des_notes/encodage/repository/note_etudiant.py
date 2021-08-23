@@ -24,11 +24,14 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
+
+
+SearchCriteria = Tuple[str, int, int]
 
 
 class INoteEtudiantRepository(interface.AbstractRepository):

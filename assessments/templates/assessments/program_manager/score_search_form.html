@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+{% load i18n academic_year_display bootstrap3 index %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li>
+        <a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a>
+    </li>
+    <li>
+        <a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a>
+    </li>
+    <li class="active">{% trans 'Scores encoding' %}</li>
+{% endblock %}
+
+
+{% block content %}
+    <div class="page-header">
+        <h2>{% trans 'Scores encoding' %}</h2>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <ul class="nav nav-tabs nav-justified" id="tabs">
+                <li>
+                    <a href="{{ score_encoding_progress_overview_url }}" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a>
+                </li>
+                <li class="active">
+                    <a data-toggle="tab" role="tab" href="#" id="lnk_score_search">{% trans 'By specific criteria' %}</a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="tab_score_search" class="tab-pane fade in active">
+                    <form id="score_search_form" method="GET" action="{{ request.path }}" style="margin-top: 20px;">
+                         <div class="row">
+                            <div class="col-md-2">
+                                 {% bootstrap_field search_form.noma %}
+                            </div>
+                            <div class="col-md-2">
+                                 {% bootstrap_field search_form.nom %}
+                            </div>
+                            <div class="col-md-2">
+                                 {% bootstrap_field search_form.prenom %}
+                            </div>
+                            <div class="col-md-3">
+                                 {% bootstrap_field search_form.justification %}
+                            </div>
+                            <div class="col-md-2">
+                                 {% bootstrap_field search_form.nom_cohorte %}
+                            </div>
+                            <div class="col-md-1">
+                                <button id="bt_submit_score_search" class="btn btn-primary" type="submit" role="button"
+                                    style="margin-top:22px">
+                                    <span class="fa fa-search" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                         </div>
+                        {% bootstrap_form_errors search_form error_types='non_field_errors' %}
+                    </form>
+
+                    {% if search_form.is_valid %}
+                        {% if notes_etudiant_filtered %}
+                            <form id="score_submit_form" class="form-inline" method="POST" action="{{ request.path }}?{{ request.GET.urlencode }}">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-12">
+                                   {% include 'assessments/common/legend.html' %}
+                                </div>
+                            </div>
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th id="status">{% trans 'Status' %}</th>
+                                        <th id="program">{% trans 'Program' context 'encoding' %}</th>
+                                        <th id="learning_unit">{% trans 'Learning unit' %}</th>
+                                        <th id="registration_number">{% trans 'Registration number' %}</th>
+                                        <th id="lastname">{% trans 'Lastname' %}</th>
+                                        <th id="firstname">{% trans 'Firstname' %}</th>
+                                        <th id="score">{% trans 'Score' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                     {% for note_etudiant in notes_etudiant_filtered %}
+                                         <tr class="result" style="background-color: {% if note_etudiant.date_echeance_atteinte %} #D3D3D3 {% endif %}">
+                                             <td style="text-align:center;" id="enrollment_status_{{ forloop.counter }}" headers="status">
+                                                {% if note_etudiant.date_echeance_atteinte %}
+                                                    <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
+                                                {% endif %}
+                                                {% if note_etudiant.est_soumise %}
+                                                    <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
+                                                {% endif %}
+                                            </td>
+                                            <td headers="program">{{ note_etudiant.nom_cohorte }}</td>
+                                            <td headers="learning_unit">{{ note_etudiant.nom_cohorte }}</td>
+                                            <td headers="registration_number">{{ note_etudiant.noma }}</td>
+                                            <td headers="lastname">{{ note_etudiant.nom }}</td>
+                                            <td headers="firstname">{{ note_etudiant.prenom }}</td>
+                                            <td id="enrollment_note_{{ forloop.counter0 }}" headers="score">
+                                                {% if not note_etudiant.est_soumise %}
+                                                    {% with score_encoding_form=form|index:forloop.counter0 %}
+                                                        {% bootstrap_field score_encoding_form.note show_label=False %}
+                                                        {% bootstrap_field score_encoding_form.noma %}
+                                                    {% endwith %}
+                                                {% else %}
+                                                    {{ note_etudiant.note }}
+                                                {% endif %}
+                                            </td>
+                                         </tr>
+                                        {% endfor %}
+                                        {{ form.management_form }}
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <button id="lnk_submit_down" class="btn btn-primary" type="submit">
+                                        <em class="fas fa-save"></em> {% trans 'Save' %}
+                                    </button>
+                                </div>
+                            </div>
+                         </form>
+                        {% else %}
+                             <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

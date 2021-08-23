@@ -94,18 +94,18 @@ class EntityRoleHelper:
     """
     @staticmethod
     def get_all_roles(person: Person) -> List['RoleModel']:
-        qs = []
+        role_cls = []
         if not person:
-            return qs
+            return role_cls
 
         role_mdls = [
             r for r in role.role_manager.roles if issubclass(r, RoleModel)
         ]
 
         for role_mdl in role_mdls:
-            for s in role_mdl.objects.filter(person=person):
-                qs.append(type(s))
-        return qs
+            if role_mdl.objects.filter(person=person).exists():
+                role_cls.append(role_mdl)
+        return role_cls
 
     @classmethod
     def has_roles(cls, person: Person, role_cls_list: List['RoleModel']) -> bool:
