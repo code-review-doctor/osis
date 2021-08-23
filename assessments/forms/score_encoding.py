@@ -65,12 +65,13 @@ class ScoreSearchForm(forms.Form):
         return choice_field.add_blank(tuple(choices))
 
     def clean(self):
+        cleaned_data = super().clean()
         if not any([
-            self.cleaned_data['noma'],
-            self.cleaned_data['nom'],
-            self.cleaned_data['prenom'],
-            self.cleaned_data['justification'],
-            self.cleaned_data['nom_cohorte'],
+            cleaned_data['noma'],
+            cleaned_data['nom'],
+            cleaned_data['prenom'],
+            cleaned_data['justification'],
+            cleaned_data['nom_cohorte'],
         ]):
             self.add_error(None, _("Please choose at least one criteria!"))
-        return super().clean()
+        return cleaned_data
