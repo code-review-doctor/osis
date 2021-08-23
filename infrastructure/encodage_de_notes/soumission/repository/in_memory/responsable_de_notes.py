@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
     UniteEnseignementIdentiteBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
@@ -48,7 +47,10 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
             code_unite_enseignement,
             annee_academique
         )
-        return next(entity for entity in cls.entities if ue_identite in entity.unites_enseignements)
+        return next(
+            (entity for entity in cls.entities if ue_identite in entity.unites_enseignements),
+            None
+        )
 
     @classmethod
     def search(
@@ -56,18 +58,17 @@ class ResponsableDeNotesInMemoryRepository(InMemoryGenericRepository, IResponsab
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
             codes_unites_enseignement: List[str] = None,
             annee_academique: Optional[int] = None,
-            feuille_notes_identities: List['IdentiteFeuilleDeNotes'] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
         return list(
             filter(
-                lambda entity: _filter(entity, codes_unites_enseignement, annee_academique, feuille_notes_identities),
+                lambda entity: _filter(entity, codes_unites_enseignement, annee_academique),
                 cls.entities
             )
         )
 
 
-def _filter(entity, codes_unites_enseignement, annee_academique, feuille_notes_identities):
+def _filter(entity, codes_unites_enseignement, annee_academique):
     matches = set()
     if codes_unites_enseignement:
         matches.add(
@@ -76,6 +77,4 @@ def _filter(entity, codes_unites_enseignement, annee_academique, feuille_notes_i
                 for code in codes_unites_enseignement
             )
         )
-    if feuille_notes_identities:
-        matches.add(entity.entity_id in feuille_notes_identities)
     return all(matches)

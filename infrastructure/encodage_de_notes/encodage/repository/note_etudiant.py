@@ -23,22 +23,37 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import abc
+from typing import List, Optional
 
-from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
-    PasGestionnaireParcoursExceptionException
-from osis_common.ddd import interface
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from osis_common.ddd.interface import ApplicationService
 
 
-class GestionnaireParcours(interface.DomainService):
+class NoteEtudiantRepository(INoteEtudiantRepository):
 
     @classmethod
-    def verifier(
-            cls,
-            matricule_gestionnaire: str,
-            cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-    ) -> None:
-        if not cohortes_gestionnaire_translator.search(matricule_gestionnaire):
-            # TODO :: perfomance : 'search' est appelé 2 fois dans meme use case
-            # TODO :: perfomance : pareil pour 'PeriodeSoumissionOuverte'
-            raise PasGestionnaireParcoursExceptionException()
+    @abc.abstractmethod
+    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def save(cls, entity: 'NoteEtudiant') -> None:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def get_all_identities(cls) -> List['IdentiteNoteEtudiant']:
+        raise NotImplementedError
+
+    @classmethod
+    @abc.abstractmethod
+    def get(cls, entity_id: 'IdentiteNoteEtudiant') -> 'NoteEtudiant':
+        raise NotImplementedError

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Set
 
 from django.utils.translation import gettext_lazy as _
 
@@ -35,29 +36,11 @@ class EnseignantNonAttribueUniteEnseignementException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class PeriodeSoumissionNotesFermeeException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("The period of scores' encoding is not opened")
-        super().__init__(message, **kwargs)
-
-
-class DateRemiseNoteAtteinteException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("Deadline reached")
-        super().__init__(message, **kwargs)
-
-
 class AucunEtudiantTrouveException(BusinessException):
     def __init__(self, learning_unit_code: str, **kwargs):
         message = _("The enrollment to the learning unit {learning_unit_code} doesn't exist").format(
             learning_unit_code=learning_unit_code,
         )
-        super().__init__(message, **kwargs)
-
-
-class NomaNeCorrespondPasEmailException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("Registration ID does not match email")
         super().__init__(message, **kwargs)
 
 
@@ -75,12 +58,6 @@ class NoteDejaSoumiseException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class NoteDecimaleNonAutoriseeException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("Decimal scores not authorized")
-        super().__init__(message, **kwargs)
-
-
 class PasResponsableDeNotesException(BusinessException):
     def __init__(self, code_unite_enseignement: str, **kwargs):
         message = _("You must be score responsible of {code_unite_enseignement} to submit the scores").format(
@@ -89,7 +66,13 @@ class PasResponsableDeNotesException(BusinessException):
         super().__init__(message, **kwargs)
 
 
-class PasGestionnaireParcoursExceptionException(BusinessException):
+class PasGestionnaireParcoursException(BusinessException):
     def __init__(self, **kwargs):
         message = _("You're not a program manager (no assigned formations found)")
+        super().__init__(message, **kwargs)
+
+
+class PasGestionnaireParcoursCohorteException(BusinessException):
+    def __init__(self, cohortes_non_geres: Set[str], **kwargs):
+        message = _("You're not a program manager of {}").format(','.join(cohortes_non_geres))
         super().__init__(message, **kwargs)

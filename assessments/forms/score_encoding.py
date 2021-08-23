@@ -25,9 +25,56 @@
 ##############################################################################
 from django import forms
 from django.forms import HiddenInput
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django.utils.translation import pgettext_lazy, gettext_lazy as _
+
 
 from base.forms.utils import choice_field
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
+from infrastructure.messages_bus import message_bus_instance
+
+
+class ScoreEncodingForm(forms.Form):
+    note = forms.CharField(max_length=100, required=False)
+    noma = forms.CharField(widget=HiddenInput())
+
+
+class ScoreSearchForm(forms.Form):
+    noma = forms.CharField(required=False)
+    nom = forms.CharField(required=False)
+    prenom = forms.CharField(required=False)
+    justification = forms.ChoiceField(
+        choices=choice_field.add_blank(
+            JustificationTypes.choices(),
+            blank_choice_display=pgettext_lazy("male plural", "All")
+        ),
+        required=False
+    )
+    nom_cohorte = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+
+    def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
+        super().__init__(**kwargs)
+        self.fields['nom_cohorte'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
+
+    def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
+        cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
+        results = message_bus_instance.invoke(cmd)
+        choices = (
+            (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
+        )
+        return choice_field.add_blank(tuple(choices))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if not any([
+            cleaned_data['noma'],
+            cleaned_data['nom'],
+            cleaned_data['prenom'],
+            cleaned_data['justification'],
+            cleaned_data['nom_cohorte'],
+        ]):
+            self.add_error(None, _("Please choose at least one criteria!"))
+        return cleaned_data
 
 
 class ScoreEncodingProgressFilterForm(forms.Form):
@@ -51,8 +98,3 @@ class ScoreEncodingProgressFilterForm(forms.Form):
         # )
         choices = ()
         return choice_field.add_blank(tuple(choices), blank_choice_display=pgettext_lazy("male plural", "All"))
-
-
-class ScoreEncodingForm(forms.Form):
-    note = forms.CharField(max_length=100, required=False)
-    noma = forms.CharField(widget=HiddenInput())

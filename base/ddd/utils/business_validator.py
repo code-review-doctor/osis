@@ -25,7 +25,7 @@
 ##############################################################################
 from abc import ABC
 from functools import partial
-from typing import List, Set, Union
+from typing import List, Set, Union, Iterable
 
 import attr
 
@@ -122,7 +122,7 @@ class BusinessListValidator(BusinessValidator):
 
 
 class MultipleBusinessExceptions(Exception):
-    def __init__(self, exceptions: Set['BusinessException']):
+    def __init__(self, exceptions: Iterable['BusinessException']):
         self.exceptions = exceptions
 
 

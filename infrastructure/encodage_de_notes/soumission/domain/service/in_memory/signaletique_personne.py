@@ -26,7 +26,7 @@
 from typing import Set
 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_personne import ISignaletiquePersonneTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import DetailContactDTO, AdresseDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DetailContactDTO, AdresseDTO
 
 
 class SignaletiquePersonneTranslatorInMemory(ISignaletiquePersonneTranslator):

@@ -76,7 +76,6 @@ class AttributionEnseignantTest(TestCase):
         }
         self.assertSetEqual(expected_result, result)
 
-    @skip("Waiting for domain to be implemented")
     def test_should_trouver_repartition_classes(self):
         raise NotImplementedError  # TODO :: en attente du domaine 'effective_class_repartition'
 

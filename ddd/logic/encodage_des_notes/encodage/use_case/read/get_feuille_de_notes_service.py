@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand
 from ddd.logic.encodage_des_notes.encodage.domain.service.feuille_de_notes_par_cohorte import \
     FeuilleDeNotesParCohorte
-from ddd.logic.encodage_des_notes.encodage.domain.service.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.dtos import FeuilleDeNotesParCohorteDTO
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
@@ -46,6 +46,7 @@ def get_feuille_de_notes_gestionnaire(
         cmd: 'GetFeuilleDeNotesGestionnaireCommand',
         note_repo: 'INoteEtudiantRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
+        signaletique_personne_translator: 'ISignaletiquePersonneTranslator',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         inscription_examen_translator: 'IInscriptionExamenTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
@@ -55,7 +56,7 @@ def get_feuille_de_notes_gestionnaire(
 ) -> 'FeuilleDeNotesParCohorteDTO':
     # GIVEN
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
-    GestionnaireParcours().verifier(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
+    GestionnaireParcoursBuilder().get(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
 
     periode_encodage = periode_encodage_note_translator.get()
     notes = note_repo.search_by_code_unite_enseignement_annee_session(
@@ -68,6 +69,7 @@ def get_feuille_de_notes_gestionnaire(
         matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
         notes=notes,
         responsable_notes_repo=responsable_notes_repo,
+        signaletique_personne_translator=signaletique_personne_translator,
         periode_encodage=periode_encodage_note_translator.get(),
         inscription_examen_translator=inscription_examen_translator,
         signaletique_etudiant_translator=signaletique_etudiant_translator,

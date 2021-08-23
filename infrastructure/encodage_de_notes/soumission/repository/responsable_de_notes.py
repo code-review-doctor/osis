@@ -27,7 +27,7 @@ import functools
 import itertools
 import operator
 import string
-from typing import Optional, List, Tuple
+from typing import Optional, List
 
 from django.db.models import F, Q, CharField
 from django.db.models.functions import Concat
@@ -35,12 +35,11 @@ from django.db.models.functions import Concat
 from assessments.models.score_responsible import ScoreResponsible
 from base.auth.roles.tutor import Tutor
 from base.models.learning_unit_year import LearningUnitYear
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_builder import ResponsableDeNotesBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
     UniteEnseignementIdentiteFromRepositoryDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
@@ -55,7 +54,6 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
             codes_unites_enseignement: List[str] = None,
             annee_academique: Optional[int] = None,
-            feuille_notes_identities: List['IdentiteFeuilleDeNotes'] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
         qs = _fetch_responsable_de_notes()

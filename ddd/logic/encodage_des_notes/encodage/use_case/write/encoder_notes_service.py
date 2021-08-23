@@ -23,24 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from collections import OrderedDict
+from typing import List, Tuple, Dict
 
+from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
+from ddd.logic.encodage_des_notes.encodage.builder.identite_note_etudiant_builder import NoteEtudiantIdentityBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import EncoderNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant
+from ddd.logic.encodage_des_notes.encodage.domain.service.encoder_notes_en_lot import EncoderNotesEnLot
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import IPeriodeEncodageNotesTranslator
+from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
+
+NouvelleNote = str
+EmailEtudiant = str
 
 
 def encoder_notes(
         cmd: 'EncoderNotesCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
+        cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
 ) -> List['IdentiteNoteEtudiant']:
     # Given
-    # Anticorruption layer : cf. DomainService dans contexte "soumission"
+    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
+    gestionnaire_parcours = GestionnaireParcoursBuilder().get(
+        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
+        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
+    )
+    periode_ouverte = periode_encodage_note_translator.get()
 
-    # When
-    for note_cmd in cmd.notes_encodees:
-        pass
+    # WHEN
+    notes = EncoderNotesEnLot().execute(cmd.notes_encodees, gestionnaire_parcours, note_etudiant_repo, periode_ouverte)
 
-    # Then
-    # Historiser (DomainService)
-    return
+    return notes

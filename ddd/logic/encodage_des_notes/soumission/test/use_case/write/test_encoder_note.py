@@ -32,15 +32,16 @@ from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.exam_enrollment_justification_type import TutorJustificationTypes
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException, \
+    NomaNeCorrespondPasEmailException, NoteDecimaleNonAutoriseeException, PeriodeEncodageNotesFermeeException
 from ddd.logic.encodage_des_notes.soumission.commands import EncoderNoteCommand
 from ddd.logic.encodage_des_notes.soumission.domain.model._note import Justification
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PeriodeSoumissionNotesFermeeException, \
-    EnseignantNonAttribueUniteEnseignementException, DateRemiseNoteAtteinteException, \
-    NomaNeCorrespondPasEmailException, NoteIncorrecteException, \
-    NoteDecimaleNonAutoriseeException, NoteDejaSoumiseException
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO, DateDTO, AttributionEnseignantDTO
-from ddd.logic.encodage_des_notes.tests.factory.note_etudiant import NoteManquanteEtudiantFactory, \
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
+    EnseignantNonAttribueUniteEnseignementException, NoteIncorrecteException, NoteDejaSoumiseException
+from ddd.logic.encodage_des_notes.soumission.dtos import DateDTO, AttributionEnseignantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
+from ddd.logic.encodage_des_notes.soumission.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteDecimalesAuthorisees, NoteDejaSoumise
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \
     AttributionEnseignantTranslatorInMemory
@@ -88,7 +89,7 @@ class EncoderNoteTest(SimpleTestCase):
     def test_should_empecher_si_periode_fermee_depuis_hier(self):
         hier = datetime.date.today() - datetime.timedelta(days=1)
         date_dans_le_passe = DateDTO(jour=hier.day, mois=hier.month, annee=hier.year)
-        periode_fermee = PeriodeSoumissionNotesDTO(
+        periode_fermee = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -96,14 +97,14 @@ class EncoderNoteTest(SimpleTestCase):
         )
         self.periode_encodage_notes_translator.get = lambda *args: periode_fermee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_autoriser_si_periode_ferme_aujourdhui(self):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_passe = DateDTO(jour=1, mois=1, annee=1950)
-        periode_ouverte = PeriodeSoumissionNotesDTO(
+        periode_ouverte = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_dans_le_passe,
@@ -120,7 +121,7 @@ class EncoderNoteTest(SimpleTestCase):
         aujourdhui = datetime.date.today()
         date_aujourdhui = DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year)
         date_dans_le_futur = DateDTO(jour=1, mois=1, annee=9999)
-        periode_ouverte = PeriodeSoumissionNotesDTO(
+        periode_ouverte = PeriodeEncodageNotesDTO(
             annee_concernee=self.note.annee,
             session_concernee=self.note.numero_session,
             debut_periode_soumission=date_aujourdhui,
@@ -137,7 +138,7 @@ class EncoderNoteTest(SimpleTestCase):
         aucune_periode_trouvee = None
         self.periode_encodage_notes_translator.get = lambda *args: aucune_periode_trouvee
 
-        with self.assertRaises(PeriodeSoumissionNotesFermeeException):
+        with self.assertRaises(PeriodeEncodageNotesFermeeException):
             self.message_bus.invoke(self.cmd)
 
     def test_should_empecher_si_utilisateur_non_attribue_unite_enseignement(self):
@@ -171,7 +172,7 @@ class EncoderNoteTest(SimpleTestCase):
             self.message_bus.invoke(cmd)
         self.assertIsInstance(
             class_exceptions.exception.exceptions.pop(),
-            DateRemiseNoteAtteinteException
+            DateEcheanceNoteAtteinteException
         )
 
     def test_should_autoriser_si_date_de_remise_est_aujourdhui(self):
@@ -212,6 +213,12 @@ class EncoderNoteTest(SimpleTestCase):
             NoteIncorrecteException
         )
 
+    def test_should_encoder_note_de_presence(self):
+        note_de_presence = "0"
+        cmd = attr.evolve(self.cmd, note=note_de_presence)
+        entity_id = self.message_bus.invoke(cmd)
+        self.assertEqual(self.repository.get(entity_id).note.value, Decimal(0.0))
+
     def test_should_empecher_si_note_superieure_20(self):
         cmd = attr.evolve(self.cmd, note="21")
 
@@ -221,6 +228,11 @@ class EncoderNoteTest(SimpleTestCase):
             class_exceptions.exception.exceptions.pop(),
             NoteIncorrecteException
         )
+
+    def test_should_encoder_20(self):
+        cmd = attr.evolve(self.cmd, note="20")
+        entity_id = self.message_bus.invoke(cmd)
+        self.assertEqual(self.repository.get(entity_id).note.value, Decimal(20.0))
 
     def test_should_empecher_si_note_pas_lettre_autorisee(self):
         cmd = attr.evolve(self.cmd, note="S")

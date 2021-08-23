@@ -40,11 +40,10 @@ class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
             cls,
             matricule_gestionnaire: str,
     ) -> Set['CohorteGestionnaireDTO']:
-        # TODO :: intégrer 11BA
         qs = ProgramManager.objects.filter(
             person__global_id=matricule_gestionnaire
         ).annotate(
-            nom_cohorte=Subquery(
+            nom_formation=Subquery(
                 EducationGroupYear.objects.filter(
                     education_group_id=OuterRef('education_group_id')
                 ).order_by(
@@ -52,8 +51,21 @@ class CohortesDuGestionnaireTranslator(ICohortesDuGestionnaire):
                 ).values('acronym')[:1]
             ),
             matricule_gestionnaire=F('person__global_id'),
+            is_11ba=F('cohort'),
         ).values(
-            'nom_cohorte',
+            'nom_formation',
+            'is_11ba',
             'matricule_gestionnaire',
         )
-        return {CohorteGestionnaireDTO(**values) for values in qs}
+        result = set()
+        for values_dict in qs:
+            nom_cohorte = values_dict['nom_formation']
+            if values_dict['is_11ba']:
+                nom_cohorte = nom_cohorte.replace('1BA', '11BA')
+            result.add(
+                CohorteGestionnaireDTO(
+                    matricule_gestionnaire=values_dict['matricule_gestionnaire'],
+                    nom_cohorte=nom_cohorte,
+                )
+            )
+        return result

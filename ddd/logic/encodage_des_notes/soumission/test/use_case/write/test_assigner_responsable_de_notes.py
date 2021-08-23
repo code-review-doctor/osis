@@ -29,7 +29,7 @@ from django.test import SimpleTestCase
 from ddd.logic.encodage_des_notes.soumission.commands import AssignerResponsableDeNotesCommand
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import \
     EnseignantNonAttribueUniteEnseignementException
-from ddd.logic.encodage_des_notes.tests.factory.responsable_de_notes import \
+from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
     ResponsableDeNotesPourUneUniteEnseignement, \
     ResponsableDeNotesPourMultipleUniteEnseignements
 from infrastructure.encodage_de_notes.shared_kernel.service.in_memory.attribution_enseignant import \

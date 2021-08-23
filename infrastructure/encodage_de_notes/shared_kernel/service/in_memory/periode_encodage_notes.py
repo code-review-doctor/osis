@@ -27,13 +27,12 @@ import datetime
 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 
 
 class PeriodeEncodageNotesTranslatorInMemory(IPeriodeEncodageNotesTranslator):
 
-    periode_soumission_ouverte = PeriodeSoumissionNotesDTO(
+    periode_soumission_ouverte = PeriodeEncodageNotesDTO(
         annee_concernee=2020,
         session_concernee=2,
         debut_periode_soumission=DateDTO(jour=1, mois=1, annee=datetime.date.today().year),
@@ -41,5 +40,5 @@ class PeriodeEncodageNotesTranslatorInMemory(IPeriodeEncodageNotesTranslator):
     )
 
     @classmethod
-    def get(cls) -> 'PeriodeSoumissionNotesDTO':
+    def get(cls) -> 'PeriodeEncodageNotesDTO':
         return cls.periode_soumission_ouverte

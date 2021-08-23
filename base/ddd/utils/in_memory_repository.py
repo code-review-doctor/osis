@@ -45,12 +45,13 @@ class InMemoryGenericRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'EntityIdentity', **kwargs: ApplicationService) -> None:
-        cls.entities.remove(next(ent for ent in cls.entities if ent.entity_id == entity_id))
+        cls.entities.remove(cls.get(entity_id))
 
     @classmethod
     def save(cls, entity: 'RootEntity') -> None:
-        if entity in cls.entities:
-            cls.entities.remove(entity)
+        to_remove = cls.get(entity.entity_id)
+        if to_remove:
+            cls.entities.remove(to_remove)
         cls.entities.append(entity)
 
     @classmethod

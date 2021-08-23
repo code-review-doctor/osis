@@ -35,8 +35,9 @@ from osis_role.contrib.tests.factories import EducationGroupRoleModelFactory
 class ProgramManagerFactory(EducationGroupRoleModelFactory):
     class Meta:
         model = "base.ProgramManager"
-        django_get_or_create = ('person', 'education_group')
+        django_get_or_create = ('person', 'education_group', 'cohort')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     education_group = factory.SubFactory(EducationGroupFactory)
+    cohort = None

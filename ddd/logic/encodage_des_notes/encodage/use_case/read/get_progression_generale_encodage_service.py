@@ -32,7 +32,6 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant 
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO
-from ddd.logic.encodage_des_notes.soumission.repository.i_feuille_de_notes import IFeuilleDeNotesRepository
 
 
 def get_progression_generale(
