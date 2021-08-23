@@ -31,6 +31,7 @@ from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 
 
 class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
@@ -53,6 +54,8 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
         self.addCleanup(self.patch_message_bus.stop)
 
     def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetCohortesGestionnaireCommand):
+            return []
         raise Exception('Bus Command not mocked in test')
 
     def test_case_user_not_logged(self):
@@ -81,3 +84,6 @@ class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
         self.assertTrue('last_synchronization' in response.context)
         self.assertEqual(response.context['person'], self.program_manager.person)
         self.assertIsInstance(response.context['search_form'], ScoreEncodingProgressFilterForm)
+
+        expected_score_search_url = reverse('score_search')
+        self.assertEqual(response.context['score_search_url'], expected_score_search_url)

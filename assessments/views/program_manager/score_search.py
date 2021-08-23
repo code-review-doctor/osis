@@ -85,6 +85,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
             **super().get_context_data(**kwargs),
             'search_form': self.get_search_form(),
             'notes_etudiant_filtered': self.get_notes_etudiant_filtered(),
+            'score_encoding_progress_overview_url': self.get_score_encoding_progress_overview_url()
         }
 
     def get_notes_etudiant_filtered(self):
@@ -99,3 +100,6 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
             )
             # return message_bus_instance.invoke(cmd)
         return []
+
+    def get_score_encoding_progress_overview_url(self):
+        return reverse('score_encoding_progress_overview')

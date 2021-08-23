@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.urls import reverse
+
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
 from base.models import synchronization
@@ -39,6 +41,7 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
             **super().get_context_data(**kwargs),
             'progression_generale': self.get_progression_generale(),
             'search_form': self.get_search_form(),
+            'score_search_url': self.get_score_search_url(),
             'last_synchronization': self.get_last_synchronization()
         }
 
@@ -56,3 +59,6 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
 
     def get_last_synchronization(self):
         return synchronization.find_last_synchronization_date()
+
+    def get_score_search_url(self):
+        return reverse('score_search')

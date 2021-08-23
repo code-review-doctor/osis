@@ -91,10 +91,9 @@ class ScoreEncodingProgressFilterForm(forms.Form):
         self.fields['cohorte_name'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
 
     def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
-        # cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
-        # results = message_bus_instance.invoke(cmd)
-        # choices = (
-        #     (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
-        # )
-        choices = ()
+        cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
+        results = message_bus_instance.invoke(cmd)
+        choices = (
+            (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
+        )
         return choice_field.add_blank(tuple(choices), blank_choice_display=pgettext_lazy("male plural", "All"))

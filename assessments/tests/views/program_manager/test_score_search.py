@@ -69,3 +69,9 @@ class ScoreSearchViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertIsInstance(response.context['search_form'], ScoreSearchForm)
         self.assertIsInstance(response.context['notes_etudiant_filtered'], List)
+
+        expected_score_encoding_progress_overview_url = reverse('score_encoding_progress_overview')
+        self.assertEqual(
+            response.context['score_encoding_progress_overview_url'],
+            expected_score_encoding_progress_overview_url
+        )
