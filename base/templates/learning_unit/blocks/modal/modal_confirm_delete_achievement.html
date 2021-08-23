@@ -27,15 +27,20 @@
 {% block modal_id %}modalDeleteLuyAchievement{% endblock %}
 
 {% block modal_content %}
+    <div class="modal-header">
+        <label>{% trans "Are you sure you want to delete the achievement" %}</label>
+        <label id="lbl_achievement_code_name"></label>
+        <label>?</label>
+    </div>
     <form>
         {% csrf_token %}
         <div class="modal-body">
-            {% trans "Are you sure you want to delete the achievement?" %}
+            {% trans "This action will permanently delete the achievement" %}
          </div>
         <input type="hidden" id="hdn_btn_delete_achievement_id" />
          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-            <button type="button" class="btn btn-danger" onclick="submit_delete()">{% trans "Confirm" %}</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fas fa-times"></i> {% trans "Cancel" %}</button>
+            <button type="button" class="btn btn-danger" onclick="submit_delete();"><i class="fas fa-trash-alt"></i> {% trans "Delete" %}</button>
          </div>
     </form>
     <script type="application/javascript">

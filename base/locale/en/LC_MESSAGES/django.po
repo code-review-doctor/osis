@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-27 11:19+0200\n"
+"POT-Creation-Date: 2021-08-23 10:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -354,7 +354,7 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure you want to delete the achievement?"
+msgid "Are you sure you want to delete the achievement"
 msgstr ""
 
 msgid "Are you sure you want to delete the teaching material?"
@@ -688,6 +688,9 @@ msgid "Default information"
 msgstr ""
 
 msgid "Default learning unit enrollment"
+msgstr ""
+
+msgid "Delete"
 msgstr ""
 
 msgid "Delete learning unit year definitively"
@@ -2673,6 +2676,9 @@ msgid "This action will permanently cancel the proposal"
 msgstr ""
 
 msgid "This action will permanently cancel the selected proposal(s)"
+msgstr ""
+
+msgid "This action will permanently delete the achievement"
 msgstr ""
 
 msgid "This code already exists for this learning unit"

@@ -165,7 +165,7 @@
                                 </div>
                             </div>
                             <div class="col-md-1">
-                                <span style="display: inline-block; width: 70%; overflow: hidden; text-overflow: ellipsis;">
+                                <span style="display: inline-block; width: 70%; overflow: hidden; text-overflow: ellipsis;" id="spn_achievement_code_name_{{ achievement.id }}">
                                     {{ achievement.code_name|default:""}}
                                 </span>
                                 {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
@@ -179,7 +179,7 @@
                             </div>
                         {% else %}
                             <div class="col-md-2 text-right">
-                                {{ achievement.code_name|default:"" }}
+                                <span id="spn_achievement_code_name_{{ achievement.id }}">{{ achievement.code_name|default:"" }}</span>
                             </div>
                         {% endif %}
 
@@ -259,7 +259,14 @@
                 var id_btn_to_submit_delete = this.id;
                 id_btn_to_submit_delete = id_btn_to_submit_delete.replace('operation_','');
                 $('#hdn_btn_delete_achievement_id').val(id_btn_to_submit_delete);
-
+                $("#lbl_achievement_code_name").empty();
+                var id_achievement = id_btn_to_submit_delete.replace('btn_delete_','');
+                console.log(id_achievement);
+                var code_name = $('#spn_achievement_code_name_'+id_achievement).text();
+                console.log(code_name);
+                console.log('kk');
+                $("#lbl_achievement_code_name").append(code_name);
+{#$('#spn_achievement_code_name_'+id_btn_to_submit_delete).val()#}
             });
 
             function set_achievement_id(id){
