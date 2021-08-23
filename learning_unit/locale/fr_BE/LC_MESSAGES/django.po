@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-30 13:22+0200\n"
+"POT-Creation-Date: 2021-08-23 14:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,20 +86,29 @@ msgstr "Complément spécifique à la classe"
 msgid "Classes can only be created by a faculty manager"
 msgstr "Les classes ne peuvent être créées que par un gestionnaire facultaire"
 
+msgid "Classes copy report"
+msgstr "Rapport de copie de classes"
+
 msgid "Code"
 msgstr "Code"
 
 msgid "Common part"
 msgstr "Partie commune"
 
-msgid "Complete LU"
-msgstr "UE complète"
-
 msgid "Components"
 msgstr "Composants"
 
 msgid "Confirm"
 msgstr "Confirmer"
+
+msgid "Copy result"
+msgstr "Résultat de la copie    "
+
+msgid "Copy source"
+msgstr "Origine de la copie"
+
+msgid "Copy to next year"
+msgstr "Copier en N+1"
 
 msgid "Credits"
 msgstr "Crédits"
@@ -112,6 +121,9 @@ msgstr "Supprimer la classe définitivement"
 
 msgid "Derogation's session"
 msgstr "Session de dérogation"
+
+msgid "Error"
+msgstr "Erreur"
 
 msgid "Faculty manager"
 msgstr "Gestionnaire facultaire"

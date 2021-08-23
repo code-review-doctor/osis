@@ -28,14 +28,67 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.component_type import LECTURING
 from base.models.enums import quadrimesters, learning_unit_year_session
+from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
 
 
+def copy_to_next_year(modeladmin, request, queryset):
+    from ddd.logic.learning_unit.commands import CreateEffectiveClassCommand
+    from infrastructure.messages_bus import message_bus_instance
+    qs = queryset.select_related("learning_component_year")
+
+    report = []
+    for obj in qs:
+        classe_source = "{} - {} — {}".format(
+            obj.learning_component_year.learning_unit_year.acronym,
+            obj.acronym,
+            obj.learning_component_year.learning_unit_year.academic_year
+        )
+        classe_result = ''
+        copy_exception = ''
+
+        cmd = CreateEffectiveClassCommand(
+            class_code=obj.acronym,
+            learning_unit_code=obj.learning_component_year.learning_unit_year.acronym,
+            year=obj.learning_component_year.learning_unit_year.academic_year.year+1,
+            title_fr=obj.title_fr,
+            title_en=obj.title_en,
+            teaching_place_uuid=obj.campus.uuid,
+            derogation_quadrimester=obj.quadrimester,
+            session_derogation=obj.session,
+            volume_first_quadrimester=obj.hourly_volume_partial_q1,
+            volume_second_quadrimester=obj.hourly_volume_partial_q2
+
+        )
+        try:
+            new_classe_identity = message_bus_instance.invoke(cmd)
+            classe_result = "{} - {} — {}".format(
+                new_classe_identity.learning_unit_identity.code,
+                new_classe_identity.class_code,
+                new_classe_identity.learning_unit_identity.academic_year
+            )
+        except MultipleBusinessExceptions as multiple_exceptions:
+            copy_exception = ", ". join([ex.message for ex in list(multiple_exceptions.exceptions)])
+
+        report.append({
+            'source': classe_source,
+            'result': classe_result,
+            'exception': copy_exception})
+
+    return create_class_copy_report(request.user, report)
+
+
+copy_to_next_year.short_description = _("Copy to next year")
+
+
 class LearningClassYearAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
-    list_display = ('learning_component_year', 'acronym')
+    list_display = ('learning_component_year', 'year', 'acronym')
     search_fields = ['acronym', 'learning_component_year__learning_unit_year__acronym']
+
+    actions = [copy_to_next_year]
 
 
 class LearningClassYearManager(models.Manager):
@@ -97,3 +150,7 @@ class LearningClassYear(models.Model):
         volume_total_of_classes += self.hourly_volume_partial_q1 or 0
         volume_total_of_classes += self.hourly_volume_partial_q2 or 0
         return volume_total_of_classes
+
+    @property
+    def year(self):
+        return self.learning_component_year.learning_unit_year.academic_year.year
