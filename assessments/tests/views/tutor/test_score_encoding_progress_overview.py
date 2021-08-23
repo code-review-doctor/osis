@@ -23,28 +23,60 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
+import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from assessments.forms.score_encoding import ScoreSearchForm
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from base.tests.factories.tutor import TutorFactory
+from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
+from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO, \
+    ProgressionEncodageNotesUniteEnseignementDTO, DateEcheanceDTO
 
 
-class ScoreSearchViewTest(TestCase):
+class ScoreEncodingProgressOverviewTutorViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.program_manager = ProgramManagerFactory(person__global_id="123456789")
+        cls.tutor = TutorFactory(person__global_id="123456789")
         cls.academic_year = AcademicYearFactory()
 
-        cls.url = reverse('score_search')
+        cls.url = reverse('score_encoding_progress_overview')
 
     def setUp(self) -> None:
-        self.client.force_login(self.program_manager.person.user)
+        self.client.force_login(self.tutor.person.user)
         self.session_exam_calendar = SessionExamCalendarFactory.create_academic_event(self.academic_year)
+
+        self.patch_message_bus = mock.patch(
+            "assessments.views.tutor.score_encoding_progress_overview.message_bus_instance.invoke",
+            side_effect=self.__mock_message_bus_invoke
+        )
+        self.message_bus_mocked = self.patch_message_bus.start()
+        self.addCleanup(self.patch_message_bus.stop)
+
+    def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetProgressionGeneraleCommand):
+            return ProgressionGeneraleEncodageNotesDTO(
+                annee_academique=2020,
+                numero_session=2,
+                progression_generale=[
+                    ProgressionEncodageNotesUniteEnseignementDTO(
+                        code_unite_enseignement='LDROI1200',
+                        intitule_complet_unite_enseignement='Introduction aux droits',
+                        dates_echeance=[
+                            DateEcheanceDTO(
+                                jour=10,
+                                mois=12,
+                                annee=2020,
+                                quantite_notes_soumises=5,
+                                quantite_total_notes=10,
+                            )
+                        ],
+                        a_etudiants_peps=True,
+                    )
+                ]
+            )
+        raise Exception('Bus Command not mocked in test')
 
     def test_case_user_not_logged(self):
         self.client.logout()
@@ -63,15 +95,10 @@ class ScoreSearchViewTest(TestCase):
     def test_assert_template_used(self):
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, "assessments/program_manager/score_search_form.html")
+        self.assertTemplateUsed(response, "assessments/tutor/score_encoding_progress_overview.html")
 
     def test_assert_contexts(self):
         response = self.client.get(self.url)
-        self.assertIsInstance(response.context['search_form'], ScoreSearchForm)
-        self.assertIsInstance(response.context['notes_etudiant_filtered'], List)
 
-        expected_score_encoding_progress_overview_url = reverse('score_encoding_progress_overview')
-        self.assertEqual(
-            response.context['score_encoding_progress_overview_url'],
-            expected_score_encoding_progress_overview_url
-        )
+        self.assertIsInstance(response.context['progression_generale'], ProgressionGeneraleEncodageNotesDTO)
+        self.assertEqual(response.context['person'], self.tutor.person)

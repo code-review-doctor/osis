@@ -75,3 +75,25 @@ class ScoreSearchForm(forms.Form):
         ]):
             self.add_error(None, _("Please choose at least one criteria!"))
         return cleaned_data
+
+
+class ScoreEncodingProgressFilterForm(forms.Form):
+    cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+    tutor = forms.CharField(max_length=100, required=False, label=_('Tutor'))
+    learning_unit_code = forms.CharField(
+        max_length=100, required=False, label=_('Learning unit'),
+        widget=forms.TextInput(attrs={'placeholder':  pgettext_lazy('UE acronym', 'Acronym')})
+    )
+    incomplete_encodings_only = forms.BooleanField(required=False, label=_('Missing score'))
+
+    def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
+        super().__init__(**kwargs)
+        self.fields['cohorte_name'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
+
+    def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
+        cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
+        results = message_bus_instance.invoke(cmd)
+        choices = (
+            (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
+        )
+        return choice_field.add_blank(tuple(choices), blank_choice_display=pgettext_lazy("male plural", "All"))

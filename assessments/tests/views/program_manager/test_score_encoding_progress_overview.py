@@ -23,28 +23,40 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
+import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from assessments.forms.score_encoding import ScoreSearchForm
+from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from ddd.logic.encodage_des_notes.encodage.commands import GetCohortesGestionnaireCommand
 
 
-class ScoreSearchViewTest(TestCase):
+class ScoreEncodingProgressOverviewProgramManagerViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.program_manager = ProgramManagerFactory(person__global_id="123456789")
         cls.academic_year = AcademicYearFactory()
 
-        cls.url = reverse('score_search')
+        cls.url = reverse('score_encoding_progress_overview')
 
     def setUp(self) -> None:
         self.client.force_login(self.program_manager.person.user)
         self.session_exam_calendar = SessionExamCalendarFactory.create_academic_event(self.academic_year)
+
+        self.patch_message_bus = mock.patch(
+            "assessments.views.program_manager.score_encoding_progress_overview.message_bus_instance.invoke",
+            side_effect=self.__mock_message_bus_invoke
+        )
+        self.message_bus_mocked = self.patch_message_bus.start()
+        self.addCleanup(self.patch_message_bus.stop)
+
+    def __mock_message_bus_invoke(self, cmd):
+        if isinstance(cmd, GetCohortesGestionnaireCommand):
+            return []
+        raise Exception('Bus Command not mocked in test')
 
     def test_case_user_not_logged(self):
         self.client.logout()
@@ -63,15 +75,15 @@ class ScoreSearchViewTest(TestCase):
     def test_assert_template_used(self):
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, "assessments/program_manager/score_search_form.html")
+        self.assertTemplateUsed(response, "assessments/program_manager/score_encoding_progress_overview.html")
 
     def test_assert_contexts(self):
         response = self.client.get(self.url)
-        self.assertIsInstance(response.context['search_form'], ScoreSearchForm)
-        self.assertIsInstance(response.context['notes_etudiant_filtered'], List)
 
-        expected_score_encoding_progress_overview_url = reverse('score_encoding_progress_overview')
-        self.assertEqual(
-            response.context['score_encoding_progress_overview_url'],
-            expected_score_encoding_progress_overview_url
-        )
+        self.assertTrue('progression_generale' in response.context)
+        self.assertTrue('last_synchronization' in response.context)
+        self.assertEqual(response.context['person'], self.program_manager.person)
+        self.assertIsInstance(response.context['search_form'], ScoreEncodingProgressFilterForm)
+
+        expected_score_search_url = reverse('score_search')
+        self.assertEqual(response.context['score_search_url'], expected_score_search_url)

@@ -44,7 +44,7 @@
         <div class="panel-body">
             <ul class="nav nav-tabs nav-justified" id="tabs">
                 <li>
-                    <a href="{% url 'scores_encoding' %}" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a>
+                    <a href="{{ score_encoding_progress_overview_url }}" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a>
                 </li>
                 <li class="active">
                     <a data-toggle="tab" role="tab" href="#" id="lnk_score_search">{% trans 'By specific criteria' %}</a>
