@@ -25,20 +25,15 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsEnseignantCommand
 from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
     ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
-from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 
 
 # FIXME :: should be moved in another context "attribution_to_learning_unit"
-def search_attributions_to_learning_unit(
-        cmd: SearchAttributionsToLearningUnitCommand,
+def search_attributions_enseignant(
+        cmd: SearchAttributionsEnseignantCommand,
         tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
 ) -> List['TutorAttributionToLearningUnitDTO']:
-    learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
-        code=cmd.learning_unit_code,
-        year=cmd.learning_unit_year,
-    )
-    return tutor_attribution_translator.search_attributions_to_learning_unit(learning_unit_identity)
+    return tutor_attribution_translator.get_by_enseignant(cmd.matricule_fgs_enseignant, cmd.annee)

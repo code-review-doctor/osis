@@ -23,37 +23,74 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
+import datetime
 from typing import List
 
+from attribution.models.enums.function import Functions
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
 from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 from ddd.logic.learning_unit.domain.model.learning_unit import LearningUnitIdentity
-from osis_common.ddd import interface
 
 
-class ITutorAttributionToLearningUnitTranslator(interface.DomainService):
+class TutorAttributionToLearningUnitTranslatorInMemory(ITutorAttributionToLearningUnitTranslator):
+
+    attributions = [
+        TutorAttributionToLearningUnitDTO(
+            learning_unit_code='LDROI1001',
+            learning_unit_year=datetime.date.today().year,
+            attribution_uuid='attribution_uuid1',
+            last_name='Smith',
+            first_name='Charles',
+            personal_id_number='00321234',
+            function=Functions.COORDINATOR.name,
+            lecturing_volume_attributed=10.0,
+            practical_volume_attributed=15.0,
+        ),
+        TutorAttributionToLearningUnitDTO(
+            learning_unit_code='LDROI1001',
+            learning_unit_year=datetime.date.today().year,
+            attribution_uuid='attribution_uuid2',
+            last_name='Smith',
+            first_name='Bastos',
+            personal_id_number='00321235',
+            function=Functions.CO_HOLDER.name,
+            lecturing_volume_attributed=1.0,
+            practical_volume_attributed=5.0,
+        ),
+    ]
+
     @classmethod
-    @abc.abstractmethod
     def search_attributions_to_learning_unit(
             cls,
             learning_unit_identity: 'LearningUnitIdentity',
     ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
+        return list(
+            filter(
+                lambda dto: _filter(dto, learning_unit_identity),
+                cls.attributions
+            )
+        )
 
     @classmethod
-    @abc.abstractmethod
     def get_learning_unit_attribution(cls, attribution_uuid: str) -> 'TutorAttributionToLearningUnitDTO':
-        pass
+        return next(cls.search_learning_unit_attributions([attribution_uuid]))
 
     @classmethod
-    @abc.abstractmethod
     def search_learning_unit_attributions(
             cls,
             attribution_uuids: List[str]
     ) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
+        return [att for att in cls.attributions if att.attribution_uuid in attribution_uuids]
 
     @classmethod
-    @abc.abstractmethod
     def get_by_enseignant(cls, matricule_fgs_enseignant: str, annee: int) -> List['TutorAttributionToLearningUnitDTO']:
-        pass
+        return [
+            att for att in cls.attributions
+            if att.personal_id_number == matricule_fgs_enseignant and att.learning_unit_year == annee
+        ]
+
+
+def _filter(dto, learning_unit_identity):
+    return dto.learning_unit_code == learning_unit_identity.code \
+           and dto.learning_unit_year == learning_unit_identity.academic_year.year

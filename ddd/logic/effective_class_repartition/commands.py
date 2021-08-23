@@ -31,6 +31,12 @@ from osis_common.ddd import interface
 
 
 @attr.s(frozen=True, slots=True)
+class SearchAttributionsEnseignantCommand(interface.CommandRequest):
+    matricule_fgs_enseignant = attr.ib(type=str)
+    annee = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
 class SearchAttributionsToLearningUnitCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
@@ -41,6 +47,12 @@ class SearchTutorsDistributedToClassCommand(interface.CommandRequest):
     learning_unit_code = attr.ib(type=str)
     learning_unit_year = attr.ib(type=int)
     class_code = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class SearchClassesEnseignantCommand(interface.CommandRequest):
+    matricule_fgs_enseignant = attr.ib(type=str)
+    annee = attr.ib(type=int)
 
 
 @attr.s(frozen=True, slots=True)
