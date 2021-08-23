@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-23 10:21+0200\n"
+"POT-Creation-Date: 2021-08-23 10:45+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -371,9 +371,6 @@ msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
 
-msgid "Are you sure you want to delete the achievement"
-msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage"
-
 msgid "Are you sure you want to delete the teaching material?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
 
@@ -713,6 +710,10 @@ msgstr "Inscription par défaut aux cours"
 
 msgid "Delete"
 msgstr "Supprimer"
+
+msgctxt "learning_unit_achievement_delete"
+msgid "Delete achievement"
+msgstr "Supprimer l'acquis d'apprentissage"
 
 msgid "Delete learning unit year definitively"
 msgstr "Supprimer l'UE définitivement"
@@ -3454,6 +3455,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Are you sure you want to delete the achievement?"
-#~ msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage ?"

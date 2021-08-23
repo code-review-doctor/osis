@@ -261,12 +261,8 @@
                 $('#hdn_btn_delete_achievement_id').val(id_btn_to_submit_delete);
                 $("#lbl_achievement_code_name").empty();
                 var id_achievement = id_btn_to_submit_delete.replace('btn_delete_','');
-                console.log(id_achievement);
                 var code_name = $('#spn_achievement_code_name_'+id_achievement).text();
-                console.log(code_name);
-                console.log('kk');
                 $("#lbl_achievement_code_name").append(code_name);
-{#$('#spn_achievement_code_name_'+id_btn_to_submit_delete).val()#}
             });
 
             function set_achievement_id(id){
