@@ -29,7 +29,7 @@ import attr
 
 from base.ddd.utils.business_validator import BusinessValidator
 from ddd.logic.encodage_des_notes.business_types import *
-from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import DateRemiseNoteAtteinteException
+from ddd.logic.encodage_des_notes.shared_kernel.validator.exceptions import DateEcheanceNoteAtteinteException
 
 
 @attr.s(frozen=True, slots=True)
@@ -39,4 +39,4 @@ class ShouldDateDeRemiseNotePasEtreAtteinte(BusinessValidator):
     def validate(self, *args, **kwargs):
         aujourdhui = datetime.date.today()
         if aujourdhui > self.note_etudiant.get_date_limite_de_remise():
-            raise DateRemiseNoteAtteinteException()
+            raise DateEcheanceNoteAtteinteException()

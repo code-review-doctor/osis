@@ -25,7 +25,7 @@
 ##############################################################################
 import abc
 
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import PeriodeEncodageNotesDTO
 from osis_common.ddd import interface
 
 
@@ -33,5 +33,5 @@ class IPeriodeEncodageNotesTranslator(interface.DomainService):
 
     @classmethod
     @abc.abstractmethod
-    def get(cls) -> 'PeriodeSoumissionNotesDTO':
+    def get(cls) -> 'PeriodeEncodageNotesDTO':
         raise NotImplementedError

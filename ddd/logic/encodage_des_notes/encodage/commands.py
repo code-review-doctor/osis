@@ -33,12 +33,14 @@ from osis_common.ddd import interface
 @attr.s(frozen=True, slots=True)
 class EncoderNoteCommand(interface.CommandRequest):
     noma = attr.ib(type=str)
+    email = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     note = attr.ib(type=str)
 
 
 @attr.s(frozen=True, slots=True)
 class EncoderNotesCommand(interface.CommandRequest):
+    matricule_fgs_gestionnaire = attr.ib(type=str)
     notes_encodees = attr.ib(type=List[EncoderNoteCommand])
 
 

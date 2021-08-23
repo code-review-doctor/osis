@@ -27,7 +27,7 @@ from typing import List
 
 import attr
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO, NoteEtudiantDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO, NoteEtudiantDTO, DetailContactDTO
 from osis_common.ddd import interface
 
 
@@ -42,6 +42,7 @@ class FeuilleDeNotesParCohorteDTO(interface.DTO):
     code_unite_enseignement = attr.ib(type=str)
     intitule_complet_unite_enseignement = attr.ib(type=str)  # unite enseignement
     responsable_note = attr.ib(type=EnseignantDTO)  # responsables notes + signaletique enseignant ?
+    contact_responsable_notes = attr.ib(type=DetailContactDTO)
     autres_enseignants = attr.ib(type=List[EnseignantDTO])  # attributions
     annee_academique = attr.ib(type=int)
     numero_session = attr.ib(type=int)

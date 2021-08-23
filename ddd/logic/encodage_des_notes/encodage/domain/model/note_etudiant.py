@@ -44,9 +44,24 @@ class IdentiteNoteEtudiant(interface.EntityIdentity):
 @attr.s(slots=True)
 class NoteEtudiant(interface.RootEntity):
     entity_id = attr.ib(type=IdentiteNoteEtudiant)
+    email = attr.ib(type=str)
     note = attr.ib(type=Note)
-    date_echeance = attr.ib(type=date)
+    echeance_gestionnaire = attr.ib(type=date)
     nom_cohorte = attr.ib(type=str)
+    note_decimale_autorisee = attr.ib(type=bool)
 
-    def encoder(self, note: str) -> None:
-        raise NotImplementedError
+    @property
+    def noma(self):
+        return self.entity_id.noma
+
+    @property
+    def code_unite_enseignement(self):
+        return self.entity_id.code_unite_enseignement
+
+    @property
+    def annee_academique(self):
+        return self.entity_id.annee_academique
+
+    @property
+    def numero_session(self):
+        return self.entity_id.numero_session

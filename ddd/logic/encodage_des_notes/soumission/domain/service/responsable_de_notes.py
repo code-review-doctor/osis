@@ -25,7 +25,6 @@
 ##############################################################################
 from ddd.logic.encodage_des_notes.soumission.builder.responsable_de_notes_identity_builder import \
     ResponsableDeNotesIdentityBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
 from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasResponsableDeNotesException
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface

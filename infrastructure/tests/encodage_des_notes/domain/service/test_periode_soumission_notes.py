@@ -31,8 +31,7 @@ from django.test import SimpleTestCase
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from base.business.academic_calendar import AcademicSessionEvent
 from base.models.enums.academic_calendar_type import AcademicCalendarTypes
-from ddd.logic.encodage_des_notes.soumission.dtos import PeriodeSoumissionNotesDTO
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, PeriodeEncodageNotesDTO
 from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_notes import \
     PeriodeEncodageNotesTranslator
 
@@ -60,7 +59,7 @@ class PeriodeSoumissionNotesTest(SimpleTestCase):
             session=2,
         )
         mock_opened_events.return_value = [periode_fermee]
-        expected_result = PeriodeSoumissionNotesDTO(
+        expected_result = PeriodeEncodageNotesDTO(
             annee_concernee=self.annee_concernee,
             session_concernee=2,
             debut_periode_soumission=DateDTO(jour=hier.day, mois=hier.month, annee=hier.year),
@@ -80,7 +79,7 @@ class PeriodeSoumissionNotesTest(SimpleTestCase):
             session=2,
         )
         mock_opened_events.return_value = [periode_fermee]
-        expected_result = PeriodeSoumissionNotesDTO(
+        expected_result = PeriodeEncodageNotesDTO(
             annee_concernee=self.annee_concernee,
             session_concernee=2,
             debut_periode_soumission=DateDTO(jour=aujourdhui.day, mois=aujourdhui.month, annee=aujourdhui.year),

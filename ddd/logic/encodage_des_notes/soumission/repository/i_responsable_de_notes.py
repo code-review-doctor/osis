@@ -26,10 +26,9 @@
 import abc
 from typing import List, Optional
 
-from ddd.logic.encodage_des_notes.soumission.domain.model.feuille_de_notes import IdentiteFeuilleDeNotes
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -43,7 +42,6 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
             entity_ids: Optional[List['IdentiteResponsableDeNotes']] = None,
             codes_unites_enseignement: List[str] = None,
             annee_academique: Optional[int] = None,
-            feuille_notes_identities: List['IdentiteFeuilleDeNotes'] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
         pass
