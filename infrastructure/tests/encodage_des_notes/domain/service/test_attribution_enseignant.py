@@ -23,109 +23,92 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
 
-from django.test import TestCase
+from django.test import SimpleTestCase
 
-from attribution.tests.factories.attribution_class import AttributionClassFactory
-from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO, TutorClassRepartitionDTO
 from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 
 
-class AttributionEnseignantTest(TestCase):  # TODO :: to convert to SimpleTestCase (mock service_bus)
+class AttributionEnseignantTest(SimpleTestCase):
 
-    @classmethod
-    def setUpTestData(cls):
-        cls.code_unite_enseignement = "LDROI1001"
-        cls.annee = 2020
-        cls.translator = AttributionEnseignantTranslator()
-
-        cls.attribution_db = AttributionNewFactory(
-            learning_container_year__acronym=cls.code_unite_enseignement,
-            learning_container_year__academic_year__year=cls.annee,
+    def setUp(self) -> None:
+        self.code_unite_enseignement = "LDROI1001"
+        self.annee = 2020
+        self.translator = AttributionEnseignantTranslator()
+        self.matricule_fgs_enseignant = '12345678'
+        self.attribution_unite_enseignement_dto = TutorAttributionToLearningUnitDTO(
+            learning_unit_code=self.code_unite_enseignement,
+            learning_unit_year=self.annee,
+            attribution_uuid='uuid-attribution',
+            last_name='Smith',
+            first_name='Pierre',
+            personal_id_number=self.matricule_fgs_enseignant,
+            function='FUNCTION',
+            lecturing_volume_attributed=10.0,
+            practical_volume_attributed=15.0,
+        )
+        self.code_complet_classe = self.code_unite_enseignement + 'A'
+        self.repartition_classe_dto = TutorClassRepartitionDTO(
+            attribution_uuid='uuid-attribution',
+            last_name='Smith',
+            first_name='Pierre',
+            function='FUNCTION',
+            distributed_volume_to_class='10.0',
+            personal_id_number=self.matricule_fgs_enseignant,
+            complete_class_code=self.code_complet_classe,
+            annee=self.annee,
         )
 
-    def test_should_trouver_attribution_unite_enseignement(self):
-        attribution_class = AttributionClassFactory(
-            attribution_charge__attribution=self.attribution_db,
-            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=self.annee,
-            learning_class_year__learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
-        )
+    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
+    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
+    def test_should_trouver_attribution_sans_classe_par_unite_enseignement(self, mock_unites_enseignement, mock_classes):  # TODO :: to rename
+        mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
+        mock_classes.return_value = [self.repartition_classe_dto]
         result = self.translator.search_attributions_enseignant(self.code_unite_enseignement, self.annee)
-
-        expected_result = {self._convert_attribution_db_data_to_dto(self.attribution_db)}
+        dto = list(result)[0]
         detail_assertion = "Seule l'attribution à l'unite enseignement doit être renvoyée, pas l'attrib. à la classe"
-        attribution_classe = self._convert_class_attribution_db_data_to_dto(attribution_class)
-        self.assertNotIn(attribution_classe, result, detail_assertion)
-        self.assertSetEqual(expected_result, result, detail_assertion)
+        self.assertNotEqual(self.code_complet_classe, dto.code_unite_enseignement, detail_assertion)
+        self.assertEqual(self.code_unite_enseignement, dto.code_unite_enseignement, detail_assertion)
 
-    def test_should_trouver_attribution_par_matricule(self):
-        result = self.translator.search_attributions_enseignant_par_matricule(
-            self.annee,
-            self.attribution_db.tutor.person.global_id,
-        )
+    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
+    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
+    def test_should_trouver_attribution_par_matricule(self, mock_unites_enseignement, mock_classes):
+        mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
+        mock_classes.return_value = []
+        result = self.translator.search_attributions_enseignant_par_matricule(self.annee, self.matricule_fgs_enseignant)
+        self.assertEqual(self.code_unite_enseignement, list(result)[0].code_unite_enseignement)
 
-        expected_result = {self._convert_attribution_db_data_to_dto(self.attribution_db)}
-        self.assertSetEqual(expected_result, result)
+    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
+    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
+    def test_should_trouver_attribution_pour_une_classe_et_une_unite_ensiegnement_par_matricule(self, mock_unites_enseignement, mock_classes):
+        mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
+        mock_classes.return_value = [self.repartition_classe_dto]
 
-    def test_should_trouver_attribution_pour_une_classe_par_matricule(self):
-        attribution_class = AttributionClassFactory(
-            learning_class_year__learning_component_year__learning_unit_year__academic_year__year=self.annee,
-            learning_class_year__learning_component_year__learning_unit_year__acronym=self.code_unite_enseignement,
-        )
+        result = self.translator.search_attributions_enseignant_par_matricule(self.annee, self.matricule_fgs_enseignant)
 
-        result = self.translator.search_attributions_enseignant_par_matricule(
-            self.annee,
-            attribution_class.attribution_charge.attribution.tutor.person.global_id,
-        )
+        detail_assertion = "L'attribution à l'unite enseignement ET la répartition sur la classe doivent être renvoyées"
+        self.assertEqual(2, len(result))
+        codes = [dto.code_unite_enseignement for dto in result]
+        self.assertIn(self.code_complet_classe, codes, detail_assertion)
+        self.assertIn(self.code_unite_enseignement, codes, detail_assertion)
 
-        expected_result = {
-            self._convert_attribution_db_data_to_dto(attribution_class.attribution_charge.attribution),
-            self._convert_class_attribution_db_data_to_dto(attribution_class)
-        }
-        self.assertSetEqual(expected_result, result)
+    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
+    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
+    def test_should_trouver_attribution_pour_une_classe_par_matricule(self, mock_unites_enseignement, mock_classes):
+        mock_unites_enseignement.return_value = []
+        mock_classes.return_value = [self.repartition_classe_dto]
+        result = self.translator.search_attributions_enseignant_par_matricule(self.annee, self.matricule_fgs_enseignant)
+        self.assertEqual(self.code_complet_classe, list(result)[0].code_unite_enseignement)
 
-    def test_should_trouver_repartition_classes_par_unite_enseignement(self):
-        container = LearningContainerYearFactory()
-        attribution_class = AttributionClassFactory(
-            attribution_charge__attribution__learning_container_year=container,
-            learning_class_year__learning_component_year__learning_unit_year__learning_container_year=container,
-            learning_class_year__learning_component_year__learning_unit_year__academic_year=container.academic_year,
-            learning_class_year__learning_component_year__learning_unit_year__acronym=container.acronym,
-        )
-        code_complet_classe = container.acronym + attribution_class.learning_class_year.acronym
-        result = self.translator.search_attributions_enseignant(
-            code_unite_enseignement=code_complet_classe,
-            annee=container.academic_year.year,
-        )
-
-        expected_result = {self._convert_class_attribution_db_data_to_dto(attribution_class)}
-        attribution_ue = self._convert_attribution_db_data_to_dto(attribution_class.attribution_charge.attribution)
-        detail_assertion = "Seule l'attribution à la classe doit être renvoyée, pas l'UE"
-        self.assertNotIn(attribution_ue, result, detail_assertion)
-        self.assertSetEqual(expected_result, result, detail_assertion)
-
-    def _convert_attribution_db_data_to_dto(self, attribution_db):
-        return AttributionEnseignantDTO(
-            matricule_fgs_enseignant=attribution_db.tutor.person.global_id,
-            code_unite_enseignement=attribution_db.learning_container_year.acronym,
-            annee=attribution_db.learning_container_year.academic_year.year,
-            nom=attribution_db.tutor.person.last_name,
-            prenom=attribution_db.tutor.person.first_name,
-        )
-
-    def _convert_class_attribution_db_data_to_dto(self, class_attribution_db):
-        attribution_db = class_attribution_db.attribution_charge.attribution
-        class_year = class_attribution_db.learning_class_year
-        return AttributionEnseignantDTO(
-            matricule_fgs_enseignant=attribution_db.tutor.person.global_id,
-            code_unite_enseignement='{}{}'.format(
-                class_year.learning_component_year.learning_unit_year.acronym,
-                class_year.acronym,
-            ),
-            annee=attribution_db.learning_container_year.academic_year.year,
-            nom=attribution_db.tutor.person.last_name,
-            prenom=attribution_db.tutor.person.first_name,
-        )
+    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
+    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
+    def test_should_trouver_repartition_classes_par_unite_enseignement(self, mock_unites_enseignement, mock_classes):
+        mock_unites_enseignement.return_value = []
+        mock_classes.return_value = [self.repartition_classe_dto]
+        result = self.translator.search_attributions_enseignant(self.code_complet_classe, self.annee)
+        detail_assertion = "Seule l'attribution à la classe doit être renvoyée, pas l'attribution à l'UE"
+        self.assertEqual(list(result)[0].code_unite_enseignement, self.code_complet_classe, detail_assertion)
+        self.assertNotEqual(list(result)[0].code_unite_enseignement, self.code_unite_enseignement, detail_assertion)

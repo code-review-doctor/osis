@@ -32,7 +32,7 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant
 from ddd.logic.encodage_des_notes.soumission.dtos import AttributionEnseignantDTO
 
 
-class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
+class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):  # TODO :: renommer attributions UE + classes
 
     @classmethod
     def search_attributions_enseignant(
@@ -40,9 +40,12 @@ class AttributionEnseignantTranslator(IAttributionEnseignantTranslator):
             code_unite_enseignement: str,
             annee: int,
     ) -> Set['AttributionEnseignantDTO']:
-        dtos = _search_attributions_unite_enseignement(code_unite_enseignement=code_unite_enseignement, annee=annee)
-        dtos |= _search_repartition_classes(code_unite_enseignement=code_unite_enseignement, annee=annee)
-        return dtos
+        unites_enseignement_dtos = _search_attributions_unite_enseignement(
+            code_unite_enseignement=code_unite_enseignement,
+            annee=annee,
+        )
+        classes_dtos = _search_repartition_classes(code_unite_enseignement=code_unite_enseignement, annee=annee)
+        return unites_enseignement_dtos or classes_dtos
 
     @classmethod
     def search_attributions_enseignant_par_matricule(
