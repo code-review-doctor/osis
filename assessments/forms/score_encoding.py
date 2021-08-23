@@ -25,13 +25,32 @@
 ##############################################################################
 from django import forms
 from django.forms import HiddenInput
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
+
+from base.forms.utils import choice_field
 
 
 class ScoreEncodingProgressFilterForm(forms.Form):
-    cohorte_name = forms.CharField(max_length=100, required=False)
-    tutor = forms.CharField(max_length=100, required=False)
-    learning_unit_code = forms.CharField(max_length=100, required=False)
-    incomplete_encodings_only = forms.BooleanField(required=False)
+    cohorte_name = forms.ChoiceField(required=False, label=pgettext_lazy('encoding', 'Program'))
+    tutor = forms.CharField(max_length=100, required=False, label=_('Tutor'))
+    learning_unit_code = forms.CharField(
+        max_length=100, required=False, label=_('Learning unit'),
+        widget=forms.TextInput(attrs={'placeholder':  pgettext_lazy('UE acronym', 'Acronym')})
+    )
+    incomplete_encodings_only = forms.BooleanField(required=False, label=_('Missing score'))
+
+    def __init__(self, matricule_fgs_gestionnaire: str = '', **kwargs):
+        super().__init__(**kwargs)
+        self.fields['cohorte_name'].choices = self.get_nom_cohorte_choices(matricule_fgs_gestionnaire)
+
+    def get_nom_cohorte_choices(self, matricule_fgs_gestionnaire: str):
+        # cmd = GetCohortesGestionnaireCommand(matricule_fgs_gestionnaire=matricule_fgs_gestionnaire)
+        # results = message_bus_instance.invoke(cmd)
+        # choices = (
+        #     (cohorte.nom_cohorte, cohorte.nom_cohorte,) for cohorte in sorted(results, key=lambda x: x.nom_cohorte)
+        # )
+        choices = ()
+        return choice_field.add_blank(tuple(choices), blank_choice_display=pgettext_lazy("male plural", "All"))
 
 
 class ScoreEncodingForm(forms.Form):

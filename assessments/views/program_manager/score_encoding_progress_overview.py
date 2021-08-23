@@ -25,6 +25,7 @@
 ##############################################################################
 from assessments.forms.score_encoding import ScoreEncodingProgressFilterForm
 from assessments.views.common.score_encoding_progress_overview import ScoreEncodingProgressOverviewBaseView
+from base.models import synchronization
 from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
 from infrastructure.messages_bus import message_bus_instance
 
@@ -37,13 +38,21 @@ class ScoreEncodingProgressOverviewProgramManagerView(ScoreEncodingProgressOverv
         return {
             **super().get_context_data(**kwargs),
             'progression_generale': self.get_progression_generale(),
-            'search_form': self.get_search_form()
+            'search_form': self.get_search_form(),
+            'last_synchronization': self.get_last_synchronization()
         }
 
     def get_search_form(self):
-        return ScoreEncodingProgressFilterForm(self.request.GET or None)
+        return ScoreEncodingProgressFilterForm(
+            matricule_fgs_gestionnaire=self.person.global_id,
+            data=self.request.GET or None
+        )
 
     def get_progression_generale(self):
         # TODO: Change to command for program manager
-        cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.person.global_id)
-        return message_bus_instance.invoke(cmd)
+        # cmd = GetProgressionGeneraleCommand(matricule_fgs_enseignant=self.person.global_id)
+        # return message_bus_instance.invoke(cmd)
+        return dict()
+
+    def get_last_synchronization(self):
+        return synchronization.find_last_synchronization_date()
