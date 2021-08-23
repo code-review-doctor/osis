@@ -32,6 +32,8 @@ from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseigna
     AttributionEnseignantTranslator
 
 
+@mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
+@mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
 class SearchAttributionsEnseignantTest(SimpleTestCase):
 
     def setUp(self) -> None:
@@ -62,8 +64,6 @@ class SearchAttributionsEnseignantTest(SimpleTestCase):
             annee=self.annee,
         )
 
-    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
-    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
     def test_should_trouver_attribution_unite_enseignement_sans_classe(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
         mock_classes.return_value = [self.repartition_classe_dto]
@@ -73,8 +73,6 @@ class SearchAttributionsEnseignantTest(SimpleTestCase):
         self.assertNotEqual(self.code_complet_classe, dto.code_unite_enseignement, detail_assertion)
         self.assertEqual(self.code_unite_enseignement, dto.code_unite_enseignement, detail_assertion)
 
-    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
-    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
     def test_should_trouver_repartition_classe(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = []
         mock_classes.return_value = [self.repartition_classe_dto]
@@ -83,8 +81,6 @@ class SearchAttributionsEnseignantTest(SimpleTestCase):
         self.assertEqual(list(result)[0].code_unite_enseignement, self.code_complet_classe, detail_assertion)
         self.assertNotEqual(list(result)[0].code_unite_enseignement, self.code_unite_enseignement, detail_assertion)
 
-    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
-    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
     def test_should_trouver_attribution_unite_enseignement(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
         mock_classes.return_value = []
@@ -92,8 +88,6 @@ class SearchAttributionsEnseignantTest(SimpleTestCase):
         self.assertNotEqual(self.code_complet_classe, list(result)[0].code_unite_enseignement)
         self.assertEqual(self.code_unite_enseignement, list(result)[0].code_unite_enseignement)
 
-    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
-    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
     def test_should_convertir_attribution_unite_enseignement(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
         mock_classes.return_value = []
@@ -105,8 +99,6 @@ class SearchAttributionsEnseignantTest(SimpleTestCase):
         self.assertEqual('Smith', dto.nom)
         self.assertEqual('Pierre', dto.prenom)
 
-    @mock.patch("infrastructure.messages_bus.search_tutors_distributed_to_class")
-    @mock.patch("infrastructure.messages_bus.search_attributions_to_learning_unit")
     def test_should_convertir_repartition_classe(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = []
         mock_classes.return_value = [self.repartition_classe_dto]
@@ -119,6 +111,8 @@ class SearchAttributionsEnseignantTest(SimpleTestCase):
         self.assertEqual('Pierre', dto.prenom)
 
 
+@mock.patch("infrastructure.messages_bus.search_classes_enseignant")
+@mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
 class AttributionEnseignantTest(SimpleTestCase):
 
     def setUp(self) -> None:
@@ -149,16 +143,12 @@ class AttributionEnseignantTest(SimpleTestCase):
             annee=self.annee,
         )
 
-    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
-    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
     def test_should_trouver_attribution_unite_enseignement(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
         mock_classes.return_value = []
         result = self.translator.search_attributions_enseignant_par_matricule(self.annee, self.matricule_fgs_enseignant)
         self.assertEqual(self.code_unite_enseignement, list(result)[0].code_unite_enseignement)
 
-    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
-    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
     def test_should_trouver_attribution_ue_et_repartition_classe(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
         mock_classes.return_value = [self.repartition_classe_dto]
@@ -171,16 +161,12 @@ class AttributionEnseignantTest(SimpleTestCase):
         self.assertIn(self.code_complet_classe, codes, detail_assertion)
         self.assertIn(self.code_unite_enseignement, codes, detail_assertion)
 
-    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
-    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
     def test_should_trouver_repartition_classe(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = []
         mock_classes.return_value = [self.repartition_classe_dto]
         result = self.translator.search_attributions_enseignant_par_matricule(self.annee, self.matricule_fgs_enseignant)
         self.assertEqual(self.code_complet_classe, list(result)[0].code_unite_enseignement)
 
-    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
-    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
     def test_should_convertir_attribution_unite_enseignement(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = [self.attribution_unite_enseignement_dto]
         mock_classes.return_value = []
@@ -192,8 +178,6 @@ class AttributionEnseignantTest(SimpleTestCase):
         self.assertEqual('Smith', dto.nom)
         self.assertEqual('Pierre', dto.prenom)
 
-    @mock.patch("infrastructure.messages_bus.search_classes_enseignant")
-    @mock.patch("infrastructure.messages_bus.search_attributions_enseignant")
     def test_should_convertir_repartition_classe(self, mock_unites_enseignement, mock_classes):
         mock_unites_enseignement.return_value = []
         mock_classes.return_value = [self.repartition_classe_dto]
