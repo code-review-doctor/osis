@@ -53,7 +53,9 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
-from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, EncoderNotesCommand
+from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, EncoderNotesCommand, \
+    GetCohortesGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.write.encoder_notes_service import encoder_notes
@@ -295,6 +297,10 @@ class MessageBus:
             PeriodeEncodageNotesTranslator(),
             CohortesDuGestionnaireTranslator(),
         ),
+        GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
+            cmd,
+            CohortesDuGestionnaireTranslator()
+        )
 
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

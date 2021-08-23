@@ -31,6 +31,7 @@ from assessments.views import scores_responsible
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
+from assessments.views.program_manager.score_search import ScoreSearchFormView
 from assessments.views.score_encoding import LearningUnitScoreEncodingView, LearningUnitScoreEncodingFormView, \
     ScoreSheetPDFExportView, ScoreSheetXLSExportView, ScoreSheetXLSImportView
 from assessments.views.scores_responsible import ScoresResponsibleSearch
@@ -67,6 +68,7 @@ urlpatterns = [
             upload_xls_utils.upload_scores_file, name='upload_encoding'),
 
         # New URL's
+        path('search', ScoreSearchFormView.as_view(), name='score_search'),
         path('<str:learning_unit_code>/', include(([
             path('', LearningUnitScoreEncodingView.as_view(), name='learning_unit_score_encoding'),
             path('form', LearningUnitScoreEncodingFormView.as_view(), name='learning_unit_score_encoding_form'),
