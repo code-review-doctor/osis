@@ -356,13 +356,14 @@ class ExternalPartimForm(LearningUnitBaseForm):
     ]
 
     def __init__(self, person, learning_unit_full_instance, academic_year, learning_unit_instance=None,
-                 data=None, *args, **kwargs):
+                 data=None, start_year=None, *args, **kwargs):
         if not isinstance(learning_unit_full_instance, LearningUnit):
             raise AttributeError('learning_unit_full arg should be an instance of {}'.format(LearningUnit))
         if learning_unit_instance is not None and not isinstance(learning_unit_instance, LearningUnit):
             raise AttributeError('learning_unit_partim_instance arg should be an instance of {}'.format(LearningUnit))
         self.person = person
         self.academic_year = academic_year
+        self.start_year = start_year
         self.learning_unit_full_instance = learning_unit_full_instance
         self.learning_unit_instance = learning_unit_instance
 
@@ -485,8 +486,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
         return initial_learning_unit_year
 
     def save(self, commit=True):
-        start_year = self.instance.learning_unit.start_year if self.instance else \
-            self.learning_unit_full_instance.start_year
+        start_year = self.instance.learning_unit.start_year if self.instance else self.start_year
 
         lcy = self.learning_unit_year_full.learning_container_year
         # Save learning unit
