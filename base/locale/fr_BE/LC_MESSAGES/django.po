@@ -2803,7 +2803,7 @@ msgstr ""
 "Cette action annulera définitivement la (les) proposition(s) sélectionnée(s)"
 
 msgid "This action will permanently delete the achievement"
-msgstr "Cette action annulera définitivement l'acquis d'apprentissage"
+msgstr "Cette action supprimera définitivement l'acquis d'apprentissage"
 
 msgid "This code already exists for this learning unit"
 msgstr "Ce code existe déja pour cette unité d'enseignement"
