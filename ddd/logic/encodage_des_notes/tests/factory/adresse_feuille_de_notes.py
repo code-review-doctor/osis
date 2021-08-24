@@ -45,14 +45,14 @@ class AdresseFeuilleDeNotesSpecifiqueFactory(factory.Factory):
         abstract = False
 
     entity_id = factory.SubFactory(_IdentiteAdresseFeuilleDeNotesFactory)
-    destinataire = "Faculte"
-    rue_numero = "Rue de la Victoire"
-    code_postal = "1458"
-    ville = "Bruxelles"
+    destinataire = "Faculté de Droit"
+    rue_numero = "Rue de la Fac, 19"
+    code_postal = "1321"
+    ville = "Louvain-La-Neuve"
     pays = "Belgique"
-    telephone = "458932414"
-    fax = ""
-    email = "temp@temp.com"
+    telephone = "0106601122"
+    fax = "0106601123"
+    email = "email-fac-droit@email.be"
 
 
 class PremiereAnneeBachelierAdresseFeuilleDeNotesSpecifiqueFactory(AdresseFeuilleDeNotesSpecifiqueFactory):

@@ -43,6 +43,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_not
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesFromRepositoryDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
+from education_group.models.cohort_year import CohortYear
 from education_group.models.enums.cohort_name import CohortName
 from osis_common.ddd.interface import ApplicationService
 from reference.models.country import Country
@@ -55,9 +56,10 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
             entity_ids: Optional[List['IdentiteAdresseFeuilleDeNotes']] = None,
             **kwargs
     ) -> List['AdresseFeuilleDeNotes']:
-        rows = get_queryset().filter(
-            nom_cohorte__in=[entity_id.nom_cohorte for entity_id in entity_ids]
-        )
+        cohortes = [entity_id.nom_cohorte for entity_id in entity_ids]
+        if not cohortes:
+            return []
+        rows = get_queryset(cohortes)
 
         builder = AdresseFeuilleDeNotesBuilder()
         return [builder.build_from_repository_dto(cls._convert_row_to_dto(row)) for row in rows]
@@ -137,7 +139,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
                     "location": entity.rue_numero,
                     "postal_code": entity.code_postal,
                     "city": entity.ville,
-                    "country": Country.objects.get(name=entity.pays),
+                    "country": Country.objects.get(name=entity.pays) if entity.pays else None,
                     "phone": entity.telephone,
                     "fax": entity.fax,
                     "email": entity.email
@@ -153,7 +155,7 @@ class AdresseFeuilleDeNotesRepository(IAdresseFeuilleDeNotesRepository):
         return cls.search([entity_id])[0]
 
 
-def get_queryset():
+def get_queryset(cohortes: List[str]):
     nom_cohorte_subqs = EducationGroupYear.objects.filter(
         education_group=OuterRef('education_group'),
         academic_year=current_academic_year()
@@ -179,6 +181,12 @@ def get_queryset():
         entity=OuterRef('entity'),
         ).values('title')
 
+    first_year_cohort_without_scoresheet_address_subqs = CohortYear.objects.exclude(
+        education_group_year__education_group__scoresheetaddress__cohort_name=CohortName.FIRST_YEAR.name
+    ).values(
+        "education_group_year__education_group"
+    )
+
     return ScoreSheetAddress.objects.annotate(
         entite=Subquery(entity_acronym_subqs[:1]),
         entite_intitule=Subquery(entity_title_subqs[:1])
@@ -194,6 +202,8 @@ def get_queryset():
         ville=F("city"),
         pays=F("country__name"),
         telephone=F("phone"),
+    ).filter(
+        nom_cohorte__in=cohortes
     ).values(
         "nom_cohorte",
         "entite",
@@ -205,4 +215,32 @@ def get_queryset():
         "telephone",
         "fax",
         "email",
+    ).union(
+        ScoreSheetAddress.objects.filter(
+            education_group__in=first_year_cohort_without_scoresheet_address_subqs
+        ).annotate(
+            entite=Subquery(entity_acronym_subqs[:1]),
+            entite_intitule=Subquery(entity_title_subqs[:1]),
+            nom_cohorte=Subquery(nom_cohorte_first_year_bachelor_subqs[:1], output_field=CharField()),
+        ).annotate(
+            destinataire=F('recipient'),
+            rue_numero=F("location"),
+            code_postal=F("postal_code"),
+            ville=F("city"),
+            pays=F("country__name"),
+            telephone=F("phone"),
+        ).filter(
+            nom_cohorte__in=cohortes
+        ).values(
+            "nom_cohorte",
+            "entite",
+            "destinataire",
+            "rue_numero",
+            "code_postal",
+            "ville",
+            "pays",
+            "telephone",
+            "fax",
+            "email",
+        )
     )

@@ -196,7 +196,11 @@ class AdresseFeuilleDeNotesDTO(interface.DTO):
     telephone = attr.ib(type=str)
     fax = attr.ib(type=str)
     email = attr.ib(type=str)
-    specifique_a_la_premiere_annee_de_bachelier = attr.ib(type=bool)
+
+    def identique_a(self, autre_adresse: 'AdresseFeuilleDeNotesDTO') -> bool:
+        filter = attr.filters.exclude(attr.fields(AdresseFeuilleDeNotesDTO).nom_cohorte)
+        return attr.astuple(self, filter=filter, retain_collection_types=True) == \
+            attr.astuple(autre_adresse, filter=filter, retain_collection_types=True)
 
 
 @attr.s(frozen=True, slots=True)

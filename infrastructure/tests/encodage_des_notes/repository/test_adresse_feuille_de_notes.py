@@ -27,6 +27,8 @@ from django.test import TestCase
 from base.tests.factories.cohort_year import CohortYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
+    AdresseFeuilleDeNotesIdentityBuilder
 from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_notes import AdresseFeuilleDeNotes, \
     AdresseFeuilleDeNotesBaseeSurEntite, AdresseFeuilleDeNotesSpecifique
 from ddd.logic.encodage_des_notes.tests.factory.adresse_feuille_de_notes import \
@@ -52,6 +54,18 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             adresse,
             self.repository.get(adresse.entity_id)
         )
+
+    def test_should_charger_adresse_feuille_de_notes_de_1ba_si_non_definie_pour_11ba(self):
+        adresse = AdresseFeuilleDeNotesSpecifiqueFactory()
+        self._create_necessary_data(adresse, with_cohort_year=True)
+
+        self.repository.save(adresse)
+
+        entity_11ba = AdresseFeuilleDeNotesIdentityBuilder().build_from_nom_cohorte(
+            adresse.nom_cohorte.replace('1BA', "11BA")
+        )
+
+        self.assertTrue(self.repository.get(entity_11ba))
 
     def test_should_charger_adresse_feuille_de_notes_sur_base_de_entite_si_definie(self):
         adresse = AdresseFeuilleDeNotesBaseeSurEntiteFactory()
@@ -129,7 +143,7 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
             [adresse]
         )
 
-    def _create_necessary_data(self, adresse: 'AdresseFeuilleDeNotes'):
+    def _create_necessary_data(self, adresse: 'AdresseFeuilleDeNotes', with_cohort_year: bool = False):
         if "11BA" in adresse.nom_cohorte:
             CohortYearFactory(
                 education_group_year__acronym=adresse.nom_cohorte.replace('11BA', '1BA'),
@@ -137,7 +151,9 @@ class TestAdresseFeuilleDeNotesRepository(TestCase):
                 first_year_bachelor=True
             )
         else:
-            EducationGroupYearFactory(acronym=adresse.nom_cohorte, academic_year__current=True)
+            egy = EducationGroupYearFactory(acronym=adresse.nom_cohorte, academic_year__current=True)
+            if with_cohort_year:
+                CohortYearFactory(education_group_year=egy, first_year_bachelor=True)
 
         if isinstance(adresse, AdresseFeuilleDeNotesSpecifique):
             CountryFactory(name=adresse.pays)

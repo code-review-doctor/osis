@@ -22,7 +22,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import attr
+from typing import List
 
 from ddd.logic.encodage_des_notes.soumission.builder.adresse_feuille_de_notes_identity_builder import \
     AdresseFeuilleDeNotesIdentityBuilder
@@ -31,12 +31,22 @@ from ddd.logic.encodage_des_notes.soumission.domain.model.adresse_feuille_de_not
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_adresse_feuille_de_notes import \
     IAdresseFeuilleDeNotesRepository
-from ddd.logic.shared_kernel.entite.builder.identite_entite_builder import IdentiteEntiteBuilder
 from ddd.logic.shared_kernel.entite.repository.entite import IEntiteRepository
 from osis_common.ddd import interface
 
 
 class AdresseFeuilleDeNotesDomainService(interface.DomainService):
+    @classmethod
+    def get_dtos(
+            cls,
+            noms_cohorte: List[str],
+            adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
+            entite_repo: 'IEntiteRepository'
+    ) -> List[AdresseFeuilleDeNotesDTO]:
+        identity_builder = AdresseFeuilleDeNotesIdentityBuilder()
+        identites_adresse = [identity_builder.build_from_nom_cohorte(nom_cohorte) for nom_cohorte in noms_cohorte]
+        adresses = adresse_feuille_de_notes_repo.search(identites_adresse)
+        return [cls._convert_adresse_to_dto(adresse, entite_repo) for adresse in adresses]
 
     @classmethod
     def get_dto(
@@ -45,50 +55,13 @@ class AdresseFeuilleDeNotesDomainService(interface.DomainService):
             adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
             entite_repo: 'IEntiteRepository'
     ) -> AdresseFeuilleDeNotesDTO:
-        if "11BA" in nom_cohorte:
-            return cls._get_dto_for_first_year_bachelor(nom_cohorte, adresse_feuille_de_notes_repo, entite_repo)
-        return cls._get_dto(nom_cohorte, adresse_feuille_de_notes_repo, entite_repo)
-
-    @classmethod
-    def _get_dto(
-            cls,
-            nom_cohorte: str,
-            adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
-            entite_repo: 'IEntiteRepository'
-    ) -> AdresseFeuilleDeNotesDTO:
-        identity_builder = AdresseFeuilleDeNotesIdentityBuilder()
-        identite_adresse = identity_builder.build_from_nom_cohorte(nom_cohorte)
-        adresse = adresse_feuille_de_notes_repo.get(identite_adresse)
-        return cls._convert_adresse_to_dto(adresse, entite_repo, False)
-
-    @classmethod
-    def _get_dto_for_first_year_bachelor(
-            cls,
-            nom_cohorte: str,
-            adresse_feuille_de_notes_repo: 'IAdresseFeuilleDeNotesRepository',
-            entite_repo: 'IEntiteRepository'
-    ) -> AdresseFeuilleDeNotesDTO:
-        identity_builder = AdresseFeuilleDeNotesIdentityBuilder()
-
-        identite_adresse_bachelier = identity_builder.build_from_nom_cohorte(nom_cohorte.replace("11BA", "1BA"))
-        adresse_bachelier = adresse_feuille_de_notes_repo.get(identite_adresse_bachelier)
-
-        identite_adresse = identity_builder.build_from_nom_cohorte(nom_cohorte)
-        try:
-            adresse = adresse_feuille_de_notes_repo.get(identite_adresse)
-        except IndexError:
-            adresse = adresse_bachelier
-
-        specifique_a_la_premiere_annee_de_bachelier = cls._are_addresses_identiques(adresse_bachelier, adresse)
-
-        return cls._convert_adresse_to_dto(adresse, entite_repo, specifique_a_la_premiere_annee_de_bachelier)
+        return cls.get_dtos([nom_cohorte], adresse_feuille_de_notes_repo, entite_repo)[0]
 
     @classmethod
     def _convert_adresse_to_dto(
             cls,
             adresse: AdresseFeuilleDeNotes,
             entite_repo: 'IEntiteRepository',
-            specifique_a_la_premiere_annee_de_bachelier: bool
     ) -> 'AdresseFeuilleDeNotesDTO':
         if isinstance(adresse, AdresseFeuilleDeNotesSpecifique):
             return AdresseFeuilleDeNotesDTO(
@@ -102,7 +75,6 @@ class AdresseFeuilleDeNotesDomainService(interface.DomainService):
                 telephone=adresse.telephone,
                 fax=adresse.fax,
                 email=adresse.email,
-                specifique_a_la_premiere_annee_de_bachelier=specifique_a_la_premiere_annee_de_bachelier
             )
         elif isinstance(adresse, AdresseFeuilleDeNotesBaseeSurEntite):
             entite = entite_repo.get(adresse.entite)
@@ -117,10 +89,4 @@ class AdresseFeuilleDeNotesDomainService(interface.DomainService):
                 telephone=entite.adresse.telephone,
                 fax=entite.adresse.fax,
                 email=adresse.email,
-                specifique_a_la_premiere_annee_de_bachelier=specifique_a_la_premiere_annee_de_bachelier
             )
-
-    @classmethod
-    def _are_addresses_identiques(cls, addresse_1: AdresseFeuilleDeNotes, addresse_2: AdresseFeuilleDeNotes) -> bool:
-        return attr.astuple(addresse_1, retain_collection_types=True) != \
-               attr.astuple(addresse_2, retain_collection_types=True)

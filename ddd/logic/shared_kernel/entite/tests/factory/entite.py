@@ -79,3 +79,5 @@ class SSTEntiteFactory(_EntiteFactory):
     parent = factory.SubFactory(_IdentiteEntiteFactory, sigle='UCL')
     type = EntityType.SECTOR
     intitule = "Secteur des Sciences et Technologies"
+
+

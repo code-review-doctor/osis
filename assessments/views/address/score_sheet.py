@@ -134,7 +134,7 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
     def get_initial(self):
         initial = super().get_initial()
         initial.update({
-            "specific_address": self.score_sheet_address.specifique_a_la_premiere_annee_de_bachelier
+            "specific_address": not self.score_sheet_address.identique_a(self.bachelor_score_sheet_address_dto)
         })
         return initial
 

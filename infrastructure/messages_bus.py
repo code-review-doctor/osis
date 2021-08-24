@@ -139,8 +139,6 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
-from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
-    AdresseFeuilleDeNotesTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.deliberation import DeliberationTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.entites_cohorte import EntitesCohorteTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.signaletique_personne import \
@@ -326,9 +324,10 @@ class MessageBus:
         SearchAdressesFeuilleDeNotesCommand: lambda cmd: search_donnees_administratives_feuille_de_notes(
             cmd,
             PeriodeEncodageNotesTranslator(),
-            AdresseFeuilleDeNotesTranslator(),
             InscriptionExamenTranslator(),
             DeliberationTranslator(),
+            AdresseFeuilleDeNotesRepository(),
+            EntiteRepository(),
         ),
         EncoderNotesCommand: lambda cmd: encoder_notes(
             cmd,
