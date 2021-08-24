@@ -379,16 +379,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
-        self._restrict_academic_years_choice_for_daily_management()
-
-    def _restrict_academic_years_choice_for_daily_management(self):
-        if EntityRoleHelper.has_role(self.person, FacultyManager):
-            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
-        elif EntityRoleHelper.has_role(self.person, CentralManager):
-            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-        else:
-            target_years_opened = []
-        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
 
     @property
     def learning_unit_form(self):
