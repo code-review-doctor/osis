@@ -26,8 +26,9 @@
 from ddd.logic.projet_doctoral.builder.proposition_builder import PropositionBuilder
 from ddd.logic.projet_doctoral.commands import InitierPropositionCommand
 from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
+from ddd.logic.projet_doctoral.domain.service.bureau_CDE import BureauCDE
 from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
-from ddd.logic.projet_doctoral.domain.service.initier_proposition import InitierProposition
+from ddd.logic.projet_doctoral.domain.service.initier_proposition import MaximumPropositionAutorisee
 from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
@@ -39,7 +40,8 @@ def initier_proposition(
     # GIVEN
     doctorat = doctorat_translator.get(cmd.sigle_formation, cmd.annee_formation)
     propositions_candidat = proposition_repository.search(matricule_candidat=cmd.matricule_candidat)
-    InitierProposition().verifier_maximum_propositions_autorisees(propositions_candidat)
+    MaximumPropositionAutorisee().verifier(propositions_candidat)
+    BureauCDE().verifier(doctorat, cmd.bureau_CDE)
 
     # WHEN
     proposition = PropositionBuilder().initier_proposition(cmd, doctorat.entity_id)

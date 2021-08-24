@@ -29,9 +29,9 @@ from django.test import SimpleTestCase
 
 from ddd.logic.projet_doctoral.commands import InitierPropositionCommand
 from ddd.logic.projet_doctoral.domain.model._financement import ChoixTypeFinancement
-from ddd.logic.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition
+from ddd.logic.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition, ChoixBureauCDE
 from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException, \
-    DoctoratNonTrouveException
+    DoctoratNonTrouveException, BureauCDEInconsistantException
 from ddd.logic.projet_doctoral.test.factory.proposition import (
     PropositionAdmissionSC3DPMinimaleAnnuleeFactory,
 )
@@ -56,16 +56,18 @@ class TestInitierPropositionService(SimpleTestCase):
         self.message_bus = message_bus_instance
         self.cmd = InitierPropositionCommand(
             type_admission=ChoixTypeAdmission.ADMISSION.name,
-            sigle_formation='SC3DP',
+            sigle_formation='ECGE3DP',
             annee_formation=2020,
             matricule_candidat='01234567',
-            bureau_CDE='',
+            bureau_CDE=ChoixBureauCDE.ECONOMY.name,
             type_financement=ChoixTypeFinancement.SELF_FUNDING.name,
             type_contrat_travail='assistant_uclouvain',
             titre_projet='Mon projet',
             resume_projet='LE résumé de mon projet',
             documents_projet=[],
         )
+
+        self.doctorat_non_CDE = 'AGRO3DP'
 
     def test_should_initier(self):
         proposition_id = self.message_bus.invoke(self.cmd)
@@ -75,12 +77,28 @@ class TestInitierPropositionService(SimpleTestCase):
         self.assertEqual(self.cmd.sigle_formation, proposition.doctorat_id.sigle)
         self.assertEqual(self.cmd.annee_formation, proposition.doctorat_id.annee)
         self.assertEqual(self.cmd.matricule_candidat, proposition.matricule_candidat)
-        self.assertEqual(self.cmd.bureau_CDE, proposition.bureau_CDE)
+        # self.assertEqual(ChoixBureauCDE[self.cmd.bureau_CDE], proposition.bureau_CDE)
         self.assertEqual(ChoixTypeFinancement[self.cmd.type_financement], proposition.financement.type)
         self.assertEqual(self.cmd.type_contrat_travail, proposition.financement.type_contrat_travail)
         self.assertEqual(self.cmd.titre_projet, proposition.projet.titre)
         self.assertEqual(self.cmd.resume_projet, proposition.projet.resume)
         self.assertEqual(self.cmd.documents_projet, proposition.projet.documents)
+
+    def test_should_initier_bureau_cde_vide_et_non_CDE(self):
+        cmd = attr.evolve(self.cmd, bureau_CDE=None, sigle_formation=self.doctorat_non_CDE)
+        proposition_id = self.message_bus.invoke(cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
+        self.assertIsNone(proposition.bureau_CDE)
+
+    def test_should_pas_initier_bureau_cde_vide_et_CDE(self):
+        cmd = attr.evolve(self.cmd, bureau_CDE=None)
+        with self.assertRaises(BureauCDEInconsistantException):
+            self.message_bus.invoke(cmd)
+
+    def test_should_pas_initier_si_bureau_cde_et_non_CDE(self):
+        cmd = attr.evolve(self.cmd, sigle_formation=self.doctorat_non_CDE)
+        with self.assertRaises(BureauCDEInconsistantException):
+            self.message_bus.invoke(cmd)
 
     def test_should_empecher_si_maximum_propositions_autorisees(self):
         self.message_bus.invoke(self.cmd)

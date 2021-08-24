@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
 
 import attr
 from django.utils.translation import gettext_lazy as _
@@ -47,6 +46,11 @@ class ChoixStatusProposition(ChoiceEnum):
     IN_PROGRESS = _('IN_PROGRESS')
 
 
+class ChoixBureauCDE(ChoiceEnum):
+    ECONOMY = _('ECONOMY')
+    MANAGEMENT = _('MANAGEMENT')
+
+
 class ChoixTypeAdmission(ChoiceEnum):
     ADMISSION = _('ADMISSION')
     PRE_ADMISSION = _('PRE_ADMISSION')
@@ -65,7 +69,7 @@ class Proposition(interface.RootEntity):
     matricule_candidat = attr.ib(type=str)
     projet = attr.ib(type=DetailProjet)
     status = attr.ib(type=ChoixStatusProposition, default=ChoixStatusProposition.IN_PROGRESS)
-    bureau_CDE = attr.ib(type=Optional[str], default='')  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
+    bureau_CDE = attr.ib(type=ChoixBureauCDE, default=None)  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     financement = attr.ib(type=Financement, default=financement_non_rempli)
     experience_precedente_recherche = attr.ib(
         type=ExperiencePrecedenteRecherche,

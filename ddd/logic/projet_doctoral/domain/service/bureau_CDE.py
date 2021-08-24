@@ -24,24 +24,16 @@
 #
 ##############################################################################
 
-from django.utils.translation import gettext_lazy as _
-
-from osis_common.ddd.interface import BusinessException
-
-
-class MaximumPropositionsAtteintException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("You've reached the maximum authorized propositions.")
-        super().__init__(message, **kwargs)
+from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
+from ddd.logic.projet_doctoral.domain.validator.exceptions import BureauCDEInconsistantException
+from osis_common.ddd import interface
 
 
-class DoctoratNonTrouveException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("No PhD found.")
-        super().__init__(message, **kwargs)
+class BureauCDE(interface.DomainService):
 
-
-class BureauCDEInconsistantException(BusinessException):
-    def __init__(self, **kwargs):
-        message = _("CDE Bureau should be filled in only if the doctorate's entity is CDE")
-        super().__init__(message, **kwargs)
+    @classmethod
+    def verifier(cls, doctorat: 'Doctorat', bureau_CDE: str) -> None:
+        if doctorat.est_entite_CDE() and not bureau_CDE:
+            raise BureauCDEInconsistantException()
+        if not doctorat.est_entite_CDE() and bureau_CDE:
+            raise BureauCDEInconsistantException()

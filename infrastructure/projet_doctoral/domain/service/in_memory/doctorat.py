@@ -52,14 +52,18 @@
 from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
 from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
-from ddd.logic.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory
+from ddd.logic.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory, DoctoratCDEFactory
 
 
 class DoctoratInMemoryTranslator(IDoctoratTranslator):
 
     doctorats = [
+        DoctoratCDEFactory(
+            entity_id__sigle='ECGE3DP',
+            entity_id__annee=2020,
+        ),
         DoctoratCDSCFactory(
-            entity_id__sigle='SC3DP',
+            entity_id__sigle='AGRO3DP',
             entity_id__annee=2020,
         ),
     ]

@@ -31,8 +31,8 @@ from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche imp
 from ddd.logic.projet_doctoral.domain.model._financement import Financement, ChoixTypeFinancement, \
     financement_non_rempli
 from ddd.logic.projet_doctoral.domain.model.doctorat import DoctoratIdentity
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, ChoixStatusProposition, ChoixTypeAdmission
-from education_group.ddd.domain.training import TrainingIdentity
+from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, ChoixStatusProposition, ChoixTypeAdmission, \
+    ChoixBureauCDE
 from osis_common.ddd import interface
 
 
@@ -55,13 +55,14 @@ class PropositionBuilder(interface.RootEntityBuilder):
             cmd: 'InitierPropositionCommand',
             doctorat_id: 'DoctoratIdentity',
     ) -> 'Proposition':
+        # ValidatorList().validate()
         return Proposition(
             entity_id=PropositionIdentityBuilder.build(),
             status=ChoixStatusProposition.IN_PROGRESS,
             type_admission=ChoixTypeAdmission[cmd.type_admission],
             doctorat_id=doctorat_id,
             matricule_candidat=cmd.matricule_candidat,
-            bureau_CDE=cmd.bureau_CDE,
+            bureau_CDE=ChoixBureauCDE[cmd.bureau_CDE] if cmd.bureau_CDE else None,
             financement=_build_financement(cmd),
             projet=_build_projet(cmd),
             experience_precedente_recherche=_build_experience_precedente_recherche(cmd),

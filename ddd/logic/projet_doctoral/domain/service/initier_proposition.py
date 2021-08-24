@@ -32,9 +32,9 @@ from osis_common.ddd import interface
 MAXIMUM_AUTORISE = 1
 
 
-class InitierProposition(interface.DomainService):
+class MaximumPropositionAutorisee(interface.DomainService):
 
     @classmethod
-    def verifier_maximum_propositions_autorisees(cls, propositions_candidat: List['Proposition']):
+    def verifier(cls, propositions_candidat: List['Proposition']) -> None:
         if len([prop for prop in propositions_candidat if prop.est_en_cours()]) >= MAXIMUM_AUTORISE:
             raise MaximumPropositionsAtteintException()
