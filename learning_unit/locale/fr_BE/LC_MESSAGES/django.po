@@ -102,7 +102,7 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 msgid "Copy result"
-msgstr "Résultat de la copie    "
+msgstr "Résultat de la copie"
 
 msgid "Copy source"
 msgstr "Origine de la copie"
