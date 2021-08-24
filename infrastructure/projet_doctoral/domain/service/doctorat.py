@@ -23,30 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
-
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
-from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
+from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
+from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 
 
-class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):
-    entities = list()  # type: List[Proposition]
-
+class DoctoratTranslator(IDoctoratTranslator):
     @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List['PropositionIdentity']] = None,
-            matricule_candidat: str = None,
-            **kwargs
-    ) -> List['Proposition']:
-        returned = cls.entities
-        if matricule_candidat:
-            returned = filter(lambda p: p.matricule_candidat == matricule_candidat, returned)
-        if entity_ids:
-            returned = filter(lambda p: p.entity_id in entity_ids, returned)
-        return list(returned)
-
-    @classmethod
-    def reset(cls):
-        cls.entities = []
+    def get(cls, sigle: str, annee: int) -> Doctorat:
+        raise NotImplementedError

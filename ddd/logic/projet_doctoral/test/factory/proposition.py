@@ -66,7 +66,7 @@ class _PropositionFactory(factory.Factory):
 
     entity_id = factory.SubFactory(_PropositionIdentityFactory)
     matricule_candidat = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    formation_id = factory.SubFactory(TrainingIdentityFactory)
+    doctorat_id = factory.SubFactory(TrainingIdentityFactory)
     status = ChoixStatusProposition.IN_PROGRESS
     projet = factory.SubFactory(_DetailProjetFactory)
     financement = financement_non_rempli
@@ -75,7 +75,7 @@ class _PropositionFactory(factory.Factory):
 
 class PropositionAdmissionSC3DPMinimaleFactory(_PropositionFactory):
     type_admission = ChoixTypeAdmission.ADMISSION
-    formation_id = factory.SubFactory(TrainingIdentityFactory, acronym='SC3DP')
+    doctorat_id = factory.SubFactory(TrainingIdentityFactory, acronym='SC3DP')
 
 
 class PropositionAdmissionSC3DPMinimaleAnnuleeFactory(PropositionAdmissionSC3DPMinimaleFactory):
@@ -84,4 +84,4 @@ class PropositionAdmissionSC3DPMinimaleAnnuleeFactory(PropositionAdmissionSC3DPM
 
 class PropositionPreAdmissionSC3DPMinimaleFactory(_PropositionFactory):
     type_admission = ChoixTypeAdmission.PRE_ADMISSION
-    formation_id = factory.SubFactory(TrainingIdentityFactory, acronym='SC3DP')
+    doctorat_id = factory.SubFactory(TrainingIdentityFactory, acronym='SC3DP')

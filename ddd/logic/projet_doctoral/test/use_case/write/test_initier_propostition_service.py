@@ -31,22 +31,25 @@ from ddd.logic.projet_doctoral.domain.model._financement import ChoixTypeFinance
 from ddd.logic.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition
 from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException
 from ddd.logic.projet_doctoral.test.factory.proposition import (
-    PropositionAdmissionSC3DPMinimaleFactory,
     PropositionAdmissionSC3DPMinimaleAnnuleeFactory,
 )
 from infrastructure.messages_bus import message_bus_instance
+from infrastructure.projet_doctoral.domain.service.in_memory.doctorat import DoctoratInMemoryTranslator
 from infrastructure.projet_doctoral.repository.in_memory.proposition import PropositionInMemoryRepository
 
 
 class TestInitierPropositionService(SimpleTestCase):
     def setUp(self) -> None:
         self.proposition_repository = PropositionInMemoryRepository()
+        self.doctorat_translator = DoctoratInMemoryTranslator()
         message_bus_patcher = mock.patch.multiple(
             'infrastructure.messages_bus',
             PropositionRepository=lambda: self.proposition_repository,
+            DoctoratTranslator=lambda: self.doctorat_translator,
         )
         message_bus_patcher.start()
         self.addCleanup(message_bus_patcher.stop)
+        self.addCleanup(self.proposition_repository.reset)
 
         self.message_bus = message_bus_instance
         self.cmd = InitierPropositionCommand(
@@ -67,8 +70,8 @@ class TestInitierPropositionService(SimpleTestCase):
         proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
         self.assertEqual(proposition_id, proposition.entity_id)
         self.assertEqual(ChoixTypeAdmission[self.cmd.type_admission], proposition.type_admission)
-        self.assertEqual(self.cmd.sigle_formation, proposition.formation_id.acronym)
-        self.assertEqual(self.cmd.annee_formation, proposition.formation_id.year)
+        self.assertEqual(self.cmd.sigle_formation, proposition.doctorat_id.sigle)
+        self.assertEqual(self.cmd.annee_formation, proposition.doctorat_id.annee)
         self.assertEqual(self.cmd.matricule_candidat, proposition.matricule_candidat)
         self.assertEqual(self.cmd.bureau_CDE, proposition.bureau_CDE)
         self.assertEqual(ChoixTypeFinancement[self.cmd.type_financement], proposition.financement.type)

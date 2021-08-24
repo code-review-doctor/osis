@@ -38,7 +38,7 @@ from ddd.logic.projet_doctoral.domain.model._financement import (
     Financement,
     financement_non_rempli,
 )
-from education_group.ddd.domain.training import TrainingIdentity
+from ddd.logic.projet_doctoral.domain.model.doctorat import DoctoratIdentity
 from osis_common.ddd import interface
 
 
@@ -61,7 +61,7 @@ class PropositionIdentity(interface.EntityIdentity):
 class Proposition(interface.RootEntity):
     entity_id = attr.ib(type=PropositionIdentity)
     type_admission = attr.ib(type=ChoixTypeAdmission)
-    formation_id = attr.ib(type=TrainingIdentity)
+    doctorat_id = attr.ib(type=DoctoratIdentity)
     matricule_candidat = attr.ib(type=str)
     projet = attr.ib(type=DetailProjet)
     status = attr.ib(type=ChoixStatusProposition, default=ChoixStatusProposition.IN_PROGRESS)

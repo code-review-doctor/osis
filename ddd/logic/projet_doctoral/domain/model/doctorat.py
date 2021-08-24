@@ -23,30 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+import attr
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
-from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
+# FIXME should be imported from shared kernel when available
+from base.ddd.utils.converters import to_upper_case_converter
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity
+from osis_common.ddd import interface
+
+ENTITY_CDE = 'CDE'
 
 
-class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):
-    entities = list()  # type: List[Proposition]
+@attr.s(slots=True)
+class DoctoratIdentity(interface.EntityIdentity):
+    sigle = attr.ib(type=str, converter=to_upper_case_converter)
+    annee = attr.ib(type=int)
 
-    @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List['PropositionIdentity']] = None,
-            matricule_candidat: str = None,
-            **kwargs
-    ) -> List['Proposition']:
-        returned = cls.entities
-        if matricule_candidat:
-            returned = filter(lambda p: p.matricule_candidat == matricule_candidat, returned)
-        if entity_ids:
-            returned = filter(lambda p: p.entity_id in entity_ids, returned)
-        return list(returned)
 
-    @classmethod
-    def reset(cls):
-        cls.entities = []
+@attr.s(slots=True)
+class Doctorat(interface.Entity):
+    entity_id = attr.ib(type=DoctoratIdentity)
+    entite_ucl_id = attr.ib(type=UCLEntityIdentity)
+
+    def est_entite_CDE(self):
+        return self.entite_ucl_id.code == ENTITY_CDE

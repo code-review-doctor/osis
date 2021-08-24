@@ -23,30 +23,40 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
 
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
-from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
+import uuid
+
+import factory
+
+# FIXME import this factory from shared kernel when available
+from ddd.logic.learning_unit.tests.factory.ucl_entity import UclEntityIdentityFactory
+from ddd.logic.projet_doctoral.domain.model.doctorat import (
+    DoctoratIdentity,
+    Doctorat,
+)
 
 
-class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):
-    entities = list()  # type: List[Proposition]
+class _DoctoratIdentityFactory(factory.Factory):
+    class Meta:
+        model = DoctoratIdentity
+        abstract = False
 
-    @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List['PropositionIdentity']] = None,
-            matricule_candidat: str = None,
-            **kwargs
-    ) -> List['Proposition']:
-        returned = cls.entities
-        if matricule_candidat:
-            returned = filter(lambda p: p.matricule_candidat == matricule_candidat, returned)
-        if entity_ids:
-            returned = filter(lambda p: p.entity_id in entity_ids, returned)
-        return list(returned)
+    sigle = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+    annee = factory.fuzzy.FuzzyInteger(1999, 2099)
 
-    @classmethod
-    def reset(cls):
-        cls.entities = []
+
+class _DoctoratFactory(factory.Factory):
+    class Meta:
+        model = Doctorat
+        abstract = False
+
+    entity_id = factory.SubFactory(_DoctoratIdentityFactory)
+    entite_ucl_id = factory.SubFactory(UclEntityIdentityFactory)
+
+
+class DoctoratCDEFactory(_DoctoratFactory):
+    entite_ucl_id = factory.SubFactory(UclEntityIdentityFactory, code='CDE')
+
+
+class DoctoratCDSCFactory(_DoctoratFactory):
+    entite_ucl_id = factory.SubFactory(UclEntityIdentityFactory, code='CDSC')

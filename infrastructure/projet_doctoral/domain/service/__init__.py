@@ -23,30 +23,3 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
-
-from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
-from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
-
-
-class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):
-    entities = list()  # type: List[Proposition]
-
-    @classmethod
-    def search(
-            cls,
-            entity_ids: Optional[List['PropositionIdentity']] = None,
-            matricule_candidat: str = None,
-            **kwargs
-    ) -> List['Proposition']:
-        returned = cls.entities
-        if matricule_candidat:
-            returned = filter(lambda p: p.matricule_candidat == matricule_candidat, returned)
-        if entity_ids:
-            returned = filter(lambda p: p.entity_id in entity_ids, returned)
-        return list(returned)
-
-    @classmethod
-    def reset(cls):
-        cls.entities = []
