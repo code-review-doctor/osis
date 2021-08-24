@@ -38,7 +38,7 @@ class ApplicationSerializer:
             'practical_allocation': str(application.practical_volume) if application.practical_volume else '0',
             'learning_container_year': {
                 'reference': self._get_reference(application),
-                'year': str(application.vacant_course_id.year),
+                'year': application.vacant_course_id.year,
                 'acronym': application.vacant_course_id.code
             }
         }
@@ -53,7 +53,7 @@ class ApplicationSerializer:
             'practical_allocation': str(application.practical_volume) if application.practical_volume else '0',
             'learning_container_year': {
                 'reference': self._get_reference(application),
-                'year': str(application.vacant_course_id.year),
+                'year': application.vacant_course_id.year,
                 'acronym': application.vacant_course_id.code
             }
         }
