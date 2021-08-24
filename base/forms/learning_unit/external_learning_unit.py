@@ -192,7 +192,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['disabled'] = True
             self.learning_unit_year_form.fields['acronym'].required = False
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
-        self._restrict_academic_years_choice(proposal)
+        if not self.instance:
+            self._restrict_academic_years_choice(proposal)
 
     def _restrict_academic_years_choice(self, proposal_type):
         if proposal_type:
