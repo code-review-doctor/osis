@@ -29,10 +29,15 @@ import attr
 from django.utils.translation import gettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
-from ddd.logic.projet_doctoral.domain.model._detail_projet import DetailProjet, DetailProjetNonRempli
-from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import ExperiencePrecedenteRecherche, \
-    AucuneExperiencePrecedenteRecherche
-from ddd.logic.projet_doctoral.domain.model._financement import Financement, FinancementNonRempli
+from ddd.logic.projet_doctoral.domain.model._detail_projet import DetailProjet
+from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import (
+    ExperiencePrecedenteRecherche,
+    aucune_experience_precedente_recherche,
+)
+from ddd.logic.projet_doctoral.domain.model._financement import (
+    Financement,
+    financement_non_rempli,
+)
 from education_group.ddd.domain.training import TrainingIdentity
 from osis_common.ddd import interface
 
@@ -55,16 +60,16 @@ class PropositionIdentity(interface.EntityIdentity):
 @attr.s(slots=True, hash=False)
 class Proposition(interface.RootEntity):
     entity_id = attr.ib(type=PropositionIdentity)
-    status = attr.ib(type=ChoixStatusProposition, default=ChoixStatusProposition.IN_PROGRESS)
     type_admission = attr.ib(type=ChoixTypeAdmission)
     formation_id = attr.ib(type=TrainingIdentity)
     matricule_candidat = attr.ib(type=str)
+    projet = attr.ib(type=DetailProjet)
+    status = attr.ib(type=ChoixStatusProposition, default=ChoixStatusProposition.IN_PROGRESS)
     bureau_CDE = attr.ib(type=Optional[str], default='')  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
-    financement = attr.ib(type=Financement, factory=FinancementNonRempli)
-    projet = attr.ib(type=DetailProjet, factory=DetailProjetNonRempli)
+    financement = attr.ib(type=Financement, default=financement_non_rempli)
     experience_precedente_recherche = attr.ib(
         type=ExperiencePrecedenteRecherche,
-        factory=AucuneExperiencePrecedenteRecherche,
+        default=aucune_experience_precedente_recherche,
     )
 
     def est_en_cours(self):

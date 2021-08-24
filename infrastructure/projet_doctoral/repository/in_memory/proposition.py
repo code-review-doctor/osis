@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,19 +22,29 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from typing import List
+# ##############################################################################
+from typing import Optional, List
 
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition
-from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException
-from osis_common.ddd import interface
-
-MAXIMUM_AUTORISE = 1
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
+from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
+from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
-class InitierProposition(interface.DomainService):
+class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):
+    entities = list()  # type: List[Proposition]
 
     @classmethod
-    def verifier_maximum_propositions_autorisees(cls, propositions_candidat: List['Proposition']):
-        if len([prop for prop in propositions_candidat if prop.est_en_cours()]) >= MAXIMUM_AUTORISE:
-            raise MaximumPropositionsAtteintException()
+    def search(
+            cls,
+            entity_ids: Optional[List['PropositionIdentity']] = None,
+            matricule_candidat: str = None,
+            **kwargs
+    ) -> List['Proposition']:
+        returned = cls.entities
+        if matricule_candidat:
+            returned = filter(lambda p: p.matricule_candidat == matricule_candidat, returned)
+        if entity_ids:
+            returned = filter(lambda p: p.entity_id in entity_ids, returned)
+        return list(returned)
+
+

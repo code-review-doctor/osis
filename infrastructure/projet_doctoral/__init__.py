@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,19 +22,4 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from typing import List
-
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition
-from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException
-from osis_common.ddd import interface
-
-MAXIMUM_AUTORISE = 1
-
-
-class InitierProposition(interface.DomainService):
-
-    @classmethod
-    def verifier_maximum_propositions_autorisees(cls, propositions_candidat: List['Proposition']):
-        if len([prop for prop in propositions_candidat if prop.est_en_cours()]) >= MAXIMUM_AUTORISE:
-            raise MaximumPropositionsAtteintException()
+# ##############################################################################
