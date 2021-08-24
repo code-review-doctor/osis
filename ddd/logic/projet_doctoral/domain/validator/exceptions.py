@@ -34,3 +34,9 @@ class MaximumPropositionsAtteintException(BusinessException):
     def __init__(self, **kwargs):
         message = _("You've reached the maximum authorized propositions.")
         super().__init__(message, **kwargs)
+
+
+class DoctoratNonTrouveException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("No PhD found.")
+        super().__init__(message, **kwargs)

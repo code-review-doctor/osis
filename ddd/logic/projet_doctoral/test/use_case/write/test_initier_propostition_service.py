@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
+import attr
 import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.projet_doctoral.commands import InitierPropositionCommand
 from ddd.logic.projet_doctoral.domain.model._financement import ChoixTypeFinancement
 from ddd.logic.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition
-from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException
+from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException, \
+    DoctoratNonTrouveException
 from ddd.logic.projet_doctoral.test.factory.proposition import (
     PropositionAdmissionSC3DPMinimaleAnnuleeFactory,
 )
@@ -91,3 +93,9 @@ class TestInitierPropositionService(SimpleTestCase):
         proposition_id = self.message_bus.invoke(self.cmd)
         proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
         self.assertEqual(proposition_id, proposition.entity_id)
+
+    def test_should_empecher_si_pas_doctorat(self):
+        not_doctorat = 'DROI1BA'
+        cmd = attr.evolve(self.cmd, sigle_formation=not_doctorat)
+        with self.assertRaises(DoctoratNonTrouveException):
+            self.message_bus.invoke(cmd)

@@ -51,13 +51,22 @@
 
 from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
 from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
+from ddd.logic.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
 from ddd.logic.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory
 
 
 class DoctoratInMemoryTranslator(IDoctoratTranslator):
+
+    doctorats = [
+        DoctoratCDSCFactory(
+            entity_id__sigle='SC3DP',
+            entity_id__annee=2020,
+        ),
+    ]
+
     @classmethod
     def get(cls, sigle: str, annee: int) -> Doctorat:
-        return DoctoratCDSCFactory(
-            entity_id__sigle=sigle,
-            entity_id__annee=annee,
-        )
+        try:
+            return next(doc for doc in cls.doctorats if doc.entity_id.sigle == sigle and doc.entity_id.annee == annee)
+        except StopIteration:
+            raise DoctoratNonTrouveException()
