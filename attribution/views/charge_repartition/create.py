@@ -91,9 +91,9 @@ class AddChargeRepartition(UpdateAttributionView):
         if self.luy.learning_container_year.container_type != learning_container_year_types.COURSE and \
                 self.luy.is_partim():
             if copy_attribution.start_year is None:
-                copy_attribution.start_year = self.luy.learning_unit.start_year.year
+                copy_attribution.start_year = self.luy.academic_year.year
             if copy_attribution.end_year is None:
-                copy_attribution.end_year = self.luy.learning_unit.start_year.year
+                copy_attribution.end_year = self.luy.academic_year.year
         copy_attribution.save()
         return copy_attribution
 
