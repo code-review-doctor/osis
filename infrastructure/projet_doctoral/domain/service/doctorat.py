@@ -23,11 +23,48 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
+from typing import List
+
+from base.models.enums.education_group_types import TrainingType
+from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
+from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity  # FIXME reuse from shared_kernel
+from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat, DoctoratIdentity
 from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
+from ddd.logic.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
+from ddd.logic.projet_doctoral.dtos import DoctoratDTO
 
 
 class DoctoratTranslator(IDoctoratTranslator):
     @classmethod
     def get(cls, sigle: str, annee: int) -> Doctorat:
-        raise NotImplementedError
+        dtos = message_bus_instance.invoke(
+            SearchFormationsCommand(sigle=sigle, annee=annee, type=TrainingType.PHD.name)
+        )
+        if dtos:
+            dto = dtos[0]
+            return Doctorat(
+                entity_id=DoctoratIdentity(sigle=dto.acronym, annee=dto.year),
+                entite_ucl_id=UCLEntityIdentity(code=dto.management_entity_acronym),
+            )
+        raise DoctoratNonTrouveException()
+
+    @classmethod
+    def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
+        from infrastructure.messages_bus import message_bus_instance
+        dtos = message_bus_instance.invoke(
+            SearchFormationsCommand(
+                annee=annee,
+                sigle_entite_gestion=sigle_entite_gestion,
+                inclure_entites_gestion_subordonnees=True,
+                type=TrainingType.PHD.name,
+            )
+        )
+        return [
+            DoctoratDTO(
+                sigle=dto.acronym,
+                annee=dto.year,
+                intitule_fr=dto.title_fr,
+                intitule_en=dto.title_en,
+                sigle_entite_gestion=dto.management_entity_acronym,
+            ) for dto in dtos
+        ]

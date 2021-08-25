@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,23 +22,17 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from abc import abstractmethod
-from typing import List
+##############################################################################
 
-from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
-from ddd.logic.projet_doctoral.dtos import DoctoratDTO
+import attr
+
 from osis_common.ddd import interface
 
 
-class IDoctoratTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, sigle: str, annee: int) -> Doctorat:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
-        pass
-
+@attr.s(frozen=True, slots=True)
+class DoctoratDTO(interface.DTO):
+    sigle = attr.ib(type=str)
+    annee = attr.ib(type=int)
+    intitule_fr = attr.ib(type=str)
+    intitule_en = attr.ib(type=str)
+    sigle_entite_gestion = attr.ib(type=str)

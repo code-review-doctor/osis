@@ -48,10 +48,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
+from typing import List
 
 from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
 from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
+from ddd.logic.projet_doctoral.dtos import DoctoratDTO
 from ddd.logic.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory, DoctoratCDEFactory
 
 
@@ -78,3 +80,7 @@ class DoctoratInMemoryTranslator(IDoctoratTranslator):
             return next(doc for doc in cls.doctorats if doc.entity_id.sigle == sigle and doc.entity_id.annee == annee)
         except StopIteration:
             raise DoctoratNonTrouveException()
+
+    @classmethod
+    def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
+        raise NotImplementedError

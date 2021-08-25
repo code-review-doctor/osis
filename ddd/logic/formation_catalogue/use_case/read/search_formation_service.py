@@ -23,22 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
 from typing import List
 
-from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
-from ddd.logic.projet_doctoral.dtos import DoctoratDTO
-from osis_common.ddd import interface
+from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
+from ddd.logic.formation_catalogue.dtos import TrainingDto
+from education_group.ddd.repository.training import TrainingRepository
 
 
-class IDoctoratTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, sigle: str, annee: int) -> Doctorat:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
-        pass
-
+def search_formations(
+        cmd: 'SearchFormationsCommand',
+        training_repository: 'TrainingRepository',
+) -> List['TrainingDto']:
+    # TODO :: assurer qu'au moins 1 param de recherche soit rempli
+    # entites_de_gestion = [cmd.sigle_entite_gestion] if cmd.sigle_entite_gestion else []
+    # if cmd.inclure_entites_gestion_subordonnees:
+    #     entities = get_entities_ids(entity_acronym=cmd.sigle_entite_gestion, with_entity_subordinated=True)
+    #     entites_de_gestion += entities
+    # TODO :: gérer cmd. inclure_entites_gestion_subordonnees et cmd.sigle_entite_gestion (shared kernel UCLEntity)
+    # TODO :: unit tests
+    return training_repository.search_dtos(
+        sigle=cmd.sigle,
+        annee=cmd.annee,
+        type=cmd.type,
+    )

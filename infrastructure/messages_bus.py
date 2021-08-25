@@ -53,6 +53,8 @@ from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tu
 from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repartition_to_tutor_service import \
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
+from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
+from ddd.logic.formation_catalogue.use_case.read.search_formation_service import search_formations
 from ddd.logic.learning_unit.commands import CreateLearningUnitCommand, GetLearningUnitCommand, \
     CreateEffectiveClassCommand, CanCreateEffectiveClassCommand, GetEffectiveClassCommand, \
     UpdateEffectiveClassCommand, DeleteEffectiveClassCommand, CanDeleteEffectiveClassCommand, \
@@ -66,7 +68,9 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
-from ddd.logic.projet_doctoral.commands import InitierPropositionCommand, CompleterPropositionCommand
+from ddd.logic.projet_doctoral.commands import InitierPropositionCommand, CompleterPropositionCommand, \
+    SearchDoctoratCommand
+from ddd.logic.projet_doctoral.use_case.read.rechercher_doctorats_service import rechercher_doctorats
 from ddd.logic.projet_doctoral.use_case.write.completer_proposition_service import completer_proposition
 from ddd.logic.projet_doctoral.use_case.write.initier_proposition_service import initier_proposition
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
@@ -77,6 +81,7 @@ from ddd.logic.shared_kernel.campus.use_case.read.search_uclouvain_campuses_serv
 from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, GetLanguageCommand
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
+from education_group.ddd.repository.training import TrainingRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -206,6 +211,14 @@ class MessageBus:
         CompleterPropositionCommand: lambda cmd: completer_proposition(
             cmd,
             PropositionRepository(),
+            DoctoratTranslator(),
+        ),
+        SearchFormationsCommand: lambda cmd: search_formations(
+            cmd,
+            TrainingRepository(),
+        ),
+        SearchDoctoratCommand: lambda cmd: rechercher_doctorats(
+            cmd,
             DoctoratTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

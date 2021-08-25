@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import Decimal
 from typing import List, Optional
 
 import attr
 
 from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import ChoixDoctoratDejaRealise
 from osis_common.ddd import interface
-
 
 UUID = str
 
@@ -63,3 +61,8 @@ class CompleterPropositionCommand(interface.CommandRequest):
     documents_projet = attr.ib(type=List[UUID], factory=list)
     doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
     institution = attr.ib(type=Optional[str], default='')
+
+
+@attr.s(frozen=True, slots=True)
+class SearchDoctoratCommand(interface.CommandRequest):
+    sigle_secteur_entite_gestion = attr.ib(type=str)

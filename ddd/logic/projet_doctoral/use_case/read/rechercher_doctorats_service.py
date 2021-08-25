@@ -23,22 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
+import datetime
 from typing import List
 
-from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat
+from ddd.logic.projet_doctoral.commands import SearchDoctoratCommand
+from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.projet_doctoral.dtos import DoctoratDTO
-from osis_common.ddd import interface
 
 
-class IDoctoratTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, sigle: str, annee: int) -> Doctorat:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
-        pass
-
+def rechercher_doctorats(
+        cmd: 'SearchDoctoratCommand',
+        doctorat_translator: 'IDoctoratTranslator',
+) -> List['DoctoratDTO']:
+    annee = datetime.date.today().year  # TODO :: comment déterminer l'année concernée pour la formation ? Sur base d'un calendrier ?
+    return doctorat_translator.search(cmd.sigle_secteur_entite_gestion, annee)
