@@ -29,7 +29,8 @@ FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = [
     'acronym', 'internship_subtype', 'credits', 'periodicity',
     'status', 'language', 'professional_integration', 'stage_dimona', 'specific_title',
     'specific_title_english', 'quadrimester', 'session', 'faculty_remark',
-    'other_remark', 'other_remark_english'
+    'other_remark', 'other_remark_english', 'individual_loan', 'french_friendly',
+    'english_friendly', 'exchange_students'
 ]
 FIELDS_FOR_COMMON_TITLE_COMPARISON = ['common_title', 'common_title_english']
 FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
