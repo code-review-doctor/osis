@@ -23,33 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
+from django.test import TestCase
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
-
-class CountryAdmin(SerializableModelAdmin):
-    list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code',
-                    'currency', 'continent')
-    list_filter = ('european_union',)
-    ordering = ('name',)
-    search_fields = ['name']
+from reference.api.serializers.language import LanguageSerializer
+from reference.models.language import Language
 
 
-class Country(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    iso_code = models.CharField(max_length=2, unique=True)
-    name = models.CharField(max_length=80)
-    name_en = models.CharField(max_length=80)
-    nationality = models.CharField(max_length=80, blank=True, null=True)
-    european_union = models.BooleanField(default=False)
-    dialing_code = models.CharField(max_length=3, blank=True, null=True)
-    cref_code = models.CharField(max_length=3, blank=True, null=True)
-    currency = models.ForeignKey('Currency', blank=True, null=True, on_delete=models.CASCADE)
-    continent = models.ForeignKey('Continent', blank=True, null=True, on_delete=models.CASCADE)
+class LanguageSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.language = Language()
+        cls.serializer = LanguageSerializer(cls.language)
 
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ('name',)
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'code',
+            'name',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)

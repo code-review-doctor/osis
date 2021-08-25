@@ -25,31 +25,23 @@
 ##############################################################################
 from django.db import models
 
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models import osis_model_admin
 
 
-class CountryAdmin(SerializableModelAdmin):
-    list_display = ('uuid', 'name', 'iso_code', 'nationality', 'european_union', 'dialing_code', 'cref_code',
-                    'currency', 'continent')
-    list_filter = ('european_union',)
-    ordering = ('name',)
-    search_fields = ['name']
+class ZipCodeAdmin(osis_model_admin.OsisModelAdmin):
+    list_display = ('zip_code', 'municipality', 'country')
+    list_filter = ('country',)
+    ordering = ('zip_code',)
+    search_fields = ['municipality']
 
 
-class Country(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    iso_code = models.CharField(max_length=2, unique=True)
-    name = models.CharField(max_length=80)
-    name_en = models.CharField(max_length=80)
-    nationality = models.CharField(max_length=80, blank=True, null=True)
-    european_union = models.BooleanField(default=False)
-    dialing_code = models.CharField(max_length=3, blank=True, null=True)
-    cref_code = models.CharField(max_length=3, blank=True, null=True)
-    currency = models.ForeignKey('Currency', blank=True, null=True, on_delete=models.CASCADE)
-    continent = models.ForeignKey('Continent', blank=True, null=True, on_delete=models.CASCADE)
+class ZipCode(models.Model):
+    zip_code = models.CharField(max_length=255)
+    municipality = models.CharField(max_length=255)
+    country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name
+        return "{} - {} ({})".format(self.zip_code, self.municipality, self.country.iso_code)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('zip_code',)

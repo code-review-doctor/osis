@@ -42,6 +42,9 @@ def notify_application_deleted(application: Application):
         queue_sender.send_message(queue_name, message_serialized)
         log_msg = "Application deleted message sent: {}".format(json.dumps(message_serialized))
         queue_exception_logger.info(log_msg)
+    else:
+        log_msg = "[APPLICATION] Settings APPLICATION_REQUEST (QUEUES) missing"
+        queue_exception_logger.info(log_msg)
 
 
 def notify_application_saved(application: Application):
@@ -50,6 +53,9 @@ def notify_application_saved(application: Application):
         message_serialized = ApplicationSerializer().serialize_to_update_epc_message(application)
         queue_sender.send_message(queue_name, message_serialized)
         log_msg = "Application save message sent: {}".format(json.dumps(message_serialized))
+        queue_exception_logger.info(log_msg)
+    else:
+        log_msg = "[APPLICATION] Settings APPLICATION_REQUEST (QUEUES) missing"
         queue_exception_logger.info(log_msg)
 
 

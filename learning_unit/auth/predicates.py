@@ -579,3 +579,14 @@ def is_learning_unit_year_summary_editable(self, user, learning_unit_year):
     if learning_unit_year:
         return not learning_unit_year.summary_locked
     return None
+
+
+@predicate(bind=True)
+@predicate_failed_msg(message=_("This learning unit is not editable this period."))
+@predicate_cache(cache_key_fn=lambda obj: getattr(obj, 'pk', None))
+def is_learning_unit_of_class_edition_for_faculty_manager_period_open(self, user, learning_class_year):
+    if learning_class_year:
+        luy = learning_class_year.learning_component_year.learning_unit_year
+        academic_year = luy.academic_year if luy else None
+        return _check_if_education_group_limited_daily_management_is_open(academic_year)
+    return None

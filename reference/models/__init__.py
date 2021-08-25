@@ -5,3 +5,4 @@ from reference.models import decree
 from reference.models import domain
 from reference.models import domain_isced
 from reference.models import language
+from reference.models import zipcode
