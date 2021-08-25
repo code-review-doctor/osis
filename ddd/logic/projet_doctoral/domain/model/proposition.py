@@ -82,6 +82,8 @@ class Proposition(interface.RootEntity):
         type=ExperiencePrecedenteRecherche,
         default=aucune_experience_precedente_recherche,
     )
+    promoteurs = attr.ib(type=List[PromoteurIdentity], factory=list)
+    membres_CA = attr.ib(type=List[MembreCAIdentity], factory=list)
 
     @property
     def sigle_formation(self):
@@ -150,4 +152,8 @@ class Proposition(interface.RootEntity):
         raise NotImplementedError
 
     def identifier_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
+        raise NotImplementedError
+
+    def demander_signature(self, matricule_signataire: str) -> None:
+        # TODO :: verifier si signataire dans membres_CA ou promoteurs
         raise NotImplementedError

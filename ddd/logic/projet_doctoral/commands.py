@@ -78,3 +78,9 @@ class IdentifierPromoteurCommand(interface.CommandRequest):
 class IdentifierMembreCACommand(interface.CommandRequest):
     uuid_proposition = attr.ib(type=str)
     matricule = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DemanderSignatureCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)
+    matricule_signataire = attr.ib(type=str)
