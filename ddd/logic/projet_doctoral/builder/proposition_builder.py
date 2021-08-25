@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from ddd.logic.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
+from ddd.logic.projet_doctoral.commands import CompleterPropositionCommand
 from ddd.logic.projet_doctoral.commands import InitierPropositionCommand
 from ddd.logic.projet_doctoral.domain.model._detail_projet import DetailProjet
 from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import ExperiencePrecedenteRecherche, \
@@ -33,6 +34,7 @@ from ddd.logic.projet_doctoral.domain.model._financement import Financement, Cho
 from ddd.logic.projet_doctoral.domain.model.doctorat import DoctoratIdentity
 from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, ChoixStatusProposition, ChoixTypeAdmission, \
     ChoixBureauCDE
+from ddd.logic.projet_doctoral.domain.validator.validator_by_business_action import InitierPropositionValidatorList
 from osis_common.ddd import interface
 
 
@@ -55,7 +57,12 @@ class PropositionBuilder(interface.RootEntityBuilder):
             cmd: 'InitierPropositionCommand',
             doctorat_id: 'DoctoratIdentity',
     ) -> 'Proposition':
-        # ValidatorList().validate()
+        InitierPropositionValidatorList(
+            type_financement=cmd.type_financement,
+            type_contrat_travail=cmd.type_contrat_travail,
+            doctorat_deja_realise=cmd.doctorat_deja_realise,
+            institution=cmd.institution,
+        ).validate()
         return Proposition(
             entity_id=PropositionIdentityBuilder.build(),
             status=ChoixStatusProposition.IN_PROGRESS,
@@ -91,4 +98,5 @@ def _build_experience_precedente_recherche(cmd: 'InitierPropositionCommand') -> 
         return aucune_experience_precedente_recherche
     return ExperiencePrecedenteRecherche(
         doctorat_deja_realise=ChoixDoctoratDejaRealise[cmd.doctorat_deja_realise],
+        institution=cmd.institution,
     )

@@ -45,3 +45,15 @@ class BureauCDEInconsistantException(BusinessException):
     def __init__(self, **kwargs):
         message = _("CDE Bureau should be filled in only if the doctorate's entity is CDE")
         super().__init__(message, **kwargs)
+
+
+class ContratTravailInconsistantException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Work contract should be set when financing type is set to work contract")
+        super().__init__(message, **kwargs)
+
+
+class InstitutionInconsistanteException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Institution should be set when PhD has been set to yes or partial")
+        super().__init__(message, **kwargs)

@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,44 +22,47 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from decimal import Decimal
-from typing import List, Optional
+# ##############################################################################
+from typing import Optional, List
 
 import attr
 
+from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
 from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import ChoixDoctoratDejaRealise
-from osis_common.ddd import interface
-
-
-UUID = str
-
-
-@attr.s(frozen=True, slots=True)
-class InitierPropositionCommand(interface.CommandRequest):
-    type_admission = attr.ib(type=str)
-    sigle_formation = attr.ib(type=str)
-    annee_formation = attr.ib(type=int)
-    matricule_candidat = attr.ib(type=str)
-    bureau_CDE = attr.ib(type=Optional[str], default='')  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
-    type_financement = attr.ib(type=Optional[str], default='')
-    type_contrat_travail = attr.ib(type=Optional[str], default='')
-    titre_projet = attr.ib(type=Optional[str], default='')
-    resume_projet = attr.ib(type=Optional[str], default='')
-    documents_projet = attr.ib(type=List[UUID], factory=list)
-    doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
-    institution = attr.ib(type=Optional[str], default='')
+from ddd.logic.projet_doctoral.domain.validator._should_institution_dependre_doctorat_realise import \
+    ShouldInstitutionDependreDoctoratRealise
+from ddd.logic.projet_doctoral.domain.validator._should_type_contrat_travail_dependre_type_financement import \
+    ShouldTypeContratTravailDependreTypeFinancement
 
 
 @attr.s(frozen=True, slots=True)
-class CompleterPropositionCommand(interface.CommandRequest):
-    uuid = attr.ib(type=str)
-    type_admission = attr.ib(type=str)
-    bureau_CDE = attr.ib(type=Optional[str], default='')  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
-    type_financement = attr.ib(type=Optional[str], default='')
+class InitierPropositionValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    type_financement = attr.ib(type=str)
     type_contrat_travail = attr.ib(type=Optional[str], default='')
-    titre_projet = attr.ib(type=Optional[str], default='')
-    resume_projet = attr.ib(type=Optional[str], default='')
-    documents_projet = attr.ib(type=List[UUID], factory=list)
     doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
     institution = attr.ib(type=Optional[str], default='')
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldTypeContratTravailDependreTypeFinancement(self.type_financement, self.type_contrat_travail),
+            ShouldInstitutionDependreDoctoratRealise(self.doctorat_deja_realise, self.institution),
+        ]
+
+@attr.s(frozen=True, slots=True)
+class CompletionPropositionValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    type_financement = attr.ib(type=str)
+    type_contrat_travail = attr.ib(type=Optional[str], default='')
+    doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
+    institution = attr.ib(type=Optional[str], default='')
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldTypeContratTravailDependreTypeFinancement(self.type_financement, self.type_contrat_travail),
+            ShouldInstitutionDependreDoctoratRealise(self.doctorat_deja_realise, self.institution),
+        ]

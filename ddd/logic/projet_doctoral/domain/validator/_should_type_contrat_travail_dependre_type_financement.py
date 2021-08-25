@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,23 +22,23 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-import uuid
+# ##############################################################################
+from typing import Optional
 
-from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
-from osis_common.ddd.interface import EntityIdentityBuilder, DTO
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.projet_doctoral.domain.model._financement import ChoixTypeFinancement
+from ddd.logic.projet_doctoral.domain.validator.exceptions import ContratTravailInconsistantException
 
 
-class PropositionIdentityBuilder(EntityIdentityBuilder):
+@attr.s(frozen=True, slots=True)
+class ShouldTypeContratTravailDependreTypeFinancement(BusinessValidator):
+    type = attr.ib(type=str)
+    type_contrat_travail = attr.ib(type=Optional[str], default='')
 
-    @classmethod
-    def build_from_repository_dto(cls, dto_object: 'DTO') -> 'PropositionIdentity':
-        raise NotImplementedError
-
-    @classmethod
-    def build(cls) -> 'PropositionIdentity':
-        return PropositionIdentity(uuid=str(uuid.uuid4()))
-
-    @classmethod
-    def build_from_uuid(cls, uuid: str) -> 'PropositionIdentity':
-        return PropositionIdentity(uuid=uuid)
+    def validate(self, *args, **kwargs):
+        if (not self.type or ChoixTypeFinancement[self.type] != ChoixTypeFinancement.WORK_CONTRACT) and self.type_contrat_travail:
+            raise ContratTravailInconsistantException()
+        if self.type and ChoixTypeFinancement[self.type] == ChoixTypeFinancement.WORK_CONTRACT and not self.type_contrat_travail:
+            raise ContratTravailInconsistantException()

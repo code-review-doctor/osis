@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import Optional, Union
 
 import attr
 from django.utils.translation import gettext_lazy as _
@@ -40,11 +40,11 @@ class ChoixTypeFinancement(ChoiceEnum):
 
 @attr.s(frozen=True, slots=True)
 class Financement(interface.ValueObject):
-    type = attr.ib(type=ChoixTypeFinancement)
+    type = attr.ib(type=Union[ChoixTypeFinancement, str])
     type_contrat_travail = attr.ib(type=Optional[str], default='')
 
 
 financement_non_rempli = Financement(
-    type = '',
-    type_contrat_travail = '',
+    type='',
+    type_contrat_travail='',
 )

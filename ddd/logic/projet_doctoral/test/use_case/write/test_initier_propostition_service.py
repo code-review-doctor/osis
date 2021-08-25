@@ -28,10 +28,16 @@ import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.projet_doctoral.commands import InitierPropositionCommand
-from ddd.logic.projet_doctoral.domain.model._financement import ChoixTypeFinancement
+from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import (
+    ChoixDoctoratDejaRealise,
+    aucune_experience_precedente_recherche,
+)
+from ddd.logic.projet_doctoral.domain.model._financement import ChoixTypeFinancement, financement_non_rempli
 from ddd.logic.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition, ChoixBureauCDE
-from ddd.logic.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException, \
-    DoctoratNonTrouveException, BureauCDEInconsistantException
+from ddd.logic.projet_doctoral.domain.validator.exceptions import (
+    MaximumPropositionsAtteintException,
+    DoctoratNonTrouveException, BureauCDEInconsistantException,
+)
 from ddd.logic.projet_doctoral.test.factory.proposition import (
     PropositionAdmissionSC3DPMinimaleAnnuleeFactory,
 )
@@ -60,11 +66,13 @@ class TestInitierPropositionService(SimpleTestCase):
             annee_formation=2020,
             matricule_candidat='01234567',
             bureau_CDE=ChoixBureauCDE.ECONOMY.name,
-            type_financement=ChoixTypeFinancement.SELF_FUNDING.name,
+            type_financement=ChoixTypeFinancement.WORK_CONTRACT.name,
             type_contrat_travail='assistant_uclouvain',
             titre_projet='Mon projet',
             resume_projet='LE résumé de mon projet',
             documents_projet=[],
+            doctorat_deja_realise=ChoixDoctoratDejaRealise.YES.name,
+            institution="psychiatrique",
         )
 
         self.doctorat_non_CDE = 'AGRO3DP'
@@ -77,12 +85,25 @@ class TestInitierPropositionService(SimpleTestCase):
         self.assertEqual(self.cmd.sigle_formation, proposition.doctorat_id.sigle)
         self.assertEqual(self.cmd.annee_formation, proposition.doctorat_id.annee)
         self.assertEqual(self.cmd.matricule_candidat, proposition.matricule_candidat)
-        # self.assertEqual(ChoixBureauCDE[self.cmd.bureau_CDE], proposition.bureau_CDE)
+
+    def test_should_initier_financement(self):
+        proposition_id = self.message_bus.invoke(self.cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
         self.assertEqual(ChoixTypeFinancement[self.cmd.type_financement], proposition.financement.type)
         self.assertEqual(self.cmd.type_contrat_travail, proposition.financement.type_contrat_travail)
+
+    def test_should_initier_projet(self):
+        proposition_id = self.message_bus.invoke(self.cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
         self.assertEqual(self.cmd.titre_projet, proposition.projet.titre)
         self.assertEqual(self.cmd.resume_projet, proposition.projet.resume)
         self.assertEqual(self.cmd.documents_projet, proposition.projet.documents)
+
+    def test_should_initier_experience_precedente(self):
+        proposition_id = self.message_bus.invoke(self.cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
+        self.assertEqual(ChoixDoctoratDejaRealise[self.cmd.doctorat_deja_realise], proposition.experience_precedente_recherche.doctorat_deja_realise)
+        self.assertEqual(self.cmd.institution, proposition.experience_precedente_recherche.institution)
 
     def test_should_initier_bureau_cde_vide_et_non_CDE(self):
         cmd = attr.evolve(self.cmd, bureau_CDE=None, sigle_formation=self.doctorat_non_CDE)
@@ -117,3 +138,23 @@ class TestInitierPropositionService(SimpleTestCase):
         cmd = attr.evolve(self.cmd, sigle_formation=not_doctorat)
         with self.assertRaises(DoctoratNonTrouveException):
             self.message_bus.invoke(cmd)
+
+    def test_should_initier_sans_financement(self):
+        cmd = attr.evolve(self.cmd, type_financement='', type_contrat_travail='')
+        proposition_id = self.message_bus.invoke(cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
+        self.assertEqual(proposition.financement, financement_non_rempli)
+
+    def test_should_initier_sans_projet(self):
+        cmd = attr.evolve(self.cmd, titre_projet='', resume_projet='', documents_projet=[])
+        proposition_id = self.message_bus.invoke(cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
+        self.assertEqual(proposition.projet.titre, '')
+        self.assertEqual(proposition.projet.resume, '')
+        self.assertEqual(proposition.projet.documents, [])
+
+    def test_should_initier_sans_experience(self):
+        cmd = attr.evolve(self.cmd, doctorat_deja_realise=ChoixDoctoratDejaRealise.NO.name, institution='')
+        proposition_id = self.message_bus.invoke(cmd)
+        proposition = self.proposition_repository.get(proposition_id)  # type: Proposition
+        self.assertEqual(proposition.experience_precedente_recherche, aucune_experience_precedente_recherche)
