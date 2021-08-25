@@ -24,9 +24,9 @@
 #
 # ##############################################################################
 import string
+import uuid
 
 import factory
-import uuid
 
 from ddd.logic.projet_doctoral.domain.model._detail_projet import DetailProjet
 from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import \
@@ -38,7 +38,7 @@ from ddd.logic.projet_doctoral.domain.model.proposition import (
     ChoixTypeAdmission,
     ChoixStatusProposition,
 )
-from education_group.tests.ddd.factories.domain.training import TrainingIdentityFactory
+from ddd.logic.projet_doctoral.test.factory.doctorat import _DoctoratIdentityFactory
 
 
 class _PropositionIdentityFactory(factory.Factory):
@@ -46,7 +46,7 @@ class _PropositionIdentityFactory(factory.Factory):
         model = PropositionIdentity
         abstract = False
 
-    uuid = uuid.uuid4()
+    uuid = factory.LazyFunction(lambda: str(uuid.uuid4()))
 
 
 class _DetailProjetFactory(factory.Factory):
@@ -66,7 +66,7 @@ class _PropositionFactory(factory.Factory):
 
     entity_id = factory.SubFactory(_PropositionIdentityFactory)
     matricule_candidat = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    doctorat_id = factory.SubFactory(TrainingIdentityFactory)
+    doctorat_id = factory.SubFactory(_DoctoratIdentityFactory)
     status = ChoixStatusProposition.IN_PROGRESS
     projet = factory.SubFactory(_DetailProjetFactory)
     financement = financement_non_rempli
@@ -75,7 +75,12 @@ class _PropositionFactory(factory.Factory):
 
 class PropositionAdmissionSC3DPMinimaleFactory(_PropositionFactory):
     type_admission = ChoixTypeAdmission.ADMISSION
-    doctorat_id = factory.SubFactory(TrainingIdentityFactory, acronym='SC3DP')
+    doctorat_id = factory.SubFactory(_DoctoratIdentityFactory, sigle='SC3DP', annee=2020)
+
+
+class PropositionAdmissionECGE3DPMinimaleFactory(_PropositionFactory):
+    type_admission = ChoixTypeAdmission.ADMISSION
+    doctorat_id = factory.SubFactory(_DoctoratIdentityFactory, sigle='ECGE3DP', annee=2020)
 
 
 class PropositionAdmissionSC3DPMinimaleAnnuleeFactory(PropositionAdmissionSC3DPMinimaleFactory):
@@ -84,4 +89,4 @@ class PropositionAdmissionSC3DPMinimaleAnnuleeFactory(PropositionAdmissionSC3DPM
 
 class PropositionPreAdmissionSC3DPMinimaleFactory(_PropositionFactory):
     type_admission = ChoixTypeAdmission.PRE_ADMISSION
-    doctorat_id = factory.SubFactory(TrainingIdentityFactory, acronym='SC3DP')
+    doctorat_id = factory.SubFactory(_DoctoratIdentityFactory, sigle='SC3DP', annee=2020)

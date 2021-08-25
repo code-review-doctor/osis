@@ -38,6 +38,7 @@ class ShouldTypeContratTravailDependreTypeFinancement(BusinessValidator):
     type_contrat_travail = attr.ib(type=Optional[str], default='')
 
     def validate(self, *args, **kwargs):
+        # TODO :: unit tests
         if (not self.type or ChoixTypeFinancement[self.type] != ChoixTypeFinancement.WORK_CONTRACT) and self.type_contrat_travail:
             raise ContratTravailInconsistantException()
         if self.type and ChoixTypeFinancement[self.type] == ChoixTypeFinancement.WORK_CONTRACT and not self.type_contrat_travail:

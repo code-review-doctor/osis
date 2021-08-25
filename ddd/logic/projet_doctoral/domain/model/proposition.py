@@ -29,7 +29,6 @@ import attr
 from django.utils.translation import gettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
-from ddd.logic.projet_doctoral.commands import CompleterPropositionCommand
 from ddd.logic.projet_doctoral.domain.model._detail_projet import DetailProjet
 from ddd.logic.projet_doctoral.domain.model._experience_precedente_recherche import (
     ExperiencePrecedenteRecherche,
@@ -64,7 +63,7 @@ class PropositionIdentity(interface.EntityIdentity):
     uuid = attr.ib(type=str)
 
 
-@attr.s(slots=True, hash=False)
+@attr.s(slots=True, hash=False, eq=False)
 class Proposition(interface.RootEntity):
     entity_id = attr.ib(type=PropositionIdentity)
     type_admission = attr.ib(type=ChoixTypeAdmission)
@@ -82,6 +81,14 @@ class Proposition(interface.RootEntity):
         default=aucune_experience_precedente_recherche,
     )
 
+    @property
+    def sigle_formation(self):
+        return self.doctorat_id.sigle
+
+    @property
+    def annee(self):
+        return self.doctorat_id.annee
+
     def est_en_cours(self):
         return self.status == ChoixStatusProposition.IN_PROGRESS
 
@@ -96,7 +103,7 @@ class Proposition(interface.RootEntity):
             doctorat_deja_realise: str,
             institution: str,
             documents: List[str] = None,
-    ):
+    ) -> None:
         CompletionPropositionValidatorList(
             type_financement=type_financement,
             type_contrat_travail=type_contrat_travail,
@@ -110,7 +117,7 @@ class Proposition(interface.RootEntity):
 
     def _completer_proposition(self, type_admission: str, bureau_CDE: str):
         self.type_admission = ChoixTypeAdmission[type_admission]
-        self.bureau_CDE = ChoixBureauCDE[bureau_CDE]
+        self.bureau_CDE = ChoixBureauCDE[bureau_CDE] if bureau_CDE else ''
 
     def _completer_financement(self, type: str, type_contrat_travail: str):
         if type:

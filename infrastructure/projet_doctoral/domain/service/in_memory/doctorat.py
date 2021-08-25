@@ -66,6 +66,10 @@ class DoctoratInMemoryTranslator(IDoctoratTranslator):
             entity_id__sigle='AGRO3DP',
             entity_id__annee=2020,
         ),
+        DoctoratCDSCFactory(
+            entity_id__sigle='SC3DP',
+            entity_id__annee=2020,
+        ),
     ]
 
     @classmethod

@@ -23,25 +23,27 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from ddd.logic.projet_doctoral.builder.proposition_builder import PropositionBuilder
 from ddd.logic.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
 from ddd.logic.projet_doctoral.commands import CompleterPropositionCommand
 from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
 from ddd.logic.projet_doctoral.domain.service.bureau_CDE import BureauCDE
+from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
 def completer_proposition(
         cmd: 'CompleterPropositionCommand',
         proposition_repository: 'IPropositionRepository',
+        doctorat_translator: 'IDoctoratTranslator',
 ) -> 'PropositionIdentity':
     # GIVEN
     entity_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid)
     proposition_candidat = proposition_repository.get(entity_id=entity_id)
-    BureauCDE().verifier(proposition_candidat.doctorat_id, cmd.bureau_CDE)
+    doctorat = doctorat_translator.get(proposition_candidat.sigle_formation, proposition_candidat.annee)
+    BureauCDE().verifier(doctorat, cmd.bureau_CDE)
 
     # WHEN
-    proposition = proposition_candidat.completer(
+    proposition_candidat.completer(
         type_admission=cmd.type_admission,
         bureau_CDE=cmd.bureau_CDE,
         type_financement=cmd.type_financement,
@@ -54,6 +56,6 @@ def completer_proposition(
     )
 
     # THEN
-    proposition_repository.save(proposition)
+    proposition_repository.save(proposition_candidat)
 
-    return proposition.entity_id
+    return entity_id
