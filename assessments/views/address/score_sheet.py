@@ -33,6 +33,7 @@ from base.auth.roles import program_manager
 from base.forms.exceptions import InvalidFormException
 from base.models import academic_year
 from base.models.education_group_year import EducationGroupYear
+from base.views.education_groups.search import convert_title_to_first_year_bachelor_title
 from ddd.logic.encodage_des_notes.soumission.commands import GetAdresseFeuilleDeNotesServiceCommand
 from ddd.logic.encodage_des_notes.soumission.dtos import AdresseFeuilleDeNotesDTO
 from education_group.models.cohort_year import CohortYear
@@ -144,6 +145,7 @@ class FirstYearBachelorScoreSheetAddressView(ScoreSheetAddressView):
         context.update({
             "addresse_bachelier": self.bachelor_score_sheet_address_dto,
             "nom_cohorte_bachelier": self.nom_cohorte_bachelier,
+            "intitule": convert_title_to_first_year_bachelor_title(self.education_group_year.title)
         })
 
         return context

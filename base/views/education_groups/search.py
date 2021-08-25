@@ -26,11 +26,12 @@
 from typing import Iterable, List
 
 import attr
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
 from django.utils.functional import cached_property
 from django.views.generic import ListView
 
 from base.forms.education_group.search_offers import OffersFilter
+from base.models import academic_year
 from base.models.education_group_year import EducationGroupYear, EducationGroupYearQueryset
 from base.models.entity_version import EntityVersion
 from base.models.enums.education_group_categories import Categories
@@ -88,18 +89,16 @@ def get_queryset(acronym: str, management_entity: str) -> Iterable[EducationGrou
         management_entity_id__in=entity_ids_with_children,
         acronym__icontains=acronym,
         education_group_type__category=Categories.TRAINING.name,
+        academic_year=academic_year.current_academic_year()
     ).exclude(
-        acronym__icontains="common-"
+        Q(acronym__icontains="common-") | Q(acronym__icontains="11BA"),
     ).select_related(
         'education_group',
         'management_entity',
         'academic_year',
-    ).distinct(
-        'education_group'
     ).annotate(
         has_11ba=Exists(cohort_11ba_qs)
     ).order_by(
-        'education_group',
         'acronym'
     )
     return EducationGroupYearQueryset.annotate_entity_requirement_acronym(offer_years)
@@ -120,9 +119,15 @@ def convert_queryset_to_dto(qs) -> List[OfferSearchDTO]:
             result.append(
                 OfferSearchDTO(
                     acronym=egy_obj.acronym.replace("1BA", "11BA"),
-                    title=egy_obj.title,
+                    title=convert_title_to_first_year_bachelor_title(egy_obj.title),
                     management_entity_acronym=egy_obj.management_entity_acronym
                 )
             )
 
     return result
+
+
+# fixme move to proper file
+def convert_title_to_first_year_bachelor_title(title: str) -> str:
+    uncapitalize_title = title[0].lower() + title[1:]
+    return "Première année de {}".format(uncapitalize_title)
