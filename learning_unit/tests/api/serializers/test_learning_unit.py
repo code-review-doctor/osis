@@ -149,6 +149,9 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'campus',
             'team',
             'language',
+            'exchange_students',
+            'french_friendly',
+            'english_friendly',
             'components',
             'parent',
             'partims',
@@ -157,9 +160,6 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'professional_integration',
             'remark',
             'remark_en',
-            'is_french_friendly',
-            'is_english_friendly',
-            'student_exchange',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -215,6 +215,9 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'campus',
             'team',
             'language',
+            'exchange_students',
+            'french_friendly',
+            'english_friendly',
             'components',
             'parent',
             'partims',
@@ -223,9 +226,6 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'professional_integration',
             'remark',
             'remark_en',
-            'is_french_friendly',
-            'is_english_friendly',
-            'student_exchange',
             'local_code',
             'local_url'
         ]
