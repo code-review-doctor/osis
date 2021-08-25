@@ -66,3 +66,15 @@ class CompleterPropositionCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SearchDoctoratCommand(interface.CommandRequest):
     sigle_secteur_entite_gestion = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class IdentifierPromoteurCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)
+    matricule = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class IdentifierMembreCACommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)
+    matricule = attr.ib(type=str)

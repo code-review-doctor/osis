@@ -39,6 +39,8 @@ from ddd.logic.projet_doctoral.domain.model._financement import (
     financement_non_rempli, ChoixTypeFinancement,
 )
 from ddd.logic.projet_doctoral.domain.model.doctorat import DoctoratIdentity
+from ddd.logic.projet_doctoral.domain.model.membre_CA import MembreCAIdentity
+from ddd.logic.projet_doctoral.domain.model.promoteur import PromoteurIdentity
 from ddd.logic.projet_doctoral.domain.validator.validator_by_business_action import CompletionPropositionValidatorList
 from osis_common.ddd import interface
 
@@ -143,3 +145,9 @@ class Proposition(interface.RootEntity):
                 doctorat_deja_realise=ChoixDoctoratDejaRealise[doctorat_deja_realise],
                 institution=institution,
             )
+
+    def identifier_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
+        raise NotImplementedError
+
+    def identifier_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
+        raise NotImplementedError
