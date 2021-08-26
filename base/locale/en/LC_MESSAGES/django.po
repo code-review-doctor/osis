@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2015-2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -354,9 +354,6 @@ msgstr ""
 msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 
-msgid "Are you sure you want to delete the achievement?"
-msgstr ""
-
 msgid "Are you sure you want to delete the teaching material?"
 msgstr ""
 
@@ -688,6 +685,12 @@ msgid "Default information"
 msgstr ""
 
 msgid "Default learning unit enrollment"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Delete achievement"
 msgstr ""
 
 msgid "Delete learning unit year definitively"
@@ -1198,6 +1201,31 @@ msgid "Inactive"
 msgstr ""
 
 msgid "Include subordinate entities"
+msgstr ""
+
+msgid ""
+"Indicates if the UE can be accessible for a student, even if the UE is not "
+"included in the detailed program of his training"
+msgstr ""
+
+msgid ""
+"Indicates if the UE includes an internship, so that students enrolled in "
+"this UE must be declared to the DIMONA"
+msgstr ""
+
+msgid "Indicates if this UE is accessible to exchange students"
+msgstr ""
+
+msgid ""
+"Indicates, for the UE whose language of instruction is not French, if this "
+"UE is nevertheless accessible to French speaking students. If the language "
+"of instruction is French, the value of this field must be 'no'"
+msgstr ""
+
+msgid ""
+"Indicates, for the UE whose teaching language is not English, if this UE is "
+"however accessible to English speaking students. If the language of "
+"instruction is English, the value of this field must be 'no'"
 msgstr ""
 
 msgid "Individual loan"
@@ -2685,6 +2713,9 @@ msgid "This action will permanently cancel the proposal"
 msgstr ""
 
 msgid "This action will permanently cancel the selected proposal(s)"
+msgstr ""
+
+msgid "This action will permanently delete the achievement"
 msgstr ""
 
 msgid "This code already exists for this learning unit"
