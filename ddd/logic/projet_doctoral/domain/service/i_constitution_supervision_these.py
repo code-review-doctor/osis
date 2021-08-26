@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,15 +22,26 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from abc import abstractmethod
+##############################################################################
+import abc
 
-from ddd.logic.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity, Proposition
+from ddd.logic.shared_kernel.processus_signature.domain.model.processus import ProcessusIdentity
 from osis_common.ddd import interface
 
 
-class IPromoteurTranslator(interface.DomainService):
+class IConstitutionSupervisionThese(interface.DomainService):
+
     @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
+    @abc.abstractmethod
+    def get(cls, proposition_id: 'PropositionIdentity') -> 'ProcessusIdentity':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def envoyer_demande_signature(
+            cls,
+            proposition: 'Proposition',
+            matricule_candidat: str
+    ) -> None:
         pass

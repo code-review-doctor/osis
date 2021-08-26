@@ -23,14 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
+import attr
+from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
 from ddd.logic.projet_doctoral.domain.model._promoteur import PromoteurIdentity
 from osis_common.ddd import interface
 
 
-class IPromoteurTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
+class ChoixEtatSignature(ChoiceEnum):
+    NOT_INVITED = _('NOT_INVITED')  # Pas encore envoyée au signataire
+    INVITED = _('INVITED')  # Envoyée au signataire
+    APPROVED = _('APPROVED')  # Approuvée par le signataire
+    REFUSED = _('REFUSED')  # Refusée par le signataire
+
+
+@attr.s(frozen=True, slots=True)
+class SignaturePromoteur(interface.ValueObject):
+    promoteur_id = attr.ib(type=PromoteurIdentity)
+    etat = attr.ib(type=ChoixEtatSignature, default=ChoixEtatSignature.NOT_INVITED)

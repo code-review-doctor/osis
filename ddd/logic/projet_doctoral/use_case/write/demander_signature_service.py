@@ -26,30 +26,31 @@
 from ddd.logic.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
 from ddd.logic.projet_doctoral.commands import DemanderSignatureCommand
 from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
-from ddd.logic.projet_doctoral.domain.service.i_processus_signature import IProcessusSignature
+from ddd.logic.projet_doctoral.domain.service.i_constitution_supervision_these import IConstitutionSupervisionThese
+from ddd.logic.projet_doctoral.repository.i_groupe_de_supervision import IGroupeDeSupervisionRepository
 from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
-from ddd.logic.shared_kernel.processus_signature.domain.service.i_signature_email import ISignatureEmail
 
 
 # TODO :: unit tests
 def demander_signature(
         cmd: 'DemanderSignatureCommand',
         proposition_repository: 'IPropositionRepository',
-        signature_email: 'ISignatureEmail',
-        signature_process_service: 'IProcessusSignature',
-        notification_service: 'INotification',
+        groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
+        constitution_supervision_these: 'IConstitutionSupervisionThese',
 ) -> 'PropositionIdentity':
     # GIVEN
     entity_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
     proposition_candidat = proposition_repository.get(entity_id=entity_id)
-    processus_id = signature_process_service.get(cmd.uuid_proposition)
-    signature_email.verifier_deja_envoyee(processus_id, cmd.matricule_signataire)
+    groupe_de_supervision = groupe_supervision_repository.get_by_proposition_id(entity_id)
+    groupe_de_supervision.verifier_membre_supervision_these(cmd.matricule_signataire)
 
     # WHEN
-    proposition_candidat.demander_signature(cmd.matricule_signataire)
+    proposition_candidat.set_etat_signature(cmd.matricule_signataire)
 
     # THEN
-    contenu_notification = signature_process_service.build_notification(proposition_candidat, cmd.matricule_signataire)
-    notification_service.envoyer(cmd.matricule_signataire, contenu_notification, type=WEB)  # FIXME
+    constitution_supervision_these.envoyer_demande_signature(
+        proposition_candidat,
+        cmd.matricule_signataire,
+    )
 
     return proposition_candidat.entity_id

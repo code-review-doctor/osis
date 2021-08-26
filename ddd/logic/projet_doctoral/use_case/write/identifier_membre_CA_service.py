@@ -27,6 +27,7 @@ from ddd.logic.projet_doctoral.builder.proposition_identity_builder import Propo
 from ddd.logic.projet_doctoral.commands import IdentifierMembreCACommand
 from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
 from ddd.logic.projet_doctoral.domain.service.i_membre_CA import IMembreCATranslator
+from ddd.logic.projet_doctoral.repository.i_groupe_de_supervision import IGroupeDeSupervisionRepository
 from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
@@ -34,17 +35,18 @@ from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepos
 def identifier_membre_CA(
         cmd: 'IdentifierMembreCACommand',
         proposition_repository: 'IPropositionRepository',
+        groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
         membre_CA_translator: 'IMembreCATranslator',
 ) -> 'PropositionIdentity':
     # GIVEN
-    entity_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
-    proposition_candidat = proposition_repository.get(entity_id=entity_id)
+    proposition_candidat_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
+    groupe_de_supervision = groupe_supervision_repository.get_by_proposition_id(proposition_candidat_id)
     membre_CA = membre_CA_translator.get(cmd.matricule)
 
     # WHEN
-    proposition_candidat.identifier_membre_CA(membre_CA)
+    groupe_de_supervision.identifier_membre_CA(membre_CA)
 
     # THEN
-    proposition_repository.save(proposition_candidat)
+    groupe_supervision_repository.save(groupe_de_supervision)
 
-    return proposition_candidat.entity_id
+    return proposition_candidat_id

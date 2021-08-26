@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,17 +22,15 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-import abc
+# ##############################################################################
+import attr
 
-from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
-from ddd.logic.shared_kernel.processus_signature.domain.model.processus import ProcessusIdentity
+from ddd.logic.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
+from ddd.logic.projet_doctoral.domain.model._signature_promoteur import ChoixEtatSignature
 from osis_common.ddd import interface
 
 
-class IProcessusSignature(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def get(cls, proposition_id: 'PropositionIdentity') -> 'ProcessusIdentity':
-        pass
+@attr.s(frozen=True, slots=True)
+class SignatureMembreCA(interface.ValueObject):
+    membre_CA_id = attr.ib(type=MembreCAIdentity)
+    etat = attr.ib(type=ChoixEtatSignature, default=ChoixEtatSignature.NOT_INVITED)

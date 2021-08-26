@@ -25,7 +25,7 @@
 # ##############################################################################
 from abc import abstractmethod
 
-from ddd.logic.projet_doctoral.domain.model.membre_CA import MembreCAIdentity
+from ddd.logic.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from osis_common.ddd import interface
 
 

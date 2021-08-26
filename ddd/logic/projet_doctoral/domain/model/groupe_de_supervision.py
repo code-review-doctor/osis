@@ -23,14 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
+from typing import List
 
+import attr
+
+from ddd.logic.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from ddd.logic.projet_doctoral.domain.model._signature_membre_CA import SignatureMembreCA
+from ddd.logic.projet_doctoral.domain.model._signature_promoteur import SignaturePromoteur
+from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
 from osis_common.ddd import interface
 
 
-class IPromoteurTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
+@attr.s(slots=True)
+class GroupeDeSupervisionIdentity(interface.EntityIdentity):
+    uuid = attr.ib(type=str)
+
+
+@attr.s(slots=True)
+class GroupeDeSupervision(interface.Entity):
+    entity_id = attr.ib(type=GroupeDeSupervisionIdentity)
+    proposition_id = attr.ib(type=PropositionIdentity)
+    signatures_promoteurs = attr.ib(type=List[SignaturePromoteur], factory=list)
+    signatures_membres_CA = attr.ib(type=List[SignatureMembreCA], factory=list)
+
+    def verifier_membre_supervision_these(self, matricule_signataire: str) -> None:
+        # TODO :: verifier si signataire dans membres_CA ou promoteurs
+        raise NotImplementedError
+
+    def identifier_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
+        raise NotImplementedError
+
+    def identifier_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
+        raise NotImplementedError
