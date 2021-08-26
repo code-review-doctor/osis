@@ -23,26 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+import attr
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import ChoixEtatSignature
+from osis_common.ddd import interface
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
-
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
-
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+@attr.s(frozen=True, slots=True)
+class SignatureMembreCA(interface.ValueObject):
+    membre_CA_id = attr.ib(type=MembreCAIdentity)
+    etat = attr.ib(type=ChoixEtatSignature, default=ChoixEtatSignature.NOT_INVITED)

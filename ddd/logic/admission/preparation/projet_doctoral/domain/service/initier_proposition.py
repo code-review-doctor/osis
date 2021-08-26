@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,27 +22,19 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from typing import Optional, List
+##############################################################################
+from typing import List
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import MaximumPropositionsAtteintException
+from osis_common.ddd import interface
+
+MAXIMUM_AUTORISE = 1
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
-
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
+class MaximumPropositionAutorisee(interface.DomainService):
 
     @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+    def verifier(cls, propositions_candidat: List['Proposition']) -> None:
+        if len([prop for prop in propositions_candidat if prop.est_en_cours()]) >= MAXIMUM_AUTORISE:
+            raise MaximumPropositionsAtteintException()

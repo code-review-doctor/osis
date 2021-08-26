@@ -171,7 +171,7 @@ class TwoStepsMultipleBusinessExceptionListValidator(BusinessListValidator):
         self.__validate_invariants()
 
 
-def execute_functions_and_aggregate_exceptions(*functions_to_execute: partial) -> list:
+def execute_functions_and_aggregate_exceptions(*functions_to_execute: callable) -> list:
     """
     Execute functions given in parameter.
     All Exceptions of type :

@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,27 +22,18 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from typing import Optional, List
+##############################################################################
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.doctorat import Doctorat
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import BureauCDEInconsistantException
+from osis_common.ddd import interface
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+class BureauCDE(interface.DomainService):
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
-
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+    def verifier(cls, doctorat: 'Doctorat', bureau_CDE: str) -> None:
+        if doctorat.est_entite_CDE() and not bureau_CDE:
+            raise BureauCDEInconsistantException()
+        if not doctorat.est_entite_CDE() and bureau_CDE:
+            raise BureauCDEInconsistantException()

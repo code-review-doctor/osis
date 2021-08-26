@@ -23,26 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+import factory
+
+# FIXME import this factory from shared kernel when available
+from ddd.logic.learning_unit.tests.factory.ucl_entity import UclEntityIdentityFactory
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.doctorat import (
+    DoctoratIdentity,
+    Doctorat,
+)
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+class _DoctoratIdentityFactory(factory.Factory):
+    class Meta:
+        model = DoctoratIdentity
+        abstract = False
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
+    sigle = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+    annee = factory.fuzzy.FuzzyInteger(1999, 2099)
 
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
 
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+class _DoctoratFactory(factory.Factory):
+    class Meta:
+        model = Doctorat
+        abstract = False
+
+    entity_id = factory.SubFactory(_DoctoratIdentityFactory)
+    entite_ucl_id = factory.SubFactory(UclEntityIdentityFactory)
+
+
+class DoctoratCDEFactory(_DoctoratFactory):
+    entite_ucl_id = factory.SubFactory(UclEntityIdentityFactory, code='CDE')
+
+
+class DoctoratCDSCFactory(_DoctoratFactory):
+    entite_ucl_id = factory.SubFactory(UclEntityIdentityFactory, code='CDSC')

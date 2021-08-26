@@ -23,26 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+from typing import Optional
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import ChoixDoctoratDejaRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import InstitutionInconsistanteException
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+@attr.s(frozen=True, slots=True)
+class ShouldInstitutionDependreDoctoratRealise(BusinessValidator):
+    doctorat_deja_realise = attr.ib(type=str, default=ChoixDoctoratDejaRealise.NO.name)
+    institution = attr.ib(type=Optional[str], default='')
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
-
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+    def validate(self, *args, **kwargs):
+        # TODO :: unit tests
+        if ChoixDoctoratDejaRealise[self.doctorat_deja_realise] == ChoixDoctoratDejaRealise.NO and self.institution:
+            raise InstitutionInconsistanteException()
+        if ChoixDoctoratDejaRealise[self.doctorat_deja_realise] != ChoixDoctoratDejaRealise.NO and not self.institution:
+            raise InstitutionInconsistanteException()

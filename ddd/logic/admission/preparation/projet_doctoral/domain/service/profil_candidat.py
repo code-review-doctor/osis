@@ -23,26 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
-
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_profil_candidat import IProfilCandidatTranslator
+from osis_common.ddd import interface
 
 
-class PropositionRepository(IPropositionRepository):
+class ProfilCandidat(interface.DomainService):
     @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
-
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
+    def verifier_identification(cls, profil_candidat_translator: 'IProfilCandidatTranslator') -> None:
+        # TODO : cherger les
+        pass
 
     @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+    def verifier_coordonnees(cls, profil_candidat_translator: 'IProfilCandidatTranslator') -> None:
+        pass
 
     @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+    def verifier_curriculum(cls, profil_candidat_translator: 'IProfilCandidatTranslator') -> None:
+        pass

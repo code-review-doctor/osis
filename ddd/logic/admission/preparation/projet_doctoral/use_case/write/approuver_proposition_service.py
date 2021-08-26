@@ -48,39 +48,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import List
-
-from ddd.logic.admission.preparation.projet_doctoral import Doctorat
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
-from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
-from ddd.logic.admission.preparation.projet_doctoral import DoctoratDTO
-from ddd.logic.admission.preparation.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory, DoctoratCDEFactory
+from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
+from ddd.logic.admission.preparation.projet_doctoral.commands import ApprouverPropositionCommand
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import IGroupeDeSupervisionRepository
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
-class DoctoratInMemoryTranslator(IDoctoratTranslator):
+# TODO :: unit tests
+def approuver_proposition(
+        cmd: 'ApprouverPropositionCommand',
+        proposition_repository: 'IPropositionRepository',
+        groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
+) -> 'PropositionIdentity':
+    # GIVEN
+    entity_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
+    proposition_candidat = proposition_repository.get(entity_id=entity_id)
+    groupe_de_supervision = groupe_supervision_repository.get_by_proposition_id(entity_id)
+    signataire = groupe_de_supervision.get_signataire(cmd.matricule)
 
-    doctorats = [
-        DoctoratCDEFactory(
-            entity_id__sigle='ECGE3DP',
-            entity_id__annee=2020,
-        ),
-        DoctoratCDSCFactory(
-            entity_id__sigle='AGRO3DP',
-            entity_id__annee=2020,
-        ),
-        DoctoratCDSCFactory(
-            entity_id__sigle='SC3DP',
-            entity_id__annee=2020,
-        ),
-    ]
+    # WHEN
+    groupe_de_supervision.approuver(signataire)
 
-    @classmethod
-    def get(cls, sigle: str, annee: int) -> Doctorat:
-        try:
-            return next(doc for doc in cls.doctorats if doc.entity_id.sigle == sigle and doc.entity_id.annee == annee)
-        except StopIteration:
-            raise DoctoratNonTrouveException()
+    # THEN
+    groupe_supervision_repository.save(groupe_de_supervision)
 
-    @classmethod
-    def search(cls, sigle_entite_gestion: str, annee: int) -> List['DoctoratDTO']:
-        raise NotImplementedError
+    return proposition_candidat.entity_id

@@ -28,10 +28,10 @@ from typing import List
 from base.models.enums.education_group_types import TrainingType
 from ddd.logic.formation_catalogue.commands import SearchFormationsCommand
 from ddd.logic.learning_unit.domain.model.responsible_entity import UCLEntityIdentity  # FIXME reuse from shared_kernel
-from ddd.logic.projet_doctoral.domain.model.doctorat import Doctorat, DoctoratIdentity
-from ddd.logic.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
-from ddd.logic.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
-from ddd.logic.projet_doctoral.dtos import DoctoratDTO
+from ddd.logic.admission.preparation.projet_doctoral import Doctorat, DoctoratIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
+from ddd.logic.admission.preparation.projet_doctoral import DoctoratDTO
 
 
 class DoctoratTranslator(IDoctoratTranslator):

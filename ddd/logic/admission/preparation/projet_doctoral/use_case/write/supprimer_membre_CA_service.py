@@ -23,26 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
-
+from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
+from ddd.logic.admission.preparation.projet_doctoral.commands import SupprimerMembreCACommand
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import IGroupeDeSupervisionRepository
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+def supprimer_membre_CA(
+        cmd: 'SupprimerMembreCACommand',
+        proposition_repository: 'IPropositionRepository',
+        groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
+) -> 'PropositionIdentity':
+    # GIVEN
+    proposition_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
+    proposition_candidat = proposition_repository.get(entity_id=proposition_id)
+    groupe_supervision = groupe_supervision_repository.get_by_proposition_id(proposition_id)
+    membre_CA_id = groupe_supervision.get_signataire(cmd.matricule)
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
+    # WHEN
+    groupe_supervision.supprimer_membre_CA(membre_CA_id)
 
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+    # THEN
+    groupe_supervision_repository.save(groupe_supervision)
 
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+    return proposition_id

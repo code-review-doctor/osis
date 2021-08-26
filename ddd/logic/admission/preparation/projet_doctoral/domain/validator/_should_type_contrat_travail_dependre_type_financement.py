@@ -23,26 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+from typing import Optional
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+import attr
+
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement import ChoixTypeFinancement
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import ContratTravailInconsistantException
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+@attr.s(frozen=True, slots=True)
+class ShouldTypeContratTravailDependreTypeFinancement(BusinessValidator):
+    type = attr.ib(type=str)
+    type_contrat_travail = attr.ib(type=Optional[str], default='')
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
-
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+    def validate(self, *args, **kwargs):
+        # TODO :: unit tests
+        if (not self.type or ChoixTypeFinancement[self.type] != ChoixTypeFinancement.WORK_CONTRACT) and self.type_contrat_travail:
+            raise ContratTravailInconsistantException()
+        if self.type and ChoixTypeFinancement[self.type] == ChoixTypeFinancement.WORK_CONTRACT and not self.type_contrat_travail:
+            raise ContratTravailInconsistantException()

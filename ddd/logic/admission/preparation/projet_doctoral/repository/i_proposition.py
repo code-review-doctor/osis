@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,27 +22,37 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from typing import Optional, List
+##############################################################################
+import abc
+from typing import List, Optional
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity, Proposition
+from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
 
-class PropositionRepository(IPropositionRepository):
+class IPropositionRepository(interface.AbstractRepository):
     @classmethod
+    @abc.abstractmethod
     def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+        pass
 
     @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
+    @abc.abstractmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['PropositionIdentity']] = None,
+            matricule_candidat: str = None,
+            **kwargs
+    ) -> List['Proposition']:
+        pass
 
     @classmethod
+    @abc.abstractmethod
     def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
+        pass
 
     @classmethod
+    @abc.abstractmethod
     def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+        pass

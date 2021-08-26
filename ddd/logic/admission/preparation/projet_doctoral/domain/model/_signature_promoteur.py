@@ -23,26 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+import attr
+from django.utils.translation import gettext_lazy as _
 
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd.interface import ApplicationService
+from base.models.utils.utils import ChoiceEnum
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from osis_common.ddd import interface
 
 
-class PropositionRepository(IPropositionRepository):
-    @classmethod
-    def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
-        raise NotImplementedError
+class ChoixEtatSignature(ChoiceEnum):
+    NOT_INVITED = _('NOT_INVITED')  # Pas encore envoyée au signataire
+    INVITED = _('INVITED')  # Envoyée au signataire
+    APPROVED = _('APPROVED')  # Approuvée par le signataire
+    REFUSED = _('REFUSED')  # Refusée par le signataire
 
-    @classmethod
-    def search(cls, entity_ids: Optional[List['PropositionIdentity']] = None, matricule_candidat: str = None,
-               **kwargs) -> List['Proposition']:
-        raise NotImplementedError
 
-    @classmethod
-    def delete(cls, entity_id: 'PropositionIdentity', **kwargs: ApplicationService) -> None:
-        raise NotImplementedError
-
-    @classmethod
-    def save(cls, entity: 'Proposition') -> None:
-        raise NotImplementedError
+@attr.s(frozen=True, slots=True)
+class SignaturePromoteur(interface.ValueObject):
+    promoteur_id = attr.ib(type=PromoteurIdentity)
+    etat = attr.ib(type=ChoixEtatSignature, default=ChoixEtatSignature.NOT_INVITED)

@@ -26,8 +26,8 @@
 from typing import Optional, List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
-from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
 class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):

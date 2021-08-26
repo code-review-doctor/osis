@@ -68,11 +68,11 @@ from ddd.logic.learning_unit.use_case.write.create_effective_class_service impor
 from ddd.logic.learning_unit.use_case.write.create_learning_unit_service import create_learning_unit
 from ddd.logic.learning_unit.use_case.write.delete_effective_class_service import delete_effective_class
 from ddd.logic.learning_unit.use_case.write.update_effective_class_service import update_effective_class
-from ddd.logic.projet_doctoral.commands import InitierPropositionCommand, CompleterPropositionCommand, \
+from ddd.logic.admission.preparation.projet_doctoral import InitierPropositionCommand, CompleterPropositionCommand, \
     SearchDoctoratCommand
-from ddd.logic.projet_doctoral.use_case.read.rechercher_doctorats_service import rechercher_doctorats
-from ddd.logic.projet_doctoral.use_case.write.completer_proposition_service import completer_proposition
-from ddd.logic.projet_doctoral.use_case.write.initier_proposition_service import initier_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import rechercher_doctorats
+from ddd.logic.admission.preparation.projet_doctoral import completer_proposition
+from ddd.logic.admission.preparation.projet_doctoral import initier_proposition
 from ddd.logic.shared_kernel.academic_year.commands import SearchAcademicYearCommand
 from ddd.logic.shared_kernel.academic_year.use_case.read.search_academic_years_service import search_academic_years
 from ddd.logic.shared_kernel.campus.commands import SearchUclouvainCampusesCommand, GetCampusCommand
