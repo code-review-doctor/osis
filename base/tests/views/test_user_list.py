@@ -41,9 +41,10 @@ from learning_unit.tests.factories.faculty_manager import FacultyManagerFactory
 COL_FOR_LAST_NAME = 0
 COL_FOR_FIRST_NAME = 1
 COL_FOR_GLOBAL_ID = 2
-COL_FOR_GROUP_NAMES = 3
-COL_FOR_MANAGED_ENTITIES = 4
-COL_FOR_FACULTY_MGR_UE_MANAGED_ENTITIES = 6
+COL_FOR_EMAIL = 3
+COL_FOR_GROUP_NAME = 4
+COL_FOR_ENTITIES = 5
+COL_FOR_FACULTY_MGR_UE_MANAGED_ENTITIES = 7
 
 
 class UserListViewTestCase(TestCase):
@@ -102,19 +103,24 @@ class XlsUserListTestCase(TestCase):
         person_faculty_manager = PersonFactory(global_id='12345678')
         FacultyManagerFactory(person=person_faculty_manager, entity=self.entity_drt)
         EntityManagerFactory(person=person_faculty_manager, entity=self.entity_espo)
-        FacultyManagerFactory(person=person_faculty_manager, entity=self.entity_drt)
+        FacultyManagerFactory(person=person_faculty_manager, entity=self.entity_espo)
+
         data = _prepare_xls_content(self.view, [person_faculty_manager])
-        self.assertEqual(len(data), 1)
-        date_first_user = data[0]
-        self.assertEqual(date_first_user[COL_FOR_LAST_NAME], person_faculty_manager.last_name)
-        self.assertEqual(date_first_user[COL_FOR_FIRST_NAME], person_faculty_manager.first_name)
-        self.assertEqual(date_first_user[COL_FOR_GLOBAL_ID], person_faculty_manager.global_id)
-        self.assertListEqual(
-            date_first_user[COL_FOR_GROUP_NAMES].split('\n'),
-            ["faculty_managers_for_ue", "entity_managers"]
-        )
-        self.assertEqual(date_first_user[COL_FOR_MANAGED_ENTITIES], "ESPO")
-        self.assertEqual(date_first_user[COL_FOR_FACULTY_MGR_UE_MANAGED_ENTITIES], "DRT")
+        self.assertEqual(len(data), 2)
+        data_user_faculty_mgr = data[0]
+        self.assertEqual(data_user_faculty_mgr[COL_FOR_LAST_NAME], person_faculty_manager.last_name)
+        self.assertEqual(data_user_faculty_mgr[COL_FOR_FIRST_NAME], person_faculty_manager.first_name)
+        self.assertEqual(data_user_faculty_mgr[COL_FOR_GLOBAL_ID], person_faculty_manager.global_id)
+        self.assertEqual(data_user_faculty_mgr[COL_FOR_EMAIL], person_faculty_manager.email)
+        self.assertEqual(data_user_faculty_mgr[COL_FOR_GROUP_NAME], "faculty_managers_for_ue")
+        self.assertEqual(data_user_faculty_mgr[COL_FOR_ENTITIES], "ESPO\nDRT")
+        data_user_entity_mgr = data[1]
+        self.assertEqual(data_user_entity_mgr[COL_FOR_LAST_NAME], person_faculty_manager.last_name)
+        self.assertEqual(data_user_entity_mgr[COL_FOR_FIRST_NAME], person_faculty_manager.first_name)
+        self.assertEqual(data_user_entity_mgr[COL_FOR_GLOBAL_ID], person_faculty_manager.global_id)
+        self.assertEqual(data_user_entity_mgr[COL_FOR_EMAIL], person_faculty_manager.email)
+        self.assertEqual(data_user_entity_mgr[COL_FOR_GROUP_NAME], "entity_managers")
+        self.assertEqual(data_user_entity_mgr[COL_FOR_ENTITIES], "ESPO")
 
     def test_headers(self):
         titles = _get_headers()
@@ -122,15 +128,10 @@ class XlsUserListTestCase(TestCase):
             _('Lastname'),
             _('Firstname'),
             _('Global ID'),
+            _('Email'),
             _('Groups'),
-            _('Entity managers'),
-            _('Central Manager (Learning units)'),
-            _('Faculty Manager (Learning units)'),
-            _('Central Manager (Trainings)'),
-            _('Faculty Manager (Trainings)'),
-            _('Partnership entities'),
-            _('Program managers')
-
+            _('Entities'),
+            _('Trainings')
         ]
         self.assertListEqual(
             titles,

@@ -41,8 +41,8 @@ from base.business.xls import get_name_or_username
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion
-from base.models.enums.groups import TUTOR, ENTITY_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, \
-    CENTRAL_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
+from base.models.enums.groups import TUTOR, UE_CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, \
+    CENTRAL_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, ENTITY_MANAGER_GROUP
 from base.models.person import Person
 from osis_common.document import xls_build
 from osis_role.contrib.helper import EntityRoleHelper, Row
@@ -143,13 +143,14 @@ def create_xls(request):
     objects = view.get_queryset()
     working_sheets_data = _prepare_xls_content(view, objects)
 
-    parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
-                  xls_build.USER: get_name_or_username(request.user),
-                  xls_build.FILENAME: XLS_FILENAME,
-                  xls_build.HEADER_TITLES: _get_headers(),
-                  xls_build.WS_TITLE: WORKSHEET_TITLE,
-                  xls_build.FONT_ROWS: {BOLD_FONT: [0]},
-                  }
+    parameters = {
+        xls_build.DESCRIPTION: XLS_DESCRIPTION,
+        xls_build.USER: get_name_or_username(request.user),
+        xls_build.FILENAME: XLS_FILENAME,
+        xls_build.HEADER_TITLES: _get_headers(),
+        xls_build.WS_TITLE: WORKSHEET_TITLE,
+        xls_build.FONT_ROWS: {BOLD_FONT: [0]},
+    }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters))
 
@@ -184,75 +185,22 @@ def _prepare_xls_content(view: UserListView, users_data_list) -> List[Dict[str, 
         context.update({'partnership_entity_managers': view.get_partnership_entity_managers()})
     data = []
     for user_data in users_data_list:
-        if user_data.global_id == "00233801":
-            data.extend(_extract_xls_data(user_data, context))
+        data.extend(_extract_xls_data(user_data, context))
     return data
-    # return [_extract_xls_data(user_data, context) for user_data in users_data_list]
 
 
 def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[Row]]]) -> List[str]:
-    entities_managed = context.get('entity_managers').get(user_data.pk, [])
+    line_with_user_data_by_group_name = []
 
-    central_managers_for_ue_entities_managed = context.get('central_managers_for_ue').get(user_data.pk, [])
-    faculty_managers_for_ue_entities_managed = context.get('faculty_managers_for_ue').get(user_data.pk, [])
-
-    central_managers_for_of_entities_managed = context.get('central_managers_for_of').get(user_data.pk, [])
-    faculty_managers_for_of_entities_managed = context.get('faculty_managers_for_of').get(user_data.pk, [])
-
-    partnership_entity_managers_entities_managed = context.get('partnership_entity_managers', {}).get(user_data.pk, [])
-
-    entities_acronym = '\n'.join([row.entity_recent_acronym for row in entities_managed])
-    user_datas = []
-    if 'learning_unit' in settings.INSTALLED_APPS:
-        entities_acronym = "{}{}{}".format(
-            entities_acronym,
-            '\n'.join([row.entity_recent_acronym for row in central_managers_for_ue_entities_managed]),
-            '\n'.join([row.entity_recent_acronym for row in faculty_managers_for_ue_entities_managed])
-        )
-        # data.extend(
-        #     [
-        #         '\n'.join([row.entity_recent_acronym for row in central_managers_for_ue_entities_managed]),
-        #         '\n'.join([row.entity_recent_acronym for row in faculty_managers_for_ue_entities_managed])
-        #     ]
-        # )
-    if 'education_group' in settings.INSTALLED_APPS:
-        entities_acronym = "{}{}{}".format(
-            entities_acronym,
-            _build_acronyms_with_scope(central_managers_for_of_entities_managed),
-            _build_acronyms_with_scope(faculty_managers_for_of_entities_managed)
-        )
-        # data.extend(
-        #     [
-        #         _build_acronyms_with_scope(central_managers_for_of_entities_managed),
-        #         _build_acronyms_with_scope(faculty_managers_for_of_entities_managed)
-        #     ]
-        # )
-    if 'partnership' in settings.INSTALLED_APPS:
-        # data.append('\n'.join([row.entity_recent_acronym for row in partnership_entity_managers_entities_managed]))
-        entities_acronym = "{}{}".format(entities_acronym, '\n'.join(
-            [row.entity_recent_acronym for row in partnership_entity_managers_entities_managed]))
-    # from partnership.auth.roles.partnership_manager import PartnershipEntityManager
     for group in user_data.user.groups.all():
         trainings_acronym = ''
-        # entities_acronym = get_entities_acronym(group.name, context) A developper jeudi
+        entities_acronym = get_entities_acronym(group.name, context, user_data.pk)
         if group.name == PROGRAM_MANAGER_GROUP:
-            entities_acronym = '\n'.join([row.entity_recent_acronym for row in entities_managed])
-            trainings_acronym = '\n'.join([row.most_recent_acronym or '' for row in
-                               user_data.programmanager_set.all()]) if user_data.programmanager_set.all() else ''
-        elif group.name == UE_CENTRAL_MANAGER_GROUP:
-            entities_acronym = '\n'.join([row.entity_recent_acronym for row in central_managers_for_ue_entities_managed])
-        elif group.name == UE_FACULTY_MANAGER_GROUP:
-            entities_acronym = '\n'.join([row.entity_recent_acronym for row in faculty_managers_for_ue_entities_managed])
-        elif group.name == CENTRAL_MANAGER_GROUP:
-            entities_acronym = '\n'.join([row.entity_recent_acronym for row in central_managers_for_of_entities_managed])
-        elif group.name == FACULTY_MANAGER_GROUP:
-            entities_acronym = '\n'.join([row.entity_recent_acronym for row in faculty_managers_for_of_entities_managed])
-        elif group.name == "partnership_managers":
-            entities_acronym = '\n'.join([row.entity_recent_acronym for row in entities_managed])
-        else:
-            entities_acronym = ''
+            trainings_acronym = '\n'.join(
+                [row.most_recent_acronym or '' for row in user_data.programmanager_set.all()]
+            ) if user_data.programmanager_set.all() else ''
 
-        data = [
+        data_by_group_name = [
             user_data.last_name,
             user_data.first_name,
             user_data.global_id,
@@ -262,8 +210,8 @@ def _extract_xls_data(user_data: Person, context: Dict[str, Dict[PersonId, List[
             trainings_acronym
         ]
 
-        user_datas.append(data)
-    return user_datas
+        line_with_user_data_by_group_name.append(data_by_group_name)
+    return line_with_user_data_by_group_name
 
 
 def _build_acronyms_with_scope(entities: List[Row]) -> str:
@@ -279,30 +227,29 @@ def _build_acronyms_with_scope(entities: List[Row]) -> str:
 
 
 def _get_headers() -> List[str]:
-    titles = [
-        _('Lastname'),
-        _('Firstname'),
-        _('Global ID'),
-        _('Email'),
-        _('Groups'),
-        _('Entities')
+    return [
+        _('Lastname'), _('Firstname'), _('Global ID'), _('Email'), _('Groups'), _('Entities'), _('Trainings')
     ]
-    # if 'learning_unit' in settings.INSTALLED_APPS:
-    #     titles.extend(
-    #         [
-    #             _('Central Manager (Learning units)'),
-    #             _('Faculty Manager (Learning units)')
-    #         ]
-    #     )
-    # if 'education_group' in settings.INSTALLED_APPS:
-    #     titles.extend(
-    #         [
-    #             _('Central Manager (Trainings)'),
-    #             _('Faculty Manager (Trainings)')
-    #         ]
-    #     )
-    # if 'partnership' in settings.INSTALLED_APPS:
-    #     titles.append(_('Partnership entities'))
-    #
-    titles.append(_('Trainings'))
-    return titles
+
+
+def get_entities_acronym(group_name, context, user_id):
+    if group_name == PROGRAM_MANAGER_GROUP or group_name == ENTITY_MANAGER_GROUP:
+        entities_managed = context.get('entity_managers').get(user_id, [])
+        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+    elif group_name == UE_CENTRAL_MANAGER_GROUP:
+        entities_managed = context.get('central_managers_for_ue').get(user_id, [])
+        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+    elif group_name == UE_FACULTY_MANAGER_GROUP:
+        entities_managed = context.get('faculty_managers_for_ue').get(user_id, [])
+        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+    elif group_name == CENTRAL_MANAGER_GROUP:
+        entities_managed = context.get('central_managers_for_of').get(user_id, [])
+        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+    elif group_name == FACULTY_MANAGER_GROUP:
+        entities_managed = context.get('faculty_managers_for_of').get(user_id, [])
+        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+    elif group_name == "partnership_managers":
+        entities_managed = context.get('partnership_entity_managers', {}).get(user_id, [])
+        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+    else:
+        return ''
