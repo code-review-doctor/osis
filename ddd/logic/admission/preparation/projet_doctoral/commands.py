@@ -27,7 +27,8 @@ from typing import List, Optional
 
 import attr
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import ChoixDoctoratDejaRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import \
+    ChoixDoctoratDejaRealise
 from osis_common.ddd import interface
 
 UUID = str
@@ -39,8 +40,10 @@ class InitierPropositionCommand(interface.CommandRequest):
     sigle_formation = attr.ib(type=str)
     annee_formation = attr.ib(type=int)
     matricule_candidat = attr.ib(type=str)
-    bureau_CDE = attr.ib(type=Optional[str],
-                         default='')  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
+    bureau_CDE = attr.ib(
+        type=Optional[str],
+        default='',
+    )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     type_financement = attr.ib(type=Optional[str], default='')
     type_contrat_travail = attr.ib(type=Optional[str], default='')
     titre_projet = attr.ib(type=Optional[str], default='')
@@ -54,8 +57,10 @@ class InitierPropositionCommand(interface.CommandRequest):
 class CompleterPropositionCommand(interface.CommandRequest):
     uuid = attr.ib(type=str)
     type_admission = attr.ib(type=str)
-    bureau_CDE = attr.ib(type=Optional[str],
-                         default='')  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
+    bureau_CDE = attr.ib(
+        type=Optional[str],
+        default='',
+    )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
     type_financement = attr.ib(type=Optional[str], default='')
     type_contrat_travail = attr.ib(type=Optional[str], default='')
     titre_projet = attr.ib(type=Optional[str], default='')
@@ -109,3 +114,11 @@ class ApprouverPropositionCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SoumettrePropositionCommand(interface.CommandRequest):
     uuid_proposition = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DefinirCotutelleCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)
+    motivation = attr.ib(type=Optional[str], default='')
+    institution = attr.ib(type=Optional[str], default='')
+    demande_ouverture = attr.ib(type=Optional[str], default='')

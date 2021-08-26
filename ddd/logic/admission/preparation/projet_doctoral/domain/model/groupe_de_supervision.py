@@ -27,6 +27,7 @@ from typing import List, Union
 
 import attr
 
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._cotutelle import Cotutelle, pas_de_cotutelle
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_membre_CA import SignatureMembreCA
@@ -46,6 +47,7 @@ class GroupeDeSupervision(interface.Entity):
     proposition_id = attr.ib(type=PropositionIdentity)
     signatures_promoteurs = attr.ib(type=List[SignaturePromoteur], factory=list)
     signatures_membres_CA = attr.ib(type=List[SignatureMembreCA], factory=list)
+    cotutelle = attr.ib(type=Cotutelle, default=pas_de_cotutelle)
 
     def identifier_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
         # TODO :: verifier si pas deja présent
@@ -85,3 +87,13 @@ class GroupeDeSupervision(interface.Entity):
 
     def verifier_tout_le_monde_a_approuve(self):
         raise NotImplementedError
+
+    def verifier_cotutelle(self):
+        raise NotImplementedError
+
+    def definir_cotutelle(self, motivation: str, institution: str, demande_ouverture: str):
+        self.cotutelle = Cotutelle(
+            motivation=motivation,
+            institution=institution,
+            demande_ouverture=demande_ouverture,
+        )

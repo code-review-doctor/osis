@@ -47,5 +47,6 @@ class DemandeInscription(interface.DomainService):
             partial(profil_candidat_service.verifier_coordonnees, profil_candidat_translator),
             partial(profil_candidat_service.verifier_curriculum, profil_candidat_translator),
             groupe_supervision.verifier_tout_le_monde_a_approuve,
+            groupe_supervision.verifier_cotutelle,
             proposition_candidat.verifier,
         )
