@@ -15,7 +15,7 @@ def update_attribution_start_end_year(apps, schema_editor):
     filter_type = \
         Q(learning_component_year__learning_unit_year__subtype=PARTIM) | \
         ~Q(attribution__learning_container_year__container_type=COURSE)
-    
+
     attribution_charge_news = AttributionChargeNew.objects\
         .filter(
             attribution__start_year__isnull=True,
