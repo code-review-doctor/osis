@@ -84,3 +84,15 @@ class IdentifierMembreCACommand(interface.CommandRequest):
 class DemanderSignatureCommand(interface.CommandRequest):
     uuid_proposition = attr.ib(type=str)
     matricule_signataire = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class SupprimerPromoteurCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)
+    matricule = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class SupprimerMembreCACommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)
+    matricule = attr.ib(type=str)

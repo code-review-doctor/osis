@@ -24,33 +24,29 @@
 #
 # ##############################################################################
 from ddd.logic.projet_doctoral.builder.proposition_identity_builder import PropositionIdentityBuilder
-from ddd.logic.projet_doctoral.commands import DemanderSignatureCommand
+from ddd.logic.projet_doctoral.commands import SupprimerMembreCACommand
 from ddd.logic.projet_doctoral.domain.model.proposition import PropositionIdentity
-from ddd.logic.projet_doctoral.domain.service.i_constitution_supervision_these import IConstitutionSupervisionThese
+from ddd.logic.projet_doctoral.domain.service.i_membre_CA import IMembreCATranslator
 from ddd.logic.projet_doctoral.repository.i_groupe_de_supervision import IGroupeDeSupervisionRepository
 from ddd.logic.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
-# TODO :: unit tests
-def demander_signature(
-        cmd: 'DemanderSignatureCommand',
+def supprimer_membre_CA(
+        cmd: 'SupprimerMembreCACommand',
         proposition_repository: 'IPropositionRepository',
         groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
-        constitution_supervision_these: 'IConstitutionSupervisionThese',
+        membre_CA_translator: 'IMembreCATranslator',
 ) -> 'PropositionIdentity':
     # GIVEN
-    entity_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
-    proposition_candidat = proposition_repository.get(entity_id=entity_id)
-    groupe_de_supervision = groupe_supervision_repository.get_by_proposition_id(entity_id)
+    proposition_id = PropositionIdentityBuilder.build_from_uuid(cmd.uuid_proposition)
+    proposition_candidat = proposition_repository.get(entity_id=proposition_id)
+    groupe_supervision = groupe_supervision_repository.get_by_proposition_id(proposition_id)
+    membre_CA_id = membre_CA_translator.get(cmd.matricule)
 
     # WHEN
-    groupe_de_supervision.inviter_a_signer(cmd.matricule_signataire)
+    groupe_supervision.supprimer_membre_CA(membre_CA_id)
 
     # THEN
-    groupe_supervision_repository.save(groupe_de_supervision)
-    constitution_supervision_these.notifier(
-        proposition_candidat,
-        cmd.matricule_signataire,
-    )
+    groupe_supervision_repository.save(groupe_supervision)
 
-    return proposition_candidat.entity_id
+    return proposition_id

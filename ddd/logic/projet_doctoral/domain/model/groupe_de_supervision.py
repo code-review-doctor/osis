@@ -47,12 +47,30 @@ class GroupeDeSupervision(interface.Entity):
     signatures_promoteurs = attr.ib(type=List[SignaturePromoteur], factory=list)
     signatures_membres_CA = attr.ib(type=List[SignatureMembreCA], factory=list)
 
-    def verifier_membre_supervision_these(self, matricule_signataire: str) -> None:
-        # TODO :: verifier si signataire dans membres_CA ou promoteurs
-        raise NotImplementedError
-
     def identifier_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
+        # TODO :: verifier si pas deja présent
+        # TODO :: verifier si pas deja dans membres_CA
+        # TODO :: appeler ValidatorList
         raise NotImplementedError
 
     def identifier_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
+        # TODO :: verifier si pas deja présent
+        # TODO :: verifier si pas deja dans promoteurs
+        # TODO :: appeler ValidatorList
+        raise NotImplementedError
+
+    def inviter_a_signer(self, matricule_signataire):
+        # TODO :: verifier si signataire dans membres_CA ou promoteurs
+        # TODO :: appeler ValidatorList
+        # TODO set etat to ChoixEtatSignature.INVITED
+        raise NotImplementedError
+
+    def supprimer_promoteur(self, promoteur_id: 'PromoteurIdentity'):
+        # TODO :: verifier si signataire dans membres_CA ou promoteurs
+        # TODO :: appeler ValidatorList
+        raise NotImplementedError
+
+    def supprimer_membre_CA(self, membre_CA_id: 'MembreCAIdentity'):
+        # TODO :: verifier si signataire dans membres_CA ou promoteurs
+        # TODO :: appeler ValidatorList
         raise NotImplementedError

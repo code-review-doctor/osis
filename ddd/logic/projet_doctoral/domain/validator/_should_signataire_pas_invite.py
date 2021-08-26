@@ -1,4 +1,4 @@
-##############################################################################
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,19 +22,18 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-import abc
+# ##############################################################################
+import attr
 
-from ddd.logic.projet_doctoral.domain.model.proposition import Proposition
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.projet_doctoral.domain.model.groupe_de_supervision import GroupeDeSupervision
 
 
-class IConstitutionSupervisionThese(interface.DomainService):
-    @classmethod
-    @abc.abstractmethod
-    def notifier(
-            cls,
-            proposition: 'Proposition',
-            matricule_candidat: str
-    ) -> None:
+@attr.s(frozen=True, slots=True)
+class ShouldSignatairePasInvite(BusinessValidator):
+    groupe_de_supervision = attr.ib(type=GroupeDeSupervision)
+    matricule = attr.ib(type=str)
+
+    def validate(self, *args, **kwargs):
+        # TODO :: verifier si le signataire a été invité
         pass
