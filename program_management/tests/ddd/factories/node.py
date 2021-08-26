@@ -27,15 +27,15 @@ import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
+from education_group.ddd.business_types import *
 from education_group.models.enums.constraint_type import ConstraintTypes
 from program_management.ddd.domain import exception
+from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear, Node, \
     NodeIdentity
-from education_group.ddd.business_types import *
-from program_management.ddd.domain._campus import Campus
 from program_management.ddd.domain.program_tree_version import STANDARD, NOT_A_TRANSITION
-from program_management.models.enums.node_type import NodeType
 from program_management.ddd.repositories import node as node_repository
+from program_management.models.enums.node_type import NodeType
 
 
 def generate_end_date(node):
@@ -145,10 +145,14 @@ class NodeLearningUnitYearFactory(NodeFactory):
         model = NodeLearningUnitYear
         abstract = False
 
-    node_id = factory.Sequence(lambda n: n*2+1)
+    node_id = factory.Sequence(lambda n: n * 2 + 1)
     node_type = NodeType.LEARNING_UNIT
     code = factory.Sequence(lambda n: 'LUCODE%02d' % n)
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
     specific_title_en = factory.fuzzy.FuzzyText(length=240)
     common_title_en = factory.fuzzy.FuzzyText(length=240)
     learning_unit_type = factory.fuzzy.FuzzyChoice(LearningContainerYearType)
+    language_code = factory.fuzzy.FuzzyText(length=2)
+    english_friendly = False
+    french_friendly = False
+    exchange_students = True

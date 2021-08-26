@@ -284,7 +284,11 @@ class TestEditLearningUnit(TestCase):
                 "periodicity": self.learning_unit_year.periodicity,
                 "faculty_remark": self.learning_unit_year.faculty_remark,
                 "other_remark": self.learning_unit_year.other_remark,
-                "other_remark_english": self.learning_unit_year.other_remark_english
+                "other_remark_english": self.learning_unit_year.other_remark_english,
+                'individual_loan': self.learning_unit_year.individual_loan,
+                'exchange_students': self.learning_unit_year.exchange_students,
+                'english_friendly': self.learning_unit_year.english_friendly,
+                'french_friendly': self.learning_unit_year.french_friendly,
             }
         }
         for form_name, expected_initial in expected_initials.items():

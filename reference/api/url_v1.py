@@ -26,6 +26,7 @@
 from django.conf.urls import url
 
 from reference.api.views.country import CountryList, CountryDetail
+from reference.api.views.language import LanguageList
 from reference.api.views.study_domain import StudyDomainList
 
 app_name = "reference"
@@ -33,4 +34,5 @@ urlpatterns = [
     url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
     url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
     url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
+    url(r'^languages$', LanguageList.as_view(), name=LanguageList.name),
 ]

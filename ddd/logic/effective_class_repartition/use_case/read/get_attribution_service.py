@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
 
-from osis_common.ddd import interface
+from ddd.logic.effective_class_repartition.commands import SearchAttributionCommand
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 
 
-class IStudentEnrollmentsToEffectiveClass(interface.DomainService):
-
-    @classmethod
-    @abc.abstractmethod
-    def has_enrollments_to_class(cls, learning_unit_identity: 'LearningUnitIdentity') -> bool:
-        pass
+def get_attribution(
+        cmd: SearchAttributionCommand,
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
+) -> TutorAttributionToLearningUnitDTO:
+    return tutor_attribution_translator.get_learning_unit_attribution(cmd.learning_unit_attribution_uuid)

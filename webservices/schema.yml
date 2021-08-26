@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1
    description: Production server
 info:
-  version: '1'
+  version: '1.01'
   title: Auth Service
   description: |-
     A set of API endpoints that allow you to get a token.
@@ -20,6 +20,12 @@ paths:
     post:
       description: Return a token linked to the username. Only Admin can access to this endpoint
       operationId: token_create
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       requestBody:
         required: true
         content:
@@ -55,6 +61,12 @@ paths:
     get:
       description: Return basic information of the connected user
       operationId: user_get
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -75,6 +87,39 @@ components:
       in: header
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
+  parameters:
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
+    Accept-Language:
+      in: header
+      name: Accept-Language
+      description: >
+        The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)
+      schema:
+        $ref: '#/components/schemas/AcceptedLanguageEnum'
+      required: false
   responses:
     Unauthorized:
       description: Unauthorized
@@ -103,6 +148,11 @@ components:
         email:
           type: string
           format: email
+    AcceptedLanguageEnum:
+      type: string
+      enum:
+        - 'en'
+        - 'fr-be'
     Error:
       type: object
       properties:

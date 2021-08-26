@@ -27,7 +27,6 @@ from ddd.logic.learning_unit.builder.effective_class_identity_builder import Eff
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import UpdateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClassIdentity
-from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
 from ddd.logic.learning_unit.domain.service.save_effective_class import SaveEffectiveClass
 from ddd.logic.learning_unit.repository.i_effective_class import IEffectiveClassRepository
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository

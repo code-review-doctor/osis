@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2015-2021 THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-13 13:48+0200\n"
+"POT-Creation-Date: 2021-08-12 13:40+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -324,6 +324,9 @@ msgstr "Accords"
 msgid "Alert"
 msgstr "Alerte"
 
+msgid "All"
+msgstr "Tous"
+
 msgctxt "female plural"
 msgid "All"
 msgstr "Toutes"
@@ -338,8 +341,8 @@ msgstr "Toutes les notes ont été soumises."
 msgid "Alloc. Ent."
 msgstr "Ent. attrib."
 
-msgid "Alloc. Entity"
-msgstr "Ent. attrib."
+msgid "Alloc.Entity"
+msgstr "Ent.attrib."
 
 msgid "Allocation entity"
 msgstr "Entité d'attribution"
@@ -367,9 +370,6 @@ msgid "Are you certain that you want to delete the learning unit ?"
 msgstr ""
 "Etes-vous certain de vouloir supprimer définitivement cette unité "
 "d'enseignement ?"
-
-msgid "Are you sure you want to delete the achievement?"
-msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage ?"
 
 msgid "Are you sure you want to delete the teaching material?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours ?"
@@ -708,6 +708,13 @@ msgstr "Informations par défaut"
 msgid "Default learning unit enrollment"
 msgstr "Inscription par défaut aux cours"
 
+msgid "Delete"
+msgstr "Supprimer"
+
+msgctxt "learning_unit_achievement_delete"
+msgid "Delete achievement"
+msgstr "Supprimer l'acquis d'apprentissage"
+
 msgid "Delete learning unit year definitively"
 msgstr "Supprimer l'UE définitivement"
 
@@ -902,6 +909,9 @@ msgstr "Intitulé propre en anglais"
 msgid "English title specific complement"
 msgstr "Intitulé en EN compl. spéc. à l'UE"
 
+msgid "English-friendly"
+msgstr "English-friendly"
+
 msgid "Enrolled"
 msgstr "Inscrit"
 
@@ -992,6 +1002,9 @@ msgstr "Inscription aux examens"
 
 msgid "Exceptional procedure"
 msgstr "Procédure exceptionnelle"
+
+msgid "Exchange students"
+msgstr "Etudiants d'échange"
 
 msgid "Execute"
 msgstr "Exécuter"
@@ -1100,6 +1113,9 @@ msgstr "Français"
 
 msgid "French title proper"
 msgstr "Intitulé propre en français"
+
+msgid "French-friendly"
+msgstr "French-friendly"
 
 msgid "From"
 msgstr "De"
@@ -1217,6 +1233,44 @@ msgstr "Inactif"
 
 msgid "Include subordinate entities"
 msgstr "Inclure les entités subordonnées"
+
+msgid ""
+"Indicates if the UE can be accessible for a student, even if the UE is not "
+"included in the detailed program of his training"
+msgstr ""
+"Indique si l'UE peut être accessible pour un étudiant, même si l'UE ne "
+"figure pas dans le programme détaillé de sa formation"
+
+msgid ""
+"Indicates if the UE includes an internship, so that students enrolled in "
+"this UE must be declared to the DIMONA"
+msgstr ""
+"Indique si l'UE comprend un stage, de sorte que les étudiants inscrits à "
+"cette UE doivent être déclarés à la DIMONA."
+
+msgid "Indicates if this UE is accessible to exchange students"
+msgstr "Indique si cette UE est accessible aux étudiants d'échange."
+
+msgid ""
+"Indicates, for the UE whose language of instruction is not French, if this "
+"UE is nevertheless accessible to French speaking students. If the language "
+"of instruction is French, the value of this field must be 'no'"
+msgstr ""
+"Indique, pour les UE dont la langue d'enseignement n'est pas le français, si "
+"cette UE est cependant accessible aux étudiants parlant français. Si la "
+"langue d'enseignement est le français, la valeur de ce champ doit être 'non'"
+
+msgid ""
+"Indicates, for the UE whose teaching language is not English, if this UE is "
+"however accessible to English speaking students. If the language of "
+"instruction is English, the value of this field must be 'no'"
+msgstr ""
+"Indique, pour les UE dont la langue d'enseignement n'est pas l'anglais, si "
+"cette UE est cependant accessible aux étudiants parlant anglais. Si la "
+"langue d'enseignement est l'anglais, la valeur de ce champ doit être 'non'"
+
+msgid "Individual loan"
+msgstr "Emprunt individuel"
 
 msgid "Initial data"
 msgstr "Valeur initiale"
@@ -1756,8 +1810,11 @@ msgstr "Ok"
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-msgid "Only proposals"
-msgstr "Uniquement les propositions"
+msgid "Only UE in proposal"
+msgstr "Uniquement les UE en proposition"
+
+msgid "Only UE with classes"
+msgstr "Uniquement les UE ayant des classes"
 
 msgid "Only the volume Q1 must have a value"
 msgstr "Seul le volume Q1 doit avoir une valeur"
@@ -2195,6 +2252,9 @@ msgstr "Ent. charges"
 msgid "Req. Entity"
 msgstr "Ent. charge"
 
+msgid "Req.Entity"
+msgstr "Ent.charge"
+
 msgid "Requesting entity"
 msgstr "Entité demandeuse"
 
@@ -2507,6 +2567,7 @@ msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
 msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
 
+#, python-format
 msgid "The class %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr "La classe %(acronym)s est attribuée à %(tutor)s l’année %(year)s"
 
@@ -2788,6 +2849,9 @@ msgid "This action will permanently cancel the selected proposal(s)"
 msgstr ""
 "Cette action annulera définitivement la (les) proposition(s) sélectionnée(s)"
 
+msgid "This action will permanently delete the achievement"
+msgstr "Cette action supprimera définitivement l'acquis d'apprentissage"
+
 msgid "This code already exists for this learning unit"
 msgstr "Ce code existe déja pour cette unité d'enseignement"
 
@@ -2807,8 +2871,8 @@ msgstr "Ce champ est obligatoire."
 
 msgid "This learning unit has application this year or in the future"
 msgstr ""
-"L'unité d'enseignement a au moins une candidature cette année ou dans le "
-"futur"
+"L'unité d'enseignement possède au moins une candidature cette année ou dans "
+"le futur"
 
 #, python-format
 msgid ""
@@ -3014,8 +3078,24 @@ msgstr "Volume total annuel"
 msgid "Volumes are inconsistent"
 msgstr "Les volumes sont incohérents"
 
+msgid ""
+"Volumes are inconsistent: you can't delete volume on a component having "
+"classes."
+msgstr ""
+"Les volumes sont incohérents: vous ne pouvez pas supprimer le volume sur un "
+"composant ayant des classes."
+
 msgid "Volumes management"
 msgstr "Gestion des volumes"
+
+#, python-format
+msgid ""
+"Volumes of %(code_ue)s are inconsistent: you can't consolidate a learning "
+"unit whose volume has been deleted on a component having classes"
+msgstr ""
+"Les volumes de %(code_ue)s sont incohérents: vous ne pouvez pas consolider "
+"une unité d'enseignement dont le volume a été supprimé sur un composant "
+"ayant des classes."
 
 msgid "Volumes of {} are inconsistent"
 msgstr "Les volumes de {} sont incohérents"
@@ -3052,8 +3132,8 @@ msgid ""
 "You cannot create a partim for a learning unit having classes for this year "
 "or in the future"
 msgstr ""
-"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant une "
-"ou plusieurs classes cette année ou dans le futur"
+"Vous ne pouvez pas créer de partim pour une unité d'enseignement ayant des "
+"classes cette année ou dans le futur"
 
 msgid ""
 "You cannot create a partim for a learning unit in proposition of creation"

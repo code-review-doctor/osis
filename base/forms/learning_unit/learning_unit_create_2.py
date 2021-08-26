@@ -344,7 +344,9 @@ class FullForm(LearningUnitBaseForm):
                 target_years_opened = LearningUnitExtendedProposalManagementCalendar().get_target_years_opened()
             else:
                 target_years_opened = []
-            self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+            self.fields["academic_year"].queryset = AcademicYear.objects.filter(
+                year__in=target_years_opened
+            ).order_by('-year')
 
     def _restrict_academic_years_choice_for_daily_management(self):
         if EntityRoleHelper.has_role(self.person, FacultyManager):
@@ -353,4 +355,6 @@ class FullForm(LearningUnitBaseForm):
             target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
         else:
             target_years_opened = []
-        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
+        self.fields["academic_year"].queryset = AcademicYear.objects.filter(
+            year__in=target_years_opened
+        ).order_by('-year')

@@ -36,16 +36,17 @@ LIMIT_OF_CHOICES = 2
 class SelectComparisonYears(forms.Form):
 
     def __init__(self, *args, **kwargs):
-        academic_year = kwargs.pop('academic_year', None)
+        year = kwargs.pop('academic_year', None)
         self.search_form = kwargs.pop('search_form', None)
 
         super(SelectComparisonYears, self).__init__(*args, **kwargs)
-        if academic_year is None:
-            academic_year = starting_academic_year()
-
+        if year is None:
+            year = starting_academic_year().year
+        else:
+            year = int(year)
         years = AcademicYear.objects.filter(
-            Q(year=academic_year.year + 1) | Q(year=academic_year.year - 1)).order_by('year')
-        choices = _get_choices(years, academic_year)
+            Q(year=year + 1) | Q(year=year - 1)).order_by('year')
+        choices = _get_choices(years, year)
         initial_value = _get_initial(choices)
         self.fields['academic_years'] = forms.ChoiceField(
             widget=forms.RadioSelect,

@@ -51,7 +51,7 @@ def handle(exc, context):
                 errors_dict = dict.fromkeys(field_names, [exception_formated])
                 data = {field: exceptions + data[field] for field, exceptions in errors_dict.items()}
             else:
-                data[api_settings.NON_FIELD_ERRORS_KEY].append(exception_formated)
+                data.setdefault(api_settings.NON_FIELD_ERRORS_KEY, []).append(exception_formated)
         return Response(data, status=status.HTTP_400_BAD_REQUEST)
     return response
 

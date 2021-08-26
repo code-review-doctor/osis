@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,15 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import abc
-from typing import Optional
+from django.db import models
 
-from osis_common.ddd import interface
+from osis_common.models import osis_model_admin
 
 
-class ITutorDistributedToClass(interface.DomainService):
+class ZipCodeAdmin(osis_model_admin.OsisModelAdmin):
+    list_display = ('zip_code', 'municipality', 'country')
+    list_filter = ('country',)
+    ordering = ('zip_code',)
+    search_fields = ['municipality']
 
-    @classmethod
-    @abc.abstractmethod
-    def get_first_tutor_full_name_if_exists(cls, effective_class_identity: 'EffectiveClassIdentity') -> Optional[str]:
-        pass
+
+class ZipCode(models.Model):
+    zip_code = models.CharField(max_length=255)
+    municipality = models.CharField(max_length=255)
+    country = models.ForeignKey('Country', blank=True, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "{} - {} ({})".format(self.zip_code, self.municipality, self.country.iso_code)
+
+    class Meta:
+        ordering = ('zip_code',)

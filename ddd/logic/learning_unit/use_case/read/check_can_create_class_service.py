@@ -27,12 +27,14 @@
 from ddd.logic.learning_unit.builder.learning_unit_identity_builder import LearningUnitIdentityBuilder
 from ddd.logic.learning_unit.commands import CanCreateEffectiveClassCommand
 from ddd.logic.learning_unit.domain.service.can_save_effective_class import CanCreateEffectiveClass
+from ddd.logic.learning_unit.domain.service.i_student_enrollments import IStudentEnrollmentsTranslator
 from ddd.logic.learning_unit.repository.i_learning_unit import ILearningUnitRepository
 
 
 def check_can_create_effective_class(
         cmd: 'CanCreateEffectiveClassCommand',
-        learning_unit_repository: 'ILearningUnitRepository'
+        learning_unit_repository: 'ILearningUnitRepository',
+        student_enrollment_translator: 'IStudentEnrollmentsTranslator',
 ) -> None:
     learning_unit_identity = LearningUnitIdentityBuilder.build_from_code_and_year(
         code=cmd.learning_unit_code,
@@ -41,5 +43,6 @@ def check_can_create_effective_class(
     learning_unit = learning_unit_repository.get(learning_unit_identity)
     CanCreateEffectiveClass().verify(
         learning_unit=learning_unit,
-        learning_unit_repository=learning_unit_repository
+        learning_unit_repository=learning_unit_repository,
+        student_enrollment_translator=student_enrollment_translator,
     )

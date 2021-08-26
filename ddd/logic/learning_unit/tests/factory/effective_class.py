@@ -23,17 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 import factory.fuzzy
 
 from base.models.enums.learning_unit_year_session import DerogationSession
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from ddd.logic.learning_unit.domain.model._class_titles import ClassTitles
 from ddd.logic.learning_unit.domain.model._volumes_repartition import ClassVolumes
-from ddd.logic.shared_kernel.campus.domain.model.uclouvain_campus import UclouvainCampusIdentity
 from ddd.logic.learning_unit.domain.model.effective_class import EffectiveClass, EffectiveClassIdentity, \
     LecturingEffectiveClass, PracticalEffectiveClass
-from ddd.logic.learning_unit.tests.factory.learning_unit import _LearningUnitIdentityFactory, \
-    _UclouvainCampusIdentityFactory
+from ddd.logic.learning_unit.tests.factory.learning_unit import LearningUnitIdentityFactory, \
+    LDROI1001LearningUnitIdentityFactory
+from ddd.logic.learning_unit.tests.factory.learning_unit import _UclouvainCampusIdentityFactory
 
 
 class _ClassTitlesFactory(factory.Factory):
@@ -60,7 +61,7 @@ class _EffectiveClassIdentityFactory(factory.Factory):
         abstract = False
 
     class_code = factory.fuzzy.FuzzyText(length=1)
-    learning_unit_identity = factory.SubFactory(_LearningUnitIdentityFactory)
+    learning_unit_identity = factory.SubFactory(LearningUnitIdentityFactory)
 
 
 class _EffectiveClassFactory(factory.Factory):
@@ -95,3 +96,8 @@ class LecturingEffectiveClassFactory(_LecturingEffectiveClassFactory):
         volume_first_quadrimester=1,
         volume_second_quadrimester=0
     )
+
+
+class LDROI1001XEffectiveClassIdentityFactory(_EffectiveClassIdentityFactory):
+    class_code = 'X'
+    learning_unit_identity = factory.SubFactory(LDROI1001LearningUnitIdentityFactory)

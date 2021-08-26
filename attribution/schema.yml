@@ -11,7 +11,7 @@ servers:
  - url: https://osis.uclouvain.be/api/v1/attribution/
    description: 'Production server'
 info:
-  version: '1.13'
+  version: '1.14'
   title: 'Attribution Service'
   description: |-
     A set of API endpoints that allow you to get information about attribution
@@ -22,6 +22,10 @@ paths:
       operationId: application_list
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -42,6 +46,10 @@ paths:
       operationId: application_create
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       requestBody:
         required: true
         content:
@@ -69,6 +77,10 @@ paths:
       operationId: my_charge_summary
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -90,6 +102,10 @@ paths:
       operationId: applications_summary_send
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '204':
           description: 'The summary email has been sent'
@@ -107,6 +123,10 @@ paths:
       operationId: application_update
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
         - in: path
           name: application_uuid
           required: true
@@ -139,6 +159,10 @@ paths:
       operationId: application_delete
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
         - in: path
           name: application_uuid
           required: true
@@ -162,6 +186,10 @@ paths:
       operationId: applicationcoursescalendars_list
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -185,6 +213,10 @@ paths:
       operationId: vacantcourses_list
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
         - in: query
           name: code
           schema:
@@ -216,6 +248,10 @@ paths:
       operationId: attributionsabouttoexpire_list
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       responses:
         '200':
           description: OK
@@ -236,6 +272,10 @@ paths:
       operationId: attributionsabouttoexpire_renew
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
       requestBody:
         required: true
         content:
@@ -259,6 +299,10 @@ paths:
       operationId: myattributions_list
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
         - in: path
           name: year
           required: true
@@ -293,6 +337,10 @@ paths:
       operationId: attributions_list
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/X-User-FirstName'
+        - $ref: '#/components/parameters/X-User-LastName'
+        - $ref: '#/components/parameters/X-User-Email'
+        - $ref: '#/components/parameters/X-User-GlobalID'
         - in: path
           name: year
           required: true
@@ -335,6 +383,30 @@ components:
       name: Authorization
       description: Enter your token in the format **Token &lt;token>**
   parameters:
+    X-User-FirstName:
+      in: header
+      name: X-User-FirstName
+      schema:
+        type: string
+      required: false
+    X-User-LastName:
+      in: header
+      name: X-User-LastName
+      schema:
+        type: string
+      required: false
+    X-User-Email:
+      in: header
+      name: X-User-Email
+      schema:
+        type: string
+      required: false
+    X-User-GlobalID:
+      in: header
+      name: X-User-GlobalID
+      schema:
+        type: string
+      required: false
     Accept-Language:
       in: header
       name: Accept-Language

@@ -28,15 +28,29 @@ from django.urls import include, path
 from learning_unit.views.learning_unit_class.create import CreateClassView as CreateClass
 from learning_unit.views.learning_unit_class.delete import DeleteClassView as DeleteClass
 from learning_unit.views.learning_unit_class.identification_read import ClassIdentificationView
+from learning_unit.views.learning_unit_class.learning_unit_tutors import LearningUnitTutorsView
+from learning_unit.views.learning_unit_class.tutor_repartition import TutorRepartitionView, \
+    TutorRepartitionRemoveView, TutorRepartitionEditView
+from learning_unit.views.learning_unit_class.tutors import ClassTutorsView
 from learning_unit.views.learning_unit_class.update import UpdateClassView as UpdateClass
 
 urlpatterns = [
     path('<int:learning_unit_year>/<str:learning_unit_code>/', include([
         path('class/', include([
             path('create', CreateClass.as_view(), name='class_create'),
-            path('<str:class_code>/identification', ClassIdentificationView.as_view(), name='class_identification'),
-            path('<str:class_code>/update', UpdateClass.as_view(), name='class_update'),
-            path('<str:class_code>/delete', DeleteClass.as_view(), name='class_delete'),
+        ])),
+        path('class/<str:class_code>/', include([
+            path('identification', ClassIdentificationView.as_view(), name='class_identification'),
+            path('tutors', ClassTutorsView.as_view(), name='class_tutors'),
+            path('update', UpdateClass.as_view(), name='class_update'),
+            path('lu_tutors', LearningUnitTutorsView.as_view(), name='learning_unit_tutors'),
+            path('tutors/<str:attribution_uuid>/repartition',
+                 TutorRepartitionView.as_view(), name='edit_charge_repartition'),
+            path('tutors/<str:attribution_uuid>/repartition/remove',
+                 TutorRepartitionRemoveView.as_view(), name='remove_class_attribution'),
+            path('tutors/<str:attribution_uuid>/repartition/edit',
+                 TutorRepartitionEditView.as_view(), name='edit_class_attribution'),
+            path('delete', DeleteClass.as_view(), name='class_delete'),
         ]))
     ]))
 ]

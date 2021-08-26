@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import uuid
-
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -118,5 +117,7 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
         )
         self.assertNotEqual(attribution_partim.external_id, self.attribution_full.external_id)
         self.assertIsNone(attribution_partim.external_id)
+        self.assertEqual(attribution_partim.start_year, self.learning_unit_year.learning_unit.start_year.year)
+        self.assertEqual(attribution_partim.end_year, self.learning_unit_year.learning_unit.start_year.year)
         self.assertRedirects(response,
                              reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))
