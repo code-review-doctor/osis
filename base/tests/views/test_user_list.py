@@ -113,8 +113,8 @@ class XlsUserListTestCase(TestCase):
         self.assertEqual(data_user_faculty_mgr[COL_FOR_GLOBAL_ID], person_faculty_manager.global_id)
         self.assertEqual(data_user_faculty_mgr[COL_FOR_EMAIL], person_faculty_manager.email)
         self.assertEqual(data_user_faculty_mgr[COL_FOR_GROUP_NAME], "faculty_managers_for_ue")
-        self.assertContains(data_user_faculty_mgr[COL_FOR_ENTITIES], "ESPO")
-        self.assertContains(data_user_faculty_mgr[COL_FOR_ENTITIES], "DRT")
+        entities = data_user_faculty_mgr[COL_FOR_ENTITIES].split("\n")
+        self.assertCountEqual(entities, ["ESPO", "DRT"])
         data_user_entity_mgr = data[1]
         self.assertEqual(data_user_entity_mgr[COL_FOR_LAST_NAME], person_faculty_manager.last_name)
         self.assertEqual(data_user_entity_mgr[COL_FOR_FIRST_NAME], person_faculty_manager.first_name)
