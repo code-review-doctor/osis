@@ -26,38 +26,23 @@
 import datetime
 from typing import List, Optional
 
+from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.shared_kernel.academic_year.domain.model.academic_year import AcademicYearIdentity
 from ddd.logic.shared_kernel.academic_year.repository.i_academic_year import IAcademicYearRepository
 from osis_common.ddd.interface import ApplicationService
 from program_management.ddd.domain.academic_year import AcademicYear
 
 
-class AcademicYearInMemoryRepository(IAcademicYearRepository):
-    academic_years = []
-
-    # TODO remove this and change classmethod to instance method save/search/...
-    def __init__(self, academic_years: List[AcademicYear] = None):
-        AcademicYearInMemoryRepository.academic_years = academic_years or []
+class AcademicYearInMemoryRepository(InMemoryGenericRepository, IAcademicYearRepository):
+    entities = list()  # type: List[AcademicYear]
 
     @classmethod
     def search(cls, entity_ids: Optional[List[AcademicYearIdentity]] = None, **kwargs) -> List[AcademicYear]:
-        results = cls.academic_years
+        results = cls.entities
         return list(results)
-
-    @classmethod
-    def get(cls, entity_id: AcademicYearIdentity) -> AcademicYear:
-        return next(academic_year for academic_year in cls.academic_years if academic_year.entity_id == entity_id)
-
-    @classmethod
-    def delete(cls, entity_id: 'AcademicYearIdentity', **kwargs: ApplicationService) -> None:
-        pass
-
-    @classmethod
-    def save(cls, entity: 'AcademicYear') -> None:
-        pass
 
     @classmethod
     def get_current(cls) -> 'AcademicYear':
         return next(
-            academic_year for academic_year in cls.academic_years if academic_year.year == datetime.datetime.now().year
+            academic_year for academic_year in cls.entities if academic_year.year == datetime.datetime.now().year
         )

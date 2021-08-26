@@ -34,7 +34,7 @@ from education_group.ddd.domain.training import Training
 from education_group.ddd.service.write import postpone_certificate_aims_modification_service
 from education_group.tests.ddd.factories.domain.diploma import DiplomaFactory
 from education_group.tests.ddd.factories.domain.training import TrainingFactory
-from infrastructure.shared_kernel.academic_year.repository.academic_year_in_memory import AcademicYearInMemoryRepository
+from infrastructure.shared_kernel.academic_year.repository.in_memory.academic_year import AcademicYearInMemoryRepository
 from testing.testcases import DDDTestCase
 
 
@@ -62,7 +62,9 @@ class TestPostponeCertificateAims(DDDTestCase):
             start_date=datetime.date(self.trainings[0].entity_identity.year, 9, 30),
             end_date=datetime.date(self.trainings[0].entity_identity.year+1, 9, 30)
         )
-        self.academic_year_repository = AcademicYearInMemoryRepository([self.academic_year, self.current_academic_year])
+        self.academic_year_repository = AcademicYearInMemoryRepository()
+        self.academic_year_repository.save(self.current_academic_year)
+        self.academic_year_repository.save(self.academic_year)
 
     def test_cannot_have_more_than_one_certificate_aim_of_section_2(self):
         cmd = attr.evolve(self.cmd, aims=[(1, 2), (4, 2)])
