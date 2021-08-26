@@ -1,17 +1,17 @@
 #set( $UseCase = ${StringUtils.removeAndHump($NAME)} )
+#set( $aggregate_lower = $aggregate.toLowerCase() )
 #set( $Aggregate = ${StringUtils.removeAndHump($aggregate)} )
 from typing import Optional, List
 
-class ${NAME}(
+def ${NAME}(
         cmd: '${UseCase}Command',
-        ${aggregate}_repository: 'I${Aggregate}Repository',
-) -> '${Aggregate}Idendity':
+        ${aggregate_lower}_repository: 'I${Aggregate}Repository',
+) -> '${Aggregate}Identity':
     # GIVEN
-    ${aggregate} = ${aggregate}_repository.get(entity_id=cmd.entity_id)
+    ${aggregate_lower} = ${aggregate_lower}_repository.get(entity_id=cmd.entity_id)
 
     # WHEN
 
     # THEN
-
 
     return entity_id
