@@ -6,7 +6,9 @@
         <template name="Repository.py.child.0.py" file-name="in_memory/${NAME}" reformat="true" live-template-enabled="false" />
       </template>
       <template name="Repository.py.child.0.py" file-name="in_memory/${NAME}" reformat="true" live-template-enabled="false" />
-      <template name="Use case.py" file-name="${NAME}_service" reformat="true" live-template-enabled="false" />
+      <template name="Translator.py" file-name="i_$NAME" reformat="true" live-template-enabled="false" />
+      <template name="Use case (read).py" file-name="${NAME}_service" reformat="true" live-template-enabled="false" />
+      <template name="Use case (write).py" file-name="${NAME}_service" reformat="true" live-template-enabled="false" />
     </default_templates>
   </component>
 </project>

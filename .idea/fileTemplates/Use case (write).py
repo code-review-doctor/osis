@@ -3,6 +3,7 @@
 #set( $Aggregate = ${StringUtils.removeAndHump($aggregate)} )
 from typing import Optional, List
 
+
 def ${NAME}(
         cmd: '${UseCase}Command',
         ${aggregate_lower}_repository: 'I${Aggregate}Repository',
