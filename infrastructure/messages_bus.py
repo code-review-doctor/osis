@@ -85,6 +85,8 @@ from ddd.logic.shared_kernel.language.commands import SearchLanguagesCommand, Ge
 from ddd.logic.shared_kernel.language.use_case.read.get_language_service import get_language
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from education_group.ddd.repository.training import TrainingRepository
+from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
+from infrastructure.admission.preparation.projet_doctoral.repository.proposition import PropositionRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
 from infrastructure.application.repository.application_calendar import ApplicationCalendarRepository
@@ -100,8 +102,6 @@ from infrastructure.learning_unit.domain.service.tutor_distributed_to_class impo
 from infrastructure.learning_unit.repository.effective_class import EffectiveClassRepository
 from infrastructure.learning_unit.repository.entity import UclEntityRepository
 from infrastructure.learning_unit.repository.learning_unit import LearningUnitRepository
-from infrastructure.projet_doctoral.domain.service.doctorat import DoctoratTranslator
-from infrastructure.projet_doctoral.repository.proposition import PropositionRepository
 from infrastructure.shared_kernel.academic_year.repository.academic_year import AcademicYearRepository
 from infrastructure.shared_kernel.campus.repository.uclouvain_campus import UclouvainCampusRepository
 from infrastructure.shared_kernel.language.repository.language import LanguageRepository

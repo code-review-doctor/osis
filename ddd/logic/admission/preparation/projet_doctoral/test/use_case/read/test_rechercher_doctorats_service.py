@@ -29,8 +29,8 @@ from django.test import SimpleTestCase
 from base.models.enums.education_group_types import TrainingType
 from ddd.logic.admission.preparation.projet_doctoral.commands import SearchDoctoratCommand
 from ddd.logic.formation_catalogue.dtos import TrainingDto
+from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.projet_doctoral.domain.service.doctorat import DoctoratTranslator
 
 
 class TestRechercherDoctoratService(SimpleTestCase):

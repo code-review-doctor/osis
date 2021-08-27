@@ -32,8 +32,10 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_pr
     ChoixDoctoratDejaRealise,
     aucune_experience_precedente_recherche,
 )
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement import ChoixTypeFinancement, financement_non_rempli
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition, ChoixBureauCDE
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._financement import ChoixTypeFinancement, \
+    financement_non_rempli
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import ChoixTypeAdmission, Proposition, \
+    ChoixBureauCDE
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
     MaximumPropositionsAtteintException,
     DoctoratNonTrouveException, BureauCDEInconsistantException,
@@ -41,9 +43,11 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions
 from ddd.logic.admission.preparation.projet_doctoral.test.factory.proposition import (
     PropositionAdmissionSC3DPMinimaleAnnuleeFactory,
 )
+from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.doctorat import \
+    DoctoratInMemoryTranslator
+from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.proposition import \
+    PropositionInMemoryRepository
 from infrastructure.messages_bus import message_bus_instance
-from infrastructure.projet_doctoral.domain.service.in_memory.doctorat import DoctoratInMemoryTranslator
-from infrastructure.projet_doctoral.repository.in_memory.proposition import PropositionInMemoryRepository
 
 
 class TestInitierPropositionService(SimpleTestCase):
