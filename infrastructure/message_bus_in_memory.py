@@ -27,18 +27,22 @@ from typing import Dict, Callable, List
 
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
     SearchDoctoratCommand, CompleterPropositionCommand,
-    InitierPropositionCommand, IdentifierPromoteurCommand,
+    InitierPropositionCommand, IdentifierPromoteurCommand, IdentifierMembreCACommand,
 )
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
     completer_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_membre_CA_service import \
+    identifier_membre_CA
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
     identifier_promoteur
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
     initier_proposition
 from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.doctorat import \
     DoctoratInMemoryTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.membre_CA import \
+    MembreCAInMemoryTranslator
 from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.promoteur import \
     PromoteurInMemoryTranslator
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
@@ -69,6 +73,12 @@ class MessageBusInMemory:
             PropositionInMemoryRepository(),
             GroupeDeSupervisionInMemoryRepository(),
             PromoteurInMemoryTranslator(),
+        ),
+        IdentifierMembreCACommand: lambda cmd: identifier_membre_CA(
+            cmd,
+            PropositionInMemoryRepository(),
+            GroupeDeSupervisionInMemoryRepository(),
+            MembreCAInMemoryTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

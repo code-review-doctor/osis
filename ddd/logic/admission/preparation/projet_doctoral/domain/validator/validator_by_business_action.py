@@ -32,8 +32,11 @@ from ddd.logic.admission.preparation.projet_doctoral.business_types import *
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import \
     ChoixDoctoratDejaRealise
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_institution_dependre_doctorat_realise import \
     ShouldInstitutionDependreDoctoratRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_membre_CA_pas_deja_present_dans_groupe_de_supervision import \
+    ShouldMembreCAPasDejaPresentDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_promoteur_pas_deja_present_dans_groupe_de_supervision import \
     ShouldPromoteurPasDejaPresentDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_type_contrat_travail_dependre_type_financement import \
@@ -94,6 +97,24 @@ class IdentifierPromoteurValidatorList(TwoStepsMultipleBusinessExceptionListVali
         return []
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
+        membre_CA_id = MembreCAIdentity(matricule=self.promoteur_id.matricule)
         return [
             ShouldPromoteurPasDejaPresentDansGroupeDeSupervision(self.groupe_de_supervision, self.promoteur_id),
+            ShouldMembreCAPasDejaPresentDansGroupeDeSupervision(self.groupe_de_supervision, membre_CA_id),
+        ]
+
+
+@attr.s(frozen=True, slots=True)
+class IdentifierMembreCAValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    membre_CA_id = attr.ib(type='MembreCAIdentity')  # type: MembreCAIdentity
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        promoteur_id = PromoteurIdentity(matricule=self.membre_CA_id.matricule)
+        return [
+            ShouldMembreCAPasDejaPresentDansGroupeDeSupervision(self.groupe_de_supervision, self.membre_CA_id),
+            ShouldPromoteurPasDejaPresentDansGroupeDeSupervision(self.groupe_de_supervision, promoteur_id),
         ]

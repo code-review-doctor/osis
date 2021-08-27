@@ -36,8 +36,10 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_pro
     ChoixEtatSignature,
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
-from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import \
-    IdentifierPromoteurValidatorList
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import (
+    IdentifierPromoteurValidatorList,
+    IdentifierMembreCAValidatorList,
+)
 from osis_common.ddd import interface
 
 
@@ -55,9 +57,6 @@ class GroupeDeSupervision(interface.Entity):
     cotutelle = attr.ib(type=Cotutelle, default=pas_de_cotutelle)
 
     def identifier_promoteur(self, promoteur_id: 'PromoteurIdentity') -> None:
-        # TODO :: verifier si pas deja présent
-        # TODO :: verifier si pas deja dans membres_CA
-        # TODO :: appeler ValidatorList
         IdentifierPromoteurValidatorList(
             groupe_de_supervision=self,
             promoteur_id=promoteur_id,
@@ -67,10 +66,13 @@ class GroupeDeSupervision(interface.Entity):
         )
 
     def identifier_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
-        # TODO :: verifier si pas deja présent
-        # TODO :: verifier si pas deja dans promoteurs
-        # TODO :: appeler ValidatorList
-        raise NotImplementedError
+        IdentifierMembreCAValidatorList(
+            groupe_de_supervision=self,
+            membre_CA_id=membre_CA_id,
+        ).validate()
+        self.signatures_membres_CA.append(
+            SignatureMembreCA(membre_CA_id=membre_CA_id, etat=ChoixEtatSignature.NOT_INVITED)
+        )
 
     def get_signataire(self, matricule_signataire: str) -> Union['PromoteurIdentity', 'MembreCAIdentity']:
         pass

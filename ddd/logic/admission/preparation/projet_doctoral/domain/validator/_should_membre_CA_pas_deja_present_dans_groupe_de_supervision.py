@@ -1,4 +1,5 @@
-##############################################################################
+
+# ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -6,7 +7,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,13 +23,19 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from typing import TYPE_CHECKING
+# ##############################################################################
+import attr
 
-# FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.admission.preparation.projet_doctoral.business_types import *
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import DejaMembreCAException
 
-if TYPE_CHECKING:
-    from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
-    from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import GroupeDeSupervision
-    from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
-    from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
+
+@attr.s(frozen=True, slots=True)
+class ShouldMembreCAPasDejaPresentDansGroupeDeSupervision(BusinessValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    membre_CA_id = attr.ib(type='MembreCAIdentity')  # type: MembreCAIdentity
+
+    def validate(self, *args, **kwargs):
+        if any(s for s in self.groupe_de_supervision.signatures_membres_CA if s.membre_CA_id == self.membre_CA_id):
+            raise DejaMembreCAException

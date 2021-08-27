@@ -32,64 +32,65 @@ from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
     PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
-    IdentifierPromoteurCommand,
     IdentifierMembreCACommand,
+    IdentifierPromoteurCommand,
 )
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import (
-    SignaturePromoteur,
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_membre_CA  import (
+    SignatureMembreCA,
     ChoixEtatSignature,
 )
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import (
-    DejaPromoteurException,
-    PromoteurNonTrouveException, GroupeDeSupervisionNonTrouveException, DejaMembreCAException,
+    DejaMembreCAException,
+    MembreCANonTrouveException,
+    GroupeDeSupervisionNonTrouveException, DejaPromoteurException,
 )
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
     GroupeDeSupervisionInMemoryRepository
 from infrastructure.message_bus_in_memory import message_bus_in_memory_instance
 
 
-class TestIdentifierPromoteurService(SimpleTestCase):
+class TestIdentifierMembreCAService(SimpleTestCase):
     def setUp(self) -> None:
-        self.matricule_promoteur = '00987890'
+        self.matricule_membre_CA = '00987890'
         self.uuid_proposition = 'uuid-SC3DP'
 
         self.groupe_de_supervision_repository = GroupeDeSupervisionInMemoryRepository()
         self.proposition_id = PropositionIdentityBuilder.build_from_uuid(self.uuid_proposition)
 
         self.message_bus = message_bus_in_memory_instance
-        self.cmd = IdentifierPromoteurCommand(
+        self.cmd = IdentifierMembreCACommand(
             uuid_proposition=self.uuid_proposition,
-            matricule=self.matricule_promoteur,
+            matricule=self.matricule_membre_CA,
         )
         self.addCleanup(self.groupe_de_supervision_repository.reset)
 
-    def test_should_ajouter_promoteur_dans_groupe_supervision(self):
+    def test_should_ajouter_membre_CA_dans_groupe_supervision(self):
         proposition_id = self.message_bus.invoke(self.cmd)
         self.assertEqual(proposition_id.uuid, self.uuid_proposition)
         groupe = self.groupe_de_supervision_repository.get_by_proposition_id(proposition_id)
-        signatures = groupe.signatures_promoteurs  # type:List[SignaturePromoteur]
-        self.assertEqual(signatures[0].promoteur_id.matricule, self.matricule_promoteur)
+        signatures = groupe.signatures_membres_CA  # type:List[SignatureMembreCA]
+        self.assertEqual(signatures[0].membre_CA_id.matricule, self.matricule_membre_CA)
         self.assertEqual(signatures[0].etat, ChoixEtatSignature.NOT_INVITED)
 
-    def test_should_pas_ajouter_personne_si_pas_promoteur(self):
-        cmd = attr.evolve(self.cmd, matricule='paspromoteur')
-        with self.assertRaises(PromoteurNonTrouveException):
+    def test_should_pas_ajouter_personne_si_pas_membre_CA(self):
+        cmd = attr.evolve(self.cmd, matricule='pasmembre_CA')
+        with self.assertRaises(MembreCANonTrouveException):
             self.message_bus.invoke(cmd)
 
-    def test_should_pas_ajouter_personne_si_deja_promoteur(self):
+    def test_should_pas_ajouter_personne_si_deja_membre_CA(self):
         self.message_bus.invoke(self.cmd)
         with self.assertRaises(MultipleBusinessExceptions) as e:
             self.message_bus.invoke(self.cmd)
-        self.assertIsInstance(e.exception.exceptions.pop(), DejaPromoteurException)
+        self.assertIsInstance(e.exception.exceptions.pop(), DejaMembreCAException)
 
     def test_should_pas_ajouter_personne_si_deja_membre_CA(self):
-        self.message_bus.invoke(IdentifierMembreCACommand(
+        self.message_bus.invoke(IdentifierPromoteurCommand(
             uuid_proposition=self.uuid_proposition,
-            matricule=self.matricule_promoteur,
+            matricule=self.matricule_membre_CA,
         ))
         with self.assertRaises(MultipleBusinessExceptions) as e:
             self.message_bus.invoke(self.cmd)
-        self.assertIsInstance(e.exception.exceptions.pop(), DejaMembreCAException)
+        self.assertIsInstance(e.exception.exceptions.pop(), DejaPromoteurException)
 
     def test_should_pas_ajouter_si_groupe_proposition_non_trouve(self):
         cmd = attr.evolve(self.cmd, uuid_proposition='propositioninconnue')

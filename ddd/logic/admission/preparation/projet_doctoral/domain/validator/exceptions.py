@@ -77,6 +77,12 @@ class PromoteurNonTrouveException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class MembreCANonTrouveException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Membre CA not found.")
+        super().__init__(message, **kwargs)
+
+
 class DejaPromoteurException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Already a promoter.")
