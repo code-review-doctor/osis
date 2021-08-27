@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
+from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
 
 
@@ -50,3 +51,7 @@ class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepos
     @classmethod
     def reset(cls):
         cls.entities = []
+
+    @classmethod
+    def get_dto(cls, uuid_proposition: str) -> 'PropositionDTO':
+        raise NotImplementedError

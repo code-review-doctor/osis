@@ -50,11 +50,12 @@
 # ##############################################################################
 from typing import List
 
-from ddd.logic.admission.preparation.projet_doctoral import Doctorat
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.doctorat import Doctorat
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import DoctoratNonTrouveException
-from ddd.logic.admission.preparation.projet_doctoral import DoctoratDTO
-from ddd.logic.admission.preparation.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory, DoctoratCDEFactory
+from ddd.logic.admission.preparation.projet_doctoral.dtos import DoctoratDTO
+from ddd.logic.admission.preparation.projet_doctoral.test.factory.doctorat import DoctoratCDSCFactory, \
+    DoctoratCDEFactory
 
 
 class DoctoratInMemoryTranslator(IDoctoratTranslator):
@@ -75,7 +76,7 @@ class DoctoratInMemoryTranslator(IDoctoratTranslator):
     ]
 
     @classmethod
-    def get(cls, sigle: str, annee: int) -> Doctorat:
+    def get(cls, sigle: str, annee: int) -> 'Doctorat':
         try:
             return next(doc for doc in cls.doctorats if doc.entity_id.sigle == sigle and doc.entity_id.annee == annee)
         except StopIteration:

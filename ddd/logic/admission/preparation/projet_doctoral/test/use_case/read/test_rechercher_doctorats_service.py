@@ -27,8 +27,8 @@ import mock
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType
-from ddd.logic.formation_catalogue.dtos import TrainingDto
 from ddd.logic.admission.preparation.projet_doctoral.commands import SearchDoctoratCommand
+from ddd.logic.formation_catalogue.dtos import TrainingDto
 from infrastructure.messages_bus import message_bus_instance
 from infrastructure.projet_doctoral.domain.service.doctorat import DoctoratTranslator
 
@@ -36,7 +36,7 @@ from infrastructure.projet_doctoral.domain.service.doctorat import DoctoratTrans
 class TestRechercherDoctoratService(SimpleTestCase):
     def setUp(self) -> None:
         self._mock_message_bus()
-        self.doctorat_translator = DoctoratTranslator()
+        self.doctorat_translator = DoctoratTranslator()  # FIXME :: InMemory ??
         self.cmd = SearchDoctoratCommand(
             sigle_secteur_entite_gestion='SST',
         )

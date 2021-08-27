@@ -28,8 +28,9 @@ from typing import Optional, List
 import attr
 
 from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionListValidator, BusinessValidator
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import ChoixDoctoratDejaRealise
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
+from ddd.logic.admission.preparation.projet_doctoral.business_types import *
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import \
+    ChoixDoctoratDejaRealise
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_institution_dependre_doctorat_realise import \
     ShouldInstitutionDependreDoctoratRealise
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_type_contrat_travail_dependre_type_financement import \
@@ -72,7 +73,7 @@ class CompletionPropositionValidatorList(TwoStepsMultipleBusinessExceptionListVa
 
 @attr.s(frozen=True, slots=True)
 class SoumettrePropositionValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
-    proposition = attr.ib(type=Proposition)
+    proposition = attr.ib(type='Proposition')  # type: Proposition
 
     def get_data_contract_validators(self) -> List[BusinessValidator]:
         return []
