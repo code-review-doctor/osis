@@ -24,8 +24,10 @@
 #
 # ##############################################################################
 from abc import abstractmethod
+from typing import List
 
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
+from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
 from osis_common.ddd import interface
 
 
@@ -33,4 +35,20 @@ class IMembreCATranslator(interface.DomainService):
     @classmethod
     @abstractmethod
     def get(cls, matricule: str) -> 'MembreCAIdentity':
+        pass
+
+    @classmethod
+    @abstractmethod
+    def search(cls, matricules: List[str]) -> List['MembreCAIdentity']:
+        pass
+
+    @classmethod
+    @abstractmethod
+    def search_dto(
+            cls,
+            terme_de_recherche: str,
+            signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+    ) -> List['MembreCADTO']:
+        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
+        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
         pass

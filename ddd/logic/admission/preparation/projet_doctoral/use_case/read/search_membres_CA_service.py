@@ -23,32 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
 from typing import List
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
-from osis_common.ddd import interface
+from ddd.logic.admission.preparation.projet_doctoral.commands import SearchMembresCACommand
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_membre_CA import IMembreCATranslator
+from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
 
 
-class IPromoteurTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
-    ) -> List['PromoteurDTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+def search_membres_CA(
+        cmd: 'SearchMembresCACommand',
+        membre_CA_translator: 'IMembreCATranslator',
+        signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+) -> List['MembreCADTO']:
+    return membre_CA_translator.search_dto(cmd.terme_de_recherche, signaletique_translator)
