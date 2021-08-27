@@ -24,7 +24,6 @@
 #
 # ##############################################################################
 import attr
-import mock
 from django.test import SimpleTestCase
 
 from ddd.logic.admission.preparation.projet_doctoral.commands import CompleterPropositionCommand
@@ -42,30 +41,21 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions
 from ddd.logic.admission.preparation.projet_doctoral.test.factory.proposition import (
     PropositionAdmissionSC3DPMinimaleFactory, PropositionAdmissionECGE3DPMinimaleFactory,
 )
-from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.doctorat import \
-    DoctoratInMemoryTranslator
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.proposition import \
     PropositionInMemoryRepository
-from infrastructure.messages_bus import message_bus_instance
+from infrastructure.message_bus_in_memory import message_bus_in_memory_instance
 
 
 class TestCompleterPropositionService(SimpleTestCase):
     def setUp(self) -> None:
         self.proposition_repository = PropositionInMemoryRepository()
-        self.doctorat_translator = DoctoratInMemoryTranslator()
-        message_bus_patcher = mock.patch.multiple(
-            'infrastructure.messages_bus',
-            PropositionRepository=lambda: self.proposition_repository,
-            DoctoratTranslator=lambda: self.doctorat_translator,
-        )
-        message_bus_patcher.start()
-        self.addCleanup(message_bus_patcher.stop)
+
         self.addCleanup(self.proposition_repository.reset)
 
         self.proposition_existante = PropositionAdmissionSC3DPMinimaleFactory()
         self.proposition_repository.save(self.proposition_existante)
 
-        self.message_bus = message_bus_instance
+        self.message_bus = message_bus_in_memory_instance
         self.cmd = CompleterPropositionCommand(
             uuid=self.proposition_existante.entity_id.uuid,
             type_admission=ChoixTypeAdmission.ADMISSION.name,
