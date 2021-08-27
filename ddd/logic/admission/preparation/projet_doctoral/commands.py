@@ -121,7 +121,7 @@ class DefinirCotutelleCommand(interface.CommandRequest):
     uuid_proposition = attr.ib(type=str)
     motivation = attr.ib(type=Optional[str], default='')
     institution = attr.ib(type=Optional[str], default='')
-    demande_ouverture = attr.ib(type=Optional[str], default='')
+    uuid_document_demande_ouverture = attr.ib(type=Optional[str], default='')
 
 
 @attr.s(frozen=True, slots=True)
@@ -142,3 +142,8 @@ class SearchPromoteursCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class SearchMembresCACommand(interface.CommandRequest):
     terme_de_recherche = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetCotutelleCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)

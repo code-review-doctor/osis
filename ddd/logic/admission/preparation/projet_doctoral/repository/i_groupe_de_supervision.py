@@ -30,6 +30,8 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supe
     GroupeDeSupervisionIdentity, \
     GroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
+from ddd.logic.admission.preparation.projet_doctoral.dtos import CotutelleDTO
+from ddd.logic.admission.preparation.projet_doctoral.dtos import GroupeDeSupervisionDTO
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
 
@@ -67,5 +69,10 @@ class IGroupeDeSupervisionRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def get_dto(cls, uuid_proposition: str) -> 'GroupeDeSu':
+    def get_dto(cls, uuid_proposition: str) -> 'GroupeDeSupervisionDTO':
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_cotutelle_dto(cls, uuid_proposition: str) -> 'CotutelleDTO':
         pass

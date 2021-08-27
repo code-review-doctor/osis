@@ -24,8 +24,6 @@
 #
 # ##############################################################################
 
-from typing import Optional, List
-
 from ddd.logic.admission.preparation.projet_doctoral.builder.proposition_identity_builder import \
     PropositionIdentityBuilder
 from ddd.logic.admission.preparation.projet_doctoral.commands import DefinirCotutelleCommand
@@ -46,7 +44,7 @@ def definir_cotutelle(
     groupe_de_supervision.definir_cotutelle(
         motivation=cmd.motivation,
         institution=cmd.institution,
-        demande_ouverture=cmd.demande_ouverture,
+        demande_ouverture=cmd.uuid_document_demande_ouverture,
     )
 
     # THEN

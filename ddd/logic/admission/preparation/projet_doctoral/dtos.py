@@ -139,3 +139,11 @@ class DetailSignatureMembreCADTO(interface.DTO):
 class GroupeDeSupervisionDTO(interface.DTO):
     signatures_promoteurs = attr.ib(type=List[DetailSignaturePromoteurDTO], factory=list)
     signatures_membres_CA = attr.ib(type=List[DetailSignatureMembreCADTO], factory=list)
+
+
+@attr.s(frozen=True, slots=True)
+class CotutelleDTO(interface.DTO):
+    uuid_proposition = attr.ib(type=str)
+    motivation = attr.ib(type=Optional[str])
+    institution = attr.ib(type=Optional[str])
+    uuid_document_demande_ouverture = attr.ib(type=Optional[str])
