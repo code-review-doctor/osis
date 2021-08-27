@@ -122,3 +122,8 @@ class DefinirCotutelleCommand(interface.CommandRequest):
     motivation = attr.ib(type=Optional[str], default='')
     institution = attr.ib(type=Optional[str], default='')
     demande_ouverture = attr.ib(type=Optional[str], default='')
+
+
+@attr.s(frozen=True, slots=True)
+class GetPropositionCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)

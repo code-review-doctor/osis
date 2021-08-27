@@ -35,6 +35,7 @@ class IPropositionRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def get(cls, entity_id: 'PropositionIdentity') -> 'Proposition':
+        # TODO :: réutiliser get_dto() et convertir DTO en Proposition
         pass
 
     @classmethod
@@ -55,4 +56,9 @@ class IPropositionRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def save(cls, entity: 'Proposition') -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_dto(cls, uuid_proposition: str) -> 'PropositionDTO':
         pass

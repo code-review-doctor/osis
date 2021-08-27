@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Union, List
+from typing import Union, List, Optional
 
 import attr
 
@@ -87,3 +87,23 @@ class CurriculumDTO(interface.DTO):
         SuperieurNonUniversitaireNonBelgeDTO,
         AutreOccupationDTO,
     ]])
+
+
+@attr.s(frozen=True, slots=True)
+class PropositionDTO(interface.DTO):
+    type_admission = attr.ib(type=str)
+    sigle_doctorat = attr.ib(type=str)
+    intitule_doctorat_fr = attr.ib(type=str)
+    intitule_doctorat_en = attr.ib(type=str)
+    matricule_candidat = attr.ib(type=str)
+    code_secteur_formation = attr.ib(type=str)
+    bureau_CDE = attr.ib(
+        type=Optional[str],
+    )  # CDE = Comission Doctorale du domaine Sciences Economique et de Gestion
+    type_financement = attr.ib(type=Optional[str])
+    type_contrat_travail = attr.ib(type=Optional[str])
+    titre_projet = attr.ib(type=Optional[str])
+    resume_projet = attr.ib(type=Optional[str])
+    documents_projet = attr.ib(type=List[str])  # str == UUID
+    doctorat_deja_realise = attr.ib(type=str)
+    institution = attr.ib(type=Optional[str])
