@@ -107,3 +107,25 @@ class PropositionDTO(interface.DTO):
     documents_projet = attr.ib(type=List[str])  # str == UUID
     doctorat_deja_realise = attr.ib(type=str)
     institution = attr.ib(type=Optional[str])
+
+
+@attr.s(frozen=True, slots=True)
+class DetailSignaturePromoteurDTO(interface.DTO):
+    matricule = attr.ib(type=str)
+    nom = attr.ib(type=str)
+    prenom = attr.ib(type=str)
+    status = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class DetailSignatureMembreCADTO(interface.DTO):
+    matricule = attr.ib(type=str)
+    nom = attr.ib(type=str)
+    prenom = attr.ib(type=str)
+    status = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GroupeDeSupervisionDTO(interface.DTO):
+    signatures_promoteurs = attr.ib(type=List[DetailSignaturePromoteurDTO], factory=list)
+    signatures_membres_CA = attr.ib(type=List[DetailSignatureMembreCADTO], factory=list)

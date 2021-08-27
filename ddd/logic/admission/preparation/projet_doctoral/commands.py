@@ -127,3 +127,8 @@ class DefinirCotutelleCommand(interface.CommandRequest):
 @attr.s(frozen=True, slots=True)
 class GetPropositionCommand(interface.CommandRequest):
     uuid_proposition = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetGroupeDeSupervisionCommand(interface.CommandRequest):
+    uuid_proposition = attr.ib(type=str)

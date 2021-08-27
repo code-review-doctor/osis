@@ -23,20 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
+from ddd.logic.admission.preparation.projet_doctoral.dtos import GroupeDeSupervisionDTO
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import \
+    IGroupeDeSupervisionRepository
 from osis_common.ddd import interface
 
 
-class PropositionDto(interface.DomainService):
+class GroupeDeSupervisionDto(interface.DomainService):
     @classmethod
     def get(
             cls,
             uuid_proposition: str,
-            repository: 'IPropositionRepository',
-            doctorat_translator: 'IDoctoratTranslator',
-            secteur_ucl_translator: 'ISecteurUclTranslator',
-    ) -> 'PropositionDTO':
+            repository: 'IGroupeDeSupervisionRepository',
+            signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+    ) -> 'GroupeDeSupervisionDTO':
         raise NotImplementedError

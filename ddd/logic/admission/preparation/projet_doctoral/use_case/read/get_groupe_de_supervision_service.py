@@ -23,20 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_doctorat import IDoctoratTranslator
-from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_secteur_ucl import ISecteurUclTranslator
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
-from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
-from osis_common.ddd import interface
+from ddd.logic.admission.preparation.projet_doctoral.commands import GetGroupeDeSupervisionCommand
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.groupe_de_supervision_dto import \
+    GroupeDeSupervisionDto
+from ddd.logic.admission.preparation.projet_doctoral.dtos import GroupeDeSupervisionDTO
+from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import \
+    IGroupeDeSupervisionRepository
 
 
-class PropositionDto(interface.DomainService):
-    @classmethod
-    def get(
-            cls,
-            uuid_proposition: str,
-            repository: 'IPropositionRepository',
-            doctorat_translator: 'IDoctoratTranslator',
-            secteur_ucl_translator: 'ISecteurUclTranslator',
-    ) -> 'PropositionDTO':
-        raise NotImplementedError
+def get_groupe_de_supervision(
+        cmd: 'GetGroupeDeSupervisionCommand',
+        groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
+        signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+) -> 'GroupeDeSupervisionDTO':
+    return GroupeDeSupervisionDto().get(
+        uuid_proposition=cmd.uuid_proposition,
+        repository=groupe_supervision_repository,
+        signaletique_translator=signaletique_translator,
+    )

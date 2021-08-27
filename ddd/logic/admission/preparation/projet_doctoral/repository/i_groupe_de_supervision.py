@@ -26,7 +26,8 @@
 import abc
 from typing import List, Optional
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import GroupeDeSupervisionIdentity, \
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import \
+    GroupeDeSupervisionIdentity, \
     GroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
 from osis_common.ddd import interface
@@ -62,4 +63,9 @@ class IGroupeDeSupervisionRepository(interface.AbstractRepository):
     @classmethod
     @abc.abstractmethod
     def save(cls, entity: 'GroupeDeSupervision') -> None:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def get_dto(cls, uuid_proposition: str) -> 'GroupeDeSu':
         pass
