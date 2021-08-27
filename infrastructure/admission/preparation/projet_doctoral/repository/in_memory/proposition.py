@@ -23,16 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Any
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition, PropositionIdentity
 from ddd.logic.admission.preparation.projet_doctoral.dtos import PropositionDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_proposition import IPropositionRepository
+from ddd.logic.admission.preparation.projet_doctoral.test.factory.proposition import \
+    PropositionAdmissionSC3DPMinimaleFactory
 
 
 class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepository):
-    entities = list()  # type: List[Proposition]
+    entities = []  # type: List[Proposition]
+
+    @classmethod
+    def reset(cls):
+        cls.entities = [
+            PropositionAdmissionSC3DPMinimaleFactory(),
+        ]
 
     @classmethod
     def search(
@@ -47,10 +55,6 @@ class PropositionInMemoryRepository(InMemoryGenericRepository, IPropositionRepos
         if entity_ids:
             returned = filter(lambda p: p.entity_id in entity_ids, returned)
         return list(returned)
-
-    @classmethod
-    def reset(cls):
-        cls.entities = []
 
     @classmethod
     def get_dto(cls, uuid_proposition: str) -> 'PropositionDTO':

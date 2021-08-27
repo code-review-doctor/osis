@@ -31,8 +31,13 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.model._cotutelle imp
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_membre_CA import SignatureMembreCA
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import SignaturePromoteur
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import (
+    SignaturePromoteur,
+    ChoixEtatSignature,
+)
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import PropositionIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.validator_by_business_action import \
+    IdentifierPromoteurValidatorList
 from osis_common.ddd import interface
 
 
@@ -53,7 +58,13 @@ class GroupeDeSupervision(interface.Entity):
         # TODO :: verifier si pas deja présent
         # TODO :: verifier si pas deja dans membres_CA
         # TODO :: appeler ValidatorList
-        raise NotImplementedError
+        IdentifierPromoteurValidatorList(
+            groupe_de_supervision=self,
+            promoteur_id=promoteur_id,
+        ).validate()
+        self.signatures_promoteurs.append(
+            SignaturePromoteur(promoteur_id=promoteur_id, etat=ChoixEtatSignature.NOT_INVITED)
+        )
 
     def identifier_membre_CA(self, membre_CA_id: 'MembreCAIdentity') -> None:
         # TODO :: verifier si pas deja présent

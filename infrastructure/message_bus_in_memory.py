@@ -25,16 +25,24 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
-from ddd.logic.admission.preparation.projet_doctoral.commands import SearchDoctoratCommand, CompleterPropositionCommand, \
-    InitierPropositionCommand
+from ddd.logic.admission.preparation.projet_doctoral.commands import (
+    SearchDoctoratCommand, CompleterPropositionCommand,
+    InitierPropositionCommand, IdentifierPromoteurCommand,
+)
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
     completer_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
+    identifier_promoteur
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
     initier_proposition
 from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.doctorat import \
     DoctoratInMemoryTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.promoteur import \
+    PromoteurInMemoryTranslator
+from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.groupe_de_supervision import \
+    GroupeDeSupervisionInMemoryRepository
 from infrastructure.admission.preparation.projet_doctoral.repository.in_memory.proposition import \
     PropositionInMemoryRepository
 from osis_common.ddd.interface import CommandRequest, ApplicationServiceResult
@@ -55,6 +63,12 @@ class MessageBusInMemory:
             cmd,
             PropositionInMemoryRepository(),
             DoctoratInMemoryTranslator(),
+        ),
+        IdentifierPromoteurCommand: lambda cmd: identifier_promoteur(
+            cmd,
+            PropositionInMemoryRepository(),
+            GroupeDeSupervisionInMemoryRepository(),
+            PromoteurInMemoryTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

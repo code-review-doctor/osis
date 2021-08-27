@@ -1,4 +1,4 @@
-# ##############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,34 +22,22 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-# ##############################################################################
-from abc import abstractmethod
-from typing import List
+##############################################################################
+from typing import Set, List
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
 from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from ddd.logic.shared_kernel.personne_connue_ucl.dtos import PersonneConnueUclDTO
 
 
-class IPromoteurTranslator(interface.DomainService):
+class PersonneConnueUclTranslator(IPersonneConnueUclTranslator):
     @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
-        pass
+    def get(cls, matricule: str) -> 'PersonneConnueUclDTO':
+        raise NotImplementedError
 
     @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['PromoteurDTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+    def search(cls, terme_de_recherche: str) -> List['PersonneConnueUclDTO']:
+        raise NotImplementedError
+
+    @classmethod
+    def search_by_matricules(cls, matricules_fgs: Set[str]) -> List['PersonneConnueUclDTO']:
+        raise NotImplementedError

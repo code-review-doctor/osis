@@ -26,6 +26,7 @@
 from ddd.logic.admission.preparation.projet_doctoral.dtos import GroupeDeSupervisionDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import \
     IGroupeDeSupervisionRepository
+from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
 from osis_common.ddd import interface
 
 
@@ -35,6 +36,6 @@ class GroupeDeSupervisionDto(interface.DomainService):
             cls,
             uuid_proposition: str,
             repository: 'IGroupeDeSupervisionRepository',
-            signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
     ) -> 'GroupeDeSupervisionDTO':
         raise NotImplementedError

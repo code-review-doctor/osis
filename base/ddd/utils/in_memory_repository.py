@@ -23,14 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional, List
+from typing import Optional, List, Any
 
+from base.ddd.utils.singleton import SingletonMeta
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService, RootEntity, EntityIdentity
 
 
-class InMemoryGenericRepository(interface.AbstractRepository):
+class InMemoryGenericRepository(interface.AbstractRepository, metaclass=SingletonMeta):
     entities = list()  # type: List[RootEntity]
+
+    def __new__(cls) -> Any:
+        cls.reset()
+        return super().__new__(cls)
 
     @classmethod
     def get(cls, entity_id: 'EntityIdentity') -> 'RootEntity':
@@ -56,3 +61,7 @@ class InMemoryGenericRepository(interface.AbstractRepository):
     @classmethod
     def get_all_identities(cls) -> List['EntityIdentity']:
         return [entity.entity_id for entity in cls.entities]
+
+    @classmethod
+    def reset(cls):
+        cls.entities = []

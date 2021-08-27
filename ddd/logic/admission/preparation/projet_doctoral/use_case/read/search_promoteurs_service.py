@@ -28,11 +28,12 @@ from typing import List
 from ddd.logic.admission.preparation.projet_doctoral.commands import SearchPromoteursCommand
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_promoteur import IPromoteurTranslator
 from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
+from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
 
 
 def search_promoteurs(
         cmd: 'SearchPromoteursCommand',
         promoteur_translator: 'IPromoteurTranslator',
-        signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+        personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
 ) -> List['PromoteurDTO']:
-    return promoteur_translator.search_dto(cmd.terme_de_recherche, signaletique_translator)
+    return promoteur_translator.search_dto(cmd.terme_de_recherche, personne_connue_ucl_translator)

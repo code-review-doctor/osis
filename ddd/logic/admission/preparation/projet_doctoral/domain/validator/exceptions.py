@@ -41,6 +41,18 @@ class DoctoratNonTrouveException(BusinessException):
         super().__init__(message, **kwargs)
 
 
+class PropositionNonTrouveeException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Proposition not found.")
+        super().__init__(message, **kwargs)
+
+
+class GroupeDeSupervisionNonTrouveException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Supervision group not found.")
+        super().__init__(message, **kwargs)
+
+
 class BureauCDEInconsistantException(BusinessException):
     def __init__(self, **kwargs):
         message = _("CDE Bureau should be filled in only if the doctorate's entity is CDE")
@@ -56,4 +68,22 @@ class ContratTravailInconsistantException(BusinessException):
 class InstitutionInconsistanteException(BusinessException):
     def __init__(self, **kwargs):
         message = _("Institution should be set when PhD has been set to yes or partial")
+        super().__init__(message, **kwargs)
+
+
+class PromoteurNonTrouveException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Promoter not found.")
+        super().__init__(message, **kwargs)
+
+
+class DejaPromoteurException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Already a promoter.")
+        super().__init__(message, **kwargs)
+
+
+class DejaMembreCAException(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("Already a member of CA.")
         super().__init__(message, **kwargs)

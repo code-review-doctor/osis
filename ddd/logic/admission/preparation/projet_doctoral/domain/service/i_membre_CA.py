@@ -28,6 +28,7 @@ from typing import List
 
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
 from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
+from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
 from osis_common.ddd import interface
 
 
@@ -47,7 +48,7 @@ class IMembreCATranslator(interface.DomainService):
     def search_dto(
             cls,
             terme_de_recherche: str,
-            signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
     ) -> List['MembreCADTO']:
         # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
         # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)

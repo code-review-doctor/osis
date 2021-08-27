@@ -69,10 +69,5 @@ class IGroupeDeSupervisionRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def get_dto(cls, uuid_proposition: str) -> 'GroupeDeSupervisionDTO':
-        pass
-
-    @classmethod
-    @abc.abstractmethod
     def get_cotutelle_dto(cls, uuid_proposition: str) -> 'CotutelleDTO':
         pass

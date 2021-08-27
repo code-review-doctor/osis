@@ -25,12 +25,16 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
-from ddd.logic.admission.preparation.projet_doctoral.commands import InitierPropositionCommand, SearchDoctoratCommand, \
-    CompleterPropositionCommand
+from ddd.logic.admission.preparation.projet_doctoral.commands import (
+    InitierPropositionCommand, SearchDoctoratCommand,
+    CompleterPropositionCommand, IdentifierPromoteurCommand,
+)
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.completer_proposition_service import \
     completer_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_promoteur_service import \
+    identifier_promoteur
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
     initier_proposition
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
@@ -86,6 +90,9 @@ from ddd.logic.shared_kernel.language.use_case.read.get_language_service import 
 from ddd.logic.shared_kernel.language.use_case.read.search_languages_service import search_languages
 from education_group.ddd.repository.training import TrainingRepository
 from infrastructure.admission.preparation.projet_doctoral.domain.service.doctorat import DoctoratTranslator
+from infrastructure.admission.preparation.projet_doctoral.domain.service.promoteur import PromoteurTranslator
+from infrastructure.admission.preparation.projet_doctoral.repository.groupe_de_supervision import \
+    GroupeDeSupervisionRepository
 from infrastructure.admission.preparation.projet_doctoral.repository.proposition import PropositionRepository
 from infrastructure.application.repository.applicant import ApplicantRepository
 from infrastructure.application.repository.application import ApplicationRepository
@@ -215,6 +222,12 @@ class MessageBus:
             cmd,
             PropositionRepository(),
             DoctoratTranslator(),
+        ),
+        IdentifierPromoteurCommand: lambda cmd: identifier_promoteur(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+            PromoteurTranslator(),
         ),
         SearchFormationsCommand: lambda cmd: search_formations(
             cmd,

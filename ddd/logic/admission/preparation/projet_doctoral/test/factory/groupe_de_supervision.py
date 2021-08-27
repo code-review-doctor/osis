@@ -23,33 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
-from typing import List
+import uuid
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+import factory
+
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._cotutelle import pas_de_cotutelle
+from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import (
+    GroupeDeSupervisionIdentity, GroupeDeSupervision,
+)
+from ddd.logic.admission.preparation.projet_doctoral.test.factory.proposition import (
+    _PropositionIdentityFactory,
+)
 
 
-class IPromoteurTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
+class _GroupeDeSupervisionIdentityFactory(factory.Factory):
+    class Meta:
+        model = GroupeDeSupervisionIdentity
+        abstract = False
 
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
-        pass
+    uuid = factory.LazyFunction(lambda: str(uuid.uuid4()))
 
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['PromoteurDTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+
+class _GroupeDeSupervisionFactory(factory.Factory):
+    class Meta:
+        model = GroupeDeSupervision
+        abstract = False
+
+    entity_id = factory.SubFactory(_GroupeDeSupervisionIdentityFactory)
+    proposition_id = factory.SubFactory(_PropositionIdentityFactory)
+    signatures_promoteurs = factory.LazyFunction(list)
+    signatures_membres_CA = factory.LazyFunction(list)
+    cotutelle = pas_de_cotutelle
+
+
+class GroupeDeSupervisionSC3DPFactory(_GroupeDeSupervisionFactory):
+    proposition_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP')

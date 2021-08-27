@@ -29,15 +29,16 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.service.groupe_de_su
 from ddd.logic.admission.preparation.projet_doctoral.dtos import GroupeDeSupervisionDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import \
     IGroupeDeSupervisionRepository
+from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
 
 
 def get_groupe_de_supervision(
         cmd: 'GetGroupeDeSupervisionCommand',
         groupe_supervision_repository: 'IGroupeDeSupervisionRepository',
-        signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+        personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
 ) -> 'GroupeDeSupervisionDTO':
     return GroupeDeSupervisionDto().get(
         uuid_proposition=cmd.uuid_proposition,
         repository=groupe_supervision_repository,
-        signaletique_translator=signaletique_translator,
+        personne_connue_ucl_translator=personne_connue_ucl_translator,
     )

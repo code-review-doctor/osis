@@ -1,3 +1,4 @@
+
 # ##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
@@ -23,33 +24,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
-from typing import List
+import attr
 
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from base.ddd.utils.business_validator import BusinessValidator
+from ddd.logic.admission.preparation.projet_doctoral.business_types import *
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import DejaPromoteurException
 
 
-class IPromoteurTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
+@attr.s(frozen=True, slots=True)
+class ShouldPromoteurPasDejaPresentDansGroupeDeSupervision(BusinessValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    promoteur_id = attr.ib(type='PromoteurIdentity')  # type: PromoteurIdentity
 
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['PromoteurDTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+    def validate(self, *args, **kwargs):
+        if any(s for s in self.groupe_de_supervision.signatures_promoteurs if s.promoteur_id == self.promoteur_id):
+            raise DejaPromoteurException

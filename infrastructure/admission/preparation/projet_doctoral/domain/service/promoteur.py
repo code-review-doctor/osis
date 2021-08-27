@@ -23,28 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
 from typing import List
 
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_promoteur import IPromoteurTranslator
 from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
 from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
 
 
-class IPromoteurTranslator(interface.DomainService):
+class PromoteurTranslator(IPromoteurTranslator):
     @classmethod
-    @abstractmethod
     def get(cls, matricule: str) -> 'PromoteurIdentity':
         pass
 
     @classmethod
-    @abstractmethod
     def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
         pass
 
     @classmethod
-    @abstractmethod
     def search_dto(
             cls,
             terme_de_recherche: str,

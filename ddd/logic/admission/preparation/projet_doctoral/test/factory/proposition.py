@@ -74,6 +74,7 @@ class _PropositionFactory(factory.Factory):
 
 
 class PropositionAdmissionSC3DPMinimaleFactory(_PropositionFactory):
+    entity_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP')
     type_admission = ChoixTypeAdmission.ADMISSION
     doctorat_id = factory.SubFactory(_DoctoratIdentityFactory, sigle='SC3DP', annee=2020)
 

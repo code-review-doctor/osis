@@ -28,4 +28,6 @@ from typing import TYPE_CHECKING
 # FIXME :: Temporary solution ; waiting for update python to 3.8 for data structure
 
 if TYPE_CHECKING:
-    pass
+    from ddd.logic.admission.preparation.projet_doctoral.domain.model.proposition import Proposition
+    from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import GroupeDeSupervision
+    from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity

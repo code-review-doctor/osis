@@ -23,33 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
-from typing import List
-
-from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
-from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
-from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from osis_common.ddd.interface import BusinessException
+from django.utils.translation import gettext_lazy as _
 
 
-class IPromoteurTranslator(interface.DomainService):
-    @classmethod
-    @abstractmethod
-    def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
-        pass
-
-    @classmethod
-    @abstractmethod
-    def search_dto(
-            cls,
-            terme_de_recherche: str,
-            personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
-    ) -> List['PromoteurDTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+class PersonneNonConnueDeLUcl(BusinessException):
+    def __init__(self, **kwargs):
+        message = _("UCL Person not found.")
+        super().__init__(message, **kwargs)

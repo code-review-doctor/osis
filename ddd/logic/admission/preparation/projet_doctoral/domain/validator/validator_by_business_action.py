@@ -31,8 +31,11 @@ from base.ddd.utils.business_validator import TwoStepsMultipleBusinessExceptionL
 from ddd.logic.admission.preparation.projet_doctoral.business_types import *
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._experience_precedente_recherche import \
     ChoixDoctoratDejaRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_institution_dependre_doctorat_realise import \
     ShouldInstitutionDependreDoctoratRealise
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_promoteur_pas_deja_present_dans_groupe_de_supervision import \
+    ShouldPromoteurPasDejaPresentDansGroupeDeSupervision
 from ddd.logic.admission.preparation.projet_doctoral.domain.validator._should_type_contrat_travail_dependre_type_financement import \
     ShouldTypeContratTravailDependreTypeFinancement
 
@@ -80,3 +83,17 @@ class SoumettrePropositionValidatorList(TwoStepsMultipleBusinessExceptionListVal
 
     def get_invariants_validators(self) -> List[BusinessValidator]:
         return []
+
+
+@attr.s(frozen=True, slots=True)
+class IdentifierPromoteurValidatorList(TwoStepsMultipleBusinessExceptionListValidator):
+    groupe_de_supervision = attr.ib(type='GroupeDeSupervision')  # type: GroupeDeSupervision
+    promoteur_id = attr.ib(type='PromoteurIdentity')  # type: PromoteurIdentity
+
+    def get_data_contract_validators(self) -> List[BusinessValidator]:
+        return []
+
+    def get_invariants_validators(self) -> List[BusinessValidator]:
+        return [
+            ShouldPromoteurPasDejaPresentDansGroupeDeSupervision(self.groupe_de_supervision, self.promoteur_id),
+        ]

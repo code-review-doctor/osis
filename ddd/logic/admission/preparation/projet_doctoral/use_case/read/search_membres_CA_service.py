@@ -28,11 +28,12 @@ from typing import List
 from ddd.logic.admission.preparation.projet_doctoral.commands import SearchMembresCACommand
 from ddd.logic.admission.preparation.projet_doctoral.domain.service.i_membre_CA import IMembreCATranslator
 from ddd.logic.admission.preparation.projet_doctoral.dtos import MembreCADTO
+from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
 
 
 def search_membres_CA(
         cmd: 'SearchMembresCACommand',
         membre_CA_translator: 'IMembreCATranslator',
-        signaletique_translator: 'ISignaletiquePersonneTranslator',  # TODO :: réutiliser quand disponible
+        personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
 ) -> List['MembreCADTO']:
-    return membre_CA_translator.search_dto(cmd.terme_de_recherche, signaletique_translator)
+    return membre_CA_translator.search_dto(cmd.terme_de_recherche, personne_connue_ucl_translator)

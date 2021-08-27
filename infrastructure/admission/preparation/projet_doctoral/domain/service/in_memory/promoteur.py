@@ -23,33 +23,46 @@
 #    see http://www.gnu.org/licenses/.
 #
 # ##############################################################################
-from abc import abstractmethod
+import contextlib
 from typing import List
 
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions import PromoteurNonTrouveException
 from ddd.logic.admission.preparation.projet_doctoral.dtos import PromoteurDTO
 from ddd.logic.shared_kernel.personne_connue_ucl.domain.service.personne_connue_ucl import IPersonneConnueUclTranslator
-from osis_common.ddd import interface
+from infrastructure.admission.preparation.projet_doctoral.domain.service.promoteur import IPromoteurTranslator
 
 
-class IPromoteurTranslator(interface.DomainService):
+class PromoteurInMemoryTranslator(IPromoteurTranslator):
+    promoteurs = [
+        PromoteurIdentity('00987890')
+    ]
+
     @classmethod
-    @abstractmethod
     def get(cls, matricule: str) -> 'PromoteurIdentity':
-        pass
+        try:
+            return next(p for p in cls.promoteurs if p.matricule == matricule)
+        except StopIteration:
+            raise PromoteurNonTrouveException
 
     @classmethod
-    @abstractmethod
     def search(cls, matricules: List[str]) -> List['PromoteurIdentity']:
-        pass
+        return [p for p in cls.promoteurs if p.matricule in matricules]
 
     @classmethod
-    @abstractmethod
     def search_dto(
             cls,
             terme_de_recherche: str,
             personne_connue_ucl_translator: 'IPersonneConnueUclTranslator',
     ) -> List['PromoteurDTO']:
-        # TODO :: 1. signaletiques_dto = signaletique_translator.search(terme_de_recherche)
-        # TODO :: 2. call cls.seacrh(matricules=signaletiques_dto)
-        pass
+        results = []
+        personnes = personne_connue_ucl_translator.search(terme_de_recherche)
+        for personne in personnes:
+            with contextlib.suppress:
+                promoteur = cls.get(personne.matricule)
+                results.append(PromoteurDTO(
+                    matricule=promoteur.matricule,
+                    prenom=personne.prenom,
+                    nom=personne.nom,
+                ))
+        return results
