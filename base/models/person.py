@@ -39,6 +39,9 @@ from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROU
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 from osis_common.utils.models import get_object_or_none
+from osis_document.contrib import FileField
+
+FILE_MAX_SIZE = None  # TODO : ??
 
 
 class PersonAdmin(SerializableModelAdmin):
@@ -63,7 +66,11 @@ class Person(SerializableModel):
         ('F', _('Female')),
         ('M', _('Male'))
     )
-    YEAR_REGEX = r'^[1-9]\d{3}$'
+    YEAR_REGEX = RegexValidator(
+        regex=r'^[1-2]\d{3}$',
+        message=_('Birth year must be between 1000 and 2999'),
+        code='invalid_birth_year'
+    )
 
     objects = SerializableModelManager()
     employees = EmployeeManager()
@@ -84,7 +91,8 @@ class Person(SerializableModel):
     phone_mobile = models.CharField(max_length=30, blank=True, null=True)
     language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
-    birth_year = models.IntegerField(blank=True, null=True, validators=[RegexValidator(YEAR_REGEX)])
+
+    birth_year = models.IntegerField(blank=True, null=True, validators=[YEAR_REGEX])
     birth_country = models.ForeignKey(
         'reference.Country',
         blank=True, null=True,
@@ -92,10 +100,39 @@ class Person(SerializableModel):
         on_delete=models.PROTECT,
         related_name='birth_persons'
     )
-    birth_place = models.CharField(blank=True, null=True, max_length=255)
+    birth_place = models.CharField(max_length=255, default='')
     country_of_citizenship = models.ForeignKey(
         'reference.Country', verbose_name=_('Country of citizenship'), on_delete=models.PROTECT, blank=True, null=True
     )
+    id_card = FileField(
+        mimetypes=['image/jpeg', 'image/png', 'application/pdf'],
+        max_size=FILE_MAX_SIZE,
+        max_files=2,
+        min_files=1,
+    )
+    passport = FileField(
+        mimetypes=['image/jpeg', 'image/png', 'application/pdf'],
+        max_size=FILE_MAX_SIZE,
+        max_files=2,
+        min_files=1,
+    )
+    last_registration_year = models.ForeignKey(
+        'base.AcademicYear',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    national_number = models.CharField(max_length=255, default='')
+    id_card_number = models.CharField(max_length=255, default='')
+    passport_number = models.CharField(max_length=255, default='')
+    passport_expiration_date = models.DateField(null=True)
+    id_photo = FileField(
+        mimetypes=['image/jpeg', 'image/png'],
+        max_size=FILE_MAX_SIZE,
+        max_files=1,
+        min_files=1,
+    )
+
     source = models.CharField(max_length=25, blank=True, null=True, choices=person_source_type.CHOICES,
                               default=person_source_type.BASE)
     employee = models.BooleanField(default=False)

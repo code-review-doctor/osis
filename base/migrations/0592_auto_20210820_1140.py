@@ -4,6 +4,8 @@ import django.core.validators
 import django.db.models.deletion
 from django.db import migrations, models
 
+import osis_document.contrib.fields
+
 
 def initialize_sex_and_edit_gender_values(apps, schema_editor):
     Person = apps.get_model('base', 'Person')
@@ -27,6 +29,47 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='person',
+            name='id_card',
+            field=osis_document.contrib.fields.FileField(base_field=models.UUIDField(), default=list, size=1),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='id_card_number',
+            field=models.CharField(default='', max_length=255),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='id_photo',
+            field=osis_document.contrib.fields.FileField(base_field=models.UUIDField(), default=list, size=1),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='last_registration_year',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL,
+                                    to='base.AcademicYear'),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='national_number',
+            field=models.CharField(default='', max_length=255),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='passport',
+            field=osis_document.contrib.fields.FileField(base_field=models.UUIDField(), default=list, size=1),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='passport_expiration_date',
+            field=models.DateField(null=True),
+        ),
+        migrations.AddField(
+            model_name='person',
+            name='passport_number',
+            field=models.CharField(default='', max_length=255),
+        ),
+        migrations.AddField(
+            model_name='person',
             name='birth_country',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT,
                                     related_name='birth_persons', to='reference.Country', verbose_name='Birth country'),
@@ -34,13 +77,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='birth_place',
-            field=models.CharField(blank=True, max_length=255, null=True),
+            field=models.CharField(default='', max_length=255),
         ),
         migrations.AddField(
             model_name='person',
             name='birth_year',
             field=models.IntegerField(blank=True, null=True,
-                                      validators=[django.core.validators.RegexValidator('^[1-9]\\d{3}$')]),
+                                      validators=[django.core.validators.RegexValidator(code='invalid_birth_year',
+                                                                                        message='Birth year must be between 1000 and 2999',
+                                                                                        regex='^[1-2]\\d{3}$')]),
         ),
         migrations.AddField(
             model_name='person',

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-20 13:49+0200\n"
+"POT-Creation-Date: 2021-08-30 11:04+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -467,6 +467,9 @@ msgstr "Date de naissance"
 
 msgid "Birth country"
 msgstr "Pays de naissance"
+
+msgid "Birth year must be between 1000 and 2999"
+msgstr "L'année de naissance doit être entre 1000 et 2999"
 
 msgid "Block"
 msgstr "Bloc"
