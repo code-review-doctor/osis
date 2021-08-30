@@ -43,7 +43,7 @@
             <div class="tab-content" id="tab_content">
                 <div role="tabpanel" class="tab-pane active">
                     {% block form %}
-                        <form method="post" id="LearningUnitYearForm"
+                        <form method="post" id="LearningUnitYearForm" class="learningUnitForm"
                               data-validate-url="{% url 'check_acronym' subtype=learning_unit_year.subtype %}">
 
                             {% csrf_token %}
