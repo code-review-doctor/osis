@@ -24,21 +24,27 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import IdentiteNoteEtudiant, NoteEtudiant
 from osis_common.ddd import interface
 from osis_common.ddd.interface import ApplicationService
-
-
-SearchCriteria = Tuple[str, int, int]
 
 
 class INoteEtudiantRepository(interface.AbstractRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            noms_cohortes: List[str] = None,
+            nomas: List[str] = None,
+            note_manquante: bool = False,
+            justification: JustificationTypes = None,
+            **kwargs
+    ) -> List['NoteEtudiant']:
         pass
 
     @classmethod

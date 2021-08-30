@@ -56,9 +56,10 @@ class GetCohortesGestionnaireCommand(interface.CommandRequest):
 
 
 @attr.s(frozen=True, slots=True)
-class SearchNotesCommand(interface.CommandRequest):
+class RechercherNotesCommand(interface.CommandRequest):
     noma = attr.ib(type=str)
     nom = attr.ib(type=str)
     prenom = attr.ib(type=str)
     etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
     nom_cohorte = attr.ib(type=str)
+    matricule_fgs_gestionnaire = attr.ib(type=str)

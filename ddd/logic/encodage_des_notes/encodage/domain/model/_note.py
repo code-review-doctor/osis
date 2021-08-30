@@ -28,7 +28,7 @@ from typing import Any
 
 import attr
 
-from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes, SCORE_MISSING
 from osis_common.ddd import interface
 
 NOTE_MIN = 0
@@ -38,6 +38,7 @@ ABSENCE_INJUSTIFIEE = 'A'
 TRICHERIE = 'T'
 LETTRES_AUTORISEES = [ABSENCE_JUSTIFIEE, ABSENCE_INJUSTIFIEE, TRICHERIE]
 JUSTIFICATIONS_AUTORISEES = LETTRES_AUTORISEES + JustificationTypes.get_names()
+NOTE_MANQUANTE = SCORE_MISSING
 
 
 class NoteBuilder:

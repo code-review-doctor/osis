@@ -34,7 +34,7 @@ from django.views.generic import FormView
 
 from assessments.calendar.scores_exam_submission_calendar import ScoresExamSubmissionCalendar
 from assessments.forms.score_encoding import ScoreSearchForm, ScoreEncodingForm
-from ddd.logic.encodage_des_notes.encodage.commands import SearchNotesCommand
+from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand
 from infrastructure.messages_bus import message_bus_instance
 from osis_role.contrib.views import PermissionRequiredMixin
 
@@ -91,7 +91,7 @@ class ScoreSearchFormView(PermissionRequiredMixin, FormView):
     def get_notes_etudiant_filtered(self):
         search_form = self.get_search_form()
         if search_form.is_valid():
-            cmd = SearchNotesCommand(
+            cmd = RechercherNotesCommand(
                 noma=search_form.cleaned_data['noma'],
                 nom=search_form.cleaned_data['nom'],
                 prenom=search_form.cleaned_data['prenom'],
