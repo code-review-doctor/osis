@@ -28,8 +28,10 @@ from django.test import TestCase
 
 from assessments.models.score_responsible import ScoreResponsible
 from assessments.tests.factories.score_responsible import ScoreResponsibleFactory, ScoreResponsibleOfClassFactory
+from base.models.person import Person
 from base.tests.factories.tutor import TutorFactory
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import ResponsableDeNotes
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.test.factory.responsable_de_notes import \
     ResponsableDeNotesPourUneUniteEnseignement, \
     ResponsableDeNotesPourMultipleUniteEnseignements, ResponsableDeNotesPourClasse
@@ -139,6 +141,39 @@ class ResponsableDeNotesRepositoryTest(TestCase):
         responsable_not_persisted = ResponsableDeNotesPourUneUniteEnseignement()
 
         responsables_retrieved = self.responsable_de_notes_repository.search([responsable_not_persisted.entity_id])
+
+        self.assertListEqual(responsables_retrieved, [])
+
+    def test_should_search_dto_renvoyer_responsable_dto(self):
+        responsable = ResponsableDeNotesPourUneUniteEnseignement()
+        self._create_necessary_data(responsable)
+        self.responsable_de_notes_repository.save(responsable)
+
+        unite_enseignement_identity = next(iter(responsable.unites_enseignements))
+        responsable_notes_dto = self.responsable_de_notes_repository.search_dto(
+            unite_enseignement_identities={unite_enseignement_identity}
+        )
+
+        person = Person.objects.get(global_id=responsable.entity_id.matricule_fgs_enseignant)
+        self.assertListEqual(
+            responsable_notes_dto,
+            [
+                ResponsableDeNotesDTO(
+                    nom=person.last_name,
+                    prenom=person.first_name,
+                    code_unite_enseignement=unite_enseignement_identity.code_unite_enseignement,
+                    annee_unite_enseignement=unite_enseignement_identity.annee_academique,
+                )
+            ]
+        )
+
+    def test_should_search_dto_pas_de_resultat_renvoyer_liste_vide(self):
+        responsable_not_persisted = ResponsableDeNotesPourUneUniteEnseignement()
+
+        unite_enseignement_identity = next(iter(responsable_not_persisted.unites_enseignements))
+        responsables_retrieved = self.responsable_de_notes_repository.search_dto(
+            unite_enseignement_identities={unite_enseignement_identity}
+        )
 
         self.assertListEqual(responsables_retrieved, [])
 

@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import abc
-from typing import List, Optional
+from typing import List, Optional, Set, Tuple
 
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import EnseignantDTO
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
+from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from osis_common.ddd import interface
@@ -44,6 +46,14 @@ class IResponsableDeNotesRepository(interface.AbstractRepository):
             annee_academique: Optional[int] = None,
             **kwargs
     ) -> List['ResponsableDeNotes']:
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def search_dto(
+            cls,
+            unite_enseignement_identities: Set[UniteEnseignementIdentite],
+    ) -> List['ResponsableDeNotesDTO']:
         pass
 
     @classmethod

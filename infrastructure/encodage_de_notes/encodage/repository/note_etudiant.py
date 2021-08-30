@@ -35,7 +35,14 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
 
     @classmethod
     @abc.abstractmethod
-    def search(cls, entity_ids: Optional[List['IdentiteNoteEtudiant']] = None, **kwargs) -> List['NoteEtudiant']:
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            cohorte_names: List[str] = None,
+            annee: int = None,
+            session: int = None,
+            **kwargs
+    ) -> List['NoteEtudiant']:
         raise NotImplementedError
 
     @classmethod

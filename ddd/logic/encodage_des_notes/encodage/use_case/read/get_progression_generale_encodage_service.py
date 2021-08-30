@@ -23,29 +23,40 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ddd.logic.encodage_des_notes.soumission.commands import GetProgressionGeneraleCommand
-from ddd.logic.encodage_des_notes.shared_kernel.service.i_attribution_enseignant import \
-    IAttributionEnseignantTranslator
+from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
+from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneraleGestionnaireCommand
+from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
+from ddd.logic.encodage_des_notes.encodage.domain.service.progression_generale_encodage import \
+    ProgressionGeneraleEncodage
+from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
-from ddd.logic.encodage_des_notes.soumission.dtos import ProgressionGeneraleEncodageNotesDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 
 
-def get_progression_generale(
-        cmd: 'GetProgressionGeneraleCommand',
-        feuille_de_note_repo: 'IFeuilleDeNotesRepository',
-        periode_soumission_note_translator: 'IPeriodeEncodageNotesTranslator',
+def get_progression_generale_gestionnaire(
+        cmd: 'GetProgressionGeneraleGestionnaireCommand',
+        note_etudiant_repo: 'INoteEtudiantRepository',
+        responsable_notes_repo: 'IResponsableDeNotesRepository',
+        periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
-        attribution_translator: 'IAttributionEnseignantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
+        cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
 ) -> 'ProgressionGeneraleEncodageNotesDTO':
-    # Given
-    # PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
-    # TODO :: FeuilleDeNotesDTO doit être commun aux 2 contextes et les filtres sont faits dans chaque contexte
-    # When
+    # GIVEN
+    PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
+    gestionnaire = GestionnaireParcoursBuilder().get(cmd.matricule_fgs_gestionnaire, cohortes_gestionnaire_translator)
+    periode_encodage = periode_encodage_note_translator.get()
 
-    # Then
-    return
+    return ProgressionGeneraleEncodage().get(
+        gestionnaire=gestionnaire,
+        periode_encodage=periode_encodage,
+        note_etudiant_repo=note_etudiant_repo,
+        responsable_notes_repo=responsable_notes_repo,
+        signaletique_etudiant_translator=signaletique_etudiant_translator,
+        unite_enseignement_translator=unite_enseignement_translator,
+    )

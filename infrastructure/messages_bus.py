@@ -262,6 +262,7 @@ class MessageBus:
         GetProgressionGeneraleCommand: lambda cmd: get_progression_generale(
             cmd,
             NoteEtudiantRepository(),
+            ResponsableDeNotesRepository(),
             PeriodeEncodageNotesTranslator(),
             SignaletiqueEtudiantTranslator(),
             AttributionEnseignantTranslator(),

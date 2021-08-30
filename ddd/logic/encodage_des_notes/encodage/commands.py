@@ -62,3 +62,8 @@ class SearchNotesCommand(interface.CommandRequest):
     prenom = attr.ib(type=str)
     etat = attr.ib(type=str)  # absence justifiee, injustifiee, tricherie, note manquante  TODO :: renommer ?
     nom_cohorte = attr.ib(type=str)
+
+
+@attr.s(frozen=True, slots=True)
+class GetProgressionGeneraleGestionnaireCommand(interface.CommandRequest):
+    matricule_fgs_gestionnaire = attr.ib(type=str)

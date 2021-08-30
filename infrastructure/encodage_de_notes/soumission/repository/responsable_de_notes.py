@@ -27,7 +27,7 @@ import functools
 import itertools
 import operator
 import string
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from django.db.models import F, Q, CharField
 from django.db.models.functions import Concat
@@ -41,7 +41,7 @@ from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_id
 from ddd.logic.encodage_des_notes.soumission.domain.model.responsable_de_notes import IdentiteResponsableDeNotes, \
     ResponsableDeNotes
 from ddd.logic.encodage_des_notes.soumission.dtos import ResponsableDeNotesFromRepositoryDTO, \
-    UniteEnseignementIdentiteFromRepositoryDTO
+    UniteEnseignementIdentiteFromRepositoryDTO, ResponsableDeNotesDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.ddd.interface import ApplicationService
@@ -189,6 +189,39 @@ class ResponsableDeNotesRepository(IResponsableDeNotesRepository):
             'prenom',
         ).get()
         return EnseignantDTO(**detail_enseignant_as_values)
+
+    @classmethod
+    def search_dto(
+            cls,
+            unite_enseignement_identities: Set[UniteEnseignementIdentite],
+    ) -> List['ResponsableDeNotesDTO']:
+        unite_enseignement_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(
+                    code_unite_enseignement=identite_ue.code_unite_enseignement,
+                    annee_unite_enseignement=identite_ue.annee_academique,
+                )
+                for identite_ue in unite_enseignement_identities
+            ]
+        )
+
+        responsables_notes_as_values = ScoreResponsible.objects.annotate(
+            nom=F('tutor__person__last_name'),
+            prenom=F('tutor__person__first_name'),
+            code_unite_enseignement=Concat(
+                'learning_unit_year__acronym',
+                'learning_class_year__acronym',
+                output_field=CharField()
+            ),
+            annee_unite_enseignement=F('learning_unit_year__academic_year__year'),
+        ).values(
+            'nom',
+            'prenom',
+            'code_unite_enseignement',
+            'annee_unite_enseignement'
+        ).filter(unite_enseignement_filters)
+        return [ResponsableDeNotesDTO(**row) for row in responsables_notes_as_values]
 
 
 def _fetch_responsable_de_notes():
