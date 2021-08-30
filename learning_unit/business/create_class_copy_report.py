@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2021 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,16 +23,36 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from typing import List, Dict
 
-from reference.api.views.country import CountryList, CountryDetail
-from reference.api.views.language import LanguageList
-from reference.api.views.study_domain import StudyDomainList
+from django.contrib.auth.models import User
+from django.utils.translation import gettext_lazy as _
+from openpyxl.styles import Font
 
-app_name = "reference"
-urlpatterns = [
-    url(r'^countries/$', CountryList.as_view(), name=CountryList.name),
-    url(r'^countries/(?P<uuid>[0-9a-f-]+)$', CountryDetail.as_view(), name=CountryDetail.name),
-    url(r'^study-domains$', StudyDomainList.as_view(), name=StudyDomainList.name),
-    url(r'^languages$', LanguageList.as_view(), name=LanguageList.name),
-]
+from base.business.xls import get_name_or_username
+from osis_common.document import xls_build
+
+BOLD_FONT = Font(bold=True)
+
+
+def create_class_copy_report(user: User, copy_classes_report: List[Dict]):
+    working_sheets_data = []
+
+    for line in copy_classes_report:
+        working_sheets_data.append([line.get('source'), line.get('result'), line.get('exception')])
+    parameters = {
+        xls_build.DESCRIPTION: _('Classes copy report'),
+        xls_build.USER: get_name_or_username(user),
+        xls_build.FILENAME: "classes_copy_report",
+        xls_build.WS_TITLE: _('Classes copy report'),
+        xls_build.HEADER_TITLES: [
+            str(_('Copy source')),
+            str(_('Copy result')),
+            str(_('Error')),
+        ],
+        xls_build.FONT_ROWS: {
+            BOLD_FONT: [0]
+        }
+    }
+
+    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters))
