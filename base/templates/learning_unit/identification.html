@@ -124,20 +124,44 @@
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'status' label_text=_('State') value=learning_unit_year.status_verbose %}
                                 </div>
-                                <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year 'language' %}
-                                </div>
+                                {% if not learning_unit_year.is_external_mobility %}
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'individual_loan' value=learning_unit_year.individual_loan|yesno:_("yes,no")|title %}
+                                    </div>
+                                {% else %}
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'language' %}
+                                    </div>
+                                {% endif %}
                             {% endblock content_row2 %}
                         </div>
+                        {% if not learning_unit_year.is_external_mobility %}
+                            <div class="row">
+                                {% block content_languages %}
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'language' %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'english_friendly' value=learning_unit_year.english_friendly|yesno:_("yes,no")|title %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'french_friendly' value=learning_unit_year.french_friendly|yesno:_("yes,no")|title %}
+                                    </div>
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'exchange_students' value=learning_unit_year.exchange_students|yesno:_("yes,no")|title %}
+                                    </div>
+                                {% endblock content_languages %}
+                            </div>
+                        {% endif %}
                         <div class="row">
                             {% block content_row3 %}
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year 'professional_integration' value=learning_unit_year.professional_integration|yesno:_("yes,no")|title %}
                                 </div>
                                 {% if not learning_unit_year.is_external_mobility %}
-                                <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year 'stage_dimona' value=learning_unit_year.stage_dimona|yesno:_("yes,no")|title %}
-                                </div>
+                                    <div class="col-md-3">
+                                        {% dl_tooltip learning_unit_year 'stage_dimona' value=learning_unit_year.stage_dimona|yesno:_("yes,no")|title %}
+                                    </div>
                                 {% endif %}
                             {% endblock content_row3 %}
                         </div>
