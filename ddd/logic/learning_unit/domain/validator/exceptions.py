@@ -220,3 +220,14 @@ class LearningUnitOfEffectiveClassHasEnrollmentException(BusinessException):
             "Class of learning unit having enrollment can't be delete"
         )
         super().__init__(message, **kwargs)
+
+
+class LearningUnitNotExistingException(BusinessException):
+    def __init__(self, learning_unit_year: int, **kwargs):
+        message = _(
+            "You cannot create class in %(year)s because there is no learning unit corresponding in %(year)s"
+        ) % {
+            'year': learning_unit_year,
+            'year': learning_unit_year,
+        }
+        super().__init__(message, **kwargs)

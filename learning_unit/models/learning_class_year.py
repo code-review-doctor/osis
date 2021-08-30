@@ -80,7 +80,7 @@ def copy_to_next_year(modeladmin, request, queryset):
             )
 
         except MultipleBusinessExceptions as multiple_exceptions:
-            copy_exception = ", ". join([ex.message for ex in list(multiple_exceptions.exceptions)])
+            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
 
         report.append({
             'source': classe_source,
