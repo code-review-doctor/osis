@@ -49,4 +49,3 @@ tblib==1.7.0
 -r ./internship/requirements.txt
 -r ./osis_role/requirements.txt
 -r ./osis_mail_template/requirements.txt
-

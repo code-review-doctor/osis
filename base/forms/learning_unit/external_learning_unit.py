@@ -119,7 +119,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
                   'professional_integration', 'stage_dimona', 'campus', 'language', 'periodicity',
-                  'other_remark', 'faculty_remark', 'other_remark_english')
+                  'other_remark', 'faculty_remark', 'other_remark_english', 'individual_loan', 'exchange_students',
+                  'french_friendly', 'english_friendly')
 
         widgets = {
             'campus': autocomplete.ModelSelect2(
@@ -191,7 +192,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             self.learning_unit_year_form.fields['acronym'].widget.widgets[0].attrs['disabled'] = True
             self.learning_unit_year_form.fields['acronym'].required = False
         self.start_year = self.instance.learning_unit.start_year if self.instance else start_year
-        self._restrict_academic_years_choice(proposal)
+        if not self.instance:
+            self._restrict_academic_years_choice(proposal)
 
     def _restrict_academic_years_choice(self, proposal_type):
         if proposal_type:
@@ -355,13 +357,14 @@ class ExternalPartimForm(LearningUnitBaseForm):
     ]
 
     def __init__(self, person, learning_unit_full_instance, academic_year, learning_unit_instance=None,
-                 data=None, *args, **kwargs):
+                 data=None, start_year=None, *args, **kwargs):
         if not isinstance(learning_unit_full_instance, LearningUnit):
             raise AttributeError('learning_unit_full arg should be an instance of {}'.format(LearningUnit))
         if learning_unit_instance is not None and not isinstance(learning_unit_instance, LearningUnit):
             raise AttributeError('learning_unit_partim_instance arg should be an instance of {}'.format(LearningUnit))
         self.person = person
         self.academic_year = academic_year
+        self.start_year = start_year
         self.learning_unit_full_instance = learning_unit_full_instance
         self.learning_unit_instance = learning_unit_instance
 
@@ -376,16 +379,6 @@ class ExternalPartimForm(LearningUnitBaseForm):
 
         super().__init__(instances_data, *args, **kwargs)
         self.learning_unit_year_form.fields['acronym'] = ExternalPartimAcronymField()
-        self._restrict_academic_years_choice_for_daily_management()
-
-    def _restrict_academic_years_choice_for_daily_management(self):
-        if EntityRoleHelper.has_role(self.person, FacultyManager):
-            target_years_opened = EducationGroupLimitedDailyManagementCalendar().get_target_years_opened()
-        elif EntityRoleHelper.has_role(self.person, CentralManager):
-            target_years_opened = EducationGroupExtendedDailyManagementCalendar().get_target_years_opened()
-        else:
-            target_years_opened = []
-        self.fields["academic_year"].queryset = AcademicYear.objects.filter(year__in=target_years_opened)
 
     @property
     def learning_unit_form(self):
@@ -484,8 +477,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
         return initial_learning_unit_year
 
     def save(self, commit=True):
-        start_year = self.instance.learning_unit.start_year if self.instance else \
-            self.learning_unit_full_instance.start_year
+        start_year = self.instance.learning_unit.start_year if self.instance else self.start_year
 
         lcy = self.learning_unit_year_full.learning_container_year
         # Save learning unit

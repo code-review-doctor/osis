@@ -73,7 +73,7 @@ class ApplicationSerializerTest(TestCase):
 
         self.assertEqual(obj_serialized['learning_container_year']['reference'], '428750')
         self.assertEqual(
-            obj_serialized['learning_container_year']['year'], str(self.application.vacant_course_id.year)
+            obj_serialized['learning_container_year']['year'], self.application.vacant_course_id.year
         )
         self.assertEqual(
             obj_serialized['learning_container_year']['acronym'], str(self.application.vacant_course_id.code)
@@ -91,7 +91,7 @@ class ApplicationSerializerTest(TestCase):
 
         self.assertEqual(obj_serialized['learning_container_year']['reference'], '428750')
         self.assertEqual(
-            obj_serialized['learning_container_year']['year'], str(self.application.vacant_course_id.year)
+            obj_serialized['learning_container_year']['year'], self.application.vacant_course_id.year
         )
         self.assertEqual(
             obj_serialized['learning_container_year']['acronym'], str(self.application.vacant_course_id.code)

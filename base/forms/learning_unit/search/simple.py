@@ -128,7 +128,8 @@ class LearningUnitFilter(FilterSet):
         method=lambda request, *args, **kwargs: request,
         widget=forms.HiddenInput,
         required=False,
-        initial=SearchTypes.SIMPLE_SEARCH.value
+        initial=SearchTypes.SIMPLE_SEARCH.value,
+        label=_('Search type')
     )
 
     with_only_proposals = filters.BooleanFilter(

@@ -44,7 +44,7 @@ from learning_unit.forms.classes.update import DeleteClassForm
 
 class DeleteClassView(PermissionRequiredMixin, FormView):
     form_class = DeleteClassForm
-    permission_required = 'learning_unit.change_learningclassyear'
+    permission_required = 'learning_unit.delete_learningclassyear'
     force_reload = True
 
     @cached_property

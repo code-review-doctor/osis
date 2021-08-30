@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExportableFileTemplateSettings">
+    <default_templates>
+      <template name="Repository.py" file-name="${NAME}" reformat="true" live-template-enabled="false">
+        <template name="Repository.py.child.0.py" file-name="in_memory/${NAME}" reformat="true" live-template-enabled="false" />
+      </template>
+      <template name="Repository.py.child.0.py" file-name="in_memory/${NAME}" reformat="true" live-template-enabled="false" />
+    </default_templates>
+  </component>
+</project>

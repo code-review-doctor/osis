@@ -99,6 +99,10 @@ class LearningUnitYearFactory(DjangoModelFactory):
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
     other_remark = factory.fuzzy.FuzzyText(length=255)
     other_remark_english = factory.fuzzy.FuzzyText(length=255)
+    english_friendly = False
+    french_friendly = False
+    exchange_students = False
+    individual_loan = False
 
     @factory.post_generation
     def gen_acronym(self, create, extracted, **kwargs):
