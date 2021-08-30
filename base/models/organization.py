@@ -112,12 +112,12 @@ class Organization(SerializableModel):
 
     @property
     def main_address(self) -> 'EntityVersionAddress':
-        # root_entity_version = self.__get_current_root_entity_version()
-        # if root_entity_version:
-        #     return next(
-        #         (address for address in root_entity_version.entityversionaddress_set.all() if address.is_main),
-        #         None
-        #     )
+        root_entity_version = self.__get_current_root_entity_version()
+        if root_entity_version:
+            return next(
+                (address for address in root_entity_version.entityversionaddress_set.all() if address.is_main),
+                None
+            )
         return None
 
     @property
@@ -127,11 +127,11 @@ class Organization(SerializableModel):
             return root_entity_version.entity.website
         return None
 
-    # def __get_current_root_entity_version(self) -> EntityVersion:
-    #     return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots()\
-    #         .prefetch_related(
-    #             Prefetch(
-    #                 'entityversionaddress_set',
-    #                 queryset=EntityVersionAddress.objects.all().select_related('country')
-    #             )
-    #         ).order_by('-start_date').first()
+    def __get_current_root_entity_version(self) -> EntityVersion:
+        return EntityVersion.objects.current(datetime.now()).filter(entity__organization=self.pk).only_roots() \
+            .prefetch_related(
+            Prefetch(
+                'entityversionaddress_set',
+                queryset=EntityVersionAddress.objects.all().select_related('country')
+            )
+        ).order_by('-start_date').first()
