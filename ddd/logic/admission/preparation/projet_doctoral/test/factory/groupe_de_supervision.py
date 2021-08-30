@@ -28,12 +28,48 @@ import uuid
 import factory
 
 from ddd.logic.admission.preparation.projet_doctoral.domain.model._cotutelle import pas_de_cotutelle
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._membre_CA import MembreCAIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._promoteur import PromoteurIdentity
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_membre_CA import SignatureMembreCA
+from ddd.logic.admission.preparation.projet_doctoral.domain.model._signature_promoteur import SignaturePromoteur
 from ddd.logic.admission.preparation.projet_doctoral.domain.model.groupe_de_supervision import (
     GroupeDeSupervisionIdentity, GroupeDeSupervision,
 )
 from ddd.logic.admission.preparation.projet_doctoral.test.factory.proposition import (
     _PropositionIdentityFactory,
 )
+
+
+class _PromoteurIdentityFactory(factory.Factory):
+    class Meta:
+        model = PromoteurIdentity
+        abstract = False
+
+    matricule = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+
+
+class _MembreCAIdentityFactory(factory.Factory):
+    class Meta:
+        model = MembreCAIdentity
+        abstract = False
+
+    matricule = factory.Sequence(lambda n: 'ACRONYM%02d' % n)
+
+
+class _SignaturePromoteurFactory(factory.Factory):
+    class Meta:
+        model = SignaturePromoteur
+        abstract = False
+
+    promoteur_id = factory.SubFactory(_PromoteurIdentityFactory)
+
+
+class _SignatureMembreCAFactory(factory.Factory):
+    class Meta:
+        model = SignatureMembreCA
+        abstract = False
+
+    membre_CA_id = factory.SubFactory(_MembreCAIdentityFactory)
 
 
 class _GroupeDeSupervisionIdentityFactory(factory.Factory):
@@ -58,3 +94,13 @@ class _GroupeDeSupervisionFactory(factory.Factory):
 
 class GroupeDeSupervisionSC3DPFactory(_GroupeDeSupervisionFactory):
     proposition_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP')
+
+
+class GroupeDeSupervisionSC3DPAvecPromoteurEtMembreFactory(_GroupeDeSupervisionFactory):
+    proposition_id = factory.SubFactory(_PropositionIdentityFactory, uuid='uuid-SC3DP-promoteur-membre')
+    signatures_promoteurs = factory.LazyFunction(lambda: [
+        _SignaturePromoteurFactory(promoteur_id__matricule='promoteur-SC3DP')
+    ])
+    signatures_membres_CA = factory.LazyFunction(lambda: [
+        _SignatureMembreCAFactory(membre_CA_id__matricule='membre-ca-SC3DP')
+    ])

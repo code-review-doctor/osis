@@ -39,8 +39,10 @@ from ddd.logic.admission.preparation.projet_doctoral.domain.validator.exceptions
 from ddd.logic.admission.preparation.projet_doctoral.dtos import CotutelleDTO
 from ddd.logic.admission.preparation.projet_doctoral.repository.i_groupe_de_supervision import \
     IGroupeDeSupervisionRepository
-from ddd.logic.admission.preparation.projet_doctoral.test.factory.groupe_de_supervision import \
-    GroupeDeSupervisionSC3DPFactory
+from ddd.logic.admission.preparation.projet_doctoral.test.factory.groupe_de_supervision import (
+    GroupeDeSupervisionSC3DPFactory,
+    GroupeDeSupervisionSC3DPAvecPromoteurEtMembreFactory,
+)
 
 
 class GroupeDeSupervisionInMemoryRepository(InMemoryGenericRepository, IGroupeDeSupervisionRepository):
@@ -50,6 +52,7 @@ class GroupeDeSupervisionInMemoryRepository(InMemoryGenericRepository, IGroupeDe
     def reset(cls):
         cls.entities = [
             GroupeDeSupervisionSC3DPFactory(),
+            GroupeDeSupervisionSC3DPAvecPromoteurEtMembreFactory(),
         ]
 
     @classmethod

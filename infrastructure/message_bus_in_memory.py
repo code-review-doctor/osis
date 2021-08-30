@@ -27,7 +27,7 @@ from typing import Dict, Callable, List
 
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
     SearchDoctoratCommand, CompleterPropositionCommand,
-    InitierPropositionCommand, IdentifierPromoteurCommand, IdentifierMembreCACommand,
+    InitierPropositionCommand, IdentifierPromoteurCommand, IdentifierMembreCACommand, SupprimerPromoteurCommand,
 )
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
@@ -39,6 +39,8 @@ from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_p
     identifier_promoteur
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
     initier_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_promoteur_service import \
+    supprimer_promoteur
 from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.doctorat import \
     DoctoratInMemoryTranslator
 from infrastructure.admission.preparation.projet_doctoral.domain.service.in_memory.membre_CA import \
@@ -79,6 +81,12 @@ class MessageBusInMemory:
             PropositionInMemoryRepository(),
             GroupeDeSupervisionInMemoryRepository(),
             MembreCAInMemoryTranslator(),
+        ),
+        SupprimerPromoteurCommand: lambda cmd: supprimer_promoteur(
+            cmd,
+            PropositionInMemoryRepository(),
+            GroupeDeSupervisionInMemoryRepository(),
+            PromoteurInMemoryTranslator(),
         ),
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]
 

@@ -27,7 +27,7 @@ from typing import Dict, Callable, List
 
 from ddd.logic.admission.preparation.projet_doctoral.commands import (
     InitierPropositionCommand, SearchDoctoratCommand,
-    CompleterPropositionCommand, IdentifierPromoteurCommand,
+    CompleterPropositionCommand, IdentifierPromoteurCommand, SupprimerPromoteurCommand,
 )
 from ddd.logic.admission.preparation.projet_doctoral.use_case.read.rechercher_doctorats_service import \
     rechercher_doctorats
@@ -37,6 +37,8 @@ from ddd.logic.admission.preparation.projet_doctoral.use_case.write.identifier_p
     identifier_promoteur
 from ddd.logic.admission.preparation.projet_doctoral.use_case.write.initier_proposition_service import \
     initier_proposition
+from ddd.logic.admission.preparation.projet_doctoral.use_case.write.supprimer_promoteur_service import \
+    supprimer_promoteur
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
     RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
@@ -224,6 +226,12 @@ class MessageBus:
             DoctoratTranslator(),
         ),
         IdentifierPromoteurCommand: lambda cmd: identifier_promoteur(
+            cmd,
+            PropositionRepository(),
+            GroupeDeSupervisionRepository(),
+            PromoteurTranslator(),
+        ),
+        SupprimerPromoteurCommand: lambda cmd: supprimer_promoteur(
             cmd,
             PropositionRepository(),
             GroupeDeSupervisionRepository(),
