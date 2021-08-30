@@ -88,21 +88,22 @@
                                     <div class="row">
                                         {% bootstrap_field learning_unit_year_form.credits form_group_class="col-md-3" field_class="ignore-js-validator" %}
                                         {% bootstrap_field learning_unit_year_form.periodicity form_group_class="col-md-3" %}
-                                        {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-2" %}
-                                        {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-4" %}
-                                    </div>
-                                    <br>
-                                    <div class="row">
+                                        {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-3" %}
+
                                         <div class="col-md-3 individual-loan-group" style="display: inline">
                                             {{ learning_unit_year_form.individual_loan }}
                                             {% trans 'Individual loan' %}
                                             <abbr title="{% trans 'Indicates if the UE can be accessible for a student, even if the UE is not included in the detailed program of his training' %}">
-                                                <span class="glyphicon glyphicon-question-sign "
-                                                      title="{% trans 'Indicates if the UE can be accessible for a student, even if the UE is not included in the detailed program of his training' %}"
-                                                      style="font-size: 14pt; display: inline">
-                                                </span>
+                                            <span class="glyphicon glyphicon-question-sign "
+                                                  title="{% trans 'Indicates if the UE can be accessible for a student, even if the UE is not included in the detailed program of his training' %}"
+                                                  style="font-size: 14pt; display: inline">
+                                            </span>
                                             </abbr>
                                         </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-3" %}
                                         <div class="col-md-3 english-friendly-group">
                                             {{ learning_unit_year_form.english_friendly }}
                                             {% trans 'English-friendly' %}
