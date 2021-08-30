@@ -34,7 +34,7 @@ from base.models.enums import quadrimesters, learning_unit_year_session
 from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
 from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
-from base.models.enums.learning_component_year_type import  PRACTICAL_EXERCISES
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 
 
 def copy_to_next_year(modeladmin, request, queryset):
