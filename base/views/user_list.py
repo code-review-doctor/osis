@@ -233,7 +233,7 @@ def _get_headers() -> List[str]:
 
 
 def get_entities_acronym(group_name, context, user_id):
-    if group_name == PROGRAM_MANAGER_GROUP or group_name == ENTITY_MANAGER_GROUP:
+    if group_name == ENTITY_MANAGER_GROUP:
         entities_managed = context.get('entity_managers').get(user_id, [])
         return '\n'.join([row.entity_recent_acronym for row in entities_managed])
     elif group_name == UE_CENTRAL_MANAGER_GROUP:
@@ -244,10 +244,10 @@ def get_entities_acronym(group_name, context, user_id):
         return '\n'.join([row.entity_recent_acronym for row in entities_managed])
     elif group_name == CENTRAL_MANAGER_GROUP:
         entities_managed = context.get('central_managers_for_of').get(user_id, [])
-        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+        return _build_acronyms_with_scope(entities_managed)
     elif group_name == FACULTY_MANAGER_GROUP:
         entities_managed = context.get('faculty_managers_for_of').get(user_id, [])
-        return '\n'.join([row.entity_recent_acronym for row in entities_managed])
+        return _build_acronyms_with_scope(entities_managed)
     elif group_name == "partnership_managers":
         entities_managed = context.get('partnership_entity_managers', {}).get(user_id, [])
         return '\n'.join([row.entity_recent_acronym for row in entities_managed])
