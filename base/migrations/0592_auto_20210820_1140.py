@@ -96,18 +96,53 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='person',
             name='first_name_in_use',
-            field=models.CharField(blank=True, max_length=50, null=True),
+            field=models.CharField(default='', max_length=50),
         ),
         migrations.AddField(
             model_name='person',
             name='sex',
-            field=models.CharField(blank=True, choices=[('F', 'Female'), ('M', 'Male')], max_length=1, null=True),
+            field=models.CharField(blank=True, choices=[('F', 'Female'), ('M', 'Male')], default='', max_length=1),
         ),
         migrations.RunPython(initialize_sex_and_edit_gender_values),
         migrations.AlterField(
             model_name='person',
             name='gender',
-            field=models.CharField(blank=True, choices=[('F', 'Female'), ('H', 'Male'), ('X', 'Other')], max_length=1,
-                                   null=True),
+            field=models.CharField(blank=True, choices=[('F', 'Female'), ('H', 'Male'), ('X', 'Other')], default='',
+                                   max_length=1),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='phone_mobile',
+            field=models.CharField(blank=True, default='', max_length=30),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='phone',
+            field=models.CharField(blank=True, default='', max_length=30),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='middle_name',
+            field=models.CharField(blank=True, default='', max_length=50),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='global_id',
+            field=models.CharField(blank=True, db_index=True, default='', max_length=10),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='last_name',
+            field=models.CharField(blank=True, db_index=True, default='', max_length=50),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='external_id',
+            field=models.CharField(blank=True, db_index=True, default='', max_length=100),
+        ),
+        migrations.AlterField(
+            model_name='person',
+            name='first_name',
+            field=models.CharField(blank=True, db_index=True, default='', max_length=50),
         ),
     ]

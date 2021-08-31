@@ -75,23 +75,23 @@ class Person(SerializableModel):
     objects = SerializableModelManager()
     employees = EmployeeManager()
 
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    external_id = models.CharField(max_length=100, blank=True, default='', db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     user = models.OneToOneField(User, on_delete=models.SET_NULL, blank=True, null=True)
-    global_id = models.CharField(max_length=10, blank=True, null=True, db_index=True)
-    gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES)
-    sex = models.CharField(max_length=1, blank=True, null=True, choices=SEX_CHOICES)
+    global_id = models.CharField(max_length=10, blank=True, default='', db_index=True)
+    gender = models.CharField(max_length=1, blank=True, default='', choices=GENDER_CHOICES)
 
-    first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    middle_name = models.CharField(max_length=50, blank=True, null=True)
-    last_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    first_name_in_use = models.CharField(max_length=50, blank=True, null=True)
+    first_name = models.CharField(max_length=50, blank=True, default='', db_index=True)
+    middle_name = models.CharField(max_length=50, blank=True, default='')
+    last_name = models.CharField(max_length=50, blank=True, default='', db_index=True)
     email = models.EmailField(max_length=255, default='')
-    phone = models.CharField(max_length=30, blank=True, null=True)
-    phone_mobile = models.CharField(max_length=30, blank=True, null=True)
+    phone = models.CharField(max_length=30, blank=True, default='')
+    phone_mobile = models.CharField(max_length=30, blank=True, default='')
     language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     birth_date = models.DateField(blank=True, null=True)
 
+    sex = models.CharField(max_length=1, blank=True, default='', choices=SEX_CHOICES)
+    first_name_in_use = models.CharField(max_length=50, default='')
     birth_year = models.IntegerField(blank=True, null=True, validators=[YEAR_REGEX])
     birth_country = models.ForeignKey(
         'reference.Country',
