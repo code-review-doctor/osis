@@ -31,8 +31,10 @@ from reversion.admin import VersionAdmin
 from base.ddd.utils.business_validator import MultipleBusinessExceptions
 from base.models.enums.component_type import LECTURING
 from base.models.enums import quadrimesters, learning_unit_year_session
+from ddd.logic.learning_unit.commands import GetEffectiveClassCommand
 from learning_unit.business.create_class_copy_report import create_class_copy_report
 from osis_common.models import osis_model_admin
+from base.models.enums.learning_component_year_type import PRACTICAL_EXERCISES
 
 
 def copy_to_next_year(modeladmin, request, queryset):
@@ -42,8 +44,9 @@ def copy_to_next_year(modeladmin, request, queryset):
 
     report = []
     for obj in qs:
-        classe_source = "{} - {} — {}".format(
+        classe_source = "{}{}{} — {}".format(
             obj.learning_component_year.learning_unit_year.acronym,
+            '_' if obj.learning_component_year.type == PRACTICAL_EXERCISES else '-',
             obj.acronym,
             obj.learning_component_year.learning_unit_year.academic_year
         )
@@ -65,13 +68,19 @@ def copy_to_next_year(modeladmin, request, queryset):
         )
         try:
             new_classe_identity = message_bus_instance.invoke(cmd)
-            classe_result = "{} - {} — {}".format(
-                new_classe_identity.learning_unit_identity.code,
-                new_classe_identity.class_code,
-                new_classe_identity.learning_unit_identity.academic_year
+            cmd_get_effective_class_created = GetEffectiveClassCommand(
+                class_code=new_classe_identity.class_code,
+                learning_unit_code=new_classe_identity.learning_unit_identity.code,
+                learning_unit_year=new_classe_identity.learning_unit_identity.academic_year.year
             )
+            effective_class_created = message_bus_instance.invoke(cmd_get_effective_class_created)
+            classe_result = "{} — {}".format(
+                effective_class_created.complete_acronym,
+                effective_class_created.entity_id.learning_unit_identity.academic_year
+            )
+
         except MultipleBusinessExceptions as multiple_exceptions:
-            copy_exception = ", ". join([ex.message for ex in list(multiple_exceptions.exceptions)])
+            copy_exception = ", ". join([str(ex.message) for ex in list(multiple_exceptions.exceptions)])
 
         report.append({
             'source': classe_source,
