@@ -37,5 +37,7 @@ class ISignaletiqueEtudiantTranslator(interface.DomainService):
     def search(
             cls,
             nomas: List[str],
+            nom: str = None,
+            prenom: str = None,
     ) -> Set['SignaletiqueEtudiantDTO']:
         raise NotImplementedError

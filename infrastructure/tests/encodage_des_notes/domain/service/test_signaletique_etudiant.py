@@ -84,3 +84,21 @@ class InscriptionExamenTest(TestCase):
             )
         }
         self.assertSetEqual(expected_result, result)
+
+    def test_should_trouver_etudiant_par_nom(self):
+        student = StudentFactory()
+
+        self.assertEqual(
+            len(self.translator.search([], nom=student.person.last_name)),
+            1
+        )
+
+    def test_should_trouver_etudiant_par_prenom(self):
+        StudentFactory(person__first_name="Icampos")
+        StudentFactory(person__first_name="Icampos")
+        StudentFactory(person__first_name="Other")
+
+        self.assertEqual(
+            len(self.translator.search([], prenom="Icamp")),
+            2
+        )

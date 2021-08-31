@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Set, List
+from typing import Set, List, Dict
 
 from django.db.models import F
 
@@ -40,9 +40,15 @@ class SignaletiqueEtudiantTranslator(ISignaletiqueEtudiantTranslator):
     def search(
             cls,
             nomas: List[str],
+            nom: str = None,
+            prenom: str = None,
     ) -> Set['SignaletiqueEtudiantDTO']:
+        filter_qs = cls._build_filter(nomas, nom, prenom)
+        if not filter_qs:
+            return set()
+
         qs_as_values = Student.objects.filter(
-            registration_id__in=set(nomas),
+            **filter_qs
         ).annotate(
             noma=F('registration_id'),
             nom=F('person__last_name'),
@@ -83,3 +89,20 @@ class SignaletiqueEtudiantTranslator(ISignaletiqueEtudiantTranslator):
                 )
             )
         return result
+
+    @classmethod
+    def _build_filter(
+            cls,
+            nomas: List[str],
+            nom: str = None,
+            prenom: str = None
+    ) -> Dict:
+        filter = {}
+
+        if nomas:
+            filter["registration_id__in"] = set(nomas)
+        if nom:
+            filter["person__last_name__icontains"] = nom
+        if prenom:
+            filter["person__first_name__icontains"] = prenom
+        return filter
