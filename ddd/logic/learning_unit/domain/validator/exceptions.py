@@ -228,6 +228,5 @@ class LearningUnitNotExistingException(BusinessException):
             "You cannot create class in %(year)s because there is no learning unit corresponding in %(year)s"
         ) % {
             'year': learning_unit_year,
-            'year': learning_unit_year,
         }
         super().__init__(message, **kwargs)
