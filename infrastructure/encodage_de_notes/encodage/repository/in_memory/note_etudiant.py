@@ -23,12 +23,44 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Optional
 
 from base.ddd.utils.in_memory_repository import InMemoryGenericRepository
-from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
+from base.models.enums.exam_enrollment_justification_type import JustificationTypes
+from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
 
 
 class NoteEtudiantInMemoryRepository(InMemoryGenericRepository, INoteEtudiantRepository):
     entities = list()  # type: List[NoteEtudiant]
+
+    @classmethod
+    def search(
+            cls,
+            entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
+            noms_cohortes: List[str] = None,
+            nomas: List[str] = None,
+            note_manquante: bool = False,
+            justification: JustificationTypes = None,
+            **kwargs
+    ) -> List['NoteEtudiant']:
+        if not (entity_ids or noms_cohortes or nomas or note_manquante or justification):
+            return []
+
+        result = cls.entities
+        if entity_ids:
+            result = (note for note in result if note.entity_id in entity_ids)
+
+        if noms_cohortes:
+            result = (note for note in result if note.nom_cohorte in noms_cohortes)
+
+        if nomas:
+            result = (note for note in result if note.noma in nomas)
+
+        if note_manquante:
+            result = (note for note in result if note.is_manquant)
+
+        if justification:
+            result = (note for note in result if note.note.value == justification)
+
+        return list(result)

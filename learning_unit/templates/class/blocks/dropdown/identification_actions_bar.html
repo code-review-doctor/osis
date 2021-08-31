@@ -40,7 +40,7 @@
                 </li>
                 <li>
                     {% url "class_delete" learning_unit_year=learning_unit.year learning_unit_code=learning_unit.code class_code=effective_class.entity_id.class_code  as delete_class_url %}
-                    {% a_tag_modal_target_has_perm "#modalConfirmToDeleteClass" _('Delete class definitively') 'learning_unit.change_learningclassyear' user learning_class_year %}
+                    {% a_tag_modal_target_has_perm "#modalConfirmToDeleteClass" _('Delete class definitively') 'learning_unit.delete_learningclassyear' user learning_class_year %}
                 </li>
             </ul>
         </div>

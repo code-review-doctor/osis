@@ -1594,6 +1594,16 @@ components:
           $ref: '#/components/schemas/ConstraintTypeEnum'
         version_name:
           type: string
+        language:
+          type: string
+          description: |
+            The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+        french_friendly:
+          type: boolean
+        english_friendly:
+          type: boolean
+        exchange_students:
+          type: boolean
         children:
           type: array
           items:

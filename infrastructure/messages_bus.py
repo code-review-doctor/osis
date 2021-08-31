@@ -25,6 +25,8 @@
 ##############################################################################
 from typing import Dict, Callable, List
 
+from ddd.logic.encodage_des_notes.encodage.use_case.read.rechercher_notes_service import rechercher_notes
+
 from ddd.logic.application.commands import ApplyOnVacantCourseCommand, UpdateApplicationCommand, \
     DeleteApplicationCommand, SearchApplicationByApplicantCommand, SearchVacantCoursesCommand, \
     RenewMultipleAttributionsCommand, GetAttributionsAboutToExpireCommand, SendApplicationsSummaryCommand, \
@@ -42,10 +44,15 @@ from ddd.logic.application.use_case.write.send_applications_summary import send_
 from ddd.logic.application.use_case.write.update_application_service import update_application
 from ddd.logic.effective_class_repartition.commands import SearchAttributionsToLearningUnitCommand, \
     SearchTutorsDistributedToClassCommand, SearchAttributionCommand, DistributeClassToTutorCommand, \
-    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand
+    UnassignTutorClassCommand, EditClassVolumeRepartitionToTutorCommand, SearchClassesEnseignantCommand, \
+    SearchAttributionsEnseignantCommand
 from ddd.logic.effective_class_repartition.use_case.read.get_attribution_service import get_attribution
+from ddd.logic.effective_class_repartition.use_case.read.search_attributions_enseignant_service import \
+    search_attributions_enseignant
 from ddd.logic.effective_class_repartition.use_case.read.search_attributions_to_learning_unit_service import \
     search_attributions_to_learning_unit
+from ddd.logic.effective_class_repartition.use_case.read.search_classes_enseignant_service import \
+    search_classes_enseignant
 from ddd.logic.effective_class_repartition.use_case.read.search_effective_classes_distributed_service import \
     search_tutors_distributed_to_class
 from ddd.logic.effective_class_repartition.use_case.write.distribute_class_to_tutor_service import \
@@ -54,7 +61,7 @@ from ddd.logic.effective_class_repartition.use_case.write.edit_class_volume_repa
     edit_class_volume_repartition_to_tutor
 from ddd.logic.effective_class_repartition.use_case.write.unassign_tutor_class_service import unassign_tutor_class
 from ddd.logic.encodage_des_notes.encodage.commands import GetFeuilleDeNotesGestionnaireCommand, EncoderNotesCommand, \
-    GetCohortesGestionnaireCommand
+    GetCohortesGestionnaireCommand, RechercherNotesCommand
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_cohortes_gestionnaire import get_cohortes_gestionnaire
 from ddd.logic.encodage_des_notes.encodage.use_case.read.get_feuille_de_notes_service import \
     get_feuille_de_notes_gestionnaire
@@ -108,6 +115,8 @@ from infrastructure.effective_class_repartition.domain.service.tutor_attribution
 from infrastructure.effective_class_repartition.repository.tutor import TutorRepository
 from infrastructure.encodage_de_notes.encodage.domain.service.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireTranslator
+from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
+    NoteEtudiantGestionnaireRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.attribution_enseignant import \
     AttributionEnseignantTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.inscription_examen import InscriptionExamenTranslator
@@ -115,8 +124,6 @@ from infrastructure.encodage_de_notes.shared_kernel.service.periode_encodage_not
     PeriodeEncodageNotesTranslator
 from infrastructure.encodage_de_notes.shared_kernel.service.signaletique_etudiant import \
     SignaletiqueEtudiantTranslator
-from infrastructure.encodage_de_notes.encodage.repository.note_etudiant import NoteEtudiantRepository as \
-    NoteEtudiantGestionnaireRepository
 from infrastructure.encodage_de_notes.shared_kernel.service.unite_enseignement import UniteEnseignementTranslator
 from infrastructure.encodage_de_notes.soumission.domain.service.adresse_feuille_de_notes import \
     AdresseFeuilleDeNotesTranslator
@@ -167,6 +174,10 @@ class MessageBus:
             cmd,
             TutorAttributionToLearningUnitTranslator(),
         ),
+        SearchAttributionsEnseignantCommand: lambda cmd: search_attributions_enseignant(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+        ),
         UpdateEffectiveClassCommand: lambda cmd: update_effective_class(
             cmd,
             LearningUnitRepository(),
@@ -190,6 +201,11 @@ class MessageBus:
             cmd, EffectiveClassRepository(), LearningUnitRepository()
         ),
         SearchTutorsDistributedToClassCommand: lambda cmd: search_tutors_distributed_to_class(
+            cmd,
+            TutorAttributionToLearningUnitTranslator(),
+            TutorRepository(),
+        ),
+        SearchClassesEnseignantCommand: lambda cmd: search_classes_enseignant(
             cmd,
             TutorAttributionToLearningUnitTranslator(),
             TutorRepository(),
@@ -301,6 +317,13 @@ class MessageBus:
         GetCohortesGestionnaireCommand: lambda cmd: get_cohortes_gestionnaire(
             cmd,
             CohortesDuGestionnaireTranslator()
+        ),
+        RechercherNotesCommand: lambda cmd: rechercher_notes(
+            cmd,
+            NoteEtudiantGestionnaireRepository(),
+            PeriodeEncodageNotesTranslator(),
+            CohortesDuGestionnaireTranslator(),
+            SignaletiqueEtudiantTranslator(),
         )
 
     }  # type: Dict[CommandRequest, Callable[[CommandRequest], ApplicationServiceResult]]

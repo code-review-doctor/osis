@@ -84,6 +84,7 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
+NB_COLUMNS_WHICH_COULD_BE_WHITENED = 29
 
 
 def learning_unit_titles_part1() -> List[str]:
@@ -355,6 +356,10 @@ def get_data_part2(learning_unit_yr: LearningUnitYear, effective_class: Learning
         ])
 
     lu_data_part2.append(learning_unit_yr.language or "", )
+    lu_data_part2.append(yesno(learning_unit_yr.english_friendly).strip())
+    lu_data_part2.append(yesno(learning_unit_yr.french_friendly).strip())
+    lu_data_part2.append(yesno(learning_unit_yr.exchange_students).strip())
+    lu_data_part2.append(yesno(learning_unit_yr.individual_loan).strip())
     lu_data_part2.append(yesno(learning_unit_yr.stage_dimona).strip())
     return lu_data_part2
 
@@ -416,6 +421,10 @@ def learning_unit_titles_part2() -> List[str]:
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Language')),
+        str(_('English-friendly')),
+        str(_('French-friendly')),
+        str(_('Exchange students')),
+        str(_('Individual loan')),
         str(_('Stage-Dimona')),
     ]
 
@@ -534,7 +543,10 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                 line += 1
                 if not first:
                     cells_with_white_font.extend(
-                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(25)]
+                        [
+                            "{}{}".format(letter, line-1)
+                            for letter in _get_all_columns_reference(NB_COLUMNS_WHICH_COULD_BE_WHITENED)
+                        ]
                     )
                 first = False
         else:
@@ -561,7 +573,10 @@ def prepare_xls_content_with_attributions(found_learning_units: QuerySet, nb_col
                     line += 1
                     if not first_attribution:
                         cells_with_white_font.extend(
-                            ["{}{}".format(letter, line - 1) for letter in _get_all_columns_reference(24, 1)]
+                            [
+                                "{}{}".format(letter, line - 1)
+                                for letter in _get_all_columns_reference(NB_COLUMNS_WHICH_COULD_BE_WHITENED, 1)
+                            ]
                         )
                     first_attribution = False
             else:

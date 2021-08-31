@@ -25,16 +25,15 @@
 ##############################################################################
 from typing import List
 
-from ddd.logic.encodage_des_notes.encodage.commands import SearchNotesCommand
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import NoteEtudiantDTO
+from ddd.logic.effective_class_repartition.commands import SearchAttributionsEnseignantCommand
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorAttributionToLearningUnitDTO
 
 
-def search_notes(
-        cmd: 'SearchNotesCommand',
-) -> List['NoteEtudiantDTO']:
-    # GIVEN
-    # PeriodeSoumissionOuverte().verifier(periode_soumission_note_translator)
-
-    # WHEN
-
-    return
+# FIXME :: should be moved in another context "attribution_to_learning_unit"
+def search_attributions_enseignant(
+        cmd: SearchAttributionsEnseignantCommand,
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator'
+) -> List['TutorAttributionToLearningUnitDTO']:
+    return tutor_attribution_translator.get_by_enseignant(cmd.matricule_fgs_enseignant, cmd.annee)
