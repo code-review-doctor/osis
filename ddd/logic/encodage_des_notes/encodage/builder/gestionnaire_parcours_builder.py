@@ -47,7 +47,7 @@ class GestionnaireParcoursBuilder(interface.RootEntityBuilder):
             cls,
             matricule_gestionnaire: str,
             cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
-    ):
+    ) -> 'GestionnaireParcours':
         cohortes_gestionnaire = cohortes_gestionnaire_translator.search(matricule_gestionnaire)
         if not cohortes_gestionnaire:
             raise PasGestionnaireParcoursException()

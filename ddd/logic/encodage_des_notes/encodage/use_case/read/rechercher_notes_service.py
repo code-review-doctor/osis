@@ -25,6 +25,7 @@
 ##############################################################################
 from typing import List
 
+from ddd.logic.encodage_des_notes.encodage.builder.gestionnaire_parcours_builder import GestionnaireParcoursBuilder
 from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesCommand
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.domain.service.rechercher_notes_etudiant import RechercheNotesEtudiant
@@ -43,15 +44,17 @@ def rechercher_notes(
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
 ) -> List['NoteEtudiantDTO']:
     PeriodeEncodageOuverte().verifier(periode_encodage_note_translator)
-
+    gestionnaire_parcours = GestionnaireParcoursBuilder().get(
+        cmd.matricule_fgs_gestionnaire,
+        cohortes_gestionnaire_translator
+    )
     return RechercheNotesEtudiant().search(
-        matricule_gestionnaire=cmd.matricule_fgs_gestionnaire,
         nom_cohorte=cmd.nom_cohorte,
         noma=cmd.noma,
         nom=cmd.nom,
         prenom=cmd.prenom,
         etat=cmd.etat,
+        gestionnaire_parcours=gestionnaire_parcours,
         note_etudiant_repo=note_etudiant_repo,
-        cohortes_gestionnaire_translator=cohortes_gestionnaire_translator,
         signaletique_etudiant_translator=signaletique_etudiant_translator
     )

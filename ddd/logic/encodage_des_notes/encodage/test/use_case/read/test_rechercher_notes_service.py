@@ -31,6 +31,7 @@ from ddd.logic.encodage_des_notes.encodage.commands import RechercherNotesComman
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NOTE_MANQUANTE
 from ddd.logic.encodage_des_notes.encodage.test.factory.note_etudiant import NoteManquanteEtudiantFactory, \
     NoteEtudiantChiffreeFactory, NoteEtudiantJustificationFactory
+from ddd.logic.encodage_des_notes.soumission.domain.validator.exceptions import PasGestionnaireParcoursCohorteException
 from infrastructure.encodage_de_notes.encodage.domain.service.in_memory.cohortes_du_gestionnaire import \
     CohortesDuGestionnaireInMemory
 from infrastructure.encodage_de_notes.encodage.repository.in_memory.note_etudiant import NoteEtudiantInMemoryRepository
@@ -90,12 +91,11 @@ class TestRechercherNotes(SimpleTestCase):
 
         self.assertEqual(len(result), 4)
 
-    def test_should_return_empty_list_when_nom_cohorte_n_est_pas_une_cohorte_du_gestionnaire(self):
+    def test_should_raise_exception_when_nom_cohorte_n_est_pas_une_cohorte_du_gestionnaire(self):
         cmd = attr.evolve(self.cmd, nom_cohorte="ECGE1BA")
 
-        result = message_bus_instance.invoke(cmd)
-
-        self.assertListEqual(result, [])
+        with self.assertRaises(PasGestionnaireParcoursCohorteException):
+            message_bus_instance.invoke(cmd)
 
     def test_should_return_notes_correspondantes_when_justification_est_precise(self):
         note = NoteEtudiantJustificationFactory()

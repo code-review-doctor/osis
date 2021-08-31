@@ -26,6 +26,7 @@ from typing import List, Optional
 
 from base.models.enums.exam_enrollment_justification_type import JustificationTypes
 from ddd.logic.encodage_des_notes.encodage.domain.model._note import NOTE_MANQUANTE
+from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
@@ -39,20 +40,19 @@ class RechercheNotesEtudiant(interface.DomainService):
     @classmethod
     def search(
             cls,
-            matricule_gestionnaire: str,
             nom_cohorte: str,
             noma: str,
             nom: str,
             prenom: str,
             etat: str,
+            gestionnaire_parcours: 'GestionnaireParcours',
             note_etudiant_repo: 'INoteEtudiantRepository',
-            cohortes_gestionnaire_translator: 'ICohortesDuGestionnaire',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator'
     ) -> List['NoteEtudiantDTO']:
-        cohortes_gestionnaire = cohortes_gestionnaire_translator.search(matricule_gestionnaire)
-        noms_cohortes = [cohorte.nom_cohorte for cohorte in cohortes_gestionnaire]
+        noms_cohortes = gestionnaire_parcours.cohortes_gerees
         if nom_cohorte:
-            noms_cohortes = [nom_cohorte] if nom_cohorte in noms_cohortes else []
+            gestionnaire_parcours.verifier_gere_cohorte(nom_cohorte)
+            noms_cohortes = [nom_cohorte]
 
         note_manquante = etat == NOTE_MANQUANTE
         justification = None
