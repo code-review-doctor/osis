@@ -104,9 +104,11 @@
                         </p>
                          <div class="col-md-6">
                             <div class="pull-right">
-                                <b><span class="badge" id="scores_encoding_learning_units">0</span>
+                                <b><span class="badge" id="scores_encoding_learning_units">{{ learning_unit_count }}</span>
                                     {% trans 'learning units in' %}
-                                    <span class="badge" id="scores_encoding_programs">0</span>
+                                    <span class="badge" id="scores_encoding_programs">
+                                        {{ cohorte_count }}
+                                    </span>
                                     {% trans 'program(s)' %}.
                                 </b>
                             </div>
@@ -152,7 +154,7 @@
                                                         </a>
                                                     </td>
                                                     <td headers="tab_online_responsible">
-
+                                                        {{ progression_encodage.responsable_note.nom }} {{ progression_encodage.responsable_note.prenom }}
                                                     </td>
                                                     <td headers="tab_online_tutor_deadline">
                                                         {% for echeance in progression_encodage.dates_echeance %}

@@ -24,11 +24,11 @@
 #
 ##############################################################################
 from datetime import date
-from typing import Set, Optional
+from typing import Set, Optional, List
 
 import attr
 
-from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO
+from ddd.logic.encodage_des_notes.shared_kernel.dtos import DateDTO, EtudiantPepsDTO, DateEcheanceDTO
 from osis_common.ddd import interface
 
 
@@ -153,3 +153,17 @@ class ResponsableDeNotesDTO(interface.DTO):
     prenom = attr.ib(type=str)
     code_unite_enseignement = attr.ib(type=str)
     annee_unite_enseignement = attr.ib(type=int)
+
+
+@attr.s(frozen=True, slots=True)
+class DateEcheanceNoteDTO(interface.DTO):
+    code_unite_enseignement = attr.ib(type=str)
+    annee_unite_enseignement = attr.ib(type=int)
+    numero_session = attr.ib(type=int)
+    noma = attr.ib(type=str)
+    jour = attr.ib(type=int)
+    mois = attr.ib(type=int)
+    annee = attr.ib(type=int)
+
+    def to_date(self) -> date:
+        return date(day=self.jour, month=self.mois, year=self.annee)

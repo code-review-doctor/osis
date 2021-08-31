@@ -40,6 +40,8 @@ class INoteEtudiantRepository(interface.AbstractRepository):
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
             noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
             nomas: List[str] = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,

@@ -23,15 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import Optional
 
 from ddd.logic.encodage_des_notes.encodage.domain.model.gestionnaire_parcours import GestionnaireParcours
 from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository as \
+    INoteEtudiantSoumissionRepository
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant import \
     ISignaletiqueEtudiantTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.shared_kernel.service.progression_generale import ProgressionGeneral
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
 from ddd.logic.encodage_des_notes.shared_kernel.dtos import ProgressionGeneraleEncodageNotesDTO, PeriodeEncodageNotesDTO
 from osis_common.ddd import interface
 
@@ -44,17 +45,31 @@ class ProgressionGeneraleEncodage(interface.DomainService):
             gestionnaire: GestionnaireParcours,
             periode_encodage: PeriodeEncodageNotesDTO,
             note_etudiant_repo: 'INoteEtudiantRepository',
+            note_etudiant_soumission_repo: 'INoteEtudiantSoumissionRepository',
             responsable_notes_repo: 'IResponsableDeNotesRepository',
             signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
             unite_enseignement_translator: 'IUniteEnseignementTranslator',
-    ) -> 'ProgressionGeneraleEncodageNotesDTO':
-        notes = note_etudiant_repo.search(
-            cohorte_names=gestionnaire.cohortes_gerees,
 
+            nom_cohorte: Optional[str],
+            code_unite_enseignement: Optional[str],
+            seulement_notes_manquantes: bool = False
+    ) -> 'ProgressionGeneraleEncodageNotesDTO':
+        noms_cohortes = gestionnaire.cohortes_gerees
+        if nom_cohorte:
+            gestionnaire.verifier_gere_cohorte(nom_cohorte)
+            noms_cohortes = [nom_cohorte]
+
+        notes = note_etudiant_repo.search(
+            noms_cohortes=noms_cohortes,
+            annee_academique=periode_encodage.annee_concernee,
+            numero_session=periode_encodage.session_concernee,
+            code_unite_enseignement=code_unite_enseignement,
+            note_manquante=seulement_notes_manquantes
         )
 
         return ProgressionGeneral().get(
-            notes,
+            [note.entity_id for note in notes],
+            note_etudiant_soumission_repo,
             responsable_notes_repo,
             periode_encodage,
             signaletique_etudiant_translator,

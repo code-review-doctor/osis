@@ -34,8 +34,10 @@ from django.db.models.functions import Coalesce, Cast, Concat
 from base.models.exam_enrollment import ExamEnrollment
 from base.models.session_exam_deadline import SessionExamDeadline
 from ddd.logic.encodage_des_notes.soumission.builder.note_etudiant_builder import NoteEtudiantBuilder
+from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import UniteEnseignementIdentite
 from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
-from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO
+from ddd.logic.encodage_des_notes.soumission.dtos import NoteEtudiantFromRepositoryDTO, \
+    DateEcheanceNoteDTO
 from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository, SearchCriteria
 from osis_common.ddd.interface import ApplicationService
 
@@ -107,6 +109,35 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             )
             result.append(NoteEtudiantBuilder.build_from_repository_dto(dto_object))
         return result
+
+    @classmethod
+    def search_dates_echeances(
+            cls,
+            criterias: List[SearchCriteria]
+    ) -> List[DateEcheanceNoteDTO]:
+        q_filters = functools.reduce(
+            operator.or_,
+            [
+                Q(
+                    acronym=criteria[0],
+                    year=criteria[1],
+                    number_session=criteria[2],
+                )
+                for criteria in criterias
+            ]
+        )
+        rows = _fetch_session_exams().filter(q_filters)
+        return [
+            DateEcheanceNoteDTO(
+                code_unite_enseignement=row.acronym,
+                annee_unite_enseignement=row.year,
+                numero_session=row.number_session,
+                noma=row.noma,
+                jour=row.date_limite_de_remise.day,
+                mois=row.date_limite_de_remise.month,
+                annee=row.date_limite_de_remise.year,
+            ) for row in rows
+        ]
 
     @classmethod
     def delete(cls, entity_id: 'IdentiteNoteEtudiant', **kwargs: ApplicationService) -> None:

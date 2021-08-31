@@ -28,6 +28,9 @@ from ddd.logic.encodage_des_notes.encodage.commands import GetProgressionGeneral
 from ddd.logic.encodage_des_notes.encodage.domain.service.i_cohortes_du_gestionnaire import ICohortesDuGestionnaire
 from ddd.logic.encodage_des_notes.encodage.domain.service.progression_generale_encodage import \
     ProgressionGeneraleEncodage
+from ddd.logic.encodage_des_notes.encodage.repository.note_etudiant import INoteEtudiantRepository
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository as \
+    INoteEtudiantSoumissionRepository
 from ddd.logic.encodage_des_notes.shared_kernel.service.periode_encodage_ouverte import PeriodeEncodageOuverte
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_periode_encodage_notes import \
     IPeriodeEncodageNotesTranslator
@@ -41,6 +44,7 @@ from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes i
 def get_progression_generale_gestionnaire(
         cmd: 'GetProgressionGeneraleGestionnaireCommand',
         note_etudiant_repo: 'INoteEtudiantRepository',
+        note_etudiant_soumission_repo: 'INoteEtudiantSoumissionRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
         periode_encodage_note_translator: 'IPeriodeEncodageNotesTranslator',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
@@ -56,7 +60,12 @@ def get_progression_generale_gestionnaire(
         gestionnaire=gestionnaire,
         periode_encodage=periode_encodage,
         note_etudiant_repo=note_etudiant_repo,
+        note_etudiant_soumission_repo=note_etudiant_soumission_repo,
         responsable_notes_repo=responsable_notes_repo,
         signaletique_etudiant_translator=signaletique_etudiant_translator,
         unite_enseignement_translator=unite_enseignement_translator,
+
+        nom_cohorte=cmd.nom_cohorte,
+        code_unite_enseignement=cmd.code_unite_enseignement,
+        seulement_notes_manquantes=cmd.seulement_notes_manquantes
     )

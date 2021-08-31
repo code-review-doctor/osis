@@ -49,12 +49,22 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
             noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
             nomas: List[str] = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
             **kwargs
     ) -> List['NoteEtudiant']:
-        filter_qs = cls._build_filter(entity_ids, noms_cohortes, nomas, note_manquante, justification)
+        filter_qs = cls._build_filter(
+            entity_ids,
+            noms_cohortes,
+            annee_academique,
+            numero_session,
+            nomas,
+            note_manquante,
+            justification
+        )
 
         if not filter_qs:
             return []
@@ -81,6 +91,8 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
             cls,
             entity_ids: Optional[List['IdentiteNoteEtudiant']] = None,
             noms_cohortes: List[str] = None,
+            annee_academique: int = None,
+            numero_session: int = None,
             nomas: List[str] = None,
             note_manquante: bool = False,
             justification: JustificationTypes = None,
@@ -116,6 +128,14 @@ class NoteEtudiantRepository(INoteEtudiantRepository):
         if justification:
             result.append(
                 Q(note=justification.name)
+            )
+        if annee_academique:
+            result.append(
+                Q(annee_academique=annee_academique)
+            )
+        if numero_session:
+            result.append(
+                Q(numero_session=numero_session)
             )
         return result
 

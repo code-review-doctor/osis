@@ -33,8 +33,9 @@ from ddd.logic.encodage_des_notes.shared_kernel.service.i_signaletique_etudiant 
 from ddd.logic.encodage_des_notes.shared_kernel.service.i_unite_enseignement import IUniteEnseignementTranslator
 from ddd.logic.encodage_des_notes.soumission.domain.model._unite_enseignement_identite import \
     UniteEnseignementIdentite, UniteEnseignementIdentiteBuilder
-from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant
+from ddd.logic.encodage_des_notes.soumission.domain.model.note_etudiant import NoteEtudiant, IdentiteNoteEtudiant
 from ddd.logic.encodage_des_notes.soumission.dtos import UniteEnseignementDTO, ResponsableDeNotesDTO
+from ddd.logic.encodage_des_notes.soumission.repository.i_note_etudiant import INoteEtudiantRepository
 from ddd.logic.encodage_des_notes.soumission.repository.i_responsable_de_notes import IResponsableDeNotesRepository
 from osis_common.ddd import interface
 
@@ -43,35 +44,42 @@ class ProgressionGeneral(interface.DomainService):
     @classmethod
     def get(
         cls,
-        notes: List['NoteEtudiant'],
+        note_identites: List['IdentiteNoteEtudiant'],
+        note_etudiant_soumission_repo: 'INoteEtudiantRepository',
         responsable_notes_repo: 'IResponsableDeNotesRepository',
         periode_encodage: 'PeriodeEncodageNotesDTO',
         signaletique_etudiant_translator: 'ISignaletiqueEtudiantTranslator',
         unite_enseignement_translator: 'IUniteEnseignementTranslator',
     ) -> 'ProgressionGeneraleEncodageNotesDTO':
-        nomas_concernes = [note.noma for note in notes]
+        nomas_concernes = [note.noma for note in note_identites]
         nomas_avec_peps = _get_nomas_avec_peps(nomas_concernes, signaletique_etudiant_translator)
 
-        detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
-            {(note.code_unite_enseignement, note.annee) for note in notes},
-            unite_enseignement_translator,
-        )
-        responsable_notes_par_code = _get_responsable_notes_par_unite_enseignement(
-            {
+        if note_identites:
+            detail_unite_enseignement_par_code = _get_detail_unite_enseignement_par_code(
+                {(note.code_unite_enseignement, note.annee_academique) for note in note_identites},
+                unite_enseignement_translator,
+            )
+            identites_unites_enseignements = {
                 UniteEnseignementIdentiteBuilder.build_from_code_and_annee(
                     code_unite_enseignement=note.code_unite_enseignement,
-                    annee_academique=note.annee,
-                )
-                for note in notes
-            },
-            responsable_notes_repo,
-        )
+                    annee_academique=note.annee_academique,
+                ) for note in note_identites
+            }
+            dates_echeances_par_code_unite_enseigement = _get_dates_echeances_par_unite_enseignement(
+                identites_unites_enseignements,
+                note_etudiant_soumission_repo
+            )
+            responsable_notes_par_code = _get_responsable_notes_par_unite_enseignement(
+                identites_unites_enseignements,
+                responsable_notes_repo,
+            )
 
         progressions = []
-        notes_ordonnee_ue = sorted(notes, key=lambda note: note.code_unite_enseignement)
-        for code_ue, notes_par_ue in itertools.groupby(notes_ordonnee_ue, lambda note: note.code_unite_enseignement):
+        notes_ordonnee_ue = sorted(note_identites, key=lambda note_id: note_id.code_unite_enseignement)
+        for code_ue, notes_id_par_ue in itertools.groupby(notes_ordonnee_ue, lambda note: note.code_unite_enseignement):
             progression_par_ue = cls._compute_progression_par_unite_enseignement(
-                list(notes_par_ue),
+                list(notes_id_par_ue),
+                dates_echeances_par_code_unite_enseigement[code_ue],
                 nomas_avec_peps,
                 detail_unite_enseignement_par_code[code_ue],
                 responsable_notes_par_code.get(code_ue)
@@ -87,32 +95,33 @@ class ProgressionGeneral(interface.DomainService):
     @classmethod
     def _compute_progression_par_unite_enseignement(
             cls,
-            notes: List['NoteEtudiant'],
+            notes_identites: List[IdentiteNoteEtudiant],
+            dates_echeances: List[DateEcheanceDTO],
             nomas_avec_peps: Set[str],
             detail_unite_enseignement: UniteEnseignementDTO,
             responsable_notes: Optional[ResponsableDeNotesDTO]
     ):
-        dates_echeance = []
-        notes_ordonnee_date_remise = sorted(notes, key=lambda note: note.date_limite_de_remise)
-        for date_limite_de_remise, notes_grouped in itertools.groupby(
-                notes_ordonnee_date_remise, lambda note: note.date_limite_de_remise
-        ):
-            notes_grouped = list(notes_grouped)
-            dates_echeance.append(
-                DateEcheanceDTO(
-                    jour=date_limite_de_remise.jour,
-                    mois=date_limite_de_remise.mois,
-                    annee=date_limite_de_remise.annee,
-                    quantite_notes_soumises=sum(1 for n in notes_grouped if n.est_soumise),
-                    quantite_total_notes=len(notes_grouped),
-                )
-            )
+        # dates_echeance = []
+        # notes_ordonnee_date_remise = sorted(notes, key=lambda note: note.date_limite_de_remise)
+        # for date_limite_de_remise, notes_grouped in itertools.groupby(
+        #         notes_ordonnee_date_remise, lambda note: note.date_limite_de_remise
+        # ):
+        #     notes_grouped = list(notes_grouped)
+        #     dates_echeance.append(
+        #         DateEcheanceDTO(
+        #             jour=date_limite_de_remise.jour,
+        #             mois=date_limite_de_remise.mois,
+        #             annee=date_limite_de_remise.annee,
+        #             quantite_notes_soumises=sum(1 for n in notes_grouped if n.est_soumise),
+        #             quantite_total_notes=len(notes_grouped),
+        #         )
+        #     )
 
         return ProgressionEncodageNotesUniteEnseignementDTO(
             code_unite_enseignement=detail_unite_enseignement.code,
             intitule_complet_unite_enseignement=detail_unite_enseignement.intitule_complet,
-            dates_echeance=dates_echeance,
-            a_etudiants_peps=any(note.noma in nomas_avec_peps for note in notes),
+            dates_echeance=dates_echeances,
+            a_etudiants_peps=any(note.noma in nomas_avec_peps for note in notes_identites),
             responsable_note=EnseignantDTO(
                 nom=responsable_notes.nom,
                 prenom=responsable_notes.prenom,
@@ -142,3 +151,36 @@ def _get_responsable_notes_par_unite_enseignement(
 ) -> Dict[str, ResponsableDeNotesDTO]:
     responsables_notes = responsable_notes_repo.search_dto(unite_enseignement_identities)
     return {resp.code_unite_enseignement: resp for resp in responsables_notes}
+
+
+def _get_dates_echeances_par_unite_enseignement(
+    unite_enseignement_identities: Set[UniteEnseignementIdentite],
+    note_etudiant_soumission_repo: 'INoteEtudiantRepository',
+    periode_encodage: 'PeriodeEncodageNotesDTO',
+) -> Dict[str, List[DateEcheanceDTO]]:
+    dates_echeances_notes = note_etudiant_soumission_repo.search_dates_echeances(
+        criterias=[
+            (
+                unite_enseignement_id.code_unite_enseignement,
+                unite_enseignement_id.annee_academique,
+                periode_encodage.session_concernee
+            ) for unite_enseignement_id in unite_enseignement_identities
+        ]
+    )
+
+    dates_echeances = []
+    dates_echeances_ordonee = sorted(dates_echeances_notes, key=lambda echeance_note: echeance_note.to_date())
+    for date_limite_de_remise, notes_grouped in itertools.groupby(
+            dates_echeances_ordonee, lambda echeance_note: echeance_note.to_date()
+    ):
+        notes_grouped = list(notes_grouped)
+        dates_echeances.append(
+            DateEcheanceDTO(
+                jour=date_limite_de_remise.jour,
+                mois=date_limite_de_remise.mois,
+                annee=date_limite_de_remise.annee,
+                quantite_notes_soumises=sum(1 for n in notes_grouped if n.est_soumise),
+                quantite_total_notes=len(notes_grouped),
+            )
+        )
+    return dates_echeances
