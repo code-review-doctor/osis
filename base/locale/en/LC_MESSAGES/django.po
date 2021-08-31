@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-30 11:04+0200\n"
+"POT-Creation-Date: 2021-08-31 11:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1028,6 +1028,10 @@ msgstr ""
 msgid "Female"
 msgstr ""
 
+msgctxt "female gender"
+msgid "Female"
+msgstr ""
+
 msgid "Fill this transition version"
 msgstr ""
 
@@ -1467,6 +1471,10 @@ msgstr ""
 msgid "Major list choice"
 msgstr ""
 
+msgid "Male"
+msgstr ""
+
+msgctxt "gender male"
 msgid "Male"
 msgstr ""
 

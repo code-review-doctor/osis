@@ -32,7 +32,7 @@ from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from base.models.enums import person_source_type
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
@@ -58,8 +58,8 @@ class EmployeeManager(SerializableModelManager):
 
 class Person(SerializableModel):
     GENDER_CHOICES = (
-        ('F', _('Female')),
-        ('H', _('Male')),
+        ('F', pgettext_lazy("female gender", "Female")),
+        ('H', pgettext_lazy("gender male", "Male")),
         ('X', _('Other'))
     )
     SEX_CHOICES = (
