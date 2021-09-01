@@ -106,7 +106,7 @@ class SpecificVersionForm(forms.Form):
         )
         choices_years = [
             (year, display_as_academic_year(year))
-            for year in range(self.tree_version_identity.year, max_year + 1)
+            for year in reversed(range(self.tree_version_identity.year, max_year + 1))
         ]
 
         standard_version_identity = attr.evolve(self.tree_version_identity, version_name=program_tree_version.STANDARD)

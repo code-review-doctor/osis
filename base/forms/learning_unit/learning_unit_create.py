@@ -141,7 +141,8 @@ class LearningUnitYearModelForm(PermissionFieldMixin, ValidationRuleMixin, forms
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure',
                   'professional_integration', 'stage_dimona', 'campus', 'language', 'periodicity',
-                  'faculty_remark', 'other_remark', 'other_remark_english')
+                  'faculty_remark', 'other_remark', 'other_remark_english', 'individual_loan', 'exchange_students',
+                  'french_friendly', 'english_friendly')
         field_classes = {'acronym': AcronymField}
         error_messages = {
             'credits': {

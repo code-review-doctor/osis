@@ -31,7 +31,13 @@
         <li><a href="{{ search_url }}" id="lnk_learning_units">{{ search_tab }}</a></li>
     {% endif %}
 {% endwith %}
-<li>{% if learning_unit_year.id %}<a href="{% url 'learning_unit' learning_unit_year.id %}">{{ learning_unit_year.acronym }}</a>{% else %}{% trans 'Learning unit' %}{% endif %}</li>
+<li>
+    {% if learning_unit_year.id %}
+        <a href="{% url 'learning_unit' learning_unit_year.id %}">{{ learning_unit_year.acronym }}</a>
+    {% else %}
+        {% trans 'Learning unit' %}
+    {% endif %}
+</li>
 {% if effective_class %}
     <li class="active">{{ effective_class.complete_acronym }}</li>
 {% endif %}

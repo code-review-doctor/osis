@@ -27,13 +27,68 @@
 <div class="row">
     {% bootstrap_field learning_unit_year_form.credits form_group_class="col-md-3" field_class="ignore-js-validator" %}
     {% bootstrap_field learning_unit_year_form.periodicity form_group_class="col-md-3" %}
-    {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-2" %}
-    {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-4" %}
+    {% bootstrap_field learning_unit_year_form.status form_group_class="col-md-3" %}
+
+    <div class="col-md-3 individual-loan-group" style="display: inline">
+        {{ learning_unit_year_form.individual_loan }}
+        {% trans 'Individual loan' %}
+        <abbr title="{% trans 'Indicates if the UE can be accessible for a student, even if the UE is not included in the detailed program of his training' %}">
+        <span class="glyphicon glyphicon-question-sign "
+              title="{% trans 'Indicates if the UE can be accessible for a student, even if the UE is not included in the detailed program of his training' %}"
+              style="font-size: 14pt; display: inline">
+        </span>
+        </abbr>
+    </div>
+</div>
+
+<br>
+
+<div class="row">
+    {% bootstrap_field learning_unit_year_form.language form_group_class="col-md-3" %}
+    <div class="col-md-3 english-friendly-group">
+        {{ learning_unit_year_form.english_friendly }}
+        {% trans 'English-friendly' %}
+        <abbr title="{% trans "Indicates, for the UE whose teaching language is not English, if this UE is however accessible to English speaking students. If the language of instruction is English, the value of this field must be 'no'" %}">
+            <span class="glyphicon glyphicon-question-sign "
+                  title="{% trans "Indicates, for the UE whose teaching language is not English, if this UE is however accessible to English speaking students. If the language of instruction is English, the value of this field must be 'no'" %}"
+                  style="font-size: 14pt; display: inline">
+            </span>
+        </abbr>
+    </div>
+    <div class="col-md-3 french-friendly-group">
+        {{ learning_unit_year_form.french_friendly }}
+        {% trans 'French-friendly' %}
+        <abbr title="{% trans "Indicates, for the UE whose language of instruction is not French, if this UE is nevertheless accessible to French speaking students. If the language of instruction is French, the value of this field must be 'no'" %}">
+            <span class="glyphicon glyphicon-question-sign "
+                  title="{% trans "Indicates, for the UE whose language of instruction is not French, if this UE is nevertheless accessible to French speaking students. If the language of instruction is French, the value of this field must be 'no'" %}"
+                  style="font-size: 14pt; display: inline">
+            </span>
+        </abbr>
+    </div>
+    <div class="col-md-3 exchange-students-group">
+        {{ learning_unit_year_form.exchange_students }}
+        {% trans 'Exchange students' %}
+        <abbr title="{% trans 'Indicates if this UE is accessible to exchange students' %}">
+            <span class="glyphicon glyphicon-question-sign "
+                  title="{% trans 'Indicates if this UE is accessible to exchange students' %}"
+                  style="font-size: 14pt; display: inline">
+            </span>
+        </abbr>
+    </div>
 </div>
 
 <br>
 
 <div class="row">
     {% bootstrap_field learning_unit_year_form.professional_integration form_group_class="col-md-3" %}
-    {% bootstrap_field learning_unit_year_form.stage_dimona form_group_class="col-md-3" %}
+    <div class="col-md-3 stage-dimona-group" style="display: inline">
+        {{ learning_unit_year_form.stage_dimona }}
+        {% trans 'Stage-Dimona' %}
+        <abbr title="{% trans "Indicates if the UE includes an internship, so that students enrolled in this UE must be declared to the DIMONA" %}">
+            <span class="glyphicon glyphicon-question-sign "
+                  title="{% trans "Indicates if the UE includes an internship, so that students enrolled in this UE must be declared to the DIMONA" %}"
+                  style="font-size: 14pt; display: inline">
+            </span>
+        </abbr>
+    </div>
 </div>

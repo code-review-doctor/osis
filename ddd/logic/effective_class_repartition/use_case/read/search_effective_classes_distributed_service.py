@@ -23,16 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Optional
+from typing import List
 
+from ddd.logic.effective_class_repartition.commands import SearchTutorsDistributedToClassCommand
+from ddd.logic.effective_class_repartition.domain.service.class_distribution_with_attribution import \
+    ClassDistributionWithAttribution
+from ddd.logic.effective_class_repartition.domain.service.i_tutor_attribution import \
+    ITutorAttributionToLearningUnitTranslator
+from ddd.logic.effective_class_repartition.dtos import TutorClassRepartitionDTO
+from ddd.logic.effective_class_repartition.repository.i_tutor import ITutorRepository
 from ddd.logic.learning_unit.builder.effective_class_identity_builder import EffectiveClassIdentityBuilder
-from infrastructure.learning_unit.domain.service.tutor_distributed_to_class import TutorDistributedToClass
 
 
-def has_class_repartition_service(
-        cmd: 'HasClassRepartitionCommand'
-) -> Optional[str]:
-    effective_class_identity = EffectiveClassIdentityBuilder.build_from_command(cmd)
-    return TutorDistributedToClass.get_first_tutor_full_name_if_exists(
-        effective_class_identity
+# TODO :: unit test
+def search_tutors_distributed_to_class(
+        cmd: 'SearchTutorsDistributedToClassCommand',
+        tutor_attribution_translator: 'ITutorAttributionToLearningUnitTranslator',
+        tutor_repository: 'ITutorRepository'
+) -> List['TutorClassRepartitionDTO']:
+    class_identity = EffectiveClassIdentityBuilder.build_from_code_and_learning_unit_identity_data(
+        class_code=cmd.class_code,
+        learning_unit_year=cmd.learning_unit_year,
+        learning_unit_code=cmd.learning_unit_code,
+    )
+    return ClassDistributionWithAttribution().search_by_effective_class(
+        class_identity,
+        tutor_attribution_translator,
+        tutor_repository
     )
